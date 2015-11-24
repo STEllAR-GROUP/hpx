@@ -23,6 +23,7 @@
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
 
+#include <memory>
 #include <numeric>
 
 namespace hpx { namespace agas
@@ -112,6 +113,8 @@ struct HPX_EXPORT response
       , parcelset::endpoints_type const& endpoints_
       , error status_ = success
         );
+
+    ~response();
 
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
@@ -220,9 +223,7 @@ struct HPX_EXPORT response
 
     namespace_action_code mc; //-V707
     error status;
-
-    // FIXME: std::unique_ptr doesn't seem to work with incomplete types
-    boost::shared_ptr<response_data> data;
+    std::unique_ptr<response_data> data;
 };
 
 }

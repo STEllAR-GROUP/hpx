@@ -48,8 +48,6 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
 
-namespace local { template <typename T> struct channel; }
-
 namespace detail
 {
     template <typename Result> struct future_data;
@@ -741,8 +739,7 @@ namespace detail
         {
             if (!started_test())
                 return future_status::deferred; //-V110
-            else
-                return this->future_data<Result>::wait_until(abs_time, ec);
+            return this->future_data<Result>::wait_until(abs_time, ec);
         };
 
     private:

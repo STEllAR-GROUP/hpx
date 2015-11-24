@@ -15,7 +15,6 @@
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/mpl/assert.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -34,11 +33,9 @@ namespace hpx { namespace util { namespace detail
             // that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro
             // somewhere in a source file, but the header in which the function
             // is defined misses a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION
-            BOOST_MPL_ASSERT_MSG(
-                traits::needs_automatic_registration<Function>::value
-              , HPX_UTIL_REGISTER_FUNCTION_DECLARATION_MISSING
-              , (Function)
-            );
+            static_assert(
+                traits::needs_automatic_registration<Function>::value,
+                "HPX_UTIL_REGISTER_FUNCTION_DECLARATION missing");
             return util::type_id<Function>::typeid_.type_id();
         }
 #endif

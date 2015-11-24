@@ -21,7 +21,7 @@
 #include <vector>
 #include <iosfwd>
 #include <limits>
-#if defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
+#if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
             && HPX_HAVE_MAX_CPU_COUNT > 64)
 #include <bitset>
 #endif
@@ -29,7 +29,7 @@
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
              && HPX_HAVE_MAX_CPU_COUNT <= 64)
     typedef boost::uint64_t mask_type;
     typedef boost::uint64_t mask_cref_type;
@@ -90,6 +90,18 @@ namespace hpx { namespace threads
     inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
     {
         return lhs == rhs;
+    }
+
+    // return true if at least one of the masks has a bit set
+    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    {
+        return (lhs | rhs) != 0;
+    }
+
+    // return true if at least one bit is set in both masks
+    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    {
+        return (lhs & rhs) != 0;
     }
 
 #define HPX_CPU_MASK_PREFIX "0x"
@@ -170,6 +182,32 @@ namespace hpx { namespace threads
             }
         }
         return true;
+    }
+
+    // return true if at least one of the masks has a bit set
+    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t numbits)
+    {
+        for (std::size_t j = 0; j != numbits; ++j)
+        {
+            if (test(lhs, j) || test(rhs, j))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // return true if at least one bit is set in both masks
+    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t numbits)
+    {
+        for (std::size_t j = 0; j != numbits; ++j)
+        {
+            if (test(lhs, j) && test(rhs, j))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 #endif
     /// \endcond

@@ -13,8 +13,6 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
 
-#include <hpx/util/memory_chunk_pool.hpp>
-
 #include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
@@ -28,12 +26,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     struct sender_connection
       : parcelset::parcelport_connection<
             sender_connection
-          , std::vector<
-                char
-              , util::detail::memory_chunk_pool_allocator<
-                    char, util::memory_chunk_pool<>
-                >
-            >
+          , std::vector<char>
         >
     {
     private:
@@ -43,13 +36,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
 
-        typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef
-            util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>>
-            allocator_type;
-        typedef
-            std::vector<char, allocator_type>
-            data_type;
+        typedef std::vector<char> data_type;
 
         enum connection_state
         {
@@ -68,18 +55,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         sender_connection(
             sender_type * s
           , int dst
-          , memory_pool_type & chunk_pool
           , performance_counters::parcels::gatherer & parcels_sent
         )
-          : base_type(allocator_type(chunk_pool))
-          , state_(initialized)
+          : state_(initialized)
           , sender_(s)
           , dst_(dst)
           , request_(MPI_REQUEST_NULL)
           , request_ptr_(0)
           , chunks_idx_(0)
           , ack_(0)
-          , chunk_pool_(chunk_pool)
           , parcels_sent_(parcels_sent)
           , there_(
                 parcelset::locality(
@@ -319,8 +303,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         MPI_Request *request_ptr_;
         std::size_t chunks_idx_;
         char ack_;
-
-        memory_pool_type & chunk_pool_;
 
         performance_counters::parcels::gatherer & parcels_sent_;
 

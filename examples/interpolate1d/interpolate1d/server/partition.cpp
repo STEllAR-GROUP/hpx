@@ -71,5 +71,5 @@ HPX_REGISTER_ACTION(partition_type::interpolate_action,
     partition_interpolate_action);
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::simple_component<partition_type>,
+    hpx::components::component<partition_type>,
     interpolate1d_partition_type);

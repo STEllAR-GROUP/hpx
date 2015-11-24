@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <boost/interprocess/errors.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/static_assert.hpp>
 
 #include <string>
 
@@ -68,8 +67,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 using namespace boost::interprocess;
 
                 // make sure our assumption about error codes is reasonably correct
-                BOOST_STATIC_ASSERT(sizeof(error_names)/sizeof(error_names[0]) ==
-                    timeout_when_waiting_error+1);
+                static_assert(
+                    sizeof(error_names)/sizeof(error_names[0]) ==
+                    timeout_when_waiting_error+1,
+                    "sizeof(error_names)/sizeof(error_names[0]) == "
+                    "timeout_when_waiting_error+1");
 
                 if (value >= no_error && value <= timeout_when_waiting_error)
                     return std::string("IPC(") + error_names[value] + ")";

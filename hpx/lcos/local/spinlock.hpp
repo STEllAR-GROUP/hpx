@@ -22,7 +22,7 @@
 #include <boost/thread/locks.hpp>
 
 #if defined(BOOST_WINDOWS)
-#  include <boost/smart_ptr/detail/spinlock_w32.hpp>
+#  include <boost/smart_ptr/detail/spinlock.hpp>
 #else
 #  if !defined(__ANDROID__) && !defined(ANDROID)
 #    include <boost/smart_ptr/detail/spinlock_sync.hpp>
@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace local
         // returns whether the mutex has been acquired
         bool acquire_lock()
         {
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
@@ -171,7 +171,7 @@ namespace hpx { namespace lcos { namespace local
 
         void relinquish_lock()
         {
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
             *const_cast<boost::uint64_t volatile*>(&v_) = 0;
 #else

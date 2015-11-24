@@ -15,9 +15,9 @@ take care of setting up various __cmake__ variables like compilers etc. They are
 in the `cmake/toolchains` directory:
 
 * [link hpx.manual.build_system.building_hpx.cmake_toolchains.Cray_Intel Cray-Intel]
+* [link hpx.manual.build_system.building_hpx.cmake_toolchains.ARM_gcc ARM-gcc]
 * [link hpx.manual.build_system.building_hpx.cmake_toolchains.BGQ BGQ]
 * [link hpx.manual.build_system.building_hpx.cmake_toolchains.BGION_gcc BGION-gcc]
-* [link hpx.manual.build_system.building_hpx.cmake_toolchains.ARM_gcc ARM-gcc]
 * [link hpx.manual.build_system.building_hpx.cmake_toolchains.XeonPhi XeonPhi]
 
 
@@ -81,6 +81,25 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     endif()
     # We do a cross compilation here ...
     set(CMAKE_CROSSCOMPILING ON CACHE BOOL "")
+``
+
+[heading:ARM_gcc ARM-gcc]
+
+``
+    # Copyright (c) 2015 Thomas Heller
+    #
+    # Distributed under the Boost Software License, Version 1.0. (See accompanying
+    # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    set(CMAKE_SYSTEM_NAME Linux)
+    set(CMAKE_CROSSCOMPILING ON)
+    # Set the gcc Compiler
+    set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++-4.8)
+    set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc-4.8)
+    set(HPX_WITH_GENERIC_CONTEXT_COROUTINES ON CACHE BOOL "enable generic coroutines")
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 ``
 
 [heading:BGQ BGQ]
@@ -205,25 +224,6 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     set(HPX_WITH_TESTS_EXTERNAL_BUILD OFF CACHE BOOL "Turn off build of cmake build tests")
     set(DART_TESTING_TIMEOUT           45  CACHE STRING "Life is too short")
     # HPX_WITH_STATIC_LINKING
-``
-
-[heading:ARM_gcc ARM-gcc]
-
-``
-    # Copyright (c) 2015 Thomas Heller
-    #
-    # Distributed under the Boost Software License, Version 1.0. (See accompanying
-    # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-    set(CMAKE_SYSTEM_NAME Linux)
-    set(CMAKE_CROSSCOMPILING ON)
-    # Set the gcc Compiler
-    set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++-4.8)
-    set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc-4.8)
-    set(HPX_WITH_GENERIC_CONTEXT_COROUTINES ON CACHE BOOL "enable generic coroutines")
-    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 ``
 
 [heading:XeonPhi XeonPhi]

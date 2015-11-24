@@ -11,6 +11,7 @@
 
 #include "boost/filesystem/operations.hpp"
 #include "boost/lexical_cast.hpp"
+#include "function_hyper.hpp"
 
 #include <string>
 #include <algorithm>
@@ -46,7 +47,7 @@ namespace boost
       if ( (pos = leaf.find_first_not_of( allowable )) != string::npos )
       {
         ++m_name_errors;
-        error( library_name, full_path, string(name())
+        error( library_name, full_path, loclink(full_path, string(name()))
             + " file or directory name contains unacceptable character '"
             + leaf[pos] + "'" );
       }
@@ -55,7 +56,7 @@ namespace boost
       if ( std::strchr( initial_char, leaf[0] ) == 0 )
       {
         ++m_name_errors;
-        error( library_name, full_path, string(name())
+        error( library_name, full_path, loclink(full_path, string(name()))
             + " file or directory name begins with an unacceptable character" );
       }
 
@@ -65,7 +66,7 @@ namespace boost
         if ( std::strchr( leaf.c_str(), '.' ) )
         {
           ++m_name_errors;
-          error( library_name, full_path, string(name())
+          error( library_name, full_path, loclink(full_path, string(name()))
               + " directory name contains a dot character ('.')" );
         }
       }
@@ -90,7 +91,7 @@ namespace boost
       {
         ++m_name_errors;
         error( library_name, full_path,
-            string(name())
+            loclink(full_path, string(name()))
             + " path will exceed "
             + boost::lexical_cast<string>(max_relative_path)
             + " characters in a directory tree with a root in the form "

@@ -7,6 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_ARITHMETICS_COUNTER_APR_10_2013_1002AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -20,10 +21,10 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     class arithmetics_counter
       : public base_performance_counter,
-        public components::managed_component_base<
+        public components::component_base<
             arithmetics_counter<Operation> >
     {
-        typedef components::managed_component_base<
+        typedef components::component_base<
             arithmetics_counter<Operation> > base_type;
 
     public:

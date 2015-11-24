@@ -34,17 +34,11 @@ namespace hpx { namespace traits
         {
             return rhs;
         }
-#if __GNUC__ == 4 && __GNUC_MINOR__ == 4
-        static Result&& call(Result&& rhs)
-        {
-            return rhs;
-        }
-#else
+
         static Result && call(Result && rhs)
         {
             return std::move(rhs);
         }
-#endif
     };
 }}
 

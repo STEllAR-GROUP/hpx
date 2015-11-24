@@ -7,6 +7,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "length_check.hpp"
+#include "function_hyper.hpp"
 #include <iostream>
 #include <functional>
 #include <string>
@@ -131,7 +132,8 @@ namespace boost
             p = 0;
             while (p < lineorder.size())
             {
-                total += lineorder[p];
+                total += linelink(full_path, lineorder[p]);
+                //linelink is located in function_hyper.hpp
                 if (p < lineorder.size() - 1)
                 {
                     total += ", ";

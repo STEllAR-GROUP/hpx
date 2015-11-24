@@ -348,7 +348,7 @@ namespace hpx { namespace parcelset
 
     namespace detail
     {
-        void parcel_sent_handler(parcelhandler::write_handler_type && f,
+        void parcel_sent_handler(parcelhandler::write_handler_type & f,
             boost::system::error_code const & ec, parcel const & p)
         {
             // inform termination detection of a sent message
@@ -428,8 +428,7 @@ namespace hpx { namespace parcelset
         using util::placeholders::_1;
         using util::placeholders::_2;
         write_handler_type wrapped_f =
-            util::bind(util::one_shot(&detail::parcel_sent_handler),
-                std::move(f), _1, _2);
+            util::bind(&detail::parcel_sent_handler, std::move(f), _1, _2);
 
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.

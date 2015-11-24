@@ -27,11 +27,10 @@ set(documentation_dependencies
     "${PROJECT_SOURCE_DIR}/examples/quickstart/hello_world.cpp"
     "${PROJECT_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
     "${PROJECT_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/server/managed_accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/stubs/managed_accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/managed_accumulator_client.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/server/accumulator.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator_client.cpp"
     "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp"
     "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp"
     "${PROJECT_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp"
@@ -89,6 +88,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_intersection.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_symmetric_difference.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_union.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/sort.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
@@ -309,8 +309,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=460
-                boost.image.h=106
+                boost.image.w=479
+                boost.image.h=104
                 boost.image.alt="HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

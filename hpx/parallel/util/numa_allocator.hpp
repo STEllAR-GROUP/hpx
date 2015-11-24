@@ -14,6 +14,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -107,7 +108,10 @@ namespace hpx { namespace parallel { namespace util
                             hpx::threads::mask_cref_type thread_mask =
                                 traits::get_pu_mask(executors_[i], topo_, thread_num);
 
-                            HPX_ASSERT(mem_mask & thread_mask);
+                            HPX_ASSERT(threads::mask_size(mem_mask) ==
+                                threads::mask_size(thread_mask));
+                            HPX_ASSERT(threads::bit_and(mem_mask, thread_mask,
+                                threads::mask_size(mem_mask)));
 #endif
                         })
                 );

@@ -23,7 +23,6 @@
 #include <numeric>
 #include <iterator>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -33,6 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // inner_product
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct inner_product
           : public detail::algorithm<inner_product<T>, T>
@@ -172,11 +172,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter2>::iterator_category
             iterator_category_2;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag,
                 iterator_category_1>::value),
             "Requires at least input iterator.");
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag,
                 iterator_category_2>::value),
             "Requires at least input iterator.");
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     it.
     ///                     The type \a Ret must be
     ///                     such that it can be implicitly converted to a type
-    ///                     of \t.
+    ///                     of \tT.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -289,11 +289,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter2>::iterator_category
             iterator_category_2;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag,
                 iterator_category_1>::value),
             "Requires at least input iterator.");
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag,
                 iterator_category_2>::value),
             "Requires at least input iterator.");

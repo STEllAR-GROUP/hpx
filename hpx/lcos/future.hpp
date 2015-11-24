@@ -29,7 +29,6 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -1148,7 +1147,7 @@ namespace hpx { namespace lcos
     {
         try
         {
-            throw e;
+            boost::throw_exception(e);
         } catch (...) {
             return lcos::make_exceptional_future<T>(boost::current_exception());
         }

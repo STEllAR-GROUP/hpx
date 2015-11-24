@@ -1,4 +1,5 @@
 # Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2015 Andreas Schäfer
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,12 +13,19 @@ function(hpx_check_compiler_compatibility)
   endif()
 
   if(NOT CMAKE_CXX_COMPILER STREQUAL HPX_CXX_COMPILER)
-    hpx_error("Compilers do not match. In order to compile HPX application it is"
-              " recommended to use the same compiler as you did for HPX. "
-              "HPX_CXX_COMPILER=${HPX_CXX_COMPILER}, "
-              "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}. To "
-              "disable this message set HPX_IGNORE_COMPILER_COMPATIBILITY to On."
-    )
+    set(MESSAGE "Compilers do not match. In order to compile HPX application it is"
+        " recommended to use the same compiler as you did for HPX. "
+        "HPX_CXX_COMPILER=${HPX_CXX_COMPILER}, "
+        "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}. To "
+        "disable this message set HPX_IGNORE_COMPILER_COMPATIBILITY to On."
+        )
+    if (HPX_FIND_REQUIRED)
+      hpx_error("${MESSAGE}")
+    else()
+      hpx_warn("${MESSAGE}")
+      set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "${MESSAGE}" PARENT_SCOPE)
+      set(${CMAKE_FIND_PACKAGE_NAME}_FOUND False PARENT_SCOPE)
+    endif()
   endif()
 endfunction()
 
@@ -28,11 +36,11 @@ function(hpx_check_boost_compatibility)
   if(NOT DEFINED BOOST_ROOT)
     return()
   endif()
-  
+
   # make sure paths are tested even if not string identical
   get_filename_component(PATH1 ${HPX_BOOST_ROOT} ABSOLUTE)
   get_filename_component(PATH2 ${BOOST_ROOT} ABSOLUTE)
-  
+
   if(NOT PATH1 STREQUAL PATH2)
     hpx_error("The specified BOOST_ROOT differs from what has been used when"
               " configuring and building HPX. Please use the same Boost "

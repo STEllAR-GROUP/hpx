@@ -15,7 +15,7 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     examples::server::template_function_accumulator
 > accumulator_type;
 

@@ -137,7 +137,7 @@ namespace throttle { namespace server
 typedef throttle::server::throttle throttle_type;
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::simple_component<throttle_type>, throttle_throttle_type);
+    hpx::components::component<throttle_type>, throttle_throttle_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions

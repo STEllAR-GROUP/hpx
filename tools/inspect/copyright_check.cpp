@@ -6,6 +6,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "copyright_check.hpp"
+#include "function_hyper.hpp"
 
 namespace boost
 {
@@ -26,7 +27,8 @@ namespace boost
         && contents.find( "copyright" ) == string::npos )
       {
         ++m_files_with_errors;
-        error( library_name, full_path, name() );
+        std::string lineloc = loclink(full_path, name());
+        error( library_name, full_path, lineloc );
       }
     }
   } // namespace inspect

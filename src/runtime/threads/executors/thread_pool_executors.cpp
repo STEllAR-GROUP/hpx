@@ -39,9 +39,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    thread_pool_executor<Scheduler>::thread_pool_executor(std::size_t max_punits,
-            std::size_t min_punits)
-      : scheduler_(max_punits, false), shutdown_sem_(0),
+    thread_pool_executor<Scheduler>::thread_pool_executor(
+            std::size_t max_punits, std::size_t min_punits,
+            char const* description)
+      : scheduler_(
+            typename Scheduler::init_parameter_type(max_punits, description),
+            false
+        ),
+        shutdown_sem_(0),
         current_concurrency_(0), max_current_concurrency_(0),
         tasks_scheduled_(0), tasks_completed_(0),
         max_punits_(max_punits), min_punits_(min_punits), cookie_(0),
@@ -418,14 +423,14 @@ namespace hpx { namespace threads { namespace executors
     local_queue_executor::local_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
             policies::local_queue_scheduler<> >(
-                get_os_thread_count(), 1))
+                get_os_thread_count(), 1, "local_queue_executor"))
     {}
 
     local_queue_executor::local_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
             policies::local_queue_scheduler<> >(
-                max_punits, min_punits))
+                max_punits, min_punits, "local_queue_executor"))
     {}
 #endif
 
@@ -434,14 +439,14 @@ namespace hpx { namespace threads { namespace executors
     static_queue_executor::static_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
             policies::static_queue_scheduler<> >(
-                get_os_thread_count(), 1))
+                get_os_thread_count(), 1, "static_queue_executor"))
     {}
 
     static_queue_executor::static_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
             policies::static_queue_scheduler<> >(
-                max_punits, min_punits))
+                max_punits, min_punits, "static_queue_executor"))
     {}
 #endif
 
@@ -465,14 +470,14 @@ namespace hpx { namespace threads { namespace executors
     local_priority_queue_executor::local_priority_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
             policies::local_priority_queue_scheduler<> >(
-                get_os_thread_count(), 1))
+                get_os_thread_count(), 1, "local_priority_queue_executor"))
     {}
 
     local_priority_queue_executor::local_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
             policies::local_priority_queue_scheduler<> >(
-                max_punits, min_punits))
+                max_punits, min_punits, "local_priority_queue_executor"))
     {}
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
@@ -480,14 +485,14 @@ namespace hpx { namespace threads { namespace executors
     static_priority_queue_executor::static_priority_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
             policies::static_priority_queue_scheduler<> >(
-                get_os_thread_count(), 1))
+                get_os_thread_count(), 1, "static_priority_queue_executor"))
     {}
 
     static_priority_queue_executor::static_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
             policies::static_priority_queue_scheduler<> >(
-                max_punits, min_punits))
+                max_punits, min_punits, "static_priority_queue_executor"))
     {}
 #endif
 }}}

@@ -16,8 +16,6 @@
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
 
-#include <hpx/util/memory_chunk_pool.hpp>
-
 #include <list>
 #include <iterator>
 #include <memory>
@@ -28,25 +26,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     struct sender
     {
-        typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef
-            util::detail::memory_chunk_pool_allocator<
-                char, util::memory_chunk_pool<>
-            >
-            allocator_type;
-        typedef
-            std::vector<char, allocator_type>
-            data_type;
         typedef
             sender_connection
             connection_type;
         typedef boost::shared_ptr<connection_type> connection_ptr;
-        typedef std::list<connection_ptr> connection_list;
+        typedef std::deque<connection_ptr> connection_list;
 
         typedef hpx::lcos::local::spinlock mutex_type;
-        sender(memory_pool_type & chunk_pool)
+
+        sender()
           : next_free_tag_(-1)
-          , chunk_pool_(chunk_pool)
         {
         }
 
@@ -60,7 +49,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             return
                 boost::make_shared<connection_type>(
-                    this, dest, chunk_pool_, parcels_sent);
+                    this, dest, parcels_sent);
         }
 
         void add(connection_ptr const & ptr)
@@ -95,7 +84,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             );
 
             // If some are still in progress, give them back
-//             if(end != connections.end())
+            if(connections.begin() != end)
             {
                 boost::unique_lock<mutex_type> l(connections_mtx_);
                 connections_.insert(
@@ -106,12 +95,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
         }
 
-        bool background_work(std::size_t num_thread)
+        bool background_work()
         {
             connection_list connections;
             {
-                boost::unique_lock<mutex_type> l(connections_mtx_);
-                std::swap(connections, connections_);
+                boost::unique_lock<mutex_type> l(connections_mtx_, boost::try_to_lock);
+                if(l && !connections_.empty())
+                {
+                    connections.push_back(connections_.front());
+                    connections_.pop_front();
+                }
             }
             bool has_work = false;
             if(!connections.empty())
@@ -182,8 +175,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         mutex_type next_free_tag_mtx_;
         MPI_Request next_free_tag_request_;
         int next_free_tag_;
-
-        memory_pool_type & chunk_pool_;
     };
 
 

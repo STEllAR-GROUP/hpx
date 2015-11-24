@@ -28,7 +28,6 @@
 #include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
 
-#include <boost/static_assert.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
@@ -351,7 +350,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     typename util::detail::algorithm_result<ExPolicy>::type
     define_task_block(ExPolicy && policy, F && f)
     {
-        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+        static_assert(
+            parallel::is_execution_policy<ExPolicy>::value,
+            "parallel::is_execution_policy<ExPolicy>::value");
 
         typedef typename hpx::util::decay<ExPolicy>::type policy_type;
         task_block<policy_type> trh(std::forward<ExPolicy>(policy));
@@ -475,7 +476,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     typename util::detail::algorithm_result<ExPolicy>::type
     define_task_block_restore_thread(ExPolicy && policy, F && f)
     {
-        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+        static_assert(
+            parallel::is_execution_policy<ExPolicy>::value,
+            "parallel::is_execution_policy<ExPolicy>::value");
 
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.

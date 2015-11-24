@@ -373,7 +373,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS) && _MSC_VER < 1900
+#if defined(BOOST_WINDOWS) && defined(_MSC_VER) && _MSC_VER < 1900
 #  define snprintf _snprintf
 #endif
 
@@ -487,8 +487,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure we have support for more than 64 threads for Xeon Phi
-#if defined(__MIC__) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
-#  define HPX_WITH_MORE_THAN_64_THREADS
+#if defined(__MIC__) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+#  define HPX_HAVE_MORE_THAN_64_THREADS
 #endif
 #if defined(__MIC__) && !defined(HPX_HAVE_MAX_CPU_COUNT)
 #  define HPX_HAVE_MAX_CPU_COUNT 256

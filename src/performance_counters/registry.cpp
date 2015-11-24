@@ -483,7 +483,7 @@ namespace hpx { namespace performance_counters
 
         // create the counter as requested
         try {
-            typedef components::managed_component<server::raw_counter> counter_t;
+            typedef components::component<server::raw_counter> counter_t;
             id = components::server::construct<counter_t>(complemented_info, f);
 
             std::string name(complemented_info.fullname_);
@@ -534,7 +534,7 @@ namespace hpx { namespace performance_counters
             switch (complemented_info.type_) {
             case counter_elapsed_time:
                 {
-                    typedef components::managed_component<server::elapsed_time_counter>
+                    typedef components::component<server::elapsed_time_counter>
                         counter_t;
                     id = components::server::construct<counter_t>(complemented_info);
                 }
@@ -618,7 +618,7 @@ namespace hpx { namespace performance_counters
 
             // create base counter only if it does not exist yet
             if (p.countername_ == "average") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::mean>
                 > counter_t;
@@ -626,7 +626,7 @@ namespace hpx { namespace performance_counters
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "stddev") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::variance>
                 > counter_t;
@@ -634,7 +634,7 @@ namespace hpx { namespace performance_counters
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "rolling_average") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::rolling_mean>
                 > counter_t;
@@ -647,7 +647,7 @@ namespace hpx { namespace performance_counters
                     complemented_info, base_counter_name, sample_interval, window_size);
             }
             else if (p.countername_ == "median") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::median>
                 > counter_t;
@@ -655,7 +655,7 @@ namespace hpx { namespace performance_counters
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "max") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::max>
                 > counter_t;
@@ -663,7 +663,7 @@ namespace hpx { namespace performance_counters
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "min") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::min>
                 > counter_t;
@@ -740,28 +740,28 @@ namespace hpx { namespace performance_counters
         try {
             // create base counter only if it does not exist yet
             if (p.countername_ == "add") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::plus<double> > > counter_t;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "subtract") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::minus<double> > > counter_t;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "multiply") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::multiplies<double> > > counter_t;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "divide") {
-                typedef hpx::components::managed_component<
+                typedef hpx::components::component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::divides<double> > > counter_t;
                 gid = components::server::construct<counter_t>(
@@ -859,7 +859,7 @@ namespace hpx { namespace performance_counters
 //         case counter_raw:
 // //             {
 // //                 typedef
-// //                     components::managed_component<server::raw_counter>
+// //                     components::component<server::raw_counter>
 // //                 counter_type;
 // //                 components::server::destroy<counter_type>(id.get_gid(), ec);
 // //                 if (ec) return status_invalid_data;

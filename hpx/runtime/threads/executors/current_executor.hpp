@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_GENERIC_EXECUTOR_JAN_11_2013_0831PM)
-#define HPX_RUNTIME_THREADS_EXECUTORS_GENERIC_EXECUTOR_JAN_11_2013_0831PM
+#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_CURRENT_EXECUTOR_JAN_11_2013_0831PM)
+#define HPX_RUNTIME_THREADS_EXECUTORS_CURRENT_EXECUTOR_JAN_11_2013_0831PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -21,11 +21,11 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         //////////////////////////////////////////////////////////////////////
-        class HPX_EXPORT generic_thread_pool_executor
+        class HPX_EXPORT current_executor
           : public threads::detail::scheduled_executor_base
         {
         public:
-            generic_thread_pool_executor(policies::scheduler_base* scheduler);
+            current_executor(policies::scheduler_base* scheduler);
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
@@ -76,10 +76,10 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT generic_thread_pool_executor : public scheduled_executor
+    struct HPX_EXPORT current_executor : public scheduled_executor
     {
-        explicit generic_thread_pool_executor(
-            policies::scheduler_base* scheduler);
+        current_executor();
+        explicit current_executor(policies::scheduler_base* scheduler);
 
         hpx::state get_state() const;
     };

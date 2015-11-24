@@ -72,6 +72,11 @@ namespace hpx { namespace components
         }
     };
 
+    template <typename Component>
+    class abstract_component_base
+      : public abstract_simple_component_base<Component>
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Derived>
     class managed_component;

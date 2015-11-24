@@ -126,5 +126,3 @@ namespace hpx { namespace threads { namespace detail
 }}}
 
 #endif
-
-

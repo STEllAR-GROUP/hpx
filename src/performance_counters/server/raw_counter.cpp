@@ -14,7 +14,7 @@
 #include <boost/version.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::raw_counter
 > raw_counter_type;
 

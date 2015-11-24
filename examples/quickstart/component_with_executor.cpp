@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
 struct hello_world_server
-  : hpx::components::managed_component_base<hello_world_server>
+  : hpx::components::component_base<hello_world_server>
 {
     hello_world_server()
       : sched_(hpx::get_num_worker_threads())   // run on all available cores
@@ -54,7 +54,7 @@ private:
     hpx::threads::executors::local_priority_queue_executor sched_;
 };
 
-typedef hpx::components::managed_component<hello_world_server> server_type;
+typedef hpx::components::component<hello_world_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, hello_world_server);
 
 typedef hello_world_server::print_action print_action;

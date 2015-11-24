@@ -7,7 +7,7 @@
 #define HPX_SERVER_SIMPLE_CENTRAL_TUPLESPACE_MAR_29_2013_0237PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/storage/tuple.hpp>
@@ -28,9 +28,8 @@ namespace examples { namespace server
     /// This class is a simple central tuplespace (SCTS) as an HPX component. An HPX
     /// component is a class that:
     ///
-    ///     * Inherits from a component base class (either
-    ///       \a hpx::components::managed_component_base or
-    ///       \a hpx::components::simple_component_base).
+    ///     * Inherits from a component base class:
+    ///       \a hpx::components::component_base
     ///     * Exposes methods that can be called asynchronously and/or remotely.
     ///       These constructs are known as HPX actions.
     ///
@@ -58,7 +57,7 @@ namespace examples { namespace server
     ///
     //[simple_central_tuplespace_server_inherit
     class simple_central_tuplespace
-      : public hpx::components::simple_component_base<simple_central_tuplespace>
+      : public hpx::components::component_base<simple_central_tuplespace>
     //]
     {
         public:

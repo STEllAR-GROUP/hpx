@@ -74,26 +74,37 @@ namespace hpx { namespace threads { namespace policies
             init_parameter()
               : num_queues_(1),
                 max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(0)
+                numa_sensitive_(0),
+                description_("local_queue_scheduler")
             {}
 
             init_parameter(std::size_t num_queues,
                     std::size_t max_queue_thread_count = max_thread_count,
-                    std::size_t numa_sensitive = 0)
+                    std::size_t numa_sensitive = 0,
+                    char const* description = "local_queue_scheduler")
               : num_queues_(num_queues),
                 max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive)
+                numa_sensitive_(numa_sensitive),
+                description_(description)
+            {}
+
+            init_parameter(std::size_t num_queues, char const* description)
+              : num_queues_(num_queues),
+                max_queue_thread_count_(max_thread_count),
+                numa_sensitive_(false),
+                description_(description)
             {}
 
             std::size_t num_queues_;
             std::size_t max_queue_thread_count_;
             std::size_t numa_sensitive_;
+            char const* description_;
         };
         typedef init_parameter init_parameter_type;
 
         local_queue_scheduler(init_parameter_type const& init,
                 bool deferred_initialization = true)
-          : scheduler_base(init.num_queues_),
+          : scheduler_base(init.num_queues_, init.description_),
             max_queue_thread_count_(init.max_queue_thread_count_),
             queues_(init.num_queues_),
             curr_queue_(0),
@@ -102,7 +113,7 @@ namespace hpx { namespace threads { namespace policies
             steals_in_numa_domain_(),
             steals_outside_numa_domain_(),
 #endif
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
             numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
 #else

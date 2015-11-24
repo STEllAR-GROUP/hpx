@@ -1,4 +1,5 @@
 # Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2015 Andreas Schaefer
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +24,8 @@ set(HPX_MINOR_VERSION @HPX_MINOR_VERSION@)
 set(HPX_PATCH_LEVEL   @HPX_PATCH_LEVEL@)
 
 set(HPX_PREFIX "${_hpx_root_dir}")
+set(HPX_DEBUG_POSTFIX "@HPX_DEBUG_POSTFIX@")
+set(HPX_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
 
 set(HPX_GIT_COMMIT @HPX_GIT_COMMIT@
     CACHE STRING "Revision of HPX from Git")
@@ -32,9 +35,6 @@ set(HPX_C_COMPILER "@CMAKE_C_COMPILER@" CACHE STRING "C compiler for HPX")
 set(HPX_CXX_COMPILER "@CMAKE_CXX_COMPILER@" CACHE STRING "CXX compiler for HPX")
 
 set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compiler for HPX")
-
-# Enforce C++11 mode
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} @CXX_FLAG@")
 
 set(HPX_BOOST_ROOT @BOOST_ROOT@)
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
@@ -56,3 +56,11 @@ enable_language(C)
 hpx_check_compiler_compatibility()
 hpx_check_boost_compatibility()
 hpx_setup_allocator()
+
+if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+  set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
+endif()
+
+if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} @CXX_FLAG@")
+endif()

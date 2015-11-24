@@ -13,8 +13,8 @@
 namespace hpx
 {
     /// The function \a wait_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns the same list of
-    /// futures after one future of that list finishes execution.
+    /// OR-composes all future objects given and returns after one future of
+    /// that list finishes execution.
     ///
     /// \param first    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
@@ -40,8 +40,8 @@ namespace hpx
     void wait_any(InputIter first, InputIter last, error_code& ec = throws);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns the same list of
-    /// futures after one future of that list finishes execution.
+    /// OR-composes all future objects given and returns after one future of
+    /// that list finishes execution.
     ///
     /// \param futures  [in] A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_any should
@@ -64,8 +64,8 @@ namespace hpx
     void wait_any(std::vector<future<R>>& futures, error_code& ec = throws);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns the same list of
-    /// futures after one future of that list finishes execution.
+    /// OR-composes all future objects given and returns after one future of
+    /// that list finishes execution.
     ///
     /// \param futures  [in] An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
@@ -88,8 +88,8 @@ namespace hpx
     void wait_any(error_code& ec, T&&... futures);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns the same list of
-    /// futures after one future of that list finishes execution.
+    /// OR-composes all future objects given and returns after one future of
+    /// that list finishes execution.
     ///
     /// \param futures  [in] An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
@@ -104,8 +104,8 @@ namespace hpx
     void wait_any(T&&... futures);
 
     /// The function \a wait_any_n is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns the same list of
-    /// futures after one future of that list finishes execution.
+    /// OR-composes all future objects given and returns after one future of
+    /// that list finishes execution.
     ///
     /// \param first    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for

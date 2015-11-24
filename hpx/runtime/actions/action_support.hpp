@@ -103,11 +103,9 @@ namespace hpx { namespace actions
             /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
             /// but the header in which the action is defined misses a
             /// HPX_REGISTER_ACTION_DECLARATION
-            BOOST_MPL_ASSERT_MSG(
-                traits::needs_automatic_registration<Action>::value
-              , HPX_REGISTER_ACTION_DECLARATION_MISSING
-              , (Action)
-            );
+            static_assert(
+                traits::needs_automatic_registration<Action>::value,
+                "HPX_REGISTER_ACTION_DECLARATION missing");
             return util::type_id<Action>::typeid_.type_id();
         }
 #endif

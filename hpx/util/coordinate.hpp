@@ -18,8 +18,6 @@
 #include <initializer_list>
 #endif
 
-#include <boost/static_assert.hpp>
-
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -33,7 +31,7 @@ namespace hpx { namespace util
     template <int Rank>
     class index
     {
-        BOOST_STATIC_ASSERT_MSG(Rank > 0, "Rank shall be greater than 0");
+        static_assert(Rank > 0, "Rank shall be greater than 0");
 
     public:
         // constants and types
@@ -197,7 +195,7 @@ namespace hpx { namespace util
     template <int Rank>
     class bounds
     {
-        BOOST_STATIC_ASSERT_MSG(Rank > 0, "Rank shall be greater than 0");
+        static_assert(Rank > 0, "Rank shall be greater than 0");
 
     public:
         // constants and types

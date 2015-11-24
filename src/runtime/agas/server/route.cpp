@@ -92,16 +92,17 @@ namespace hpx { namespace agas { namespace server
             // asynchronously update cache on source locality
             for (std::size_t i = 0; i != cache_addresses.size(); ++i)
             {
+                // update remote cache if the id is not flagged otherwise
                 resolved_type const& r = cache_addresses[i];
-                if (boost::fusion::at_c<0>(r))
+                naming::gid_type const& id = boost::fusion::at_c<0>(r);
+                if (id && naming::detail::store_in_cache(id))
                 {
                     gva const& g = boost::fusion::at_c<1>(r);
                     naming::address addr(g.prefix, g.type, g.lva());
 
                     using components::stubs::runtime_support;
                     runtime_support::update_agas_cache_entry_colocated(
-                        source, boost::fusion::at_c<0>(r), addr, g.count,
-                        g.offset);
+                        source, id, addr, g.count, g.offset);
                 }
             }
         }

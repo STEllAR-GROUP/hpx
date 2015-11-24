@@ -8,7 +8,6 @@
 #define HPX_UNIQUE_PLUGIN_NAME_MAR_24_2013_245PM
 
 #include <boost/config.hpp>
-#include <boost/mpl/assert.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 
@@ -17,7 +16,7 @@ namespace hpx { namespace plugins
     template <typename PluginType>
     struct unique_plugin_name
     {
-        BOOST_MPL_ASSERT_MSG(0, plugin_name_is_not_defined, (PluginType));
+        static_assert(sizeof(PluginType) == 0, "plugin name is not defined");
     };
 }}
 

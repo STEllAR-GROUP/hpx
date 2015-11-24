@@ -7,6 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_ELAPSED_TIME_COUNTER_SEP_18_2011_1133AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -17,9 +18,9 @@ namespace hpx { namespace performance_counters { namespace server
 {
     class HPX_EXPORT elapsed_time_counter
       : public base_performance_counter,
-        public components::managed_component_base<elapsed_time_counter>
+        public components::component_base<elapsed_time_counter>
     {
-        typedef components::managed_component_base<elapsed_time_counter> base_type;
+        typedef components::component_base<elapsed_time_counter> base_type;
 
     public:
         typedef elapsed_time_counter type_holder;

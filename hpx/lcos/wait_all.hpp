@@ -14,7 +14,7 @@ namespace hpx
 {
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param first    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
@@ -32,7 +32,7 @@ namespace hpx
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param futures  A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_all should
@@ -47,7 +47,7 @@ namespace hpx
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param futures  An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
@@ -62,7 +62,7 @@ namespace hpx
 
     /// The function \a wait_all_n is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param begin    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for

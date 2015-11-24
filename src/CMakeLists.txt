@@ -166,7 +166,7 @@ set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
 ################################################################################
 # libhpx
 if(HPX_WITH_STATIC_LINKING)
-  set(hpx_SOURCES ${hpx_SOURCES} {hpx_init_SOURCES})
+  set(hpx_SOURCES ${hpx_SOURCES} ${hpx_init_SOURCES})
 endif()
 if(HPX_WITH_DEFAULT_TARGETS)
   add_library(hpx ${hpx_library_link_mode_core}

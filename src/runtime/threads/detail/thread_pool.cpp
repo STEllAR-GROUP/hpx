@@ -331,7 +331,7 @@ namespace hpx { namespace threads { namespace detail
                     << "thread_pool::run: " << pool_name_
                     << " create OS thread " << thread_num //-V128
                     << ": will run on processing units within this mask: "
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || \
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || \
     (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
                     << std::hex << "0x" << mask;
 #else

@@ -8,7 +8,7 @@ include(CMakeParseArguments)
 macro(hpx_add_link_flag FLAG)
   set(options)
   set(one_value_args)
-  set(multi_value_args TARGETS)
+  set(multi_value_args TARGETS CONFIGURATIONS)
   cmake_parse_arguments(HPX_ADD_LINK_FLAG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_targets EXE SHARED STATIC)
@@ -16,8 +16,53 @@ macro(hpx_add_link_flag FLAG)
     set(_targets ${HPX_ADD_LINK_FLAG_TARGETS})
   endif()
 
-  foreach(_target ${_targets})
-    set(CMAKE_${_target}_LINKER_FLAGS "${CMAKE_${_target}_LINKER_FLAGS} ${FLAG}")
+  set(_configurations "none")
+  if(HPX_REMOVE_LINK_FLAG_CONFIGURATIONS)
+    set(_configurations "${HPX_REMOVE_LINK_FLAG_CONFIGURATIONS}")
+  endif()
+
+  foreach(_config ${_configurations})
+    set(_conf)
+    if(NOT _config STREQUAL "none")
+      string(TOUPPER "${_config}" _conf)
+      set(_conf "_${_conf}")
+    endif()
+
+    foreach(_target ${_targets})
+      set(CMAKE_${_target}_LINKER_FLAGS${_conf}
+        "${CMAKE_${_target}_LINKER_FLAGS${_conf}} ${FLAG}")
+    endforeach()
+  endforeach()
+endmacro()
+
+macro(hpx_remove_link_flag FLAG)
+  set(options)
+  set(one_value_args)
+  set(multi_value_args TARGETS CONFIGURATIONS)
+  cmake_parse_arguments(HPX_REMOVE_LINK_FLAG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_targets EXE SHARED STATIC)
+  if(HPX_ADD_LINK_FLAG_TARGETS)
+    set(_targets ${HPX_ADD_LINK_FLAG_TARGETS})
+  endif()
+
+  set(_configurations "none")
+  if(HPX_REMOVE_LINK_FLAG_CONFIGURATIONS)
+    set(_configurations "${HPX_REMOVE_LINK_FLAG_CONFIGURATIONS}")
+  endif()
+
+  foreach(_config ${_configurations})
+    set(_conf)
+    if(NOT _config STREQUAL "none")
+      string(TOUPPER "${_config}" _conf)
+      set(_conf "_${_conf}")
+    endif()
+
+    foreach(_target ${_targets})
+      STRING (REGEX REPLACE "${FLAG}" ""
+          CMAKE_${_target}_LINKER_FLAGS${_conf}
+          "${CMAKE_${_target}_LINKER_FLAGS${_conf}}")
+    endforeach()
   endforeach()
 endmacro()
 

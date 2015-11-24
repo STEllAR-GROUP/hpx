@@ -13,7 +13,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::lcos::queue<int> queue_type;
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::lcos::server::queue<int>
 > queue_of_ints_type;
 
