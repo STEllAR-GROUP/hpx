@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/throw_exception.hpp>
 #include <boost/noncopyable.hpp>
@@ -652,11 +653,11 @@ namespace hpx { namespace components
 
         template <typename Component_>
         friend naming::gid_type server::create(
-            util::function_nonser<void(void*)> const& ctor);
+            util::unique_function_nonser<void(void*)> const& ctor);
 
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
-            util::function_nonser<void(void*)> const& ctor);
+            util::unique_function_nonser<void(void*)> const& ctor);
 #endif
 
         naming::gid_type get_base_gid(

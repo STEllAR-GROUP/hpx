@@ -62,14 +62,12 @@ namespace hpx { namespace actions
             HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function);
 
         public:
-            template <typename F_, typename ...Ts_>
             explicit continuation_thread_function(
-                    std::unique_ptr<continuation> cont,
-                    naming::address::address_type lva, F_&& f, Ts_&&... vs)
+                std::unique_ptr<continuation> cont,
+                naming::address::address_type lva, F&& f, Ts&&... vs)
               : cont_(std::move(cont))
               , lva_(lva)
-              , f_(util::deferred_call(
-                    std::forward<F_>(f), std::forward<Ts_>(vs)...))
+              , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
             {}
 
             continuation_thread_function(continuation_thread_function && other)
@@ -91,10 +89,7 @@ namespace hpx { namespace actions
         private:
             std::unique_ptr<continuation> cont_;
             naming::address::address_type lva_;
-            util::detail::deferred_call_impl<
-                typename util::decay<F>::type
-              , util::tuple<typename util::decay_unwrap<Ts>::type...>
-            > f_;
+            util::detail::deferred<F(Ts&&...)> f_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -255,7 +250,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
-                Derived, invoker, naming::address::address_type, Ts...
+                Derived, invoker, naming::address::address_type&, Ts&&...
             > thread_function;
 
             return traits::action_decorate_function<Derived>::call(lva,

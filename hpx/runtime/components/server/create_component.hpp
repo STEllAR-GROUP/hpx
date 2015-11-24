@@ -15,6 +15,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/functional/new.hpp>
 
 #include <sstream>
@@ -49,7 +50,8 @@ namespace hpx { namespace components { namespace server
     }
 
     template <typename Component>
-    naming::gid_type create(util::function_nonser<void(void*)> const& ctor)
+    naming::gid_type create(
+        util::unique_function_nonser<void(void*)> const& ctor)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
         ctor(c);
@@ -75,7 +77,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
-        util::function_nonser<void(void*)> const& ctor)
+        util::unique_function_nonser<void(void*)> const& ctor)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
         ctor(c);
@@ -114,11 +116,7 @@ namespace hpx { namespace components { namespace server
         util::detail::bound<
             util::detail::one_shot_wrapper<
                 util::functional::placement_new<typename Component::derived_type>
-            >,
-            util::tuple<
-                util::detail::placeholder<1>,
-                typename util::decay<Ts>::type...
-            >
+            >(util::detail::placeholder<1> const&, Ts&&...)
         > construct_function(Ts&&... vs)
         {
             typedef typename Component::derived_type type;

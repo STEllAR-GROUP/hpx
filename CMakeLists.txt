@@ -1018,7 +1018,7 @@ else()
   # These come from within Boost. Detection for this flag fails with GCC 4.4,
   # 4.5 and 4.6.
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6)
-    hpx_add_compile_flag_if_available(-Wno-delete-non-virtual-dtor LANGUAGES CXX C)
+    hpx_add_compile_flag_if_available(-Wno-delete-non-virtual-dtor LANGUAGES CXX)
   endif()
 
   # Check if our libraries have unresolved symbols

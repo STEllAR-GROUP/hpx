@@ -68,6 +68,10 @@ namespace hpx { namespace util
               : _value(std::forward<U>(value))
             {}
 
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+            tuple_member(tuple_member const&) = default;
+            tuple_member(tuple_member&&) = default;
+#else
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
               : _value(other.value())
             {}
@@ -75,6 +79,7 @@ namespace hpx { namespace util
             BOOST_CONSTEXPR tuple_member(tuple_member&& other)
               : _value(std::forward<T>(other.value()))
             {}
+#endif
 
             T& value() BOOST_NOEXCEPT { return _value; }
             T const& value() const BOOST_NOEXCEPT { return _value; }
@@ -103,6 +108,10 @@ namespace hpx { namespace util
               : T(std::forward<U>(value))
             {}
 
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+            tuple_member(tuple_member const&) = default;
+            tuple_member(tuple_member&&) = default;
+#else
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
               : T(other.value())
             {}
@@ -110,6 +119,7 @@ namespace hpx { namespace util
             BOOST_CONSTEXPR tuple_member(tuple_member&& other)
               : T(std::forward<T>(other.value()))
             {}
+#endif
 
             T& value() BOOST_NOEXCEPT { return *this; }
             T const& value() const BOOST_NOEXCEPT { return *this; }
@@ -189,6 +199,10 @@ namespace hpx { namespace util
               : tuple_member<Is, Ts>(std::forward<Us>(vs))...
             {}
 
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+            tuple_impl(tuple_impl const&) = default;
+            tuple_impl(tuple_impl&&) = default;
+#else
             BOOST_CONSTEXPR tuple_impl(tuple_impl const& other)
               : tuple_member<Is, Ts>(static_cast<tuple_member<Is, Ts> const&>(other))...
             {}
@@ -196,6 +210,7 @@ namespace hpx { namespace util
             BOOST_CONSTEXPR tuple_impl(tuple_impl&& other)
               : tuple_member<Is, Ts>(static_cast<tuple_member<Is, Ts>&&>(other))...
             {}
+#endif
 
             template <typename UTuple, typename Enable =
                 typename std::enable_if<
@@ -376,6 +391,17 @@ namespace hpx { namespace util
           : _impl(std::forward<U>(v), std::forward<Us>(vs)...)
         {}
 
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+        // tuple(const tuple& u) = default;
+        // Initializes each element of *this with the corresponding element
+        // of u.
+        tuple(tuple const&) = default;
+
+        // tuple(tuple&& u) = default;
+        // For all i, initializes the ith element of *this with
+        // std::forward<Ti>(get<i>(u)).
+        tuple(tuple&&) = default;
+#else
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
@@ -389,6 +415,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(tuple&& other)
           : _impl(std::move(other._impl))
         {}
+#endif
 
         // template <class... UTypes> constexpr tuple(const tuple<UTypes...>& u);
         // template <class... UTypes> constexpr tuple(tuple<UTypes...>&& u);
