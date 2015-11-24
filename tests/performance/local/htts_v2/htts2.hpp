@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
+#include <hpx/config.hpp>
 
 #include <iostream>
 #include <boost/format.hpp>
