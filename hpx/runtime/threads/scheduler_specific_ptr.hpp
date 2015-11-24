@@ -13,6 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/emulate_deleted.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/coroutine/detail/tss.hpp>
 
 #include <boost/shared_ptr.hpp>
