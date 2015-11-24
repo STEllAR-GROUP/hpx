@@ -101,6 +101,7 @@ namespace hpx { namespace traits
         return hpx::components::component_plain_function;
     }
 
+    /// \cond NOINTERNAL
     template <> HPX_ALWAYS_EXPORT
     inline void
     component_type_database<hpx::actions::detail::plain_function>::set(
@@ -108,6 +109,7 @@ namespace hpx { namespace traits
     {
         HPX_ASSERT(false);      // shouldn't be ever called
     }
+    /// \endcond
 }}
 
 /// \def HPX_DEFINE_PLAIN_ACTION(func, name)
