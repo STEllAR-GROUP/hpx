@@ -20,6 +20,7 @@ namespace hpx { namespace util { namespace batch_environments
             std::vector<std::string> & nodelist, bool debug)
         : node_num_(std::size_t(-1))
         , num_localities_(std::size_t(-1))
+        , num_threads_(std::size_t(-1))
         , valid_(false)
     {
         char *node_num = std::getenv("PBS_NODENUM");
@@ -27,7 +28,7 @@ namespace hpx { namespace util { namespace batch_environments
         if(valid_)
         {
             // Initialize our node number
-            node_num_ = safe_lexical_cast<std::size_t>(node_num);
+            node_num_ = safe_lexical_cast<std::size_t>(node_num, std::size_t(1));
 
             if (nodelist.empty())
             {
@@ -40,6 +41,14 @@ namespace hpx { namespace util { namespace batch_environments
                 // read the PBS node list. This initializes the number of
                 // localities
                 read_nodelist(nodelist, debug);
+            }
+
+            char * thread_num = std::getenv("PBS_NUM_PPN");
+            if (thread_num != 0)
+            {
+                // Initialize number of cores to run on
+                num_threads_ = safe_lexical_cast<std::size_t>(
+                    thread_num, std::size_t(-1));
             }
         }
     }

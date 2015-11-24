@@ -31,7 +31,7 @@ namespace hpx { namespace util { namespace batch_environments {
 
         std::size_t num_threads() const
         {
-            return std::size_t(-1);
+            return num_threads_;
         }
 
         std::size_t num_localities() const
@@ -42,6 +42,7 @@ namespace hpx { namespace util { namespace batch_environments {
     private:
         std::size_t node_num_;
         std::size_t num_localities_;
+        std::size_t num_threads_;
         bool valid_;
 
         HPX_EXPORT void read_nodefile(std::vector<std::string> & nodelist,
