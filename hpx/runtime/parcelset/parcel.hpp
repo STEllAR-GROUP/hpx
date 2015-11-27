@@ -414,7 +414,7 @@ namespace hpx { namespace parcelset
             return addrs()[0].locality_;
         }
 
-        double const start_time() const
+        double start_time() const
         {
             return data_.start_time_;
         }
@@ -424,7 +424,7 @@ namespace hpx { namespace parcelset
             data_.start_time_ = time;
         }
 
-        double const creation_time() const
+        double creation_time() const
         {
             return data_.creation_time_;
         }

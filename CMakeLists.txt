@@ -948,9 +948,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # interface requirements
     hpx_add_compile_flag_if_available(-Wno-unused-parameter)
 
-    # There are ignored qualifiers in Boost, so we have to ignore them
-    hpx_add_compile_flag_if_available(-Wno-ignored-qualifiers)
-
     # Be extra strict about format checks
     # Boost.Logging is built on fprintf, sadly
     hpx_add_compile_flag_if_available(-Wformat=2)
