@@ -547,7 +547,7 @@ namespace hpx { namespace parcelset {
                         if (c.type_ == serialization::chunk_type_pointer) {
                             RdmaMemoryRegion *get_region;
                             if (c.size_<=RDMA_DEFAULT_MEMORY_POOL_LARGE_CHUNK_SIZE) {
-                                get_region = chunk_pool_->allocateRegion(c.size_));
+                                get_region = chunk_pool_->allocateRegion(c.size_);
                             }
                             else {
                                 get_region = chunk_pool_->AllocateTemporaryBlock(c.size_);

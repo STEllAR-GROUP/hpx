@@ -36,13 +36,13 @@ namespace hpx { namespace parcelset {
       }
 
       void save(serialization::output_archive & ar) const {
-        ar.save(ip_);
-        ar.save(qp_);
+        ar << ip_;
+        ar << qp_;
       }
 
       void load(serialization::input_archive & ar) {
-        ar.load(ip_);
-        ar.load(qp_);
+        ar >> ip_;
+        ar >> qp_;
       }
 
     private:
