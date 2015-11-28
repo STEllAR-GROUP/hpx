@@ -19,10 +19,10 @@ namespace hpx
     struct when_some_result
     {
         /// List of indices of futures which became ready
-        std::vector<std::size_t> indices; 
+        std::vector<std::size_t> indices;
 
         ///< The sequence of futures as passed to \a hpx::when_some
-        Sequence futures; 
+        Sequence futures;
     };
 
     /// The function \a when_some is an operator allowing to join on the result
