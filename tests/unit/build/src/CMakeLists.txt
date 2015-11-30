@@ -25,8 +25,8 @@ if(EXISTS "${HPX_DIR}")
     TYPE COMPONENT
   )
 
-  add_executable(test test.cpp)
-  hpx_setup_target(test
+  add_executable(test_executable test.cpp)
+  hpx_setup_target(test_executable
     DEPENDENCIES test_component
     COMPONENT_DEPENDENCIES iostreams
   )

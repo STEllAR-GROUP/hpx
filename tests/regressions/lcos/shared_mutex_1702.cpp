@@ -25,6 +25,7 @@ int main()
     {
         boost::shared_lock<shared_mutex_type> l(mtx);
         int i = data;
+        HPX_UNUSED(i);
     }
 
     return 0;

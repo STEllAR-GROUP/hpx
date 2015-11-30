@@ -112,6 +112,13 @@ void test_one(std::vector<int> a)
         transform_exclusive_scan(par, a.begin(), a.end(), g.begin(),
         fun_conv, 10, fun_add);
 
+    HPX_UNUSED(f_inc_add);
+    HPX_UNUSED(f_inc_mult);
+    HPX_UNUSED(f_exc_add);
+    HPX_UNUSED(f_exc_mult);
+    HPX_UNUSED(f_transform_inc);
+    HPX_UNUSED(f_transform_exc);
+
     hpx::parallel::v1::detail::sequential_inclusive_scan(
         a.begin(), a.end(), b_ans.begin(), 10, fun_add);
     hpx::parallel::v1::detail::sequential_inclusive_scan(
