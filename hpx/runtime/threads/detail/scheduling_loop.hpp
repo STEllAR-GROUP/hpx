@@ -305,16 +305,21 @@ namespace hpx { namespace threads { namespace detail
                                 exec_time_wrapper exec_time_collector(idle_rate);
 #if defined(HPX_HAVE_APEX)
                                 util::apex_wrapper apex_profiler(thrd->get_description());
-#endif
+
                                 thrd_stat = (*thrd)();
-#if defined(HPX_HAVE_APEX)
+
                                 thread_state prev_state = thrd_stat.get_previous();
                                 thread_state_enum prev_state_enum = prev_state;
-                                if(prev_state_enum == terminated) {
+                                if (prev_state_enum == terminated)
+                                {
                                     apex_profiler.stop();
-                                } else {
+                                }
+                                else
+                                {
                                     apex_profiler.yield();
                                 }
+#else
+                                thrd_stat = (*thrd)();
 #endif
                             }
 
