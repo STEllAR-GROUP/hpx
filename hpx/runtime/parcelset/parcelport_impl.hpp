@@ -22,7 +22,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/predef/detail/endian_compat.h>
+#include <boost/detail/endian.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <limits>
