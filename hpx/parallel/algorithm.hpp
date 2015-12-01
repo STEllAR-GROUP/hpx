@@ -21,6 +21,7 @@
 #include <hpx/parallel/algorithms/find.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/algorithms/is_heap.hpp>
 #include <hpx/parallel/algorithms/is_partitioned.hpp>
 #include <hpx/parallel/algorithms/is_sorted.hpp>
 #include <hpx/parallel/algorithms/lexicographical_compare.hpp>
