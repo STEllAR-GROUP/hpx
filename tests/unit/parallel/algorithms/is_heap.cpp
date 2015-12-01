@@ -28,10 +28,7 @@ void test_is_heap(ExPolicy policy, IteratorTag)
 
     bool test = 
         hpx::parallel::is_heap(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
-                [](const std::size_t& a, const std::size_t& b) {
-                    return a < b;
-                });
+                iterator(boost::begin(c)), iterator(boost::end(c)));
 
     HPX_TEST_EQ(test, true);
 }
@@ -47,10 +44,7 @@ void test_is_heap_async(ExPolicy p, IteratorTag)
 
     hpx::future<bool> test = 
         hpx::parallel::is_heap(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
-                [](const std::size_t& a, const std::size_t& b) {
-                    return a < b;
-                });
+                iterator(boost::begin(c)), iterator(boost::end(c)));
 
     HPX_TEST_EQ(test.get(), true);
 }

@@ -101,6 +101,67 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
+    /// Determintes if the range [first, last) is a max heap. 
+    /// Uses operator < to compare elements.
+    ///
+    /// \note   Complexity: at most(N+S-1) comparisons where
+    ///         \a N = distance(first, last).
+    ///         \a S = number of partitions
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RndIter     The type of the source iterators used. The iterator
+    ///                     type must meet the requirements for a Random Access
+    ///                     Iterator
+    /// \param policy       The execution policy to use for the scheduling of 
+    ///                     iterations.
+    /// \param first        Refers to the beginning of the sequence of elements 
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    ///
+    /// The comparison operations in the parallel \a is_heap algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy 
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a is_heap algorithm invoked
+    /// with an execution_policy object of type \a parallel_execution_policy 
+    /// or \a parallel_task_execution_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns The \a is_heap algorithm returns a \a hpx::future<bool> if
+    ///          the execution policy is of type \a task_execution_policy 
+    ///          and returns \a bool otherwise.
+    ///          The \a is_heap algorithm returns a bool if each element in
+    ///          the sequence [first, last) satisfies the predicate. If the
+    ///          range [first, last) contains less than two elements, the 
+    ///          function always returns true.
+    template <typename ExPolicy, typename RndIter>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+    >::type
+    is_heap(ExPolicy && policy, RndIter first, RndIter last)
+    {
+        typedef typename std::iterator_traits<RndIter>::iterator_category
+            iterator_category;
+        static_assert(
+                (boost::is_base_of<
+                 std::random_access_iterator_tag, iterator_category
+                    >::value),
+                "Requires at least random access iterator.");
+
+        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef typename std::iterator_traits<RndIter>::value_type value_type;
+
+        return detail::is_heap<RndIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::less<value_type>());
+    }
+    
     /// Determintes if the range [first, last) is a heap. Uses pred to 
     /// compare elements.
     ///
@@ -172,7 +233,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::forward<Pred>(pred));
     }
-    
 }}}
 
 #endif
