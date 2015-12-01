@@ -6,6 +6,9 @@
 #if !defined(HPX_PARCELSET_IPC_DATA_WINDOWS_NOV_25_2012_0429PM)
 #define HPX_PARCELSET_IPC_DATA_WINDOWS_NOV_25_2012_0429PM
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/parcelport/ipc/interprocess_errors.hpp>
 #include <hpx/plugins/parcelport/ipc/message.hpp>
@@ -922,4 +925,4 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
 #endif
 
-
+#endif

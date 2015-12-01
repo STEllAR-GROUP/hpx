@@ -21,6 +21,8 @@
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
+
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>

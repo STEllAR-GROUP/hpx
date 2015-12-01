@@ -6,6 +6,9 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_DATA_BUFFER_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_DATA_BUFFER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     struct data_buffer
@@ -279,6 +282,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         std::size_t size_;
     };
 }}}}
+
+#endif
 
 #endif
 

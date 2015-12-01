@@ -21,6 +21,7 @@
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/destination/convert_destination.hpp>

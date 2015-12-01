@@ -20,6 +20,7 @@
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/logging/detail/ts/ts.hpp>
 
 #include <string>

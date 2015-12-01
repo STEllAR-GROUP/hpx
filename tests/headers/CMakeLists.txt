@@ -8,6 +8,24 @@ file(GLOB_RECURSE headers "${PROJECT_SOURCE_DIR}/hpx/*hpp")
 
 set(all_headers)
 
+set(exclude_from_all_headers
+  "util/hardware/timestamp/msvc.hpp"
+  "util/hardware/timestamp/linux_x86_32.hpp"
+  "util/hardware/timestamp/linux_x86_64.hpp"
+  "util/hardware/timestamp/linux_generic.hpp"
+  "util/hardware/timestamp/bgq.hpp"
+)
+
+# If we compile with the MPI parcelport enabled, we need to additionally
+# add the MPI include path here, because for the main library, it's only
+# added for the plugin.
+if(HPX_WITH_PARCELPORT_MPI)
+  find_package(MPI)
+  if(MPI_CXX_INCLUDE_PATH)
+    include_directories(${MPI_CXX_INCLUDE_PATH})
+  endif()
+endif()
+
 # make sure #including 'hpx/config/autolink.hpp' does not cause errors
 hpx_add_compile_flag(-DHPX_AUTOLINK_LIB_NAME=hpx)
 
@@ -36,7 +54,11 @@ foreach(header ${headers})
       "int main(int argc, char** argv) { return 0; }\n"
       "#endif\n")
 
-    set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+    set(detail_pos -1)
+    list(FIND exclude_from_all_headers "${relpath}" detail_pos)
+    if(${detail_pos} EQUAL -1)
+      set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+    endif()
 
     get_filename_component(header_dir "${relpath}" DIRECTORY)
 

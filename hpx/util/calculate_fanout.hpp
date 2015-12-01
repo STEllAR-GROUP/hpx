@@ -6,6 +6,8 @@
 #if !defined(HPX_UTIL_CALCULATE_FANOUT_APR_23_2014_0124PM)
 #define HPX_UTIL_CALCULATE_FANOUT_APR_23_2014_0124PM
 
+#include <cstddef>
+
 namespace hpx { namespace util
 {
     inline std::size_t

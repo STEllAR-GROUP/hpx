@@ -7,6 +7,7 @@
 #ifndef HPX_SERIALIZATION_BASIC_ARCHIVE_HPP
 #define HPX_SERIALIZATION_BASIC_ARCHIVE_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/cstdint.hpp>

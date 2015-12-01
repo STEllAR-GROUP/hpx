@@ -192,7 +192,7 @@ namespace hpx { namespace parcelset
             boost::atomic<bool> stopped_;
 
             sender sender_;
-            receiver receiver_;
+            receiver<parcelport> receiver_;
 
             void io_service_work()
             {

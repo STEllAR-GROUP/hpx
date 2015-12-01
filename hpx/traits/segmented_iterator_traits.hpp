@@ -7,7 +7,10 @@
 #define HPX_SEGMENTED_ITERATOR_TRAITS_OCT_14_2014_0229PM
 
 #include <hpx/traits.hpp>
+#include <hpx/util/decay.hpp>
+
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits
 {

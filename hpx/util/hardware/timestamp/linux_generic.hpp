@@ -8,7 +8,11 @@
 #if !defined(HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP)
 #define HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP
 
+#if defined(__unix__)
+
 #include <boost/cstdint.hpp>
+
+#include <time.h>
 
 namespace hpx { namespace util { namespace hardware
 {
@@ -22,6 +26,8 @@ inline boost::uint64_t timestamp()
 }
 
 }}}
+
+#endif
 
 #endif // HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP
 

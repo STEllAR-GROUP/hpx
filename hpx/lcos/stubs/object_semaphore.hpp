@@ -105,7 +105,7 @@ struct object_semaphore : components::stub_base<
 
     static void wait(naming::id_type const& gid)
     {
-        wait(gid).get();
+        wait_sync(gid);
     }
 };
 

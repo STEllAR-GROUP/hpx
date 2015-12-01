@@ -83,7 +83,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         {
             try {
                 boost::shared_ptr<receiver> receiver_conn(
-                    new receiver(io_service, *this));
+                    new receiver(io_service, get_max_inbound_message_size(), *this));
 
                 tcp::endpoint ep = *it;
                 acceptor_->open(ep.protocol());
@@ -272,7 +272,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             boost::shared_ptr<receiver> c(receiver_conn);
 
             boost::asio::io_service& io_service = io_service_pool_.get_io_service();
-            receiver_conn.reset(new receiver(io_service, *this));
+            receiver_conn.reset(new receiver(io_service, get_max_inbound_message_size(),
+                *this));
             acceptor_->async_accept(receiver_conn->socket(),
                 boost::bind(&connection_handler::handle_accept,
                     this,

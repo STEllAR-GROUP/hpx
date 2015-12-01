@@ -7,10 +7,12 @@
 #define HPX_PARALLEL_TRAITS_PROJECTED_JUL_18_2015_1001PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <type_traits>
 #include <iterator>
