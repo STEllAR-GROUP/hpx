@@ -26,7 +26,7 @@ void test_is_heap(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::make_heap(boost::begin(c), boost::end(c));
 
-    bool test = 
+    bool test =
         hpx::parallel::is_heap(policy,
                 iterator(boost::begin(c)), iterator(boost::end(c)));
 
@@ -42,7 +42,7 @@ void test_is_heap_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::make_heap(boost::begin(c), boost::end(c));
 
-    hpx::future<bool> test = 
+    hpx::future<bool> test =
         hpx::parallel::is_heap(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)));
 

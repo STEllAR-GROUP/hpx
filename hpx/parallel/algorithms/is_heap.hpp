@@ -101,7 +101,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Determintes if the range [first, last) is a max heap. 
+    /// Determintes if the range [first, last) is a max heap.
     /// Uses operator < to compare elements.
     ///
     /// \note   Complexity: at most(N+S-1) comparisons where
@@ -115,19 +115,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \tparam RndIter     The type of the source iterators used. The iterator
     ///                     type must meet the requirements for a Random Access
     ///                     Iterator
-    /// \param policy       The execution policy to use for the scheduling of 
+    /// \param policy       The execution policy to use for the scheduling of
     ///                     iterations.
-    /// \param first        Refers to the beginning of the sequence of elements 
+    /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
     ///                     that the algorithm will be applied to.
     ///
     /// The comparison operations in the parallel \a is_heap algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy 
+    /// with an execution policy object of type \a sequential_execution_policy
     /// executes in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a is_heap algorithm invoked
-    /// with an execution_policy object of type \a parallel_execution_policy 
+    /// with an execution_policy object of type \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
@@ -137,7 +137,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///          and returns \a bool otherwise.
     ///          The \a is_heap algorithm returns a bool if each element in
     ///          the sequence [first, last) satisfies the predicate. If the
-    ///          range [first, last) contains less than two elements, the 
+    ///          range [first, last) contains less than two elements, the
     ///          function always returns true.
     template <typename ExPolicy, typename RndIter>
     inline typename boost::enable_if<
@@ -161,8 +161,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::less<value_type>());
     }
-    
-    /// Determintes if the range [first, last) is a heap. Uses pred to 
+
+    /// Determintes if the range [first, last) is a heap. Uses pred to
     /// compare elements.
     ///
     /// \note   Complexity: at most(N+S-1) comparisons where
@@ -176,9 +176,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \tparam RndIter     The type of the source iterators used. The iterator
     ///                     type must meet the requirements for a Random Access
     ///                     Iterator
-    /// \param policy       The execution policy to use for the scheduling of 
+    /// \param policy       The execution policy to use for the scheduling of
     ///                     iterations.
-    /// \param first        Refers to the beginning of the sequence of elements 
+    /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
     ///                     that the algorithm will be applied to.
@@ -189,28 +189,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \code
     ///                     bool pred(const Type &a, const Type &b);
     ///                     \endcode \n
-    ///                     The signature does not need to have const&, but the 
-    ///                     function must not modify the objects passed to it. 
-    ///                     The type \a Type must be such that objects of type 
-    ///                     \a RndIter can be dereferenced and then implicity 
+    ///                     The signature does not need to have const&, but the
+    ///                     function must not modify the objects passed to it.
+    ///                     The type \a Type must be such that objects of type
+    ///                     \a RndIter can be dereferenced and then implicity
     ///                     converted to \a Type.
     ///
     /// The comparison operations in the parallel \a is_heap algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy 
+    /// with an execution policy object of type \a sequential_execution_policy
     /// executes in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a is_heap algorithm invoked
-    /// with an execution_policy object of type \a parallel_execution_policy 
+    /// with an execution_policy object of type \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns The \a is_heap algorithm returns a \a hpx::future<bool> if
-    ///          the execution policy is of type \a task_execution_policy 
+    ///          the execution policy is of type \a task_execution_policy
     ///          and returns \a bool otherwise.
     ///          The \a is_heap algorithm returns a bool if each element in
     ///          the sequence [first, last) satisfies the predicate. If the
-    ///          range [first, last) contains less than two elements, the 
+    ///          range [first, last) contains less than two elements, the
     ///          function always returns true.
     template <typename ExPolicy, typename RndIter, typename Pred>
     inline typename boost::enable_if<
