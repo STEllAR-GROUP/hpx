@@ -125,7 +125,8 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     void add_thunk(util::unique_function_nonser<void()>* f)
     {
-        thunks.push(f);
+        while(!thunks.push(f))
+            ; // Wait until succesfully pushed ...
     }
 };
 

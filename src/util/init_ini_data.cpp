@@ -450,8 +450,7 @@ namespace hpx { namespace util
         std::random_shuffle(libdata.begin(), libdata.end());
 
         typedef std::pair<fs::path, std::string> libdata_type;
-        for (libdata_type const& p :
-            boost::iterator_range<iterator_type>(libdata.begin(), libdata.end()))
+        for (libdata_type const& p : libdata)
         {
             // get the handle of the library
             error_code ec(lightweight);

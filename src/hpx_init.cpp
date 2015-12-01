@@ -1179,7 +1179,7 @@ namespace hpx
 
         if (std::abs(localwait + 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-        else
+
         {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
@@ -1222,7 +1222,7 @@ namespace hpx
 
         if (std::abs(localwait + 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-        else
+
         {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();

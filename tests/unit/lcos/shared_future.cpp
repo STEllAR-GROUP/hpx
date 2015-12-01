@@ -85,9 +85,8 @@ void test_initial_state()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    int i;
     try {
-        i = fi.get();
+        fi.get();
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
@@ -366,14 +365,12 @@ void test_copies_of_shared_future_become_ready_together()
     int i = sf1.get();
     HPX_TEST_EQ(i, 42);
 
-    i = 0;
     HPX_TEST(sf2.is_ready());
     HPX_TEST(sf2.has_value());
     HPX_TEST(!sf2.has_exception());
     i = sf2.get();
     HPX_TEST_EQ(i, 42);
 
-    i = 0;
     HPX_TEST(sf3.is_ready());
     HPX_TEST(sf3.has_value());
     HPX_TEST(!sf3.has_exception());

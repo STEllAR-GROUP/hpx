@@ -72,7 +72,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T, typename Arg>
         BOOST_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
         {
-            destruct<T>(v);
+            delete_<T>(v);
             construct<T, Arg>(v, std::forward<Arg>(arg));
         }
 

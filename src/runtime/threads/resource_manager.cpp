@@ -531,7 +531,7 @@ namespace hpx { namespace threads
                         release_cores_to_min, available_punits);
                     if (reserved < min_punits)
                     {
-                        reserved += reserve_at_higher_use_count(
+                        reserve_at_higher_use_count(
                             min_punits - reserved , available_punits);
                     }
                 }

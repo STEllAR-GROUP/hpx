@@ -1093,7 +1093,6 @@ namespace hpx { namespace components { namespace server
                     if (timeout >= 0.0 && timeout < (t.elapsed() - start_time))
                     {
                         // we waited long enough
-                        timed_out = true;
                         break;
                     }
                 }

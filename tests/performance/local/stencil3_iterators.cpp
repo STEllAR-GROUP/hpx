@@ -381,6 +381,7 @@ boost::uint64_t bench_stencil3_iterator_v1()
         });
 
     result += values[partition_size-2] + values.back() + values.front();
+    HPX_UNUSED(result);
 
     return hpx::util::high_resolution_clock::now() - start;
 }
@@ -504,6 +505,7 @@ boost::uint64_t bench_stencil3_iterator_v2()
         });
 
     result += values[partition_size-2] + values.back() + values.front();
+    HPX_UNUSED(result);
 
     return hpx::util::high_resolution_clock::now() - start;
 }
@@ -528,6 +530,7 @@ boost::uint64_t bench_stencil3_iterator_explicit()
         });
 
     result += values[partition_size-2] + values.back() + values.front();
+    HPX_UNUSED(result);
 
     return hpx::util::high_resolution_clock::now() - start;
 }
