@@ -11,9 +11,9 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/move.hpp>
 
 #include <typeinfo>
+#include <utility>
 
 namespace hpx { namespace util { namespace detail
 {

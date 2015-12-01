@@ -70,6 +70,7 @@ void test_timed_this_thread_executor(Executor& exec)
 int hpx_main(int argc, char* argv[])
 {
     std::size_t num_threads = hpx::get_os_thread_count();
+    HPX_UNUSED(num_threads);
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     {

@@ -163,7 +163,7 @@ struct test_async_executor4 : test_async_executor2
         {
             results.push_back(hpx::async(hpx::launch::async, f, elem));
         }
-        return std::move(results);
+        return results;
     }
 };
 
