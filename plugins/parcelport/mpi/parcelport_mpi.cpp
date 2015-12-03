@@ -121,7 +121,7 @@ namespace hpx { namespace parcelset
             {
                 receiver_.run();
                 sender_.run();
-                for(std::size_t i = 0; i != io_service_pool_.size(); ++i)
+                for(int i = 0; i != io_service_pool_.size(); ++i)
                 {
                     io_service_pool_.get_io_service(i).post(
                         hpx::util::bind(
