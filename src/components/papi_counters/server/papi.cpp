@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace papi_ns = hpx::performance_counters::papi;
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     papi_ns::server::papi_counter
 > papi_counter_type;
 
