@@ -17,7 +17,9 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
-#if defined(_GLIBCXX_HAVE_TLS)
+#if defined(__has_feature) && __has_feature(cxx_thread_local)
+    #define HPX_NATIVE_TLS thread_local
+#elif defined(_GLIBCXX_HAVE_TLS)
     #define HPX_NATIVE_TLS __thread
 #elif defined(BOOST_WINDOWS)
     #define HPX_NATIVE_TLS __declspec(thread)
