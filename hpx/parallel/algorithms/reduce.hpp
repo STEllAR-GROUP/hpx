@@ -112,10 +112,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     binary predicate. The signature of this predicate
     ///                     should be equivalent to:
     ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
-    ///                     The types \a Type1, \a Type2, and \a Ret must be
+    ///                     The types \a Type1 \a Ret must be
     ///                     such that an object of type \a InIter can be
     ///                     dereferenced and then implicitly converted to any
     ///                     of those types.

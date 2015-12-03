@@ -152,14 +152,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of the predicate function should be equivalent to
     ///                     the following:
     ///                     \code
-    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     bool pred(const Type1 &a, const Type1 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     it. The type \a Type1 must be such
+    ///                     that objects of type \a InIter can
     ///                     be dereferenced and then implicitly converted to
-    ///                     \a Type1 and \a Type2 respectively
+    ///                     \a Type1
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with a sequential execution policy object execute in sequential

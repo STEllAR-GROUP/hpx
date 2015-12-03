@@ -127,11 +127,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     output iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
-    /// \tparam Op1         The type of the binary function object used for
-    ///                     the summation operation.
-    /// \tparam Op2         The type of the binary function object used for
-    ///                     the multiplication operation.
-    ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first1       Refers to the beginning of the first sequence of

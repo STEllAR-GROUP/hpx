@@ -248,7 +248,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
     ///
@@ -526,7 +526,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
     ///
