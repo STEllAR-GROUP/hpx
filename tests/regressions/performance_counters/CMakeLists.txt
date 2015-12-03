@@ -10,8 +10,9 @@ set(tests
 
 if(PAPI_FOUND)
   set(tests ${tests}
+    papi_counters_active_interface
     papi_counters_basic_functions
-    papi_counters_active_interface)
+    papi_counters_segfault_1890)
 endif()
 
 foreach(test ${tests})
