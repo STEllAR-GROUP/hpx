@@ -126,14 +126,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the second argument. The signature of the function
     ///                     should be equivalent to
     ///                     \code
-    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     bool pred(const Type &a, const Type &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
-    ///                     be dereferenced and then implicitly converted to
-    ///                     \a Type1 and \a Type2 respectively
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
     ///
     /// The comparison operations in the parallel \a is_sorted algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -149,11 +148,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           if the execution policy is of type \a task_execution_policy
     ///           and returns \a bool otherwise.
     ///           The \a is_sorted algorithm returns a bool if each element in
-    ///           the sequence [first, last) is greater than or equal to the
-    ///           previous element. If the range [first, last) contains less
-    ///           than two elements, the function always returns true.
+    ///           the sequence [first, last) satisfies the predicate passed.
+    ///           If the range [first, last) contains less than two elements,
+    ///           the function always returns true.
     ///
-
     template <typename ExPolicy, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -350,14 +348,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the second argument. The signature of the function
     ///                     should be equivalent to
     ///                     \code
-    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     bool pred(const Type &a, const Type &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
-    ///                     be dereferenced and then implicitly converted to
-    ///                     \a Type1 and \a Type2 respectively
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
     ///
     /// The comparison operations in the parallel \a is_sorted_until algorithm
     /// invoked with an execution policy object of type
