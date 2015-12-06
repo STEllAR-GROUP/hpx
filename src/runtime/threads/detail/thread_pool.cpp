@@ -750,8 +750,8 @@ namespace hpx { namespace threads { namespace detail
             exec_total = exec_times_[num];
             num_phases = executed_thread_phases_[num];
 
-            reset_exec_total = reset_thread_phase_duration_[num];
-            reset_num_phases = reset_thread_phase_duration_times_[num];
+            reset_exec_total = reset_thread_phase_duration_times_[num];
+            reset_num_phases = reset_thread_phase_duration_[num];
 
             if (reset)
             {
@@ -808,8 +808,8 @@ namespace hpx { namespace threads { namespace detail
             exec_total = exec_times_[num];
             num_threads = executed_threads_[num];
 
-            reset_exec_total = reset_thread_duration_[num];
-            reset_num_threads = reset_thread_duration_times_[num];
+            reset_exec_total = reset_thread_duration_times_[num];
+            reset_num_threads = reset_thread_duration_[num];
 
             if (reset)
             {
