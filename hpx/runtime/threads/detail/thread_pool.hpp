@@ -76,10 +76,10 @@ namespace hpx { namespace threads { namespace detail
         mask_cref_type get_used_processing_units() const;
 
         // performance counters
-#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         boost::int64_t get_executed_threads(std::size_t num, bool reset);
         boost::int64_t get_executed_thread_phases(std::size_t num, bool reset);
-#ifdef HPX_HAVE_THREAD_IDLE_RATES
+#if defined(HPX_HAVE_THREAD_IDLE_RATES)
         boost::int64_t get_thread_phase_duration(std::size_t num, bool reset);
         boost::int64_t get_thread_duration(std::size_t num, bool reset);
         boost::int64_t get_thread_phase_overhead(std::size_t num, bool reset);
@@ -89,7 +89,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 #endif
 
-#ifdef HPX_HAVE_THREAD_IDLE_RATES
+#if defined(HPX_HAVE_THREAD_IDLE_RATES)
         ///////////////////////////////////////////////////////////////////////
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
@@ -102,14 +102,14 @@ namespace hpx { namespace threads { namespace detail
 
         boost::int64_t get_queue_length(std::size_t num_thread) const;
 
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+#if defined(HPX_HAVE_THREAD_QUEUE_WAITTIME)
         boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread) const;
         boost::int64_t get_average_task_wait_time(
             std::size_t num_thread) const;
 #endif
 
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+#if defined(HPX_HAVE_THREAD_STEALING_COUNTS)
         boost::int64_t get_num_pending_misses(std::size_t num, bool reset);
         boost::int64_t get_num_pending_accesses(std::size_t num, bool reset);
 
@@ -165,8 +165,47 @@ namespace hpx { namespace threads { namespace detail
         std::vector<boost::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
 
-#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
+        // timestamps/values of last reset operation for various performance
+        // counters
+        std::vector<boost::int64_t> reset_executed_threads_;
+        std::vector<boost::int64_t> reset_executed_thread_phases_;
+
+#if defined(HPX_HAVE_THREAD_IDLE_RATES)
         double timestamp_scale_;    // scale timestamps to nanoseconds
+
+        std::vector<boost::int64_t> reset_thread_duration_;
+        std::vector<boost::uint64_t> reset_thread_duration_times_;
+
+        std::vector<boost::int64_t> reset_thread_overhead_;
+        std::vector<boost::uint64_t> reset_thread_overhead_times_;
+        std::vector<boost::uint64_t> reset_thread_overhead_times_total_;
+
+        std::vector<boost::int64_t> reset_thread_phase_duration_;
+        std::vector<boost::uint64_t> reset_thread_phase_duration_times_;
+
+        std::vector<boost::int64_t> reset_thread_phase_overhead_;
+        std::vector<boost::uint64_t> reset_thread_phase_overhead_times_;
+        std::vector<boost::uint64_t> reset_thread_phase_overhead_times_total_;
+
+        std::vector<boost::uint64_t> reset_cumulative_thread_duration_;
+
+        std::vector<boost::uint64_t> reset_cumulative_thread_overhead_;
+        std::vector<boost::uint64_t> reset_cumulative_thread_overhead_total_;
+#endif
+#endif
+
+#if defined(HPX_HAVE_THREAD_IDLE_RATES)
+        std::vector<boost::uint64_t> reset_idle_rate_time_;
+        std::vector<boost::uint64_t> reset_idle_rate_time_total_;
+
+#if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
+        std::vector<boost::uint64_t> reset_creation_idle_rate_time_;
+        std::vector<boost::uint64_t> reset_creation_idle_rate_time_total_;
+
+        std::vector<boost::uint64_t> reset_cleanup_idle_rate_time_;
+        std::vector<boost::uint64_t> reset_cleanup_idle_rate_time_total_;
+#endif
 #endif
 
         // tfunc_impl timers
