@@ -990,8 +990,8 @@ namespace hpx { namespace threads { namespace detail
                     reset_thread_overhead_times_.begin());
                 std::copy(tfunc_times_.begin(), tfunc_times_.end(),
                     reset_thread_overhead_times_total_.begin());
-                std::copy(executed_thread_phases_.begin(),
-                    executed_thread_phases_.end(),
+                std::copy(executed_threads_.begin(),
+                    executed_threads_.end(),
                     reset_thread_overhead_.begin());
             }
         }
