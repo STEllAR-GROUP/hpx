@@ -104,10 +104,7 @@ namespace hpx { namespace util { namespace batch_environments
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             // if MPI is active we can ignore the missing node-file
             if (util::mpi_environment::check_mpi_environment(cfg))
-            {
-                valid_ = false;
                 return;
-            }
 #endif
 
             // raise hard error if nodefile could not be opened
