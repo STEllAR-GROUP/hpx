@@ -49,7 +49,7 @@ namespace hpx { namespace serialization { namespace detail
             // hpx::lcos::local::promise<void>::set_value() might need to acquire
             // a lock, as such, we check the our triggering condition inside a
             // critical section and trigger the promise outside of it.
-            bool set_value = true;
+            bool set_value = false;
             {
                 boost::lock_guard<mutex_type> l(mtx_);
                 ++triggered_futures_;
@@ -73,6 +73,14 @@ namespace hpx { namespace serialization { namespace detail
                     trigger();
                 }
             );
+        }
+
+        void reset()
+        {
+            done_ = false;
+            num_futures_ = 0;
+            triggered_futures_ = 0;
+            promise_ = hpx::lcos::local::promise<void>();
         }
 
         bool has_futures()

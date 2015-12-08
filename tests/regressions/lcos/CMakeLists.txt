@@ -18,6 +18,7 @@ set(tests
     future_hang_on_get_629
     future_hang_on_then_629
     future_timed_wait_1025
+    future_serialization_1898
     future_unwrap_878
     future_unwrap_1182
     ignore_while_locked_1485
