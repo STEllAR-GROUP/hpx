@@ -17,24 +17,6 @@
 
 namespace hpx { namespace serialization
 {
-    // use templated Archive parameter with sfinae
-    // to make these overloads less specialized than any else
-    template <typename Archive, typename T>
-    typename boost::enable_if<
-        boost::is_same<Archive, output_archive> >::type
-    serialize(Archive & ar, const T & t, unsigned)
-    {
-        access::serialize(ar, t, 0);
-    }
-
-    template <typename Archive, typename T>
-    typename boost::enable_if<
-        boost::is_same<Archive, input_archive> >::type
-    serialize(Archive & ar, T & t, unsigned)
-    {
-        access::serialize(ar, t, 0);
-    }
-
     template <typename T>
     output_archive & operator<<(output_archive & ar, T const & t)
     {
