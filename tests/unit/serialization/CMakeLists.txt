@@ -53,6 +53,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
   set(compile_tests
       fail_compile_non_serializable_class
+      succeed_compile_empty_class
      )
 
   set(fail_compile_non_serializable_class_FLAGS FAILURE_EXPECTED)
