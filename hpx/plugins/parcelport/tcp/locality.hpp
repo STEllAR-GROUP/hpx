@@ -10,6 +10,9 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_LOCALITY_HPP
 #define HPX_PARCELSET_POLICIES_TCP_LOCALITY_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+
 #include <hpx/config/asio.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -93,6 +96,8 @@ namespace hpx { namespace parcelset
         };
     }}
 }}
+
+#endif
 
 #endif
 

@@ -7,14 +7,15 @@
 #ifndef HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 #define HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 
+#include <hpx/config.hpp>
+#include <hpx/util/plugin/config.hpp>
+#include <hpx/util/detail/pack.hpp>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
 
 #include <string>
 #include <map>
-
-#include <hpx/util/plugin/config.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace plugin {

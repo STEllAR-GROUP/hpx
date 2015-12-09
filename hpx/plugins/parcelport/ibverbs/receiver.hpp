@@ -7,6 +7,8 @@
 #ifndef HPX_PARCELSET_POLICIES_IBVERBS_RECEIVER_HPP
 #define HPX_PARCELSET_POLICIES_IBVERBS_RECEIVER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
@@ -212,5 +214,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         return lhs.get() < rhs.get();
     }
 }}}}
+
+#endif
 
 #endif

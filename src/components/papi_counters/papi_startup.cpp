@@ -26,7 +26,7 @@
 HPX_REGISTER_COMPONENT_MODULE_DYNAMIC();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::papi::server::papi_counter
 > papi_counter_type;
 

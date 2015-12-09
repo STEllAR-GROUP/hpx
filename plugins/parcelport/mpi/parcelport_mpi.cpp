@@ -123,7 +123,7 @@ namespace hpx { namespace parcelset
                 sender_.run();
                 for(std::size_t i = 0; i != io_service_pool_.size(); ++i)
                 {
-                    io_service_pool_.get_io_service(i).post(
+                    io_service_pool_.get_io_service(int(i)).post(
                         hpx::util::bind(
                             &parcelport::io_service_work, this
                         )
@@ -192,7 +192,7 @@ namespace hpx { namespace parcelset
             boost::atomic<bool> stopped_;
 
             sender sender_;
-            receiver receiver_;
+            receiver<parcelport> receiver_;
 
             void io_service_work()
             {

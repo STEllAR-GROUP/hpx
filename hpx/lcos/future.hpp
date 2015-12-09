@@ -127,6 +127,16 @@ namespace hpx { namespace lcos { namespace detail
 
                 ar.await_future(f);
             }
+            else
+            {
+                if(f.is_ready() && f.has_value())
+                {
+                    value_type const & value =
+                        *hpx::traits::future_access<Future>::
+                            get_shared_state(f)->get_result();
+                    ar << value;
+                }
+            }
             return;
         }
 

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/warnings_prefix.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>

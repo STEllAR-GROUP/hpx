@@ -6,13 +6,14 @@
 #if !defined(HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_BUFFER_MAR_07_2013_1250PM)
 #define HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_BUFFER_MAR_07_2013_1250PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/util/move.hpp>
 
 #include <vector>
-
-#include <boost/noncopyable.hpp>
 
 namespace hpx { namespace plugins { namespace parcel { namespace detail
 {
@@ -61,7 +62,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
         message_buffer_append_state append(parcelset::locality const & dest,
             parcelset::parcel p,
-            parcelset::parcelport::write_handler_type f)
+            parcelset::write_handler_type f)
         {
             HPX_ASSERT(messages_.size() == handlers_.size());
             HPX_ASSERT(dests_.size() == handlers_.size());
@@ -119,7 +120,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
     private:
         std::vector<parcelset::locality> dests_;
         std::vector<parcelset::parcel> messages_;
-        std::vector<parcelset::parcelport::write_handler_type> handlers_;
+        std::vector<parcelset::write_handler_type> handlers_;
         std::size_t max_messages_;
     };
 }}}}

@@ -10,6 +10,9 @@
 #if !defined(HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036)
 #define HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_HWLOC)
+
 #include <hwloc.h>
 
 #include <hpx/config.hpp>
@@ -262,6 +265,8 @@ namespace hpx { namespace threads
         return topo.get();
     }
 }}
+
+#endif
 
 #endif // HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036
 

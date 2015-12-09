@@ -6,7 +6,10 @@
 #if !defined(HPX_RUNTIME_PARCELSET_POLICIES_MESSAGE_HANDLER_FEB_24_2013_1141AM)
 #define HPX_RUNTIME_PARCELSET_POLICIES_MESSAGE_HANDLER_FEB_24_2013_1141AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/util/function.hpp>
 
 namespace hpx { namespace parcelset { namespace policies
 {

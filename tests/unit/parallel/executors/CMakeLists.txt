@@ -15,6 +15,7 @@ set(tests
     parallel_fork_executor
     sequential_executor
     service_executors
+    shared_parallel_executor
     this_thread_executors
     thread_pool_attached_executors
     thread_pool_executors

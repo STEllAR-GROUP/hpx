@@ -6,6 +6,9 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_CONTEXT_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_CONTEXT_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/plugins/parcelport/ibverbs/helper.hpp>
@@ -619,5 +622,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
     typedef context_impl<detail::server> server_context;
 }}}}
+
+#endif
 
 #endif

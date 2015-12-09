@@ -8,9 +8,6 @@
 #if !defined(HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM)
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
-#include <boost/noncopyable.hpp>
-#include <boost/bind.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/exception.hpp>
@@ -27,6 +24,9 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/noncopyable.hpp>
+#include <boost/bind.hpp>
 
 #include <map>
 #include <algorithm>

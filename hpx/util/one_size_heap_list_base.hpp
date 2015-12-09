@@ -6,6 +6,9 @@
 #if !defined(HPX_UTIL_ONE_SIZE_HEAP_LIST_BASE_OCT_12_2013_0413PM)
 #define HPX_UTIL_ONE_SIZE_HEAP_LIST_BASE_OCT_12_2013_0413PM
 
+#include <hpx/runtime/naming/name.hpp>
+#include <cstddef>
+
 namespace hpx { namespace util
 {
     struct one_size_heap_list_base

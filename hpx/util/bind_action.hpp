@@ -9,6 +9,7 @@
 #define HPX_UTIL_BIND_ACTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>

@@ -10,6 +10,9 @@
 #if !defined(HPX_079E367D_741C_4FA1_913F_EA33A192BDAD)
 #define HPX_079E367D_741C_4FA1_913F_EA33A192BDAD
 
+#include <hpx/config/defines.hpp>
+#if !defined(HPX_HAVE_HWLOC)
+
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/exception.hpp>
 
@@ -165,7 +168,7 @@ public:
         return 1;
     }
 
-    std::size_t get_number_of_numa_domains() const
+    std::size_t get_number_of_numa_nodes() const
     {
         return 1;
     }
@@ -236,6 +239,8 @@ inline topology& create_topology()
 }
 
 }}
+
+#endif
 
 #endif // HPX_079E367D_741C_4FA1_913F_EA33A192BDAD
 

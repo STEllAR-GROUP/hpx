@@ -9,7 +9,12 @@
 #if !defined(HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB)
 #define HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB
 
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+
 #include <boost/utility/binary.hpp>
+
+#include <string>
 
 namespace hpx { namespace agas
 {

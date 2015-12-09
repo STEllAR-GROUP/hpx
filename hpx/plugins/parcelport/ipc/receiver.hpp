@@ -4,6 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef HPX_PARCELPORT_IPC_SENDER_HPP
+#define HPX_PARCELPORT_IPC_SENDER_HPP
+
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
@@ -150,3 +156,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         return lhs.get() < rhs.get();
     }
 }}}}
+
+#endif
+
+#endif

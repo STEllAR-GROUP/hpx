@@ -9,6 +9,8 @@
 
 #include <hpx/config.hpp>
 
+#include <boost/cstdint.hpp>
+
 #include <cstddef>
 #include <climits>
 #include <cstring>

@@ -6,6 +6,8 @@
 #ifndef HPX_DLL_HPP_HK_2005_11_06
 #define HPX_DLL_HPP_HK_2005_11_06
 
+#include <hpx/config.hpp>
+
 #ifndef HPX_MSVC
 # ifndef  HPX_HAS_DLOPEN
 #  define HPX_HAS_DLOPEN 1

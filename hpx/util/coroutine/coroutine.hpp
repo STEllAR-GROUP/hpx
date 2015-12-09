@@ -30,6 +30,8 @@
 #ifndef HPX_COROUTINE_COROUTINE_HPP_20060512
 #define HPX_COROUTINE_COROUTINE_HPP_20060512
 
+#include <hpx/config.hpp>
+
 // This needs to be first for building on Macs
 #include <hpx/util/coroutine/detail/default_context_impl.hpp>
 

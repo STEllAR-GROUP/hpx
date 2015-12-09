@@ -124,10 +124,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename T>
         struct future_type<Executor, T,
             typename hpx::util::always_void<
-                typename Executor::future_type
+                typename Executor::template future_type<T>::type
             >::type>
         {
-            typedef typename Executor::future_type type;
+            typedef typename Executor::template future_type<T>::type type;
         };
 
         ///////////////////////////////////////////////////////////////////////

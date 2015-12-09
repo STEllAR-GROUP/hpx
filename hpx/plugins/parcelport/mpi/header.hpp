@@ -7,6 +7,9 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_HEADER_HPP
 #define HPX_PARCELSET_POLICIES_MPI_HEADER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <mpi.h>
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -138,5 +141,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
     };
 }}}}
+
+#endif
 
 #endif

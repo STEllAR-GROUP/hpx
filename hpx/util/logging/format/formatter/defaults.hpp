@@ -21,7 +21,6 @@
 # pragma once
 #endif
 
-#include <boost/cstdint.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
@@ -29,6 +28,7 @@
 #include <hpx/util/logging/format/formatter/time_strf.hpp>
 #include <hpx/util/logging/format/formatter/spacer.hpp>
 #include <hpx/util/logging/format/formatter/thread_id.hpp>
+#include <boost/cstdint.hpp>
 #include <stdio.h>
 #include <time.h>
 #include <sstream>
