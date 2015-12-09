@@ -9,7 +9,7 @@
 #define HPX_874FFB61_BEF5_4D46_B024_6DAAF81BACF1
 
 #include <hpx/config.hpp>
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 
 #include <boost/cstdint.hpp>
 #include <windows.h>
