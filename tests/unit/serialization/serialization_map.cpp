@@ -102,7 +102,7 @@ void test_vector_as_value()
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
     std::map<size_t, std::vector<int> > os;
-    for (size_t k = 0; k < 10; ++k)
+    for (int k = 0; k < 10; ++k)
     {
         std::vector<int> vec(10);
         std::iota(vec.begin(), vec.end(), k);
