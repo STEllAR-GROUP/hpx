@@ -14,6 +14,7 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/intrusive_ptr.hpp>
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -410,7 +411,7 @@ namespace hpx { namespace naming
         };
 
         // serialization
-        void id_type_impl::save(serialization::output_archive& ar) const
+        void id_type_impl::save(serialization::output_archive& ar, unsigned) const
         {
             if(ar.is_future_awaiting())
             {
@@ -451,7 +452,7 @@ namespace hpx { namespace naming
             }
         }
 
-        void id_type_impl::load(serialization::input_archive& ar)
+        void id_type_impl::load(serialization::input_archive& ar, unsigned)
         {
             gid_serialization_data data;
             ar >> data;
@@ -510,29 +511,17 @@ namespace hpx { namespace naming
     void id_type::save(T& ar,
         const unsigned int version) const
     {
-        bool isvalid = gid_ != 0;
-        ar << isvalid;
-        if (isvalid)
-            gid_->save(ar);
+        // We serialize the intrusive ptr and use pointer tracking here. This
+        // avoids multiple credit splitting if we need multiple future await
+        // passes (they all work on the same archive).
+        ar << gid_;
     }
 
     template <typename T>
     void id_type::load(T& ar,
         const unsigned int version)
     {
-        if (version > HPX_IDTYPE_VERSION) {
-            HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
-                "trying to load id_type of unknown version");
-        }
-
-        bool isvalid;
-        ar >> isvalid;
-        if (isvalid) {
-            boost::intrusive_ptr<detail::id_type_impl> gid(
-                new detail::id_type_impl);
-            gid->load(ar);
-            std::swap(gid_, gid);
-        }
+        ar >> gid_;
     }
 
     template HPX_EXPORT void id_type::save<serialization::output_archive>(

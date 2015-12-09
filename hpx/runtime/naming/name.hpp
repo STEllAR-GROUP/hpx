@@ -823,8 +823,9 @@ namespace hpx { namespace naming
             }
 
             // serialization
-            void save(serialization::output_archive& ar) const;
-            void load(serialization::input_archive& ar);
+            void save(serialization::output_archive& ar, unsigned) const;
+            void load(serialization::input_archive& ar, unsigned);
+            HPX_SERIALIZATION_SPLIT_MEMBER()
 
         private:
             // credit management (called during serialization), this function
