@@ -11,7 +11,7 @@
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -53,7 +53,6 @@ namespace hpx { namespace parallel { namespace util
 
                 using hpx::util::get;
                 using hpx::util::placeholders::_1;
-                using lcos::local::dataflow;
                 using hpx::util::deferred_call;
 
                 std::vector<hpx::shared_future<Result1> > workitems;
@@ -165,7 +164,6 @@ namespace hpx { namespace parallel { namespace util
 
                 using hpx::util::get;
                 using hpx::util::placeholders::_1;
-                using lcos::local::dataflow;
                 using hpx::util::deferred_call;
 
                 std::vector<hpx::shared_future<Result1> > workitems;

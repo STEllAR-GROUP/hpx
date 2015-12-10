@@ -199,8 +199,27 @@ namespace hpx { namespace lcos { namespace detail
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
+// local dataflow: invokes given function (or executor) when ready
+namespace hpx
 {
+#if defined(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
+    namespace lcos { namespace local
+    {
+        template <typename F, typename ...Ts>
+        BOOST_FORCEINLINE
+        auto dataflow(F && f, Ts &&... ts)
+        ->  decltype(lcos::detail::dataflow_dispatch<
+                typename util::decay<F>::type>::call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
+        {
+            return lcos::detail::dataflow_dispatch<
+                typename util::decay<F>::type>::call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+    }}
+#endif
+
     template <typename F, typename ...Ts>
     BOOST_FORCEINLINE
     auto dataflow(F && f, Ts &&... ts)
@@ -213,6 +232,6 @@ namespace hpx { namespace lcos { namespace local
             typename util::decay<F>::type>::call(
                 std::forward<F>(f), std::forward<Ts>(ts)...);
     }
-}}}
+}
 
 #endif

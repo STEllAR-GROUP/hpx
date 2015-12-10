@@ -13,7 +13,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, c_first, last, comp
                     ));
 
-            return hpx::lcos::local::dataflow(
+            return hpx::dataflow(
                 [](hpx::future<void> && left, hpx::future<void> && right)
                 {
                     if (left.has_exception() || right.has_exception())

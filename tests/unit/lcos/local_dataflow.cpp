@@ -14,7 +14,7 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using hpx::lcos::local::dataflow;
+using hpx::dataflow;
 using hpx::util::bind;
 
 using hpx::async;

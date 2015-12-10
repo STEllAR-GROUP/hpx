@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch;
 
     // dispatch point used for dataflow<Action> implementations
-    template <typename Action, typename Enable = void>
+    template <typename Action, typename Policy, typename Enable = void>
     struct dataflow_action_dispatch;
 
     // dispatch point used for launch_policy implementations
@@ -107,7 +107,11 @@ namespace hpx { namespace lcos { namespace detail
             traits::is_action<Action>::value
         >::type>
     {
-        typedef typename Action::result_type type;
+        typedef typename traits::promise_local_result<
+                typename hpx::actions::extract_action<
+                    Action
+                >::remote_result_type
+            >::type type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -206,7 +210,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<dataflow_frame> this_(this);
             threads::register_thread_nullary(
                 util::deferred_call(f, std::move(this_), is_void())
-              , "hpx::lcos::local::dataflow::execute"
+              , "hpx::dataflow::execute"
               , threads::pending
               , true
               , threads::thread_priority_boost);
@@ -473,52 +477,194 @@ namespace hpx { namespace lcos { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // any action
-//     template <typename Action>
-//     struct dataflow_dispatch<Action,
-//         typename boost::enable_if_c<
-//             traits::is_action<Action>::value
-//         >::type>
-//     {
-//         template <
-//             typename Component, typename Signature, typename Derived,
-//             typename ...Ts>
+    template <typename Action>
+    struct dataflow_dispatch<Action,
+        typename boost::enable_if_c<
+            traits::is_action<Action>::value
+        >::type>
+    {
+        template <
+            typename Component, typename Signature, typename Derived,
+            typename ...Ts>
+        BOOST_FORCEINLINE static
+        typename dataflow_frame<
+            BOOST_SCOPED_ENUM(launch)
+          , Derived
+          , hpx::util::tuple<
+                hpx::id_type
+              , typename hpx::traits::acquire_future<Ts>::type...
+            >
+        >::type
+        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+            hpx::actions::basic_action<Component, Signature, Derived> const& act,
+            naming::id_type const& id, Ts &&... ts)
+        {
+            typedef
+                dataflow_frame<
+                    BOOST_SCOPED_ENUM(launch)
+                  , Derived
+                  , hpx::util::tuple<
+                        hpx::id_type
+                      , typename hpx::traits::acquire_future<Ts>::type...
+                    >
+                >
+                frame_type;
+
+            boost::intrusive_ptr<frame_type> p(new frame_type(
+                    launch::async
+                  , Derived()
+                  , hpx::util::forward_as_tuple(
+                        id
+                      , hpx::traits::acquire_future_disp()(
+                            std::forward<Ts>(ts)
+                        )...
+                    )
+                ));
+            p->do_await();
+
+            using traits::future_access;
+            return future_access<typename frame_type::type>::create(std::move(p));
+        }
+
+        template <
+            typename Component, typename Signature, typename Derived,
+            typename ...Ts>
+        BOOST_FORCEINLINE static
+        typename dataflow_frame<
+            BOOST_SCOPED_ENUM(launch)
+          , Derived
+          , hpx::util::tuple<
+                hpx::id_type
+              , typename hpx::traits::acquire_future<Ts>::type...
+            >
+        >::type
+        call(hpx::actions::basic_action<Component, Signature, Derived> const& act,
+            naming::id_type const& id, Ts &&... ts)
+        {
+            return call(launch::all, act, id, std::forward<Ts>(ts)...);
+        }
+    };
+
+    // BOOST_SCOPED_ENUM(launch)
+    template <typename Action, typename Policy>
+    struct dataflow_action_dispatch<Action, Policy,
+        typename boost::enable_if_c<
+            traits::is_launch_policy<Policy>::value
+        >::type>
+    {
+        template <typename ...Ts>
+        BOOST_FORCEINLINE static lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<
+                    Action
+                >::remote_result_type
+            >::type>
+        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+            naming::id_type const& id, Ts &&... ts)
+        {
+            return dataflow_dispatch<Action>::call(launch_policy, Action(), id,
+                std::forward<Ts>(ts)...);
+        }
+
+//         template <typename DistPolicy, typename ...Ts>
 //         BOOST_FORCEINLINE static
-//         typename dataflow_frame<
-//             BOOST_SCOPED_ENUM(launch)
-//           , Derived
-//           , hpx::util::tuple<
-//                 typename hpx::traits::acquire_future<Ts>::type...
+//         typename boost::enable_if_c<
+//             traits::is_distribution_policy<DistPolicy>::value,
+//             lcos::future<
+//                 typename traits::promise_local_result<
+//                     typename hpx::actions::extract_action<
+//                         Action
+//                     >::remote_result_type
+//                 >::type
 //             >
 //         >::type
-//         call(hpx::actions::basic_action<Component, Signature, Derived> const& act,
-//             naming::id_type const& id, Ts &&... ts)
+//         call(BOOST_SCOPED_ENUM(launch) launch_policy,
+//             DistPolicy const& policy, Ts&&... ts)
 //         {
-//             typedef
-//                 dataflow_frame<
-//                     BOOST_SCOPED_ENUM(launch)
-//                   , Derived
-//                   , hpx::util::tuple<
-//                         typename hpx::traits::acquire_future<Ts>::type...
-//                     >
-//                 >
-//                 frame_type;
-//
-//             boost::intrusive_ptr<frame_type> p(new frame_type(
-//                     launch::async
-//                   , act
-//                   , id
-//                   , hpx::util::forward_as_tuple(
-//                         hpx::traits::acquire_future_disp()(
-//                             std::forward<Ts>(ts)
-//                         )...
-//                     )
-//                 ));
-//             p->do_await();
-//
-//             using traits::future_access;
-//             return future_access<typename frame_type::type>::create(std::move(p));
+//             return policy.template async<Action>(launch_policy,
+//                 std::forward<Ts>(ts)...);
+//         }
+    };
+
+    // naming::id_type
+    template <typename Action>
+    struct dataflow_action_dispatch<Action, naming::id_type>
+    {
+        template <typename ...Ts>
+        BOOST_FORCEINLINE static
+        lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<
+                    Action
+                >::remote_result_type
+            >::type>
+        call(naming::id_type const& id, Ts&&... ts)
+        {
+            return dataflow_action_dispatch<
+                    Action, BOOST_SCOPED_ENUM(launch)
+                >::call(launch::all, id, std::forward<Ts>(ts)...);
+        }
+    };
+
+    // distribution policy
+//     template <typename Action, typename Policy>
+//     struct dataflow_action_dispatch<Action, Policy,
+//         typename boost::enable_if_c<
+//             traits::is_distribution_policy<Policy>::value
+//         >::type>
+//     {
+//         template <typename DistPolicy, typename ...Ts>
+//         BOOST_FORCEINLINE static
+//         lcos::future<
+//             typename traits::promise_local_result<
+//                 typename hpx::actions::extract_action<
+//                     Action
+//                 >::remote_result_type
+//             >::type>
+//         call(DistPolicy const& policy, Ts&&... ts)
+//         {
+//             return dataflow_action_dispatch<
+//                     Action, BOOST_SCOPED_ENUM(launch)
+//                 >::call(launch::all, policy, std::forward<Ts>(ts)...);
 //         }
 //     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    struct dataflow_launch_policy_dispatch<Action,
+        typename boost::enable_if_c<
+            traits::is_action<Action>::value
+        >::type>
+    {
+        typedef typename traits::promise_local_result<
+                typename hpx::actions::extract_action<
+                    Action
+                >::remote_result_type
+            >::type result_type;
+
+        template <typename ...Ts>
+        BOOST_FORCEINLINE static
+        lcos::future<result_type>
+        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+            Action const&, naming::id_type const& id, Ts &&... ts)
+        {
+            return dataflow_action_dispatch<
+                    Action, BOOST_SCOPED_ENUM(launch)
+                >::call(launch_policy, id, std::forward<Ts>(ts)...);
+        }
+
+//         template <typename DistPolicy, typename ...Ts>
+//         BOOST_FORCEINLINE static
+//         typename boost::enable_if_c<
+//             traits::is_distribution_policy<DistPolicy>::value,
+//             lcos::future<result_type>
+//         >::type
+//         call(BOOST_SCOPED_ENUM(launch) launch_policy,
+//             Action const&, DistPolicy const& policy, Ts&&... ts)
+//         {
+//             return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);
+//         }
+    };
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

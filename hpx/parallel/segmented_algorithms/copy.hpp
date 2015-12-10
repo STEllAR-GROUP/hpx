@@ -206,7 +206,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             HPX_ASSERT(!segments.empty());
 
             return util::detail::algorithm_result<ExPolicy, SegOutIter>::get(
-                lcos::local::dataflow(
+                dataflow(
                     [=](std::vector<shared_future<local_output_iterator_type> > && r)
                         ->  SegOutIter
                     {

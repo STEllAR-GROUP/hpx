@@ -13,7 +13,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 using hpx::lcos::shared_future;
@@ -30,7 +30,7 @@ double func(double x1 , double x2 , double x3 , double x4 ,
 int main()
 {
     shared_future< double > f = make_ready_future( 1.0 );
-    f = hpx::lcos::local::dataflow(
+    f = hpx::dataflow(
             hpx::launch::sync,
             unwrapped(&func),
             f, f, f, f, f, f, f);

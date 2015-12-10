@@ -988,7 +988,7 @@ namespace hpx
 
             // when all values are here merge them to one vector
             // and return a future to this vector
-            return lcos::local::dataflow(launch::async, merge_func,
+            return dataflow(launch::async, merge_func,
                 std::move(part_values_future));
         }
 
