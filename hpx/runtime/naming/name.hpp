@@ -12,7 +12,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -458,8 +460,6 @@ namespace hpx { namespace naming
         msb |= get_gid_from_locality_id(locality_id).get_msb();
         return gid_type(msb, gid.get_lsb());
     }
-
-    BOOST_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
 
     ///////////////////////////////////////////////////////////////////////////
     inline bool refers_to_virtual_memory(gid_type const& gid)
