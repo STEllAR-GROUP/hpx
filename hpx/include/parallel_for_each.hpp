@@ -9,6 +9,7 @@
 
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
+#include <hpx/parallel/container_algorithms/for_each.hpp>
 
 #endif
 
