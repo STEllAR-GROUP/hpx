@@ -100,6 +100,8 @@ namespace hpx
 
             size_type size;
             ar >> size; //-V128
+
+            t.clear();
             for (size_type i = 0; i < size; ++i)
             {
                 value_type v;
