@@ -29,6 +29,8 @@ void test_make_heap(ExPolicy policy, IteratorTag)
 
     hpx::parallel::make_heap(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)));
+
+    HPX_TEST_EQ(std::is_heap(boost::begin(c), boost::end(c)), true);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -46,6 +48,7 @@ void test_make_heap_async(ExPolicy p, IteratorTag)
                 iterator(boost::begin(c)), iterator(boost::end(c)));
 
     test.wait();
+    HPX_TEST_EQ(std::is_heap(boost::begin(c), boost::end(c)), true);
 }
 
 template <typename IteratorTag>

@@ -30,6 +30,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // make_heap
     namespace detail
     {
+        // Perform bottom up heap construction given a range of elements.
+        // sift_down_range will take a range from [start,start-count) and
+        // move the beginning node downwards based on the result of the
+        // predicate
+        template <typename RndIter, typename Pred>
+        void sift_down_range(RndIter first, Pred && pred,
+                typename std::iterator_traits<RndIter>::difference_type len,
+                RndIter start, std::size_t count)
+        {
+            typedef typename std::iterator_traits<RndIter>::difference_type difference_type;
+            typedef typename std::iterator_traits<RndIter>::value_type value_type;
+
+            for(std::size_t i = 0; i < count; i++, start -= i) {
+                difference_type child = start - first;
+
+                if(len < 2 || (len - 2) / 2 < child)
+                    return;
+
+                child = 2 * child + 1;
+                RndIter child_i = first + child;
+
+                if ((child + 1) < len && pred(*child_i, *(child_i+1))) {
+                    ++child_i;
+                    ++child;
+                }
+
+                if(pred(*child_i, *start))
+                    return;
+
+                value_type top = *start;
+                do {
+                    *start = *child_i;
+                    start = child_i;
+
+                    if ((len - 2) / 2 < child)
+                        break;
+
+                    child = 2 * child + 1;
+                    child_i = first + child;
+
+                    if ((child + 1) < len && pred(*child_i, *(child_i + 1))) {
+                        ++child_i;
+                        ++child;
+                    }
+                }while(!pred(*child_i, top));
+                *start = top;
+            }
+        }
         /// \cond NOINTERNAL
         template <typename RndIter>
         struct make_heap: public detail::algorithm<make_heap<RndIter>, void>
@@ -52,7 +100,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy policy, RndIter first, RndIter last,
                     Pred && pred)
             {
+                typedef typename std::iterator_traits<RndIter>::difference_type
+                    dtype;
 
+                dtype n = last - first;
+
+                if(n <= 1)
+                    return util::detail::algorithm_result<ExPolicy>::get();
+
+                std::size_t chunk_size = 4;
+
+                for(dtype start = (n-2)/2; start > 0;
+                    start = (dtype)pow(2, (dtype)log2(start)) - 2) {
+                    dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
+
+                    std::size_t items = (start-end_exclusive);
+
+                    if(chunk_size > items)
+                        chunk_size = items / 2;
+
+                    std::vector<hpx::future<void> > workitems;
+                    workitems.reserve(items/chunk_size);
+                
+                    std::size_t cnt = 0;
+                    while(cnt + chunk_size < items) {
+                        workitems.push_back(
+                            hpx::async(hpx::launch::async,
+                                &sift_down_range<RndIter, Pred>, first,
+                                std::forward<Pred>(pred), n, first + start - cnt,
+                                chunk_size)
+                            );
+                        cnt += chunk_size;
+                    }
+
+                    if(cnt < items) {
+                        workitems.push_back(
+                            hpx::async(hpx::launch::async,
+                                &sift_down_range<RndIter, Pred>, first,
+                                std::forward<Pred>(pred), n, first + start - cnt,
+                                items-cnt)
+                            );
+                    }
+
+                    hpx::wait_all(workitems);
+                }
             }
         };
     }

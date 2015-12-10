@@ -25,6 +25,7 @@
 #include <hpx/parallel/algorithms/is_partitioned.hpp>
 #include <hpx/parallel/algorithms/is_sorted.hpp>
 #include <hpx/parallel/algorithms/lexicographical_compare.hpp>
+#include <hpx/parallel/algorithms/make_heap.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/algorithms/move.hpp>
