@@ -12,11 +12,8 @@ namespace hpx { namespace serialization
         naming::gid_type const & gid,
         naming::gid_type const & splitted_gid)
     {
-        if(new_gids_)
-        {
-            (*new_gids_)[gid].push_back(splitted_gid);
-            HPX_ASSERT((*new_gids_)[gid].size() == 1);
-        }
+        HPX_ASSERT(is_future_awaiting());
+        buffer_->add_gid(gid, splitted_gid);
     }
 
     naming::gid_type output_archive::get_new_gid(naming::gid_type const & gid)
