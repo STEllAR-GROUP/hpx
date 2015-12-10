@@ -63,6 +63,7 @@ set(tests
     is_sorted_executors
     is_sorted_until
     lexicographical_compare
+    make_heap
     max_element
     min_element
     minmax_element
