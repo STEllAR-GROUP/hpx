@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/parallel_move.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -72,6 +73,37 @@ void move_tests(hpx::partitioned_vector<T> const& v1)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename T, typename DistPolicy, typename ExPolicy>
+void move_algo_tests_with_policy(std::size_t size, std::size_t localities,
+    DistPolicy const& policy, ExPolicy const& move_policy)
+{
+    hpx::partitioned_vector<T> v1(size, policy);
+    fill_vector(v1, T(43));
+
+    hpx::partitioned_vector<T> v2(size, policy);
+    typename hpx::partitioned_vector<T>::iterator it =
+        hpx::parallel::move(move_policy, v1.begin(), v1.end(), v2.begin());
+    HPX_TEST(it == v2.end());
+    compare_vectors(v1, v2);
+}
+
+template <typename T, typename DistPolicy, typename ExPolicy>
+void move_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
+    DistPolicy const& policy, ExPolicy const& move_policy)
+{
+    hpx::partitioned_vector<T> v1(size, policy);
+    fill_vector(v1, T(43));
+
+    using hpx::parallel::task;
+
+    hpx::partitioned_vector<T> v2(size, policy);
+    hpx::future<typename hpx::partitioned_vector<T>::iterator> f =
+        hpx::parallel::move(move_policy(task), v1.begin(), v1.end(), v2.begin());
+
+    HPX_TEST(f.get() == v2.end());
+    compare_vectors(v1, v2);
+}
+
 template <typename T, typename DistPolicy>
 void move_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
@@ -97,6 +129,14 @@ void move_tests_with_policy(std::size_t size, std::size_t localities,
 
     fill_vector(v5, T(43));
     compare_vectors(v1, v5, false);
+
+    using namespace hpx::parallel;
+
+    move_algo_tests_with_policy<T>(size, localities, policy, seq);
+    move_algo_tests_with_policy<T>(size, localities, policy, par);
+
+    move_algo_tests_with_policy_async<T>(size, localities, policy, seq);
+    move_algo_tests_with_policy_async<T>(size, localities, policy, par);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

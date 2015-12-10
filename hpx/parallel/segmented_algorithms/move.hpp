@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM
+#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_MOVE)
+#define HPX_PARALLEL_SEGMENTED_ALGORITHM_MOVE
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -22,13 +22,14 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <iostream>
 
 #include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // segmented_copy
+    // segmented_move
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -36,11 +37,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
-            typename SegOutIter>
+                                    typename SegOutIter>
         static typename util::detail::algorithm_result<
             ExPolicy, SegOutIter
         >::type
-        segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::true_,
+        segmented_move(Algo && algo, ExPolicy const& policy, boost::mpl::true_,
             SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -70,9 +71,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_output_iterator_type out = dispatch(
-                            traits::get_id(sit),
-                            algo, policy, true_(),
-                            beg, end, traits::local(dest));
+                        traits::get_id(sit),
+                        algo, policy, true_(),
+                        beg, end, traits::local(dest));
 
                     dest = output_traits::compose(sdest, out);
                 }
@@ -85,8 +86,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if (beg != end)
                 {
-                     out = dispatch(traits::get_id(sit),
-                        algo, policy, true_(), beg, end, out);
+                    out = dispatch(traits::get_id(sit),
+                                   algo, policy, true_(), beg, end, out);
                 }
 
                 // handle all of the full partitions
@@ -99,7 +100,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
-                            algo, policy, true_(), beg, end, out);
+                                       algo, policy, true_(), beg, end, out);
                     }
                 }
 
@@ -109,23 +110,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, true_(), beg, end, traits::begin(sdest));
+                                   algo, policy, true_(), beg, end, traits::begin(sdest));
                 }
 
                 dest = output_traits::compose(sdest, out);
             }
+
             return util::detail::algorithm_result<ExPolicy, SegOutIter>::get(
                 std::move(dest));
         }
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
-            typename SegOutIter>
+                                    typename SegOutIter>
         static typename util::detail::algorithm_result<
             ExPolicy, SegOutIter
         >::type
-        segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::false_,
-            SegIter first, SegIter last, SegOutIter dest)
+        segmented_move(Algo && algo, ExPolicy const& policy, boost::mpl::false_,
+                       SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -141,8 +143,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename std::iterator_traits<SegIter>::iterator_category
                 iterator_category;
             typedef typename boost::mpl::bool_<boost::is_same<
-                    iterator_category, std::input_iterator_tag
-                >::value> forced_seq;
+                iterator_category, std::input_iterator_tag
+            >::value> forced_seq;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -161,11 +163,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(),
-                        beg, end, traits::local(dest)));
+                                                      algo, policy, forced_seq(),
+                                                      beg, end, traits::local(dest)));
                 }
             }
-            else {
+            else
+            {
                 // handle the remaining part of the first partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::end(sit);
@@ -174,7 +177,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, out));
+                                                      algo, policy, forced_seq(), beg, end, out));
                 }
 
                 // handle all of the full partitions
@@ -187,7 +190,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         segments.push_back(dispatch_async(traits::get_id(sit),
-                            algo, policy, forced_seq(), beg, end, out));
+                                                          algo, policy, forced_seq(), beg, end, out));
                     }
                 }
 
@@ -198,8 +201,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(),
-                        beg, end, traits::begin(sdest)));
+                                                      algo, policy, forced_seq(),
+                                                      beg, end, traits::begin(sdest)));
                 }
             }
             HPX_ASSERT(!segments.empty());
@@ -223,8 +226,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            std::true_type)
+        move_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+              std::true_type)
         {
             if (first == last)
             {
@@ -233,13 +236,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             typedef typename parallel::is_sequential_execution_policy<
-                    ExPolicy
-                >::type is_seq;
+                ExPolicy
+            >::type is_seq;
             typedef hpx::traits::segmented_iterator_traits<OutIter>
                 output_iterator_traits;
 
-            return segmented_copy(
-                copy<typename output_iterator_traits::local_iterator>(),
+            return segmented_move(
+                move<typename output_iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest);
         }
@@ -247,8 +250,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            std::false_type);
+            move_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+                  std::false_type);
 
         /// \endcond
     }

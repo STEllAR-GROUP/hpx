@@ -39,24 +39,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : move::algorithm("move")
             {}
 
-            template <typename ExPolicy, typename InIter>
-            static OutIter
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest)
+            template <typename ExPolicy, typename InIter, typename OutIter_>
+            static OutIter_
+            sequential(ExPolicy, InIter first, InIter last, OutIter_ dest)
             {
                 return std::move(first, last, dest);
             }
 
-            template <typename ExPolicy, typename FwdIter>
+            template <typename ExPolicy, typename FwdIter, typename OutIter_>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, OutIter_
             >::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                OutIter dest)
+                OutIter_ dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter, OutIter_> zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef typename util::detail::algorithm_result<
-                        ExPolicy, OutIter
+                        ExPolicy, OutIter_
                     >::type result_type;
 
                 return get_iter<1, result_type>(
@@ -70,6 +70,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename OutIter>
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        move_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+              std::false_type)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                    input_iterator_category;
+            typedef typename std::iterator_traits<OutIter>::iterator_category
+                    output_iterator_category;
+
+            typedef typename boost::mpl::or_<
+                    parallel::is_sequential_execution_policy<ExPolicy>,
+                    boost::is_same<std::input_iterator_tag, input_iterator_category>,
+                    boost::is_same<std::output_iterator_tag, output_iterator_category>
+            >::type is_seq;
+
+            return detail::move<OutIter>().call(
+                    std::forward<ExPolicy>(policy), is_seq(),
+                    first, last, dest);
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename OutIter>
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        move_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+            std::true_type);
+
         /// \endcond
     }
 
@@ -152,9 +180,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::move<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest);
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+
+        return detail::move_(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            is_segmented());
     }
 }}}
 
