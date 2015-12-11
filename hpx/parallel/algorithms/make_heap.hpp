@@ -12,9 +12,9 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
+
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -100,6 +100,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy policy, RndIter first, RndIter last,
                     Pred && pred)
             {
+                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
                 typedef typename std::iterator_traits<RndIter>::difference_type
                     dtype;
 
@@ -124,22 +127,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 
                     std::size_t cnt = 0;
                     while(cnt + chunk_size < items) {
-                        workitems.push_back(
-                            hpx::async(hpx::launch::async,
+                        auto op = 
+                            hpx::util::bind(
                                 &sift_down_range<RndIter, Pred>, first,
                                 std::forward<Pred>(pred), n, first + start - cnt,
-                                chunk_size)
-                            );
+                                chunk_size);
+
+                        workitems.push_back(
+                            executor_traits::async_execute(policy.executor(), op));
+                        
                         cnt += chunk_size;
                     }
 
                     if(cnt < items) {
-                        workitems.push_back(
-                            hpx::async(hpx::launch::async,
+                        auto op =
+                            hpx::util::bind(
                                 &sift_down_range<RndIter, Pred>, first,
                                 std::forward<Pred>(pred), n, first + start - cnt,
-                                items-cnt)
-                            );
+                                items-cnt);
+
+                        workitems.push_back(
+                            executor_traits::async_execute(policy.executor(), op));
                     }
 
                     hpx::wait_all(workitems);
