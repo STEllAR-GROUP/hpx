@@ -10,11 +10,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -123,7 +123,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                     for(dtype start = (n-2)/2; start > 0;
                         start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-
                         dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
 
                         std::size_t items = (start-end_exclusive);
@@ -133,7 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                         std::vector<hpx::future<void> > workitems;
                         workitems.reserve(items/chunk_size);
-                    
+                        
                         std::size_t cnt = 0;
                         while(cnt + chunk_size < items) {
                             auto op = 
@@ -159,15 +158,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 executor_traits::async_execute(policy.executor(), op));
                             
                         }
-
                         hpx::wait_all(workitems);
                     }
+                        sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
                 }
-
-                sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
                 return util::detail::algorithm_result<ExPolicy>::get();
             }
         };
+    }
+
+    template <typename ExPolicy, typename RndIter, typename Pred>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename util::detail::algorithm_result<ExPolicy>::type
+    >::type
+    make_heap(ExPolicy && policy, RndIter first, RndIter last, Pred && pred)
+    {
+        typedef typename std::iterator_traits<RndIter>::iterator_category
+            iterator_category;
+        static_assert(
+                (boost::is_base_of<
+                 std::random_access_iterator_tag, iterator_category
+                    >::value),
+                "Requires random access iterator.");
+
+        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef typename std::iterator_traits<RndIter>::value_type value_type;
+
+        return detail::make_heap<RndIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<Pred>(pred));
     }
 
     template <typename ExPolicy, typename RndIter>
