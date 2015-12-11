@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 return executor_traits::async_execute(
                     policy.executor(),
-                    [first, last, comp]()
+                    [first, last, comp]() -> RandomIt
                     {
                         std::sort(first, last, comp);
                         return last;
@@ -198,7 +198,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::swap(*first, *c_last);
 
             // spawn tasks for each sub section
-            hpx::future<void> left =
+            hpx::future<RandomIt> left =
                 executor_traits::async_execute(
                     policy.executor(),
                     hpx::util::bind(
@@ -206,7 +206,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, first, c_last, comp
                     ));
 
-            hpx::future<void> right =
+            hpx::future<RandomIt> right =
                 executor_traits::async_execute(
                     policy.executor(),
                     hpx::util::bind(
@@ -215,7 +215,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     ));
 
             return hpx::lcos::local::dataflow(
-                [last](hpx::future<void> && left, hpx::future<void> && right)
+                [last](hpx::future<RandomIt> && left,
+                    hpx::future<RandomIt> && right) -> RandomIt
                 {
                     if (left.has_exception() || right.has_exception())
                     {
