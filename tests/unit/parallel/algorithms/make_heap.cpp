@@ -140,7 +140,6 @@ void make_heap_test2()
     test_make_heap2<std::random_access_iterator_tag>();
 }
 
-/*
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -167,7 +166,7 @@ void test_make_heap_exception(ExPolicy policy, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
+        //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -202,12 +201,11 @@ void test_make_heap_exception_async(ExPolicy p, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
+        //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch(...) {
         HPX_TEST(false);
     }
-
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
 }
@@ -237,7 +235,7 @@ void make_heap_exception_test()
 {
     test_make_heap_exception<std::random_access_iterator_tag>();
 }
-
+/*
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_make_heap_bad_alloc(ExPolicy policy, IteratorTag)
@@ -345,7 +343,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     make_heap_test1();
     make_heap_test2();
-    //make_heap_exception_test();
+    make_heap_exception_test();
     //make_heap_bad_alloc_test();
     return hpx::finalize();
 }

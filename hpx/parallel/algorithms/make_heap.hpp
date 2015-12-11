@@ -120,7 +120,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if(n > 1) {
                     std::size_t chunk_size = 4;
-
+    
+                    std::list<boost::exception_ptr> errors;
+                    std::vector<hpx::future<void> > workitems;
+                    workitems.reserve(std::distance(first,last)/chunk_size);
+                    try{
                     for(dtype start = (n-2)/2; start > 0;
                         start = (dtype)pow(2, (dtype)log2(start)) - 2) {
                         dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
@@ -129,10 +133,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                         if(chunk_size > items)
                             chunk_size = items / 2;
-
-                        std::vector<hpx::future<void> > workitems;
-                        workitems.reserve(items/chunk_size);
-                        
+ 
                         std::size_t cnt = 0;
                         while(cnt + chunk_size < items) {
                             auto op = 
@@ -160,7 +161,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }
                         hpx::wait_all(workitems);
                     }
-                        sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                    sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                    } catch(...) {
+                        util::detail::handle_local_exceptions<ExPolicy>::call(
+                                boost::current_exception(), errors);
+                    }
+
+                    util::detail::handle_local_exceptions<ExPolicy>::call(
+                            workitems, errors);
                 }
                 return util::detail::algorithm_result<ExPolicy>::get();
             }
