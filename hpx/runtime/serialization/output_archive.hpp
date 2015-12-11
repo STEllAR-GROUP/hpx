@@ -185,7 +185,7 @@ namespace hpx { namespace serialization
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {
-                serialize(*this, t, 0);
+                access::serialize(*this, t, 0);
             }
             else
             {
@@ -196,7 +196,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void save_nonintrusively_polymorphic(T const & t, boost::mpl::false_)
         {
-            serialize(*this, const_cast<T &>(t), 0);
+            access::serialize(*this, t, 0);
         }
 
         template <typename T>
