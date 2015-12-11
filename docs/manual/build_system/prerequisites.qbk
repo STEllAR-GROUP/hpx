@@ -125,6 +125,9 @@ listed below.
          diagnostics.]]
     [[__libunwind__              ][0.99               ][0.97            ]
         [Dependency of google-perftools on x86-64, used for stack unwinding.]]
+    [[__openmpi__                ][1.10.1             ][1.8.0           ]
+        [Can be used as a highspeed communication library backend for the
+         parcelport.]]
 ]
 
 [table Optional Software Prerequisites for __hpx__ on Linux systems
