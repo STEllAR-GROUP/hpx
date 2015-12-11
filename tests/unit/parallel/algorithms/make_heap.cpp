@@ -23,9 +23,8 @@ void test_make_heap(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> c(25);
     std::iota(boost::begin(c), boost::end(c), 0);
-    std::make_heap(boost::begin(c), boost::end(c));
 
     hpx::parallel::make_heap(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)));
@@ -41,7 +40,6 @@ void test_make_heap_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
-    std::make_heap(boost::begin(c), boost::end(c));
 
     hpx::future<void> test =
         hpx::parallel::make_heap(p,
@@ -58,9 +56,8 @@ void test_make_heap()
 
     test_make_heap(seq, IteratorTag());
     test_make_heap(par, IteratorTag());
-    //test_make_heap(par_vec, IteratorTag());
-
-    /*
+    test_make_heap(par_vec, IteratorTag());
+ 
     test_make_heap_async(seq(task), IteratorTag());
     test_make_heap_async(par(task), IteratorTag());
 
@@ -69,7 +66,7 @@ void test_make_heap()
     test_make_heap(execution_policy(par_vec), IteratorTag());
     test_make_heap(execution_policy(seq(task)), IteratorTag());
     test_make_heap(execution_policy(par(task)), IteratorTag());
-    */
+    
 }
 
 void make_heap_test()
