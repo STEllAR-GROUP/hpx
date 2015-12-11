@@ -13,7 +13,8 @@
 @_parcelport_export@
 namespace hpx { namespace parcelset
 {
-    void init_static_parcelport_factories()
+    void init_static_parcelport_factories(
+        std::vector<plugins::parcelport_factory_base *>& factories)
     {
 @_parcelport_init@    }
 }}
