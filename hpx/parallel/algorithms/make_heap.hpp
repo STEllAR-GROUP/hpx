@@ -8,6 +8,8 @@
 #if !defined(HPX_PARALLEL_ALGORITHMS_MAKE_HEAP_DEC_10_2015_0331PM)
 #define HPX_PARALLEL_ALGORITHMS_MAKE_HEAP_DEC_10_2015_0331PM
 
+#include <hpx/lcos/local/dataflow.hpp>
+
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -89,14 +91,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// \cond NOINTERNAL
-        template <typename RndIter>
-        struct make_heap: public detail::algorithm<make_heap<RndIter>, void>
+        struct make_heap: public detail::algorithm<make_heap>
         {
             make_heap()
                 : make_heap::algorithm("make_heap")
             {}
 
-            template<typename ExPolicy, typename Pred>
+            template<typename ExPolicy, typename RndIter, typename Pred>
             static hpx::util::unused_type
             sequential(ExPolicy, RndIter first, RndIter last,
                     Pred && pred)
@@ -105,8 +106,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return hpx::util::unused;
             }
 
-            template<typename ExPolicy, typename Pred>
-            static typename util::detail::algorithm_result<ExPolicy, void>::type
+            template<typename ExPolicy, typename RndIter, typename Pred>
+            static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy policy, RndIter first, RndIter last,
                     Pred && pred)
             {
@@ -118,59 +119,136 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 dtype n = last - first;
 
-                if(n > 1) {
-                    std::size_t chunk_size = 4;
-    
-                    std::list<boost::exception_ptr> errors;
-                    std::vector<hpx::future<void> > workitems;
-                    workitems.reserve(std::distance(first,last)/chunk_size);
-                    try{
-                    for(dtype start = (n-2)/2; start > 0;
-                        start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-                        dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
-
-                        std::size_t items = (start-end_exclusive);
-
-                        if(chunk_size > items)
-                            chunk_size = items / 2;
- 
-                        std::size_t cnt = 0;
-                        while(cnt + chunk_size < items) {
-                            auto op = 
-                                hpx::util::bind(
-                                    &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n, first + start - cnt,
-                                    chunk_size);
-
-                            workitems.push_back(
-                                executor_traits::async_execute(policy.executor(), op));
-                            
-                            cnt += chunk_size;
-                        }
-
-                        if(cnt < items) {
-                            auto op =
-                                hpx::util::bind(
-                                    &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n, first + start - cnt,
-                                    items-cnt);
-     
-                            workitems.push_back(
-                                executor_traits::async_execute(policy.executor(), op));
-                            
-                        }
-                        hpx::wait_all(workitems);
-                    }
-                    sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
-                    } catch(...) {
-                        util::detail::handle_local_exceptions<ExPolicy>::call(
-                                boost::current_exception(), errors);
-                    }
-
-                    util::detail::handle_local_exceptions<ExPolicy>::call(
-                            workitems, errors);
+                if(n <= 1) {
+                    return util::detail::algorithm_result<ExPolicy>::get();
                 }
+
+                std::list<boost::exception_ptr> errors;
+                std::size_t chunk_size = 4;
+
+                std::vector<hpx::future<void> > workitems;
+                workitems.reserve(std::distance(first,last)/chunk_size);
+                try{
+                for(dtype start = (n-2)/2; start > 0;
+                    start = (dtype)pow(2, (dtype)log2(start)) - 2) {
+                    dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
+
+                    std::size_t items = (start-end_exclusive);
+
+                    if(chunk_size > items)
+                        chunk_size = items / 2;
+
+                    std::size_t cnt = 0;
+                    while(cnt + chunk_size < items) {
+                        auto op = 
+                            hpx::util::bind(
+                                &sift_down_range<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), n, first + start - cnt,
+                                chunk_size);
+
+                        workitems.push_back(
+                            executor_traits::async_execute(policy.executor(), op));
+                        
+                        cnt += chunk_size;
+                    }
+
+                    if(cnt < items) {
+                        auto op =
+                            hpx::util::bind(
+                                &sift_down_range<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), n, first + start - cnt,
+                                items-cnt);
+ 
+                        workitems.push_back(
+                            executor_traits::async_execute(policy.executor(), op));
+                        
+                    }
+                    hpx::wait_all(workitems);
+                }
+                sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                } catch(...) {
+                    util::detail::handle_local_exceptions<ExPolicy>::call(
+                            boost::current_exception(), errors);
+                }
+                
+                util::detail::handle_local_exceptions<ExPolicy>::call(
+                        workitems, errors); 
                 return util::detail::algorithm_result<ExPolicy>::get();
+            }
+
+            template<typename RndIter, typename Pred>
+            static typename util::detail::algorithm_result<parallel_task_execution_policy>::type
+            parallel(parallel_task_execution_policy policy, RndIter first, RndIter last,
+                    Pred && pred)
+            {
+                typedef typename parallel_task_execution_policy::executor_type executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+                typedef typename std::iterator_traits<RndIter>::difference_type
+                    dtype;
+
+                dtype n = last - first;
+
+                if(n <= 1) {
+                    return util::detail::algorithm_result<parallel_task_execution_policy>::get();
+                }
+
+                std::list<boost::exception_ptr> errors;
+                std::size_t chunk_size = 4;
+
+                std::vector<hpx::future<void> > workitems;
+                workitems.reserve(std::distance(first,last)/chunk_size);
+                try{
+                for(dtype start = (n-2)/2; start > 0;
+                    start = (dtype)pow(2, (dtype)log2(start)) - 2) {
+                    dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
+
+                    std::size_t items = (start-end_exclusive);
+
+                    if(chunk_size > items)
+                        chunk_size = items / 2;
+
+                    std::size_t cnt = 0;
+                    while(cnt + chunk_size < items) {
+                        auto op = 
+                            hpx::util::bind(
+                                &sift_down_range<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), n, first + start - cnt,
+                                chunk_size);
+
+                        workitems.push_back(
+                            executor_traits::async_execute(policy.executor(), op));
+                        
+                        cnt += chunk_size;
+                    }
+
+                    if(cnt < items) {
+                        auto op =
+                            hpx::util::bind(
+                                &sift_down_range<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), n, first + start - cnt,
+                                items-cnt);
+ 
+                        workitems.push_back(
+                            executor_traits::async_execute(policy.executor(), op));
+                        
+                    }
+                    hpx::wait_all(workitems);
+                }
+                sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                } catch(...) {
+                    util::detail::handle_local_exceptions<parallel_task_execution_policy>::call(
+                            boost::current_exception(), errors);
+                }
+               
+                return hpx::lcos::local::dataflow(
+                    [errors](std::vector<hpx::future<void> > && r) 
+                        mutable
+                    {
+                        util::detail::handle_local_exceptions<parallel_task_execution_policy>::call(
+                            r, errors);
+                    },
+                    workitems);
             }
         };
     }
@@ -178,7 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename RndIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy>::type
+        typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
     make_heap(ExPolicy && policy, RndIter first, RndIter last, Pred && pred)
     {
@@ -193,7 +271,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
         typedef typename std::iterator_traits<RndIter>::value_type value_type;
 
-        return detail::make_heap<RndIter>().call(
+        return detail::make_heap().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::forward<Pred>(pred));
     }
@@ -201,7 +279,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename RndIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy>::type
+        typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
     make_heap(ExPolicy && policy, RndIter first, RndIter last)
     {
@@ -216,7 +294,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
         typedef typename std::iterator_traits<RndIter>::value_type value_type;
 
-        return detail::make_heap<RndIter>().call(
+        return detail::make_heap().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::less<value_type>());
     }
