@@ -732,6 +732,18 @@ namespace hpx
         }
 
     public:
+
+        std::vector< hpx::id_type > get_partitions_ids()
+        {
+            std::vector< hpx::id_type > ids;
+
+            for(auto const part_data : partitions_)
+            {
+                ids.push_back( part_data.partition_);
+            }
+            return ids;
+        }
+
         /// \brief Array subscript operator. This does not throw any exception.
         ///
         /// \param pos Position of the element in the vector [Note the first
