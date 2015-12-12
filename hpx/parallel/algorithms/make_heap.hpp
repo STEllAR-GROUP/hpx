@@ -236,6 +236,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     hpx::wait_all(workitems);
                 }
                 sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                } catch(std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<void>(
+                        boost::current_exception());
                 } catch(...) {
                     util::detail::handle_local_exceptions<parallel_task_execution_policy>::call(
                             boost::current_exception(), errors);

@@ -235,7 +235,7 @@ void make_heap_exception_test()
 {
     test_make_heap_exception<std::random_access_iterator_tag>();
 }
-/*
+
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_make_heap_bad_alloc(ExPolicy policy, IteratorTag)
@@ -330,7 +330,7 @@ void make_heap_bad_alloc_test()
 {
     test_make_heap_bad_alloc<std::random_access_iterator_tag>();
 }
-*/
+
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -344,7 +344,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     make_heap_test1();
     make_heap_test2();
     make_heap_exception_test();
-    //make_heap_bad_alloc_test();
+    make_heap_bad_alloc_test();
     return hpx::finalize();
 }
 
