@@ -8,6 +8,7 @@
 #define HPX_UTIL_PBS_ENVIRONMENT_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <string>
 #include <vector>
@@ -17,7 +18,7 @@ namespace hpx { namespace util { namespace batch_environments {
     struct pbs_environment
     {
         HPX_EXPORT pbs_environment(std::vector<std::string> & nodelist,
-            bool debug);
+            bool debug, util::runtime_configuration const& cfg);
 
         bool valid() const
         {
@@ -46,7 +47,7 @@ namespace hpx { namespace util { namespace batch_environments {
         bool valid_;
 
         HPX_EXPORT void read_nodefile(std::vector<std::string> & nodelist,
-            bool debug);
+            bool debug, util::runtime_configuration const& cfg);
         HPX_EXPORT void read_nodelist(std::vector<std::string> & nodelist,
             bool debug);
     };
