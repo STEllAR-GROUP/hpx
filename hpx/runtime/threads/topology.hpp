@@ -11,7 +11,9 @@
 #define HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/address.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/variant.hpp>
@@ -324,7 +326,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_type get_thread_affinity_mask_from_lva(
-            naming::address::address_type, error_code& ec = throws) const = 0;
+            naming::address_type, error_code& ec = throws) const = 0;
 
         /// \brief Prints the \param m to os in a human readable form
         virtual void print_affinity_mask(std::ostream& os,

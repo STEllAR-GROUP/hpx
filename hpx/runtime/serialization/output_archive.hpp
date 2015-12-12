@@ -8,6 +8,7 @@
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -22,11 +23,6 @@
 #include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-namespace hpx { namespace naming
-{
-    struct HPX_EXPORT gid_type;
-}}
 
 namespace hpx { namespace serialization
 {
@@ -185,7 +181,7 @@ namespace hpx { namespace serialization
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {
-                serialize(*this, t, 0);
+                access::serialize(*this, t, 0);
             }
             else
             {
@@ -196,7 +192,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void save_nonintrusively_polymorphic(T const & t, boost::mpl::false_)
         {
-            serialize(*this, const_cast<T &>(t), 0);
+            access::serialize(*this, t, 0);
         }
 
         template <typename T>

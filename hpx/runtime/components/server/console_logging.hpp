@@ -13,6 +13,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/fusion/include/vector.hpp>
