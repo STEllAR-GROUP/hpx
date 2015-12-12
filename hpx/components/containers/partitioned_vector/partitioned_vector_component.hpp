@@ -737,7 +737,7 @@ namespace hpx
             return get_copied_data().get();
         }
 
-        /// Returns the data reference of the partition_vector
+        /// Returns a copy of the data owned by the partition_vector
         /// component.
         ///
         /// \return This returns the data as an hpx::future
