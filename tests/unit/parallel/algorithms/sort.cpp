@@ -8,8 +8,8 @@
 
 // use smaller array sizes for debug tests
 #if defined(HPX_DEBUG)
-#define HPX_SORT_TEST_SIZE          10000
-#define HPX_SORT_TEST_SIZE_STRINGS  50000
+#define HPX_SORT_TEST_SIZE          50000
+#define HPX_SORT_TEST_SIZE_STRINGS  10000
 #endif
 
 #include "sort_tests.hpp"
