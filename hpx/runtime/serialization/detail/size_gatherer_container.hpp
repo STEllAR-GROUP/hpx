@@ -38,6 +38,11 @@ namespace hpx { namespace serialization { namespace detail
           , hpx::lcos::detail::future_data_refcnt_base & future_data)
         {}
 
+        static void add_gid(size_gatherer_container& cont,
+                naming::gid_type const & gid,
+                naming::gid_type const & splitted_gid)
+        {}
+
         static void
         write(size_gatherer_container& cont, std::size_t count,
             std::size_t current, void const* address)

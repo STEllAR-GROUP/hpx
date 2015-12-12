@@ -9,7 +9,7 @@
 #if defined(HPX_HAVE_LOGGING)
 
 #include <hpx/exception.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

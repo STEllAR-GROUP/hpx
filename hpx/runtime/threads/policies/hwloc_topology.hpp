@@ -20,6 +20,7 @@
 #include <hpx/exception.hpp>
 
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util/static.hpp>
 
 #include <boost/format.hpp>
 
@@ -112,7 +113,7 @@ namespace hpx { namespace threads
             ) const;
 
         mask_type get_thread_affinity_mask_from_lva(
-            naming::address::address_type
+            naming::address_type
           , error_code& ec = throws
             ) const;
 

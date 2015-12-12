@@ -13,6 +13,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 
