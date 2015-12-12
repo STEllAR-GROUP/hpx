@@ -34,8 +34,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         // Perform bottom up heap construction given a range of elements.
         // sift_down_range will take a range from [start,start-count) and
-        // move the beginning node downwards based on the result of the
-        // predicate
+        // apply sift_down to each element in the range
         template <typename RndIter, typename Pred>
         void sift_down(RndIter first, Pred && pred,
                 typename std::iterator_traits<RndIter>::difference_type len,
@@ -129,43 +128,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::vector<hpx::future<void> > workitems;
                 workitems.reserve(std::distance(first,last)/chunk_size);
                 try{
-                for(dtype start = (n-2)/2; start > 0;
-                    start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-                    dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
+                    // Beginning at node (n-2)/2, partition the items within a level
+                    // and execute each chunk asynchronously. Each level must synchronize
+                    // before continuing up, loop will iterate over levels not items
+                    for(dtype start = (n-2)/2; start > 0;
+                        start = (dtype)pow(2, (dtype)log2(start)) - 2) {
+                        dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
 
-                    std::size_t items = (start-end_exclusive);
+                        // The amount of work for this level
+                        std::size_t items = (start-end_exclusive);
 
-                    if(chunk_size > items)
-                        chunk_size = items / 2;
+                        // TO-DO: determine the best solution for when chunk_size becomes
+                        // too large as the heap shrinks
+                        if(chunk_size > items)
+                            chunk_size = items / 2;
 
-                    std::size_t cnt = 0;
-                    while(cnt + chunk_size < items) {
-                        auto op = 
-                            hpx::util::bind(
-                                &sift_down_range<RndIter, Pred&>, first,
-                                std::forward<Pred&>(pred), n, first + start - cnt,
-                                chunk_size);
+                        // Sift down the nodes children and reposition 
+                        std::size_t cnt = 0;
+                        while(cnt + chunk_size < items) {
+                            // Perform sift_down_range on each chunk
+                            auto op = 
+                                hpx::util::bind(
+                                    &sift_down_range<RndIter, Pred&>, first,
+                                    std::forward<Pred&>(pred), n, first + start - cnt,
+                                    chunk_size);
 
-                        workitems.push_back(
-                            executor_traits::async_execute(policy.executor(), op));
-                        
-                        cnt += chunk_size;
+                            workitems.push_back(
+                                executor_traits::async_execute(policy.executor(), op));
+                            
+                            cnt += chunk_size;
+                        }
+
+                        if(cnt < items) {
+                            // Perform sift_down_range on remaining items
+                            auto op =
+                                hpx::util::bind(
+                                    &sift_down_range<RndIter, Pred&>, first,
+                                    std::forward<Pred&>(pred), n, first + start - cnt,
+                                    items-cnt);
+     
+                            workitems.push_back(
+                                executor_traits::async_execute(policy.executor(), op));
+                            
+                        }
+                        // Synchronize level
+                        hpx::wait_all(workitems);
                     }
-
-                    if(cnt < items) {
-                        auto op =
-                            hpx::util::bind(
-                                &sift_down_range<RndIter, Pred&>, first,
-                                std::forward<Pred&>(pred), n, first + start - cnt,
-                                items-cnt);
- 
-                        workitems.push_back(
-                            executor_traits::async_execute(policy.executor(), op));
-                        
-                    }
-                    hpx::wait_all(workitems);
-                }
-                sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                    // Sift down the first element synchronously
+                    sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
                 } catch(...) {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                             boost::current_exception(), errors);
@@ -187,6 +197,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<RndIter>::difference_type
                     dtype;
 
+                // Size of list
                 dtype n = last - first;
 
                 if(n <= 1) {
@@ -199,43 +210,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::vector<hpx::future<void> > workitems;
                 workitems.reserve(std::distance(first,last)/chunk_size);
                 try{
-                for(dtype start = (n-2)/2; start > 0;
-                    start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-                    dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
+                    // Beginning at node (n-2)/2, partition the items within a level
+                    // and execute each chunk asynchronously. Each level must synchronize
+                    // before continuing up, loop will iterate over levels not items
+                    for(dtype start = (n-2)/2; start > 0;
+                        start = (dtype)pow(2, (dtype)log2(start)) - 2) {
+                        dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
 
-                    std::size_t items = (start-end_exclusive);
+                        // The amount of work for this level
+                        std::size_t items = (start-end_exclusive);
 
-                    if(chunk_size > items)
-                        chunk_size = items / 2;
+                        // TO-DO: determine the best solution for when chunk_size becomes
+                        // too large as the heap shrinks
+                        if(chunk_size > items)
+                            chunk_size = items / 2;
 
-                    std::size_t cnt = 0;
-                    while(cnt + chunk_size < items) {
-                        auto op = 
-                            hpx::util::bind(
-                                &sift_down_range<RndIter, Pred&>, first,
-                                std::forward<Pred&>(pred), n, first + start - cnt,
-                                chunk_size);
+                        // Sift down the nodes children and reposition 
+                        std::size_t cnt = 0;
+                        while(cnt + chunk_size < items) {
+                            // Perform sift_down_range on each chunk
+                            auto op = 
+                                hpx::util::bind(
+                                    &sift_down_range<RndIter, Pred&>, first,
+                                    std::forward<Pred&>(pred), n, first + start - cnt,
+                                    chunk_size);
 
-                        workitems.push_back(
-                            executor_traits::async_execute(policy.executor(), op));
-                        
-                        cnt += chunk_size;
+                            workitems.push_back(
+                                executor_traits::async_execute(policy.executor(), op));
+                            
+                            cnt += chunk_size;
+                        }
+
+                        if(cnt < items) {
+                            // Perform sift_down_range on remaining items
+                            auto op =
+                                hpx::util::bind(
+                                    &sift_down_range<RndIter, Pred&>, first,
+                                    std::forward<Pred&>(pred), n, first + start - cnt,
+                                    items-cnt);
+     
+                            workitems.push_back(
+                                executor_traits::async_execute(policy.executor(), op));
+                            
+                        }
+                        // Synchronize level
+                        hpx::wait_all(workitems);
                     }
-
-                    if(cnt < items) {
-                        auto op =
-                            hpx::util::bind(
-                                &sift_down_range<RndIter, Pred&>, first,
-                                std::forward<Pred&>(pred), n, first + start - cnt,
-                                items-cnt);
- 
-                        workitems.push_back(
-                            executor_traits::async_execute(policy.executor(), op));
-                        
-                    }
-                    hpx::wait_all(workitems);
-                }
-                sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                    // Sift down the first element synchronously
+                    sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
                 } catch(std::bad_alloc const&) {
                     return hpx::make_exceptional_future<void>(
                         boost::current_exception());
@@ -243,13 +265,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     util::detail::handle_local_exceptions<parallel_task_execution_policy>::call(
                             boost::current_exception(), errors);
                 }
-               
+              
+                // Perform local exception handling within a dataflow, because otherwise the
+                // exception would be thrown outside of the future which is not the desired
+                // behavior
                 return hpx::lcos::local::dataflow(
                     [errors](std::vector<hpx::future<void> > && r) 
                         mutable
                     {
-                        util::detail::handle_local_exceptions<parallel_task_execution_policy>::call(
-                            r, errors);
+                        util::detail::handle_local_exceptions<parallel_task_execution_policy>
+                            ::call(r, errors);
                     },
                     workitems);
             }
