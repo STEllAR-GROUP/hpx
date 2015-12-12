@@ -8,6 +8,7 @@
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -22,11 +23,6 @@
 #include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-namespace hpx { namespace naming
-{
-    struct HPX_EXPORT gid_type;
-}}
 
 namespace hpx { namespace serialization
 {

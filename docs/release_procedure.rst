@@ -16,9 +16,6 @@ Please update it as appropriate.
 One way to use this procedure is to print a copy and check off
 the lines as they are completed to avoid confusion.
 
-Note: If you are using commandline git to change branches use: 
-      ``git checkout -t origin/[branch name]``
-
 #.  Notify developers that a release is imminent. 
 
 #.  Make a list of examples and benchmarks that should not go into the release.
@@ -34,12 +31,11 @@ Note: If you are using commandline git to change branches use:
 
 #.  Write release notes for the blog to summarize the major changes listed in
     the log. The blog article should go in the "downloads" section. The url of
-    the blog article should follow this format (where # are version numbers)::
+    the blog article should follow this format (where # are version numbers):
+    stellar.cct.lsu.edu/downloads/hpx-v#-#-#-release-notes
 
-        stellar.cct.lsu.edu/downloads/hpx-v#-#-#-release-notes
-
-    Save the blog article as a draft. Place the release notes into a new section
-    in ``docs/whats_new.qbk``.
+    *   Save the blog article as a draft. Place the release notes into a new section
+        in ``docs/whats_new.qbk``.
 
 #.  Build the docs, and proof-read them. Update any documentation that may have
     changed, and correct any typos. Pay special attention to:
@@ -62,6 +58,7 @@ Note: If you are using commandline git to change branches use:
     *   ``git branch -D [branch name]``
     *   ``git branch [new branch name]``
     *   ``git push origin [new branch name]``
+    *   ``git branch --set-upstream-to=origin/[branch name] [branch name]``
     
 #.  Checkout the main branch, and bump the HPX version to the next release
     target. The following files contain version info:
@@ -80,7 +77,7 @@ Note: If you are using commandline git to change branches use:
     and later with an empty string for the actual release).
     
 #.  Change logo for release documentation by removing '_draft' suffix 
-    in ``docs/cmakelist.txt`` on line 170. Update logo size accordingly on
+    in ``docs/cmakelist.txt`` on line 211. Update logo size accordingly on
     lines 262/263.
 
 #.  Remove the examples and benchmarks that will not go into the release from
@@ -90,6 +87,7 @@ Note: If you are using commandline git to change branches use:
 
     *   ``git tag -a [tag name] -m '[description]'``
     *   ``git push origin [tag name]``
+    *   Create a pre-release on GitHub
 
 #.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
     availability of the release candidate. Ask users to test the candidate by 
@@ -98,7 +96,7 @@ Note: If you are using commandline git to change branches use:
 #.  Switch Buildbot over to test the release branch
 
     *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/master/master/master.cfg
-    *   Line 117
+    *   Line 120
     
 #.  Allow at least a week for testing of the release candidate. Pull in changes
     as needed from master to resolve bug fixes, etc.

@@ -198,7 +198,7 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<hpx::serialization::output_archive>
                 archive(
                     new hpx::serialization::output_archive(
-                        *future_await, 0, 0, 0, 0, &future_await->new_gids_)
+                        *future_await, 0, 0, 0, 0)
                 );
 
             put_parcel_await(

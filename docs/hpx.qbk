@@ -127,6 +127,7 @@
 [def __sbatch__                 [@http://slurm.schedmd.com/sbatch.html sbatch]]
 [def __linda__                  [@http://en.wikipedia.org/wiki/Linda_(coordination_language) The Linda Coordination Language]]
 [def __opencl__                 [@https://www.khronos.org/opencl/ OpenCL]]
+[def __openmpi__                [@https://www.open-mpi.org Open MPI]]
 [def __pocl__                   [@http://portablecl.org/ POCL]]
 [def __cuda__                   [@http://www.nvidia.com/object/cuda_home_new.html CUDA]]
 [def __nt2__                    [@http://www.numscale.com/nt2/ NT2]]

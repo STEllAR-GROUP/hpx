@@ -75,6 +75,14 @@ namespace hpx { namespace serialization { namespace detail
             );
         }
 
+        void add_gid(
+            naming::gid_type const & gid,
+            naming::gid_type const & splitted_gid)
+        {
+            boost::lock_guard<mutex_type> l(mtx_);
+            new_gids_[gid].push_back(splitted_gid);
+        }
+
         void reset()
         {
             done_ = false;
@@ -131,6 +139,13 @@ namespace hpx { namespace serialization { namespace detail
           , hpx::lcos::detail::future_data_refcnt_base & future_data)
         {
             cont.await_future(future_data);
+        }
+
+        static void add_gid(future_await_container& cont,
+                naming::gid_type const & gid,
+                naming::gid_type const & splitted_gid)
+        {
+            cont.add_gid(gid, splitted_gid);
         }
 
         static void
