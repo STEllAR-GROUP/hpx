@@ -737,7 +737,7 @@ namespace hpx
         {
             std::vector< hpx::id_type > ids;
 
-            for(auto const part_data : partitions_)
+            for(auto const & part_data : partitions_)
             {
                 ids.push_back( part_data.partition_);
             }
