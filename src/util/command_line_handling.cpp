@@ -488,7 +488,7 @@ namespace hpx { namespace util
         }
 
         bool enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
-        util::batch_environment env(nodelist, debug_clp, enable_batch_env);
+        util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
 
         if(!nodelist.empty())
         {
