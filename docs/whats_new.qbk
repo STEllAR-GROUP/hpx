@@ -17,6 +17,10 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr 1910] - Keep cmake_module_path
+* [pr 1909] - Fix mpirun with pbs
+* [pr 1908] - Changing parallel::sort to return the last iterator as proposed by N4560
+* [pr 1907] - Adding minimum version for Open MPI
 
 [endsect]
 
