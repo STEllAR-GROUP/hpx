@@ -9,6 +9,8 @@
 #define HPX_PARALLEL_ALGORITHMS_MAKE_HEAP_DEC_10_2015_0331PM
 
 #include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
