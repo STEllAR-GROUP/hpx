@@ -10,6 +10,9 @@
 #define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/concepts.hpp>
+#include <hpx/util/invoke.hpp>
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -19,6 +22,7 @@
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/parallel/traits/projected.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -150,11 +154,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
+    template <typename ExPolicy, typename InIter, typename OutIter,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        traits::detail::is_iterator<InIter>::value &&
+        traits::detail::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
@@ -324,6 +329,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // copy_if
     namespace detail
     {
+        // sequential copy_if with projection function
+        template <typename InIter, typename OutIter, typename Pred, typename Proj>
+        inline OutIter
+        sequential_copy_if(InIter first, InIter last, OutIter dest,
+            Pred && pred, Proj && proj)
+        {
+            while (first != last)
+            {
+                if (hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
+                    *dest++ = *first;
+                first++;
+            }
+            return dest;
+        }
+
         /// \cond NOINTERNAL
         template <typename Iter>
         struct copy_if : public detail::algorithm<copy_if<Iter>, Iter>
@@ -332,19 +352,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : copy_if::algorithm("copy_if")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Pred>
+            template <typename ExPolicy, typename InIter, typename Pred,
+                typename Proj = util::projection_identity>
             static Iter
             sequential(ExPolicy, InIter first, InIter last, Iter dest,
-                Pred && pred)
+                Pred && pred, Proj && proj = Proj())
             {
-                return std::copy_if(first, last, dest,
-                    std::forward<Pred>(pred));
+                return sequential_copy_if(first, last, dest,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Pred>
+            template <typename ExPolicy, typename FwdIter, typename Pred,
+                typename Proj = util::projection_identity>
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                Iter dest, Pred && pred)
+                Iter dest, Pred && pred, Proj && proj = Proj())
             {
                 typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
                 typedef util::detail::algorithm_result<ExPolicy, Iter> result;
@@ -367,17 +389,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     policy, make_zip_iterator(first, flags.get()),
                     count, init,
                     // step 1 performs first part of scan algorithm
-                    [pred](zip_iterator part_begin, std::size_t part_size)
+                    [pred, proj](zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
                     {
                         std::size_t curr = 0;
+
+                        // MSVC complains if proj is captured by ref below
                         util::loop_n(part_begin, part_size,
-                            [&pred, &curr](zip_iterator it) mutable
+                            [&pred, proj, &curr](zip_iterator it) mutable
                             {
-                                if((get<1>(*it) = pred(get<0>(*it))))
-                                {
+                                bool f = hpx::util::invoke(pred,
+                                    hpx::util::invoke(proj, get<0>(*it)));
+
+                                if ((get<1>(*it) = f))
                                     ++curr;
-                                }
                             });
                         return curr;
                     },
@@ -476,12 +501,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
-    copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f)
+    template <typename Proj = util::projection_identity,
+        typename ExPolicy, typename InIter, typename OutIter, typename F,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        traits::detail::is_iterator<InIter>::value &&
+        traits::is_projected<Proj, InIter>::value &&
+        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_indirect_callable<
+            F, traits::projected<Proj, InIter>
+        >::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f,
+        Proj && proj = Proj{})
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
@@ -510,7 +542,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::copy_if<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, std::forward<F>(f));
+            first, last, dest, std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}
 

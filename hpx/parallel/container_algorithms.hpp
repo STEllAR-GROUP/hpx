@@ -6,6 +6,8 @@
 #if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_JUL_18_2015_0958AM)
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_JUL_18_2015_0958AM
 
+#include <hpx/parallel/algorithm.hpp>
+#include <hpx/parallel/container_algorithms/copy.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
