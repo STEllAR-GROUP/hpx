@@ -13,6 +13,15 @@
 
 [heading Breaking Changes]
 
+- In order to move the dataflow facility to `namespace hpx` we added a
+  definition of `hpx::dataflow` which might create ambiguities in existing
+  codes. The previous definition of this facility (`hpx::lcos::local::dataflow`)
+  has been deprecated and is available only if the constant
+  `HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY` is defined at configuration time.
+  Please explicitly qualify all uses of the dataflow facility if you enable
+  this compatibility setting and encounter ambiguities.
+
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.

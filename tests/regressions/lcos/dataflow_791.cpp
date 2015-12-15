@@ -10,7 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <vector>
 
@@ -25,7 +25,7 @@ using std::vector;
 using hpx::lcos::shared_future;
 using hpx::wait_all;
 using hpx::async;
-using hpx::lcos::local::dataflow;
+using hpx::dataflow;
 using hpx::util::unwrapped;
 
 struct block {

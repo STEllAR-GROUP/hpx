@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 namespace jacobi_smp {
@@ -64,7 +64,7 @@ namespace jacobi_smp {
                  * FIXME: dataflow seems to have some raceconditions
                  * left
                 (*deps_new)[j]
-                    = hpx::lcos::local::dataflow(
+                    = hpx::dataflow(
                         hpx::util::bind(
                             jacobi_kernel_wrap
                           , range(y, y_end)

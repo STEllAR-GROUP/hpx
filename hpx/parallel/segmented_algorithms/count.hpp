@@ -175,7 +175,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             return result::get(
-                lcos::local::dataflow(
+                dataflow(
                     hpx::util::unwrapped([=](std::vector<value_type> && r)
                     {
                         return std::accumulate(r.begin(), r.end(), value_type());
@@ -377,7 +377,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             return result::get(
-                lcos::local::dataflow(
+                dataflow(
                     [=](std::vector<shared_future<value_type> > && r) -> value_type
                     {
                         // handle any remote exceptions, will throw on error
