@@ -281,11 +281,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename Size, typename OutIter>
-    typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
+    template <typename ExPolicy, typename InIter, typename Size,
+        typename OutIter,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        traits::detail::is_iterator<InIter>::value &&
+        traits::detail::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     copy_n(ExPolicy && policy, InIter first, Size count, OutIter dest)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category

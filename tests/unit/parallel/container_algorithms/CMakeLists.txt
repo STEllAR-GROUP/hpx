@@ -5,6 +5,7 @@
 
 set(tests
     copy_range
+    copyif_range
     foreach_range
     foreach_range_projection
     sort_range
