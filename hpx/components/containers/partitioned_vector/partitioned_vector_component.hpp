@@ -732,7 +732,7 @@ namespace hpx
         ///
         /// \return This returns the data of the partition_vector
         ///
-        auto get_copied_data_sync()
+        typename server_type::data_type get_copied_data_sync() const
         {
             return get_copied_data().get();
         }
@@ -742,7 +742,7 @@ namespace hpx
         ///
         /// \return This returns the data as an hpx::future
         ///
-        auto get_copied_data() const
+        hpx::future<typename server_type::data_type> get_copied_data() const
         {
             HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::get_copied_data_action>(
