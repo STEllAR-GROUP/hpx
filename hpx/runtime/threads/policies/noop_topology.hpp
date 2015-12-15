@@ -14,6 +14,7 @@
 #if !defined(HPX_HAVE_HWLOC)
 
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/exception.hpp>
 
 #if defined(__ANDROID__) && defined(ANDROID)
