@@ -8,12 +8,12 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <iostream>
 
-using hpx::lcos::local::dataflow;
+using hpx::dataflow;
 
 typedef hpx::lcos::shared_future< double > future_type;
 

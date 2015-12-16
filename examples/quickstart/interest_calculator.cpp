@@ -18,7 +18,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 
 #include <iostream>
 
@@ -49,7 +49,7 @@ int hpx_main(variables_map & vm)
     {
         using hpx::shared_future;
         using hpx::make_ready_future;
-        using hpx::lcos::local::dataflow;
+        using hpx::dataflow;
         using hpx::util::unwrapped;
         hpx::naming::id_type here = hpx::find_here();
 

@@ -310,7 +310,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                         const boost::uint64_t B_offset = phase * block_size;
 
                         phase_futures.push_back(
-                            hpx::lcos::local::dataflow(
+                            hpx::dataflow(
                                 &transpose
                               , A[from_block].get_sub_block(A_offset, block_size)
                               , B[b].get_sub_block(B_offset, block_size)

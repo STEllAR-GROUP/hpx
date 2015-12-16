@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 
@@ -31,6 +32,7 @@ namespace hpx { namespace util
         // the constructor tries to read initial values from a batch environment,
         // filling our map of nodes and thread counts
         batch_environment(std::vector<std::string> & nodelist,
+            util::runtime_configuration const& cfg,
             bool debug = false, bool enable = true);
 
         // this function initializes the map of nodes from the given (space

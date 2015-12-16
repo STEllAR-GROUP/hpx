@@ -437,7 +437,7 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
 partition stepper_server::heat_part(partition const& left,
     partition const& middle, partition const& right)
 {
-    using hpx::lcos::local::dataflow;
+    using hpx::dataflow;
     using hpx::util::unwrapped;
 
     hpx::shared_future<partition_data> middle_data =
@@ -487,7 +487,7 @@ partition stepper_server::heat_part(partition const& left,
 stepper_server::space stepper_server::do_work(std::size_t local_np,
     std::size_t nx, std::size_t nt)
 {
-    using hpx::lcos::local::dataflow;
+    using hpx::dataflow;
     using hpx::util::unwrapped;
 
     // U[t][i] is the state of position i at time t.
@@ -559,7 +559,7 @@ HPX_REGISTER_GATHER(stepper_server::space, stepper_server_space_gatherer);
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    using hpx::lcos::local::dataflow;
+    using hpx::dataflow;
 
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.

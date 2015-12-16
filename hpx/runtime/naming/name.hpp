@@ -13,6 +13,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -459,8 +460,6 @@ namespace hpx { namespace naming
         return gid_type(msb, gid.get_lsb());
     }
 
-    HPX_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
-
     ///////////////////////////////////////////////////////////////////////////
     inline bool refers_to_virtual_memory(gid_type const& gid)
     {
@@ -655,9 +654,6 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
-        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(
-            gid_type::mutex_type::scoped_lock &l, gid_type& gid);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
@@ -823,8 +819,9 @@ namespace hpx { namespace naming
             }
 
             // serialization
-            void save(serialization::output_archive& ar) const;
-            void load(serialization::input_archive& ar);
+            void save(serialization::output_archive& ar, unsigned) const;
+            void load(serialization::input_archive& ar, unsigned);
+            HPX_SERIALIZATION_SPLIT_MEMBER()
 
         private:
             // credit management (called during serialization), this function

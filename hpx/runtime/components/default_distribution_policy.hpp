@@ -19,7 +19,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/move.hpp>
 
 #include <algorithm>
@@ -139,7 +139,7 @@ namespace hpx { namespace components
                 }
 
                 // consolidate all results
-                return hpx::lcos::local::dataflow(hpx::launch::sync,
+                return hpx::dataflow(hpx::launch::sync,
                     [=](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
                         mutable -> std::vector<bulk_locality_result>
                     {

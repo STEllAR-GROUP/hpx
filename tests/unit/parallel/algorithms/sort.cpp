@@ -6,6 +6,12 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+// use smaller array sizes for debug tests
+#if defined(HPX_DEBUG)
+#define HPX_SORT_TEST_SIZE          10000
+#define HPX_SORT_TEST_SIZE_STRINGS  50000
+#endif
+
 #include "sort_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,8 +54,8 @@ void test_sort1()
     test_sort1_async(par(task), char());
     test_sort1_async(seq(task), double());
     test_sort1_async(par(task), float());
-    test_sort1_async(seq(task), std::string());
-    test_sort1_async(par(task), std::string());
+    test_sort1_async_str(seq(task));
+    test_sort1_async_str(par(task));
 
     // Async execution, user comparison operator
     test_sort1_async(seq(task), int(),    std::less<unsigned int>());
@@ -58,8 +64,8 @@ void test_sort1()
     test_sort1_async(seq(task), double(), std::greater<double>());
     test_sort1_async(par(task), float(),  std::greater<float>());
     //
-    test_sort1_async(seq(task), std::string(), std::greater<std::string>());
-    test_sort1_async(par(task), std::string(), std::greater<std::string>());
+    test_sort1_async_str(seq(task), std::greater<std::string>());
+    test_sort1_async_str(par(task), std::greater<std::string>());
 
     test_sort1(execution_policy(seq),       int());
     test_sort1(execution_policy(par),       int());

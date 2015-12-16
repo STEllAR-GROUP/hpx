@@ -21,7 +21,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/util/move.hpp>
 

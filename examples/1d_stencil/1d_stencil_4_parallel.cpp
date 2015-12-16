@@ -113,7 +113,7 @@ struct stepper
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
     {
         using hpx::util::unwrapped;
-        using hpx::lcos::local::dataflow;
+        using hpx::dataflow;
         using hpx::parallel::for_each;
         using hpx::parallel::par;
 
