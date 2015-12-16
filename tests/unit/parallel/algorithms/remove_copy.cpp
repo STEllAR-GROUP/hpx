@@ -56,7 +56,7 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
     std::fill(boost::begin(c), middle, 1);
     std::fill(middle, boost::end(c), 2);
 
-    hpx::future<base_iterator> f =
+    auto f =
         hpx::parallel::remove_copy(p, iterator(boost::begin(c)),
             iterator(boost::end(c)), boost::begin(d), std::size_t(2));
 
@@ -232,7 +232,7 @@ void test_remove_copy_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::remove_copy(p,
                 decorated_iterator(
                     boost::begin(c),
@@ -334,7 +334,7 @@ void test_remove_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::remove_copy(p,
                 decorated_iterator(
                     boost::begin(c),

@@ -66,7 +66,7 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
     std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
-    hpx::future<base_iterator> f =
+    auto f =
         hpx::parallel::remove_copy_if(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d), [](int i){ return i < 0; });
@@ -238,7 +238,7 @@ void test_remove_copy_if_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::remove_copy_if(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
@@ -339,7 +339,7 @@ void test_remove_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::remove_copy_if(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d),

@@ -50,7 +50,7 @@ void test_copy_n_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<base_iterator> f =
+    auto f =
         hpx::parallel::copy_n(p,
             iterator(boost::begin(c)), c.size(), boost::begin(d));
     f.wait();
@@ -212,7 +212,7 @@ void test_copy_n_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::copy_n(p,
                 decorated_iterator(
                     boost::begin(c),
@@ -318,11 +318,11 @@ void test_copy_n_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::copy_n(p,
                 decorated_iterator(
                     boost::begin(c),
-                    [](){throw std::bad_alloc();}
+                    [](){ throw std::bad_alloc(); }
                 ),
                 c.size(),
                 boost::begin(d));

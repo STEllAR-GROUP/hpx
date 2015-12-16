@@ -71,7 +71,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
         traits::detail::is_iterator<OutIter>::value)>
-    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    typename util::detail::algorithm_result<
+        ExPolicy,
+        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+    >::type
     copy(ExPolicy && policy, Rng && rng, OutIter dest)
     {
         return copy(std::forward<ExPolicy>(policy),
@@ -158,7 +161,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_indirect_callable<
             F, traits::projected_range<Proj, Rng>
         >::value)>
-    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    typename util::detail::algorithm_result<
+        ExPolicy,
+        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+    >::type
     copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
         Proj && proj = Proj{})
     {

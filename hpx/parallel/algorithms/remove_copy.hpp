@@ -28,27 +28,49 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename Iter>
-        struct remove_copy : public detail::algorithm<remove_copy<Iter>, Iter>
+
+        // sequential remove_copy
+        template <typename InIter, typename OutIter, typename T>
+        inline std::pair<InIter, OutIter>
+        sequential_remove_copy(InIter first, InIter last, OutIter dest,
+            T const& value)
+        {
+            for (/* */; first != last; ++first)
+            {
+                if (!(*first == value))
+                {
+                    *dest++ = *first;
+                }
+            }
+            return std::make_pair(first, dest);
+        }
+
+        template <typename IterPair>
+        struct remove_copy
+          : public detail::algorithm<remove_copy<IterPair>, IterPair>
         {
             remove_copy()
               : remove_copy::algorithm("remove_copy")
             {}
 
-            template <typename ExPolicy, typename InIter, typename T>
-            static Iter
+            template <typename ExPolicy, typename InIter, typename OutIter,
+                typename T>
+            static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last,
-                Iter dest, const T& val)
+                OutIter dest, const T& val)
             {
-                return std::remove_copy(first, last, dest, val);
+                return sequential_remove_copy(first, last, dest, val);
             }
 
-            template <typename ExPolicy, typename FwdIter, typename T>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
+            template <typename ExPolicy, typename FwdIter, typename OutIter,
+                typename T>
+            static typename util::detail::algorithm_result<
+                ExPolicy, std::pair<FwdIter, OutIter>
+            >::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                Iter dest, const T& val)
+                OutIter dest, T const& val)
             {
-                return copy_if<Iter>().call(
+                return copy_if<IterPair>().call(
                     policy, boost::mpl::false_(), first, last, dest,
                     [val](T const& a){ return a != val; });
             }
@@ -97,19 +119,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a remove_copy algorithm returns a \a hpx::future<OutIter> if the
-    ///           execution policy is of type
+    /// \returns  The \a remove_copy algorithm returns a
+    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a remove_copy algorithm returns the output iterator to the
+    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           forwarded to the first element after the last in the input
+    ///           sequence and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter, typename T>
     typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<
+            ExPolicy, std::pair<InIter, OutIter>
+        >::type
     >::type
     remove_copy(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         const T& val)
@@ -139,7 +166,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::remove_copy<OutIter>().call(
+        return detail::remove_copy<std::pair<InIter, OutIter> >().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, dest, val);
     }
@@ -149,31 +176,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename Iter>
-        struct remove_copy_if : public detail::algorithm<remove_copy_if<Iter>, Iter>
+
+        // sequential remove_copy_if
+        template <typename InIter, typename OutIter, typename F>
+        inline std::pair<InIter, OutIter>
+        sequential_remove_copy_if(InIter first, InIter last, OutIter dest, F p)
+        {
+            for (/* */; first != last; ++first)
+            {
+                if (!p(*first))
+                {
+                    *dest++ = *first;
+                }
+            }
+            return std::make_pair(first, dest);
+        }
+
+        template <typename IterPair>
+        struct remove_copy_if
+          : public detail::algorithm<remove_copy_if<IterPair>, IterPair>
         {
             remove_copy_if()
               : remove_copy_if::algorithm("remove_copy_if")
             {}
 
-            template <typename ExPolicy, typename InIter, typename F>
-            static Iter
+            template <typename ExPolicy, typename InIter, typename OutIter,
+                typename F>
+            static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last,
-                Iter dest, F && f)
+                OutIter dest, F && f)
             {
-                return std::remove_copy_if(first, last, dest,
+                return sequential_remove_copy_if(first, last, dest,
                     std::forward<F>(f));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
+            template <typename ExPolicy, typename FwdIter, typename OutIter,
+                typename F>
+            static typename util::detail::algorithm_result<
+                ExPolicy, std::pair<FwdIter, OutIter>
+            >::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                Iter dest, F && f)
+                OutIter dest, F && f)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type T;
-                return copy_if<Iter>().call(
+                typedef typename std::iterator_traits<FwdIter>::value_type
+                    value_type;
+
+                return copy_if<IterPair>().call(
                     policy, boost::mpl::false_(), first, last, dest,
-                    [f](T const& a){ return !f(a); });
+                    [f](value_type const& a){ return !f(a); });
             }
         };
         /// \endcond
@@ -236,19 +286,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a remove_copy_if algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a remove_copy_if algorithm returns a
+    ///           \a hpx::future<std::pair<InIter, OutIter> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a remove_copy_if algorithm returns the output iterator to the
+    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           forwarded to the first element after the last in the input
+    ///           sequence and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter, typename F>
     typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<
+            ExPolicy, std::pair<InIter, OutIter>
+        >::type
     >::type
     remove_copy_if(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         F && f)
@@ -278,7 +333,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::remove_copy_if<OutIter>().call(
+        return detail::remove_copy_if<std::pair<InIter, OutIter> >().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, dest, std::forward<F>(f));
     }

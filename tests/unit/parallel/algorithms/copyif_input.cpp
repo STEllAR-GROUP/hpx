@@ -64,7 +64,7 @@ void test_copy_if_async(ExPolicy p)
     std::iota(boost::begin(c), middle, std::rand());
     std::fill(middle, boost::end(c), -1);
 
-    hpx::future<base_iterator> f =
+    auto f =
         hpx::parallel::copy_if(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d), [](int i){ return !(i < 0); });

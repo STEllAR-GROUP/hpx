@@ -36,14 +36,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename ZipIter>
-    R get_iter_tuple(ZipIter&& zipiter)
+    template <typename ZipIter>
+    typename ZipIter::iterator_tuple_type
+    get_iter_tuple(ZipIter && zipiter)
     {
         return zipiter.get_iterator_tuple();
     }
 
-    template <typename R, typename ZipIter>
-    R get_iter_tuple(hpx::future<ZipIter>&& zipiter)
+    template <typename ZipIter>
+    hpx::future<typename ZipIter::iterator_tuple_type>
+    get_iter_tuple(hpx::future<ZipIter> && zipiter)
     {
         typedef typename ZipIter::iterator_tuple_type result_type;
 
@@ -51,6 +53,51 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             [](hpx::future<ZipIter>&& f) -> result_type
             {
                 return f.get().get_iterator_tuple();
+            });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ZipIter>
+    std::pair<
+        typename hpx::util::tuple_element<
+            0, typename ZipIter::iterator_tuple_type
+        >::type,
+        typename hpx::util::tuple_element<
+            1, typename ZipIter::iterator_tuple_type
+        >::type
+    >
+    get_iter_pair(ZipIter && zipiter)
+    {
+        typename ZipIter::iterator_tuple_type t = zipiter.get_iterator_tuple();
+        return std::make_pair(hpx::util::get<0>(t), hpx::util::get<1>(t));
+    }
+
+    template <typename ZipIter>
+    hpx::future<std::pair<
+        typename hpx::util::tuple_element<
+            0, typename ZipIter::iterator_tuple_type
+        >::type,
+        typename hpx::util::tuple_element<
+            1, typename ZipIter::iterator_tuple_type
+        >::type
+    > >
+    get_iter_pair(hpx::future<ZipIter> && f)
+    {
+        typedef std::pair<
+            typename hpx::util::tuple_element<
+                0, typename ZipIter::iterator_tuple_type
+            >::type,
+            typename hpx::util::tuple_element<
+                1, typename ZipIter::iterator_tuple_type
+            >::type
+        > result_type;
+
+        return f.then(
+            [](hpx::future<ZipIter> && f) -> result_type
+            {
+                typename ZipIter::iterator_tuple_type t =
+                    f.get().get_iterator_tuple();
+                return std::make_pair(hpx::util::get<0>(t), hpx::util::get<1>(t));
             });
     }
 }}}}
