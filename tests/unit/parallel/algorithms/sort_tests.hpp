@@ -143,7 +143,7 @@ void test_sort1(ExPolicy && policy, T)
 ////////////////////////////////////////////////////////////////////////////////
 // call sort with a comparison operator
 template <typename ExPolicy, typename T, typename Compare = std::less<T>>
-        void test_sort1_comp(ExPolicy && policy, T, Compare comp = Compare())
+void test_sort1_comp(ExPolicy && policy, T, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -169,7 +169,7 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
 ////////////////////////////////////////////////////////////////////////////////
 // async sort
 template <typename ExPolicy, typename T, typename Compare = std::less<T>>
-        void test_sort1_async(ExPolicy && policy, T, Compare comp = Compare())
+void test_sort1_async(ExPolicy && policy, T, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -649,9 +649,8 @@ template <typename ExPolicy, typename Compare = std::less<std::string>>
 ////////////////////////////////////////////////////////////////////////////////
 // overload of test routine 1 for strings
 // async sort
-template <typename ExPolicy, typename Compare = std::less<std::string>>
-        void test_sort1_async(ExPolicy && policy, const std::string &,
-        Compare comp = Compare())
+template <typename ExPolicy, typename Compare = std::less<std::string> >
+void test_sort1_async_str(ExPolicy && policy, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
