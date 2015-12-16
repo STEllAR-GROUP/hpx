@@ -9,6 +9,7 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/thread_mapper.hpp>
@@ -26,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace papi_ns = hpx::performance_counters::papi;
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     papi_ns::server::papi_counter
 > papi_counter_type;
 

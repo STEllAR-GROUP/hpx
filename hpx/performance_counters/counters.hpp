@@ -6,16 +6,17 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM)
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>
+
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters

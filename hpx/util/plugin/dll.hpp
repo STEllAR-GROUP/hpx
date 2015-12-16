@@ -6,6 +6,7 @@
 #ifndef HPX_DLL_HPP_HK_2005_11_06
 #define HPX_DLL_HPP_HK_2005_11_06
 
+#include <hpx/config.hpp>
 #include <boost/config.hpp>
 
 #ifndef BOOST_WINDOWS

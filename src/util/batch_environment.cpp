@@ -23,7 +23,7 @@
 namespace hpx { namespace util
 {
     batch_environment::batch_environment(std::vector<std::string> & nodelist,
-            bool debug, bool enable)
+            util::runtime_configuration const& cfg, bool debug, bool enable)
       : agas_node_num_(0)
       , node_num_(-1)
       , num_threads_(-1)
@@ -50,7 +50,7 @@ namespace hpx { namespace util
             node_num_ = slurm_env.node_num();
             return;
         }
-        batch_environments::pbs_environment pbs_env(nodelist, debug);
+        batch_environments::pbs_environment pbs_env(nodelist, debug, cfg);
         if(pbs_env.valid())
         {
             batch_name_ = "PBS";

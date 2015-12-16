@@ -10,6 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>

@@ -16,8 +16,7 @@
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
@@ -438,30 +437,12 @@ namespace hpx { namespace actions
         /// serialization support
         friend class hpx::serialization::access;
 
-        void serialize(serialization::input_archive & ar)
-        {
-            // serialize function
-            bool have_function = false;
-            ar >> have_function;
-            if (have_function)
-                ar >> f_;
-        }
-
-        void serialize(serialization::output_archive & ar)
-        {
-            // serialize function
-            bool have_function = !f_.empty();
-            ar << have_function;
-            if (have_function)
-                ar << f_;
-        }
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
             // serialize base class
             ar & hpx::serialization::base_object<continuation>(*this);
-
-            serialize(ar);
+            ar & f_;
         }
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
@@ -542,30 +523,13 @@ namespace hpx { namespace actions
         /// serialization support
         friend class hpx::serialization::access;
 
-        void serialize(serialization::input_archive & ar)
-        {
-            // serialize function
-            bool have_function = false;
-            ar >> have_function;
-            if (have_function)
-                ar >> f_;
-        }
-
-        void serialize(serialization::output_archive & ar)
-        {
-            // serialize function
-            bool have_function = !f_.empty();
-            ar << have_function;
-            if (have_function)
-                ar << f_;
-        }
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
             // serialize base class
             ar & hpx::serialization::base_object<continuation>(*this);
 
-            serialize(ar);
+            ar & f_;
         }
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation

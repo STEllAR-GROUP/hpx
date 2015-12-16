@@ -83,6 +83,10 @@ void test_one(std::vector<int> a)
     Iter i_remove_copy =
         remove_copy(par, a.begin(), a.end(), d.begin(), 0);
 
+    HPX_UNUSED(i_copy_if);
+    HPX_UNUSED(i_remove_copy_if);
+    HPX_UNUSED(i_remove_copy);
+
     std::copy_if(a.begin(), a.end(), b_ans.begin(),
         [](int bar){ return bar % 2 == 1; });
     std::remove_copy_if(a.begin(), a.end(), c_ans.begin(),

@@ -6,17 +6,18 @@
 #if !defined(HPX_UTIL_TIME_LOGGER_NOV_26_0548PM)
 #define HPX_UTIL_TIME_LOGGER_NOV_26_0548PM
 
-#include <fstream>
+#include <hpx/util/logging.hpp>
+
 #include <boost/version.hpp>
 #include <boost/cstdint.hpp>
-
-#include <hpx/util/logging.hpp>
+#include <boost/lexical_cast.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <process.h>
 #elif defined(BOOST_HAS_UNISTD_H)
 #  include <unistd.h>
 #endif
+#include <fstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INITIAL_TIMES_SIZE 64000

@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>

@@ -9,13 +9,13 @@
 #if !defined(HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4)
 #define HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
 
-#include <boost/io/ios_state.hpp>
-#include <boost/cstdint.hpp>
-
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/safe_bool.hpp>
+
+#include <boost/io/ios_state.hpp>
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace agas
 {

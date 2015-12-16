@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             return result::get(
-                lcos::local::dataflow(
+                dataflow(
                     [=](std::vector<hpx::future<local_iterator_type> > && r)
                         ->  SegIter
                     {

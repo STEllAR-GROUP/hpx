@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>

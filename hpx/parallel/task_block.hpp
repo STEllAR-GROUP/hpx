@@ -11,10 +11,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/emulate_deleted.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/async.hpp>
@@ -139,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             typedef typename util::detail::algorithm_result<ExPolicy>::type
                 result_type;
             typedef std::integral_constant<
-                    bool, traits::is_future<result_type>::value
+                    bool, hpx::traits::is_future<result_type>::value
                 > is_fut;
             wait_for_completion(is_fut());
         }
@@ -190,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             return
                 result::get(
-                    hpx::lcos::local::dataflow(
+                    hpx::dataflow(
                         hpx::util::bind(hpx::
                             util::one_shot(&task_block::on_ready),
                             hpx::util::placeholders::_1, std::move(errors)),

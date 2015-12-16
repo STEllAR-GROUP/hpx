@@ -198,10 +198,31 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<hpx::serialization::output_archive>
                 archive(
                     new hpx::serialization::output_archive(
-                        *future_await, 0, 0, 0, 0, &future_await->new_gids_)
+                        *future_await, 0, 0, 0, 0)
                 );
+
+            put_parcel_await(
+                dest, std::move(p), std::move(f), trigger, archive, future_await);
+        }
+
+        void put_parcel_await(
+            locality const & dest, parcel p, write_handler_type f, bool trigger
+          , boost::shared_ptr<hpx::serialization::output_archive> const & archive
+          , boost::shared_ptr<
+                hpx::serialization::detail::future_await_container
+            > const & future_await)
+        {
+            future_await->reset();
+
             (*archive) << p;
 
+            // We are doing a fixed point iteration until we are sure that the
+            // serialization process requires nothing more to wait on ...
+            // Things where we need waiting:
+            //  - (shared_)future<id_type>: when the future wasn't ready yet, we
+            //      need to do another await round for the id splitting
+            //  - id_type: we need to await, if and only if, the credit of the
+            //      needs to split.
             if(future_await->has_futures())
             {
                 void (parcelport_impl::*awaiter)(
@@ -210,7 +231,7 @@ namespace hpx { namespace parcelset
                   , boost::shared_ptr<
                         hpx::serialization::detail::future_await_container> const &
                 )
-                    = &parcelport_impl::put_parcel_impl;
+                    = &parcelport_impl::put_parcel_await;
                 (*future_await)(
                     util::bind(
                         util::one_shot(awaiter), this,

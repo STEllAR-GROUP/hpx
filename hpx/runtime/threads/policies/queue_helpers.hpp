@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/try_lock_wrapper.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies

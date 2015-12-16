@@ -8,6 +8,8 @@
 #if !defined(HPX_UTIL_HARDWARE_TIMESTAMP_BGQ_HPP)
 #define HPX_UTIL_HARDWARE_TIMESTAMP_BGQ_HPP
 
+#if defined(__bgq__)
+
 // Hardware cycle-accurate timer on BGQ.
 // see https://wiki.alcf.anl.gov/parts/index.php/Blue_Gene/Q#High-Resolution_Timers
 
@@ -22,6 +24,8 @@ inline boost::uint64_t timestamp()
 }
 
 }}}
+
+#endif
 
 #endif // HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP
 

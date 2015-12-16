@@ -21,6 +21,7 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>

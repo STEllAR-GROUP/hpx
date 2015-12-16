@@ -17,14 +17,22 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
-#if defined(_GLIBCXX_HAVE_TLS)
-    #define HPX_NATIVE_TLS __thread
-#elif defined(BOOST_WINDOWS)
-    #define HPX_NATIVE_TLS __declspec(thread)
-#elif defined(__FreeBSD__) || (defined(__APPLE__) && defined(__MACH__))
-    #define HPX_NATIVE_TLS __thread
-#else
-    #error Unsupported platform.
+#if defined(__has_feature)
+#  if __has_feature(cxx_thread_local)
+#    define HPX_NATIVE_TLS thread_local
+#  endif
+#endif
+
+#if !defined(HPX_NATIVE_TLS)
+#  if defined(_GLIBCXX_HAVE_TLS)
+#    define HPX_NATIVE_TLS __thread
+#  elif defined(BOOST_WINDOWS)
+#    define HPX_NATIVE_TLS __declspec(thread)
+#  elif defined(__FreeBSD__) || (defined(__APPLE__) && defined(__MACH__))
+#    define HPX_NATIVE_TLS __thread
+#  else
+#    error Unsupported platform.
+#  endif
 #endif
 
 using boost::program_options::variables_map;

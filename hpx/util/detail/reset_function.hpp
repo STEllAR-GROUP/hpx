@@ -11,8 +11,8 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    template <typename Sig, typename IArchive, typename OArchive>
-    inline void reset_function(hpx::util::function<Sig, IArchive, OArchive>& f)
+    template <typename Sig, bool Serializable>
+    inline void reset_function(hpx::util::function<Sig, Serializable>& f)
     {
         f.reset();
     }
@@ -23,8 +23,8 @@ namespace hpx { namespace util { namespace detail
         f.reset();
     }
 
-    template <typename Sig, typename IArchive, typename OArchive>
-    inline void reset_function(hpx::util::unique_function<Sig, IArchive, OArchive>& f)
+    template <typename Sig, bool Serializable>
+    inline void reset_function(hpx::util::unique_function<Sig, Serializable>& f)
     {
         f.reset();
     }

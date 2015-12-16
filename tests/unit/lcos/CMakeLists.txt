@@ -38,6 +38,7 @@ set(tests
     packaged_action
     promise
     reduce
+    remote_dataflow
     remote_latch
     run_guarded
     shared_future
@@ -79,6 +80,12 @@ set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
 set(remote_latch_PARAMETERS LOCALITIES 2)
+
+set(local_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
+set(local_dataflow_executor_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(remote_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
+set(remote_dataflow_PARAMETERS LOCALITIES 2)
 
 set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)
 

@@ -25,6 +25,7 @@
 #pragma warning ( disable : 4355)
 #endif
 
+#include <hpx/config.hpp>
 #include <boost/version.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>

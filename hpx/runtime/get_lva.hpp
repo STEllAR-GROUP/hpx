@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 #include <boost/mpl/or.hpp>

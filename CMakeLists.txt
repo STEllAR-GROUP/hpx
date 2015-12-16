@@ -59,7 +59,7 @@ endif()
 ################################################################################
 # CMake configuration
 ################################################################################
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 # We safe the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols (
@@ -602,6 +602,14 @@ if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
 
+# HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.12
+hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
+    "Enable backwards compatibility for hpx::lcos::local::dataflow() functions"
+    ON ADVANCED)
+if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
@@ -947,9 +955,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # These are usually benign and can't be suppressed because of
     # interface requirements
     hpx_add_compile_flag_if_available(-Wno-unused-parameter)
-
-    # There are ignored qualifiers in Boost, so we have to ignore them
-    hpx_add_compile_flag_if_available(-Wno-ignored-qualifiers)
 
     # Be extra strict about format checks
     # Boost.Logging is built on fprintf, sadly

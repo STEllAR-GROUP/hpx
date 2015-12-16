@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
@@ -204,12 +205,12 @@ namespace hpx { namespace detail
         BOOST_FORCEINLINE static auto
         call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
         ->  decltype(detail::async_launch_policy_dispatch<
-                    typename util::decay<F>::type
-                >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...))
+                typename util::decay<F>::type
+            >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...))
         {
-            return async_launch_policy_dispatch<
-                    typename util::decay<F>::type
-                >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::async_launch_policy_dispatch<
+                typename util::decay<F>::type
+            >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
 }}

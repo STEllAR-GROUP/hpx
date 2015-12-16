@@ -16,6 +16,7 @@
 #include <memory>
 #endif
 
+#include <boost/type_traits/add_const.hpp>
 #include <boost/cstdint.hpp>
 
 namespace hpx { namespace serialization

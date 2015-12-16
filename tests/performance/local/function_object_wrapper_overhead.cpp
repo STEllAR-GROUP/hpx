@@ -59,7 +59,7 @@ int app_main(
         run(f, iterations);
     }
     {
-        hpx::util::function<void(), void, void> f = foo();
+        hpx::util::function<void(), false> f = foo();
         std::cout << "hpx::util::function (non-serializable)";
         run(f, iterations);
     }
