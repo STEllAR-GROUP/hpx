@@ -142,8 +142,8 @@ HPX_INLINE_NAMESPACE(v1)
               log2N = 0;
               while (cores >>= 1) ++log2N;
               n_chunks = (1 << log2N);
-              chunk_size = count / n_chunks;
-              while (chunk_size < sequential_scan_limit) {
+              chunk_size = std::max(1, int(count / n_chunks));
+              while (n_chunks > 0 && chunk_size < sequential_scan_limit) {
                 chunk_size <<= 1;
                 n_chunks >>= 1;
                 log2N -= 1;
