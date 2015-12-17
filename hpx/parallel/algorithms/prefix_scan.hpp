@@ -17,7 +17,7 @@
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-
+#include <hpx/lcos/when_all.hpp>
 
 #include <algorithm>
 #include <numeric>
