@@ -109,7 +109,7 @@ namespace hpx { namespace util { namespace functional
             friend class hpx::serialization::access;
 
             template <typename Archive>
-            BOOST_FORCEINLINE void save(Archive& ar, unsigned int const) const
+            HPX_FORCEINLINE void save(Archive& ar, unsigned int const) const
             {
                 bool has_continuation = cont_ ? true : false;
                 ar & bound_ & has_continuation;
@@ -120,7 +120,7 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename Archive>
-            BOOST_FORCEINLINE void load(Archive& ar, unsigned int const)
+            HPX_FORCEINLINE void load(Archive& ar, unsigned int const)
             {
                 bool has_continuation = cont_ ? true : false;
                 ar & bound_ & has_continuation;
@@ -217,7 +217,7 @@ namespace hpx { namespace util { namespace functional
             friend class hpx::serialization::access;
 
             template <typename Archive>
-            BOOST_FORCEINLINE void save(Archive& ar, unsigned int const) const
+            HPX_FORCEINLINE void save(Archive& ar, unsigned int const) const
             {
                 bool has_continuation = cont_ ? true : false;
                 ar & bound_ & has_continuation;
@@ -228,7 +228,7 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename Archive>
-            BOOST_FORCEINLINE void load(Archive& ar, unsigned int const)
+            HPX_FORCEINLINE void load(Archive& ar, unsigned int const)
             {
                 bool has_continuation = cont_ ? true : false;
                 ar & bound_ & has_continuation;

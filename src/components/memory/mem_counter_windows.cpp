@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 
 #include <hpx/exception.hpp>
 #include <boost/format.hpp>

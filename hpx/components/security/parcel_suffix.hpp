@@ -19,7 +19,7 @@
 
 namespace hpx { namespace components { namespace security
 {
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #  pragma pack(push, 1)
 #endif
 
@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace security
             return reinterpret_cast<unsigned char const*>(this) + size();
         }
 
-        BOOST_CONSTEXPR static std::size_t size()
+        HPX_CONSTEXPR static std::size_t size()
         {
             return sizeof(parcel_suffix);
         }
@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace security
         hash hash_;
     };
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #  pragma pack(pop)
 #endif
 }}}

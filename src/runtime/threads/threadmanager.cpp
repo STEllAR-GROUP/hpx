@@ -719,7 +719,7 @@ namespace hpx { namespace threads
               util::bind(&coroutine_type::impl_type::get_stack_recycle_count, _1),
               util::function_nonser<boost::uint64_t(bool)>(), "", 0
             },
-#if !defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
+#if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
             // /threads{locality#%d/total}/count/stack-unbinds
             { "count/stack-unbinds",
               util::bind(&coroutine_type::impl_type::get_stack_unbind_count, _1),
@@ -973,7 +973,7 @@ namespace hpx { namespace threads
               counts_creator, &performance_counters::locality_counter_discoverer,
               ""
             },
-#if !defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
+#if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
             { "/threads/count/stack-unbinds", performance_counters::counter_raw,
               "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,

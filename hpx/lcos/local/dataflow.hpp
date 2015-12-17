@@ -32,7 +32,7 @@ namespace hpx { namespace lcos { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<F>::type
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static auto
+        HPX_FORCEINLINE static auto
         call(BOOST_SCOPED_ENUM(launch) const& policy, F && f, Ts &&... ts)
         ->  decltype(dataflow_launch_policy_dispatch<
                     typename util::decay<F>::type
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<F>::type
@@ -117,7 +117,7 @@ namespace hpx { namespace lcos { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename dataflow_frame<
             threads::executor
           , typename hpx::util::decay<F>::type
@@ -161,7 +161,7 @@ namespace hpx { namespace lcos { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename detail::dataflow_frame<
             Executor
           , typename hpx::util::decay<F>::type
@@ -206,7 +206,7 @@ namespace hpx
     namespace lcos { namespace local
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         auto dataflow(F && f, Ts &&... ts)
         ->  decltype(lcos::detail::dataflow_dispatch<
                 typename util::decay<F>::type>::call(
@@ -221,7 +221,7 @@ namespace hpx
 #endif
 
     template <typename F, typename ...Ts>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     auto dataflow(F && f, Ts &&... ts)
     ->  decltype(lcos::detail::dataflow_dispatch<
             typename util::decay<F>::type>::call(

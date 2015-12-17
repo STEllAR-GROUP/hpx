@@ -22,15 +22,14 @@
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <boost/config.hpp>
 #include <boost/bind.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <iostream>
 #include <sstream>
 #include <vector>
-
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>

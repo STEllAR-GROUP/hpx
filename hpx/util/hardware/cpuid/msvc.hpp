@@ -11,7 +11,7 @@
 #define HPX_1AB68005_619C_4049_9C2B_DCD5F336B508
 
 #include <hpx/config.hpp>
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 
 #include <intrin.h>
 

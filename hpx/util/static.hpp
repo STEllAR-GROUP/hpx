@@ -19,7 +19,7 @@
 #include <boost/type_traits/alignment_of.hpp>
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) && \
-    !(BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS)) && \
+    !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) && \
     (_MSC_FULL_VER < 180021114)         // NovCTP_2013
 #include <boost/thread/once.hpp>
 #include <boost/bind.hpp>
@@ -27,7 +27,7 @@
 #include <memory>   // for placement new
 #endif
 
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_STATIC_ HPX_EXPORT
 #else
 #  define HPX_EXPORT_STATIC_
@@ -36,7 +36,7 @@
 namespace hpx { namespace util
 {
 #if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION) || \
-    (BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS)) || \
+    (HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) || \
     (_MSC_FULL_VER >= 180021114)         // NovCTP_2013
 
     //

@@ -17,7 +17,7 @@
 #ifndef JT28092007_filter_HPP_DEFINED
 #define JT28092007_filter_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 

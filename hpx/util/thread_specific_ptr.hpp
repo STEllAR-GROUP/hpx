@@ -10,11 +10,9 @@
 
 #include <hpx/util/assert.hpp>
 
-#include <boost/config.hpp>
-
 #include <hpx/config/export_definitions.hpp>
 
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_THREAD_SPECIFIC_PTR HPX_EXPORT
 #else
 #  define HPX_EXPORT_THREAD_SPECIFIC_PTR
@@ -34,7 +32,7 @@
 #if !defined(HPX_NATIVE_TLS)
 #  if defined(_GLIBCXX_HAVE_TLS)
 #    define HPX_NATIVE_TLS __thread
-#  elif defined(BOOST_WINDOWS)
+#  elif defined(HPX_WINDOWS)
 #    define HPX_NATIVE_TLS __declspec(thread)
 #  elif defined(__FreeBSD__) || (defined(__APPLE__) && defined(__MACH__))
 #    define HPX_NATIVE_TLS __thread

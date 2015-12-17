@@ -86,7 +86,7 @@ namespace hpx { namespace lcos
         ///
         /// \throws Nothing.
         ///
-        bool is_ready() const BOOST_NOEXCEPT
+        bool is_ready() const HPX_NOEXCEPT
         {
             return is_ready_async().get();
         }

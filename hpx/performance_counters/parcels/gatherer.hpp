@@ -13,7 +13,6 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/thread/locks.hpp>
 

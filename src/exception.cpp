@@ -16,9 +16,9 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #  include <process.h>
-#elif defined(BOOST_HAS_UNISTD_H)
+#elif defined(HPX_HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
 
@@ -35,7 +35,7 @@
 #ifdef __APPLE__
 #include <crt_externs.h>
 #define environ (*_NSGetEnviron())
-#elif !defined(BOOST_WINDOWS)
+#elif !defined(HPX_WINDOWS)
 extern char **environ;
 #endif
 
@@ -83,7 +83,7 @@ namespace hpx { namespace detail
     {
         std::vector<std::string> env;
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
         std::size_t len = get_arraylen(_environ);
         env.reserve(len);
         std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
@@ -306,7 +306,6 @@ namespace hpx { namespace detail
     template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::detail::bad_exception const&,
         std::string const&, std::string const&, long);
-#ifndef BOOST_NO_TYPEID
     template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::bad_typeid const&,
         std::string const&, std::string const&, long);
@@ -319,7 +318,6 @@ namespace hpx { namespace detail
     template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::detail::bad_cast const&,
         std::string const&, std::string const&, long);
-#endif
     template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::bad_alloc const&,
         std::string const&, std::string const&, long);

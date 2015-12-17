@@ -21,7 +21,7 @@
 #include <boost/cstdint.hpp>
 
 // include Windows specific performance counter binding
-#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
+#if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
 #include "win_perf_counters.hpp"
 #endif
 
@@ -34,7 +34,7 @@ void stop_monitor(boost::shared_ptr<hpx::promise<void> > p)
 ///////////////////////////////////////////////////////////////////////////////
 int monitor(double runfor, std::string const& name, boost::uint64_t pause)
 {
-#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
+#if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
     hpx::register_shutdown_function(&uninstall_windows_counters);
 #endif
 
@@ -88,7 +88,7 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
                          % double((value.time_ - zero_time) * 1e-9)
                          % value.value_);
 
-#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
+#if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
             update_windows_counters(value.value_);
 #endif
         }
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
         , "time to wait before this application exits ([s], default: run forever)")
         ;
 
-#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
+#if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
     hpx::register_startup_function(&install_windows_counters);
 #endif
 

@@ -116,7 +116,7 @@ namespace hpx { namespace util
         result = handle_ini_file_env (ini, "HPX_INI") || result;
 
         // afterwards in the standard locations
-#if !defined(BOOST_WINDOWS)   // /etc/hpx.ini doesn't make sense for Windows
+#if !defined(HPX_WINDOWS)   // /etc/hpx.ini doesn't make sense for Windows
         {
             bool result2 = handle_ini_file(ini, "/etc/hpx.ini");
             if (result2) {
@@ -405,7 +405,7 @@ namespace hpx { namespace util
                 // instance name and module name are the same
                 std::string name(fs::basename(curr));
 
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif

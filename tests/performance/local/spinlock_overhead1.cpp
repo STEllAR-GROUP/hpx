@@ -80,7 +80,7 @@ namespace test
             }
             else
             {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
                 Sleep(0);
 #else
                 // g++ -Wextra warns on {} or {0}

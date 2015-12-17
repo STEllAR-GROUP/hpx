@@ -7,7 +7,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is code specific to Windows
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 
 #include <windows.h>
 #include <perflib.h>

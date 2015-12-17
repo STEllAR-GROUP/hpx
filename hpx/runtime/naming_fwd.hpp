@@ -34,7 +34,7 @@ namespace hpx
 
         typedef boost::uint64_t address_type;
 
-        BOOST_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
+        HPX_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
     }
 
     ///////////////////////////////////////////////////////////////////////////

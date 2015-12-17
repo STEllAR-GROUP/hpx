@@ -20,7 +20,7 @@
 
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #include <boost/interprocess/managed_windows_shared_memory.hpp>
 #else
 #include <boost/interprocess/managed_shared_memory.hpp>
@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
     typedef boost::interprocess::allocator<
         char, boost::interprocess::managed_windows_shared_memory::segment_manager
     > ipc_allocator_type;
@@ -208,14 +208,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
           : segment_name_(segment_name),
             created_(created)
         {
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
             if (created_)
                 boost::interprocess::shared_memory_object::remove(segment_name);
 #endif
         }
         ~data_buffer_base()
         {
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
             if (created_)
                 boost::interprocess::shared_memory_object::remove(segment_name_.c_str());
 #endif
@@ -305,7 +305,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             }
 
         private:
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
             boost::interprocess::managed_windows_shared_memory segment_;
 #else
             boost::interprocess::managed_shared_memory segment_;

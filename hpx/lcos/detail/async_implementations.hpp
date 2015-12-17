@@ -18,7 +18,7 @@
 namespace hpx { namespace detail
 {
     /// \cond NOINTERNAL
-    BOOST_FORCEINLINE bool has_async_policy(BOOST_SCOPED_ENUM(launch) policy)
+    HPX_FORCEINLINE bool has_async_policy(BOOST_SCOPED_ENUM(launch) policy)
     {
         return (static_cast<int>(policy) &
             static_cast<int>(launch::async_policies)) ? true : false;
@@ -89,7 +89,7 @@ namespace hpx { namespace detail
     struct sync_local_invoke<Action, lcos::future<R> >
     {
         template <typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<R> call(
+        HPX_FORCEINLINE static lcos::future<R> call(
             boost::mpl::true_, naming::id_type const&,
             naming::address && addr, Ts &&... vs)
         {
@@ -156,7 +156,7 @@ namespace hpx { namespace detail
     struct sync_local_invoke_cb<Action, lcos::future<R> >
     {
         template <typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<R> call(
+        HPX_FORCEINLINE static lcos::future<R> call(
             boost::mpl::true_, naming::id_type const&,
             naming::address && addr, Callback && cb, Ts&&... vs)
         {

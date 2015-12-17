@@ -12,9 +12,8 @@
 
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 
-#include <boost/utility/enable_if.hpp>
+#include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -58,8 +57,8 @@ namespace hpx { namespace util { namespace detail
 namespace hpx { namespace util
 {
     template <typename T>
-    typename boost::enable_if<
-        traits::is_bind_expression<typename util::decay<T>::type>
+    typename std::enable_if<
+        traits::is_bind_expression<typename util::decay<T>::type>::value
       , detail::protected_bind<typename util::decay<T>::type>
     >::type
     protect(T && f)
@@ -71,8 +70,8 @@ namespace hpx { namespace util
 
     // leave everything that is not a bind expression as is
     template <typename T>
-    typename boost::disable_if<
-        traits::is_bind_expression<typename util::decay<T>::type>
+    typename std::enable_if<
+        !traits::is_bind_expression<typename util::decay<T>::type>::value
       , T
     >::type
     protect(T && v) //-V659

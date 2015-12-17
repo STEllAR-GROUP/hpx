@@ -114,6 +114,13 @@ macro(hpx_cpuid target variable)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_unistd_h)
+  add_hpx_config_test(HPX_WITH_UNISTD_H
+    SOURCE cmake/tests/unistd_h.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_alias_templates)
   add_hpx_config_test(HPX_WITH_CXX11_ALIAS_TEMPLATES
     SOURCE cmake/tests/cxx11_alias_templates.cpp
@@ -145,6 +152,13 @@ endmacro()
 macro(hpx_check_for_cxx11_decltype_n3276)
   add_hpx_config_test(HPX_WITH_CXX11_DECLTYPE_N3276
     SOURCE cmake/tests/cxx11_decltype_n3276.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_sfinae_expression)
+  add_hpx_config_test(HPX_WITH_CXX11_SFINAE_EXPRESSION
+    SOURCE cmake/tests/cxx11_sfinae_expression.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -261,6 +275,13 @@ macro(hpx_check_for_cxx11_std_chrono)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_cstdint)
+  add_hpx_config_test(HPX_WITH_CXX11_CSTDINT
+    SOURCE cmake/tests/cxx11_std_cstdint.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_is_bind_expression)
   add_hpx_config_test(HPX_WITH_CXX11_IS_BIND_EXPRESSION
     SOURCE cmake/tests/cxx11_std_is_bind_expression.cpp
@@ -299,6 +320,13 @@ endmacro()
 macro(hpx_check_for_cxx11_std_initializer_list)
   add_hpx_config_test(HPX_WITH_CXX11_STD_INITIALIZER_LIST
     SOURCE cmake/tests/cxx11_std_initializer_list.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_array)
+  add_hpx_config_test(HPX_WITH_CXX11_ARRAY
+    SOURCE cmake/tests/cxx11_std_array.cpp
     FILE ${ARGN})
 endmacro()
 

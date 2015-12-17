@@ -37,7 +37,7 @@ namespace hpx { namespace serialization {
             typedef std::map<std::string, boost::uint32_t> typename_to_id_t;
             typedef std::vector<ctor_t> cache_t;
 
-            BOOST_STATIC_CONSTEXPR boost::uint32_t invalid_id = ~0u;
+            HPX_STATIC_CONSTEXPR boost::uint32_t invalid_id = ~0u;
 
             void register_factory_function(const std::string& type_name,
                 ctor_t ctor)

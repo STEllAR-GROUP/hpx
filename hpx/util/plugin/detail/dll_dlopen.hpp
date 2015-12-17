@@ -12,7 +12,6 @@
 #include <iostream>
 
 #include <boost/bind.hpp>
-#include <boost/config.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>

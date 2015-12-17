@@ -29,19 +29,19 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    static bool is_empty_function(F const&, std::false_type) BOOST_NOEXCEPT
+    static bool is_empty_function(F const&, std::false_type) HPX_NOEXCEPT
     {
         return false;
     }
 
     template <typename F>
-    static bool is_empty_function(F const& f, std::true_type) BOOST_NOEXCEPT
+    static bool is_empty_function(F const& f, std::true_type) HPX_NOEXCEPT
     {
         return f == 0;
     }
 
     template <typename F>
-    static bool is_empty_function(F const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(F const& f) HPX_NOEXCEPT
     {
         std::integral_constant<bool,
             std::is_pointer<F>::value
@@ -66,7 +66,7 @@ namespace hpx { namespace util { namespace detail
         typename serializable_vtable::load_object_t load_object;
 
         template <typename T>
-        serializable_function_vtable_ptr(construct_vtable<T>) BOOST_NOEXCEPT
+        serializable_function_vtable_ptr(construct_vtable<T>) HPX_NOEXCEPT
           : VTablePtr(construct_vtable<T>())
           , name("empty")
           , save_object(&serializable_vtable::save_object<T>)
@@ -124,14 +124,14 @@ namespace hpx { namespace util { namespace detail
         static VTablePtr const empty_table;
 
     public:
-        function_base() BOOST_NOEXCEPT
+        function_base() HPX_NOEXCEPT
           : vptr(&empty_table)
           , object(0)
         {
             vtable::default_construct<empty_function<R(Ts...)> >(&object);
         }
 
-        function_base(function_base&& other) BOOST_NOEXCEPT
+        function_base(function_base&& other) HPX_NOEXCEPT
           : vptr(other.vptr)
           , object(other.object) // move-construct
         {
@@ -144,7 +144,7 @@ namespace hpx { namespace util { namespace detail
             vptr->delete_(&object);
         }
 
-        function_base& operator=(function_base&& other) BOOST_NOEXCEPT
+        function_base& operator=(function_base&& other) HPX_NOEXCEPT
         {
             if (this != &other)
             {
@@ -177,7 +177,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void reset() BOOST_NOEXCEPT
+        void reset() HPX_NOEXCEPT
         {
             if (!vptr->empty)
             {
@@ -188,37 +188,37 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void swap(function_base& f) BOOST_NOEXCEPT
+        void swap(function_base& f) HPX_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object); // swap
         }
 
-        bool empty() const BOOST_NOEXCEPT
+        bool empty() const HPX_NOEXCEPT
         {
             return vptr->empty;
         }
 
 #       ifdef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        explicit operator bool() const BOOST_NOEXCEPT
+        explicit operator bool() const HPX_NOEXCEPT
         {
             return !empty();
         }
 #       else
         operator typename util::safe_bool<function_base>
-            ::result_type() const BOOST_NOEXCEPT
+            ::result_type() const HPX_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
 #       endif
 
-        std::type_info const& target_type() const BOOST_NOEXCEPT
+        std::type_info const& target_type() const HPX_NOEXCEPT
         {
             return empty() ? typeid(void) : vptr->get_type();
         }
 
         template <typename T>
-        T* target() BOOST_NOEXCEPT
+        T* target() HPX_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
                 (traits::is_callable<T(Ts...), R>::value)
@@ -235,7 +235,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T>
-        T const* target() const BOOST_NOEXCEPT
+        T const* target() const HPX_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
                 (traits::is_callable<T(Ts...), R>::value)
@@ -251,14 +251,14 @@ namespace hpx { namespace util { namespace detail
             return &vtable::get<target_type>(&object);
         }
 
-        BOOST_FORCEINLINE R operator()(Ts... vs) const
+        HPX_FORCEINLINE R operator()(Ts... vs) const
         {
             return vptr->invoke(&object, std::forward<Ts>(vs)...);
         }
 
     private:
         template <typename T>
-        static VTablePtr const* get_table_ptr() BOOST_NOEXCEPT
+        static VTablePtr const* get_table_ptr() HPX_NOEXCEPT
         {
             return detail::get_table<VTablePtr, T>();
         }
@@ -273,7 +273,7 @@ namespace hpx { namespace util { namespace detail
         detail::construct_vtable<detail::empty_function<R(Ts...)> >();
 
     template <typename Sig, typename VTablePtr>
-    static bool is_empty_function(function_base<VTablePtr, Sig> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(function_base<VTablePtr, Sig> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }
@@ -297,15 +297,15 @@ namespace hpx { namespace util { namespace detail
     public:
         typedef R result_type;
 
-        basic_function() BOOST_NOEXCEPT
+        basic_function() HPX_NOEXCEPT
           : base_type()
         {}
 
-        basic_function(basic_function&& other) BOOST_NOEXCEPT
+        basic_function(basic_function&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        basic_function& operator=(basic_function&& other) BOOST_NOEXCEPT
+        basic_function& operator=(basic_function&& other) HPX_NOEXCEPT
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -357,15 +357,15 @@ namespace hpx { namespace util { namespace detail
     public:
         typedef R result_type;
 
-        basic_function() BOOST_NOEXCEPT
+        basic_function() HPX_NOEXCEPT
           : base_type()
         {}
 
-        basic_function(basic_function&& other) BOOST_NOEXCEPT
+        basic_function(basic_function&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        basic_function& operator=(basic_function&& other) BOOST_NOEXCEPT
+        basic_function& operator=(basic_function&& other) HPX_NOEXCEPT
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -374,7 +374,7 @@ namespace hpx { namespace util { namespace detail
 
     template <typename Sig, typename VTablePtr, bool Serializable>
     static bool is_empty_function(
-        basic_function<VTablePtr, Sig, Serializable> const& f) BOOST_NOEXCEPT
+        basic_function<VTablePtr, Sig, Serializable> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }

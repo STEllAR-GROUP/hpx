@@ -7,7 +7,7 @@
 #define HPX_LCOS_ASYNC_CONTINUE_CALLBACK_FWD_MAR_30_2015_1130AM
 
 #include <hpx/lcos/async_continue_fwd.hpp>
-#ifndef BOOST_MSVC
+#ifndef HPX_MSVC
 #include <boost/utility/enable_if.hpp>
 #endif
 
@@ -52,7 +52,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
-#ifndef BOOST_MSVC
+#ifndef HPX_MSVC
     template <typename Action, typename Cont, typename DistPolicy,
         typename Callback, typename ...Ts>
     typename boost::enable_if_c<

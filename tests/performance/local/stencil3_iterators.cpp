@@ -29,42 +29,42 @@ namespace hpx { namespace experimental { namespace detail
     {};
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator previous(Iterator it, boost::mpl::false_)
     {
         return --it;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator previous(Iterator const& it, boost::mpl::true_)
     {
         return it - 1;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator previous(Iterator const& it)
     {
         return previous(it, is_random_access_iterator<Iterator>());
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator next(Iterator it, boost::mpl::false_)
     {
         return ++it;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator next(Iterator const& it, boost::mpl::true_)
     {
         return it + 1;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator next(Iterator const& it)
     {
         return next(it, is_random_access_iterator<Iterator>());

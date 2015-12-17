@@ -10,7 +10,8 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/utility/declval.hpp>
+
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace detail
@@ -37,9 +38,9 @@ namespace hpx { namespace util { namespace detail
         HPX_ASSERT(l.owns_lock());
     }
 
-#   if !defined(BOOST_NO_SFINAE_EXPR)
+#   if defined(HPX_HAVE_CXX11_SFINAE_EXPR)
     template <typename Lock>
-    decltype(boost::declval<Lock>().owns_lock())
+    decltype(std::declval<Lock>().owns_lock())
     assert_owns_lock(Lock const& l, long)
     {
         HPX_ASSERT(l.owns_lock());
@@ -49,9 +50,9 @@ namespace hpx { namespace util { namespace detail
 
 #else
 
-#   if !defined(BOOST_NO_SFINAE_EXPR)
+#   if defined(HPX_HAVE_CXX11_SFINAE_EXPR)
     template <typename Lock>
-    decltype(boost::declval<Lock>().owns_lock())
+    decltype(std::declval<Lock>().owns_lock())
     assert_owns_lock(Lock const&, long)
     {
         return true;
