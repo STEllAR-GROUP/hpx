@@ -137,32 +137,46 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename OutputIter>
+
+        // sequential reverse_copy
+        template <typename BidirIt, typename OutIter>
+        inline std::pair<BidirIt, OutIter>
+        sequential_reverse_copy(BidirIt first, BidirIt last, OutIter dest)
+        {
+            BidirIt iter = last;
+            while (first != iter)
+            {
+                *dest++ = *--iter;
+            }
+            return std::make_pair(last, dest);
+        }
+
+        template <typename IterPair>
         struct reverse_copy
-          : public detail::algorithm<reverse_copy<OutputIter>, OutputIter>
+          : public detail::algorithm<reverse_copy<IterPair>, IterPair>
         {
             reverse_copy()
               : reverse_copy::algorithm("reverse_copy")
             {}
 
-            template <typename ExPolicy, typename BidirIter>
-            static OutputIter
+            template <typename ExPolicy, typename BidirIter, typename OutIter>
+            static std::pair<BidirIter, OutIter>
             sequential(ExPolicy, BidirIter first, BidirIter last,
-                OutputIter dest_first)
+                OutIter dest_first)
             {
-                return std::reverse_copy(first, last, dest_first);
+                return sequential_reverse_copy(first, last, dest_first);
             }
 
-            template <typename ExPolicy, typename BidirIter>
+            template <typename ExPolicy, typename BidirIter, typename OutIter>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutputIter
+                ExPolicy, std::pair<BidirIter, OutIter>
             >::type
             parallel(ExPolicy policy, BidirIter first, BidirIter last,
-                OutputIter dest_first)
+                OutIter dest_first)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
 
-                return detail::copy<OutputIter>().call(
+                return detail::copy<std::pair<iterator, OutIter> >().call(
                     policy, boost::mpl::false_(),
                     iterator(last), iterator(first), dest_first);
             }
@@ -212,25 +226,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a reverse_copy algorithm returns a \a hpx::future<OutputIter>
+    /// \returns  The \a reverse_copy algorithm returns a
+    ///           \a hpx::future<std::pair<BidirIter, OutIter> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutputIter otherwise.
-    ///           The \a reverse_copy algorithm returns the output iterator to the
-    ///           element past the last element copied.
+    ///           returns \a std::pair<BidirIter, OutIter> otherwise.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           forwarded to the first element after the last in the input
+    ///           sequence and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
     ///
-    template <typename ExPolicy, typename BidirIter, typename OutputIter>
+    template <typename ExPolicy, typename BidirIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutputIter>::type
+        typename util::detail::algorithm_result<
+            ExPolicy, std::pair<BidirIter, OutIter>
+        >::type
     >::type
     reverse_copy(ExPolicy && policy, BidirIter first, BidirIter last,
-        OutputIter dest_first)
+        OutIter dest_first)
     {
         typedef typename std::iterator_traits<BidirIter>::iterator_category
             input_iterator_category;
-        typedef typename std::iterator_traits<OutputIter>::iterator_category
+        typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
 
         static_assert(
@@ -252,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::reverse_copy<OutputIter>().call(
+        return detail::reverse_copy<std::pair<BidirIter, OutIter> >().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, dest_first);
     }

@@ -197,7 +197,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef boost::mpl::false_ non_seq;
 
             parallel_task_execution_policy p =
-                parallel_task_execution_policy().with(policy.parameters());
+                parallel_task_execution_policy()
+                    .on(policy.executor())
+                    .with(policy.parameters());
 
             hpx::future<OutIter> f =
                 detail::copy<OutIter>().call(p, non_seq(),

@@ -214,7 +214,7 @@ namespace hpx { namespace threads
 #endif
     /// \endcond
 
-    struct topology
+    struct HPX_EXPORT topology
     {
         virtual ~topology() {}
 

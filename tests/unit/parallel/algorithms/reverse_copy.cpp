@@ -151,7 +151,7 @@ void test_reverse_copy_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::reverse_copy(p,
                 decorated_iterator(boost::begin(c)),
                 decorated_iterator(
@@ -254,7 +254,7 @@ void test_reverse_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::reverse_copy(p,
                 decorated_iterator(boost::begin(c)),
                 decorated_iterator(
