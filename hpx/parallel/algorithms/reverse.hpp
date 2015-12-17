@@ -188,10 +188,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// beginning at dest_first in such a way that the elements in the new
     /// range are in reverse order.
     /// Behaves as if by executing the assignment
-    /// *(d_first + (last - first) - 1 - i) = *(first + i) once for each
+    /// *(dest_first + (last - first) - 1 - i) = *(first + i) once for each
     /// non-negative i < (last - first)
     /// If the source and destination ranges (that is, [first, last) and
-    /// [dest_first, ddest_first+(last-first)) respectively) overlap, the
+    /// [dest_first, dest_first+(last-first)) respectively) overlap, the
     /// behavior is undefined.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
@@ -200,7 +200,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam BidirIter  The type of the source iterators used (deduced).
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     bidirectional iterator.
     /// \tparam OutputIter  The type of the iterator representing the
