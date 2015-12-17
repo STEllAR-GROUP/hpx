@@ -32,6 +32,12 @@
 
 #include <hpx/util/assert.hpp>
 
+// include unist.d conditionally to check for POSIX version. Not all OSs have the
+// unistd header...
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 #if defined(_POSIX_VERSION)
 /**
  * Most of these utilities are really pure C++, but they are useful
