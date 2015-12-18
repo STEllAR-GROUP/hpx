@@ -509,7 +509,7 @@ namespace hpx
     boost::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
-    util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
+    util::thread_specific_ptr<runtime*, runtime::tls_tag> runtime::runtime_;
     util::thread_specific_ptr<std::string, runtime::tls_tag> runtime::thread_name_;
     util::thread_specific_ptr<boost::uint64_t, runtime::tls_tag> runtime::uptime_;
 
@@ -534,6 +534,7 @@ namespace hpx
         threads::coroutine_type::impl_type::reset_self();
         runtime::uptime_.reset();
         runtime::runtime_.reset();
+        util::reset_held_lock_data();
     }
 
     std::string runtime::get_thread_name()

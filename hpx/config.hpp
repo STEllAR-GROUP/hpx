@@ -426,7 +426,11 @@
 // This limits how deep the internal recursion of future continuations will go
 // before a new operation is re-spawned.
 #if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
-#if defined(HPX_DEBUG)
+#if defined(__has_feature) && __has_feature(address_sanitizer)
+// if we build under AddressSanitizer we set the max recursion depth to 1 to not
+// run into stack overflows.
+#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 1
+#elif defined(HPX_DEBUG)
 #define HPX_CONTINUATION_MAX_RECURSION_DEPTH 14
 #else
 #define HPX_CONTINUATION_MAX_RECURSION_DEPTH 20
