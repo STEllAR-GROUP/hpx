@@ -81,7 +81,7 @@ namespace hpx { namespace util
         function(function const& other)
           : base_type()
         {
-            detail::vtable::destruct<
+            detail::vtable::delete_<
                 detail::empty_function<R(Ts...)>
             >(&this->object);
 
@@ -115,7 +115,7 @@ namespace hpx { namespace util
             if (this != &other)
             {
                 reset();
-                detail::vtable::destruct<
+                detail::vtable::delete_<
                     detail::empty_function<R(Ts...)>
                 >(&this->object);
 

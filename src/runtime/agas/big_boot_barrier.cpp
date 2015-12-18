@@ -941,7 +941,18 @@ void big_boot_barrier::trigger()
         util::unique_function_nonser<void()>* p;
 
         while (thunks.pop(p))
-            (*p)();
+        {
+            try
+            {
+                (*p)();
+            }
+            catch(...)
+            {
+                delete p;
+                throw;
+            }
+            delete p;
+        }
     }
 }
 

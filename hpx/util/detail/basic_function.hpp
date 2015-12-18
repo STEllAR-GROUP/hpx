@@ -167,7 +167,7 @@ namespace hpx { namespace util { namespace detail
                     vtable::reconstruct<target_type>(&object, std::forward<F>(f));
                 } else {
                     reset();
-                    vtable::destruct<empty_function<R(Ts...)> >(&object);
+                    vtable::delete_<empty_function<R(Ts...)> >(&object);
 
                     vptr = f_vptr;
                     vtable::construct<target_type>(&object, std::forward<F>(f));

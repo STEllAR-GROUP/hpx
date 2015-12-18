@@ -108,9 +108,8 @@ void test_initial_state()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    int i;
     try {
-        i = fi.get();
+        fi.get();
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
