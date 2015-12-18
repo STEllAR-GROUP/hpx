@@ -130,9 +130,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::vector<hpx::future<void> > workitems;
                 workitems.reserve(std::distance(first,last)/chunk_size);
                 try{
-                    // Beginning at node (n-2)/2, partition the items within a level
-                    // and execute each chunk asynchronously. Each level must synchronize
-                    // before continuing up, loop will iterate over levels not items
+                    // Beginning at node (n-2)/2, partition the items within
+                    // a level and execute each chunk asynchronously. Each
+                    // level must synchronize before continuing up, the loop 
+                    // will iterate over levels not items
                     for(dtype start = (n-2)/2; start > 0;
                         start = (dtype)pow(2, (dtype)log2(start)) - 2) {
                         dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
@@ -140,8 +141,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         // The amount of work for this level
                         std::size_t items = (start-end_exclusive);
 
-                        // TO-DO: determine the best solution for when chunk_size becomes
-                        // too large as the heap shrinks
+                        // TO-DO: determine the best solution for when
+                        // chunk_size becomes too large as the heap shrinks
                         if(chunk_size > items)
                             chunk_size = items / 2;
 
@@ -152,11 +153,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             auto op = 
                                 hpx::util::bind(
                                     &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n, first + start - cnt,
-                                    chunk_size);
+                                    std::forward<Pred&>(pred), n, 
+                                    first + start - cnt, chunk_size);
 
-                            workitems.push_back(
-                                executor_traits::async_execute(policy.executor(), op));
+                            workitems.push_back(executor_traits::async_execute(
+                                policy.executor(), op));
                             
                             cnt += chunk_size;
                         }
@@ -166,34 +167,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             auto op =
                                 hpx::util::bind(
                                     &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n, first + start - cnt,
-                                    items-cnt);
+                                    std::forward<Pred&>(pred), n,
+                                    first + start - cnt, items-cnt);
      
-                            workitems.push_back(
-                                executor_traits::async_execute(policy.executor(), op));
+                            workitems.push_back(executor_traits::async_execute(
+                                policy.executor(), op));
                             
                         }
                         // Synchronize level
                         hpx::wait_all(workitems);
                     }
                     // Sift down the first element synchronously
-                    sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                    sift_down_range(first, 
+                        std::forward<Pred>(pred), n, first, 1);
                 } catch(...) {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                             boost::current_exception(), errors);
                 }
                 
                 util::detail::handle_local_exceptions<ExPolicy>::call(
-                        workitems, errors); 
+                    workitems, errors);
                 return util::detail::algorithm_result<ExPolicy>::get();
             }
 
             template<typename RndIter, typename Pred>
-            static typename util::detail::algorithm_result<parallel_task_execution_policy>::type
-            parallel(parallel_task_execution_policy policy, RndIter first, RndIter last,
+            static typename util::detail::algorithm_result<
+                parallel_task_execution_policy>::type
+            parallel(parallel_task_execution_policy policy, 
+                    RndIter first, RndIter last,
                     Pred && pred)
             {
-                typedef typename parallel_task_execution_policy::executor_type executor_type;
+                typedef typename parallel_task_execution_policy::executor_type 
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef typename std::iterator_traits<RndIter>::difference_type
@@ -203,7 +208,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 dtype n = last - first;
 
                 if(n <= 1) {
-                    return util::detail::algorithm_result<parallel_task_execution_policy>::get();
+                    return util::detail::algorithm_result<
+                        parallel_task_execution_policy>::get();
                 }
 
                 std::list<boost::exception_ptr> errors;
@@ -212,18 +218,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::vector<hpx::future<void> > workitems;
                 workitems.reserve(std::distance(first,last)/chunk_size);
                 try{
-                    // Beginning at node (n-2)/2, partition the items within a level
-                    // and execute each chunk asynchronously. Each level must synchronize
-                    // before continuing up, loop will iterate over levels not items
+                    // Beginning at node (n-2)/2, partition the items within 
+                    // a level and execute each chunk asynchronously. Each 
+                    // level must synchronize before continuing up, the loop 
+                    // will iterate over levels not items
                     for(dtype start = (n-2)/2; start > 0;
                         start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-                        dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
+                        dtype end_exclusive = 
+                            (dtype)pow(2, (dtype)log2(start))-2;
 
                         // The amount of work for this level
                         std::size_t items = (start-end_exclusive);
 
-                        // TO-DO: determine the best solution for when chunk_size becomes
-                        // too large as the heap shrinks
+                        // TO-DO: determine the best solution for when 
+                        // chunk_size becomes too large as the heap shrinks
                         if(chunk_size > items)
                             chunk_size = items / 2;
 
@@ -234,11 +242,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             auto op = 
                                 hpx::util::bind(
                                     &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n, first + start - cnt,
-                                    chunk_size);
+                                    std::forward<Pred&>(pred), n, 
+                                    first + start - cnt, chunk_size);
 
-                            workitems.push_back(
-                                executor_traits::async_execute(policy.executor(), op));
+                            workitems.push_back(executor_traits::async_execute(
+                                policy.executor(), op));
                             
                             cnt += chunk_size;
                         }
@@ -248,34 +256,37 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             auto op =
                                 hpx::util::bind(
                                     &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n, first + start - cnt,
-                                    items-cnt);
+                                    std::forward<Pred&>(pred), n, 
+                                    first + start - cnt, items-cnt);
      
-                            workitems.push_back(
-                                executor_traits::async_execute(policy.executor(), op));
+                            workitems.push_back(executor_traits::async_execute(
+                                policy.executor(), op));
                             
                         }
                         // Synchronize level
                         hpx::wait_all(workitems);
                     }
                     // Sift down the first element synchronously
-                    sift_down_range(first, std::forward<Pred>(pred), n, first, 1);
+                    sift_down_range(first, 
+                        std::forward<Pred>(pred), n, first, 1);
                 } catch(std::bad_alloc const&) {
                     return hpx::make_exceptional_future<void>(
                         boost::current_exception());
                 } catch(...) {
-                    util::detail::handle_local_exceptions<parallel_task_execution_policy>::call(
+                    util::detail::handle_local_exceptions<
+                        parallel_task_execution_policy>::call(
                             boost::current_exception(), errors);
                 }
               
-                // Perform local exception handling within a dataflow, because otherwise the
-                // exception would be thrown outside of the future which is not the desired
-                // behavior
+                // Perform local exception handling within a dataflow, 
+                // because otherwise the exception would be thrown outside 
+                // of the future which is not the desired behavior
                 return hpx::lcos::local::dataflow(
                     [errors](std::vector<hpx::future<void> > && r) 
                         mutable
                     {
-                        util::detail::handle_local_exceptions<parallel_task_execution_policy>
+                        util::detail::handle_local_exceptions<
+                        parallel_task_execution_policy>
                             ::call(r, errors);
                     },
                     workitems);
