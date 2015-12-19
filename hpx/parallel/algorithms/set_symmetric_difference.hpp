@@ -72,13 +72,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if (first1 == last1)
                 {
-                    return detail::copy<OutIter>().call(
-                        policy, boost::mpl::false_(), first2, last2, dest);
+                    return util::detail::convert_to_result(
+                        detail::copy<std::pair<RanIter2, OutIter> >()
+                            .call(
+                                policy, boost::mpl::false_(), first2, last2,
+                                dest
+                            ),
+                            [](std::pair<RanIter2, OutIter> const& p) -> OutIter
+                            {
+                                return p.second;
+                            });
                 }
+
                 if (first2 == last2)
                 {
-                    return detail::copy<OutIter>().call(
-                        policy, boost::mpl::false_(), first1, last1, dest);
+                    return util::detail::convert_to_result(
+                        detail::copy<std::pair<RanIter1, OutIter> >()
+                            .call(
+                                policy, boost::mpl::false_(), first1, last1,
+                                dest
+                            ),
+                            [](std::pair<RanIter1, OutIter> const& p) -> OutIter
+                            {
+                                return p.second;
+                            });
                 }
 
                 typedef typename set_operations_buffer<OutIter>::type buffer_type;

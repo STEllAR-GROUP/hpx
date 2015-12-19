@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_REPLACE_AUG_18_2014_0148PM
 
 #include <hpx/parallel/algorithms/replace.hpp>
+#include <hpx/parallel/container_algorithms/replace.hpp>
 
 #endif
 

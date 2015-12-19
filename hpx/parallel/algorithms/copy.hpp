@@ -9,7 +9,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
 #define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
 
@@ -517,6 +517,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -539,6 +541,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     it. The type \a Type must be such that an object of
     ///                     type \a InIter can be dereferenced and then
     ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// The assignments in the parallel \a copy_if algorithm invoked with
     /// an execution policy object of type \a sequential_execution_policy
@@ -567,8 +573,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::detail::is_iterator<InIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
         traits::detail::is_iterator<OutIter>::value &&
+        traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
         >::value)>

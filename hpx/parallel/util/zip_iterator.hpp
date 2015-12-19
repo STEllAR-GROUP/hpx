@@ -18,7 +18,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename R, typename ZipIter>
-    R get_iter(ZipIter&& zipiter)
+    R get_iter(ZipIter && zipiter)
     {
         return hpx::util::get<N>(zipiter.get_iterator_tuple());
     }
@@ -30,7 +30,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             N, typename ZipIter::iterator_tuple_type
         >::type result_type;
 
-        return lcos::make_future(std::move(zipiter), &get_iter<N, R, ZipIter>);
+        return lcos::make_future<result_type>(std::move(zipiter),
+            [](ZipIter zipiter)
+            {
+                return get_iter<N, result_type>(std::move(zipiter));
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -45,7 +49,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     hpx::future<typename ZipIter::iterator_tuple_type>
     get_iter_tuple(hpx::future<ZipIter> && zipiter)
     {
-        return lcos::make_future(std::move(zipiter), &get_iter_tuple<ZipIter>);
+        typedef typename ZipIter::iterator_tuple_type result_type;
+        return lcos::make_future<result_type>(std::move(zipiter),
+            [](ZipIter zipiter)
+            {
+                return get_iter_tuple(std::move(zipiter));
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -75,7 +84,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             1, typename ZipIter::iterator_tuple_type
         >::type
     > >
-    get_iter_pair(hpx::future<ZipIter> && f)
+    get_iter_pair(hpx::future<ZipIter> && zipiter)
     {
         typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
 
@@ -84,7 +93,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             typename hpx::util::tuple_element<1, iterator_tuple_type>::type
         > result_type;
 
-        return lcos::make_future(std::move(f), &get_iter_pair<ZipIter>);
+        return lcos::make_future<result_type>(std::move(zipiter),
+            [](ZipIter zipiter)
+            {
+                return get_iter_pair(std::move(zipiter));
+            });
     }
 }}}}
 

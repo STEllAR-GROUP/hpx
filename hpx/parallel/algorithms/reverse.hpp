@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -176,9 +176,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
 
-                return detail::copy<std::pair<iterator, OutIter> >().call(
-                    policy, boost::mpl::false_(),
-                    iterator(last), iterator(first), dest_first);
+                return util::detail::convert_to_result(
+                    detail::copy<std::pair<iterator, OutIter> >()
+                        .call(
+                            policy, boost::mpl::false_(),
+                            iterator(last), iterator(first), dest_first
+                        ),
+                    [](std::pair<iterator, OutIter> const& p)
+                        -> std::pair<BidirIter, OutIter>
+                    {
+                        return std::make_pair(p.first.base(), p.second);
+                    });
             }
         };
         /// \endcond

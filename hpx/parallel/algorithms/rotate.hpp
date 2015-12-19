@@ -189,8 +189,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        // sequential rotate_copy
+        template <typename FwdIter, typename OutIter>
+        inline std::pair<FwdIter, OutIter>
+        sequential_rotate_copy(FwdIter first, FwdIter new_first, FwdIter last,
+            OutIter dest_first)
+        {
+            std::pair<FwdIter, OutIter> p1 =
+                sequential_copy(new_first, last, dest_first);
+            std::pair<FwdIter, OutIter> p2 =
+                sequential_copy(first, new_first, std::move(p1.second));
+            return std::make_pair(std::move(p1.first), std::move(p2.second));
+        }
+
         template <typename ExPolicy, typename FwdIter, typename OutIter>
-        hpx::future<OutIter>
+        hpx::future<std::pair<FwdIter, OutIter> >
         rotate_copy_helper(ExPolicy policy, FwdIter first,
             FwdIter new_first, FwdIter last, OutIter dest_first)
         {
@@ -201,42 +215,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     .on(policy.executor())
                     .with(policy.parameters());
 
-            hpx::future<OutIter> f =
-                detail::copy<OutIter>().call(p, non_seq(),
+            typedef std::pair<FwdIter, OutIter> copy_return_type;
+
+            hpx::future<copy_return_type> f =
+                detail::copy<copy_return_type>().call(p, non_seq(),
                     new_first, last, dest_first);
 
             return f.then(
-                [=](hpx::future<OutIter> && it)
+                [=](hpx::future<copy_return_type> && result)
                 {
-                    return detail::copy<OutIter>().call(
-                        p, non_seq(), first, new_first, it.get());
+                    std::pair<FwdIter, OutIter> p1 = result.get();
+                    return detail::copy<copy_return_type>().call(
+                        p, non_seq(), first, new_first, p1.second);
                 });
         }
 
-        template <typename OutIter>
+        template <typename IterPair>
         struct rotate_copy
-          : public detail::algorithm<rotate_copy<OutIter>, OutIter>
+          : public detail::algorithm<rotate_copy<IterPair>, IterPair>
         {
             rotate_copy()
               : rotate_copy::algorithm("rotate_copy")
             {}
 
-            template <typename ExPolicy, typename FwdIter>
-            static OutIter
+            template <typename ExPolicy, typename FwdIter, typename OutIter>
+            static std::pair<FwdIter, OutIter>
             sequential(ExPolicy, FwdIter first, FwdIter new_first,
                 FwdIter last, OutIter dest_first)
             {
-                return std::rotate_copy(first, new_first, last, dest_first);
+                return sequential_rotate_copy(first, new_first, last, dest_first);
             }
 
-            template <typename ExPolicy, typename FwdIter>
+            template <typename ExPolicy, typename FwdIter, typename OutIter>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, std::pair<FwdIter, OutIter>
             >::type
             parallel(ExPolicy policy, FwdIter first, FwdIter new_first,
                 FwdIter last, OutIter dest_first)
             {
-                return util::detail::algorithm_result<ExPolicy, OutIter>::get(
+                return util::detail::algorithm_result<ExPolicy, IterPair>::get(
                     rotate_copy_helper(policy, first, new_first, last, dest_first));
             }
         };
@@ -292,7 +309,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<
+            ExPolicy, std::pair<FwdIter, OutIter>
+        >::type
     >::type
     rotate_copy(ExPolicy && policy, FwdIter first, FwdIter new_first,
         FwdIter last, OutIter dest_first)
@@ -321,7 +340,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::rotate_copy<OutIter>().call(
+        return detail::rotate_copy<std::pair<FwdIter, OutIter> >().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, new_first, last, dest_first);
     }

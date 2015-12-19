@@ -1143,16 +1143,14 @@ namespace hpx { namespace lcos
 
     // Allow to convert any future<U> into any other future<T> based on a given
     // conversion function: T f(U).
-    template <typename U, typename Conv,
+    template <typename R, typename U, typename Conv,
     HPX_CONCEPT_REQUIRES_(
         hpx::traits::is_callable<Conv(U)>::value)>
-    hpx::future<typename hpx::util::result_of<Conv(U)>::type>
+    hpx::future<R>
     make_future(hpx::future<U> && f, Conv && conv)
     {
-        typedef typename hpx::util::result_of<Conv(U)>::type result_type;
-
         return f.then(
-            [conv](hpx::future<U> && f) -> result_type
+            [conv](hpx::future<U> && f) -> R
             {
                 return hpx::util::invoke(conv, f.get());
             });
