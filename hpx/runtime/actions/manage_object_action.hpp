@@ -111,7 +111,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive&, const unsigned int) {}
 
-        HPX_SERIALIZATION_POLYMORPHIC(manage_object_action_base);
+        HPX_SERIALIZATION_POLYMORPHIC(manage_object_action_base)
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -209,7 +209,7 @@ namespace hpx { namespace actions
             ar & hpx::serialization::base_object<manage_object_action_base>(*this);
         }
 
-        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(manage_object_action);
+        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(manage_object_action)
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -228,7 +228,7 @@ namespace hpx { namespace actions
             ar & hpx::serialization::base_object<manage_object_action_base>(*this);
         }
 
-        HPX_SERIALIZATION_POLYMORPHIC(manage_object_action);
+        HPX_SERIALIZATION_POLYMORPHIC(manage_object_action)
     };
 
     inline manage_object_action_base const&

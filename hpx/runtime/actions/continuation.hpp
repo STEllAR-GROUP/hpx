@@ -447,7 +447,7 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , detail::get_continuation_name<typed_continuation>()
-        );
+        )
 
         function_type f_;
     };
@@ -534,7 +534,7 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , "hpx_void_typed_continuation"
-        );
+        )
 
         function_type f_;
     };

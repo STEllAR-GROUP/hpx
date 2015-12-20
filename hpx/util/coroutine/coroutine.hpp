@@ -115,7 +115,7 @@ namespace hpx { namespace util { namespace coroutines
   class coroutine
   {
   private:
-    HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine);
+    HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine)
 
   public:
     typedef coroutine<Signature, Heap, ContextImpl> type;

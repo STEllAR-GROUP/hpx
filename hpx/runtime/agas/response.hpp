@@ -254,7 +254,6 @@ struct get_remote_result<naming::id_type, agas::response>
 
                 return naming::id_type(raw_gid, naming::id_type::unmanaged);
             }
-            break;
 
         default:
             break;

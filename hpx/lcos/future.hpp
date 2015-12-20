@@ -1161,6 +1161,8 @@ namespace hpx { namespace lcos
         } catch (...) {
             return lcos::make_exceptional_future<T>(boost::current_exception());
         }
+
+        return future<T>();
     }
 
     // extension: create a pre-initialized future object which gets ready at

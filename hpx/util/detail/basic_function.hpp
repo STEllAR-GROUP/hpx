@@ -350,7 +350,7 @@ namespace hpx { namespace util { namespace detail
     class basic_function<VTablePtr, R(Ts...), false>
       : public function_base<VTablePtr, R(Ts...)>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function)
 
         typedef function_base<VTablePtr, R(Ts...)> base_type;
 
