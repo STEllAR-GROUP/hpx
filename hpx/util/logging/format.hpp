@@ -638,9 +638,7 @@ thread-safe access to an instance of this clas (used internally).
                 switch ( b->m_type) {
                 case route::is_fmt:       append_formatter( b->m_fmt); break;
                 case route::is_dest:      append_destination( b->m_dest); break;
-                    break;
                 case route::is_clear:     append_clear_format(); break;
-                    break;
                 }
             }
         }

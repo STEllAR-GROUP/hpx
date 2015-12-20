@@ -51,7 +51,7 @@ namespace hpx
 
         ~thread();
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(thread);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(thread)
 
     public:
         thread(thread &&) BOOST_NOEXCEPT;

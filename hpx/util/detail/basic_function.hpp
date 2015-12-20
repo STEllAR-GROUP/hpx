@@ -119,7 +119,7 @@ namespace hpx { namespace util { namespace detail
     template <typename VTablePtr, typename R, typename ...Ts>
     class function_base<VTablePtr, R(Ts...)>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(function_base);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(function_base)
 
         static VTablePtr const empty_table;
 
@@ -289,7 +289,7 @@ namespace hpx { namespace util { namespace detail
           , R(Ts...)
         >
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function)
 
         typedef serializable_function_vtable_ptr<VTablePtr> vtable_ptr;
         typedef function_base<vtable_ptr, R(Ts...)> base_type;

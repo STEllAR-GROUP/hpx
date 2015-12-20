@@ -51,7 +51,7 @@ namespace hpx { namespace actions
     template <typename Action>
     struct transfer_action : base_action
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(transfer_action);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(transfer_action)
 
     public:
         typedef typename Action::component_type component_type;
@@ -434,7 +434,7 @@ namespace hpx { namespace actions
             serialize(ar);
         }
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
-            transfer_action, detail::get_action_name<derived_type>());
+            transfer_action, detail::get_action_name<derived_type>())
 
         /// Extract the current invocation count for this action
         static boost::int64_t get_invocation_count(bool reset)

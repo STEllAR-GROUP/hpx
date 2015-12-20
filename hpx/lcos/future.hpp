@@ -694,7 +694,7 @@ namespace hpx { namespace lcos
     template <typename R>
     class future : public detail::future_base<future<R>, R>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(future);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(future)
 
         typedef detail::future_base<future<R>, R> base_type;
 
@@ -1329,7 +1329,7 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , detail::get_continuation_name<typed_continuation>()
-        );
+        )
 
         function_type f_;
     };
@@ -1446,7 +1446,7 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , "hpx_future_void_typed_continuation"
-        );
+        )
 
         function_type f_;
     };
@@ -1561,7 +1561,7 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , detail::get_continuation_name<typed_continuation>()
-        );
+        )
 
         function_type f_;
     };
@@ -1678,7 +1678,7 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , "hpx_shared_future_void_typed_continuation"
-        );
+        )
 
         function_type f_;
     };
