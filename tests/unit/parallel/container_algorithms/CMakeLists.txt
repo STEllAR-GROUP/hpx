@@ -8,6 +8,12 @@ set(tests
     copyif_range
     foreach_range
     foreach_range_projection
+    remove_copy_range
+    remove_copy_if_range
+    replace_range
+    replace_copy_range
+    replace_copy_if_range
+    replace_if_range
     sort_range
     transform_range
     transform_range_binary

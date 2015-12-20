@@ -1,91 +1,29 @@
-//  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/remove_copy.hpp
+/// \file parallel/container_algorithms/remove_copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM)
-#define HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM
+#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_REMOVE_COPY_DEC_20_2015_0631AM)
+#define HPX_PARALLEL_CONTAINER_ALGORITHM_REMOVE_COPY_DEC_20_2015_0631AM
 
 #include <hpx/config.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/util/invoke.hpp>
 
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/remove_copy.hpp>
+#include <hpx/parallel/traits/is_range.hpp>
+#include <hpx/parallel/traits/projected.hpp>
+#include <hpx/parallel/traits/projected_range.hpp>
+#include <hpx/parallel/traits/range_traits.hpp>
 
-#include <algorithm>
-#include <iterator>
+#include <boost/range/functions.hpp>
+
 #include <type_traits>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
-    /////////////////////////////////////////////////////////////////////////////
-    // remove_copy
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-
-        // sequential remove_copy
-        template <typename InIter, typename OutIter, typename T, typename Proj>
-        inline std::pair<InIter, OutIter>
-        sequential_remove_copy(InIter first, InIter last, OutIter dest,
-            T const& value, Proj && proj)
-        {
-            for (/* */; first != last; ++first)
-            {
-                if (!(hpx::util::invoke(proj, *first) == value))
-                {
-                    *dest++ = *first;
-                }
-            }
-            return std::make_pair(first, dest);
-        }
-
-        template <typename IterPair>
-        struct remove_copy
-          : public detail::algorithm<remove_copy<IterPair>, IterPair>
-        {
-            remove_copy()
-              : remove_copy::algorithm("remove_copy")
-            {}
-
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                typename T, typename Proj>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last,
-                OutIter dest, const T& val, Proj && proj)
-            {
-                return sequential_remove_copy(first, last, dest, val,
-                    std::forward<Proj>(proj));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
-                typename T, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<FwdIter, OutIter>
-            >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                OutIter dest, T const& val, Proj && proj)
-            {
-                return copy_if<IterPair>().call(
-                    policy, boost::mpl::false_(), first, last, dest,
-                    [val, proj](T const& a)
-                    {
-                        return !(a == val);
-                    },
-                    std::forward<Proj>(proj));
-            }
-        };
-        /// \endcond
-    }
-
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
     /// comparison operator returns false when compare to val.
@@ -103,9 +41,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -117,10 +55,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     /// \param val          Value to be removed.
     /// \param proj         Specifies the function (or function object) which
@@ -151,117 +87,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename OutIter, typename T,
+        typename ExPolicy, typename Rng, typename OutIter, typename T,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
+        traits::is_range<Rng>::value &&
         traits::detail::is_iterator<OutIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
+        traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             std::equal_to<>,
-                traits::projected<Proj, InIter>,
+                traits::projected_range<Proj, Rng>,
                 traits::projected<Proj, T const*>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<InIter, OutIter>
+        ExPolicy,
+        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
     >::type
-    remove_copy(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-        T const& val, Proj && proj = Proj{})
+    remove_copy(ExPolicy && policy, Rng rng, OutIter dest, T const& val,
+        Proj && proj = Proj{})
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
-        static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Required at least input iterator.");
-
-        static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
-            "Requires at least output iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
-
-        return detail::remove_copy<std::pair<InIter, OutIter> >().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, val, std::forward<Proj>(proj));
+        return remove_copy(std::forward<ExPolicy>(policy),
+            boost::begin(rng), boost::end(rng), dest, val,
+            std::forward<Proj>(proj));
     }
 
     /////////////////////////////////////////////////////////////////////////////
-    // remove_copy_if
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-
-        // sequential remove_copy_if
-        template <typename InIter, typename OutIter, typename F, typename Proj>
-        inline std::pair<InIter, OutIter>
-        sequential_remove_copy_if(InIter first, InIter last, OutIter dest, F p,
-            Proj && proj)
-        {
-            for (/* */; first != last; ++first)
-            {
-                using hpx::util::invoke;
-                if (!invoke(p, invoke(proj, *first)))
-                {
-                    *dest++ = *first;
-                }
-            }
-            return std::make_pair(first, dest);
-        }
-
-        template <typename IterPair>
-        struct remove_copy_if
-          : public detail::algorithm<remove_copy_if<IterPair>, IterPair>
-        {
-            remove_copy_if()
-              : remove_copy_if::algorithm("remove_copy_if")
-            {}
-
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                typename F, typename Proj>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last,
-                OutIter dest, F && f, Proj && proj)
-            {
-                return sequential_remove_copy_if(first, last, dest,
-                    std::forward<F>(f), std::forward<Proj>(proj));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
-                typename F, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<FwdIter, OutIter>
-            >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                OutIter dest, F && f, Proj && proj)
-            {
-                typedef typename std::iterator_traits<FwdIter>::value_type
-                    value_type;
-
-                return copy_if<IterPair>().call(
-                    policy, boost::mpl::false_(), first, last, dest,
-                    [f](value_type const& a)
-                    {
-                        return !hpx::util::invoke(f, a);
-                    },
-                    std::forward<Proj>(proj));
-            }
-        };
-        /// \endcond
-    }
-
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
     /// predicate \a f returns false. The order of the elements that are not
@@ -343,49 +192,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename OutIter, typename F,
+        typename ExPolicy, typename Rng, typename OutIter, typename F,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
+        traits::is_range<Rng>::value &&
         traits::detail::is_iterator<OutIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
+        traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            F, traits::projected<Proj, InIter>
+            F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<InIter, OutIter>
+        ExPolicy,
+        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
     >::type
-    remove_copy_if(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-        F && f, Proj && proj = Proj{})
+    remove_copy_if(ExPolicy && policy, Rng rng, OutIter dest, F && f,
+        Proj && proj = Proj{})
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
-        static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Required at least input iterator.");
-
-        static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
-            "Requires at least output iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
-
-        return detail::remove_copy_if<std::pair<InIter, OutIter> >().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, std::forward<F>(f), std::forward<Proj>(proj));
+        return remove_copy_if(std::forward<ExPolicy>(policy),
+            boost::begin(rng), boost::end(rng), dest, std::forward<F>(f),
+            std::forward<Proj>(proj));
     }
 }}}
 

@@ -33,6 +33,52 @@ namespace test
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseContainer, typename IteratorTag>
+    struct test_container : BaseContainer
+    {
+        template <typename ... Ts>
+        test_container(Ts && ...ts)
+          : BaseContainer(std::forward<Ts>(ts)...)
+        {}
+
+        BaseContainer& base() { return *this; }
+        BaseContainer const& base() const { return *this; }
+
+        typedef test_iterator<
+                typename BaseContainer::iterator, IteratorTag
+            > iterator;
+        typedef test_iterator<
+                typename BaseContainer::const_iterator, IteratorTag
+            > const_iterator;
+
+        iterator begin()
+        {
+            return iterator(this->BaseContainer::begin());
+        }
+        const_iterator begin() const
+        {
+            return const_iterator(this->BaseContainer::begin());
+        }
+        const_iterator cbegin() const
+        {
+            return const_iterator(this->BaseContainer::cbegin());
+        }
+
+        iterator end()
+        {
+            return iterator(this->BaseContainer::end());
+        }
+        const_iterator end() const
+        {
+            return const_iterator(this->BaseContainer::end());
+        }
+        const_iterator cend() const
+        {
+            return const_iterator(this->BaseContainer::cend());
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct decorated_iterator
       : boost::iterator_adaptor<
