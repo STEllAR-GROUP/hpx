@@ -25,7 +25,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
@@ -39,7 +39,7 @@ namespace hpx { namespace detail
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             lcos::future<
@@ -63,7 +63,7 @@ namespace hpx { namespace detail
     struct async_action_dispatch<Action, naming::id_type>
     {
         template <typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
@@ -86,7 +86,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
@@ -115,7 +115,7 @@ namespace hpx { namespace detail
             >::type result_type;
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<result_type>
         call(BOOST_SCOPED_ENUM(launch) launch_policy,
             Action const&, naming::id_type const& id, Ts&&... ts)
@@ -124,7 +124,7 @@ namespace hpx { namespace detail
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             lcos::future<result_type>
@@ -140,7 +140,7 @@ namespace hpx { namespace detail
 namespace hpx
 {
     template <typename Action, typename F, typename ...Ts>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     auto async(F&& f, Ts&&... ts)
     ->  decltype(detail::async_action_dispatch<
                     Action, typename util::decay<F>::type
@@ -166,7 +166,7 @@ namespace hpx { namespace detail
         template <
             typename Component, typename Signature, typename Derived,
             typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Derived
@@ -181,7 +181,7 @@ namespace hpx { namespace detail
         template <
             typename Component, typename Signature, typename Derived,
             typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Derived
@@ -202,7 +202,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static auto
+        HPX_FORCEINLINE static auto
         call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
         ->  decltype(detail::async_launch_policy_dispatch<
                 typename util::decay<F>::type

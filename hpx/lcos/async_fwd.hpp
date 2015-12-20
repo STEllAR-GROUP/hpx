@@ -49,7 +49,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F, typename ...Ts>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     auto async(F&& f, Ts&&... ts)
     ->  decltype(detail::async_action_dispatch<
                     Action, typename util::decay<F>::type
@@ -57,7 +57,7 @@ namespace hpx
         ));
 
     template <typename F, typename ...Ts>
-    BOOST_FORCEINLINE auto async(F&& f, Ts&&... ts)
+    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
     ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...
         ));

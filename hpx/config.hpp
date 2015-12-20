@@ -7,13 +7,6 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
-// We need to detect if user code include boost/config.hpp before
-// including hpx/config.hpp
-// Everything else might lead to hard compile errors and possible very subtile bugs.
-#if defined(BOOST_CONFIG_HPP)
-#error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
-#endif
-
 #include <hpx/config/defines.hpp>
 #include <hpx/config/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
@@ -21,6 +14,7 @@
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
+#include <hpx/config/noexcept.hpp>
 
 #include <boost/version.hpp>
 
@@ -35,7 +29,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
 #define _WINSOCKAPI_
@@ -69,24 +63,6 @@
 /// executable
 #if !defined(HPX_RUNTIME_INSTANCE_LIMIT)
 #  define HPX_RUNTIME_INSTANCE_LIMIT 1
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Properly handle all preprocessing limits
-#if !defined(HPX_LIMIT)
-#  define HPX_LIMIT 5
-#elif (HPX_LIMIT < 5)
-#  error "HPX_LIMIT is too low, it must be at least 5"
-#endif
-
-// make sure Fusion sizes are adjusted appropriately as well
-#if HPX_LIMIT > 5 && !defined(FUSION_MAX_VECTOR_SIZE)
-#  define FUSION_MAX_VECTOR_SIZE 20
-#endif
-
-// make sure boost::result_of is adjusted appropriately as well
-#if HPX_LIMIT > 5 && !defined(BOOST_RESULT_OF_NUM_ARGS)
-#  define BOOST_RESULT_OF_NUM_ARGS 20
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -298,7 +274,7 @@
 //    - to delimit several HPX ini paths
 //    - used as file extensions for shared libraries
 //    - used as path delimiters
-#ifdef BOOST_WINDOWS  // windows
+#ifdef HPX_WINDOWS  // windows
 #  define HPX_INI_PATH_DELIMITER            ";"
 #  define HPX_SHARED_LIB_EXTENSION          ".dll"
 #  define HPX_PATH_DELIMITERS               "\\/"
@@ -315,7 +291,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
 #  if defined(HPX_DEBUG)
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + n + "d" + HPX_SHARED_LIB_EXTENSION
 #  else
@@ -373,7 +349,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS) && defined(_MSC_VER) && _MSC_VER < 1900
+#if defined(HPX_WINDOWS) && defined(HPX_MSVC) && HPX_MSVC < 1900
 #  define snprintf _snprintf
 #endif
 
@@ -425,7 +401,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_SMALL_STACK_SIZE)
-#  if defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
+#  if defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 #    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
@@ -458,31 +434,28 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Older Boost versions do not have BOOST_NOEXCEPT defined
-#if !defined(BOOST_NOEXCEPT)
-#  define BOOST_NOEXCEPT
-#  define BOOST_NOEXCEPT_IF(Predicate)
-#  define BOOST_NOEXCEPT_EXPR(Expression) false
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Older Boost versions do not have BOOST_NOINLINE defined
-#if !defined(BOOST_NOINLINE)
-#  if defined(_MSC_VER)
-#    define BOOST_NOINLINE __declspec(noinline)
-#  else
-#    define BOOST_NOINLINE
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Older Boost versions do not have BOOST_NORETURN defined
-#if defined(BOOST_NORETURN)
-#  define HPX_ATTRIBUTE_NORETURN BOOST_NORETURN
-#elif defined(BOOST_ATTRIBUTE_NORETURN)
-#  define HPX_ATTRIBUTE_NORETURN BOOST_ATTRIBUTE_NORETURN
+#if defined(HPX_MSVC)
+#   define HPX_NOINLINE __declspec(noinline)
+#elif defined(__GNUC__)
+#   if defined(__CUDACC__)
+        // nvcc doesn't always parse __noinline
+#       define HPX_NOINLINE __attribute__ ((noinline))
+#   else
+#       define HPX_NOINLINE __attribute__ ((__noinline__))
+#   endif
 #else
-#  define HPX_ATTRIBUTE_NORETURN
+#   define HPX_NOINLINE
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_ATTRIBUTE_NORETURN)
+#  if defined(_MSC_VER)
+#    define HPX_ATTRIBUTE_NORETURN __declspec(noreturn)
+#  elif defined(__GNUC__)
+#    define HPX_ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
+#  else
+#    define HPX_ATTRIBUTE_NORETURN
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -519,7 +492,7 @@
 #if !defined(HPX_NO_DEPRECATED)
 #  define HPX_DEPRECATED_MSG \
    "This function is deprecated and will be removed in the future."
-#  if defined(_MSC_VER)
+#  if defined(HPX_MSVC)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
 #  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))

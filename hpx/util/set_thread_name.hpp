@@ -6,9 +6,9 @@
 #if !defined(HPX_UTIL_SET_THREAD_NAME_DEC_30_2012_1016AM)
 #define HPX_UTIL_SET_THREAD_NAME_DEC_30_2012_1016AM
 
-#include <boost/config.hpp>
+#include <hpx/config.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #include <windows.h>
 
 namespace hpx { namespace util

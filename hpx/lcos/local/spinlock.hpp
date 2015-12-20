@@ -21,7 +21,7 @@
 
 #include <boost/thread/locks.hpp>
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
 #else
 #  if !defined(__ANDROID__) && !defined(ANDROID)
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace local
                 }
                 else
                 {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
                     Sleep(0);
 #elif defined(BOOST_HAS_PTHREADS)
                     sched_yield();
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos { namespace local
                 }
                 else
                 {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
                     Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
                     // g++ -Wextra warns on {} or {0}

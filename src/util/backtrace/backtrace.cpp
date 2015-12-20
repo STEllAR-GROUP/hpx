@@ -54,7 +54,7 @@
 #include <sstream>
 #include <iomanip>
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #include <windows.h>
 #include <winbase.h>
 #include <stdlib.h>
@@ -134,7 +134,7 @@ namespace hpx { namespace util {
             return :: backtrace(array,n);
         }
 
-#elif defined(BOOST_MSVC)
+#elif defined(HPX_MSVC)
 
         HPX_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
@@ -284,7 +284,7 @@ namespace hpx { namespace util {
             }
         }
 
-#elif defined(BOOST_MSVC)
+#elif defined(HPX_MSVC)
 
         namespace {
             HANDLE hProcess = 0;

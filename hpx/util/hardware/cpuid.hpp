@@ -18,7 +18,7 @@
 
     #include <hpx/util/hardware/bit_manipulation.hpp>
 
-    #if defined(_MSC_VER)
+    #if defined(HPX_MSVC)
         #include <hpx/util/hardware/cpuid/msvc.hpp>
     #else
         #include <hpx/util/hardware/cpuid/linux_x86.hpp>

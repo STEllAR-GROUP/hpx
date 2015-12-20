@@ -16,7 +16,7 @@
 #include <boost/lexical_cast.hpp>
 
 // suppress warnings about dependent classes not being exported from the dll
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4091 4251 4231 4275 4660)
 #endif

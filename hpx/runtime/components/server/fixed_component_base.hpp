@@ -177,7 +177,7 @@ public:
     }
 
     // This component type does not support migration.
-    static BOOST_CONSTEXPR bool supports_migration() { return false; }
+    static HPX_CONSTEXPR bool supports_migration() { return false; }
 
     // Pinning functionality
     void pin() {}

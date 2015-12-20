@@ -6,8 +6,6 @@
 #if !defined(HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649)
 #define HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
 
-#include <boost/config.hpp>
-
 #include <boost/preprocessor/stringize.hpp>
 
 namespace hpx { namespace components

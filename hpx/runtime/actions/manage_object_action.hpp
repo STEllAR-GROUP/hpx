@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #include <cstring>
-#include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/exception.hpp>

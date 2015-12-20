@@ -23,12 +23,12 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/version.hpp>
+#include <boost/cstdint.hpp>
 
 #if BOOST_VERSION < 105100
 #error Boost.Context is available only with Boost V1.51 or later
 #endif
 
-#include <boost/config.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>
@@ -154,7 +154,7 @@ namespace hpx { namespace util { namespace coroutines
         // Generic implementation for the context_impl_base class based on
         // Boost.Context.
         template <typename T>
-        BOOST_FORCEINLINE void trampoline(intptr_t pv)
+        HPX_FORCEINLINE void trampoline(intptr_t pv)
         {
             T* fun = reinterpret_cast<T*>(pv);
             HPX_ASSERT(fun);

@@ -18,7 +18,7 @@
 
 namespace hpx { namespace agas
 {
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma warning (push)
 #pragma warning (disable: 4521)
 #endif
@@ -227,7 +227,7 @@ namespace hpx { namespace agas
 
         data_type data;
     };
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma warning (pop)
 #endif
 

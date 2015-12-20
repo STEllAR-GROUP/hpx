@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef void result_type;
 
         template <typename Future>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if<
             hpx::traits::is_future_or_future_range<Future>
         >::type
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Future>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if<
             traits::is_future_or_future_range<Future>
         >::type
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Future>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::disable_if<
             traits::is_future_or_future_range<Future>
         >::type
@@ -157,7 +157,7 @@ namespace hpx { namespace lcos { namespace detail
 
     protected:
         ///////////////////////////////////////////////////////////////////////
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void execute(boost::mpl::false_)
         {
             try {
@@ -175,7 +175,7 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void execute(boost::mpl::true_)
         {
             try {
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         ///////////////////////////////////////////////////////////////////////
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void finalize(BOOST_SCOPED_ENUM(launch) policy)
         {
             typedef
@@ -216,7 +216,7 @@ namespace hpx { namespace lcos { namespace detail
               , threads::thread_priority_boost);
         }
 
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void finalize(threads::executor& sched)
         {
             typedef
@@ -230,7 +230,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // handle executors through their executor_traits
         template <typename Executor>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void finalize(Executor& exec)
         {
             typedef
@@ -246,7 +246,7 @@ namespace hpx { namespace lcos { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void do_await(Iter &&, boost::mpl::true_)
         {
             done_ = true;
@@ -255,7 +255,7 @@ namespace hpx { namespace lcos { namespace detail
         // Current element is a not a future or future range, e.g. a just plain
         // value.
         template <typename Iter, typename IsFuture, typename IsRange>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void await_next_respawn(Iter iter, IsFuture is_future,
             IsRange is_range)
         {
@@ -268,7 +268,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Iter>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void await_next(Iter iter, boost::mpl::false_, boost::mpl::false_)
         {
             typedef
@@ -355,7 +355,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // Current element is a range (vector) of futures
         template <typename Iter>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void await_next(Iter iter, boost::mpl::false_, boost::mpl::true_)
         {
             await_range(
@@ -367,7 +367,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // Current element is a simple future
         template <typename Iter>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void await_next(Iter iter, boost::mpl::true_, boost::mpl::false_)
         {
             typedef
@@ -428,7 +428,7 @@ namespace hpx { namespace lcos { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void do_await(Iter iter, boost::mpl::false_)
         {
             typedef
@@ -449,7 +449,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
-        BOOST_FORCEINLINE void do_await()
+        HPX_FORCEINLINE void do_await()
         {
             typedef
                 typename boost::fusion::result_of::begin<Futures>::type
@@ -486,7 +486,7 @@ namespace hpx { namespace lcos { namespace detail
         template <
             typename Component, typename Signature, typename Derived,
             typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
           , Derived
@@ -529,7 +529,7 @@ namespace hpx { namespace lcos { namespace detail
         template <
             typename Component, typename Signature, typename Derived,
             typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
           , Derived
@@ -553,7 +553,7 @@ namespace hpx { namespace lcos { namespace detail
         >::type>
     {
         template <typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
@@ -567,7 +567,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
 //         template <typename DistPolicy, typename ...Ts>
-//         BOOST_FORCEINLINE static
+//         HPX_FORCEINLINE static
 //         typename boost::enable_if_c<
 //             traits::is_distribution_policy<DistPolicy>::value,
 //             lcos::future<
@@ -591,7 +591,7 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_action_dispatch<Action, naming::id_type>
     {
         template <typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
@@ -614,7 +614,7 @@ namespace hpx { namespace lcos { namespace detail
 //         >::type>
 //     {
 //         template <typename DistPolicy, typename ...Ts>
-//         BOOST_FORCEINLINE static
+//         HPX_FORCEINLINE static
 //         lcos::future<
 //             typename traits::promise_local_result<
 //                 typename hpx::actions::extract_action<
@@ -643,7 +643,7 @@ namespace hpx { namespace lcos { namespace detail
             >::type result_type;
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<result_type>
         call(BOOST_SCOPED_ENUM(launch) launch_policy,
             Action const&, naming::id_type const& id, Ts &&... ts)
@@ -654,7 +654,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
 //         template <typename DistPolicy, typename ...Ts>
-//         BOOST_FORCEINLINE static
+//         HPX_FORCEINLINE static
 //         typename boost::enable_if_c<
 //             traits::is_distribution_policy<DistPolicy>::value,
 //             lcos::future<result_type>
@@ -672,7 +672,7 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx
 {
     template <typename Action, typename F, typename ...Ts>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     auto dataflow(F && f, Ts &&... ts)
     ->  decltype(lcos::detail::dataflow_action_dispatch<
                     Action, typename util::decay<F>::type

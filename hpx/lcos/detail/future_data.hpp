@@ -108,7 +108,7 @@ namespace detail
         typedef Result type;
 
         template <typename U>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         U && set(U && u)
         {
             return std::forward<U>(u);
@@ -120,13 +120,13 @@ namespace detail
     {
         typedef Result* type;
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         Result* set(Result* u)
         {
             return u;
         }
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         Result* set(Result& u)
         {
             return &u;
@@ -138,7 +138,7 @@ namespace detail
     {
         typedef util::unused_type type;
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         util::unused_type set(util::unused_type u)
         {
             return u;
@@ -204,7 +204,7 @@ namespace detail
     };
 
     template <typename F1, typename F2>
-    static BOOST_FORCEINLINE util::unique_function_nonser<void()>
+    static HPX_FORCEINLINE util::unique_function_nonser<void()>
     compose_cb(F1 && f1, F2 && f2)
     {
         if (!f1)

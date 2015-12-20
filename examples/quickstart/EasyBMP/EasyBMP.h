@@ -18,7 +18,7 @@
 *                                                *
 *************************************************/
 
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_DEPRECATE)
+#if defined(HPX_MSVC) && !defined(_CRT_SECURE_NO_DEPRECATE)
 // MS Visual Studio gives warnings when using 
 // fopen. But fopen_s is not going to work well 
 // with most compilers, and fopen_s uses different 

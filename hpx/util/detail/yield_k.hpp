@@ -26,7 +26,7 @@ namespace hpx { namespace util { namespace detail {
         {
             if(!hpx::threads::get_self_ptr())
             {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
                 Sleep(0);
 #elif defined(BOOST_HAS_PTHREADS)
                 sched_yield();
@@ -42,7 +42,7 @@ namespace hpx { namespace util { namespace detail {
         {
             if(!hpx::threads::get_self_ptr())
             {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
                 Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
                 // g++ -Wextra warns on {} or {0}

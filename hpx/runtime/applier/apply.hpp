@@ -364,7 +364,7 @@ namespace hpx
         {
             template <typename Component, typename Signature, typename Derived,
                 typename ...Ts>
-            BOOST_FORCEINLINE static bool
+            HPX_FORCEINLINE static bool
             call(hpx::actions::basic_action<Component, Signature, Derived>,
                 naming::id_type const& id, Ts&&... ts)
             {
@@ -374,7 +374,7 @@ namespace hpx
 
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename ...Ts>
-            BOOST_FORCEINLINE static typename boost::enable_if_c<
+            HPX_FORCEINLINE static typename boost::enable_if_c<
                 traits::is_distribution_policy<DistPolicy>::value, bool
             >::type
             call(hpx::actions::basic_action<Component, Signature, Derived>,
@@ -590,7 +590,7 @@ namespace hpx
         {
             template <typename Component, typename Signature, typename Derived,
                 typename ...Ts>
-            BOOST_FORCEINLINE static bool
+            HPX_FORCEINLINE static bool
             call(Continuation && c,
                 hpx::actions::basic_action<Component, Signature, Derived>,
                 naming::id_type const& id, Ts&&... ts)
@@ -602,7 +602,7 @@ namespace hpx
 
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename ...Ts>
-            BOOST_FORCEINLINE static typename boost::enable_if_c<
+            HPX_FORCEINLINE static typename boost::enable_if_c<
                 traits::is_distribution_policy<DistPolicy>::value, bool
             >::type
             call(Continuation && c,

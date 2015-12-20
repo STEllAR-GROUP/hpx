@@ -11,7 +11,6 @@
 #include <hpx/util/plugin/config.hpp>
 #include <hpx/util/detail/pack.hpp>
 
-#include <boost/config.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
 

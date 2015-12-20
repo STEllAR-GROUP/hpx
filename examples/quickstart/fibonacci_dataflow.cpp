@@ -25,7 +25,7 @@
 boost::uint64_t threshold = 2;
 
 ///////////////////////////////////////////////////////////////////////////////
-BOOST_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
+HPX_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 {
     if (n < 2)
         return n;

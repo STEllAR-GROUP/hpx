@@ -15,7 +15,6 @@
 #include <iostream>
 
 #include <boost/io/ios_state.hpp>
-#include <boost/config.hpp>
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/thread/locks.hpp>

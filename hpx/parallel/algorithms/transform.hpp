@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename InIter1, typename OutIter, typename F,
             typename Proj>
-        BOOST_FORCEINLINE hpx::util::tuple<InIter1, OutIter>
+        HPX_FORCEINLINE hpx::util::tuple<InIter1, OutIter>
         sequential_transform(InIter1 first1, InIter1 last1,
             OutIter dest, F && f, Proj && proj)
         {
@@ -209,7 +209,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F, typename Proj1, typename Proj2>
-        BOOST_FORCEINLINE hpx::util::tuple<InIter1, InIter2, OutIter>
+        HPX_FORCEINLINE hpx::util::tuple<InIter1, InIter2, OutIter>
         sequential_transform(InIter1 first1, InIter1 last1,
             InIter2 first2,  OutIter dest, F && f,
             Proj1 && proj1, Proj2 && proj2)
@@ -417,7 +417,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F, typename Proj1, typename Proj2>
-        BOOST_FORCEINLINE hpx::util::tuple<InIter1, InIter2, OutIter>
+        HPX_FORCEINLINE hpx::util::tuple<InIter1, InIter2, OutIter>
         sequential_transform(InIter1 first1, InIter1 last1,
             InIter2 first2, InIter2 last2, OutIter dest, F && f,
             Proj1 && proj1, Proj2 && proj2)

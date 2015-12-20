@@ -16,7 +16,7 @@ namespace hpx { namespace util { namespace detail
     struct copyable_vtable : vtable
     {
         template <typename T>
-        BOOST_FORCEINLINE static void copy(void** v, void* const* src)
+        HPX_FORCEINLINE static void copy(void** v, void* const* src)
         {
             if (sizeof(T) <= sizeof(void*))
             {

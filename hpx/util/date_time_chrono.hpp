@@ -64,14 +64,14 @@ namespace hpx { namespace util
         typedef boost::nano period;
         typedef boost::chrono::duration<rep, period> duration;
         typedef boost::chrono::time_point<posix_clock, duration> time_point;
-        BOOST_STATIC_CONSTEXPR bool is_steady = false;
+        HPX_STATIC_CONSTEXPR bool is_steady = false;
 
-        static BOOST_FORCEINLINE time_point now() BOOST_NOEXCEPT
+        static HPX_FORCEINLINE time_point now() HPX_NOEXCEPT
         {
             return from_ptime(boost::get_system_time());
         }
 
-        static boost::posix_time::ptime to_ptime(time_point const& t) BOOST_NOEXCEPT
+        static boost::posix_time::ptime to_ptime(time_point const& t) HPX_NOEXCEPT
         {
             return boost::posix_time::from_time_t(0) +
 #if defined(BOOST_DATE_TIME_HAS_NANOSECONDS)
@@ -81,7 +81,7 @@ namespace hpx { namespace util
 #endif
         }
 
-        static time_point from_ptime(boost::posix_time::ptime const& t) BOOST_NOEXCEPT
+        static time_point from_ptime(boost::posix_time::ptime const& t) HPX_NOEXCEPT
         {
             return time_point(duration(
               (t - boost::posix_time::from_time_t(0)).total_nanoseconds()));
@@ -120,7 +120,7 @@ namespace hpx { namespace util
         }
 #endif
 
-        value_type const& value() const BOOST_NOEXCEPT
+        value_type const& value() const HPX_NOEXCEPT
         {
             return _abs_time;
         }
@@ -164,12 +164,12 @@ namespace hpx { namespace util
         }
 #endif
 
-        value_type const& value() const BOOST_NOEXCEPT
+        value_type const& value() const HPX_NOEXCEPT
         {
             return _rel_time;
         }
 
-        boost::chrono::steady_clock::time_point from_now() const BOOST_NOEXCEPT
+        boost::chrono::steady_clock::time_point from_now() const HPX_NOEXCEPT
         {
             return boost::chrono::steady_clock::now() + _rel_time;
         }
@@ -185,7 +185,7 @@ namespace hpx { namespace util
         typedef typename Clock::duration duration_type;
         typedef typename Clock::time_point time_type;
 
-        static time_type now() BOOST_NOEXCEPT
+        static time_type now() HPX_NOEXCEPT
         {
             return Clock::now();
         }

@@ -32,6 +32,7 @@
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/detail/endian.hpp>
 
 #include <algorithm>
 #include <sstream>

@@ -24,7 +24,7 @@ namespace hpx { namespace util { namespace detail
     struct callable_vtable<R(Ts...)>
     {
         template <typename T>
-        BOOST_FORCEINLINE static R invoke(void** f, Ts&&... vs)
+        HPX_FORCEINLINE static R invoke(void** f, Ts&&... vs)
         {
             return util::invoke<R>(
                 vtable::get<T>(f), std::forward<Ts>(vs)...);

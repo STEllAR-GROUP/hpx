@@ -213,7 +213,7 @@ namespace hpx { namespace lcos
         protected:
             // End of the tuple is reached
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&&, boost::mpl::true_)
             {
                 this->set_value(when_all_result<Tuple>::call(std::move(t_)));
@@ -265,7 +265,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::false_, boost::mpl::true_)
             {
                 await_range(iter,
@@ -275,7 +275,7 @@ namespace hpx { namespace lcos
 
             // Current element is a simple future
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -325,7 +325,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&& iter, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -339,7 +339,7 @@ namespace hpx { namespace lcos
             }
 
         public:
-            BOOST_FORCEINLINE void do_await()
+            HPX_FORCEINLINE void do_await()
             {
                 typedef typename boost::fusion::result_of::begin<Tuple>::type
                     begin_type;

@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     class task_canceled_exception : public hpx::exception
     {
     public:
-        task_canceled_exception() BOOST_NOEXCEPT
+        task_canceled_exception() HPX_NOEXCEPT
           : hpx::exception(hpx::task_canceled_exception)
         {}
     };

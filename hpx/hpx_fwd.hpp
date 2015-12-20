@@ -22,7 +22,7 @@
 #error HPX cannot be compiled with a Boost version earlier than V1.49.
 #endif
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #if !defined(WIN32)
 #  define WIN32
 #endif

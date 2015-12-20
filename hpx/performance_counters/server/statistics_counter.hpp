@@ -22,12 +22,12 @@
 #include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/rolling_mean.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #  pragma warning(push)
 #  pragma warning(disable: 4244)
 #endif
 #include <boost/accumulators/statistics/median.hpp>
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #  pragma warning(pop)
 #endif
 

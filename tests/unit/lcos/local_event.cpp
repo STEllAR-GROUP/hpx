@@ -40,11 +40,6 @@ void local_event_test(event& b, boost::atomic<std::size_t>& c)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    std::size_t num_threads = 1;
-
-    if (vm.count("threads"))
-        num_threads = vm["threads"].as<std::size_t>();
-
     std::size_t pxthreads = 0;
 
     if (vm.count("pxthreads"))

@@ -105,7 +105,7 @@ namespace hpx { namespace traits
                 boost::intrusive_ptr<SharedState>(shared_state));
         }
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<R>::type const&
         get_shared_state(lcos::future<R> const& f)
         {
@@ -138,7 +138,7 @@ namespace hpx { namespace traits
                 boost::intrusive_ptr<SharedState>(shared_state));
         }
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<R>::type const&
         get_shared_state(lcos::shared_future<R> const& f)
         {
