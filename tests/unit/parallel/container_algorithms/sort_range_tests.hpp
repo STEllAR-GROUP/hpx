@@ -663,7 +663,7 @@ template <typename ExPolicy, typename Compare = std::less<std::string>>
 // overload of test routine 1 for strings
 // async sort
 template <typename ExPolicy, typename Compare = std::less<std::string>>
-        void test_sort1_async(ExPolicy && policy, const std::string &,
+        void test_sort1_async_string(ExPolicy && policy, const std::string &,
         Compare comp = Compare())
 {
     static_assert(

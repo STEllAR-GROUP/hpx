@@ -515,7 +515,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f,
-        Proj && proj = Proj{})
+        Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;

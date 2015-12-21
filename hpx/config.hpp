@@ -7,6 +7,13 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
+// We need to detect if user code include boost/config.hpp before
+// including hpx/config.hpp
+// Everything else might lead to hard compile errors and possible very subtile bugs.
+#if defined(BOOST_CONFIG_HPP)
+#error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
+#endif
+
 #include <hpx/config/defines.hpp>
 #include <hpx/config/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
@@ -425,6 +432,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This limits how deep the internal recursion of future continuations will go
 // before a new operation is re-spawned.
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+// if we build under AddressSanitizer we set the max recursion depth to 1 to not
+// run into stack overflows.
+#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 1
+#endif
+#endif
+
 #if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
 #if defined(HPX_DEBUG)
 #define HPX_CONTINUATION_MAX_RECURSION_DEPTH 14
