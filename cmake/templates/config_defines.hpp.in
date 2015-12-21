@@ -8,6 +8,10 @@
 #if !defined(HPX_CONFIG_DEFINES_HPP)
 #define HPX_CONFIG_DEFINES_HPP
 
+#if defined(__INTEL_COMPILER) && !defined(BOOST_COMPILER_CONFIG)
+#define BOOST_COMPILER_CONFIG "hpx/config/boost/compiler/intel.hpp"
+#endif
+
 #if !defined(HPX_PREFIX)
 #define HPX_PREFIX "@HPX_DEFINES_PREFIX@"
 #endif
