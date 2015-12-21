@@ -32,6 +32,7 @@ add_hpx_library_sources(hpx
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/*.cpp"
+  EXCLUDE ".*lightweight_test.cpp"
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/lcos/*.cpp"

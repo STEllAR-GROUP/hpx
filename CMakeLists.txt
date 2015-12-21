@@ -1044,7 +1044,7 @@ else()
 
   # Check if our libraries have unresolved symbols
   #if(NOT APPLE AND NOT HPX_WITH_APEX)
-  if(NOT APPLE AND NOT WIN32)
+  if(NOT APPLE AND NOT WIN32 AND NOT HPX_WITH_SANITIZERS)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
   if(WIN32)
