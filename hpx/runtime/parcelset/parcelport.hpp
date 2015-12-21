@@ -311,7 +311,8 @@ namespace hpx { namespace parcelset
             applier_ = applier;
         }
 
-        void add_received_parcel(parcel p, std::size_t num_thread = std::numeric_limits<std::size_t>::max());
+        void add_received_parcel(parcel p, std::size_t num_thread =
+                                 std::numeric_limits<std::size_t>::max());
 
         /// Update performance counter data
         void add_received_data(performance_counters::parcels::data_point const& data)

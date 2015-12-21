@@ -46,7 +46,8 @@ namespace hpx { namespace serialization
     template <typename Archive>
     struct HPX_EXPORT basic_archive
     {
-        static const boost::uint64_t npos = std::numeric_limits<boost::uint64_t>::max();
+        static const boost::uint64_t npos =
+            std::numeric_limits<boost::uint64_t>::max();
 
         basic_archive(boost::uint32_t flags)
           : flags_(flags)
