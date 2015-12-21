@@ -160,7 +160,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
-        Proj && proj = Proj{})
+        Proj && proj = Proj())
     {
         return copy_if(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng), dest, std::forward<F>(f),
