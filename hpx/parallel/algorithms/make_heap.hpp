@@ -136,7 +136,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     // will iterate over levels not items
                     for(dtype start = (n-2)/2; start > 0;
                         start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-                        dtype end_exclusive = (dtype)pow(2, (dtype)log2(start))-2;
+                        dtype end_exclusive = (dtype)pow(2, 
+                            (dtype)log2(start))-2;
 
                         // The amount of work for this level
                         std::size_t items = (start-end_exclusive);
