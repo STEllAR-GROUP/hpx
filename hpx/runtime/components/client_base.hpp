@@ -73,7 +73,7 @@ namespace hpx { namespace traits
     struct future_access<Derived,
         typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<naming::id_type>::type const&
         get_shared_state(Derived const& client)
         {
@@ -89,7 +89,7 @@ namespace hpx { namespace traits
         typedef Derived type;
 
         template <typename T_>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         Derived operator()(T_ && value) const
         {
             return std::forward<T_>(value);
@@ -132,7 +132,7 @@ namespace hpx { namespace components
         {
             typedef shared_future<naming::id_type> result_type;
 
-            BOOST_FORCEINLINE result_type
+            HPX_FORCEINLINE result_type
             operator()(future<Derived> f) const
             {
                 return f.get().share();

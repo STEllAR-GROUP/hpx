@@ -218,7 +218,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void operator()(Sequence_& sequence,
                 typename boost::disable_if_c<
                     traits::is_shared_state<Sequence_>::value
@@ -228,7 +228,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::enable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -238,7 +238,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::disable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -328,7 +328,7 @@ namespace hpx { namespace lcos
                 typename traits::detail::shared_state_ptr_for<Future>::type const&
                 result_type;
 
-            BOOST_FORCEINLINE result_type
+            HPX_FORCEINLINE result_type
             operator()(Future const& f) const
             {
                 return traits::detail::get_shared_state(f);

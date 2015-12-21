@@ -11,7 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/emulate_deleted.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     class task_canceled_exception : public hpx::exception
     {
     public:
-        task_canceled_exception() BOOST_NOEXCEPT
+        task_canceled_exception() HPX_NOEXCEPT
           : hpx::exception(hpx::task_canceled_exception)
         {}
     };
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             return
                 result::get(
-                    hpx::lcos::local::dataflow(
+                    hpx::dataflow(
                         hpx::util::bind(hpx::
                             util::one_shot(&task_block::on_ready),
                             hpx::util::placeholders::_1, std::move(errors)),

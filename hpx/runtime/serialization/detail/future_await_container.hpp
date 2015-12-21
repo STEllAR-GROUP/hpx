@@ -10,7 +10,7 @@
 // ready before the actual serialization process can be started
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -112,7 +112,7 @@ namespace hpx { namespace serialization { namespace detail
                 }
             }
 
-            hpx::lcos::local::dataflow(//hpx::launch::sync,
+            hpx::dataflow(//hpx::launch::sync,
                 util::unwrapped(std::move(f))
               , promise_.get_future());
         }

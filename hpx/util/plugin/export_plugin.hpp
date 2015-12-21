@@ -13,7 +13,6 @@
 #include <hpx/util/plugin/config.hpp>
 #include <hpx/util/plugin/concrete_factory.hpp>
 
-#include <boost/config.hpp>
 #include <boost/any.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/algorithm/string/case_conv.hpp>

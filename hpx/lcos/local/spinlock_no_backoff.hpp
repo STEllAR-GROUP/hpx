@@ -10,16 +10,15 @@
 #if !defined(HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF)
 #define HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF
 
+#include <hpx/config.hpp>
 #include <hpx/config/emulate_deleted.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/config.hpp>
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
 #else
 #  include <boost/smart_ptr/detail/spinlock_sync.hpp>

@@ -101,7 +101,7 @@ namespace hpx { namespace util
         typedef boost::asio::io_service::work work_type;
 #endif
 
-        BOOST_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
+        HPX_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
         {
             return work_type(
 // FIXME: Intel compilers don't like this

@@ -13,7 +13,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -67,7 +67,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static hpx::future<R> call(hpx::future<R> f)
             {
                 HPX_ASSERT(f.has_exception());
-                return f;
+
+                // Intel complains if this is not explicitly moved
+                return std::move(f);
             }
 
             static hpx::future<R> call(boost::exception_ptr const& e)
@@ -214,7 +216,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, c_first, last, comp
                     ));
 
-            return hpx::lcos::local::dataflow(
+            return hpx::dataflow(
                 [last](hpx::future<RandomIt> && left,
                     hpx::future<RandomIt> && right) -> RandomIt
                 {

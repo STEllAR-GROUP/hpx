@@ -29,42 +29,42 @@ namespace hpx { namespace experimental { namespace detail
     {};
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator previous(Iterator it, boost::mpl::false_)
     {
         return --it;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator previous(Iterator const& it, boost::mpl::true_)
     {
         return it - 1;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator previous(Iterator const& it)
     {
         return previous(it, is_random_access_iterator<Iterator>());
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator next(Iterator it, boost::mpl::false_)
     {
         return ++it;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator next(Iterator const& it, boost::mpl::true_)
     {
         return it + 1;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator next(Iterator const& it)
     {
         return next(it, is_random_access_iterator<Iterator>());
@@ -381,6 +381,7 @@ boost::uint64_t bench_stencil3_iterator_v1()
         });
 
     result += values[partition_size-2] + values.back() + values.front();
+    HPX_UNUSED(result);
 
     return hpx::util::high_resolution_clock::now() - start;
 }
@@ -504,6 +505,7 @@ boost::uint64_t bench_stencil3_iterator_v2()
         });
 
     result += values[partition_size-2] + values.back() + values.front();
+    HPX_UNUSED(result);
 
     return hpx::util::high_resolution_clock::now() - start;
 }
@@ -528,6 +530,7 @@ boost::uint64_t bench_stencil3_iterator_explicit()
         });
 
     result += values[partition_size-2] + values.back() + values.front();
+    HPX_UNUSED(result);
 
     return hpx::util::high_resolution_clock::now() - start;
 }

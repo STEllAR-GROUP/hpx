@@ -209,7 +209,7 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";
 #endif
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #if defined(HPX_HAVE_FIBER_BASED_COROUTINES)
         strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=ON\n";
 #else
@@ -227,9 +227,6 @@ namespace hpx
         strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=OFF\n";
 #endif
 
-#if defined(HPX_LIMIT)
-        strm << "  HPX_LIMIT=" << HPX_LIMIT << "\n";
-#endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS="
              << HPX_PARCEL_MAX_CONNECTIONS << "\n";

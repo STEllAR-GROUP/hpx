@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 parallel_task_execution_policy().with(policy.parameters());
 
             detail::reverse r;
-            return lcos::local::dataflow(
+            return dataflow(
                 hpx::util::unwrapped([=]() mutable -> hpx::future<FwdIter>
                 {
                     hpx::future<void> f = r.call(p, non_seq(), first, last);

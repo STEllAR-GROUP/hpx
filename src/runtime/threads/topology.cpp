@@ -76,7 +76,7 @@ namespace hpx { namespace threads
                 "setpriority returned an error");
             return false;
         }
-#elif defined(BOOST_MSVC)
+#elif defined(HPX_MSVC)
         if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
         {
             HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",

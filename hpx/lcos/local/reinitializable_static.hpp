@@ -23,7 +23,7 @@
 
 #include <memory>   // for placement new
 
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_REINITIALIZABLE_STATIC HPX_EXPORT
 #else
 #  define HPX_EXPORT_REINITIALIZABLE_STATIC

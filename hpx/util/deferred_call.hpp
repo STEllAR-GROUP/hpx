@@ -108,7 +108,7 @@ namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename T>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     void serialize(
         Archive& ar
       , ::hpx::util::detail::deferred<T>& d

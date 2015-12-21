@@ -46,7 +46,7 @@ private:
 }}}}
 
 #include <hpx/util/logging/detail/tss/tss_ensure_proper_delete.hpp>
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #include <hpx/util/logging/detail/tss/tss_impl_win32.hpp>
 #else
 #include <hpx/util/logging/detail/tss/tss_impl_pthread.hpp>

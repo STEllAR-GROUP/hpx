@@ -37,7 +37,7 @@ namespace hpx { namespace serialization
         all_archive_flags           = 0x0003e000    // all of the above
     };
 
-    void BOOST_FORCEINLINE
+    void HPX_FORCEINLINE
     reverse_bytes(char size, char* address)
     {
         std::reverse(address, address + size);

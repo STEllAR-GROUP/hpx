@@ -37,7 +37,7 @@ namespace hpx { namespace util
             typedef bool type;
 
             template <std::size_t ...Is>
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(
                 detail::pack_c<std::size_t, Is...>
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
@@ -50,7 +50,7 @@ namespace hpx { namespace util
         };
 
         template <typename Action, typename BoundArgs, typename UnboundArgs>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         bool
         bind_action_apply(BoundArgs& bound_args, UnboundArgs&& unbound_args)
         {
@@ -68,7 +68,7 @@ namespace hpx { namespace util
             typedef bool type;
 
             template <std::size_t ...Is>
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(
                 detail::pack_c<std::size_t, Is...>
               , naming::id_type const& cont
@@ -82,7 +82,7 @@ namespace hpx { namespace util
         };
 
         template <typename Action, typename BoundArgs, typename UnboundArgs>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         bool
         bind_action_apply_cont(naming::id_type const& cont,
             BoundArgs& bound_args, UnboundArgs&& unbound_args
@@ -104,7 +104,7 @@ namespace hpx { namespace util
             typedef bool type;
 
             template <typename Continuation, std::size_t ...Is>
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(
                 detail::pack_c<std::size_t, Is...>
               , Continuation && cont
@@ -120,7 +120,7 @@ namespace hpx { namespace util
 
         template <typename Action, typename Continuation, typename BoundArgs,
             typename UnboundArgs>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_continuation<Continuation>::value, bool
         >::type
@@ -145,7 +145,7 @@ namespace hpx { namespace util
             >::type> type;
 
             template <std::size_t ...Is>
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(
                 detail::pack_c<std::size_t, Is...>
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
@@ -158,7 +158,7 @@ namespace hpx { namespace util
         };
 
         template <typename Action, typename BoundArgs, typename UnboundArgs>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         lcos::future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -173,7 +173,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename BoundArgs, typename UnboundArgs>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
@@ -216,7 +216,7 @@ namespace hpx { namespace util
             {}
 
             template <typename ...Us>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             bool
             apply(Us&&... us) const
             {
@@ -225,7 +225,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             bool
             apply_c(naming::id_type const& contgid, Us&&... us) const
             {
@@ -234,7 +234,7 @@ namespace hpx { namespace util
             }
 
             template <typename Continuation, typename ...Us>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             typename boost::enable_if_c<
                 traits::is_continuation<Continuation>::value, bool
             >::type
@@ -246,7 +246,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             hpx::lcos::future<result_type>
             async(Us&&... us) const
             {
@@ -255,7 +255,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             result_type
             operator()(Us&&... us) const
             {

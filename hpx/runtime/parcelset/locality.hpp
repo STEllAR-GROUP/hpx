@@ -14,8 +14,6 @@
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/util/safe_bool.hpp>
 
-#include <boost/config.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>

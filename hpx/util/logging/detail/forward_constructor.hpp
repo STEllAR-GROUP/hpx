@@ -17,16 +17,16 @@
 #ifndef JT28092007_forward_constructor_HPP_DEFINED
 #define JT28092007_forward_constructor_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <boost/config.hpp>
 
-//#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1400))
+//#if BOOST_WORKAROUND(HPX_MSVC, BOOST_TESTED_AT(1400))
 
-#ifdef BOOST_MSVC
+#ifdef HPX_MSVC
 // because of copy-constructor bug
 #include <boost/type_traits/is_base_of.hpp>
 #endif
@@ -61,7 +61,7 @@ namespace hpx { namespace util { namespace logging {
  class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5)\
  : forward_to(a1,a2,a3,a4,a5) { init(); }
 
-#ifdef BOOST_MSVC
+#ifdef HPX_MSVC
 // workaround for VS - problem with copy constructor
 
 #define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW(class_name,forward_to,type) \

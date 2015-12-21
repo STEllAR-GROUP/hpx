@@ -8,9 +8,7 @@
 #if !defined(HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093)
 #define HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093
 
-#include <boost/config.hpp>
-
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
   #include <hpx/util/hardware/timestamp/msvc.hpp>
 #elif defined(__amd64__) || defined(__amd64)    \
    || defined(__x86_64__) || defined(__x86_64)  \

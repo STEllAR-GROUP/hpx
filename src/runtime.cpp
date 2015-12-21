@@ -47,7 +47,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
 // system signals
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 
 namespace hpx
 {
@@ -136,7 +136,7 @@ namespace hpx
 
     void set_error_handlers()
     {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
         // Set console control handler to allow server to be stopped.
         SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
 #else

@@ -39,7 +39,7 @@ namespace hpx { namespace components
         }
 
         // This component type supports migration.
-        static BOOST_CONSTEXPR bool supports_migration() { return true; }
+        static HPX_CONSTEXPR bool supports_migration() { return true; }
 
         // Pinning functionality
         void pin()

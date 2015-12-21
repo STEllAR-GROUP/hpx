@@ -5,8 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#define HPX_LIMIT 6
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/plain_actions.hpp>

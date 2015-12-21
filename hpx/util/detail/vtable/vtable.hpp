@@ -19,14 +19,14 @@ namespace hpx { namespace util { namespace detail
     struct vtable
     {
         template <typename T>
-        BOOST_FORCEINLINE static std::type_info const& get_type()
+        HPX_FORCEINLINE static std::type_info const& get_type()
         {
             return typeid(T);
         }
         typedef std::type_info const& (*get_type_t)();
 
         template <typename T>
-        BOOST_FORCEINLINE static T& get(void** v)
+        HPX_FORCEINLINE static T& get(void** v)
         {
             if (sizeof(T) <= sizeof(void*))
             {
@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T>
-        BOOST_FORCEINLINE static T const& get(void* const* v)
+        HPX_FORCEINLINE static T const& get(void* const* v)
         {
             if (sizeof(T) <= sizeof(void*))
             {
@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T>
-        BOOST_FORCEINLINE static void default_construct(void** v)
+        HPX_FORCEINLINE static void default_construct(void** v)
         {
             if (sizeof(T) <= sizeof(void*))
             {
@@ -59,7 +59,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T, typename Arg>
-        BOOST_FORCEINLINE static void construct(void** v, Arg&& arg)
+        HPX_FORCEINLINE static void construct(void** v, Arg&& arg)
         {
             if (sizeof(T) <= sizeof(void*))
             {
@@ -70,21 +70,21 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T, typename Arg>
-        BOOST_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
+        HPX_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
         {
-            destruct<T>(v);
+            delete_<T>(v);
             construct<T, Arg>(v, std::forward<Arg>(arg));
         }
 
         template <typename T>
-        BOOST_FORCEINLINE static void destruct(void** v)
+        HPX_FORCEINLINE static void destruct(void** v)
         {
             get<T>(v).~T();
         }
         typedef void (*destruct_t)(void**);
 
         template <typename T>
-        BOOST_FORCEINLINE static void delete_(void** v)
+        HPX_FORCEINLINE static void delete_(void** v)
         {
             if (sizeof(T) <= sizeof(void*))
             {

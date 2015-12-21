@@ -443,7 +443,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                                             phase * block_size;
 
                                         phase_futures.push_back(
-                                            hpx::lcos::local::dataflow(
+                                            hpx::dataflow(
                                                 execs[domain]
                                               , &transpose
                                               , A[from_block].get_sub_block(

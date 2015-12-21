@@ -10,6 +10,7 @@
 #define HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -127,7 +128,13 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     void add_thunk(util::unique_function_nonser<void()>* f)
     {
-        thunks.push(f);
+        std::size_t k = 0;
+        while(!thunks.push(f))
+        {
+            // Wait until succesfully pushed ...
+            hpx::lcos::local::spinlock::yield(k);
+            ++k;
+        }
     }
 };
 

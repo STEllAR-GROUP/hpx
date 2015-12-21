@@ -30,7 +30,7 @@ void force_recursion_test1()
     for (std::size_t i = 0; i != NUM_FUTURES; ++i)
     {
         results.push_back(
-            hpx::lcos::local::dataflow(
+            hpx::dataflow(
                 hpx::launch::sync,
                 [&](hpx::shared_future<void> &&)
                 {
