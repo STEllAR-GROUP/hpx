@@ -111,8 +111,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return result::get(std::move(last));
                 }
 
-                if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
-                    return result::get(std::move(last));
 
                 std::list<boost::exception_ptr> errors;
                 std::size_t chunk_size = 4;
@@ -122,6 +120,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<std::size_t> tok(len);
 
                 try {
+                    if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
+                        return result::get(std::move(first));
+
                     for(dtype level = 2; 
                         level < (dtype)ceil(log2(len)); 
                         level++) {
@@ -186,7 +187,119 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     first = last;
 
                 return result::get(std::move(first));
-       }
+            }
+
+            template <typename Pred>
+            static typename util::detail::algorithm_result<
+                parallel_task_execution_policy, RndIter
+            >::type
+            parallel(parallel_task_execution_policy policy,
+                RndIter first, RndIter last,
+                Pred && pred)
+            {
+                typedef typename parallel_task_execution_policy::executor_type 
+                    executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+                typedef typename std::iterator_traits<RndIter>::difference_type
+                    dtype;
+                typedef typename util::detail::algorithm_result<
+                    parallel_task_execution_policy, RndIter> result;
+
+                dtype len = last - first;
+
+                if(len <= 1) {
+                    return result::get(std::move(last));
+                }
+
+
+                std::list<boost::exception_ptr> errors;
+                std::size_t chunk_size = 4;
+
+                std::vector<hpx::future<void> > workitems;
+                workitems.reserve(std::distance(first,last)/chunk_size);
+                util::cancellation_token<std::size_t> tok(len);
+
+                try {
+
+                    if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
+                        return result::get(std::move(first));
+
+                    for(dtype level = 2; 
+                        level < (dtype)ceil(log2(len)); 
+                        level++) {
+
+                        dtype start = (dtype)pow(2, level-1)-1;
+                        dtype end_exclusive = (dtype)pow(2,
+                            level)-1;
+ 
+                        std::size_t items = (end_exclusive-start);
+
+                        // If amount of work is less than chunk size, just run it
+                        // sequentially
+                        if(chunk_size > items) { 
+                            auto op = 
+                                hpx::util::bind(
+                                    &comp_heap<RndIter, Pred&>, first,
+                                    std::forward<Pred&>(pred), len, start, 
+                                    end_exclusive-start, tok);
+                            workitems.push_back(executor_traits::async_execute(
+                                policy.executor(), op));
+                            op();
+                        } else {
+                            std::size_t cnt = 0;
+                            while(cnt + chunk_size < items) {
+                                auto op = 
+                                    hpx::util::bind(
+                                        &comp_heap<RndIter, Pred&>, first,
+                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        chunk_size, tok);
+                                workitems.push_back(executor_traits::async_execute(
+                                    policy.executor(), op));
+                                op();
+                                cnt += chunk_size;
+                            }
+
+                            if(cnt < items) {
+                                auto op = 
+                                    hpx::util::bind(
+                                        &comp_heap<RndIter, Pred&>, first,
+                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        items-cnt, tok);
+                                op();
+                                workitems.push_back(executor_traits::async_execute(
+                                    policy.executor(), op));
+                            }
+                        }
+                        hpx::wait_all(workitems); 
+                    }
+                } catch(std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<RndIter>(
+                            boost::current_exception());
+                } catch(...) {
+                    util::detail::handle_local_exceptions<
+                        parallel_task_execution_policy>::call(
+                            boost::current_exception(), errors);
+                }
+
+                return hpx::lcos::local::dataflow(
+                    [=](std::vector<hpx::future<void> > && r)
+                        mutable -> RndIter 
+                    {
+                        util::detail::handle_local_exceptions<
+                            parallel_task_execution_policy>::call(
+                                r, errors);
+
+                        dtype pos = static_cast<dtype>(tok.get_data());
+                        if(pos != len)
+                            std::advance(first, pos);
+                        else
+                            first = last;
+
+                        return std::move(first);
+                    },
+                    workitems);
+            }
         };
         /// \endcond
     }

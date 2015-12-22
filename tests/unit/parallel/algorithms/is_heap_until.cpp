@@ -119,6 +119,7 @@ void test_is_heap_async1(ExPolicy p, IteratorTag)
         hpx::parallel::is_heap_until(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)));
 
+
     HPX_TEST(test.get() == iterator(middle));
 }
 
@@ -145,6 +146,201 @@ void is_heap_test1()
 {
     test_is_heap1<std::random_access_iterator_tag>();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag>
+void test_is_heap_exception(ExPolicy policy, IteratorTag)
+{
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+    std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::make_heap(boost::begin(c), boost::end(c));
+
+    bool caught_exception = false;
+    try {
+        hpx::parallel::is_heap_until(policy,
+            decorated_iterator(
+                boost::begin(c),
+                [](){ throw std::runtime_error("test"); }),
+            decorated_iterator(boost::end(c)));
+        HPX_TEST(false);
+    }
+    catch(hpx::exception_list const& e) {
+        caught_exception = true;
+        //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_is_heap_exception_async(ExPolicy p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::make_heap(boost::begin(c), boost::end(c));
+
+    bool caught_exception = false;
+    bool returned_from_algorithm = false;
+    try {
+        hpx::future<void> f =
+            hpx::parallel::is_heap_until(p,
+                decorated_iterator(
+                    boost::begin(c),
+                    [](){ throw std::runtime_error("test"); }),
+                decorated_iterator(boost::end(c)));
+        returned_from_algorithm = true;
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(hpx::exception_list const& e) {
+        caught_exception = true;
+        //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+    HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
+}
+
+template <typename IteratorTag>
+void test_is_heap_exception()
+{
+    using namespace hpx::parallel;
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_is_heap_exception(seq, IteratorTag());
+    test_is_heap_exception(par, IteratorTag());
+
+    test_is_heap_exception_async(seq(task), IteratorTag());
+    test_is_heap_exception_async(par(task), IteratorTag());
+
+    test_is_heap_exception(execution_policy(seq), IteratorTag());
+    test_is_heap_exception(execution_policy(par), IteratorTag());
+
+    test_is_heap_exception(execution_policy(seq(task)), IteratorTag());
+    test_is_heap_exception(execution_policy(par(task)), IteratorTag());
+}
+
+void is_heap_exception_test()
+{
+    test_is_heap_exception<std::random_access_iterator_tag>();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag>
+void test_is_heap_bad_alloc(ExPolicy policy, IteratorTag)
+{
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(100007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::make_heap(boost::begin(c), boost::end(c));
+
+    bool caught_bad_alloc = false;
+    try {
+        hpx::parallel::is_heap_until(policy,
+            decorated_iterator(
+                boost::begin(c),
+                [](){ throw std::bad_alloc(); }),
+            decorated_iterator(boost::end(c)));
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_is_heap_bad_alloc_async(ExPolicy p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::make_heap(boost::begin(c), boost::end(c));
+
+    bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
+    try {
+        hpx::future<void> f =
+            hpx::parallel::is_heap_until(p,
+                decorated_iterator(
+                    boost::begin(c),
+                    [](){ throw std::bad_alloc(); }),
+                decorated_iterator(boost::end(c)));
+        returned_from_algorithm = true;
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
+}
+
+template <typename IteratorTag>
+void test_is_heap_bad_alloc()
+{
+    using namespace hpx::parallel;
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_is_heap_bad_alloc(seq, IteratorTag());
+    test_is_heap_bad_alloc(par, IteratorTag());
+
+    test_is_heap_bad_alloc_async(seq(task), IteratorTag());
+    test_is_heap_bad_alloc_async(par(task), IteratorTag());
+
+    test_is_heap_bad_alloc(execution_policy(seq), IteratorTag());
+    test_is_heap_bad_alloc(execution_policy(par), IteratorTag());
+
+    test_is_heap_bad_alloc(execution_policy(seq(task)), IteratorTag());
+    test_is_heap_bad_alloc(execution_policy(par(task)), IteratorTag());
+}
+
+void is_heap_bad_alloc_test()
+{
+    test_is_heap_bad_alloc<std::random_access_iterator_tag>();
+}
+
 int hpx_main(boost::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int)std::time(0);
@@ -156,6 +352,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     is_heap_test0();
     is_heap_test1();
+    is_heap_exception_test();
+    is_heap_bad_alloc_test();
     return hpx::finalize();
 }
 
