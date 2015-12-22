@@ -128,9 +128,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     const bool leftMatches(left == mid);
                     const bool rightMatches(right == mid);
-
-                    //assume it is the middle, and check for the other use-case
-                     kiter = ReduceKeySeriesStates(!leftMatches, !rightMatches);
+                    kiter = ReduceKeySeriesStates(!leftMatches, !rightMatches);
                 }
             }
         };
@@ -326,15 +324,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename std::iterator_traits<RanIter>::reference element_type;
             typedef typename hpx::util::zip_iterator<reducebykey_iter, KeyStateIterType>::reference zip_ref;
 
-            ReduceStencilGeneration<detail::reduce_stencil_transformer, RanIter, KeyStateIterType> kernel;
-            hpx::parallel::for_each(
-                    policy,
-                    hpx::util::make_zip_iterator(reduce_begin, keystate.begin()),
-                    hpx::util::make_zip_iterator(reduce_end, keystate.end()),
-                    [&kernel](zip_ref ref) {
-                        kernel.operator()(hpx::util::get<0>(ref), hpx::util::get<1>(ref));
-                    }
-            );
+            if (numberOfKeys==2) {
+                // for two entries, one is a start, the other an end,
+                // if they are different, then they are both start/end
+                element_type left  = *key_first;
+                element_type right = *std::next(key_first);
+                keystate[0] = ReduceKeySeriesStates(true,left!=right);
+                keystate[1] = ReduceKeySeriesStates(left!=right,true);
+            }
+            else {
+                // do the first element and last one by hand to simplify the iterator
+                // traversal as there is no prev/next for first/last
+                element_type elem0 = *key_first;
+                element_type elem1 = *std::next(key_first);
+                keystate[0] = ReduceKeySeriesStates(true,elem0!=elem1);
+                //
+                ReduceStencilGeneration <detail::reduce_stencil_transformer, RanIter, KeyStateIterType> kernel;
+                hpx::parallel::for_each(
+                        policy,
+                        hpx::util::make_zip_iterator(reduce_begin + 1, keystate.begin() + 1),
+                        hpx::util::make_zip_iterator(reduce_end - 1, keystate.end() - 1),
+                        [&kernel](zip_ref ref) {
+                            kernel.operator()(hpx::util::get<0>(ref), hpx::util::get<1>(ref));
+                        }
+                );
+                //
+                element_type elemN = *std::prev(key_last);
+                element_type elemn = *std::prev(std::prev(key_last));
+                keystate.back() = ReduceKeySeriesStates(elemN!=elemn,true);
+            }
         }
 /*
             //next step is we need to reduce the values for each key. This is done
