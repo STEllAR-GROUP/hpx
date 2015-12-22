@@ -8,23 +8,87 @@
 
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/algorithms/detail/tuple_iterator.hpp>
+#include <hpx/util/transform_iterator.hpp>
 
 #define VTKM_CONT_EXPORT
 #define VTKM_EXEC_EXPORT
+
 namespace vtkm {
     typedef uint64_t Id;
-
     template<typename T1, typename T2> using Pair = std::pair<T1, T2>;
 }
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // sort
+    // reduce_by_key
     namespace detail
     {
         /// \cond NOINTERNAL
 
+        // -------------------------------------------------------------------
+        // simple iterator helper object for access to prev/next items
+        // -------------------------------------------------------------------
+        struct reduce_stencil_transformer
+        {
+            // declare result type as a template
+            template <typename T> struct result;
+
+            // specialize result for iterator type
+            template <typename This, typename Iterator>
+            struct result<This(Iterator)>
+            {
+                typedef typename std::iterator_traits<Iterator>::reference element_type;
+                typedef hpx::util::tuple<element_type, element_type, element_type> type;
+            };
+
+            // call operator for stencil transform
+            // it will dereference tuple(it-1, it, it+1)
+            template <typename Iterator>
+            typename result<reduce_stencil_transformer(Iterator)>::type
+            operator()(Iterator const& it) const
+            {
+                typedef typename result<
+                        reduce_stencil_transformer(Iterator)
+                >::type type;
+                return type(*std::prev(it), *it, *std::next(it));
+            }
+        };
+
+        // -------------------------------------------------------------------
+        // transform iterator using reduce_stencil_transformer helper
+        // -------------------------------------------------------------------
+        template <typename Iterator,
+                typename Transformer = detail::reduce_stencil_transformer>
+        class reduce_stencil_iterator
+                : public hpx::util::transform_iterator<Iterator, Transformer>
+        {
+        private:
+            typedef hpx::util::transform_iterator<Iterator, Transformer> base_type;
+
+        public:
+
+            reduce_stencil_iterator() {}
+
+            explicit reduce_stencil_iterator(Iterator const& it)
+                    : base_type(it, Transformer())
+            {}
+
+            reduce_stencil_iterator(Iterator const& it, Transformer const& t)
+                    : base_type(it, t)
+            {}
+        };
+
+        template <typename Iterator, typename Transformer>
+        inline reduce_stencil_iterator<Iterator, Transformer>
+        make_reduce_stencil_iterator(Iterator const& it, Transformer const& t)
+        {
+            return reduce_stencil_iterator<Iterator, Transformer>(it, t);
+        }
+
+        // -------------------------------------------------------------------
+        // state of a reduce by key step
+        // -------------------------------------------------------------------
         struct ReduceKeySeriesStates
         {
             bool fStart;    // START of a segment
@@ -32,67 +96,41 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ReduceKeySeriesStates(bool start=false, bool end=false) : fStart(start), fEnd(end) {}
         };
 
-        template<typename InputIterType, typename KeyStateIterType >
+        template<typename Transformer, typename StencilIterType, typename KeyStateIterType >
         struct ReduceStencilGeneration
         {
-            InputIterType keys_last;
-//            KeyStateIterType KeyState;
+            //
+//            typedef typename std::result_of<Transformer(StencilIterType)>::type tuple_type;
+            typedef typename Transformer::template result<Transformer(StencilIterType)>::element_type element_type;
+            typedef typename Transformer::template result<Transformer(StencilIterType)>::type tuple_type;
+//            typedef typename std::iterator_traits<StencilIterType>::reference tuple_type;
+            typedef typename std::iterator_traits<KeyStateIterType>::reference KeyStateType;
 
             VTKM_CONT_EXPORT
-            ReduceStencilGeneration(const InputIterType &key_first, const InputIterType &key_last)
-                    : keys_last(key_last)
-            {  }
+            ReduceStencilGeneration() {}
 
             VTKM_EXEC_EXPORT
-            void operator()(const InputIterType centerIter, KeyStateIterType kiter) const
+            void operator()(const tuple_type &value, KeyStateType &kiter) const
             {
-                // typedef typename InputIterType::value_type ValueType;
-                // typedef typename KeyStateIterType::value_type KeyStateType;
+                // resolves to a tuple of values for *(it-1), *it, *(it+1)
 
-                typedef typename std::iterator_traits<InputIterType>::value_type ValueType;
-                typedef typename std::iterator_traits<KeyStateIterType>::value_type KeyStateType;
+                element_type left  = hpx::util::get<0>(value);
+                element_type mid   = hpx::util::get<1>(value);
+                element_type right = hpx::util::get<2>(value);
 
-                const InputIterType leftIter = std::prev(centerIter);
-                const InputIterType rightIter = std::next(centerIter);
-
-                //we need to determine which of three states this
-                //index is. It can be:
+                // we need to determine which of three states this
+                // index is. It can be:
                 // 1. Middle of a set of equivalent keys.
                 // 2. Start of a set of equivalent keys.
                 // 3. End of a set of equivalent keys.
                 // 4. Both the start and end of a set of keys
 
-                //we don't have to worry about an array of length 1, as
-                //the calling code handles that use case
-
-                if(centerIter == 0)
                 {
-                    //this means we are at the start of the array
-                    //means we are automatically START
-                    //just need to check if we are END
-                    const ValueType centerValue = *centerIter;
-                    const ValueType rightValue = *rightIter;
-                    const KeyStateType state = ReduceKeySeriesStates(true, rightValue != centerValue);
-                    *kiter = state;
-                }
-                else if(rightIter == keys_last)
-                {
-                    //this means we are at the end, so we are at least END
-                    //just need to check if we are START
-                    const ValueType centerValue = *centerIter;
-                    const ValueType leftValue = *leftIter;
-                    const KeyStateType state = ReduceKeySeriesStates(leftValue != centerValue, true);
-                    *kiter = state;
-                }
-                else
-                {
-                    const ValueType centerValue = *centerIter;
-                    const bool leftMatches(*leftIter == centerValue);
-                    const bool rightMatches(*rightIter == centerValue);
+                    const bool leftMatches(left == mid);
+                    const bool rightMatches(right == mid);
 
                     //assume it is the middle, and check for the other use-case
-                    KeyStateType state = ReduceKeySeriesStates(!leftMatches, !rightMatches);
-                    *kiter = state;
+                     kiter = ReduceKeySeriesStates(!leftMatches, !rightMatches);
                 }
             }
         };
@@ -280,12 +318,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef std::vector< ReduceKeySeriesStates >::iterator KeyStateIterType;
         keystate.assign(numberOfKeys, ReduceKeySeriesStates());
         {
-            typedef typename hpx::util::zip_iterator<RanIter, KeyStateIterType>::reference zip_ref;
-            ReduceStencilGeneration<RanIter, KeyStateIterType> kernel(key_first, key_last);
+            typedef typename detail::reduce_stencil_iterator<RanIter, detail::reduce_stencil_transformer> reducebykey_iter;
+            detail::reduce_stencil_transformer r_s_t;
+            reducebykey_iter reduce_begin = make_reduce_stencil_iterator(key_first, r_s_t);
+            reducebykey_iter reduce_end   = make_reduce_stencil_iterator(key_last, r_s_t);
+
+            typedef typename std::iterator_traits<RanIter>::reference element_type;
+            typedef typename hpx::util::zip_iterator<reducebykey_iter, KeyStateIterType>::reference zip_ref;
+
+            ReduceStencilGeneration<detail::reduce_stencil_transformer, RanIter, KeyStateIterType> kernel;
             hpx::parallel::for_each(
                     policy,
-                    hpx::util::make_zip_iterator(key_first, keystate.begin()),
-                    key_last,
+                    hpx::util::make_zip_iterator(reduce_begin, keystate.begin()),
+                    hpx::util::make_zip_iterator(reduce_end, keystate.end()),
                     [&kernel](zip_ref ref) {
                         kernel.operator()(hpx::util::get<0>(ref), hpx::util::get<1>(ref));
                     }
