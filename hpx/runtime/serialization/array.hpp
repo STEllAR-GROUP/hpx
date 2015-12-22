@@ -15,7 +15,7 @@
 #include <cstddef>
 
 #include <boost/array.hpp>
-#ifdef HPX_HAVE_CXX11_ARRAY
+#ifdef HPX_HAVE_CXX11_STD_ARRAY
 #include <array>
 #endif
 
@@ -98,12 +98,12 @@ namespace hpx { namespace serialization
         ar & hpx::serialization::make_array(a.begin(), a.size());
     }
 
-#ifdef HPX_HAVE_CXX11_ARRAY
+#ifdef HPX_HAVE_CXX11_STD_ARRAY
   // implement serialization for std::array
     template <class Archive, class T, std::size_t N>
     void serialize(Archive& ar, std::array<T,N>& a, const unsigned int /* version */)
     {
-        ar & hpx::serialization::make_array(a.begin(), a.size());
+        ar & hpx::serialization::make_array(a.data(), a.size());
     }
 #endif
 
