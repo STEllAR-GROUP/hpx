@@ -71,18 +71,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel_task_execution_policy p =
                 parallel_task_execution_policy().with(policy.parameters());
 
-            detail::reverse r;
+            detail::reverse<FwdIter> r;
             return dataflow(
-                hpx::util::unwrapped([=]() mutable -> hpx::future<FwdIter>
+                [=](hpx::future<FwdIter>&&, hpx::future<FwdIter>&&) mutable
+                ->  hpx::future<FwdIter>
                 {
-                    hpx::future<void> f = r.call(p, non_seq(), first, last);
+                    hpx::future<FwdIter> f = r.call(p, non_seq(), first, last);
                     std::advance(first, std::distance(new_first, last));
                     return f.then(
-                        [first] (hpx::future<void> &&) -> FwdIter
+                        [first] (hpx::future<FwdIter> &&) -> FwdIter
                         {
                             return first;
                         });
-                }),
+                },
                 r.call(p, non_seq(), first, new_first),
                 r.call(p, non_seq(), new_first, last));
         }

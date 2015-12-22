@@ -14,6 +14,8 @@ set(tests
     replace_copy_range
     replace_copy_if_range
     replace_if_range
+    reverse_range
+    reverse_copy_range
     sort_range
     transform_range
     transform_range_binary
