@@ -48,28 +48,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             dtype p = start;
             dtype c = 2 * p + 1;
             RndIter pp = first + start;
-            while(c < len && p > (p - n)) {
-                if( c >= len )
+            while(c < len && n > 0) {
+                if(tok.was_cancelled(c)) {
                     break;
-                RndIter cp = first + start + c;
-                std::cout << "\tcomparing: " << *pp << " - " << *cp << std::endl;
+                }
+                RndIter cp = first + c;
                 if(pred(*pp, *cp)) {
-                    std::cout << "\tCANCEL" << std::endl;
                     tok.cancel(c);
                     break;
                 }
-                --c;
-                --cp;
+                ++c;
+                ++cp;
                 if( c <= 0 )
                     break;
-                std::cout << "\tcomparing: " << *pp << " - " << *cp << std::endl;
                 if(pred(*pp, *cp)) {
-                    std::cout << "\tcancel" << std::endl;
                     tok.cancel(c);
                     break;
                 }
-                --p;
-                --pp;
+                ++p;
+                ++pp;
+                --n;
                 c = 2 * p + 1;
             }
         }
@@ -107,12 +105,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename util::detail::algorithm_result<ExPolicy,
                         RndIter> result;
 
-                // Size of list
                 dtype len = last - first;
 
                 if(len <= 1) {
                     return result::get(std::move(last));
                 }
+
+                if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
+                    return result::get(std::move(last));
 
                 std::list<boost::exception_ptr> errors;
                 std::size_t chunk_size = 4;
@@ -121,53 +121,56 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 workitems.reserve(std::distance(first,last)/chunk_size);
                 util::cancellation_token<std::size_t> tok(len);
 
-                std::cout << "len: " << len << std::endl;
                 try {
-                    for(dtype start = (len-2)/2; start > 0;
-                        start = (dtype)pow(2, (dtype)log2(start)) - 2) {
+                    for(dtype level = 2; 
+                        level < (dtype)ceil(log2(len)); 
+                        level++) {
+
+                        dtype start = (dtype)pow(2, level-1)-1;
                         dtype end_exclusive = (dtype)pow(2,
-                            (dtype)log2(start))-2;
+                            level)-1;
+ 
+                        std::size_t items = (end_exclusive-start);
 
-                        std::size_t items = (start-end_exclusive);
-
-                        if(chunk_size > items) {
-                            chunk_size = items / 2;
-                        }
-
-                        std::size_t cnt = 0;
-                        while(cnt + chunk_size < items) {
+                        // If amount of work is less than chunk size, just run it
+                        // sequentially
+                        if(chunk_size > items) { 
                             auto op = 
                                 hpx::util::bind(
                                     &comp_heap<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), len, start-cnt, 
-                                    chunk_size, tok);
-
-                            //workitems.push_back(executor_traits::async_execute(
-                            //    policy.executor(), op));
-
-                            std::cout << "Calling " << start-cnt << " to " << 
-                                      start-cnt-chunk_size << std::endl;
+                                    std::forward<Pred&>(pred), len, start, 
+                                    end_exclusive-start, tok);
+                            workitems.push_back(executor_traits::async_execute(
+                                policy.executor(), op));
                             op();
-                            cnt += chunk_size;
+                        } else {
+                            std::size_t cnt = 0;
+                            while(cnt + chunk_size < items) {
+                                auto op = 
+                                    hpx::util::bind(
+                                        &comp_heap<RndIter, Pred&>, first,
+                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        chunk_size, tok);
+                                workitems.push_back(executor_traits::async_execute(
+                                    policy.executor(), op));
+                                op();
+                                cnt += chunk_size;
+                            }
+
+                            if(cnt < items) {
+                                auto op = 
+                                    hpx::util::bind(
+                                        &comp_heap<RndIter, Pred&>, first,
+                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        items-cnt, tok);
+                                op();
+                                workitems.push_back(executor_traits::async_execute(
+                                    policy.executor(), op));
+                            }
                         }
-
-                        if(cnt < items) {
-                            auto op = 
-                                hpx::util::bind(
-                                    &comp_heap<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), len, start-cnt, 
-                                    items-cnt, tok);
-
-                            std::cout << "Calling " << start-cnt << " to " << 
-                                      start-cnt-(items-cnt) << std::endl;
-                            op();
-                            //workitems.push_back(executor_traits::async_execute(
-                            //    policy.executor(), op));
-                        }
-
-                        hpx::wait_all(workitems);
+                        hpx::wait_all(workitems); 
                     }
-                    comp_heap(first, std::forward<Pred>(pred), len, 0, 1, tok);
+                    //comp_heap(first, std::forward<Pred>(pred), len, 0, 1, tok);
                 } catch(...) {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                         boost::current_exception(), errors);

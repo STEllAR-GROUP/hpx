@@ -23,15 +23,13 @@ void test_is_heap0(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(15);
+    std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
     std::make_heap(boost::begin(c), boost::end(c));
 
     auto test =
         hpx::parallel::is_heap_until(policy,
                 iterator(boost::begin(c)), iterator(boost::end(c)));
-
-    std::cout << *test << " == " << *boost::end(c) << std::endl;
 
     HPX_TEST(test == iterator(boost::end(c)));
 }
@@ -58,11 +56,10 @@ void test_is_heap0()
 {
     using namespace hpx::parallel;
 
-    //test_is_heap0(seq, IteratorTag());
+    test_is_heap0(seq, IteratorTag());
     test_is_heap0(par, IteratorTag());
-    //test_is_heap0(par_vec, IteratorTag());
+    test_is_heap0(par_vec, IteratorTag());
 
-    /*
     test_is_heap_async0(seq(task), IteratorTag());
     test_is_heap_async0(par(task), IteratorTag());
 
@@ -70,8 +67,7 @@ void test_is_heap0()
     test_is_heap0(execution_policy(par), IteratorTag());
     test_is_heap0(execution_policy(par_vec), IteratorTag());
     test_is_heap0(execution_policy(seq(task)), IteratorTag());
-    test_is_heap0(execution_policy(par(task)), IteratorTag());
-    */
+    test_is_heap0(execution_policy(par(task)), IteratorTag()); 
 }
 
 void is_heap_test0()
@@ -92,13 +88,17 @@ void test_is_heap1(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
-    std::make_heap(boost::begin(c), boost::end(c)-1);
+    
+    auto middle = boost::begin(c) + 
+        std::distance(boost::begin(c), boost::end(c)) / 2;
+    
+    std::make_heap(boost::begin(c), middle);
 
     auto test =
         hpx::parallel::is_heap_until(policy,
                 iterator(boost::begin(c)), iterator(boost::end(c)));
 
-    HPX_TEST(test == iterator(boost::end(c)-1));
+    HPX_TEST(test == iterator(middle));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -109,13 +109,17 @@ void test_is_heap_async1(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
-    std::make_heap(boost::begin(c), boost::end(c)-1);
+
+    auto middle = boost::begin(c) +
+        std::distance(boost::begin(c), boost::end(c)) / 2;
+
+    std::make_heap(boost::begin(c), middle);
 
     auto test =
         hpx::parallel::is_heap_until(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)));
 
-    HPX_TEST(test.get() == iterator(boost::end(c)-1));
+    HPX_TEST(test.get() == iterator(middle));
 }
 
 template <typename IteratorTag>
@@ -151,7 +155,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::srand(seed);
 
     is_heap_test0();
-    //is_heap_test1();
+    is_heap_test1();
     return hpx::finalize();
 }
 
