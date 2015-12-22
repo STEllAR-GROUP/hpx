@@ -26,6 +26,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <map>
+#include <limits>
 #include <set>
 #include <string>
 #include <vector>

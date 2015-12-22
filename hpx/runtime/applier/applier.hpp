@@ -21,6 +21,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
 
+#include <limits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <map>
+#include <limits>
 #include <iostream>
 
 namespace hpx { namespace serialization
