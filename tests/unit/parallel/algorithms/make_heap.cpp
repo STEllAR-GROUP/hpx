@@ -57,7 +57,7 @@ void test_make_heap1()
     test_make_heap1(seq, IteratorTag());
     test_make_heap1(par, IteratorTag());
     test_make_heap1(par_vec, IteratorTag());
- 
+
     test_make_heap_async1(seq(task), IteratorTag());
     test_make_heap_async1(par(task), IteratorTag());
 
@@ -66,7 +66,7 @@ void test_make_heap1()
     test_make_heap1(execution_policy(par_vec), IteratorTag());
     test_make_heap1(execution_policy(seq(task)), IteratorTag());
     test_make_heap1(execution_policy(par(task)), IteratorTag());
-    
+
 }
 
 void make_heap_test1()
@@ -92,7 +92,7 @@ void test_make_heap2(ExPolicy policy, IteratorTag)
             iterator(boost::begin(c)), iterator(boost::end(c)),
             std::greater<std::size_t>());
 
-    HPX_TEST_EQ(std::is_heap(boost::begin(c), boost::end(c), std::greater<std::size_t>()), 
+    HPX_TEST_EQ(std::is_heap(boost::begin(c), boost::end(c), std::greater<std::size_t>()),
             true);
 }
 
@@ -111,7 +111,7 @@ void test_make_heap_async2(ExPolicy p, IteratorTag)
                 std::greater<std::size_t>());
 
     test.wait();
-    HPX_TEST_EQ(std::is_heap(boost::begin(c), boost::end(c), std::greater<std::size_t>()), 
+    HPX_TEST_EQ(std::is_heap(boost::begin(c), boost::end(c), std::greater<std::size_t>()),
             true);
 }
 
@@ -123,7 +123,7 @@ void test_make_heap2()
     test_make_heap2(seq, IteratorTag());
     test_make_heap2(par, IteratorTag());
     test_make_heap2(par_vec, IteratorTag());
- 
+
     test_make_heap_async2(seq(task), IteratorTag());
     test_make_heap_async2(par(task), IteratorTag());
 
@@ -132,7 +132,7 @@ void test_make_heap2()
     test_make_heap2(execution_policy(par_vec), IteratorTag());
     test_make_heap2(execution_policy(seq(task)), IteratorTag());
     test_make_heap2(execution_policy(par(task)), IteratorTag());
-    
+
 }
 
 void make_heap_test2()

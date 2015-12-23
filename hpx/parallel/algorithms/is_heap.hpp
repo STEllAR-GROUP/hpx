@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// \cond NOINTERNAL
         template <typename RndIter>
-        struct is_heap_until: 
+        struct is_heap_until:
             public detail::algorithm<is_heap_until<RndIter>, RndIter>
         {
             is_heap_until()
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy, RndIter first, RndIter last,
                     Pred && pred)
             {
-                return 
+                return
                     std::is_heap_until(first, last, std::forward<Pred>(pred));
             }
 
@@ -123,23 +123,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
                         return result::get(std::move(first));
 
-                    for(dtype level = 2; 
-                        level < (dtype)ceil(log2(len)); 
+                    for(dtype level = 2;
+                        level < (dtype)ceil(log2(len));
                         level++) {
 
                         dtype start = (dtype)pow(2, level-1)-1;
                         dtype end_exclusive = (dtype)pow(2,
                             level)-1;
- 
+
                         std::size_t items = (end_exclusive-start);
 
                         // If amount of work is less than chunk size, just run it
                         // sequentially
-                        if(chunk_size > items) { 
-                            auto op = 
+                        if(chunk_size > items) {
+                            auto op =
                                 hpx::util::bind(
                                     &comp_heap<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), len, start, 
+                                    std::forward<Pred&>(pred), len, start,
                                     end_exclusive-start, tok);
                             workitems.push_back(executor_traits::async_execute(
                                 policy.executor(), op));
@@ -147,10 +147,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         } else {
                             std::size_t cnt = 0;
                             while(cnt + chunk_size < items) {
-                                auto op = 
+                                auto op =
                                     hpx::util::bind(
                                         &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        std::forward<Pred&>(pred), len, start+cnt,
                                         chunk_size, tok);
                                 workitems.push_back(executor_traits::async_execute(
                                     policy.executor(), op));
@@ -159,17 +159,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             }
 
                             if(cnt < items) {
-                                auto op = 
+                                auto op =
                                     hpx::util::bind(
                                         &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        std::forward<Pred&>(pred), len, start+cnt,
                                         items-cnt, tok);
                                 op();
                                 workitems.push_back(executor_traits::async_execute(
                                     policy.executor(), op));
                             }
                         }
-                        hpx::wait_all(workitems); 
+                        hpx::wait_all(workitems);
                     }
                     //comp_heap(first, std::forward<Pred>(pred), len, 0, 1, tok);
                 } catch(...) {
@@ -197,7 +197,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 RndIter first, RndIter last,
                 Pred && pred)
             {
-                typedef typename parallel_task_execution_policy::executor_type 
+                typedef typename parallel_task_execution_policy::executor_type
                     executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
@@ -225,23 +225,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
                         return result::get(std::move(first));
 
-                    for(dtype level = 2; 
-                        level < (dtype)ceil(log2(len)); 
+                    for(dtype level = 2;
+                        level < (dtype)ceil(log2(len));
                         level++) {
 
                         dtype start = (dtype)pow(2, level-1)-1;
                         dtype end_exclusive = (dtype)pow(2,
                             level)-1;
- 
+
                         std::size_t items = (end_exclusive-start);
 
                         // If amount of work is less than chunk size, just run it
                         // sequentially
-                        if(chunk_size > items) { 
-                            auto op = 
+                        if(chunk_size > items) {
+                            auto op =
                                 hpx::util::bind(
                                     &comp_heap<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), len, start, 
+                                    std::forward<Pred&>(pred), len, start,
                                     end_exclusive-start, tok);
                             workitems.push_back(executor_traits::async_execute(
                                 policy.executor(), op));
@@ -249,10 +249,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         } else {
                             std::size_t cnt = 0;
                             while(cnt + chunk_size < items) {
-                                auto op = 
+                                auto op =
                                     hpx::util::bind(
                                         &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        std::forward<Pred&>(pred), len, start+cnt,
                                         chunk_size, tok);
                                 workitems.push_back(executor_traits::async_execute(
                                     policy.executor(), op));
@@ -261,17 +261,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             }
 
                             if(cnt < items) {
-                                auto op = 
+                                auto op =
                                     hpx::util::bind(
                                         &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt, 
+                                        std::forward<Pred&>(pred), len, start+cnt,
                                         items-cnt, tok);
                                 op();
                                 workitems.push_back(executor_traits::async_execute(
                                     policy.executor(), op));
                             }
                         }
-                        hpx::wait_all(workitems); 
+                        hpx::wait_all(workitems);
                     }
                 } catch(std::bad_alloc const&) {
                     return hpx::make_exceptional_future<RndIter>(
@@ -284,7 +284,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return hpx::lcos::local::dataflow(
                     [=](std::vector<hpx::future<void> > && r)
-                        mutable -> RndIter 
+                        mutable -> RndIter
                     {
                         util::detail::handle_local_exceptions<
                             parallel_task_execution_policy>::call(

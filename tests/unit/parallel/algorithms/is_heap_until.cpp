@@ -67,7 +67,7 @@ void test_is_heap0()
     test_is_heap0(execution_policy(par), IteratorTag());
     test_is_heap0(execution_policy(par_vec), IteratorTag());
     test_is_heap0(execution_policy(seq(task)), IteratorTag());
-    test_is_heap0(execution_policy(par(task)), IteratorTag()); 
+    test_is_heap0(execution_policy(par(task)), IteratorTag());
 }
 
 void is_heap_test0()
@@ -88,10 +88,10 @@ void test_is_heap1(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
-    
-    auto middle = boost::begin(c) + 
+
+    auto middle = boost::begin(c) +
         std::distance(boost::begin(c), boost::end(c)) / 2;
-    
+
     std::make_heap(boost::begin(c), middle);
 
     auto test =
