@@ -101,6 +101,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/remove_copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/replace.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/reverse.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/rotate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/sort.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/auto_chunk_size.hpp"
