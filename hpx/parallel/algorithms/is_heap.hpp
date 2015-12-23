@@ -376,15 +376,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     result;
 
                 return result::get(
-                        is_heap_until<RndIter>().call(
-                        policy, boost::mpl::false_(),
-                        first, last, std::forward<Pred>(pred)) == last);
+                    is_heap_until<RndIter>().call(
+                    policy, boost::mpl::false_(),
+                    first, last, std::forward<Pred>(pred)) == last);
             }
 
             template <typename RndIter, typename Pred>
             static typename util::detail::algorithm_result<
                 parallel_task_execution_policy, bool>::type
-            parallel(parallel_task_execution_policy policy, 
+            parallel(parallel_task_execution_policy policy,
                 RndIter first, RndIter last,
                 Pred && pred)
             {
@@ -392,11 +392,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     parallel_task_execution_policy, bool>
                     result;
 
-                return result::get(
-                        hpx::util::unwrapped(
-                        is_heap_until<RndIter>().call(
-                        policy, boost::mpl::false_(),
-                        first, last, std::forward<Pred>(pred))) == last);
+                return is_heap_until<RndIter>().call(
+                    policy, boost::mpl::false_(),
+                    first, last, std::forward<Pred>(pred)).then(
+                    [=](hpx::future<RndIter> f) -> bool
+                    {
+                        return f.get() == last;
+                    });
             }
         };
     }
