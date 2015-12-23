@@ -20,15 +20,15 @@ dependencies:
         - docker pull ${IMAGE_NAME}
         - mkdir build
     override:
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" -DHPX_WITH_TESTS_HEADERS=On
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 core
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 components
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 examples
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 tests.unit
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 tests.regressions
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 tests.headers
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 tests.performance
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ninja -j2 tools.inspect
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" -DHPX_WITH_TESTS_HEADERS=On
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.headers
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tools.inspect
         # TODO replace this line with "docker build" once docker managed to
         # introduce temporal file copies that don't show in the resulting image
         # size.
