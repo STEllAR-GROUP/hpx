@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -346,6 +347,102 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<RndIter>::value_type value_type;
 
         return detail::is_heap_until<RndIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::less<value_type>());
+    }
+
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        struct is_heap: public detail::algorithm<is_heap, bool>
+        {
+            is_heap()
+                : is_heap::algorithm("is_heap")
+            {}
+
+            template <typename ExPolicy, typename RndIter, typename Pred>
+            static bool
+            sequential(ExPolicy, RndIter first, RndIter last, Pred && pred)
+            {
+                return std::is_heap(first, last, std::forward<Pred>(pred));
+            }
+
+            template <typename ExPolicy, typename RndIter, typename Pred>
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, RndIter first, RndIter last,
+                Pred && pred)
+            {
+                typedef typename util::detail::algorithm_result<ExPolicy, bool>
+                    result;
+
+                return result::get(
+                        is_heap_until<RndIter>().call(
+                        policy, boost::mpl::false_(),
+                        first, last, std::forward<Pred>(pred)) == last);
+            }
+
+            template <typename RndIter, typename Pred>
+            static typename util::detail::algorithm_result<
+                parallel_task_execution_policy, bool>::type
+            parallel(parallel_task_execution_policy policy, 
+                RndIter first, RndIter last,
+                Pred && pred)
+            {
+                typedef typename util::detail::algorithm_result<
+                    parallel_task_execution_policy, bool>
+                    result;
+
+                return result::get(
+                        hpx::util::unwrapped(
+                        is_heap_until<RndIter>().call(
+                        policy, boost::mpl::false_(),
+                        first, last, std::forward<Pred>(pred))) == last);
+            }
+        };
+    }
+
+    template <typename ExPolicy, typename RndIter, typename Pred>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+    >::type
+    is_heap(ExPolicy && policy, RndIter first, RndIter last, Pred && pred)
+    {
+        typedef typename std::iterator_traits<RndIter>::iterator_category
+            iterator_category;
+        static_assert(
+                (boost::is_base_of<
+                 std::random_access_iterator_tag, iterator_category
+                    >::value),
+                "Requires random access iterator.");
+
+        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef typename std::iterator_traits<RndIter>::value_type value_type;
+
+        return detail::is_heap().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<Pred>(pred));
+    }
+
+    template <typename ExPolicy, typename RndIter>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+    >::type
+    is_heap(ExPolicy && policy, RndIter first, RndIter last)
+    {
+        typedef typename std::iterator_traits<RndIter>::iterator_category
+            iterator_category;
+        static_assert(
+                (boost::is_base_of<
+                 std::random_access_iterator_tag, iterator_category
+                    >::value),
+                "Requires random access iterator.");
+
+        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef typename std::iterator_traits<RndIter>::value_type value_type;
+
+        return detail::is_heap().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::less<value_type>());
     }
