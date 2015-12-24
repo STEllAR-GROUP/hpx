@@ -141,6 +141,7 @@
 [def __cpp11_n4107__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4313.html N4313]]
 [def __cpp11_n4406__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4406.pdf N4406]]
 [def __cpp17_n4399__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html N4399]]
+[def __cpp17_n4560__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4560.pdf N4560]]
 
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]

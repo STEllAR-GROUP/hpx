@@ -11,6 +11,11 @@
 
 [heading General Changes]
 
+- We have started to add parallel algorithm overloads based on the C++
+  Extensions for Ranges (__cpp17_n4560__) proposal. This also includes the
+  addition of projections to the existing algorithms. Please see [issue 1668]
+  for a list of algorithms which have been adapted to __cpp17_n4560__.
+
 [heading Breaking Changes]
 
 - In order to move the dataflow facility to `namespace hpx` we added a
@@ -20,7 +25,12 @@
   `HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY` is defined at configuration time.
   Please explicitly qualify all uses of the dataflow facility if you enable
   this compatibility setting and encounter ambiguities.
-
+- The adaptation of the C++ Extensions for Ranges (__cpp17_n4560__) proposal
+  imposes some breaking changes related to the return types of some of the
+  parallel algorithms. Here is the list of algorithms we have changed so far:
+  `parallel::for_each`, `parallel::copy`, `parallel::rotate`,
+  `parallel::reverse` and `parallel::reverse_copy`, `parallel::remove` and
+  `parallel::remove_copy`.
 
 [heading Bug Fixes (Closed Tickets)]
 
@@ -28,7 +38,8 @@ Here is a list of the important tickets we closed for this release.
 
 * [pr 1910] - Keep cmake_module_path
 * [pr 1909] - Fix mpirun with pbs
-* [pr 1908] - Changing parallel::sort to return the last iterator as proposed by N4560
+* [pr 1908] - Changing parallel::sort to return the last iterator as proposed by
+              N4560
 * [pr 1907] - Adding minimum version for Open MPI
 
 [endsect]
