@@ -218,7 +218,7 @@ HPX_INLINE_NAMESPACE(v1)
             // Downsweep:
             // --------------------------
             //
-            std::get < 3 > (work_chunks.back()) = 0;
+            std::get < 3 > (work_chunks.back()) = T();
             for (int d = log2N - 1; d >= 0; --d) {
                 int d_2 = (1 << d);
                 int dp1_2 = (2 << d);
@@ -228,7 +228,7 @@ HPX_INLINE_NAMESPACE(v1)
                     std::get < 3 > (work_chunks[k + d_2 - 1]) =
                         std::get < 3 > (work_chunks[k + dp1_2 - 1]);
                     std::get < 3 > (work_chunks[k + dp1_2 - 1]) =
-                        temp + std::get < 3 > (work_chunks[k + dp1_2 - 1]);
+                        op(temp , std::get < 3 > (work_chunks[k + dp1_2 - 1]));
                 }
             }
             // now combine the partial sums back into the initial chunks
