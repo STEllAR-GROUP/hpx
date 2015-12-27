@@ -11,9 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -242,11 +244,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a reverse_copy algorithm returns a
-    ///           \a hpx::future<std::pair<BidirIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(BidirIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<BidirIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
@@ -259,7 +262,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::detail::is_iterator<BidirIter>::value &&
         traits::detail::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<BidirIter, OutIter>
+        ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
     >::type
     reverse_copy(ExPolicy && policy, BidirIter first, BidirIter last,
         OutIter dest_first)
@@ -288,9 +291,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::reverse_copy<std::pair<BidirIter, OutIter> >().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest_first);
+        return hpx::util::make_tagged_pair<tag::in, tag::out>(
+            detail::reverse_copy<std::pair<BidirIter, OutIter> >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest_first));
     }
 }}}
 

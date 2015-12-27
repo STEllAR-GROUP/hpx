@@ -398,8 +398,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///           It returns \a last.
     //-----------------------------------------------------------------------------
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename RandomIt,
+    template <typename ExPolicy, typename RandomIt,
+        typename Proj = util::projection_identity,
         typename Compare = std::less<
             typename std::remove_reference<
                 typename traits::projected_result_of<Proj, RandomIt>::type

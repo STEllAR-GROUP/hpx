@@ -12,8 +12,10 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -21,6 +23,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 
@@ -163,11 +166,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a copy algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
@@ -179,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::detail::is_iterator<InIter>::value &&
         traits::detail::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<InIter, OutIter>
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
@@ -205,9 +209,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
         typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::copy_(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            is_segmented());
+        return hpx::util::make_tagged_pair<tag::in, tag::out>(
+            detail::copy_(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                is_segmented()));
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -315,11 +320,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a copy_n algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
@@ -333,7 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::detail::is_iterator<InIter>::value &&
         traits::detail::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<InIter, OutIter>
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     copy_n(ExPolicy && policy, InIter first, Size count, OutIter dest)
     {
@@ -356,12 +362,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires at least output iterator.");
 
+        using hpx::util::tagged_pair;
+        using hpx::util::make_tagged_pair;
+
         // if count is representing a negative value, we do nothing
         if (detail::is_negative<Size>::call(count))
         {
             return util::detail::algorithm_result<
-                    ExPolicy, std::pair<InIter, OutIter>
-                >::get(std::make_pair(first, dest));
+                    ExPolicy, tagged_pair<tag::in(InIter), tag::out(OutIter)>
+                >::get(make_tagged_pair<tag::in, tag::out>(first, dest));
         }
 
         typedef typename boost::mpl::or_<
@@ -370,9 +379,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::copy_n<std::pair<InIter, OutIter> >().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, std::size_t(count), dest);
+        return make_tagged_pair<tag::in, tag::out>(
+            detail::copy_n<std::pair<InIter, OutIter> >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, std::size_t(count), dest));
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -455,8 +465,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             part_begin, part_size,
                             [&pred, proj, &curr](zip_iterator it) mutable
                             {
-                                bool f = hpx::util::invoke(pred,
-                                    hpx::util::invoke(proj, get<0>(*it)));
+                                using hpx::util::invoke;
+                                bool f = invoke(pred, invoke(proj, get<0>(*it)));
 
                                 if ((get<1>(*it) = f))
                                     ++curr;
@@ -557,19 +567,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a copy_if algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename OutIter, typename F,
+    template <typename ExPolicy, typename InIter, typename OutIter, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::detail::is_iterator<InIter>::value &&
@@ -579,7 +590,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             F, traits::projected<Proj, InIter>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<InIter, OutIter>
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f,
         Proj && proj = Proj{})
@@ -609,9 +620,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::copy_if<std::pair<InIter, OutIter> >().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, std::forward<F>(f), std::forward<Proj>(proj));
+        return hpx::util::make_tagged_pair<tag::in, tag::out>(
+            detail::copy_if<std::pair<InIter, OutIter> >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest, std::forward<F>(f),
+                std::forward<Proj>(proj)));
     }
 }}}
 

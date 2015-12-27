@@ -9,14 +9,17 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_REMOVE_COPY_DEC_20_2015_0631AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/remove_copy.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
 #include <hpx/parallel/traits/range_traits.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <boost/range/functions.hpp>
 
@@ -75,19 +78,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a remove_copy algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename OutIter, typename T,
+    template <typename ExPolicy, typename Rng, typename OutIter, typename T,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -100,7 +104,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_traits<Rng>::iterator_type),
+            tag::out(OutIter)
+        >
     >::type
     remove_copy(ExPolicy && policy, Rng rng, OutIter dest, T const& val,
         Proj && proj = Proj{})
@@ -180,19 +187,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a remove_copy_if algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename OutIter, typename F,
+    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -203,7 +211,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_traits<Rng>::iterator_type),
+            tag::out(OutIter)
+        >
     >::type
     remove_copy_if(ExPolicy && policy, Rng rng, OutIter dest, F && f,
         Proj && proj = Proj{})

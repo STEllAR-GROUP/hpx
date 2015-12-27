@@ -41,17 +41,20 @@ namespace hpx { namespace parallel { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        // This implementation of is_iterator seems to work fine even for
+        // VS2013 which has an implementation of std::iterator_traits which is
+        // SFINAE-unfriendly.
         template <typename T>
         struct is_iterator
         {
-            template <typename U>
-            static char test(typename std::iterator_traits<U>::pointer* x);
+            template <typename U, typename =
+                typename std::iterator_traits<U>::pointer>
+            static char test(U&&);
 
-            template <typename U>
             static long test(...);
 
             static bool const value =
-                sizeof(test<T>(0)) == sizeof(char);
+                sizeof(test(std::declval<T>())) == sizeof(char);
         };
     }
 

@@ -9,8 +9,11 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHMS_REVERSE_DEC_21_2015_0245PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
@@ -114,11 +117,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a reverse_copy algorithm returns a
-    ///           \a hpx::future<std::pair<BidirIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(BidirIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<BidirIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
@@ -132,7 +136,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::detail::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_iterator<Rng>::type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_iterator<Rng>::type),
+            tag::out(OutIter)
+        >
     >::type
     reverse_copy(ExPolicy && policy, Rng rng, OutIter dest_first)
     {

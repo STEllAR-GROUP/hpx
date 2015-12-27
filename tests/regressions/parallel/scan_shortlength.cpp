@@ -18,13 +18,13 @@ void test_zero()
     std::vector<int> a;
     std::vector<int> b, c, d;
 
-    std::pair<Iter, Iter> p_copy_if =
+    auto p_copy_if =
         copy_if(par, a.begin(), a.end(), b.begin(),
         [](int bar){ return bar % 2 == 1; });
-    std::pair<Iter, Iter> p_remove_copy_if =
+    auto p_remove_copy_if =
         remove_copy_if(par, a.begin(), a.end(), c.begin(),
         [](int bar){ return bar % 2 != 1; });
-    std::pair<Iter, Iter> p_remove_copy =
+    auto p_remove_copy =
         remove_copy(par, a.begin(), a.end(), d.begin(), 0);
 
     Iter ans_copy_if = std::copy_if(a.begin(), a.end(), b.begin(),
@@ -33,9 +33,9 @@ void test_zero()
         [](int bar){ return bar % 2 != 1; });
     Iter ans_remove_copy = std::remove_copy(a.begin(), a.end(), d.begin(), 0);
 
-    HPX_TEST(p_copy_if.second == ans_copy_if);
-    HPX_TEST(p_remove_copy_if.second == ans_remove_copy_if);
-    HPX_TEST(p_remove_copy.second == ans_remove_copy);
+    HPX_TEST(p_copy_if.out() == ans_copy_if);
+    HPX_TEST(p_remove_copy_if.out() == ans_remove_copy_if);
+    HPX_TEST(p_remove_copy.out() == ans_remove_copy);
 }
 
 void test_async_zero()
@@ -46,13 +46,13 @@ void test_async_zero()
     std::vector<int> a;
     std::vector<int> b, c, d;
 
-    Fut_Iter f_copy_if =
+    auto f_copy_if =
         copy_if(par(task), a.begin(), a.end(), b.begin(),
         [](int bar){ return bar % 2 == 1; });
-    Fut_Iter f_remove_copy_if =
+    auto f_remove_copy_if =
         remove_copy_if(par(task), a.begin(), a.end(), c.begin(),
         [](int bar){ return bar % 2 != 1; });
-    Fut_Iter f_remove_copy =
+    auto f_remove_copy =
         remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
 
     Iter ans_copy_if = std::copy_if(a.begin(), a.end(), b.begin(),
@@ -61,9 +61,9 @@ void test_async_zero()
         [](int bar){ return bar % 2 != 1; });
     Iter ans_remove_copy = std::remove_copy(a.begin(), a.end(), d.begin(), 0);
 
-    HPX_TEST(f_copy_if.get().second == ans_copy_if);
-    HPX_TEST(f_remove_copy_if.get().second == ans_remove_copy_if);
-    HPX_TEST(f_remove_copy.get().second == ans_remove_copy);
+    HPX_TEST(f_copy_if.get().out() == ans_copy_if);
+    HPX_TEST(f_remove_copy_if.get().out() == ans_remove_copy_if);
+    HPX_TEST(f_remove_copy.get().out() == ans_remove_copy);
 }
 
 void test_one(std::vector<int> a)
@@ -74,13 +74,13 @@ void test_one(std::vector<int> a)
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);
 
-    std::pair<Iter, Iter> p_copy_if =
+    auto p_copy_if =
         copy_if(par, a.begin(), a.end(), b.begin(),
         [](int bar){ return bar % 2 == 1; });
-    std::pair<Iter, Iter> p_remove_copy_if =
+    auto p_remove_copy_if =
         remove_copy_if(par, a.begin(), a.end(), c.begin(),
         [](int bar){ return bar % 2 != 1; });
-    std::pair<Iter, Iter> p_remove_copy =
+    auto p_remove_copy =
         remove_copy(par, a.begin(), a.end(), d.begin(), 0);
 
     HPX_UNUSED(p_copy_if);
@@ -115,13 +115,13 @@ void test_async_one(std::vector<int> a)
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);
 
-    Fut_Iter f_copy_if =
+    auto f_copy_if =
         copy_if(par(task), a.begin(), a.end(), b.begin(),
             [](int bar){ return bar % 2 == 1; });
-    Fut_Iter f_remove_copy_if =
+    auto f_remove_copy_if =
         remove_copy_if(par(task), a.begin(), a.end(), c.begin(),
             [](int bar){ return bar % 2 != 1; });
-    Fut_Iter f_remove_copy =
+    auto f_remove_copy =
         remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
 
     std::copy_if(a.begin(), a.end(), b_ans.begin(),

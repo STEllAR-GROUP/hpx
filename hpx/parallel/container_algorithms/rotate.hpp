@@ -9,9 +9,12 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_ROTATE_DEC_22_2015_0736PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/rotate.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
 #include <hpx/parallel/traits/range_traits.hpp>
@@ -60,10 +63,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///       of \a MoveAssignable and \a MoveConstructible.
     ///
     /// \returns  The \a rotate algorithm returns a
-    ///           \a hpx::future<std::pair<FwdIter, FwdIter> >
+    ///           \a hpx::future<tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)> >
     ///           if the execution policy is of type
     ///           \a parallel_task_execution_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
+    ///           otherwise.
     ///           The \a rotate algorithm returns the iterator equal to
     ///           pair(first + (last - new_first), last).
     ///
@@ -73,9 +77,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<
-            typename traits::range_iterator<Rng>::type,
-            typename traits::range_iterator<Rng>::type>
+        hpx::util::tagged_pair<
+            tag::begin(typename traits::range_iterator<Rng>::type),
+            tag::end(typename traits::range_iterator<Rng>::type)
+        >
     >::type
     rotate(ExPolicy && policy, Rng rng,
         typename traits::range_iterator<Rng>::type middle)
@@ -123,10 +128,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a rotate_copy algorithm returns a
-    ///           \a hpx::future<std::pair<FwdIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a rotate_copy algorithm returns the output iterator to the
     ///           element past the last element copied.
     ///
@@ -137,7 +143,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::detail::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_iterator<Rng>::type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_iterator<Rng>::type),
+            tag::out(OutIter)
+        >
     >::type
     rotate_copy(ExPolicy && policy, Rng rng,
         typename traits::range_iterator<Rng>::type middle, OutIter dest_first)

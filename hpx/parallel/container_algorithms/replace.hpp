@@ -9,9 +9,12 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_REPLACE_DEC_18_2015_0103PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/replace.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
 #include <hpx/parallel/traits/range_traits.hpp>
@@ -71,8 +74,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_execution_policy and
     ///           returns \a void otherwise.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename T1, typename T2,
+    template <typename ExPolicy, typename Rng, typename T1, typename T2,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -161,8 +164,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           and returns \a void otherwise.
     ///           It returns \a last.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename F, typename T,
+    template <typename ExPolicy, typename Rng, typename F, typename T,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -233,19 +236,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a replace_copy algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename OutIter, typename T1,
-        typename T2,
+    template <typename ExPolicy, typename Rng, typename OutIter, typename T1,
+        typename T2, typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -257,7 +260,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_traits<Rng>::iterator_type),
+            tag::out(OutIter)
+        >
     >::type
     replace_copy(ExPolicy && policy, Rng rng, OutIter dest,
         T1 const& old_value, T2 const& new_value, Proj && proj = Proj{})
@@ -337,19 +343,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a replace_copy_if algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy
-    ///           and returns \a OutIter otherwise.
+    ///           and returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a replace_copy_if algorithm returns the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename T,
+    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
+        typename T, typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -359,7 +365,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_traits<Rng>::iterator_type),
+            tag::out(OutIter)
+        >
     >::type
     replace_copy_if(ExPolicy && policy, Rng rng, OutIter dest,
         F && f, T const& new_value, Proj && proj = Proj{})
