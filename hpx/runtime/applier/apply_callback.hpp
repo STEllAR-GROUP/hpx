@@ -8,6 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <hpx/runtime/applier/apply.hpp>
 
@@ -340,6 +342,101 @@ namespace hpx
             actions::typed_continuation<result_type>(contgid),
             std::move(addr), gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+    }
+
+    namespace functional
+    {
+        template <typename Action, typename Callback, typename ...Ts>
+        struct apply_c_p_cb_impl
+        {
+        private:
+            HPX_MOVABLE_BUT_NOT_COPYABLE(apply_c_p_cb_impl)
+
+        public:
+            typedef util::tuple<Ts...> tuple_type;
+
+            template <typename ...Ts_>
+            apply_c_p_cb_impl(naming::id_type const& contid,
+                    naming::address && addr, naming::id_type const& id,
+                    threads::thread_priority p, Callback && cb, Ts_ &&... vs)
+              : contid_(contid), addr_(std::move(addr)), id_(id), p_(p),
+                cb_(std::move(cb)),
+                args_(std::forward<Ts_>(vs)...)
+            {}
+
+            apply_c_p_cb_impl(apply_c_p_cb_impl && rhs)
+              : contid_(std::move(rhs.contid_)),
+                addr_(std::move(rhs.addr_)),
+                id_(std::move(rhs.id_)),
+                p_(std::move(rhs.p_)),
+                cb_(std::move(rhs.cb_)),
+                args_(std::move(rhs.args_))
+            {}
+
+            apply_c_p_cb_impl& operator=(apply_c_p_cb_impl && rhs)
+            {
+                contid_ = std::move(rhs.contid_);
+                addr_ = std::move(rhs.addr_);
+                id_ = std::move(rhs.id_);
+                p_ = std::move(rhs.p_);
+                cb_ = std::move(rhs.cb_);
+                args_ = std::move(rhs.args_);
+                return *this;
+            }
+
+            void operator()()
+            {
+                apply_action(
+                    typename util::detail::make_index_pack<
+                        sizeof...(Ts)
+                    >::type());
+            }
+
+        protected:
+            template <std::size_t ...Is>
+            void apply_action(util::detail::pack_c<std::size_t, Is...>)
+            {
+                if (addr_)
+                {
+                    hpx::apply_c_p_cb<Action>(
+                        contid_, std::move(addr_), id_, p_, std::move(cb_),
+                        util::get<Is>(std::forward<tuple_type>(args_))...);
+                }
+                else
+                {
+                    hpx::apply_c_p_cb<Action>(
+                        contid_, id_, p_, std::move(cb_),
+                        util::get<Is>(std::forward<tuple_type>(args_))...);
+                }
+            }
+
+        private:
+            naming::id_type contid_;
+            naming::address addr_;
+            naming::id_type id_;
+            threads::thread_priority p_;
+            Callback cb_;
+            tuple_type args_;
+        };
+
+        template <typename Action, typename Callback, typename ...Ts>
+        apply_c_p_cb_impl<
+            Action, typename util::decay<Callback>::type,
+            typename util::decay<Ts>::type...
+        >
+        apply_c_p_cb(naming::id_type const& contid, naming::address && addr,
+            naming::id_type const& id, threads::thread_priority p,
+            Callback && cb, Ts &&... vs)
+        {
+            typedef apply_c_p_cb_impl<
+                    Action, typename util::decay<Callback>::type,
+                    typename util::decay<Ts>::type...
+                > result_type;
+
+            return result_type(
+                contid, std::move(addr), id, p, std::forward<Callback>(cb),
+                std::forward<Ts>(vs)...);
+        }
     }
 }
 
