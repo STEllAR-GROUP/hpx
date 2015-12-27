@@ -60,7 +60,7 @@ void test_copy_if_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::copy_if(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),

@@ -1,21 +1,20 @@
-//  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015 Daniel Bourgeois
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/parallel_remove_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/functions.hpp>
 
 #include "test_utils.hpp"
 
-////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_copy(ExPolicy policy, IteratorTag)
+void test_remove_copy(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -24,61 +23,86 @@ void test_copy(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    hpx::parallel::copy(policy, c, boost::begin(d));
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag> test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d(c.size()/2);
+    std::size_t middle_idx =std::rand() % (c.size()/2);
+    auto middle = hpx::parallel::v1::detail::next(boost::begin(c), middle_idx);
+    std::fill(boost::begin(c), middle, 1);
+    std::fill(middle, boost::end(c), 2);
+
+    hpx::parallel::remove_copy(policy, c, boost::begin(d), std::size_t(2));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
-    HPX_TEST_EQ(count, d.size());
+    HPX_TEST_EQ(count, middle_idx);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_copy_async(ExPolicy p, IteratorTag)
+void test_remove_copy_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag> test_vector;
 
-    auto f = hpx::parallel::copy(p, c, boost::begin(d));
+    test_vector c(10007);
+    std::vector<std::size_t> d(c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size()/2);
+    auto middle = hpx::parallel::v1::detail::next(boost::begin(c), middle_idx);
+    std::fill(boost::begin(c), middle, 1);
+    std::fill(middle, boost::end(c), 2);
+
+    auto f = hpx::parallel::remove_copy(p, c, boost::begin(d), std::size_t(2));
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
-    HPX_TEST_EQ(count, d.size());
+    HPX_TEST_EQ(count, middle_idx);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_copy_outiter(ExPolicy policy, IteratorTag)
+void test_remove_copy_outiter(ExPolicy policy, IteratorTag)
 {
-        static_assert(
+    static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d(0);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    hpx::parallel::copy(policy, c, std::back_inserter(d));
+    std::iota(boost::begin(c), boost::end(c), 0);
+
+    hpx::parallel::remove_copy(policy, c,
+        std::back_inserter(d), std::size_t(3000));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(
+        boost::begin(c.base()), boost::begin(c.base()) + 3000,
+        boost::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST(std::equal(
+        boost::begin(c.base())+3001, boost::end(c.base()),
+        boost::begin(d) + 3000,
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -88,20 +112,34 @@ void test_copy_outiter(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_copy_outiter_async(ExPolicy p, IteratorTag)
+void test_remove_copy_outiter_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(0);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag> test_vector;
 
-    auto f = hpx::parallel::copy(p, c, std::back_inserter(d));
+    test_vector c(10007);
+    std::vector<std::size_t> d(0);
+    std::iota(boost::begin(c), boost::end(c), 0);
+
+    auto f =
+        hpx::parallel::remove_copy(p, c,
+            std::back_inserter(d), std::size_t(3000));
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(
+        std::equal(boost::begin(c.base()), boost::begin(c.base()) + 3000,
+        boost::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST(std::equal(
+        boost::begin(c.base())+3001, boost::end(c.base()),
+        boost::begin(d) + 3000,
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -111,49 +149,49 @@ void test_copy_outiter_async(ExPolicy p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_copy()
+void test_remove_copy()
 {
     using namespace hpx::parallel;
-    test_copy(seq, IteratorTag());
-    test_copy(par, IteratorTag());
-    test_copy(par_vec, IteratorTag());
+    test_remove_copy(seq, IteratorTag());
+    test_remove_copy(par, IteratorTag());
+    test_remove_copy(par_vec, IteratorTag());
 
-    test_copy_async(seq(task), IteratorTag());
-    test_copy_async(par(task), IteratorTag());
+    test_remove_copy_async(seq(task), IteratorTag());
+    test_remove_copy_async(par(task), IteratorTag());
 
-    test_copy(execution_policy(seq), IteratorTag());
-    test_copy(execution_policy(par), IteratorTag());
-    test_copy(execution_policy(par_vec), IteratorTag());
+    test_remove_copy(execution_policy(seq), IteratorTag());
+    test_remove_copy(execution_policy(par), IteratorTag());
+    test_remove_copy(execution_policy(par_vec), IteratorTag());
 
-    test_copy(execution_policy(seq(task)), IteratorTag());
-    test_copy(execution_policy(par(task)), IteratorTag());
+    test_remove_copy(execution_policy(seq(task)), IteratorTag());
+    test_remove_copy(execution_policy(par(task)), IteratorTag());
 
     //assure output iterator will work
-    test_copy_outiter(seq, IteratorTag());
-    test_copy_outiter(par, IteratorTag());
-    test_copy_outiter(par_vec, IteratorTag());
+    test_remove_copy_outiter(seq, IteratorTag());
+    test_remove_copy_outiter(par, IteratorTag());
+    test_remove_copy_outiter(par_vec, IteratorTag());
 
-    test_copy_outiter_async(seq(task), IteratorTag());
-    test_copy_outiter_async(par(task), IteratorTag());
+    test_remove_copy_outiter_async(seq(task), IteratorTag());
+    test_remove_copy_outiter_async(par(task), IteratorTag());
 
-    test_copy_outiter(execution_policy(seq), IteratorTag());
-    test_copy_outiter(execution_policy(par), IteratorTag());
-    test_copy_outiter(execution_policy(par_vec), IteratorTag());
+    test_remove_copy_outiter(execution_policy(seq), IteratorTag());
+    test_remove_copy_outiter(execution_policy(par), IteratorTag());
+    test_remove_copy_outiter(execution_policy(par_vec), IteratorTag());
 
-    test_copy_outiter(execution_policy(seq(task)), IteratorTag());
-    test_copy_outiter(execution_policy(par(task)), IteratorTag());
+    test_remove_copy_outiter(execution_policy(seq(task)), IteratorTag());
+    test_remove_copy_outiter(execution_policy(par(task)), IteratorTag());
 }
 
-void copy_test()
+void remove_copy_test()
 {
-    test_copy<std::random_access_iterator_tag>();
-    test_copy<std::forward_iterator_tag>();
-    test_copy<std::input_iterator_tag>();
+    test_remove_copy<std::random_access_iterator_tag>();
+    test_remove_copy<std::forward_iterator_tag>();
+    test_remove_copy<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_copy_exception(ExPolicy policy, IteratorTag)
+void test_remove_copy_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -165,17 +203,17 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c), boost::end(c), 0);
 
     bool caught_exception = false;
     try {
-        hpx::parallel::copy(policy,
+        hpx::parallel::remove_copy(policy,
             boost::make_iterator_range(
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c))),
-            boost::begin(d));
+            boost::begin(d), std::size_t(3000));
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
@@ -190,7 +228,7 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_copy_exception_async(ExPolicy p, IteratorTag)
+void test_remove_copy_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -198,19 +236,19 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c), boost::end(c), 0);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         auto f =
-            hpx::parallel::copy(p,
+            hpx::parallel::remove_copy(p,
                 boost::make_iterator_range(
                     decorated_iterator(
                         boost::begin(c),
                         [](){ throw std::runtime_error("test"); }),
                     decorated_iterator(boost::end(c))),
-                boost::begin(d));
+                boost::begin(d), std::size_t(3000));
         returned_from_algorithm = true;
         f.get();
 
@@ -229,36 +267,36 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_copy_exception()
+void test_remove_copy_exception()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_copy_exception(seq, IteratorTag());
-    test_copy_exception(par, IteratorTag());
+    test_remove_copy_exception(seq, IteratorTag());
+    test_remove_copy_exception(par, IteratorTag());
 
-    test_copy_exception_async(seq(task), IteratorTag());
-    test_copy_exception_async(par(task), IteratorTag());
+    test_remove_copy_exception_async(seq(task), IteratorTag());
+    test_remove_copy_exception_async(par(task), IteratorTag());
 
-    test_copy_exception(execution_policy(seq), IteratorTag());
-    test_copy_exception(execution_policy(par), IteratorTag());
+    test_remove_copy_exception(execution_policy(seq), IteratorTag());
+    test_remove_copy_exception(execution_policy(par), IteratorTag());
 
-    test_copy_exception(execution_policy(seq(task)), IteratorTag());
-    test_copy_exception(execution_policy(par(task)), IteratorTag());
+    test_remove_copy_exception(execution_policy(seq(task)), IteratorTag());
+    test_remove_copy_exception(execution_policy(par(task)), IteratorTag());
 }
 
-void copy_exception_test()
+void remove_copy_exception_test()
 {
-    test_copy_exception<std::random_access_iterator_tag>();
-    test_copy_exception<std::forward_iterator_tag>();
-    test_copy_exception<std::input_iterator_tag>();
+    test_remove_copy_exception<std::random_access_iterator_tag>();
+    test_remove_copy_exception<std::forward_iterator_tag>();
+    test_remove_copy_exception<std::input_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
+void test_remove_copy_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -270,17 +308,17 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c), boost::end(c), 0);
 
     bool caught_bad_alloc = false;
     try {
-        hpx::parallel::copy(policy,
+        hpx::parallel::remove_copy(policy,
             boost::make_iterator_range(
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c))),
-            boost::begin(d));
+            boost::begin(d), std::size_t(3000));
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&) {
@@ -294,7 +332,7 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_remove_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -302,19 +340,19 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c), boost::end(c), 0);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         auto f =
-            hpx::parallel::copy(p,
+            hpx::parallel::remove_copy(p,
                 boost::make_iterator_range(
                     decorated_iterator(
                         boost::begin(c),
                         [](){ throw std::bad_alloc(); }),
                     decorated_iterator(boost::end(c))),
-                boost::begin(d));
+                boost::begin(d), std::size_t(3000));
         returned_from_algorithm = true;
         f.get();
 
@@ -332,31 +370,31 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_copy_bad_alloc()
+void test_remove_copy_bad_alloc()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_copy_bad_alloc(seq, IteratorTag());
-    test_copy_bad_alloc(par, IteratorTag());
+    test_remove_copy_bad_alloc(seq, IteratorTag());
+    test_remove_copy_bad_alloc(par, IteratorTag());
 
-    test_copy_bad_alloc_async(seq(task), IteratorTag());
-    test_copy_bad_alloc_async(par(task), IteratorTag());
+    test_remove_copy_bad_alloc_async(seq(task), IteratorTag());
+    test_remove_copy_bad_alloc_async(par(task), IteratorTag());
 
-    test_copy_bad_alloc(execution_policy(seq), IteratorTag());
-    test_copy_bad_alloc(execution_policy(par), IteratorTag());
+    test_remove_copy_bad_alloc(execution_policy(seq), IteratorTag());
+    test_remove_copy_bad_alloc(execution_policy(par), IteratorTag());
 
-    test_copy_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_copy_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_remove_copy_bad_alloc(execution_policy(seq(task)), IteratorTag());
+    test_remove_copy_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
-void copy_bad_alloc_test()
+void remove_copy_bad_alloc_test()
 {
-    test_copy_bad_alloc<std::random_access_iterator_tag>();
-    test_copy_bad_alloc<std::forward_iterator_tag>();
-    test_copy_bad_alloc<std::input_iterator_tag>();
+    test_remove_copy_bad_alloc<std::random_access_iterator_tag>();
+    test_remove_copy_bad_alloc<std::forward_iterator_tag>();
+    test_remove_copy_bad_alloc<std::input_iterator_tag>();
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -368,9 +406,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    copy_test();
-    copy_exception_test();
-    copy_bad_alloc_test();
+    remove_copy_test();
+    remove_copy_exception_test();
+    remove_copy_bad_alloc_test();
     return hpx::finalize();
 }
 

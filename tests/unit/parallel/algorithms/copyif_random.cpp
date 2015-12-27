@@ -21,7 +21,8 @@ void test_copy_if(ExPolicy policy)
         "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag> iterator;
+    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
+        iterator;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
@@ -56,7 +57,8 @@ template <typename ExPolicy>
 void test_copy_if_async(ExPolicy p)
 {
     typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag> iterator;
+    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
+        iterator;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
@@ -64,7 +66,7 @@ void test_copy_if_async(ExPolicy p)
     std::iota(boost::begin(c), middle, std::rand());
     std::fill(middle, boost::end(c), -1);
 
-    hpx::future<base_iterator> f =
+    auto f =
         hpx::parallel::copy_if(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d), [](int i){ return !(i < 0); });
@@ -97,7 +99,8 @@ void test_copy_if_outiter(ExPolicy policy)
         "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag> iterator;
+    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
+        iterator;
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
@@ -123,7 +126,8 @@ template <typename ExPolicy>
 void test_copy_if_outiter_async(ExPolicy p)
 {
     typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag> iterator;
+    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
+        iterator;
 
     std::vector<int> c(10007);
     std::vector<int> d(0);

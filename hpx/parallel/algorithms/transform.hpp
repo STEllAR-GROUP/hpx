@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ExPolicy, hpx::util::tuple<FwdIter, output_iterator>
                     >::type result_type;
 
-                return get_iter_tuple<result_type>(
+                return get_iter_tuple(
                     for_each_n<zip_iterator>().call(
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
@@ -260,7 +260,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::util::tuple<FwdIter1, FwdIter2, output_iterator>
                     >::type result_type;
 
-                return get_iter_tuple<result_type>(
+                return get_iter_tuple(
                     for_each_n<zip_iterator>().call(
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first1, first2, dest),
@@ -469,7 +469,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::util::tuple<FwdIter1, FwdIter2, output_iterator>
                     >::type result_type;
 
-                return get_iter_tuple<result_type>(
+                return get_iter_tuple(
                     for_each_n<zip_iterator>().call(
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first1, first2, dest),

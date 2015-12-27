@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::loop_n(first, count,
                     [&f, &proj](Iter const& curr)
                     {
-                        f(hpx::util::invoke(proj, *curr));
+                        hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
             }
 
@@ -72,11 +72,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, first, count,
                         [f, proj](Iter part_begin, std::size_t part_size)
                         {
-                            // VS2015 bails out when proj ot f are captured by ref
-                            util::loop_n(part_begin, part_size,
+                            // VS2015 bails out when proj or f are captured by
+                            // ref
+                            util::loop_n(
+                                part_begin, part_size,
                                 [=](Iter const& curr)
                                 {
-                                    f(hpx::util::invoke(proj, *curr));
+                                    hpx::util::invoke(
+                                        f, hpx::util::invoke(proj, *curr));
                                 });
                         });
                 }

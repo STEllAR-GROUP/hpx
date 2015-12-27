@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,7 +23,9 @@ void test_replace_copy(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
@@ -31,9 +33,7 @@ void test_replace_copy(ExPolicy policy, IteratorTag)
 
     std::size_t idx = std::rand() % c.size(); //-V104
 
-    hpx::parallel::replace_copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d1), c[idx], c[idx]+1);
+    hpx::parallel::replace_copy(policy, c, boost::begin(d1), c[idx], c[idx]+1);
 
     std::replace_copy(boost::begin(c), boost::end(c),
         boost::begin(d2), c[idx], c[idx]+1);
@@ -54,7 +54,9 @@ void test_replace_copy_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
@@ -62,10 +64,7 @@ void test_replace_copy_async(ExPolicy p, IteratorTag)
 
     std::size_t idx = std::rand() % c.size(); //-V104
 
-    auto f =
-        hpx::parallel::replace_copy(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d1), c[idx], c[idx]+1);
+    auto f = hpx::parallel::replace_copy(p, c, boost::begin(d1), c[idx], c[idx]+1);
     f.wait();
 
     std::replace_copy(boost::begin(c), boost::end(c),
@@ -126,10 +125,11 @@ void test_replace_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::parallel::replace_copy(policy,
-            decorated_iterator(
-                boost::begin(c),
-                [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)),
+            boost::make_iterator_range(
+                decorated_iterator(
+                    boost::begin(c),
+                    [](){ throw std::runtime_error("test"); }),
+                decorated_iterator(boost::end(c))),
             boost::begin(d), std::size_t(42), std::size_t(43));
         HPX_TEST(false);
     }
@@ -160,10 +160,11 @@ void test_replace_copy_exception_async(ExPolicy p, IteratorTag)
     try {
         auto f =
             hpx::parallel::replace_copy(p,
-                decorated_iterator(
-                    boost::begin(c),
-                    [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
+                boost::make_iterator_range(
+                    decorated_iterator(
+                        boost::begin(c),
+                        [](){ throw std::runtime_error("test"); }),
+                    decorated_iterator(boost::end(c))),
                 boost::begin(d), std::size_t(42), std::size_t(43));
         returned_from_algorithm = true;
         f.get();
@@ -229,10 +230,11 @@ void test_replace_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::replace_copy(policy,
-            decorated_iterator(
-                boost::begin(c),
-                [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
+            boost::make_iterator_range(
+                decorated_iterator(
+                    boost::begin(c),
+                    [](){ throw std::bad_alloc(); }),
+                decorated_iterator(boost::end(c))),
             boost::begin(d), std::size_t(42), std::size_t(43));
         HPX_TEST(false);
     }
@@ -262,10 +264,11 @@ void test_replace_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     try {
         auto f =
             hpx::parallel::replace_copy(p,
-                decorated_iterator(
-                    boost::begin(c),
-                    [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
+                boost::make_iterator_range(
+                    decorated_iterator(
+                        boost::begin(c),
+                        [](){ throw std::bad_alloc(); }),
+                    decorated_iterator(boost::end(c))),
                 boost::begin(d), std::size_t(42), std::size_t(43));
         returned_from_algorithm = true;
         f.get();

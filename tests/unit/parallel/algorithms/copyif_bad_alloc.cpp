@@ -60,13 +60,13 @@ void test_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::copy_if(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d),
-            [](std::size_t v) {
-                return throw std::bad_alloc(), v != 0;
-            });
+                iterator(boost::begin(c)), iterator(boost::end(c)),
+                boost::begin(d),
+                [](std::size_t v) {
+                    return throw std::bad_alloc(), v != 0;
+                });
 
         returned_from_algorithm = true;
         f.get();

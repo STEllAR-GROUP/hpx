@@ -7,5 +7,6 @@
 #define HPX_PARALLEL_REMOVE_COPY_FEB_25_2015_2131PM
 
 #include <hpx/parallel/algorithms/remove_copy.hpp>
+#include <hpx/parallel/container_algorithms/remove_copy.hpp>
 
 #endif

@@ -30,6 +30,8 @@
 #error On Intel Xeon/Phi coprosessors HPX cannot be use with a HWLOC version earlier than V1.6.
 #endif
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace threads
 {
     struct HPX_EXPORT hwloc_topology : topology

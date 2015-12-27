@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,16 +11,19 @@
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/concepts.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -30,6 +33,7 @@
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_void.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -1115,6 +1119,41 @@ namespace hpx { namespace lcos
     shared_future<void> make_future_void(shared_future<R> const& f)
     {
         return f;
+    }
+
+    // Allow to convert any future<U> into any other future<T> based on an
+    // existing conversion path U --> T.
+    template <typename T, typename U,
+    HPX_CONCEPT_REQUIRES_(
+        boost::is_convertible<U, T>::value)>
+    hpx::future<T> make_future(hpx::future<U> && f)
+    {
+        return f.then(
+            [](hpx::future<U> && f) -> T
+            {
+                return f.get();
+            });
+    }
+
+    template <typename T>
+    hpx::future<T> make_future(hpx::future<T> && f)
+    {
+        return f;
+    }
+
+    // Allow to convert any future<U> into any other future<T> based on a given
+    // conversion function: T f(U).
+    template <typename R, typename U, typename Conv,
+    HPX_CONCEPT_REQUIRES_(
+        hpx::traits::is_callable<Conv(U)>::value)>
+    hpx::future<R>
+    make_future(hpx::future<U> && f, Conv && conv)
+    {
+        return f.then(
+            [conv](hpx::future<U> && f) -> R
+            {
+                return hpx::util::invoke(conv, f.get());
+            });
     }
 }}
 
