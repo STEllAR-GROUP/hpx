@@ -52,6 +52,11 @@ namespace hpx { namespace util
     typename tuple_element<I, Tuple>::type&&
     get(Tuple&& t) HPX_NOEXCEPT;
 
+    template <std::size_t I, typename Tuple>
+    HPX_CONSTEXPR HPX_FORCEINLINE
+    typename tuple_element<I, Tuple>::type const&&
+    get(Tuple const&& t) HPX_NOEXCEPT;
+
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -641,6 +646,18 @@ namespace hpx { namespace util
     {
         return std::forward<
             typename tuple_element<I, Tuple>::type>(util::get<I>(t));
+    }
+
+    // template <size_t I, class... Types>
+    // constexpr typename tuple_element<I, tuple<Types...> >::type const&&
+    // get(const tuple<Types...>&& t) noexcept;
+    template <std::size_t I, typename Tuple>
+    HPX_CONSTEXPR HPX_FORCEINLINE
+    typename tuple_element<I, Tuple>::type const&&
+    get(Tuple const&& t) HPX_NOEXCEPT
+    {
+        return std::forward<
+            typename tuple_element<I, Tuple>::type const>(util::get<I>(t));
     }
 
     // 20.4.2.4, tuple creation functions
