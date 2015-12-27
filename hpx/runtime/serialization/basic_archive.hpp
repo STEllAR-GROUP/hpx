@@ -46,7 +46,7 @@ namespace hpx { namespace serialization
     template <typename Archive>
     struct HPX_EXPORT basic_archive
     {
-        static const boost::uint64_t npos = -1;
+        static const boost::uint64_t npos = boost::uint64_t(-1);
 
         basic_archive(boost::uint32_t flags)
           : flags_(flags)

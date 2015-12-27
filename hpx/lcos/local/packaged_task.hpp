@@ -365,7 +365,7 @@ namespace hpx { namespace lcos { namespace local
     class packaged_task<R(Ts...)>
       : private detail::packaged_task_base<R, R(Ts...)>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
 
         typedef detail::packaged_task_base<R, R(Ts...)> base_type;
 

@@ -60,7 +60,7 @@ namespace hpx { namespace actions
         template <typename Action, typename F, typename ...Ts>
         struct continuation_thread_function
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function);
+            HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function)
 
         public:
             explicit continuation_thread_function(

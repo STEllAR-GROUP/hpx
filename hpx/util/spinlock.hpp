@@ -33,7 +33,7 @@ struct spinlock
         m = l;
     }
 
-    HPX_NON_COPYABLE(spinlock);
+    HPX_NON_COPYABLE(spinlock)
 
     ~spinlock()
     {

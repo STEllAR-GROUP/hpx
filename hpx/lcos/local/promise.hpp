@@ -22,7 +22,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename R>
         class promise_base
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(promise_base);
+            HPX_MOVABLE_BUT_NOT_COPYABLE(promise_base)
 
             typedef R result_type;
             typedef lcos::detail::future_data<R> shared_state_type;
@@ -171,7 +171,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise : public detail::promise_base<R>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
         typedef detail::promise_base<R> base_type;
 
@@ -279,7 +279,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise<R&> : public detail::promise_base<R&>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
         typedef detail::promise_base<R&> base_type;
 
@@ -369,7 +369,7 @@ namespace hpx { namespace lcos { namespace local
     template <>
     class promise<void> : public detail::promise_base<void>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
         typedef detail::promise_base<void> base_type;
 

@@ -110,7 +110,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, desc, "");
         }
 
-        HPX_NON_COPYABLE(spinlock);
+        HPX_NON_COPYABLE(spinlock)
 
         ~spinlock()
         {
