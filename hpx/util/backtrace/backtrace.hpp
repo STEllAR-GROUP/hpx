@@ -16,21 +16,15 @@
 #include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
-#ifdef HPX_BACKTRACE_SOURCE
-# define HPX_BACKTRACE_DECL HPX_SYMBOL_EXPORT
-#else
-# define HPX_BACKTRACE_DECL HPX_SYMBOL_IMPORT
-#endif  // HPX_BACKTRACE_SOURCE
-
 namespace hpx { namespace util
 {
     namespace stack_trace
     {
-        HPX_BACKTRACE_DECL std::size_t trace(void **addresses, std::size_t size);
-        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,
+        HPX_API_EXPORT std::size_t trace(void **addresses, std::size_t size);
+        HPX_API_EXPORT void write_symbols(void *const *addresses,
             std::size_t size,std::ostream &);
-        HPX_BACKTRACE_DECL std::string get_symbol(void *address);
-        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address,
+        HPX_API_EXPORT std::string get_symbol(void *address);
+        HPX_API_EXPORT std::string get_symbols(void * const *address,
             std::size_t size);
     } // stack_trace
 
@@ -85,7 +79,7 @@ namespace hpx { namespace util
             return stack_trace::get_symbols(&frames_.front(),frames_.size());
         }
 
-        HPX_BACKTRACE_DECL std::string trace_on_new_stack() const;
+        HPX_API_EXPORT std::string trace_on_new_stack() const;
 
         void trace(std::ostream &out) const
         {
