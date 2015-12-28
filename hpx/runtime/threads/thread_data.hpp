@@ -28,7 +28,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/lockfree/detail/branch_hints.hpp>
 #include <boost/lockfree/stack.hpp>
 
 #include <stack>

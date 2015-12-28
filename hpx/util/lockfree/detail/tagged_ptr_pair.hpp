@@ -16,7 +16,6 @@
 #include <hpx/config.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <cstddef> // for std::size_t
 
