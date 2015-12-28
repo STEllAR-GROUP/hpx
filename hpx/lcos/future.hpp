@@ -529,9 +529,9 @@ namespace hpx { namespace lcos { namespace detail
         //     returns.
         template <typename F>
         typename boost::lazy_disable_if_c<
-            hpx::traits::is_launch_policy<typename hpx::util::decay<F>::type>::value ||
-            hpx::traits::is_threads_executor<typename hpx::util::decay<F>::type>::value ||
-            hpx::traits::is_executor<typename hpx::util::decay<F>::type>::value
+            hpx::traits::is_launch_policy<F>::value ||
+            hpx::traits::is_threads_executor<F>::value ||
+            hpx::traits::is_executor<F>::value
           , future_then_result<Derived, F>
         >::type
         then(F && f, error_code& ec = throws) const
@@ -565,7 +565,8 @@ namespace hpx { namespace lcos { namespace detail
             shared_state_ptr p =
                 detail::make_continuation<continuation_result_type>(
                     *static_cast<Derived const*>(this), policy, std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(std::move(p));
+            return hpx::traits::future_access<future<result_type> >::create(
+                std::move(p));
         }
 
         template <typename F>
@@ -594,7 +595,8 @@ namespace hpx { namespace lcos { namespace detail
             shared_state_ptr p =
                 detail::make_continuation<continuation_result_type>(
                     *static_cast<Derived const*>(this), sched, std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(std::move(p));
+            return hpx::traits::future_access<future<result_type> >::create(
+                std::move(p));
         }
 
         template <typename Executor, typename F>
@@ -878,9 +880,9 @@ namespace hpx { namespace lcos
 
         template <typename F>
         typename boost::lazy_disable_if_c<
-            hpx::traits::is_launch_policy<typename hpx::util::decay<F>::type>::value ||
-            hpx::traits::is_threads_executor<typename hpx::util::decay<F>::type>::value ||
-            hpx::traits::is_executor<typename hpx::util::decay<F>::type>::value
+            hpx::traits::is_launch_policy<F>::value ||
+            hpx::traits::is_threads_executor<F>::value ||
+            hpx::traits::is_executor<F>::value
           , detail::future_then_result<future, F>
         >::type
         then(F && f, error_code& ec = throws)
