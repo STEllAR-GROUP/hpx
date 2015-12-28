@@ -158,7 +158,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::detail::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
-            std::equal_to<>,
+            std::equal_to<T>,
                 traits::projected<Proj, InIter>,
                 traits::projected<Proj, T const*>
         >::value)>
