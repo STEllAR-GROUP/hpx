@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/parallel/util/detail/chunk_size.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -39,16 +40,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename RndIter, typename Pred>
         void comp_heap(RndIter first, Pred && pred,
                 typename std::iterator_traits<RndIter>::difference_type len,
-                typename std::iterator_traits<RndIter>::difference_type start,
+                RndIter start,
                 typename std::iterator_traits<RndIter>::difference_type n,
                 util::cancellation_token<std::size_t> &tok)
         {
             typedef typename std::iterator_traits<RndIter>::difference_type
                 dtype;
 
-            dtype p = start;
+            dtype p = std::distance(first, start);
             dtype c = 2 * p + 1;
-            RndIter pp = first + start;
+            RndIter pp = start;
             while(c < len && n > 0) {
                 if(tok.was_cancelled(c)) {
                     break;
@@ -104,9 +105,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<RndIter>::difference_type
                     dtype;
                 typedef typename util::detail::algorithm_result<ExPolicy,
-                        RndIter> result;
+                    RndIter> result;
+                typedef typename hpx::util::tuple<RndIter, std::size_t>
+                    tuple_type;
 
-                dtype len = last - first;
+                std::size_t len = last - first;
 
                 if(len <= 1) {
                     return result::get(std::move(last));
@@ -117,62 +120,39 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t chunk_size = 4;
 
                 std::vector<hpx::future<void> > workitems;
-                workitems.reserve(std::distance(first,last)/chunk_size);
                 util::cancellation_token<std::size_t> tok(len);
 
+                using namespace hpx::util::placeholders;
+
+                auto op = hpx::util::bind(
+                        &comp_heap<RndIter, Pred&>, first,
+                        std::forward<Pred&>(pred), len, _1,
+                        _2, tok);
+
+                std::vector<tuple_type> shape;
+
                 try {
-                    if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
-                        return result::get(std::move(first));
+                    shape = util::detail::get_topdown_heap_bulk_iteration_shape(
+                        policy, workitems, op,
+                        first, std::distance(first,last), chunk_size);
 
-                    for(dtype level = 2;
-                        level < (dtype)ceil(log2(len));
-                        level++) {
-
-                        dtype start = (dtype)pow(2, level-1)-1;
-                        dtype end_exclusive = (dtype)pow(2,
-                            level)-1;
-
-                        std::size_t items = (end_exclusive-start);
-
-                        // If amount of work is less than chunk size, just run it
-                        // sequentially
-                        if(chunk_size > items) {
-                            auto op =
-                                hpx::util::bind(
-                                    &comp_heap<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), len, start,
-                                    end_exclusive-start, tok);
+                    using hpx::util::get;
+                    for(auto &iteration: shape) {
+                        RndIter begin = get<0>(iteration);
+                        std::size_t length = get<1>(iteration);
+                        while(length != 0) {
+                            std::size_t chunk = (std::min)(chunk_size, length);
+                            auto f1 = hpx::util::bind(
+                                &comp_heap<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), len, begin,
+                                chunk, tok);
                             workitems.push_back(executor_traits::async_execute(
-                                policy.executor(), op));
-                            op();
-                        } else {
-                            std::size_t cnt = 0;
-                            while(cnt + chunk_size < items) {
-                                auto op =
-                                    hpx::util::bind(
-                                        &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt,
-                                        chunk_size, tok);
-                                workitems.push_back(executor_traits::async_execute(
-                                    policy.executor(), op));
-                                op();
-                                cnt += chunk_size;
-                            }
-
-                            if(cnt < items) {
-                                auto op =
-                                    hpx::util::bind(
-                                        &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt,
-                                        items-cnt, tok);
-                                op();
-                                workitems.push_back(executor_traits::async_execute(
-                                    policy.executor(), op));
-                            }
+                                policy.executor(), f1));
+                            length -= chunk;
+                            std::advance(begin, chunk);
                         }
                         hpx::wait_all(workitems);
                     }
-                    //comp_heap(first, std::forward<Pred>(pred), len, 0, 1, tok);
                 } catch(...) {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                         boost::current_exception(), errors);
@@ -181,7 +161,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::detail::handle_local_exceptions<ExPolicy>::call(
                     workitems, errors);
 
-                dtype pos = static_cast<dtype>(tok.get_data());
+                std::size_t pos = static_cast<dtype>(tok.get_data());
                 if(pos != len)
                     std::advance(first, pos);
                 else
@@ -206,6 +186,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     dtype;
                 typedef typename util::detail::algorithm_result<
                     parallel_task_execution_policy, RndIter> result;
+                typedef typename hpx::util::tuple<RndIter, std::size_t>
+                    tuple_type;
 
                 dtype len = last - first;
 
@@ -215,62 +197,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
 
                 std::list<boost::exception_ptr> errors;
-                std::size_t chunk_size = 4;
+                std::size_t chunk_size = 0;
 
                 std::vector<hpx::future<void> > workitems;
-                workitems.reserve(std::distance(first,last)/chunk_size);
                 util::cancellation_token<std::size_t> tok(len);
 
+                using namespace hpx::util::placeholders;
+
+                auto op = hpx::util::bind(
+                        &comp_heap<RndIter, Pred&>, first,
+                        std::forward<Pred&>(pred), len, _1,
+                        _2, tok);
+
+                std::vector<tuple_type> shape;
                 try {
+                    shape = util::detail::get_topdown_heap_bulk_iteration_shape(
+                        policy, workitems, op,
+                        first, std::distance(first,last), chunk_size);
 
-                    if(pred(*first, *(first+1)) || pred(*first, *(first+2)))
-                        return result::get(std::move(first));
-
-                    for(dtype level = 2;
-                        level < (dtype)ceil(log2(len));
-                        level++) {
-
-                        dtype start = (dtype)pow(2, level-1)-1;
-                        dtype end_exclusive = (dtype)pow(2,
-                            level)-1;
-
-                        std::size_t items = (end_exclusive-start);
-
-                        // If amount of work is less than chunk size, just run it
-                        // sequentially
-                        if(chunk_size > items) {
-                            auto op =
-                                hpx::util::bind(
-                                    &comp_heap<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), len, start,
-                                    end_exclusive-start, tok);
+                    using hpx::util::get;
+                    for(auto &iteration: shape) {
+                        RndIter begin = get<0>(iteration);
+                        std::size_t length = get<1>(iteration);
+                        while(length != 0) {
+                            std::size_t chunk = (std::min)(chunk_size, length);
+                            auto f1 = hpx::util::bind(
+                                &comp_heap<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), len, begin,
+                                chunk, tok);
                             workitems.push_back(executor_traits::async_execute(
-                                policy.executor(), op));
-                            op();
-                        } else {
-                            std::size_t cnt = 0;
-                            while(cnt + chunk_size < items) {
-                                auto op =
-                                    hpx::util::bind(
-                                        &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt,
-                                        chunk_size, tok);
-                                workitems.push_back(executor_traits::async_execute(
-                                    policy.executor(), op));
-                                op();
-                                cnt += chunk_size;
-                            }
-
-                            if(cnt < items) {
-                                auto op =
-                                    hpx::util::bind(
-                                        &comp_heap<RndIter, Pred&>, first,
-                                        std::forward<Pred&>(pred), len, start+cnt,
-                                        items-cnt, tok);
-                                op();
-                                workitems.push_back(executor_traits::async_execute(
-                                    policy.executor(), op));
-                            }
+                                policy.executor(), f1));
+                            length -= chunk;
+                            std::advance(begin, chunk);
                         }
                         hpx::wait_all(workitems);
                     }

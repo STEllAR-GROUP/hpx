@@ -42,7 +42,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename std::iterator_traits<RndIter>::difference_type len,
                 RndIter start)
         {
-            typedef typename std::iterator_traits<RndIter>::difference_type difference_type;
+            typedef typename std::iterator_traits<RndIter>::difference_type 
+                difference_type;
             typedef typename std::iterator_traits<RndIter>::value_type value_type;
 
             difference_type child = start - first;
@@ -125,6 +126,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 std::list<boost::exception_ptr> errors;
+
+                std::sizt_t const cores = executor_information_traits<executor_type>::
+                    processing_units_count(policy.executor(), policy.parameters());
+                bool variable_chunk_sizes = traits::variable_chunk_size(
+                        policy.parameters(), policy.executor());
+
                 std::size_t chunk_size = 4;
 
                 std::vector<hpx::future<void> > workitems;
