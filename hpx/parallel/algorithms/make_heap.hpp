@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename std::iterator_traits<RndIter>::difference_type len,
                 RndIter start)
         {
-            typedef typename std::iterator_traits<RndIter>::difference_type 
+            typedef typename std::iterator_traits<RndIter>::difference_type
                 difference_type;
             typedef typename std::iterator_traits<RndIter>::value_type value_type;
 
