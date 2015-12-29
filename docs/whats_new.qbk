@@ -36,11 +36,102 @@
 
 Here is a list of the important tickets we closed for this release.
 
-* [pr 1910] - Keep cmake_module_path
-* [pr 1909] - Fix mpirun with pbs
-* [pr 1908] - Changing parallel::sort to return the last iterator as proposed by
-              N4560
-* [pr 1907] - Adding minimum version for Open MPI
+* [pr    1932] - Removing superfluous includes of
+                 boost/lockfree/detail/branch_hints.hpp
+* [pr    1931] - fix compilation with clang 3.8.0
+* [issue 1930] - Missing online documentation for HPX 0.9.11
+* [pr    1929] - LWG2485: get() should be overloaded for const tuple&&
+* [pr    1928] - Revert "Using ninja for circle-ci builds"
+* [pr    1927] - Using ninja for circle-ci builds
+* [pr    1926] - Fixing serialization of std::array
+* [issue 1924] - Peformance degrading over time
+* [issue 1923] - serialization of std::array appears broken in latest commit
+* [pr    1922] - Container algorithms
+* [pr    1921] - Tons of smaller quality improvements
+* [issue 1920] - Seg fault in hpx::serialization::output_archive::add_gid when
+                 running octotiger
+* [issue 1919] - Intel 15 compiler bug preventing HPX build
+* [pr    1918] - Address sanitizer fixes
+* [pr    1917] - Fixing compilation problems of parallel::sort with Intel
+                 compilers
+* [pr    1916] - Making sure code compiles if HPX_WITH_HWLOC=Off
+* [issue 1915] - max_cores undefined if HPX_WITH_HWLOC=Off
+* [pr    1913] - Add utility member functions for partitioned_vector
+* [pr    1912] - Adding support for invoking actions to dataflow
+* [pr    1911] - Adding first batch of container algorithms
+* [pr    1910] - Keep cmake_module_path
+* [pr    1909] - Fix mpirun with pbs
+* [pr    1908] - Changing parallel::sort to return the last iterator as
+                 proposed by N4560
+* [pr    1907] - Adding a minimum version for Open MPI
+* [pr    1906] - Updates to the Release Procedure
+* [pr    1905] - Fixing #1903
+* [pr    1904] - Making sure std containers are cleared before serialization
+                 loads data
+* [issue 1903] - When running octotiger, I get: assertion
+                 '(*new_gids_)[gid].size() == 1' failed: HPX(assertion_failure)
+* [issue 1902] - Immediate crash when running hpx/octotiger with _GLIBCXX_DEBUG
+                 defined.
+* [pr    1901] - Making non-serializable classes non-serializable
+* [issue 1900] - Two possible issues with std::list serialization
+* [pr    1899] - Fixing a problem with credit splitting as revealed by #1898
+* [issue 1898] - Accessing component from locality where it was not created
+                 segfaults
+* [pr    1897] - Changing parallel::sort to return the last iterator as
+                 proposed by N4560
+* [issue 1896] - version 1.0?
+* [pr    1894] - Add support for compilers that have thread_local
+* [pr    1893] - Fixing 1890
+* [pr    1892] - Adds typed future_type for executor_traits
+* [pr    1891] - Fix wording in certain parallel algorithm docs
+* [issue 1890] - Invoking papi counters give segfault
+* [pr    1889] - Fixing problems as reported by clang-check
+* [pr    1888] - WIP parallel is_heap
+* [pr    1887] - Fixed resetting performance counters related to idle-rate, etc
+* [issue 1886] - Run hpx with qsub does not work
+* [pr    1885] - Warning cleaning pass
+* [pr    1884] - Add missing parallel algorithm header
+* [pr    1883] - Add feature test for thread_local on Clang for TLS
+* [pr    1882] - Fix some redundant qualifiers
+* [issue 1881] - Unable to compile Octotiger using HPX and Intel MPI on SuperMIC
+* [issue 1880] - clang with libc++ on Linux needs TLS case
+* [pr    1879] - Doc fixes for #1868
+* [pr    1878] - Simplify functions
+* [pr    1877] - Removing most usage of Boost.Config
+* [pr    1876] - Add missing parallel algorithms to algorithm.hpp
+* [pr    1875] - Simplify callables
+* [pr    1874] - Address long standing FIXME on using `std::unique_ptr` with
+                 incomplete types
+* [pr    1873] - Fixing 1871
+* [pr    1872] - Making sure PBS environment uses specified node list even if
+                 no PBS_NODEFILE env is available
+* [issue 1871] - Fortran checks should be optional
+* [pr    1870] - Touch local::mutex
+* [pr    1869] - Documentation refactoring based off #1868
+* [pr    1867] - Embrace static_assert
+* [pr    1866] - Fix #1803 with documentation refactoring
+* [pr    1865] - Setting OUTPUT_NAME as target properties
+* [pr    1863] - Use SYSTEM for boost includes
+* [pr    1862] - Minor cleanups
+* [pr    1861] - Minor Corrections for Release
+* [pr    1860] - Fixing hpx gdb script
+* [issue 1859] - reset_active_counters resets times and thread counts before
+                 some of the counters are evaluated
+* [pr    1858] - Release V0.9.11
+* [pr    1857] - removing diskperf example from 9.11 release
+* [pr    1856] - fix return in packaged_task_base::reset()
+* [issue 1842] - Install error: file INSTALL cannot find
+                 libhpx_parcel_coalescing.so.0.9.11
+* [pr    1824] - Changing version on master to V0.9.12
+* [pr    1818] - Fixing #1748
+* [issue 1815] - seg fault in AGAS
+* [issue 1803] - wait_all documentation
+* [issue 1796] - Outdated documentation to be revised
+* [issue 1748] - All public HPX headers need to be self contained
+* [issue 1472] - Serialization issues
+* [issue 1457] - Implement N4392: C++ Latches and Barriers
+* [issue 1265] - Enable dataflow() to be usable with actions
+* [issue 1236] - NUMA aware allocators
 
 [endsect]
 
