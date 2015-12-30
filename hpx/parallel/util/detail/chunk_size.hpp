@@ -244,14 +244,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         std::vector<tuple_type> shape;
 
         // TO-DO
-        // write test function for get_chunk_size, though this is a bit 
+        // write test function for get_chunk_size, though this is a bit
         // tricky because chunking a heap algorithm is very different from
         // other algorithms
 
-        // Take a standard chunk size ( amount of work / cores ), and only 
+        // Take a standard chunk size ( amount of work / cores ), and only
         // take half of that. If our chunk size is too large a LOT of the work
         // will be done sequentially due to the level barrier of heap parallelism.
-        // 1/2 of the standard chunk size is an estimate to lower the average 
+        // 1/2 of the standard chunk size is an estimate to lower the average
         // number of levels done sequentially
         if(chunk_size == 0)
             chunk_size = (count + cores - 1) / (cores * 2);
@@ -261,7 +261,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             // Index of start of level, and amount of items in the level
             std::size_t start = (std::size_t)pow(2, level-1)-1;
             std::size_t level_items = ((std::size_t)pow(2, level)-1) - start;
-            // If we can't at least run two chunks in parallel, don't bother 
+            // If we can't at least run two chunks in parallel, don't bother
             // parallelizing and simply run sequentially
             if(chunk_size * 2 > level_items) {
                 f1(first, level_items);
@@ -273,7 +273,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             level++;
         }
 
-        // Perform the operation above, but for the very last level which 
+        // Perform the operation above, but for the very last level which
         // requires a special check in that it may not full
         std::size_t start = (std::size_t)pow(2, level-1)-1;
         if(chunk_size * 2 > count - start) {
@@ -307,14 +307,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         std::vector<tuple_type> shape;
 
         // TO-DO
-        // write test function for get_chunk_size, though this is a bit 
-        // tricky because chunking a heap algorithm is very different 
+        // write test function for get_chunk_size, though this is a bit
+        // tricky because chunking a heap algorithm is very different
         // from other algorithms
-        
-        // Take a standard chunk size ( amount of work / cores ), and only 
+
+        // Take a standard chunk size ( amount of work / cores ), and only
         // take half of that. If our chunk size is too large a LOT of the work
         // will be done sequentially due to the level barrier of heap parallelism.
-        // 1/2 of the standard chunk size is an estimate to lower the average 
+        // 1/2 of the standard chunk size is an estimate to lower the average
         // number of levels done sequentially
         if(chunk_size == 0)
             chunk_size = (count + cores - 1) / (cores * 2);
@@ -324,7 +324,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             // Index of start of level, and amount of items in level
             std::size_t end_exclusive = (std::size_t)pow(2, floor(log2(start)))-2;
             std::size_t level_items = (start - end_exclusive);
-        
+
             // If we can't at least run two chunks in parallel, don't bother
             // parallelizng and simply run sequentially
             if(chunk_size * 2 > level_items) {
@@ -334,7 +334,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             }
 
             start = end_exclusive;
-        } 
+        }
 
         // Perform f1 on head node
         f1(first, 1);
