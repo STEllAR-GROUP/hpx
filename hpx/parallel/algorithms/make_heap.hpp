@@ -15,6 +15,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/chunk_size.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -118,6 +119,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     executor_traits;
                 typedef typename std::iterator_traits<RndIter>::difference_type
                     dtype;
+                typedef typename hpx::util::tuple<RndIter, std::size_t>
+                    tuple_type;
 
                 dtype n = last - first;
 
@@ -125,69 +128,43 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return util::detail::algorithm_result<ExPolicy>::get();
                 }
 
-                std::list<boost::exception_ptr> errors;
 
-                std::sizt_t const cores = executor_information_traits<executor_type>::
-                    processing_units_count(policy.executor(), policy.parameters());
-                bool variable_chunk_sizes = traits::variable_chunk_size(
-                        policy.parameters(), policy.executor());
-
-                std::size_t chunk_size = 4;
+                std::size_t chunk_size = 0;
 
                 std::vector<hpx::future<void> > workitems;
-                workitems.reserve(std::distance(first,last)/chunk_size);
+                std::vector<tuple_type> shape;
+                std::list<boost::exception_ptr> errors;
+
+                using namespace hpx::util::placeholders;
+                auto op = hpx::util::bind(
+                    &sift_down_range<RndIter, Pred&>, first,
+                    std::forward<Pred&>(pred), (std::size_t)n,
+                    _1, _2);
+
                 try{
-                    // Beginning at node (n-2)/2, partition the items within
-                    // a level and execute each chunk asynchronously. Each
-                    // level must synchronize before continuing up, the loop
-                    // will iterate over levels not items
-                    for(dtype start = (n-2)/2; start > 0;
-                        start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-                        dtype end_exclusive = (dtype)pow(2,
-                            (dtype)log2(start))-2;
+                    // Get workitems that are to be run in parallel
+                    shape = util::detail::get_bottomup_heap_bulk_iteration_shape(
+                        policy, workitems, op,
+                        first, (std::size_t)n, chunk_size);
 
-                        // The amount of work for this level
-                        std::size_t items = (start-end_exclusive);
-
-                        // TO-DO: determine the best solution for when
-                        // chunk_size becomes too large as the heap shrinks
-                        if(chunk_size > items)
-                            chunk_size = items / 2;
-
-                        // Sift down the nodes children and reposition
-                        std::size_t cnt = 0;
-                        while(cnt + chunk_size < items) {
-                            // Perform sift_down_range on each chunk
-                            auto op =
-                                hpx::util::bind(
-                                    &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n,
-                                    first + start - cnt, chunk_size);
-
+                    using hpx::util::get;
+                    for(auto &iteration: shape) {
+                        // Chunk up range of each iteration and execute asynchronously
+                        RndIter begin = get<0>(iteration);
+                        std::size_t length = get<1>(iteration);
+                        while(length != 0) {
+                            std::size_t chunk = (std::min)(chunk_size, length);
+                            auto f1 = hpx::util::bind(
+                                &sift_down_range<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), (std::size_t)n, begin,
+                                chunk);
                             workitems.push_back(executor_traits::async_execute(
-                                policy.executor(), op));
-
-                            cnt += chunk_size;
+                                policy.executor(), f1));
+                            length -= chunk;
+                            std::advance(begin, chunk);
                         }
-
-                        if(cnt < items) {
-                            // Perform sift_down_range on remaining items
-                            auto op =
-                                hpx::util::bind(
-                                    &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n,
-                                    first + start - cnt, items-cnt);
-
-                            workitems.push_back(executor_traits::async_execute(
-                                policy.executor(), op));
-
-                        }
-                        // Synchronize level
                         hpx::wait_all(workitems);
                     }
-                    // Sift down the first element synchronously
-                    sift_down_range(first,
-                        std::forward<Pred>(pred), n, first, 1);
                 } catch(...) {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                             boost::current_exception(), errors);
@@ -211,8 +188,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     executor_traits;
                 typedef typename std::iterator_traits<RndIter>::difference_type
                     dtype;
+                typedef typename hpx::util::tuple<RndIter, std::size_t>
+                    tuple_type;
 
-                // Size of list
                 dtype n = last - first;
 
                 if(n <= 1) {
@@ -220,63 +198,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         parallel_task_execution_policy>::get();
                 }
 
-                std::list<boost::exception_ptr> errors;
-                std::size_t chunk_size = 4;
+
+                std::size_t chunk_size = 0;
 
                 std::vector<hpx::future<void> > workitems;
-                workitems.reserve(std::distance(first,last)/chunk_size);
+                std::vector<tuple_type> shape;
+                std::list<boost::exception_ptr> errors;
+
+                using namespace hpx::util::placeholders;
+                auto op = hpx::util::bind(
+                    &sift_down_range<RndIter, Pred&>, first,
+                    std::forward<Pred&>(pred), (std::size_t)n,
+                    _1, _2);
+
                 try{
-                    // Beginning at node (n-2)/2, partition the items within
-                    // a level and execute each chunk asynchronously. Each
-                    // level must synchronize before continuing up, the loop
-                    // will iterate over levels not items
-                    for(dtype start = (n-2)/2; start > 0;
-                        start = (dtype)pow(2, (dtype)log2(start)) - 2) {
-                        dtype end_exclusive =
-                            (dtype)pow(2, (dtype)log2(start))-2;
+                    // Get workitems that are to be run in parallel
+                    shape = util::detail::get_bottomup_heap_bulk_iteration_shape(
+                        policy, workitems, op,
+                        first, (std::size_t)n, chunk_size);
 
-                        // The amount of work for this level
-                        std::size_t items = (start-end_exclusive);
-
-                        // TO-DO: determine the best solution for when
-                        // chunk_size becomes too large as the heap shrinks
-                        if(chunk_size > items)
-                            chunk_size = items / 2;
-
-                        // Sift down the nodes children and reposition
-                        std::size_t cnt = 0;
-                        while(cnt + chunk_size < items) {
-                            // Perform sift_down_range on each chunk
-                            auto op =
-                                hpx::util::bind(
-                                    &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n,
-                                    first + start - cnt, chunk_size);
-
+                    using hpx::util::get;
+                    for(auto &iteration: shape) {
+                        // Chunk up range of each iteration and execute asynchronously
+                        RndIter begin = get<0>(iteration);
+                        std::size_t length = get<1>(iteration);
+                        while(length != 0) {
+                            std::size_t chunk = (std::min)(chunk_size, length);
+                            auto f1 = hpx::util::bind(
+                                &sift_down_range<RndIter, Pred&>, first,
+                                std::forward<Pred&>(pred), (std::size_t)n, begin,
+                                chunk);
                             workitems.push_back(executor_traits::async_execute(
-                                policy.executor(), op));
-
-                            cnt += chunk_size;
+                                policy.executor(), f1));
+                            length -= chunk;
+                            std::advance(begin, chunk);
                         }
-
-                        if(cnt < items) {
-                            // Perform sift_down_range on remaining items
-                            auto op =
-                                hpx::util::bind(
-                                    &sift_down_range<RndIter, Pred&>, first,
-                                    std::forward<Pred&>(pred), n,
-                                    first + start - cnt, items-cnt);
-
-                            workitems.push_back(executor_traits::async_execute(
-                                policy.executor(), op));
-
-                        }
-                        // Synchronize level
                         hpx::wait_all(workitems);
                     }
-                    // Sift down the first element synchronously
-                    sift_down_range(first,
-                        std::forward<Pred>(pred), n, first, 1);
+
                 } catch(std::bad_alloc const&) {
                     return hpx::make_exceptional_future<void>(
                         boost::current_exception());

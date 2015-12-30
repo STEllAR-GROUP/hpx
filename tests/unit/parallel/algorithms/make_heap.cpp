@@ -23,7 +23,7 @@ void test_make_heap1(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(25);
+    std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
 
     hpx::parallel::make_heap(policy,
