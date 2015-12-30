@@ -261,6 +261,49 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
     }
 
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    /// \param pred         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second. The signature of the function should be
+    ///                     equivalent to
+    ///                     \code
+    ///                     bool pred(const Type &a, const Type &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a RndIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The predicate operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a make_heap algorithm returns a \a hpx::future<void>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns \a void otherwise.
+    ///
     template <typename ExPolicy, typename RndIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -284,6 +327,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<Pred>(pred));
     }
 
+    /// Constructs a \a max \a heap in the range [first, last). Uses the
+    /// operator \a < for comparisons.
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    ///
+    /// The predicate operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a make_heap algorithm returns a \a hpx::future<void>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns \a void otherwise.
+    ///
     template <typename ExPolicy, typename RndIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,

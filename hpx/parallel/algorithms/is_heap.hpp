@@ -266,6 +266,52 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
+    /// Examines the range [first, last) and finds the largest range beginning at first
+    /// which is a \a max \a heap.
+    ///
+    /// \note Complexity: at most (N) predicate evaluations where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    /// \param pred         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second. The signature of the function should be
+    ///                     equivalent to
+    ///                     \code
+    ///                     bool pred(const Type &a, const Type &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a RndIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The predicate operations in the parallel \a is_heap_until algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a is_heap_until algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a is_heap_until algorithm returns a \a hpx::future<RndIter>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns a \a RndIter otherwise. The iterator corresponds
+    ///           to the upper bound of the largest range beginning at first which
+    ///           is a \a max \a heap.
+    ///
     template <typename ExPolicy, typename RndIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -289,6 +335,40 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<Pred>(pred));
     }
 
+    /// Examines the range [first, last) and finds the largest range beginning at first
+    /// which is a \a max \a heap. Uses the operator \a < for comparison
+    ///
+    /// \note Complexity: at most (N) predicate evaluations where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    ///
+    /// The predicate operations in the parallel \a is_heap_until algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a is_heap_until algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a is_heap_until algorithm returns a \a hpx::future<RndIter>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns a \a RndIter otherwise. The iterator corresponds
+    ///           to the upper bound of the largest range beginning at first which
+    ///           is a \a max \a heap.
+    ///
     template <typename ExPolicy, typename RndIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -364,6 +444,53 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
     }
 
+    /// Determines if the range [first, last) is a \a max \a heap.
+    ///
+    /// \note Complexity: at most (N) predicate evaluations where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    /// \param pred         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second. The signature of the function should be
+    ///                     equivalent to
+    ///                     \code
+    ///                     bool pred(const Type &a, const Type &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a RndIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The predicate operations in the parallel \a is_heap algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a is_heap algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a is_heap algorithm returns a \a hpx::future<bool>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns a \a bool otherwise.
+    ///           The \a is_heap algorithm returns true if each element in the sequence
+    ///           for which pred returns true precedes those for which pred returns
+    ///           false. Otherwise \a is_heap returns false. If the range [first,last)
+    ///           contains less than two elements, the function always returns true.
+    ///
     template <typename ExPolicy, typename RndIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -387,6 +514,43 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<Pred>(pred));
     }
 
+    /// Determines if the range [first, last) is a \a max \a heap. Uses the
+    /// operator \a < for comparisons
+    ///
+    /// \note Complexity: at most (N) predicate evaluations where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    ///
+    /// The predicate operations in the parallel \a is_heap algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a is_heap algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a is_heap algorithm returns a \a hpx::future<bool>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns a \a bool otherwise.
+    ///           The \a is_heap algorithm returns true if each element in the sequence
+    ///           for which pred returns true precedes those for which the operator <
+    ///           returns false. Otherwise \a is_heap returns false. If the range
+    ///           [first,last) contains less than two elements, the function always
+    ///           returns true.
+    ///
     template <typename ExPolicy, typename RndIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
