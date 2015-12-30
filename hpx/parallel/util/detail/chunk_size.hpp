@@ -241,50 +241,27 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         std::size_t const cores = executor_information_traits<executor_type>::
             processing_units_count(policy.executor(), policy.parameters());
 
-        bool variable_chunk_sizes = traits::variable_chunk_size(
-            policy.parameters(), policy.executor());
-
         std::vector<tuple_type> shape;
 
-        if(!variable_chunk_sizes || chunk_size != 0)
-        {
-            /*
-            if(chunk_size == 0)
-            {
-                dtype level = 0;
-                auto test_function =
-                    [&]() -> std::size_t
-                    {
-                        std::size_t test_chunk_size = count / 100;
-                        test_chunk_size = floor(pow(2, log2(test_chunk_size)));
+        // TO-DO
+        // write test function for get_chunk_size, though this is a bit 
+        // tricky because chunking a heap algorithm is very different from
+        // other algorithms
 
-                        if (test_chunk_size == 0)
-                            return 0;
-
-                        level = test_chunk_size;
-                        add_ready_future(workitems, f1, first, test_chunk_size);
-
-                        std::advance(first, test_chunk_size);
-
-                        return test_chunk_size;
-                    };
-
-                chunk_size = traits::get_chunk_size(policy.parameters(),
-                    policy.executor(), test_function, count);
-            }
-            */
-        }
-
+        // Take a standard chunk size ( amount of work / cores ), and multiply
+        // that by a fourth. If our chunk size is 1/4 of the work a LOT of the 
+        // work will be done sequentially due to the level barrier of heap
+        // parallelism, so I chose a 1/4th for now as it's a much smaller size
         if(chunk_size == 0)
             chunk_size = (count + cores - 1) / (cores * 4);
 
-        shape.reserve(count / chunk_size + 1);
-
         std::size_t level = 1;
-        RndIter stt = first;
         while(level < (std::size_t)ceil(log2(count))) {
+            // Index of start of level, and amount of items in the level
             std::size_t start = (std::size_t)pow(2, level-1)-1;
             std::size_t level_items = ((std::size_t)pow(2, level)-1) - start;
+            // If we can't at least run two chunks in parallel, don't bother 
+            // parallelizing and simply run sequentially
             if(chunk_size * 2 > level_items) {
                 f1(first, level_items);
                 std::advance(first, level_items);
@@ -295,6 +272,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             level++;
         }
 
+        // Perform the operation above, but for the very last level which 
+        // requires a special check in that it may not full
         std::size_t start = (std::size_t)pow(2, level-1)-1;
         if(chunk_size * 2 > count - start) {
             f1(first, (count-start));

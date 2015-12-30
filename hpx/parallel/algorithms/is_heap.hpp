@@ -115,29 +115,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return result::get(std::move(last));
                 }
 
-
-                std::list<boost::exception_ptr> errors;
-                std::size_t chunk_size = 4;
+                // Manually specify a chunk_size, which will be overridden in
+                // get_topdown_heap_bulk_iteration_shape
+                std::size_t chunk_size = 0;
 
                 std::vector<hpx::future<void> > workitems;
+                std::vector<tuple_type> shape;
                 util::cancellation_token<std::size_t> tok(len);
+                std::list<boost::exception_ptr> errors;
 
                 using namespace hpx::util::placeholders;
-
                 auto op = hpx::util::bind(
                         &comp_heap<RndIter, Pred&>, first,
                         std::forward<Pred&>(pred), len, _1,
                         _2, tok);
 
-                std::vector<tuple_type> shape;
-
                 try {
+                    // Get workittems that are to be run in parallel
                     shape = util::detail::get_topdown_heap_bulk_iteration_shape(
                         policy, workitems, op,
                         first, std::distance(first,last), chunk_size);
 
                     using hpx::util::get;
                     for(auto &iteration: shape) {
+                        // Chunk up range of each iteration and execute asynchronously
                         RndIter begin = get<0>(iteration);
                         std::size_t length = get<1>(iteration);
                         while(length != 0) {
@@ -161,7 +162,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::detail::handle_local_exceptions<ExPolicy>::call(
                     workitems, errors);
 
-                std::size_t pos = static_cast<dtype>(tok.get_data());
+                std::size_t pos = tok.get_data();
                 if(pos != len)
                     std::advance(first, pos);
                 else
@@ -189,34 +190,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename hpx::util::tuple<RndIter, std::size_t>
                     tuple_type;
 
-                dtype len = last - first;
+                std::size_t len = last - first;
 
                 if(len <= 1) {
                     return result::get(std::move(last));
                 }
 
-
-                std::list<boost::exception_ptr> errors;
+                // Manually specify a chunk_size, which will be overridden in
+                // get_topdown_heap_bulk_iteration_shape
                 std::size_t chunk_size = 0;
 
                 std::vector<hpx::future<void> > workitems;
+                std::vector<tuple_type> shape;
                 util::cancellation_token<std::size_t> tok(len);
+                std::list<boost::exception_ptr> errors;
 
                 using namespace hpx::util::placeholders;
-
                 auto op = hpx::util::bind(
                         &comp_heap<RndIter, Pred&>, first,
                         std::forward<Pred&>(pred), len, _1,
                         _2, tok);
 
-                std::vector<tuple_type> shape;
                 try {
+                    // Get workittems that are to be run in parallel
                     shape = util::detail::get_topdown_heap_bulk_iteration_shape(
                         policy, workitems, op,
                         first, std::distance(first,last), chunk_size);
 
                     using hpx::util::get;
                     for(auto &iteration: shape) {
+                        // Chunk up range of each iteration and execute asynchronously
                         RndIter begin = get<0>(iteration);
                         std::size_t length = get<1>(iteration);
                         while(length != 0) {
@@ -249,7 +252,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             parallel_task_execution_policy>::call(
                                 r, errors);
 
-                        dtype pos = static_cast<dtype>(tok.get_data());
+                        std::size_t pos = tok.get_data();
                         if(pos != len)
                             std::advance(first, pos);
                         else
