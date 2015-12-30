@@ -50,6 +50,9 @@ namespace hpx { namespace performance_counters { namespace server
                 "statistics_counter<Statistic>::statistics_counter",
                 "unexpected counter type specified");
         }
+
+        // make sure this counter starts collecting data
+        start();
     }
 
     template <typename Statistic>
@@ -167,8 +170,13 @@ namespace hpx { namespace performance_counters { namespace server
                     prev_value_ = base_value;
                 }
 
-                // start counter
+                // start timer
                 timer_.start();
+            }
+            else {
+                // start timer even if base counter does not support being
+                // start/stop operations
+                timer_.start(true);
             }
             return result;
         }
