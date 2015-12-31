@@ -25,7 +25,7 @@ void test_transform(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::util::tuple<iterator, base_iterator> result =
+    auto result =
         hpx::parallel::transform(policy,
             boost::make_iterator_range(
                 iterator(boost::begin(c)), iterator(boost::end(c))
@@ -59,7 +59,7 @@ void test_transform_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<hpx::util::tuple<iterator, base_iterator> > f =
+    auto f =
         hpx::parallel::transform(p,
             boost::make_iterator_range(
                 iterator(boost::begin(c)), iterator(boost::end(c))
@@ -162,7 +162,7 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::transform(p,
                 boost::make_iterator_range(
                     iterator(boost::begin(c)), iterator(boost::end(c))
@@ -265,7 +265,7 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::transform(p,
                 boost::make_iterator_range(
                     iterator(boost::begin(c)), iterator(boost::end(c))

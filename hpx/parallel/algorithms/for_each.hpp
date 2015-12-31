@@ -167,8 +167,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           It returns \a first + \a count for non-negative values of
     ///           \a count and \a first for negative values.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename Size, typename F,
+    template <typename ExPolicy, typename InIter, typename Size, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::detail::is_iterator<InIter>::value &&
@@ -361,8 +361,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename F,
+    template <typename ExPolicy, typename InIter, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::detail::is_iterator<InIter>::value &&

@@ -304,7 +304,8 @@ namespace hpx { namespace threads { namespace detail
                                 // and add to aggregate execution time.
                                 exec_time_wrapper exec_time_collector(idle_rate);
 #if defined(HPX_HAVE_APEX)
-                                util::apex_wrapper apex_profiler(thrd->get_description());
+                                util::apex_wrapper apex_profiler(
+                                    thrd->get_description());
 
                                 thrd_stat = (*thrd)();
 

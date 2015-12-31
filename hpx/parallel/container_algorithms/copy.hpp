@@ -9,8 +9,9 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_COPY_DEC_13_2015_0241PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
@@ -73,7 +74,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::detail::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_traits<Rng>::iterator_type),
+            tag::out(OutIter)
+        >
     >::type
     copy(ExPolicy && policy, Rng && rng, OutIter dest)
     {
@@ -151,8 +155,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename OutIter, typename F,
+    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -163,7 +167,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        std::pair<typename traits::range_traits<Rng>::iterator_type, OutIter>
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_traits<Rng>::iterator_type),
+            tag::out(OutIter)
+        >
     >::type
     copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
         Proj && proj = Proj())

@@ -86,8 +86,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_execution_policy and returns \a Iter
     ///           otherwise.
     ///           It returns \a last.
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng,
+    template <typename ExPolicy, typename Rng,
+        typename Proj = util::projection_identity,
         typename Compare = std::less<
             typename std::remove_reference<
                 typename traits::projected_range_result_of<Proj, Rng>::type

@@ -9,10 +9,13 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_TRANSFORM_JUL_18_2015_0804PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/tagged_pair.hpp>
+#include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/parallel/algorithms/transform.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
@@ -82,17 +85,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a transform algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a transform algorithm returns a
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type \a parallel_task_execution_policy
-    ///           and returns \a OutIter otherwise.
+    ///           and returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the input sequence and
     ///           the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename Rng, typename OutIter, typename F,
+    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -102,12 +107,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
-            ExPolicy, hpx::util::tuple<
-                typename traits::range_iterator<Rng>::type, OutIter
-            >
-        >::type
+        ExPolicy,
+        hpx::util::tagged_pair<
+            tag::in(typename traits::range_iterator<Rng>::type),
+            tag::out(OutIter)
+        >
+    >::type
     transform(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
-        Proj && proj = Proj())
+        Proj && proj = Proj{})
     {
         return transform(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng), std::move(dest),
@@ -188,9 +195,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a transform algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a transform algorithm returns a
+    /// \a hpx::future<tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)> >
     ///           if the execution policy is of type \a parallel_task_execution_policy
-    ///           and returns \a OutIter otherwise.
+    ///           and returns
+    /// \a tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the first input sequence,
     ///           an iterator referring to the first element after the second
@@ -199,10 +209,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
         typename ExPolicy, typename Rng, typename InIter2,
         typename OutIter, typename F,
+        typename Proj1 = util::projection_identity,
+        typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -215,12 +225,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 traits::projected<Proj2, InIter2>
         >::value)>
     typename util::detail::algorithm_result<
-            ExPolicy, hpx::util::tuple<
-                typename traits::range_iterator<Rng>::type, InIter2, OutIter
-            >
-        >::type
+        ExPolicy,
+        hpx::util::tagged_tuple<
+            tag::in1(typename traits::range_iterator<Rng>::type),
+            tag::in2(InIter2), tag::out(OutIter)
+        >
+    >::type
     transform(ExPolicy && policy, Rng && rng, InIter2 first2, OutIter dest,
-        F && f, Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
+        F && f, Proj1 && proj1 = Proj1{}, Proj2 && proj2 = Proj2{})
     {
         return transform(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng), std::move(first2),
@@ -311,9 +323,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \note The algorithm will invoke the binary predicate until it reaches
     ///       the end of the shorter of the two given input sequences
     ///
-    /// \returns  The \a transform algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a transform algorithm returns a
+    /// \a hpx::future<tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)> >
     ///           if the execution policy is of type \a parallel_task_execution_policy
-    ///           and returns \a OutIter otherwise.
+    ///           and returns
+    /// \a tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the first input sequence,
     ///           an iterator referring to the first element after the second
@@ -322,10 +337,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
         typename ExPolicy, typename Rng1, typename Rng2,
         typename OutIter, typename F,
+        typename Proj1 = util::projection_identity,
+        typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng1>::value &&
@@ -338,14 +353,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 traits::projected_range<Proj2, Rng2>
         >::value)>
     typename util::detail::algorithm_result<
-            ExPolicy, hpx::util::tuple<
-                typename traits::range_iterator<Rng1>::type,
-                typename traits::range_iterator<Rng2>::type,
-                OutIter
-            >
-        >::type
+        ExPolicy,
+        hpx::util::tagged_tuple<
+            tag::in1(typename traits::range_iterator<Rng1>::type),
+            tag::in2(typename traits::range_iterator<Rng2>::type),
+            tag::out(OutIter)
+        >
+    >::type
     transform(ExPolicy && policy, Rng1 && rng1, Rng2 && rng2, OutIter dest,
-        F && f, Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
+        F && f, Proj1 && proj1 = Proj1{}, Proj2 && proj2 = Proj2{})
     {
         return transform(std::forward<ExPolicy>(policy),
             boost::begin(rng1), boost::end(rng1),

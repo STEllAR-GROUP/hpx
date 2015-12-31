@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/parallel/container_algorithms/transform.hpp>
+#include <hpx/include/parallel_transform.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/functions.hpp>
@@ -32,7 +32,7 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
             return v1 + v2;
         };
 
-    hpx::util::tuple<iterator, base_iterator, base_iterator> result =
+    auto result =
         hpx::parallel::transform(policy,
             boost::make_iterator_range(
                 iterator(boost::begin(c1)), iterator(boost::end(c1))
@@ -78,7 +78,7 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
             return v1 + v2;
         };
 
-    hpx::future<hpx::util::tuple<iterator, base_iterator, base_iterator> > f =
+    auto f =
         hpx::parallel::transform(p,
             boost::make_iterator_range(
                 iterator(boost::begin(c1)), iterator(boost::end(c1))
@@ -193,7 +193,7 @@ void test_transform_binary_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::transform(p,
                 boost::make_iterator_range(
                     iterator(boost::begin(c1)), iterator(boost::end(c1))
@@ -306,7 +306,7 @@ void test_transform_binary_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::transform(p,
                 boost::make_iterator_range(
                     iterator(boost::begin(c1)), iterator(boost::end(c1))

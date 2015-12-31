@@ -25,7 +25,9 @@ namespace hpx { namespace threads
     namespace detail
     {
         HPX_API_EXPORT void set_tss_data(void const* key,
-            boost::shared_ptr<util::coroutines::detail::tss_cleanup_function> const& func,
+            boost::shared_ptr<
+                util::coroutines::detail::tss_cleanup_function
+            > const& func,
             void* tss_data, bool cleanup_existing);
         HPX_API_EXPORT void* get_tss_data(void const* key);
     }

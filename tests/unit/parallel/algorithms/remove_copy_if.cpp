@@ -32,7 +32,7 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
 
     hpx::parallel::remove_copy_if(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d), [](int i){ return i < 0; });
+        boost::begin(d), [](int i) { return i < 0; });
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),

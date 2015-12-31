@@ -18,7 +18,7 @@
     typename std::enable_if<                                                  \
         (BOOST_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__),  \
         int                                                                   \
-    >::type = 0                                                               \
+    >::type BOOST_PP_CAT(_concept_check_, __LINE__) = 0                       \
     /**/
 
 #define HPX_CONCEPT_REQUIRES(...)                                             \
@@ -27,7 +27,7 @@
         typename std::enable_if<                                              \
             (BOOST_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__), \
             int                                                               \
-        >::type = 0>                                                          \
+        >::type BOOST_PP_CAT(_concept_check_, __LINE__) = 0>                  \
     /**/
 
 #define HPX_CONCEPT_ASSERT(...)                                               \

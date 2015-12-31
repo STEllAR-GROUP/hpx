@@ -11,10 +11,13 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
@@ -139,19 +142,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a remove_copy algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename OutIter, typename T,
+    template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::detail::is_iterator<InIter>::value &&
@@ -163,7 +167,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 traits::projected<Proj, T const*>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<InIter, OutIter>
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     remove_copy(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         T const& val, Proj && proj = Proj{})
@@ -193,9 +197,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::remove_copy<std::pair<InIter, OutIter> >().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, val, std::forward<Proj>(proj));
+        return hpx::util::make_tagged_pair<tag::in, tag::out>(
+            detail::remove_copy<std::pair<InIter, OutIter> >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest, val, std::forward<Proj>(proj)));
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -331,29 +336,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a remove_copy_if algorithm returns a
-    ///           \a hpx::future<std::pair<InIter, OutIter> >
+    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a std::pair<InIter, OutIter> otherwise.
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
     ///           sequence and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename OutIter, typename F,
+    template <typename ExPolicy, typename InIter, typename OutIter, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::detail::is_iterator<InIter>::value &&
-        traits::detail::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
-        >::value)>
+        >::value &&
+        traits::detail::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<InIter, OutIter>
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     remove_copy_if(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         F && f, Proj && proj = Proj{})
@@ -383,9 +389,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::remove_copy_if<std::pair<InIter, OutIter> >().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, std::forward<F>(f), std::forward<Proj>(proj));
+        return hpx::util::make_tagged_pair<tag::in, tag::out>(
+            detail::remove_copy_if<std::pair<InIter, OutIter> >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest, std::forward<F>(f),
+                std::forward<Proj>(proj)));
     }
 }}}
 
