@@ -15,7 +15,7 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/variant.hpp>
 #include <boost/dynamic_bitset.hpp>
 

@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <boost/assign/std/vector.hpp>
+#include <boost/scoped_array.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 void blocker(
