@@ -6,17 +6,20 @@
 #if !defined(HPX_UTIL_BLOCK_PROFILER_NOV_16_0811PM)
 #define HPX_UTIL_BLOCK_PROFILER_NOV_16_0811PM
 
+#include <hpx/config.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/version.hpp>
+#if defined(HPX_USE_ACCUMULATOR_LIBRARY)
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/sum.hpp>
 #include <boost/accumulators/statistics/count.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/moment.hpp>
+#endif
 
 #define HPX_DONT_USE_BLOCK_PROFILER
 

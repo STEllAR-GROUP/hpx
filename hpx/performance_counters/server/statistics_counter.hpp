@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,172 +6,30 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM)
 #define HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/smart_ptr/scoped_ptr.hpp>
+#include <boost/cstdint.hpp>
 
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
-#include <boost/accumulators/statistics/max.hpp>
-#include <boost/accumulators/statistics/min.hpp>
-#include <boost/accumulators/statistics/rolling_mean.hpp>
-
-#if defined(HPX_MSVC)
-#  pragma warning(push)
-#  pragma warning(disable: 4244)
-#endif
-#include <boost/accumulators/statistics/median.hpp>
-#if defined(HPX_MSVC)
-#  pragma warning(pop)
-#endif
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
     namespace detail
     {
-        template <typename Statistic>
-        struct counter_type_from_statistic;
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::mean>
+        struct counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::mean aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
+            virtual ~counter_type_from_statistic_base() {}
 
-            static accumulator_type* create(boost::uint64_t parameter2)
-            {
-                return new accumulator_type();
-            }
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    boost::accumulators::mean(accum));
-            }
-
-            typedef boost::mpl::false_ need_reset;
-        };
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::variance>
-        {
-            typedef boost::accumulators::tag::variance aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
-
-            static accumulator_type* create(boost::uint64_t parameter2)
-            {
-                return new accumulator_type();
-            }
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    sqrt(boost::accumulators::variance(accum)));
-            }
-
-            typedef boost::mpl::false_ need_reset;
-        };
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::median>
-        {
-            typedef boost::accumulators::tag::median aggregating_tag;
-            typedef boost::accumulators::with_p_square_quantile aggregating_type_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag(aggregating_type_tag)>
-            > accumulator_type;
-
-            static accumulator_type* create(boost::uint64_t parameter2)
-            {
-                return new accumulator_type();
-            }
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    boost::accumulators::median(accum));
-            }
-
-            typedef boost::mpl::false_ need_reset;
-        };
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::rolling_mean>
-        {
-            typedef boost::accumulators::tag::rolling_mean aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
-
-            static accumulator_type* create(boost::uint64_t parameter2)
-            {
-                return new accumulator_type(
-                    boost::accumulators::tag::rolling_window::window_size = parameter2
-                );
-            }
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    boost::accumulators::rolling_mean(accum));
-            }
-
-            typedef boost::mpl::false_ need_reset;
-        };
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::max>
-        {
-            typedef boost::accumulators::tag::max aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
-
-            static accumulator_type* create(boost::uint64_t parameter2)
-            {
-                return new accumulator_type();
-            }
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    (boost::accumulators::max)(accum));
-            }
-
-            typedef boost::mpl::true_ need_reset;
-        };
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::min>
-        {
-            typedef boost::accumulators::tag::min aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
-
-            static accumulator_type* create(boost::uint64_t parameter2)
-            {
-                return new accumulator_type();
-            }
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    (boost::accumulators::min)(accum));
-            }
-
-            typedef boost::mpl::true_ need_reset;
+            virtual bool need_reset() const = 0;
+            virtual double get_value() = 0;
+            virtual void add_value(double value) = 0;
         };
     }
 
@@ -182,8 +40,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     class statistics_counter
       : public base_performance_counter,
-        public components::component_base<
-            statistics_counter<Statistic> >
+        public components::component_base<statistics_counter<Statistic> >
     {
         typedef components::component_base<
             statistics_counter<Statistic> > base_type;
@@ -243,11 +100,7 @@ namespace hpx { namespace performance_counters { namespace server
         std::string base_counter_name_;   ///< name of base counter to be queried
         naming::id_type base_counter_id_;
 
-        typedef typename
-            detail::counter_type_from_statistic<Statistic>::accumulator_type
-        accumulator_type;
-
-        boost::scoped_ptr<accumulator_type> value_;
+        boost::scoped_ptr<detail::counter_type_from_statistic_base> value_;
         counter_value prev_value_;
 
         boost::uint64_t parameter1_, parameter2_;

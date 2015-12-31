@@ -40,12 +40,11 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/vector.hpp>
-#include <boost/type_traits.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <boost/call_traits.hpp>
 #include <utility>
 
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
-#include <hpx/util/coroutine/detail/is_callable.hpp>
 #include <hpx/util/coroutine/detail/signature.hpp>
 #include <hpx/util/coroutine/detail/index.hpp>
 #include <hpx/util/coroutine/detail/coroutine_traits.hpp>

@@ -1,10 +1,10 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/performance_counters/registry.hpp>
@@ -17,6 +17,7 @@
 
 #include <boost/format.hpp>
 #include <boost/regex.hpp>
+#include <boost/accumulators/statistics_fwd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
