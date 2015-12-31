@@ -45,7 +45,8 @@ namespace hpx { namespace util
         void reconfigure(std::vector<std::string> const& ini_defs);
 
         std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
-        load_modules();
+            load_modules();
+
         void load_components_static(std::vector<
             components::static_factory_load_data_type> const& static_modules);
 

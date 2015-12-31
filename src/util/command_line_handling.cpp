@@ -1057,6 +1057,10 @@ namespace hpx { namespace util
         std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
             plugin_registries = rtcfg_.load_modules();
 
+        // insert the pre-configured ini settings after loading modules
+        for (std::string const& e : ini_config_)
+            rtcfg_.parse("<user supplied config>", e, true, false);
+
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as
         // defined in any of the runtime configuration files.

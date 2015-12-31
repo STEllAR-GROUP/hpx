@@ -43,12 +43,9 @@ namespace hpx { namespace util
             pu_step_(1),
             pu_offset_(0),
             numa_sensitive_(0)
-        {
-            for (std::string const& e : ini_config_)
-                rtcfg_.parse("<user supplied config>", e, true, false);
-        }
+        {}
 
-        int call(boost::program_options::options_description  const& desc_cmdline,
+        int call(boost::program_options::options_description const& desc_cmdline,
             int argc, char** argv);
 
         boost::program_options::variables_map vm_;
