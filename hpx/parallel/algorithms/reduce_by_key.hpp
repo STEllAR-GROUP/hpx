@@ -8,14 +8,25 @@
 
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/algorithms/detail/tuple_iterator.hpp>
+#include <hpx/parallel/algorithms/prefix_scan.hpp>
+#include <hpx/parallel/algorithms/inclusive_scan.hpp>
+#include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/util/transform_iterator.hpp>
-
+#include <hpx/util/tuple.hpp>
+//
+#include <boost/thread/locks.hpp>
+//
 #define VTKM_CONT_EXPORT
 #define VTKM_EXEC_EXPORT
 
+#define boolvals(a,b) \
+  (a?1:0) + (b?2:0)
+
+typedef hpx::lcos::local::shared_mutex mutex_type;
+
 namespace vtkm {
     typedef uint64_t Id;
-    template<typename T1, typename T2> using Pair = std::pair<T1, T2>;
+    template<typename T1, typename T2> using Pair = hpx::util::tuple<T1, T2>;
 }
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -93,17 +104,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             bool fStart;    // START of a segment
             bool fEnd;      // END of a segment
-            ReduceKeySeriesStates(bool start=false, bool end=false) : fStart(start), fEnd(end) {}
+            bool fNull;
+            ReduceKeySeriesStates(bool start=false, bool end=false, bool null=true) :
+                    fStart(start), fEnd(end), fNull(null) {}
+/*
+            ReduceKeySeriesStates(const ReduceKeySeriesStates &other)
+                    : fStart(other.fStart), fEnd(other.fEnd) {}
+            ReduceKeySeriesStates(const ReduceKeySeriesStates *other)
+                    : fStart(other->fStart), fEnd(other->fEnd) {}
+            ReduceKeySeriesStates operator=(const ReduceKeySeriesStates &other) {
+                this->fStart = other.fStart;
+                this->fEnd = other.fEnd;
+                return *this;
+            }
+*/
         };
 
         template<typename Transformer, typename StencilIterType, typename KeyStateIterType >
         struct ReduceStencilGeneration
         {
             //
-//            typedef typename std::result_of<Transformer(StencilIterType)>::type tuple_type;
             typedef typename Transformer::template result<Transformer(StencilIterType)>::element_type element_type;
             typedef typename Transformer::template result<Transformer(StencilIterType)>::type tuple_type;
-//            typedef typename std::iterator_traits<StencilIterType>::reference tuple_type;
             typedef typename std::iterator_traits<KeyStateIterType>::reference KeyStateType;
 
             VTKM_CONT_EXPORT
@@ -128,41 +150,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     const bool leftMatches(left == mid);
                     const bool rightMatches(right == mid);
-                    kiter = ReduceKeySeriesStates(!leftMatches, !rightMatches);
+                    kiter = ReduceKeySeriesStates(!leftMatches, !rightMatches, false);
                 }
             }
         };
-
-        template<typename BinaryFunctor>
-        struct ReduceByKeyAdd
-        {
-            BinaryFunctor BinaryOperator;
-
-            ReduceByKeyAdd(BinaryFunctor binary_functor):
-                    BinaryOperator( binary_functor )
-            { }
-
-            template<typename T>
-            vtkm::Pair<T, ReduceKeySeriesStates> operator()(const vtkm::Pair<T, ReduceKeySeriesStates>& a,
-                                                            const vtkm::Pair<T, ReduceKeySeriesStates>& b) const
-            {
-                typedef vtkm::Pair<T, ReduceKeySeriesStates> ReturnType;
-                //need too handle how we are going to add two numbers together
-                //based on the keyStates that they have
-
-                // Make it work for parallel inclusive scan.  Will end up with all start bits = 1
-                // the following logic should change if you use a different parallel scan algorithm.
-                if (!b.second.fStart) {
-                    // if b is not START, then it's safe to sum a & b.
-                    // Propagate a's start flag to b
-                    // so that later when b's START bit is set, it means there must exists a START between a and b
-                    return ReturnType(this->BinaryOperator(a.first , b.first),
-                                      ReduceKeySeriesStates(a.second.fStart, b.second.fEnd));
-                }
-                return b;
-            }
-        };
-
+/*
         struct ReduceByKeyUnaryStencilOp
         {
             bool operator()(ReduceKeySeriesStates keySeriesState) const
@@ -171,7 +163,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
         };
-
+*/
 /*
         template <typename... T>
         auto sort_zip(T&... containers)
@@ -183,7 +175,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    //-----------------------------------------------------------------------------
+            mutex_type mtx_;
+
+            std::ostream& operator << (std::ostream &os, const detail::ReduceKeySeriesStates &rs) {
+                os << "{ start=" << rs.fStart << ",end=" << rs.fEnd << "} ";
+                return os;
+            }
+                //-----------------------------------------------------------------------------
     /// Sorts the elements in the range [first, last) in ascending order. The
     /// order of equal elements is not guaranteed to be preserved. The function
     /// uses the given comparison function object comp (defaults to using
@@ -314,30 +312,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //state start and end of a series
         std::vector< ReduceKeySeriesStates > keystate;
         typedef std::vector< ReduceKeySeriesStates >::iterator KeyStateIterType;
+        typedef typename detail::reduce_stencil_iterator<RanIter, detail::reduce_stencil_transformer> reducebykey_iter;
+        typedef typename std::iterator_traits<RanIter>::reference element_type;
+        typedef typename hpx::util::zip_iterator<reducebykey_iter, KeyStateIterType>::reference zip_ref;
         keystate.assign(numberOfKeys, ReduceKeySeriesStates());
         {
-            typedef typename detail::reduce_stencil_iterator<RanIter, detail::reduce_stencil_transformer> reducebykey_iter;
             detail::reduce_stencil_transformer r_s_t;
             reducebykey_iter reduce_begin = make_reduce_stencil_iterator(key_first, r_s_t);
             reducebykey_iter reduce_end   = make_reduce_stencil_iterator(key_last, r_s_t);
 
-            typedef typename std::iterator_traits<RanIter>::reference element_type;
-            typedef typename hpx::util::zip_iterator<reducebykey_iter, KeyStateIterType>::reference zip_ref;
 
             if (numberOfKeys==2) {
                 // for two entries, one is a start, the other an end,
                 // if they are different, then they are both start/end
                 element_type left  = *key_first;
                 element_type right = *std::next(key_first);
-                keystate[0] = ReduceKeySeriesStates(true,left!=right);
-                keystate[1] = ReduceKeySeriesStates(left!=right,true);
+                keystate[0] = ReduceKeySeriesStates(true, left!=right, false);
+                keystate[1] = ReduceKeySeriesStates(left!=right, true, false);
             }
             else {
                 // do the first element and last one by hand to simplify the iterator
                 // traversal as there is no prev/next for first/last
                 element_type elem0 = *key_first;
                 element_type elem1 = *std::next(key_first);
-                keystate[0] = ReduceKeySeriesStates(true,elem0!=elem1);
+                keystate[0] = ReduceKeySeriesStates(true, elem0!=elem1, false);
                 //
                 ReduceStencilGeneration <detail::reduce_stencil_transformer, RanIter, KeyStateIterType> kernel;
                 hpx::parallel::for_each(
@@ -351,8 +349,83 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 //
                 element_type elemN = *std::prev(key_last);
                 element_type elemn = *std::prev(std::prev(key_last));
-                keystate.back() = ReduceKeySeriesStates(elemN!=elemn,true);
+                keystate.back() = ReduceKeySeriesStates(elemN!=elemn, true, false);
             }
+        }
+        {
+            typedef hpx::util::zip_iterator<RanIter2, std::vector< ReduceKeySeriesStates >::iterator> zip_iterator;
+            typedef std::vector< ReduceKeySeriesStates >::iterator rki;
+            typedef typename zip_iterator::value_type zip_type;
+            typedef typename std::iterator_traits<RanIter2>::value_type value_type;
+
+            zip_iterator states_begin = hpx::util::make_zip_iterator(values_first, std::begin(keystate));
+            zip_iterator states_end = hpx::util::make_zip_iterator(
+                    values_first + std::distance(std::begin(keystate), std::end(keystate)),
+                    std::end(keystate));
+            zip_iterator states_out_begin = hpx::util::make_zip_iterator(values_output, std::begin(keystate));
+
+            zip_type initial = hpx::util::tuple<float, ReduceKeySeriesStates>(0.0, ReduceKeySeriesStates(true, false, true));
+            // caution : if the current value is a start value, then it should be used
+            // otherwise we add the incoming B to our A.
+            // BUT, the partitions are updated with values carried from if the when summing we can add values if the current value is not a start
+            hpx::parallel::prefix_scan(
+                    policy,
+                    states_begin, states_end,
+                    states_out_begin,
+                    initial,
+                    // B is the current entry, A is the one passed in from 'previous'
+                    [](zip_type a, zip_type b) {
+                        value_type            a_val   = hpx::util::get<0>(a);
+                        ReduceKeySeriesStates a_state = hpx::util::get<1>(a);
+                        value_type            b_val   = hpx::util::get<0>(b);
+                        ReduceKeySeriesStates b_state = hpx::util::get<1>(b);
+                        static value_type x = 1000;
+                        static value_type y = 0;
+                        // if carrying a start flag from both previous ops
+                        // then do not add (used in higher level upsweep)
+                        boost::lock_guard<mutex_type> m(mtx_);
+                        std::cout << "{ " << a_val << "+" << b_val << " },\t" << a_state << b_state ;
+                        if (b_state.fNull) {
+                            throw std::string("help");
+                            std::cout << " * " << a_val << std::endl;
+                            return hpx::util::make_tuple(
+                                    //boolvals(a_state.fStart, b_state.fStart) ,
+                                    a_val,
+                                    ReduceKeySeriesStates(a_state.fStart, b_state.fEnd, false));
+                        }
+                        else if (/*a_state.fStart && */b_state.fStart) {
+                            std::cout << " = " << b_val << std::endl;
+                            return hpx::util::make_tuple(
+                                    //boolvals(a_state.fStart, b_state.fStart) ,
+                                     b_val,
+                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
+                        }
+                        // if b is a start then reset sequence, just use b value
+                        else if (b_state.fStart) {
+                            std::cout << " = " << b_val << std::endl;
+                            return hpx::util::make_tuple(
+                                    //boolvals(a_state.fStart, b_state.fStart) ,
+                                     b_val,
+                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
+                        }
+                        // normal add of previous + this
+                        else if (a_state.fStart) {
+                            std::cout << " = " << a_val + b_val << std::endl;
+                            return hpx::util::make_tuple(
+                                    //boolvals(a_state.fStart, b_state.fStart) ,
+                                     a_val + b_val,
+                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
+                        }
+                        // should not ever be called
+                        else {
+                            std::cout << " = " << a_val + b_val << std::endl;
+                            return hpx::util::make_tuple(
+                                    //boolvals(a_state.fStart, b_state.fStart) ,
+                                     a_val + b_val,
+                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
+                        }
+                    }
+            );
         }
 /*
             //next step is we need to reduce the values for each key. This is done
