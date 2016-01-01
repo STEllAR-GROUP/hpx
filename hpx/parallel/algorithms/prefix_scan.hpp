@@ -106,10 +106,10 @@ HPX_INLINE_NAMESPACE(v1)
 
         template<typename ExPolicy, typename FwdIter, typename T, typename Op>
         static typename hpx::parallel::util::detail::algorithm_result<
-        ExPolicy, OutIter
+                ExPolicy, OutIter
         >::type
         parallel(ExPolicy policy, FwdIter first, FwdIter last,
-            OutIter dest, T && init, Op && op)
+                 OutIter dest, T && init, Op && op)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
             typedef typename std::iterator_traits<FwdIter>::difference_type
@@ -151,7 +151,7 @@ HPX_INLINE_NAMESPACE(v1)
             }
             if (n_chunks < 2 || cores == 1) {
               return sequential(policy, first, last, dest, std::forward < T >(init),
-                std::forward < Op&& >(op));
+                std::forward < Op >(op));
             }
 
             // --------------------------
@@ -184,7 +184,7 @@ HPX_INLINE_NAMESPACE(v1)
                 work_items.push_back(
                     std::move(
                         hpx::async(&sequential_scan_n<FwdIter, T, Op>,
-                            it1, chunk_size, std::move(T()), std::forward<Op&&>(op))));
+                            it1, chunk_size, (T()), std::forward < Op > (op))));
                 it1 = it2;
                 std::advance(dest, chunk_size);
             }
@@ -228,7 +228,7 @@ HPX_INLINE_NAMESPACE(v1)
                     std::get < 3 > (work_chunks[k + d_2 - 1]) =
                         std::get < 3 > (work_chunks[k + dp1_2 - 1]);
                     std::get < 3 > (work_chunks[k + dp1_2 - 1]) =
-                        op(temp , std::get < 3 > (work_chunks[k + dp1_2 - 1]));
+                        op(std::get < 3 > (work_chunks[k + dp1_2 - 1]), temp);
                 }
             }
             // now combine the partial sums back into the initial chunks
@@ -240,7 +240,7 @@ HPX_INLINE_NAMESPACE(v1)
                     std::get < 0 > (work_chunks[c]),
                     std::get < 1 > (work_chunks[c]),
                     std::get < 2 > (work_chunks[c]),
-                    std::get < 3 > (work_chunks[c]), std::forward<Op&&>(op));
+                    std::get < 3 > (work_chunks[c]), std::forward < Op > (op));
                 work_items.push_back(std::move(w1));
 
             }
