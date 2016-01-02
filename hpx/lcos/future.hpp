@@ -33,7 +33,6 @@
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_void.hpp>
-#include <boost/type_traits/is_convertible.hpp>
 #include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -926,9 +925,47 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // allow to convert any future into a future<void>
     template <typename R>
-    future<void> make_future_void(future<R>&& f)
+    future<void> make_future_void(future<R> && f)
     {
         return std::move(f);
+    }
+
+    // Allow to convert any future<U> into any other future<T> based on an
+    // existing conversion path U --> T.
+    template <typename T, typename U,
+    HPX_CONCEPT_REQUIRES_(
+       !std::is_same<T, U>::value &&
+        std::is_convertible<U, T>::value)>
+    hpx::future<T> make_future(hpx::future<U> && f)
+    {
+        return f.then(
+            [](hpx::future<U> && f) -> T
+            {
+                return f.get();
+            });
+    }
+
+    template <typename T, typename U,
+    HPX_CONCEPT_REQUIRES_(
+        std::is_same<T, U>::value)>
+    hpx::future<T> make_future(hpx::future<U> && f)
+    {
+        return std::move(f);
+    }
+
+    // Allow to convert any future<U> into any other future<T> based on a given
+    // conversion function: T f(U).
+    template <typename R, typename U, typename Conv,
+    HPX_CONCEPT_REQUIRES_(
+        hpx::traits::is_callable<Conv(U)>::value)>
+    hpx::future<R>
+    make_future(hpx::future<U> && f, Conv && conv)
+    {
+        return f.then(
+            [conv](hpx::future<U> && f) -> R
+            {
+                return hpx::util::invoke(conv, f.get());
+            });
     }
 }}
 
@@ -1127,18 +1164,21 @@ namespace hpx { namespace lcos
     // existing conversion path U --> T.
     template <typename T, typename U,
     HPX_CONCEPT_REQUIRES_(
-        boost::is_convertible<U, T>::value)>
-    hpx::future<T> make_future(hpx::future<U> && f)
+       !std::is_same<T, U>::value &&
+        std::is_convertible<U, T>::value)>
+    hpx::future<T> make_future(hpx::shared_future<U> f)
     {
         return f.then(
-            [](hpx::future<U> && f) -> T
+            [](hpx::shared_future<U> && f) -> T
             {
                 return f.get();
             });
     }
 
-    template <typename T>
-    hpx::future<T> make_future(hpx::future<T> && f)
+    template <typename T, typename U,
+    HPX_CONCEPT_REQUIRES_(
+        std::is_same<T, U>::value)>
+    hpx::shared_future<T> make_future(hpx::shared_future<U> f)
     {
         return f;
     }
@@ -1149,10 +1189,10 @@ namespace hpx { namespace lcos
     HPX_CONCEPT_REQUIRES_(
         hpx::traits::is_callable<Conv(U)>::value)>
     hpx::future<R>
-    make_future(hpx::future<U> && f, Conv && conv)
+    make_future(hpx::shared_future<U> f, Conv && conv)
     {
         return f.then(
-            [conv](hpx::future<U> && f) -> R
+            [conv](hpx::shared_future<U> && f) -> R
             {
                 return hpx::util::invoke(conv, f.get());
             });
@@ -1754,10 +1794,13 @@ namespace hpx
     using lcos::make_exceptional_future;
     using lcos::make_ready_future_at;
     using lcos::make_ready_future_after;
+    using lcos::make_future_void;
+
+    using lcos::make_future;
 }
 
-#define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                    \
-    lcos::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))   \
+#define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                     \
+    hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))     \
     /**/
 
 #endif
