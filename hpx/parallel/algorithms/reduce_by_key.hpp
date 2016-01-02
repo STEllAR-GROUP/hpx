@@ -20,18 +20,12 @@
 #define VTKM_EXEC_EXPORT
 
 #ifdef EXTRA_DEBUG
-# define boolvals(a,b) (a?1:0) + (b?2:0)
 # define debug_reduce_by_key(a) std::cout << a
 #else
 # define debug_reduce_by_key(a)
 #endif
 
 typedef hpx::lcos::local::shared_mutex mutex_type;
-
-namespace vtkm {
-    typedef uint64_t Id;
-    template<typename T1, typename T2> using Pair = hpx::util::tuple<T1, T2>;
-}
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -108,20 +102,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             bool fStart;    // START of a segment
             bool fEnd;      // END of a segment
-            bool fNull;
             ReduceKeySeriesStates(bool start=false, bool end=false, bool null=true) :
-                    fStart(start), fEnd(end), fNull(null) {}
-/*
-            ReduceKeySeriesStates(const ReduceKeySeriesStates &other)
-                    : fStart(other.fStart), fEnd(other.fEnd) {}
-            ReduceKeySeriesStates(const ReduceKeySeriesStates *other)
-                    : fStart(other->fStart), fEnd(other->fEnd) {}
-            ReduceKeySeriesStates operator=(const ReduceKeySeriesStates &other) {
-                this->fStart = other.fStart;
-                this->fEnd = other.fEnd;
-                return *this;
-            }
-*/
+                    fStart(start), fEnd(end) {}
         };
 
         template<typename Transformer, typename StencilIterType, typename KeyStateIterType >
@@ -154,7 +136,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     const bool leftMatches(left == mid);
                     const bool rightMatches(right == mid);
-                    kiter = ReduceKeySeriesStates(!leftMatches, !rightMatches, false);
+                    kiter = ReduceKeySeriesStates(!leftMatches, !rightMatches);
                 }
             }
         };
@@ -167,14 +149,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
         };
-*/
-/*
-        template <typename... T>
-        auto sort_zip(T&... containers)
-        -> boost::iterator_range<decltype(hpx::iterators::makeTupleIterator(std::begin(containers)...))> {
-            return boost::make_iterator_range(hpx::iterators::makeTupleIterator(std::begin(containers)...),
-                                              hpx::iterators::makeTupleIterator(std::end(containers)...));
-        }
 */
         /// \endcond
     }
@@ -331,15 +305,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // if they are different, then they are both start/end
                 element_type left  = *key_first;
                 element_type right = *std::next(key_first);
-                keystate[0] = ReduceKeySeriesStates(true, left!=right, false);
-                keystate[1] = ReduceKeySeriesStates(left!=right, true, false);
+                keystate[0] = ReduceKeySeriesStates(true, left!=right);
+                keystate[1] = ReduceKeySeriesStates(left!=right, true);
             }
             else {
                 // do the first element and last one by hand to simplify the iterator
                 // traversal as there is no prev/next for first/last
                 element_type elem0 = *key_first;
                 element_type elem1 = *std::next(key_first);
-                keystate[0] = ReduceKeySeriesStates(true, elem0!=elem1, false);
+                keystate[0] = ReduceKeySeriesStates(true, elem0!=elem1);
                 //
                 ReduceStencilGeneration <detail::reduce_stencil_transformer, RanIter, KeyStateIterType> kernel;
                 hpx::parallel::for_each(
@@ -353,7 +327,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 //
                 element_type elemN = *std::prev(key_last);
                 element_type elemn = *std::prev(std::prev(key_last));
-                keystate.back() = ReduceKeySeriesStates(elemN!=elemn, true, false);
+                keystate.back() = ReduceKeySeriesStates(elemN!=elemn, true);
             }
         }
         {
@@ -368,11 +342,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     std::end(keystate));
             zip_iterator states_out_begin = hpx::util::make_zip_iterator(values_output, std::begin(keystate));
 
-            zip_type initial = hpx::util::tuple<float, ReduceKeySeriesStates>(0.0, ReduceKeySeriesStates(true, false, true));
+            zip_type initial = hpx::util::tuple<float, ReduceKeySeriesStates>(0.0, ReduceKeySeriesStates(true, false));
             // caution : if the current value is a start value, then it should be used
             // otherwise we add the incoming B to our A.
             // BUT, the partitions are updated with values carried from if the when summing we can add values if the current value is not a start
-            hpx::parallel::prefix_scan(
+            hpx::parallel::prefix_scan_inclusive(
                     policy,
                     states_begin, states_end,
                     states_out_begin,
@@ -383,91 +357,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ReduceKeySeriesStates a_state = hpx::util::get<1>(a);
                         value_type            b_val   = hpx::util::get<0>(b);
                         ReduceKeySeriesStates b_state = hpx::util::get<1>(b);
-                        static value_type x = 1000;
-                        static value_type y = 0;
-                        // if carrying a start flag from both previous ops
-                        // then do not add (used in higher level upsweep)
                         boost::lock_guard<mutex_type> m(mtx_);
                         debug_reduce_by_key(
                                 "{ " << a_val << "+" << b_val << " },\t" << a_state << b_state);
-
-                        if (b_state.fNull) {
-                            throw std::string("help");
-                            debug_reduce_by_key(" * " << a_val << std::endl);
-                            return hpx::util::make_tuple(
-                                    //boolvals(a_state.fStart, b_state.fStart) ,
-                                    a_val,
-                                    ReduceKeySeriesStates(a_state.fStart, b_state.fEnd, false));
-                        }
-                        else if (/*a_state.fStart && */b_state.fStart) {
+                        // if carrying a start flag, then copy - don't add
+                        if (b_state.fStart) {
                             debug_reduce_by_key(" = " << b_val << std::endl);
                             return hpx::util::make_tuple(
-                                    //boolvals(a_state.fStart, b_state.fStart) ,
                                      b_val,
-                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
-                        }
-                        // if b is a start then reset sequence, just use b value
-                        else if (b_state.fStart) {
-                            debug_reduce_by_key(" = " << b_val << std::endl);
-                            return hpx::util::make_tuple(
-                                    //boolvals(a_state.fStart, b_state.fStart) ,
-                                     b_val,
-                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
+                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd));
                         }
                         // normal add of previous + this
-                        else if (a_state.fStart) {
-                            debug_reduce_by_key(" = " << a_val + b_val << std::endl);
-                            return hpx::util::make_tuple(
-                                    //boolvals(a_state.fStart, b_state.fStart) ,
-                                     a_val + b_val,
-                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
-                        }
-                        // should not ever be called
                         else {
                             debug_reduce_by_key(" = " << a_val + b_val << std::endl);
                             return hpx::util::make_tuple(
-                                    //boolvals(a_state.fStart, b_state.fStart) ,
                                      a_val + b_val,
-                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd, false));
+                                    ReduceKeySeriesStates(a_state.fStart || b_state.fStart, b_state.fEnd));
                         }
                     }
             );
         }
+
 /*
-            //next step is we need to reduce the values for each key. This is done
-            //by running an inclusive scan over the values array using the stencil.
-            //
-            // this inclusive scan will write out two values, the first being
-            // the value summed currently, the second being 0 or 1, with 1 being used
-            // when this is a value of a key we need to write ( END or START_AND_END)
-            {
-                hpx::parallel::inclusive_scan(
-                        policy,
-                        std::begin(keystate), std::end(keystate),
-
-                );
-
-                typedef vtkm::cont::ArrayHandle<U,VIn> ValueInHandleType;
-                typedef vtkm::cont::ArrayHandle<U,VOut> ValueOutHandleType;
-                typedef vtkm::cont::ArrayHandle< ReduceKeySeriesStates> StencilHandleType;
-                typedef vtkm::cont::ArrayHandleZip<ValueInHandleType,
-                    StencilHandleType> ZipInHandleType;
-                typedef vtkm::cont::ArrayHandleZip<ValueOutHandleType,
-                    StencilHandleType> ZipOutHandleType;
-
-                StencilHandleType stencil;
-                ValueOutHandleType reducedValues;
-
-                ZipInHandleType scanInput( values, keystate);
-                ZipOutHandleType scanOutput( reducedValues, stencil);
-
-                DerivedAlgorithm::ScanInclusive(scanInput,
-                                                scanOutput,
-                                                ReduceByKeyAdd<BinaryFunctor>(binary_functor) );
-
-                //at this point we are done with keystate, so free the memory
-                keystate.ReleaseResources();
-
                 // all we need know is an efficient way of doing the write back to the
                 // reduced global memory. this is done by using StreamCompact with the
                 // stencil and values we just created with the inclusive scan
@@ -475,9 +386,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                                  stencil,
                                                  values_output,
                                                  ReduceByKeyUnaryStencilOp());
-
-            } //release all temporary memory
-
 
             //find all the unique keys
             DerivedAlgorithm::Copy(keys,keys_output);
