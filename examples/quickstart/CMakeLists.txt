@@ -35,6 +35,7 @@ set(example_programs
     shared_mutex
     simple_future_continuation
     simplest_hello_world
+    sort_by_key
     timed_futures
     timed_wake
     use_main_thread
@@ -56,6 +57,7 @@ set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(sort_by_key_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 if(HPX_HAVE_LOCAL_SCHEDULER OR HPX_HAVE_ALL_SCHEDULERS)

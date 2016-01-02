@@ -44,12 +44,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             template <typename Compare_, typename Proj_>
             compare_projected(Compare_ && comp, Proj_ && proj)
-              : comp_(std::forward<Compare>(comp)),
-                proj_(std::forward<Proj>(proj))
+              : comp_(std::forward<Compare_>(comp)),
+                proj_(std::forward<Proj_>(proj))
             {}
 
-            template <typename T>
-            inline bool operator()(T const& t1, T const& t2)
+            template <typename T1, typename T2>
+            inline bool operator()(T1 const& t1, T2 const& t2)
             {
                 return hpx::util::invoke(comp_,
                     hpx::util::invoke(proj_, t1),
