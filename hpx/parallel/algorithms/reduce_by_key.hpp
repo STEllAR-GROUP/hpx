@@ -19,8 +19,12 @@
 #define VTKM_CONT_EXPORT
 #define VTKM_EXEC_EXPORT
 
-#define boolvals(a,b) \
-  (a?1:0) + (b?2:0)
+#ifdef EXTRA_DEBUG
+# define boolvals(a,b) (a?1:0) + (b?2:0)
+# define debug_reduce_by_key(a) std::cout << a
+#else
+# define debug_reduce_by_key(a)
+#endif
 
 typedef hpx::lcos::local::shared_mutex mutex_type;
 
@@ -384,17 +388,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         // if carrying a start flag from both previous ops
                         // then do not add (used in higher level upsweep)
                         boost::lock_guard<mutex_type> m(mtx_);
-                        std::cout << "{ " << a_val << "+" << b_val << " },\t" << a_state << b_state ;
+                        debug_reduce_by_key(
+                                "{ " << a_val << "+" << b_val << " },\t" << a_state << b_state);
+
                         if (b_state.fNull) {
                             throw std::string("help");
-                            std::cout << " * " << a_val << std::endl;
+                            debug_reduce_by_key(" * " << a_val << std::endl);
                             return hpx::util::make_tuple(
                                     //boolvals(a_state.fStart, b_state.fStart) ,
                                     a_val,
                                     ReduceKeySeriesStates(a_state.fStart, b_state.fEnd, false));
                         }
                         else if (/*a_state.fStart && */b_state.fStart) {
-                            std::cout << " = " << b_val << std::endl;
+                            debug_reduce_by_key(" = " << b_val << std::endl);
                             return hpx::util::make_tuple(
                                     //boolvals(a_state.fStart, b_state.fStart) ,
                                      b_val,
@@ -402,7 +408,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }
                         // if b is a start then reset sequence, just use b value
                         else if (b_state.fStart) {
-                            std::cout << " = " << b_val << std::endl;
+                            debug_reduce_by_key(" = " << b_val << std::endl);
                             return hpx::util::make_tuple(
                                     //boolvals(a_state.fStart, b_state.fStart) ,
                                      b_val,
@@ -410,7 +416,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }
                         // normal add of previous + this
                         else if (a_state.fStart) {
-                            std::cout << " = " << a_val + b_val << std::endl;
+                            debug_reduce_by_key(" = " << a_val + b_val << std::endl);
                             return hpx::util::make_tuple(
                                     //boolvals(a_state.fStart, b_state.fStart) ,
                                      a_val + b_val,
@@ -418,7 +424,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }
                         // should not ever be called
                         else {
-                            std::cout << " = " << a_val + b_val << std::endl;
+                            debug_reduce_by_key(" = " << a_val + b_val << std::endl);
                             return hpx::util::make_tuple(
                                     //boolvals(a_state.fStart, b_state.fStart) ,
                                      a_val + b_val,
