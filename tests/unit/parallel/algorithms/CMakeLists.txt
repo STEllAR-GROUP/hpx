@@ -79,6 +79,7 @@ set(tests
     move
     none_of
     reduce_
+    reduce_by_key
     remove_copy
     remove_copy_if
     replace
