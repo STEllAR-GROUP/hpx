@@ -35,11 +35,27 @@ HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
     /// \cond NOINTERNAL
+
+    //---------------------------------------------------------------------
+    // sequential inclusive_scan using iterators for start/end
+    //---------------------------------------------------------------------
+    template<typename InIter, typename OutIter, typename T, typename Op>
+    OutIter sequential_scan_inclusive(InIter first, InIter last,
+                                      OutIter dest, T init, Op && op)
+    {
+        T temp = init;
+        for (/* */; first != last; (void) ++first, ++dest) {
+            init = op(init, *first);
+            *dest = init;
+        }
+        return dest;
+    }
+
     //---------------------------------------------------------------------
     // sequential exclusive_scan using iterators for start/end
     //---------------------------------------------------------------------
     template<typename InIter, typename OutIter, typename T, typename Op>
-    OutIter sequential_scan(InIter first, InIter last,
+    OutIter sequential_scan_exclusive(InIter first, InIter last,
         OutIter dest, T init, Op && op)
     {
         T temp = init;
@@ -67,10 +83,33 @@ HPX_INLINE_NAMESPACE(v1)
     }
 
     //---------------------------------------------------------------------
+    // tag type we will use for inclusive/exclusive switch
+    //---------------------------------------------------------------------
+    template<bool>
+    struct is_inclusive {};
+
+    typedef is_inclusive<true> inclusive_scan_tag;
+    typedef is_inclusive<false> exclusive_scan_tag;
+
+    //---------------------------------------------------------------------
+    // inclusive scan version of sequential update
+    //---------------------------------------------------------------------
+    template<typename InIter, typename OutIter, typename T, typename Op>
+    T sequential_update_n_inclusive(InIter first, OutIter dest, std::size_t count,
+                                    T value, Op &&op) {
+        T init = value;
+        for (/* */; count-- != 0; (void) ++first, ++dest) {
+            init = op(init, *first);
+            *dest = init;
+        }
+        return init;
+    }
+
+    //---------------------------------------------------------------------
     // sequential update, applies V to each value in the sequence
     //---------------------------------------------------------------------
     template<typename InIter, typename OutIter, typename T, typename Op>
-    T sequential_update_n(InIter first, OutIter dest, std::size_t count,
+    T sequential_update_n_exclusive(InIter first, OutIter dest, std::size_t count,
         T value, Op && op)
     {
         T init = value;
@@ -84,10 +123,10 @@ HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////
-    template<typename OutIter>
+    template<typename OutIter, typename TagType>
     struct parallel_scan_struct
         : public hpx::parallel::v1::detail::algorithm<
-          parallel_scan_struct<OutIter>, OutIter>
+          parallel_scan_struct<OutIter, TagType>, OutIter>
     {
         parallel_scan_struct()
         :
@@ -100,8 +139,14 @@ HPX_INLINE_NAMESPACE(v1)
         sequential(ExPolicy, InIter first, InIter last,
             OutIter dest, T && init, Op && op)
         {
-            return detail::sequential_scan(first, last, dest,
-                std::forward < T > (init), std::forward < Op > (op));
+            if (std::is_same<TagType, detail::inclusive_scan_tag>::value) {
+                return detail::sequential_scan_inclusive(first, last, dest,
+                    std::forward<T>(init), std::forward<Op>(op));
+            }
+            else {
+                return detail::sequential_scan_exclusive(first, last, dest,
+                    std::forward<T>(init), std::forward<Op>(op));
+            }
         }
 
         template<typename ExPolicy, typename FwdIter, typename T, typename Op>
@@ -137,7 +182,7 @@ HPX_INLINE_NAMESPACE(v1)
             int n_chunks, log2N;
             std::size_t chunk_size;
             if (cores>1) {
-              const std::size_t sequential_scan_limit = 32768;
+              const std::size_t sequential_scan_limit = 16384;
               // we want 2^N chunks of data, so find a good N
               log2N = 0;
               while (cores >>= 1) ++log2N;
@@ -235,13 +280,24 @@ HPX_INLINE_NAMESPACE(v1)
             for (int c = 0; c < n_chunks; ++c) {
                 // spawn a task to do a sequential update on this chunk
 
-                hpx::future<T> w1 = hpx::async(
-                    &sequential_update_n<FwdIter, FwdIter, T, Op>,
-                    std::get < 0 > (work_chunks[c]),
-                    std::get < 1 > (work_chunks[c]),
-                    std::get < 2 > (work_chunks[c]),
-                    std::get < 3 > (work_chunks[c]), std::forward < Op > (op));
-                work_items.push_back(std::move(w1));
+                if (std::is_same<TagType, detail::inclusive_scan_tag>::value) {
+                    hpx::future<T> w1 = hpx::async(
+                        &sequential_update_n_inclusive<FwdIter, FwdIter, T, Op>,
+                        std::get < 0 > (work_chunks[c]),
+                        std::get < 1 > (work_chunks[c]),
+                        std::get < 2 > (work_chunks[c]),
+                        std::get < 3 > (work_chunks[c]), std::forward < Op > (op));
+                    work_items.push_back(std::move(w1));
+                }
+                else {
+                    hpx::future<T> w1 = hpx::async(
+                        &sequential_update_n_exclusive<FwdIter, FwdIter, T, Op>,
+                        std::get < 0 > (work_chunks[c]),
+                        std::get < 1 > (work_chunks[c]),
+                        std::get < 2 > (work_chunks[c]),
+                        std::get < 3 > (work_chunks[c]), std::forward < Op > (op));
+                    work_items.push_back(std::move(w1));
+                }
 
             }
             hpx::wait_all(work_items);
@@ -331,13 +387,52 @@ HPX_INLINE_NAMESPACE(v1)
     /// \a op is not mathematically associative, the behavior of
     /// \a inclusive_scan may be non-deterministic.
     ///
+
+
+    template<typename ExPolicy, typename InIter, typename OutIter, typename T>
+    inline typename boost::enable_if<
+            is_execution_policy<ExPolicy>,
+            typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    >::type
+    prefix_scan_inclusive(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+                          T init)
+    {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+                iterator_category;
+        typedef typename std::iterator_traits<OutIter>::iterator_category
+                output_iterator_category;
+
+        static_assert(
+                (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+                "Requires at least input iterator.");
+
+        static_assert(
+                (boost::mpl::or_<
+                        boost::is_base_of<
+                                std::forward_iterator_tag, output_iterator_category>,
+                        boost::is_same<
+                                std::output_iterator_tag, output_iterator_category>
+                >::value),
+                "Requires at least output iterator.");
+
+        typedef typename boost::mpl::or_<
+                is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, iterator_category>,
+                boost::is_same<std::output_iterator_tag, output_iterator_category>
+        >::type is_seq;
+
+        return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
+                std::forward < ExPolicy > (policy), is_seq(),
+                first, last, dest, std::move(init), std::plus<T>());
+    }
+
     template<typename ExPolicy, typename InIter, typename OutIter, typename T,
     typename Op>
     inline typename boost::enable_if<
     is_execution_policy<ExPolicy>,
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    prefix_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+    prefix_scan_inclusive(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init, Op && op)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
@@ -364,7 +459,7 @@ HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::parallel_scan_struct<OutIter>().call(
+        return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
             std::forward < ExPolicy > (policy), is_seq(),
             first, last, dest, std::move(init), std::forward < Op > (op));
     }
@@ -433,7 +528,7 @@ HPX_INLINE_NAMESPACE(v1)
     is_execution_policy<ExPolicy>,
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    prefix_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+    prefix_scan_exclusive(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
@@ -460,11 +555,49 @@ HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::parallel_scan_struct<OutIter>().call(
+        return detail::parallel_scan_struct<OutIter, detail::exclusive_scan_tag>().call(
             std::forward < ExPolicy > (policy), is_seq(),
             first, last, dest, std::move(init), std::plus<T>());
     }
+
+    template<typename ExPolicy, typename InIter, typename OutIter, typename T,
+            typename Op>
+    inline typename boost::enable_if<
+            is_execution_policy<ExPolicy>,
+            typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    >::type
+    prefix_scan_exclusive(ExPolicy &&policy, InIter first, InIter last, OutIter dest,
+                          T init, Op &&op) {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+                iterator_category;
+        typedef typename std::iterator_traits<OutIter>::iterator_category
+                output_iterator_category;
+
+        static_assert(
+                (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+                "Requires at least input iterator.");
+
+        static_assert(
+                (boost::mpl::or_<
+                        boost::is_base_of<
+                                std::forward_iterator_tag, output_iterator_category>,
+                        boost::is_same<
+                                std::output_iterator_tag, output_iterator_category>
+                >::value),
+                "Requires at least output iterator.");
+
+        typedef typename boost::mpl::or_<
+                is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, iterator_category>,
+                boost::is_same<std::output_iterator_tag, output_iterator_category>
+        >::type is_seq;
+
+        return detail::parallel_scan_struct<OutIter, detail::exclusive_scan_tag>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest, std::move(init), std::forward< Op >(op));
     }
+
+}
 }
 }
 
