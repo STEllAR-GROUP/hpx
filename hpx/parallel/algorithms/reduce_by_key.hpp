@@ -11,6 +11,7 @@
 #include <hpx/parallel/algorithms/prefix_scan.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/util/tuple.hpp>
 //
@@ -102,8 +103,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             bool fStart;    // START of a segment
             bool fEnd;      // END of a segment
-            ReduceKeySeriesStates(bool start=false, bool end=false, bool null=true) :
-                    fStart(start), fEnd(end) {}
+            ReduceKeySeriesStates(bool start=false, bool end=false) :
+                fStart(start), fEnd(end) {}
         };
 
         template<typename Transformer, typename StencilIterType, typename KeyStateIterType >
@@ -140,26 +141,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
             }
         };
-/*
-        struct ReduceByKeyUnaryStencilOp
-        {
-            bool operator()(ReduceKeySeriesStates keySeriesState) const
-            {
-                return keySeriesState.fEnd;
-            }
 
-        };
+        // Zip iterator has 3 iterators inside
+        // Iter1, key type : Iter2, value type : Iter3, state type
+        template <typename ZIter, typename iKey, typename iVal>
+        std::pair< iKey, iVal>
+        make_pair_result(ZIter zipiter, iKey key_start, iVal val_start)
+        {
+            // tagged_pair type (from copy_if) has second item the iterator we want
+            auto const& t = zipiter.second.get_iterator_tuple();
+            iKey key_end = hpx::util::get<0>(t);
+            return std::make_pair(key_end,
+                                  std::next(val_start, std::distance(key_start, key_end)));
+        }
+/*
+        template <typename Iter1, typename Iter2>
+        hpx::future< std::pair< Iter1, Iter2> >
+        make_pair_result(hpx::future<Iter1> && iter1, Iter1 ibegin, Iter2 iter2)
+        {
+            typedef std::pair< Iter1, Iter2 > result_type;
+
+            return lcos::make_future<result_type>(
+                    std::move(iter1),
+                    [=](Iter1 iter1){
+                        return std::make_pair(iter1,std::next(iter2,std::distance(ibegin, iter1)));
+                    });
+        }
 */
         /// \endcond
     }
 
-            mutex_type mtx_;
+    std::ostream& operator << (std::ostream &os, const detail::ReduceKeySeriesStates &rs) {
+        os << "{ start=" << rs.fStart << ",end=" << rs.fEnd << "} ";
+        return os;
+    }
 
-            std::ostream& operator << (std::ostream &os, const detail::ReduceKeySeriesStates &rs) {
-                os << "{ start=" << rs.fStart << ",end=" << rs.fEnd << "} ";
-                return os;
-            }
-                //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     /// Sorts the elements in the range [first, last) in ascending order. The
     /// order of equal elements is not guaranteed to be preserved. The function
     /// uses the given comparison function object comp (defaults to using
@@ -243,10 +260,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 traits::projected<Proj, RanIter>
             >::value)>
 
-    typename util::detail::algorithm_result<ExPolicy, void>::type
+    typename util::detail::algorithm_result<ExPolicy, std::pair<OutIter,OutIter2> >::type
     reduce_by_key(
         ExPolicy && policy,
-        RanIter key_first, RanIter key_last,
+        RanIter key_first,
+        RanIter key_last,
         RanIter2 values_first,
         OutIter keys_output,
         OutIter2 values_output,
@@ -270,7 +288,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::output_iterator_tag, iterator_category3>::value) ||
             (boost::is_base_of<
                 std::output_iterator_tag, iterator_category4>::value),
-            "Requires a random access iterator.");
+            "iterators : Random_access for inputs and Output for outputs.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
@@ -280,7 +298,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         { // we only have a single key/value so that is our output
             *keys_output = *key_first;
             *values_output = *values_first;
-            return;
+            return std::make_pair(keys_output,values_output);
         }
 
         using namespace hpx::parallel::detail;
@@ -336,11 +354,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename zip_iterator::value_type zip_type;
             typedef typename std::iterator_traits<RanIter2>::value_type value_type;
 
-            zip_iterator states_begin = hpx::util::make_zip_iterator(values_first, std::begin(keystate));
+            zip_iterator states_begin = hpx::util::make_zip_iterator(
+                    values_first, std::begin(keystate));
             zip_iterator states_end = hpx::util::make_zip_iterator(
-                    values_first + std::distance(std::begin(keystate), std::end(keystate)),
-                    std::end(keystate));
-            zip_iterator states_out_begin = hpx::util::make_zip_iterator(values_output, std::begin(keystate));
+                    values_first + numberOfKeys, std::end(keystate));
+            zip_iterator states_out_begin = hpx::util::make_zip_iterator(
+                    values_output, std::begin(keystate));
 
             zip_type initial = hpx::util::tuple<float, ReduceKeySeriesStates>(0.0, ReduceKeySeriesStates(true, false));
             // caution : if the current value is a start value, then it should be used
@@ -348,7 +367,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             // BUT, the partitions are updated with values carried from if the when summing we can add values if the current value is not a start
             hpx::parallel::prefix_scan_inclusive(
                     policy,
-                    states_begin, states_end,
+                    states_begin,
+                    states_end,
                     states_out_begin,
                     initial,
                     // B is the current entry, A is the one passed in from 'previous'
@@ -357,7 +377,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ReduceKeySeriesStates a_state = hpx::util::get<1>(a);
                         value_type            b_val   = hpx::util::get<0>(b);
                         ReduceKeySeriesStates b_state = hpx::util::get<1>(b);
-                        boost::lock_guard<mutex_type> m(mtx_);
                         debug_reduce_by_key(
                                 "{ " << a_val << "+" << b_val << " },\t" << a_state << b_state);
                         // if carrying a start flag, then copy - don't add
@@ -376,23 +395,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }
                     }
             );
-        }
 
-/*
-                // all we need know is an efficient way of doing the write back to the
-                // reduced global memory. this is done by using StreamCompact with the
-                // stencil and values we just created with the inclusive scan
-                DerivedAlgorithm::StreamCompact( reducedValues,
-                                                 stencil,
-                                                 values_output,
-                                                 ReduceByKeyUnaryStencilOp());
+            // now copy the values and keys for each element that
+            // is marked by an 'END' state to the final output
+            typedef hpx::util::zip_iterator<
+                    RanIter,
+                    OutIter2,
+                    std::vector< ReduceKeySeriesStates >::iterator> zip_iterator2;
+            typedef typename zip_iterator2::reference zip2_ref;
+            typedef typename zip_iterator2::value_type zip2_val;
 
-            //find all the unique keys
-            DerivedAlgorithm::Copy(keys,keys_output);
-            DerivedAlgorithm::Unique(keys_output);
-            */
+            zip_iterator2 compact_begin = hpx::util::make_zip_iterator(
+                    key_first,
+                    values_output,
+                    std::begin(keystate));
+            zip_iterator2 compact_end = hpx::util::make_zip_iterator(
+                    key_last,
+                    values_output + numberOfKeys,
+                    std::end(keystate));
+
+            // auto result = std::make_pair(key_last, values_output + numberOfKeys);
+
+            // @TODO : fix this to write keys to output array instead of input
+            auto result = detail::make_pair_result(
+                hpx::parallel::copy_if(
+                    policy,
+                    compact_begin,
+                    compact_end,
+                    compact_begin,
+                    // return true if this is an end state
+                    [](zip2_ref it) {
+                        return hpx::util::get< 2 >(it).fEnd;
+                    }
+                ), key_first, values_output);
+
+            return result;
         }
     }
+        }
 }}
 
 #endif
