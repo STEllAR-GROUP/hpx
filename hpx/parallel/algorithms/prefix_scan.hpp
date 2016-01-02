@@ -37,47 +37,16 @@ HPX_INLINE_NAMESPACE(v1)
     /// \cond NOINTERNAL
 
     //---------------------------------------------------------------------
-    // sequential inclusive_scan using iterators for start/end
-    //---------------------------------------------------------------------
-    template<typename InIter, typename OutIter, typename T, typename Op>
-    OutIter sequential_scan_inclusive(InIter first, InIter last,
-                                      OutIter dest, T init, Op && op)
-    {
-        T temp = init;
-        for (/* */; first != last; (void) ++first, ++dest) {
-            init = op(init, *first);
-            *dest = init;
-        }
-        return dest;
-    }
-
-    //---------------------------------------------------------------------
-    // sequential exclusive_scan using iterators for start/end
-    //---------------------------------------------------------------------
-    template<typename InIter, typename OutIter, typename T, typename Op>
-    OutIter sequential_scan_exclusive(InIter first, InIter last,
-        OutIter dest, T init, Op && op)
-    {
-        T temp = init;
-        for (/* */; first != last; (void) ++first, ++dest) {
-            init = op(init, *first);
-            *dest = temp;
-            temp = init;
-        }
-        return dest;
-    }
-
-    //---------------------------------------------------------------------
     // sequential exclusive_scan using count instead of end
+    // used as first step in upsweep for both inclusive/exclusive scans
+    // NB : does not write any output, only sums from input array
     //---------------------------------------------------------------------
     template<typename InIter, typename T, typename Op>
-    T sequential_scan_n(InIter first, std::size_t count,
+    T accumulate_scan_n(InIter first, std::size_t count,
         T init, Op && op)
     {
-        T temp = init;
         for (/* */; count-- != 0; (void) ++first) {
             init = op(init, *first);
-            temp = init;
         }
         return init;
     }
@@ -88,39 +57,74 @@ HPX_INLINE_NAMESPACE(v1)
     template<bool>
     struct is_inclusive {};
 
-    typedef is_inclusive<true> inclusive_scan_tag;
-    typedef is_inclusive<false> exclusive_scan_tag;
-
-    //---------------------------------------------------------------------
-    // inclusive scan version of sequential update
-    //---------------------------------------------------------------------
-    template<typename InIter, typename OutIter, typename T, typename Op>
-    T sequential_update_n_inclusive(InIter first, OutIter dest, std::size_t count,
-                                    T value, Op &&op) {
-        T init = value;
-        for (/* */; count-- != 0; (void) ++first, ++dest) {
-            init = op(init, *first);
-            *dest = init;
-        }
-        return init;
-    }
-
-    //---------------------------------------------------------------------
-    // sequential update, applies V to each value in the sequence
-    //---------------------------------------------------------------------
-    template<typename InIter, typename OutIter, typename T, typename Op>
-    T sequential_update_n_exclusive(InIter first, OutIter dest, std::size_t count,
-        T value, Op && op)
+    struct inclusive_scan_tag : is_inclusive<true>
     {
-        T init = value;
-        T temp = init;
-        for (/* */; count-- != 0; (void) ++first, ++dest) {
-            init = op(init, *first);
-            *dest = temp;
-            temp = init;
+        //---------------------------------------------------------------------
+        // sequential inclusive_scan using iterators for start/end
+        //---------------------------------------------------------------------
+        template<typename InIter, typename OutIter, typename T, typename Op>
+        static OutIter sequential_scan(InIter first, InIter last,
+                                       OutIter dest, T init, Op && op)
+        {
+            T temp = init;
+            for (/* */; first != last; (void) ++first, ++dest) {
+                init = op(init, *first);
+                *dest = init;
+            }
+            return dest;
         }
-        return init;
-    }
+
+        //---------------------------------------------------------------------
+        // inclusive scan version of sequential update
+        //---------------------------------------------------------------------
+        template<typename InIter, typename OutIter, typename T, typename Op>
+        static T sequential_update_n(InIter first, OutIter dest,
+                      std::size_t count, T value, const Op &op)
+        {
+            T init = value;
+            for (/* */; count-- != 0; (void) ++first, ++dest) {
+                init = op(init, *first);
+                *dest = init;
+            }
+            return init;
+        }
+    };
+
+    struct exclusive_scan_tag : is_inclusive<false>
+    {
+        //---------------------------------------------------------------------
+        // sequential exclusive_scan using iterators for start/end
+        //---------------------------------------------------------------------
+        template<typename InIter, typename OutIter, typename T, typename Op>
+        static OutIter sequential_scan(InIter first, InIter last,
+                                       OutIter dest, T init, Op && op)
+        {
+            T temp = init;
+            for (/* */; first != last; (void) ++first, ++dest) {
+                init = op(init, *first);
+                *dest = temp;
+                temp = init;
+            }
+            return dest;
+        }
+
+        //---------------------------------------------------------------------
+        // sequential update, applies V to each value in the sequence
+        //---------------------------------------------------------------------
+        template<typename InIter, typename OutIter, typename T, typename Op>
+        static T sequential_update_n(InIter first, OutIter dest,
+                      std::size_t count, T value, const Op &op)
+        {
+            T init = value;
+            T temp = init;
+            for (/* */; count-- != 0; (void) ++first, ++dest) {
+                init = op(init, *first);
+                *dest = temp;
+                temp = init;
+            }
+            return init;
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////
     template<typename OutIter, typename TagType>
@@ -139,14 +143,8 @@ HPX_INLINE_NAMESPACE(v1)
         sequential(ExPolicy, InIter first, InIter last,
             OutIter dest, T && init, Op && op)
         {
-            if (std::is_same<TagType, detail::inclusive_scan_tag>::value) {
-                return detail::sequential_scan_inclusive(first, last, dest,
-                    std::forward<T>(init), std::forward<Op>(op));
-            }
-            else {
-                return detail::sequential_scan_exclusive(first, last, dest,
-                    std::forward<T>(init), std::forward<Op>(op));
-            }
+            return TagType::sequential_scan(first, last, dest,
+                std::forward<T>(init), std::forward<Op>(op));
         }
 
         template<typename ExPolicy, typename FwdIter, typename T, typename Op>
@@ -228,7 +226,7 @@ HPX_INLINE_NAMESPACE(v1)
                 // spawn a task to do a sequential scan on this chunk
                 work_items.push_back(
                     std::move(
-                        hpx::async(&sequential_scan_n<FwdIter, T, Op>,
+                        hpx::async(&accumulate_scan_n<FwdIter, T, Op>,
                             it1, chunk_size, (T()), std::forward < Op > (op))));
                 it1 = it2;
                 std::advance(dest, chunk_size);
@@ -279,26 +277,14 @@ HPX_INLINE_NAMESPACE(v1)
             // now combine the partial sums back into the initial chunks
             for (int c = 0; c < n_chunks; ++c) {
                 // spawn a task to do a sequential update on this chunk
-
-                if (std::is_same<TagType, detail::inclusive_scan_tag>::value) {
-                    hpx::future<T> w1 = hpx::async(
-                        &sequential_update_n_inclusive<FwdIter, FwdIter, T, Op>,
-                        std::get < 0 > (work_chunks[c]),
-                        std::get < 1 > (work_chunks[c]),
-                        std::get < 2 > (work_chunks[c]),
-                        std::get < 3 > (work_chunks[c]), std::forward < Op > (op));
-                    work_items.push_back(std::move(w1));
-                }
-                else {
-                    hpx::future<T> w1 = hpx::async(
-                        &sequential_update_n_exclusive<FwdIter, FwdIter, T, Op>,
-                        std::get < 0 > (work_chunks[c]),
-                        std::get < 1 > (work_chunks[c]),
-                        std::get < 2 > (work_chunks[c]),
-                        std::get < 3 > (work_chunks[c]), std::forward < Op > (op));
-                    work_items.push_back(std::move(w1));
-                }
-
+                hpx::future<T> w1 = hpx::async(
+                    &TagType::template sequential_update_n<FwdIter, FwdIter, T, Op>,
+                    std::get < 0 > (work_chunks[c]),
+                    std::get < 1 > (work_chunks[c]),
+                    std::get < 2 > (work_chunks[c]),
+                    std::get < 3 > (work_chunks[c]),
+                    std::forward < Op > (op));
+                work_items.push_back(std::move(w1));
             }
             hpx::wait_all(work_items);
             return final_dest;
