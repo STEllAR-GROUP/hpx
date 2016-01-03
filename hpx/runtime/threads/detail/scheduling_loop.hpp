@@ -439,7 +439,7 @@ namespace hpx { namespace threads { namespace detail
             }
 
             // something went badly wrong, give up
-            if (this_state.load() == state_terminating)
+            if (this_state.load() >= state_terminating)
                 break;
 
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)

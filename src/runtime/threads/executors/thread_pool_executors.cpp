@@ -340,7 +340,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, virt_core) ||
-                state == state_terminating);
+                state >= state_terminating);
         }
     }
 
