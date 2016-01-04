@@ -355,6 +355,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
     }
 
+    template <typename Scheduler>
+    char const* this_thread_executor<Scheduler>::get_description() const
+    {
+        return scheduler_.get_description();
+    }
+
     // Return statistics collected by this scheduler
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::get_statistics(

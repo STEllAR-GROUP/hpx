@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -96,6 +96,9 @@ namespace hpx { namespace threads { namespace executors
 
             // Remove the given processing unit from the scheduler.
             void remove_processing_unit(std::size_t thread_num, error_code& ec);
+
+            // return the description string of the underlying scheduler
+            char const* get_description() const;
 
             // give invoking context a chance to catch up with its tasks
             void suspend_back_into_calling_context();

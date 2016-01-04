@@ -27,6 +27,13 @@ namespace test
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void verify_resource_allocation(std::size_t num_execs)
+{
+    std::vector<hpx::threads::resource_allocation> alloc_data =
+        hpx::threads::resource_manager::get_resource_allocation();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
 void test_executors(std::size_t processing_units, std::size_t num_pus)
 {
@@ -44,6 +51,8 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
         std::vector<Executor> execs;
         for (std::size_t i = 0; i != num_execs; ++i)
             execs.push_back(Executor(num_pus));
+
+        verify_resource_allocation(execs.size());
 
         // give executors a chance to get started
         hpx::this_thread::yield();

@@ -370,6 +370,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         stats.tasks_completed_ = tasks_completed_.load();
     }
 
+    template <typename Scheduler>
+    char const* thread_pool_executor<Scheduler>::get_description() const
+    {
+        return scheduler_.get_description();
+    }
+
     // Return the requested policy element
     template <typename Scheduler>
     std::size_t thread_pool_executor<Scheduler>::get_policy_element(

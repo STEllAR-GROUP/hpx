@@ -862,5 +862,28 @@ namespace hpx { namespace threads
 
         proxies_.erase(cookie);
     }
+
+    // Return the current schedulers and the corresponding allocation data
+    std::vector<resource_allocation>
+        resource_manager::get_resource_allocation() const
+    {
+        std::vector<resource_allocation> result;
+        proxies_map_type::const_iterator end = proxies_.end();
+        for (proxies_map_type::const_iterator it = proxies_.begin();
+             it != end; ++it)
+        {
+            result.push_back(resource_allocation(
+                (*it).second.proxy_->get_description(),
+                (*it).second.core_ids_
+            ));
+        }
+        return result;
+    }
+
+    std::vector<resource_allocation> get_resource_allocation()
+    {
+        resource_manager& rm = resource_manager::get();
+        return rm.get_resource_allocation();
+    }
 }}
 

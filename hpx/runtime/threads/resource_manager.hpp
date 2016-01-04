@@ -19,6 +19,9 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace  threads
 {
@@ -29,6 +32,27 @@ namespace hpx { namespace  threads
         unassigned = 0,
         reserved = 1,
         assigned = 2
+    };
+
+    /// Data describing the current allocation for a single executor known
+    /// To the resource manager
+    struct resource_allocation
+    {
+        // mapping of physical core to virtual core
+        typedef std::pair<std::size_t, std::size_t>  coreids_type;
+
+        resource_allocation()
+          : description_("")
+        {}
+
+        resource_allocation(char const* desc,
+                std::vector<coreids_type> const& core_ids)
+          : description_(desc),
+            core_ids_(core_ids)
+        {}
+
+        char const*description_;                ///< name of the executor
+        std::vector<coreids_type> core_ids_;    ///< mapping of cores
     };
 
     /// In short, there are two main responsibilities of the Resource Manager:
@@ -45,7 +69,7 @@ namespace hpx { namespace  threads
         struct tag {};
 
         // mapping of physical core to virtual core
-        typedef std::pair<std::size_t, std::size_t>  coreids_type;
+        typedef typename resource_allocation::coreids_type coreids_type;
 
     public:
         resource_manager();
@@ -62,6 +86,9 @@ namespace hpx { namespace  threads
 
         // Return the singleton resource manager instance
         static resource_manager& get();
+
+        // Return the current schedulers and the corresponding allocation data
+        std::vector<resource_allocation> get_resource_allocation() const;
 
     protected:
         // allocate virtual cores
@@ -141,7 +168,7 @@ namespace hpx { namespace  threads
             // hold on to proxy
             std::shared_ptr<detail::manage_executor> proxy_;
 
-            // map physical to logical puinit ids
+            // map physical to logical processing unit ids
             std::vector<coreids_type> core_ids_;
         };
 
@@ -222,6 +249,11 @@ namespace hpx { namespace  threads
             allocation_data_map_type &scaled_static_allocation_data,
             std::size_t total_allocated);
     };
+
+    // Return the current schedulers and the corresponding allocation data
+    HPX_EXPORT std::vector<resource_allocation> get_resource_allocation();
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
