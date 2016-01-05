@@ -5,6 +5,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/performance_counters.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -174,6 +176,23 @@ void test_mixed_arguments(hpx::id_type const& id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void print_counters(char const* name)
+{
+    using namespace hpx::performance_counters;
+
+    std::vector<performance_counter> counters = discover_counters(name);
+
+    for (performance_counter const& c : counters)
+    {
+        counter_value value = c.get_counter_value_sync();
+        hpx::cout
+            << "counter: " << c.get_name_sync()
+            << ", value: " << value.get_value<double>()
+            << std::endl;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int)std::time(0);
@@ -189,6 +208,10 @@ int hpx_main(boost::program_options::variables_map& vm)
         test_future_argument(id);
         test_mixed_arguments(id);
     }
+
+    // compare number of parcels with number of messages generated
+    print_counters("/parcels/count/*/sent");
+    print_counters("/messages/count/*/sent");
 
     return hpx::finalize();
 }

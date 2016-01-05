@@ -38,7 +38,7 @@ namespace hpx { namespace performance_counters
     {
         return stubs::performance_counter::get_info_async(get_id());
     }
-    counter_info performance_counter::get_info_sync(error_code& ec)
+    counter_info performance_counter::get_info_sync(error_code& ec) const
     {
         return stubs::performance_counter::get_info(get_id(), ec);
     }
@@ -88,5 +88,49 @@ namespace hpx { namespace performance_counters
     void performance_counter::reset_sync(error_code& ec)
     {
         stubs::performance_counter::reset(get_id(), ec);
+    }
+
+    ///
+    future<std::string> performance_counter::get_name() const
+    {
+        return lcos::make_future<std::string>(
+            get_info(),
+            [](counter_info && info) -> std::string
+            {
+                return info.fullname_;
+            });
+    }
+
+    std::string performance_counter::get_name_sync() const
+    {
+        return get_name().get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Return all counters matching the given name (with optional wildcards).
+    std::vector<performance_counter>
+    discover_counters(std::string const& name, error_code& ec)
+    {
+        std::vector<performance_counter> counters;
+
+        std::vector<counter_info> infos;
+        counter_status status = discover_counter_type(name, infos,
+            discover_counters_full, ec);
+        if (!status_is_valid(status) || ec)
+            return counters;
+
+        try {
+            counters.reserve(infos.size());
+            for (counter_info const& info : infos)
+            {
+                performance_counter counter(info.fullname_);
+                counters.push_back(counter);
+            }
+        }
+        catch (hpx::exception const& e) {
+            HPX_RETHROWS_IF(ec, e, "discover_counters");
+        }
+
+        return counters;
     }
 }}
