@@ -213,7 +213,8 @@ namespace hpx { namespace parcelset
                 hpx::serialization::detail::future_await_container
             > const & future_await)
         {
-            future_await->reset();
+            if (trigger)
+                future_await->reset();
 
             (*archive) << p;
 
@@ -284,16 +285,25 @@ namespace hpx { namespace parcelset
                 HPX_ASSERT(locality_id == dests[i]);
                 HPX_ASSERT(parcels[0].destination_locality() ==
                     parcels[i].destination_locality());
+                HPX_ASSERT(dests[i].type() == type());
             }
 #endif
+
+            boost::shared_ptr<hpx::serialization::detail::future_await_container>
+                future_await(new hpx::serialization::detail::future_await_container());
+            boost::shared_ptr<hpx::serialization::output_archive>
+                archive(
+                    new hpx::serialization::output_archive(
+                        *future_await, 0, 0, 0, 0)
+                );
 
             // enqueue the outgoing parcels ...
             HPX_ASSERT(parcels.size() == handlers.size());
             for(std::size_t i = 0; i < parcels.size(); ++i)
             {
-                put_parcel(
+                put_parcel_await(
                     locality_id, std::move(parcels[i]), std::move(handlers[i]),
-                    false);
+                    false, archive, future_await);
             }
 
             get_connection_and_send_parcels(locality_id);

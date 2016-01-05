@@ -92,7 +92,7 @@ namespace hpx { namespace plugins { namespace parcel
         }
 
         detail::message_buffer::message_buffer_append_state s =
-            buffer_.append(dest, std::move(p), f);
+            buffer_.append(dest, std::move(p), std::move(f));
 
         switch(s) {
         case detail::message_buffer::first_message:

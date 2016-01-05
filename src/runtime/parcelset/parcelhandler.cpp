@@ -462,6 +462,152 @@ namespace hpx { namespace parcelset
         resolver_->route(std::move(p), std::move(wrapped_f));
     }
 
+    void parcelhandler::put_parcels(std::vector<parcel> parcels,
+        std::vector<write_handler_type> handlers)
+    {
+        HPX_ASSERT(resolver_);
+
+        if (parcels.size() != handlers.size())
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "parcelhandler::put_parcels",
+                "mismatched number of parcels and handlers");
+            return;
+        }
+
+        if (0 == hpx::threads::get_self_ptr())
+        {
+            HPX_ASSERT(!hpx::is_starting());
+
+            naming::gid_type locality = naming::get_locality_from_gid(
+                (*parcels[0].destinations()).get_gid());
+            if (!resolver_->has_resolved_locality(locality))
+            {
+                // reschedule request as an HPX thread to avoid hangs
+                void (parcelhandler::*put_parcels_ptr) (
+                        std::vector<parcel>, std::vector<write_handler_type>
+                    ) = &parcelhandler::put_parcels;
+
+                threads::register_thread_nullary(
+                    util::bind(
+                        util::one_shot(put_parcels_ptr), this,
+                        std::move(parcels), std::move(handlers)),
+                    "parcelhandler::put_parcels", threads::pending, true,
+                    threads::thread_priority_boost);
+                return;
+            }
+        }
+
+        // partition parcels depending on whether their destination can be
+        // resolved locally
+        std::size_t num_parcels = parcels.size();
+
+        std::vector<parcel> resolved_parcels;
+        resolved_parcels.reserve(num_parcels);
+        std::vector<write_handler_type> resolved_handlers;
+        resolved_handlers.reserve(num_parcels);
+
+        typedef std::pair<boost::shared_ptr<parcelport>, locality>
+            destination_pair;
+
+        std::vector<destination_pair> resolved_dests;
+        resolved_dests.reserve(num_parcels);
+
+        std::vector<parcel> nonresolved_parcels;
+        nonresolved_parcels.reserve(num_parcels);
+        std::vector<write_handler_type> nonresolved_handlers;
+        nonresolved_handlers.reserve(num_parcels);
+
+        for (std::size_t i = 0; i != num_parcels; ++i)
+        {
+            parcel& p = parcels[i];
+
+            // make sure all parcels go to the same locality
+            if (parcels[0].destination_locality() !=
+                p.destination_locality())
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "parcelhandler::put_parcels",
+                    "mismatched number of parcels and handlers");
+                return;
+            }
+
+            // properly initialize parcel
+            init_parcel(p);
+            if (!p.parcel_id())
+                p.parcel_id() = parcel::generate_unique_id();
+
+            bool resolved_locally = true;
+            naming::address* addrs = p.addrs();
+
+            if (!addrs[0])
+            {
+                resolved_locally = resolver_->resolve_local(
+                    p.destinations()[0], addrs[0]);
+            }
+
+            using util::placeholders::_1;
+            using util::placeholders::_2;
+            write_handler_type f = util::bind(&detail::parcel_sent_handler,
+                std::move(handlers[i]), _1, _2);
+
+            // If we were able to resolve the address(es) locally we would send
+            // the parcel directly to the destination.
+            if (resolved_locally)
+            {
+                // dispatch to the message handler which is associated with the
+                // encapsulated action
+                destination_pair dest = find_appropriate_destination(
+                    addrs[0].locality_);
+
+                if (load_message_handlers_)
+                {
+                    policies::message_handler* mh = p.get_message_handler(
+                        this, dest.second);
+
+                    if (mh) {
+                        mh->put_parcel(dest.second, std::move(p), std::move(f));
+                        continue;
+                    }
+                }
+
+                resolved_parcels.push_back(std::move(p));
+                resolved_handlers.push_back(std::move(f));
+                resolved_dests.push_back(dest);
+            }
+            else
+            {
+                nonresolved_parcels.push_back(std::move(p));
+                nonresolved_handlers.push_back(std::move(f));
+            }
+        }
+
+        // handle parcel which have been locally resolved
+        if (!resolved_parcels.empty())
+        {
+            std::vector<locality> dests;
+            dests.reserve(resolved_dests.size());
+
+            for (destination_pair const& p : resolved_dests)
+            {
+                dests.push_back(p.second);
+            }
+
+            resolved_dests[0].first->put_parcels(std::move(dests),
+                std::move(resolved_parcels),
+                std::move(resolved_handlers));
+        }
+
+        // At least one of the addresses is locally unknown, route the
+        // parcel to the AGAS managing the destination.
+        for (std::size_t i = 0; i != nonresolved_parcels.size(); ++i)
+        {
+            ++count_routed_;
+            resolver_->route(std::move(nonresolved_parcels[i]),
+                std::move(nonresolved_handlers[i]));
+        }
+    }
+
     boost::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
     {
         boost::int64_t parcel_count = 0;

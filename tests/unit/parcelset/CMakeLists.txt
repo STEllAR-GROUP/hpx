@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2014 Hartmut Kaiser
+# Copyright (c) 2007-2016 Hartmut Kaiser
 # Copyright (c)      2014 Thomas Heller
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
@@ -6,6 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+  put_parcels
   set_parcel_write_handler
 )
 
