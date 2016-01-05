@@ -85,9 +85,10 @@ namespace hpx { namespace util
         std::string result;
         for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
         {
+            if (it != tokens.begin())
+                result += HPX_INI_PATH_DELIMITER;
             result += *it;
             result += suffix;
-            result += HPX_INI_PATH_DELIMITER;
         }
         return result;
     }

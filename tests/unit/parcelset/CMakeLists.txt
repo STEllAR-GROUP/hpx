@@ -10,8 +10,13 @@ set(tests
   set_parcel_write_handler
 )
 
-set(set_parcel_write_handler_PARAMETERS
-    LOCALITIES 2)
+set(put_parcels_PARAMETERS LOCALITIES 2)
+set(set_parcel_write_handler_PARAMETERS LOCALITIES 2)
+
+if(HPX_WITH_PARCEL_COALESCING)
+  set(tests ${tests} put_parcels_with_coalescing)
+  set(put_parcels_with_coalescing_PARAMETERS LOCALITIES 2)
+endif()
 
 foreach(test ${tests})
   set(sources

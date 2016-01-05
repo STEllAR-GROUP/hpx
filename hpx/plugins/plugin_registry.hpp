@@ -60,7 +60,7 @@ namespace hpx { namespace plugins
                 unique_plugin_name<plugin_registry>::call() + "]";
             fillini += "name = " HPX_PLUGIN_STRING;
             fillini += std::string("path = ") +
-                util::find_prefixes("/lib/hpx", HPX_PLUGIN_STRING);
+                util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
             fillini += "enabled = 1";
 
             char const* more = traits::plugin_config_data<Plugin>::call();

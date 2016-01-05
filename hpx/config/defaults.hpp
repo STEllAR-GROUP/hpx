@@ -34,7 +34,7 @@
 #endif
 #if !defined(HPX_DEFAULT_COMPONENT_PATH)
 #define HPX_DEFAULT_COMPONENT_PATH                                            \
-        hpx::util::find_prefixes("/lib/hpx")                                  \
+        hpx::util::find_prefixes("/hpx")                                      \
     /**/
 #endif
 

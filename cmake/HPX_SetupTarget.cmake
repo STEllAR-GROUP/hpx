@@ -127,7 +127,7 @@ function(hpx_setup_target target)
       CLEAN_DIRECT_OUTPUT 1
       OUTPUT_NAME ${name})
     if(target_PLUGIN)
-      set(plugin_name "HPX_PLUGIN_NAME=${name}")
+      set(plugin_name "HPX_PLUGIN_NAME=hpx_${name}")
     endif()
     set(nohpxinit TRUE)
 

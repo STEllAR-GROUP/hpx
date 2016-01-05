@@ -34,6 +34,7 @@ hpx::id_type test1(std::vector<double> const& data)
     return hpx::find_here();
 }
 HPX_PLAIN_ACTION(test1);
+HPX_ACTION_USES_MESSAGE_COALESCING(test1_action);
 
 void test_plain_argument(hpx::id_type const& id)
 {
@@ -72,6 +73,7 @@ hpx::id_type test2(hpx::future<double> const& data)
     return hpx::find_here();
 }
 HPX_PLAIN_ACTION(test2);
+HPX_ACTION_USES_MESSAGE_COALESCING(test2_action);
 
 void test_future_argument(hpx::id_type const& id)
 {
@@ -204,9 +206,9 @@ int main(int argc, char* argv[])
         "the random number generator seed to use for this run")
         ;
 
-    // explicitly disable message handlers (parcel coalescing)
+    // explicitly enable message handlers (parcel coalescing)
     std::vector<std::string> cfg;
-    cfg.push_back("hpx.parcel.message_handlers=0");
+    cfg.push_back("hpx.parcel.message_handlers=1");
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

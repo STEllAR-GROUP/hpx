@@ -510,8 +510,7 @@ namespace hpx { namespace parcelset
         typedef std::pair<boost::shared_ptr<parcelport>, locality>
             destination_pair;
 
-        std::vector<destination_pair> resolved_dests;
-        resolved_dests.reserve(num_parcels);
+        destination_pair resolved_dest;
 
         std::vector<parcel> nonresolved_parcels;
         nonresolved_parcels.reserve(num_parcels);
@@ -573,7 +572,14 @@ namespace hpx { namespace parcelset
 
                 resolved_parcels.push_back(std::move(p));
                 resolved_handlers.push_back(std::move(f));
-                resolved_dests.push_back(dest);
+                if (!resolved_dest.second)
+                {
+                    resolved_dest = dest;
+                }
+                else
+                {
+                    HPX_ASSERT(resolved_dest == dest);
+                }
             }
             else
             {
@@ -585,15 +591,8 @@ namespace hpx { namespace parcelset
         // handle parcel which have been locally resolved
         if (!resolved_parcels.empty())
         {
-            std::vector<locality> dests;
-            dests.reserve(resolved_dests.size());
-
-            for (destination_pair const& p : resolved_dests)
-            {
-                dests.push_back(p.second);
-            }
-
-            resolved_dests[0].first->put_parcels(std::move(dests),
+            HPX_ASSERT(!!resolved_dest.first && !!resolved_dest.second);
+            resolved_dest.first->put_parcels(resolved_dest.second,
                 std::move(resolved_parcels),
                 std::move(resolved_handlers));
         }

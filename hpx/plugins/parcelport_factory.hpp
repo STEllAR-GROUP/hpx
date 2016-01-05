@@ -64,7 +64,7 @@ namespace hpx { namespace plugins
             fillini += std::string("[hpx.parcel.") + name + "]";
             fillini += "name = " HPX_PLUGIN_STRING;
             fillini += std::string("path = ") +
-                util::find_prefixes("/lib/hpx", HPX_PLUGIN_STRING);
+                util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
             fillini += "enable = 1";
 
             std::string name_uc = boost::to_upper_copy(name);
