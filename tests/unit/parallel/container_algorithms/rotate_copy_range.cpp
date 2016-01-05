@@ -29,14 +29,20 @@ void test_rotate_copy(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
+
+    std::size_t mid_pos = std::rand() % c.size();
 
     auto mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size()); //-V104
+    std::advance(mid, mid_pos);
 
     hpx::parallel::rotate_copy(policy, c, iterator(mid), boost::begin(d1));
 
-    std::rotate_copy(boost::begin(c), mid, boost::end(c), boost::begin(d2));
+    auto mid_base = boost::begin(c.base());
+    std::advance(mid_base, mid_pos);
+
+    std::rotate_copy(boost::begin(c.base()), mid_base, boost::end(c.base()),
+        boost::begin(d2));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(d1), boost::end(d1), boost::begin(d2),
@@ -60,15 +66,21 @@ void test_rotate_copy_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
+
+    std::size_t mid_pos = std::rand() % c.size();
 
     auto mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size()); //-V104
+    std::advance(mid, mid_pos);
 
     auto f = hpx::parallel::rotate_copy(p, c, iterator(mid), boost::begin(d1));
     f.wait();
 
-    std::rotate_copy(boost::begin(c), mid, boost::end(c), boost::begin(d2));
+    auto mid_base = boost::begin(c.base());
+    std::advance(mid_base, mid_pos);
+
+    std::rotate_copy(boost::begin(c.base()), mid_base, boost::end(c.base()),
+        boost::begin(d2));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(d1), boost::end(d1), boost::begin(d2),
