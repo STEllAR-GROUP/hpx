@@ -193,8 +193,8 @@ HPX_INLINE_NAMESPACE(v1)
               }
             }
             if (n_chunks < 2 || cores == 1) {
-              return sequential(policy, first, last, dest, std::forward < T >(init),
-                std::forward < Op >(op));
+              return result::get(sequential(policy, first, last, dest, std::forward < T >(init),
+                std::forward < Op >(op)));
             }
 
             // --------------------------
@@ -287,7 +287,7 @@ HPX_INLINE_NAMESPACE(v1)
                 work_items.push_back(std::move(w1));
             }
             hpx::wait_all(work_items);
-            return final_dest;
+            return result::get(std::move(final_dest));
         }
     };
 
