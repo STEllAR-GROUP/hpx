@@ -138,29 +138,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // Zip iterator has 3 iterators inside
         // Iter1, key type : Iter2, value type : Iter3, state type
         template <typename ZIter, typename iKey, typename iVal>
-        std::pair< iKey, iVal>
+        std::pair< iKey, iVal >
         make_pair_result(ZIter zipiter, iKey key_start, iVal val_start)
         {
-            // tagged_pair type (from copy_if) has second item the iterator we want
+            // the iterator we want is 'second' part of tagged_pair type (from copy_if)
             auto const& t = zipiter.second.get_iterator_tuple();
             iKey key_end = hpx::util::get<0>(t);
             return std::make_pair(key_end,
                                   std::next(val_start, std::distance(key_start, key_end)));
         }
-/*
-        template <typename Iter1, typename Iter2>
-        hpx::future< std::pair< Iter1, Iter2> >
-        make_pair_result(hpx::future<Iter1> && iter1, Iter1 ibegin, Iter2 iter2)
+
+        template <typename ZIter, typename iKey, typename iVal>
+        hpx::future< std::pair< iKey, iVal > >
+        make_pair_result(hpx::future<ZIter> && ziter, iKey key_start, iVal val_start)
         {
-            typedef std::pair< Iter1, Iter2 > result_type;
+            typedef std::pair< iKey, iVal > result_type;
 
             return lcos::make_future<result_type>(
-                    std::move(iter1),
-                    [=](Iter1 iter1){
-                        return std::make_pair(iter1,std::next(iter2,std::distance(ibegin, iter1)));
+                    std::move(ziter),
+                    [=](ZIter zipiter) {
+                        auto const& t = zipiter.second.get_iterator_tuple();
+                        iKey key_end = hpx::util::get<0>(t);
+                        return std::make_pair(key_end,
+                                              std::next(val_start, std::distance(key_start, key_end)));
                     });
         }
-*/
+
         /// \endcond
     }
 
@@ -263,6 +266,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter2 values_output,
         Compare && comp = Compare(), Proj && proj = Proj())
     {
+        typedef util::detail::algorithm_result<ExPolicy, std::pair<OutIter,OutIter2>>
+                result;
         typedef typename std::iterator_traits<RanIter>::iterator_category
                 iterator_category1;
         typedef typename std::iterator_traits<RanIter2>::iterator_category
@@ -287,11 +292,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         const uint64_t numberOfKeys = std::distance(key_first, key_last);
 
-        if(numberOfKeys <= 1)
+        if (numberOfKeys <= 1)
         { // we only have a single key/value so that is our output
             *keys_output = *key_first;
             *values_output = *values_first;
-            return std::make_pair(keys_output,values_output);
+            return result::get(std::make_pair(keys_output,values_output));
         }
 
         using namespace hpx::parallel::detail;
@@ -396,9 +401,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             using zip2_ref = typename zip_iterator2::reference;
 
             // @TODO : fix this to write keys to output array instead of input
-            auto result = make_pair_result(
-                hpx::parallel::copy_if(
-                    policy,
+            auto return_val = make_pair_result(
+                std::move(hpx::parallel::copy_if(
+                    hpx::parallel::seq, // policy,
                     make_zip_iterator(
                         key_first, values_output, std::begin(keystate)),
                     make_zip_iterator(
@@ -409,9 +414,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     [](zip2_ref it) {
                         return get< 2 >(it).fEnd;
                     }
-                ), key_first, values_output);
+                )), key_first, values_output);
 
-            return result;
+            return result::get(std::move(return_val));
         }
     }
         }

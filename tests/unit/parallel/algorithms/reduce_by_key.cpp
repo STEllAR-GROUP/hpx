@@ -12,7 +12,7 @@
 //
 #include <boost/random/uniform_int_distribution.hpp>
 //
-#define HPX_REDUCE_BY_KEY_TEST_SIZE (1 << 4)
+#define HPX_REDUCE_BY_KEY_TEST_SIZE (1 << 18)
 //
 #include "sort_tests.hpp"
 //
@@ -45,34 +45,32 @@ namespace debug {
 };
 
 #undef msg
-#define msg(a,b,c,d,e) \
+#define msg(a,b,c,d) \
         std::cout \
         << std::setw(60) << a << std::setw(12) <<  b \
-        << std::setw(40) << c << std::setw(6)  <<  d \
-        << std::setw(8)  << #e << "\t";
+        << std::setw(40) << c << std::setw(30) \
+        << std::setw(8)  << #d << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
-// call reduce_by_key with no comparison operator
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
 void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, const Op &op, const HelperOp &ho)
 {
     static_assert(
             hpx::parallel::is_execution_policy<ExPolicy>::value,
             "hpx::parallel::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), "default", sync);
+    msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), sync);
     std::cout << "\n";
 
-    Tval rnd_min = -100;
-    Tval rnd_max =  100;
+    Tval rnd_min =  -256;
+    Tval rnd_max =   256;
 
     // vector of values, and keys
-    std::vector<Tval> values;
-    std::vector<Tkey> keys;
+    std::vector<Tval> values, o_values;
+    std::vector<Tkey> keys, o_keys;
     values.reserve(HPX_REDUCE_BY_KEY_TEST_SIZE);
     keys.reserve(HPX_REDUCE_BY_KEY_TEST_SIZE);
 
-    // to simply validate our reduction we will use a map
-    std::map<Tkey,Tval> key_check;
+    std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
     boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
@@ -81,45 +79,37 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, const Op &op, const Hel
     // use the default random engine and an uniform distribution for keys
     boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
     boost::random::uniform_real_distribution<double> distrk(0, 256);
+
     // generate test data
-    for (int i=0; i<HPX_REDUCE_BY_KEY_TEST_SIZE; i++) {
-        Tkey key = static_cast<Tkey>(distrk(engk));
-        Tval value = static_cast<Tval>(distr(eng));
-        Tkey helperkey = ho(key);
-        if (key_check.find(helperkey)==key_check.end()) {
-            key_check[helperkey] = value;
+    int keysize = 0;
+    Tkey key=0, helperkey=0, lastkey = 0;
+    for (/* */; keysize<HPX_REDUCE_BY_KEY_TEST_SIZE; )
+    {
+        do {
+            key = static_cast<Tkey>(distrk(engk));
+        } while (ho(key)==lastkey);
+        helperkey = ho(key);
+        lastkey = helperkey;
+        //
+        int numkeys = static_cast<Tkey>(distrk(engk)) + 1;
+        //
+        Tval sum = 0;
+        for (int i=0; i<numkeys && keysize<HPX_REDUCE_BY_KEY_TEST_SIZE; ++i) {
+            Tval value = static_cast<Tval>(distr(eng));
+            keys.push_back(key);
+            values.push_back(value);
+            sum += value;
+            keysize++;
         }
-        else {
-            Tval temp = key_check[helperkey] + value;
-            key_check[helperkey] = temp;
-        }
-        keys.push_back(key);
-        values.push_back(value);
+        check_values.push_back(sum);
     }
-
-    hpx::parallel::sort_by_key(
-            hpx::parallel::seq,
-            keys.begin(),
-            keys.end(),
-            values.begin());
-
-    // output
-    //debug::output("\nkeys", keys);
-    //debug::output("\nvalues", values);
-
-    std::vector<Tval> check_values;
-    for (typename std::map<Tkey,Tval>::iterator it=key_check.begin(); it!=key_check.end(); ++it) {
-        check_values.push_back(it->second);
-        //debug_msg("Operation of " << it->first << " is " << it->second << "\n");
-    }
-
-    auto policy2 = hpx::parallel::par.with(hpx::parallel::static_chunk_size(4096));
+    o_values = values;
+    o_keys = keys;
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // reduce_by_key, blocking when seq, par, par_vec
     auto result = hpx::parallel::reduce_by_key(
-            policy2,
-            //std::forward<ExPolicy>(policy),
+            std::forward<ExPolicy>(policy),
             keys.begin(), keys.end(),
             values.begin(),
             keys.begin(),
@@ -129,12 +119,97 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, const Op &op, const Hel
 
     bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
     if (is_equal) {
-        std::cout << "Test Passed\n";
+        //std::cout << "Test Passed\n";
     }
     else {
+        debug::output("keys     ", o_keys);
+        debug::output("values   ", o_values);
         debug::output("key range", keys.begin(), result.first);
         debug::output("val range", values.begin(), result.second);
         debug::output("expected ", check_values);
+        throw std::string ("Problem");
+    }
+    HPX_TEST(is_equal);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
+void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op, const HelperOp &ho)
+{
+    static_assert(
+            hpx::parallel::is_execution_policy<ExPolicy>::value,
+            "hpx::parallel::is_execution_policy<ExPolicy>::value");
+    msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), sync);
+    std::cout << "\n";
+
+    Tval rnd_min =  -256;
+    Tval rnd_max =   256;
+
+    // vector of values, and keys
+    std::vector<Tval> values, o_values;
+    std::vector<Tkey> keys, o_keys;
+    values.reserve(HPX_REDUCE_BY_KEY_TEST_SIZE);
+    keys.reserve(HPX_REDUCE_BY_KEY_TEST_SIZE);
+
+    std::vector<Tval> check_values;
+
+    // use the default random engine and an uniform distribution for values
+    boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    boost::random::uniform_real_distribution<double> distr(rnd_min, rnd_max);
+
+    // use the default random engine and an uniform distribution for keys
+    boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    boost::random::uniform_real_distribution<double> distrk(0, 256);
+
+    // generate test data
+    int keysize = 0;
+    Tkey key=0, helperkey=0, lastkey = 0;
+    for (/* */; keysize<HPX_REDUCE_BY_KEY_TEST_SIZE; )
+    {
+        do {
+            key = static_cast<Tkey>(distrk(engk));
+        } while (ho(key)==lastkey);
+        helperkey = ho(key);
+        lastkey = helperkey;
+        //
+        int numkeys = static_cast<Tkey>(distrk(engk)) + 1;
+        //
+        Tval sum = 0;
+        for (int i=0; i<numkeys && keysize<HPX_REDUCE_BY_KEY_TEST_SIZE; ++i) {
+            Tval value = static_cast<Tval>(distr(eng));
+            keys.push_back(key);
+            values.push_back(value);
+            sum += value;
+            keysize++;
+        }
+        check_values.push_back(sum);
+    }
+    o_values = values;
+    o_keys = keys;
+
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    // reduce_by_key, blocking when seq, par, par_vec
+    auto fresult = hpx::parallel::reduce_by_key(
+            std::forward<ExPolicy>(policy),
+            keys.begin(), keys.end(),
+            values.begin(),
+            keys.begin(),
+            values.begin(),
+            op);
+    auto result = fresult.get();
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
+    if (is_equal) {
+        //std::cout << "Test Passed\n";
+    }
+    else {
+        debug::output("keys     ", o_keys);
+        debug::output("values   ", o_values);
+        debug::output("key range", keys.begin(), result.first);
+        debug::output("val range", values.begin(), result.second);
+        debug::output("expected ", check_values);
+        throw std::string ("Problem");
     }
     HPX_TEST(is_equal);
 }
@@ -143,31 +218,44 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, const Op &op, const Hel
 void test_reduce_by_key1()
 {
     using namespace hpx::parallel;
-
-    // default comparison operator (std::equal_to)
-    test_reduce_by_key1(seq,     int(), int(), std::equal_to<int>(), [](int a){return a;});
-    test_reduce_by_key1(par,     int(), int(), std::equal_to<int>(), [](int a){return a;});
-    test_reduce_by_key1(par_vec, int(), int(), std::equal_to<int>(), [](int a){return a;});
-
-    // default comparison operator (std::equal_to)
-    test_reduce_by_key1(seq,     int(), double(), std::equal_to<double>(), [](int a){return a;});
-    test_reduce_by_key1(par,     int(), double(), std::equal_to<double>(), [](int a){return a;});
-    test_reduce_by_key1(par_vec, int(), double(), std::equal_to<double>(), [](int a){return a;});
-
     //
-    test_reduce_by_key1(seq,     double(), double(),
-                        [](double a, double b) { return std::floor(a)==std::floor(b); },
-                        [](double a){ return std::floor(a); }
-    );
-    test_reduce_by_key1(par,     double(), double(),
-                        [](double a, double b) { return std::floor(a)==std::floor(b); },
-                        [](double a){ return std::floor(a); }
-    );
-    test_reduce_by_key1(par_vec,     double(), double(),
-                        [](double a, double b) { return std::floor(a)==std::floor(b); },
-                        [](double a){ return std::floor(a); }
-    );
+    hpx::util::high_resolution_timer t;
+    do {
+        test_reduce_by_key1(seq,     int(), int(), std::equal_to<int>(), [](int key){return key;});
+        test_reduce_by_key1(par,     int(), int(), std::equal_to<int>(), [](int key){return key;});
+        test_reduce_by_key1(par_vec, int(), int(), std::equal_to<int>(), [](int key){return key;});
+        //
+        // default comparison operator (std::equal_to)
+        test_reduce_by_key1(seq,     int(), double(), std::equal_to<double>(), [](int key){return key;});
+        test_reduce_by_key1(par,     int(), double(), std::equal_to<double>(), [](int key){return key;});
+        test_reduce_by_key1(par_vec, int(), double(), std::equal_to<double>(), [](int key){return key;});
+        //
+        //
+        test_reduce_by_key1(seq,     double(), double(),
+                            [](double a, double b) { return std::floor(a)==std::floor(b); },
+                            [](double a){ return std::floor(a); }
+        );
+        test_reduce_by_key1(par,     double(), double(),
+                            [](double a, double b) { return std::floor(a)==std::floor(b); },
+                            [](double a){ return std::floor(a); }
+        );
+        test_reduce_by_key1(par_vec, double(), double(),
+                            [](double a, double b) { return std::floor(a)==std::floor(b); },
+                            [](double a){ return std::floor(a); }
+        );
+    } while (t.elapsed()<5);
+    //
 
+    hpx::util::high_resolution_timer t2;
+    do {
+        test_reduce_by_key_async(seq(task), int(), int(), std::equal_to<int>(), [](int key){return key;});
+        test_reduce_by_key_async(par(task), int(), int(), std::equal_to<int>(), [](int key){return key;});
+        //
+        test_reduce_by_key_async(seq(task), int(), double(), std::equal_to<double>(), [](int key){return key;});
+        test_reduce_by_key_async(par(task), int(), double(), std::equal_to<double>(), [](int key){return key;});
+    } while (t2.elapsed()<5);
+/*
+*/
 /*
     test_reduce_by_key1(seq,     double(), std::multiplies<double>());
     test_reduce_by_key1(par,     double(), std::multiplies<double>());
