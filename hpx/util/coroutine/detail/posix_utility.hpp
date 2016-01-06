@@ -47,10 +47,9 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
-
 #include <new>
-#include <iostream>
-#include <boost/type_traits.hpp>
+
+#include <boost/type_traits/type_with_alignment.hpp>
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>
@@ -73,8 +72,8 @@
 /**
  * Stack allocation routines and trampolines for setcontext
  */
-namespace hpx { namespace util { namespace coroutines { namespace detail
-{ namespace posix {
+namespace hpx { namespace util { namespace coroutines { namespace detail {
+namespace posix {
 
 HPX_EXPORT extern bool use_guard_pages;
 
@@ -253,42 +252,6 @@ HPX_EXPORT extern bool use_guard_pages;
 
 }}}}
 
-//#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
-//#include <sys/mman.h>
-//
-//#if defined(MAP_ANONYMOUS)
-//# define HPX_MAP_ANONYMOUS MAP_ANONYMOUS
-//#elif defined(MAP_ANON)
-//# define HPX_MAP_ANONYMOUS MAP_ANON
-//#else
-//# error "Anonymous mmap not available on this platform!"
-//#endif
-//
-//namespace hpx { namespace util { namespace coroutines
-// { namespace detail { namespace posix {
-//  inline
-//  void *
-//  alloc_stack_mmap(std::size_t size) {
-//    void * stack = ::mmap(NULL,
-//                          size,
-//                          PROT_EXEC|PROT_READ|PROT_WRITE,
-//                          MAP_PRIVATE|HPX_MAP_ANONYMOUS,
-//                          -1,
-//                          0
-//                          );
-//    if(stack == MAP_FAILED) {
-//      std::cerr <<strerror(errno)<<"\n";
-//      abort();
-//    }
-//    return stack;
-//  }
-//
-//  inline
-//  void free_stack_mmap(void* stack, std::size_t size) {
-//    ::munmap(stack, size);
-//  }
-//} } } } }
-//#endif
 #else
 #error This header can only be included when compiling for posix systems.
 #endif
