@@ -5,7 +5,9 @@
 
 #if !defined(HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015)
 #define HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015
-
+//
+#include <hpx/parallel/executors.hpp>
+//
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/algorithms/detail/tuple_iterator.hpp>
 #include <hpx/parallel/algorithms/prefix_scan.hpp>
@@ -164,6 +166,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     });
         }
 
+        // when we are being run with an asynchronous policy, we do not want to
+        // pass the policy directly to other algorithms we are using - as we
+        // would have wait internally on them before proceeding.
+        // Instead create a new policy from the old one which removes the async/future
+
+        template <typename ExPolicy>
+        struct remove_asynchronous {
+            typedef ExPolicy type;
+        };
+
+        template <>
+        struct remove_asynchronous<hpx::parallel::parallel_vector_execution_policy> {
+            typedef hpx::parallel::parallel_execution_policy type;
+        };
+
+        template <>
+        struct remove_asynchronous<hpx::parallel::sequential_task_execution_policy> {
+            typedef hpx::parallel::sequential_execution_policy type;
+        };
+
+        template <>
+        struct remove_asynchronous<hpx::parallel::parallel_task_execution_policy> {
+            typedef hpx::parallel::parallel_execution_policy type;
+        };
+
         /// \endcond
     }
 
@@ -288,7 +315,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::output_iterator_tag, iterator_category4>::value),
             "iterators : Random_access for inputs and Output for outputs.");
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef typename detail::remove_asynchronous<
+                    typename std::decay< ExPolicy >::type >::type sync_policy_type;
+
+        sync_policy_type sync_policy = sync_policy_type().on(policy.executor()).with(policy.parameters());
 
         const uint64_t numberOfKeys = std::distance(key_first, key_last);
 
@@ -332,7 +362,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // middle elements
                 ReduceStencilGeneration <reduce_stencil_transformer, RanIter, KeyStateIterType, Compare> kernel;
                 hpx::parallel::for_each(
-                        policy,
+                        sync_policy,
                         make_zip_iterator(reduce_begin + 1, keystate.begin() + 1),
                         make_zip_iterator(reduce_end - 1, keystate.end() - 1),
                         [&kernel, &comp](zip_ref ref) {
@@ -357,13 +387,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     values_first + numberOfKeys, std::end(keystate));
             zip_iterator states_out_begin = make_zip_iterator(
                     values_output, std::begin(keystate));
-
+            //
             zip_type initial = tuple<float, ReduceKeySeriesStates>(0.0, ReduceKeySeriesStates(true, false));
-            // caution : if the current value is a start value, then it should be used
-            // otherwise we add the incoming B to our A.
-            // BUT, the partitions are updated with values carried from if the when summing we can add values if the current value is not a start
+            //
             hpx::parallel::prefix_scan_inclusive(
-                    policy,
+                    sync_policy,
                     states_begin,
                     states_end,
                     states_out_begin,
@@ -403,7 +431,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             // @TODO : fix this to write keys to output array instead of input
             auto return_val = make_pair_result(
                 std::move(hpx::parallel::copy_if(
-                    hpx::parallel::seq, // policy,
+                    sync_policy,
                     make_zip_iterator(
                         key_first, values_output, std::begin(keystate)),
                     make_zip_iterator(

@@ -254,49 +254,6 @@ void test_reduce_by_key1()
         test_reduce_by_key_async(seq(task), int(), double(), std::equal_to<double>(), [](int key){return key;});
         test_reduce_by_key_async(par(task), int(), double(), std::equal_to<double>(), [](int key){return key;});
     } while (t2.elapsed()<5);
-/*
-*/
-/*
-    test_reduce_by_key1(seq,     double(), std::multiplies<double>());
-    test_reduce_by_key1(par,     double(), std::multiplies<double>());
-    test_reduce_by_key1(par_vec, double(), std::multiplies<double>());
-
-    // user supplied comparison operator (std::less)
-    test_reduce_by_key1_comp(seq,     int(), std::less<std::size_t>());
-    test_reduce_by_key1_comp(par,     int(), std::less<std::size_t>());
-    test_reduce_by_key1_comp(par_vec, int(), std::less<std::size_t>());
-
-    // user supplied comparison operator (std::greater)
-    test_reduce_by_key1_comp(seq,     double(), std::greater<double>());
-    test_reduce_by_key1_comp(par,     double(), std::greater<double>());
-    test_reduce_by_key1_comp(par_vec, double(), std::greater<double>());
-
-    // Async execution, default comparison operator
-    test_reduce_by_key1_async(seq(task), int());
-    test_reduce_by_key1_async(par(task), char());
-    test_reduce_by_key1_async(seq(task), double());
-    test_reduce_by_key1_async(par(task), float());
-    test_reduce_by_key1_async_str(seq(task));
-    test_reduce_by_key1_async_str(par(task));
-
-    // Async execution, user comparison operator
-    test_reduce_by_key1_async(seq(task), int(),    std::less<unsigned int>());
-    test_reduce_by_key1_async(par(task), char(),   std::less<char>());
-    //
-    test_reduce_by_key1_async(seq(task), double(), std::greater<double>());
-    test_reduce_by_key1_async(par(task), float(),  std::greater<float>());
-    //
-    test_reduce_by_key1_async_str(seq(task), std::greater<std::string>());
-    test_reduce_by_key1_async_str(par(task), std::greater<std::string>());
-
-    test_reduce_by_key1(execution_policy(seq),       int());
-    test_reduce_by_key1(execution_policy(par),       int());
-    test_reduce_by_key1(execution_policy(par_vec),   int());
-    test_reduce_by_key1(execution_policy(seq(task)), int());
-    test_reduce_by_key1(execution_policy(par(task)), int());
-    test_reduce_by_key1(execution_policy(seq(task)), std::string());
-    test_reduce_by_key1(execution_policy(par(task)), std::string());
-*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
