@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     typename util::detail::algorithm_result<
         ExPolicy, typename traits::range_iterator<Rng>::type
     >::type
-    reverse(ExPolicy && policy, Rng rng)
+    reverse(ExPolicy && policy, Rng && rng)
     {
         return reverse(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng));
@@ -141,7 +141,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             tag::out(OutIter)
         >
     >::type
-    reverse_copy(ExPolicy && policy, Rng rng, OutIter dest_first)
+    reverse_copy(ExPolicy && policy, Rng && rng, OutIter dest_first)
     {
         return reverse_copy(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng), dest_first);
