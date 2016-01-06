@@ -15,7 +15,8 @@
 
 #include <boost/cstdint.hpp>
 
-namespace hpx {
+namespace hpx
+{
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
     ///        from.

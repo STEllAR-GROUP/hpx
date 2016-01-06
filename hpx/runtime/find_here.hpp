@@ -13,7 +13,8 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
-namespace hpx {
+namespace hpx
+{
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
     ///
