@@ -170,7 +170,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     remove_copy(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-        T const& val, Proj && proj = Proj{})
+        T const& val, Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
@@ -362,7 +362,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     remove_copy_if(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-        F && f, Proj && proj = Proj{})
+        F && f, Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
