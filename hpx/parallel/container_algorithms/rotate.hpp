@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             tag::end(typename traits::range_iterator<Rng>::type)
         >
     >::type
-    rotate(ExPolicy && policy, Rng rng,
+    rotate(ExPolicy && policy, Rng && rng,
         typename traits::range_iterator<Rng>::type middle)
     {
         return rotate(std::forward<ExPolicy>(policy),
@@ -148,7 +148,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             tag::out(OutIter)
         >
     >::type
-    rotate_copy(ExPolicy && policy, Rng rng,
+    rotate_copy(ExPolicy && policy, Rng && rng,
         typename traits::range_iterator<Rng>::type middle, OutIter dest_first)
     {
         return rotate_copy(std::forward<ExPolicy>(policy),

@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             tag::out(OutIter)
         >
     >::type
-    remove_copy(ExPolicy && policy, Rng rng, OutIter dest, T const& val,
+    remove_copy(ExPolicy && policy, Rng && rng, OutIter dest, T const& val,
         Proj && proj = Proj{})
     {
         return remove_copy(std::forward<ExPolicy>(policy),
@@ -216,7 +216,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             tag::out(OutIter)
         >
     >::type
-    remove_copy_if(ExPolicy && policy, Rng rng, OutIter dest, F && f,
+    remove_copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
         Proj && proj = Proj{})
     {
         return remove_copy_if(std::forward<ExPolicy>(policy),

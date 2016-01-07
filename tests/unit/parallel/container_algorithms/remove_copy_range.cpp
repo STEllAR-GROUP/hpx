@@ -27,15 +27,15 @@ void test_remove_copy(ExPolicy policy, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size()/2);
-    std::size_t middle_idx =std::rand() % (c.size()/2);
-    auto middle = hpx::parallel::v1::detail::next(boost::begin(c), middle_idx);
-    std::fill(boost::begin(c), middle, 1);
-    std::fill(middle, boost::end(c), 2);
+    std::size_t middle_idx = std::rand() % (c.size()/2);
+    auto middle = hpx::parallel::v1::detail::next(boost::begin(c.base()), middle_idx);
+    std::fill(boost::begin(c.base()), middle, 1);
+    std::fill(middle, boost::end(c.base()), 2);
 
     hpx::parallel::remove_copy(policy, c, boost::begin(d), std::size_t(2));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
+    HPX_TEST(std::equal(boost::begin(c.base()), middle, boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -55,15 +55,15 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
     test_vector c(10007);
     std::vector<std::size_t> d(c.size()/2);
     std::size_t middle_idx = std::rand() % (c.size()/2);
-    auto middle = hpx::parallel::v1::detail::next(boost::begin(c), middle_idx);
-    std::fill(boost::begin(c), middle, 1);
-    std::fill(middle, boost::end(c), 2);
+    auto middle = hpx::parallel::v1::detail::next(boost::begin(c.base()), middle_idx);
+    std::fill(boost::begin(c.base()), middle, 1);
+    std::fill(middle, boost::end(c.base()), 2);
 
     auto f = hpx::parallel::remove_copy(p, c, boost::begin(d), std::size_t(2));
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
+    HPX_TEST(std::equal(boost::begin(c.base()), middle, boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;

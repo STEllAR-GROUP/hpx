@@ -88,7 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     typename util::detail::algorithm_result<
         ExPolicy, typename traits::range_traits<Rng>::iterator_type
     >::type
-    replace(ExPolicy && policy, Rng rng, T1 const& old_value,
+    replace(ExPolicy && policy, Rng && rng, T1 const& old_value,
         T2 const& new_value, Proj && proj = Proj{})
     {
         return replace(std::forward<ExPolicy>(policy),
@@ -176,7 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     typename util::detail::algorithm_result<
         ExPolicy, typename traits::range_traits<Rng>::iterator_type
     >::type
-    replace_if(ExPolicy && policy, Rng rng, F && f, T const& new_value,
+    replace_if(ExPolicy && policy, Rng && rng, F && f, T const& new_value,
         Proj && proj = Proj{})
     {
         return replace_if(std::forward<ExPolicy>(policy),
@@ -265,7 +265,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             tag::out(OutIter)
         >
     >::type
-    replace_copy(ExPolicy && policy, Rng rng, OutIter dest,
+    replace_copy(ExPolicy && policy, Rng && rng, OutIter dest,
         T1 const& old_value, T2 const& new_value, Proj && proj = Proj{})
     {
         return replace_copy(std::forward<ExPolicy>(policy),
@@ -370,7 +370,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             tag::out(OutIter)
         >
     >::type
-    replace_copy_if(ExPolicy && policy, Rng rng, OutIter dest,
+    replace_copy_if(ExPolicy && policy, Rng && rng, OutIter dest,
         F && f, T const& new_value, Proj && proj = Proj{})
     {
         return replace_copy_if(std::forward<ExPolicy>(policy),
