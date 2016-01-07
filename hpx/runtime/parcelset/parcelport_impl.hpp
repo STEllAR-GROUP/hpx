@@ -191,25 +191,7 @@ namespace hpx { namespace parcelset
 
         }
 
-        void put_parcel(locality const & dest, parcel p, write_handler_type f)
-        {
-            put_parcel(dest, std::move(p), std::move(f), true);
-        }
-
-        void put_parcel(locality const & dest, parcel p, write_handler_type f,
-            bool trigger)
-        {
-            HPX_ASSERT(dest.type() == type());
-
-            boost::shared_ptr<future_await_container_type> future_await =
-                boost::make_shared<future_await_container_type>();
-            boost::shared_ptr<archive_type> archive =
-                boost::make_shared<archive_type>(*future_await);
-
-            put_parcel_await(dest, std::move(p), std::move(f), trigger,
-                archive, future_await);
-        }
-
+    protected:
         void put_parcel_await(
             locality const & dest, parcel p, write_handler_type f, bool trigger
           , boost::shared_ptr<archive_type> const & archive
@@ -251,7 +233,29 @@ namespace hpx { namespace parcelset
                 get_connection_and_send_parcels(dest);
         }
 
-        void put_parcel_await(
+    public:
+        void put_parcel(locality const & dest, parcel p, write_handler_type f)
+        {
+            put_parcel(dest, std::move(p), std::move(f), true);
+        }
+
+        void put_parcel(locality const & dest, parcel p, write_handler_type f,
+            bool trigger)
+        {
+            HPX_ASSERT(dest.type() == type());
+
+            boost::shared_ptr<future_await_container_type> future_await =
+                boost::make_shared<future_await_container_type>();
+            boost::shared_ptr<archive_type> archive =
+                boost::make_shared<archive_type>(*future_await);
+
+            put_parcel_await(dest, std::move(p), std::move(f), trigger,
+                archive, future_await);
+        }
+
+
+    protected:
+        void put_parcels_await(
             locality const& dest, std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers, bool trigger
           , boost::shared_ptr<archive_type> const & archive
@@ -277,7 +281,7 @@ namespace hpx { namespace parcelset
                   , boost::shared_ptr<archive_type> const &
                   , boost::shared_ptr<future_await_container_type> const &
                 )
-                    = &parcelport_impl::put_parcel_await;
+                    = &parcelport_impl::put_parcels_await;
                 (*future_await)(
                     util::bind(
                         util::one_shot(awaiter), this,
@@ -295,8 +299,15 @@ namespace hpx { namespace parcelset
                 get_connection_and_send_parcels(dest);
         }
 
+    public:
         void put_parcels(locality const& dest, std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers)
+        {
+            put_parcels(dest, std::move(parcels), std::move(handlers), true);
+        }
+
+        void put_parcels(locality const& dest, std::vector<parcel> parcels,
+            std::vector<write_handler_type> handlers, bool trigger)
         {
             if (parcels.size() != handlers.size())
             {
@@ -323,12 +334,9 @@ namespace hpx { namespace parcelset
                 boost::make_shared<archive_type>(*future_await);
 
             // enqueue the outgoing parcels ...
-            HPX_ASSERT(parcels.size() == handlers.size());
-            put_parcel_await(
-                locality_id, std::move(parcels), std::move(handlers),
-                false, archive, future_await);
-
-            get_connection_and_send_parcels(locality_id);
+            put_parcels_await(
+                locality_id, std::move(parcels), std::move(handlers), trigger,
+                archive, future_await);
         }
 
         void send_early_parcel(locality const & dest, parcel p)
@@ -833,7 +841,9 @@ namespace hpx { namespace parcelset
             locality const& locality_id,
             boost::shared_ptr<connection> sender_connection)
         {
+            HPX_ASSERT(operations_in_flight_ != 0);
             --operations_in_flight_;
+
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             client_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif

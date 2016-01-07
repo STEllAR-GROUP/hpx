@@ -527,7 +527,8 @@ namespace hpx { namespace parcelset
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "parcelhandler::put_parcels",
-                    "mismatched number of parcels and handlers");
+                    "mismatched destinations, all parcels are expected to "
+                    "target the same locality");
                 return;
             }
 
