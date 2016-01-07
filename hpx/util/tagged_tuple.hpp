@@ -51,6 +51,7 @@ namespace hpx { namespace util
         };
     }
 
+#if defined(HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
     template <typename ...Tags, typename ...Ts>
     HPX_CONSTEXPR HPX_FORCEINLINE
     tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>
@@ -77,6 +78,49 @@ namespace hpx { namespace util
 
         return result_type(std::move(t));
     }
+#else
+    // workaround for the only direct use in HPX itself
+    template <
+        typename Tag1, typename Tag2, typename Tag3,
+        typename T1, typename T2, typename T3>
+    HPX_CONSTEXPR HPX_FORCEINLINE
+    tagged_tuple<
+        typename detail::tagged_type<Tag1, T1>::type,
+        typename detail::tagged_type<Tag2, T2>::type,
+        typename detail::tagged_type<Tag3, T3>::type
+    >
+    make_tagged_tuple(T1 && t1, T2 && t2, T3 && t3)
+    {
+        typedef tagged_tuple<
+                typename detail::tagged_type<Tag1, T1>::type,
+                typename detail::tagged_type<Tag2, T2>::type,
+                typename detail::tagged_type<Tag3, T3>::type
+            > result_type;
+
+        return result_type(std::forward<T1>(t1), std::forward<T2>(t2),
+            std::forward<T3>(t3));
+    }
+
+    template <
+        typename Tag1, typename Tag2, typename Tag3,
+        typename T1, typename T2, typename T3>
+    HPX_CONSTEXPR HPX_FORCEINLINE
+    tagged_tuple<
+        typename detail::tagged_type<Tag1, T1>::type,
+        typename detail::tagged_type<Tag2, T2>::type,
+        typename detail::tagged_type<Tag3, T3>::type
+    >
+    make_tagged_tuple(tuple<T1, T2, T3> && t)
+    {
+        typedef tagged_tuple<
+                typename detail::tagged_type<Tag1, T1>::type,
+                typename detail::tagged_type<Tag2, T2>::type,
+                typename detail::tagged_type<Tag3, T3>::type
+            > result_type;
+
+        return result_type(std::move(t));
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -108,6 +152,7 @@ namespace hpx { namespace util
         };
     }
 
+#if defined(HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
     template <typename ...Tags, typename ...Ts>
     hpx::future<typename detail::tagged_tuple_helper<
         tuple<Ts...>,
@@ -133,6 +178,31 @@ namespace hpx { namespace util
                 return make_tagged_tuple<Tags...>(std::move(t));
             });
     }
+#else
+    // workaround for the only direct use in HPX itself
+    template <
+        typename Tag1, typename Tag2, typename Tag3,
+        typename T1, typename T2, typename T3>
+    hpx::future<typename detail::tagged_tuple_helper<
+        tuple<T1, T2, T3>,
+        typename detail::make_index_pack<3ul>::type,
+        Tag1, Tag2, Tag3
+    >::type>
+    make_tagged_tuple(hpx::future<tuple<T1, T2, T3> > && f)
+    {
+        typedef typename detail::tagged_tuple_helper<
+            tuple<T1, T2, T3>,
+            typename detail::make_index_pack<3ul>::type,
+            Tag1, Tag2, Tag3
+        >::type result_type;
+
+        return lcos::make_future<result_type>(std::move(f),
+            [](tuple<T1, T2, T3> && t) -> result_type
+            {
+                return make_tagged_tuple<Tag1, Tag2, Tag3>(std::move(t));
+            });
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ...Ts>
