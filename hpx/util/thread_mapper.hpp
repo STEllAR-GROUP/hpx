@@ -14,7 +14,7 @@
 #include <vector>
 #include <string>
 
-#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/function.hpp>

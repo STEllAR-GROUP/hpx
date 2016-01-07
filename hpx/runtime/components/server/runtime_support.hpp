@@ -28,12 +28,13 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
 
-#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/atomic.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <map>
 #include <list>

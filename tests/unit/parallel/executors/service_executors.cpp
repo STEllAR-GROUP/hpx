@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <boost/range/functions.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::thread::id test() { return boost::this_thread::get_id(); }

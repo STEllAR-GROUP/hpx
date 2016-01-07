@@ -26,9 +26,9 @@
 
 #include <boost/atomic.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <vector>
 #include <memory>

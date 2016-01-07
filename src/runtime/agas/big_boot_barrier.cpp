@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,11 +39,13 @@
 #endif
 
 #include <boost/format.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/ref.hpp>
 
 #include <sstream>
 #include <cstdlib>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -29,7 +29,7 @@
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/detail/endian.hpp>
