@@ -957,7 +957,7 @@ namespace hpx { namespace lcos
     // conversion function: T f(U).
     template <typename R, typename U, typename Conv,
     HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_callable<Conv(U)>::value)>
+        hpx::traits::is_callable<Conv(U), R>::value)>
     hpx::future<R>
     make_future(hpx::future<U> && f, Conv && conv)
     {
@@ -1187,7 +1187,7 @@ namespace hpx { namespace lcos
     // conversion function: T f(U).
     template <typename R, typename U, typename Conv,
     HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_callable<Conv(U)>::value)>
+        hpx::traits::is_callable<Conv(U), R>::value)>
     hpx::future<R>
     make_future(hpx::shared_future<U> f, Conv && conv)
     {
