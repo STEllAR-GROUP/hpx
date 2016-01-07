@@ -923,46 +923,76 @@ namespace hpx { namespace lcos
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // allow to convert any future into a future<void>
-    template <typename R>
-    future<void> make_future_void(future<R> && f)
+    namespace detail
     {
-        return std::move(f);
-    }
-
-    // Allow to convert any future<U> into any other future<T> based on an
-    // existing conversion path U --> T.
-    template <typename T, typename U,
-    HPX_CONCEPT_REQUIRES_(
-       !std::is_same<T, U>::value &&
-        std::is_convertible<U, T>::value)>
-    hpx::future<T> make_future(hpx::future<U> && f)
-    {
-        return f.then(
-            [](hpx::future<U> && f) -> T
+        template <typename T, typename U>
+        struct make_future_helper
+        {
+            static hpx::future<T> call(hpx::future<U> && f)
             {
-                return f.get();
-            });
+                return f.then(
+                    [](hpx::future<U> && f) -> T
+                    {
+                        return f.get();
+                    });
+            }
+        };
+
+        template <typename T>
+        struct make_future_helper<T, T>
+        {
+            static future<T> call(future<T> && f)
+            {
+                return std::move(f);
+            }
+        };
+
+        template <typename T>
+        struct make_future_helper<void, T>
+        {
+            static future<void> call(future<T> && f)
+            {
+                return std::move(f);
+            }
+        };
+
+        template <>
+        struct make_future_helper<void, void>
+        {
+            static future<void> call(future<void> && f)
+            {
+                return std::move(f);
+            }
+        };
     }
 
-    template <typename T, typename U,
-    HPX_CONCEPT_REQUIRES_(
-        std::is_same<T, U>::value)>
-    hpx::future<T> make_future(hpx::future<U> && f)
+    // Allow to convert any future<U> into any other future<R> based on an
+    // existing conversion path U --> R.
+    template <typename R, typename U>
+    hpx::future<R>
+    make_future(hpx::future<U> && f)
     {
-        return std::move(f);
+        static_assert(
+            std::is_convertible<R, U>::value || std::is_void<R>::value,
+            "the argument type must be implicitly convertible to the requested "
+            "result type");
+
+        return detail::make_future_helper<R, U>::call(std::move(f));
     }
 
-    // Allow to convert any future<U> into any other future<T> based on a given
-    // conversion function: T f(U).
-    template <typename R, typename U, typename Conv,
-    HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_callable<Conv(U), R>::value)>
+    // Allow to convert any future<U> into any other future<R> based on a given
+    // conversion function: R conv(U).
+    template <typename R, typename U, typename Conv>
     hpx::future<R>
     make_future(hpx::future<U> && f, Conv && conv)
     {
+        static_assert(
+            hpx::traits::is_callable<Conv(U), R>::value,
+            "the argument type must be convertible to the requested "
+            "result type by using the supplied conversion function");
+
         return f.then(
-            [conv](hpx::future<U> && f) -> R
+            [conv](hpx::future<U> && f)
             {
                 return hpx::util::invoke(conv, f.get());
             });
@@ -1153,46 +1183,76 @@ namespace hpx { namespace lcos
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // allow to convert any future into a future<void>
-    template <typename R>
-    shared_future<void> make_future_void(shared_future<R> const& f)
+    namespace detail
     {
-        return f;
-    }
-
-    // Allow to convert any future<U> into any other future<T> based on an
-    // existing conversion path U --> T.
-    template <typename T, typename U,
-    HPX_CONCEPT_REQUIRES_(
-       !std::is_same<T, U>::value &&
-        std::is_convertible<U, T>::value)>
-    hpx::future<T> make_future(hpx::shared_future<U> f)
-    {
-        return f.then(
-            [](hpx::shared_future<U> && f) -> T
+        template <typename T, typename U>
+        struct make_shared_future_helper
+        {
+            static hpx::future<T> call(hpx::shared_future<U> const& f)
             {
-                return f.get();
-            });
+                return f.then(
+                    [](hpx::shared_future<U> const& f) -> T
+                    {
+                        return f.get();
+                    });
+            }
+        };
+
+        template <typename T>
+        struct make_shared_future_helper<T, T>
+        {
+            static shared_future<T> const& call(shared_future<T> const& f)
+            {
+                return f;
+            }
+        };
+
+        template <typename T>
+        struct make_shared_future_helper<void, T>
+        {
+            static shared_future<void> call(shared_future<T> const& f)
+            {
+                return f;
+            }
+        };
+
+        template <>
+        struct make_shared_future_helper<void, void>
+        {
+            static shared_future<void> const& call(shared_future<void> const& f)
+            {
+                return f;
+            }
+        };
     }
 
-    template <typename T, typename U,
-    HPX_CONCEPT_REQUIRES_(
-        std::is_same<T, U>::value)>
-    hpx::shared_future<T> make_future(hpx::shared_future<U> f)
+    // Allow to convert any shared_future<U> into any other future<R> based on
+    // an existing conversion path U --> R.
+    template <typename R, typename U>
+    hpx::shared_future<R>
+    make_future(hpx::shared_future<U> const& f)
     {
-        return f;
+        static_assert(
+            std::is_convertible<R, U>::value || std::is_void<R>::value,
+            "the argument type must be implicitly convertible to the requested "
+            "result type");
+
+        return detail::make_shared_future_helper<R, U>::call(f);
     }
 
-    // Allow to convert any future<U> into any other future<T> based on a given
-    // conversion function: T f(U).
-    template <typename R, typename U, typename Conv,
-    HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_callable<Conv(U), R>::value)>
+    // Allow to convert any future<U> into any other future<R> based on a given
+    // conversion function: R conv(U).
+    template <typename R, typename U, typename Conv>
     hpx::future<R>
-    make_future(hpx::shared_future<U> f, Conv && conv)
+    make_future(hpx::shared_future<U> const& f, Conv && conv)
     {
+        static_assert(
+            hpx::traits::is_callable<Conv(U), R>::value,
+            "the argument type must be convertible to the requested "
+            "result type by using the supplied conversion function");
+
         return f.then(
-            [conv](hpx::shared_future<U> && f) -> R
+            [conv](hpx::shared_future<U> const& f)
             {
                 return hpx::util::invoke(conv, f.get());
             });
@@ -1794,7 +1854,6 @@ namespace hpx
     using lcos::make_exceptional_future;
     using lcos::make_ready_future_at;
     using lcos::make_ready_future_after;
-    using lcos::make_future_void;
 
     using lcos::make_future;
 }

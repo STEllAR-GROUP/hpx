@@ -26,6 +26,18 @@ void test_make_future()
         HPX_TEST_EQ(42.0, f2.get());
     }
 
+    // test make_future<void>(future<U>)
+    {
+        hpx::future<int> f1 = hpx::make_ready_future(42);
+        hpx::future<void> f2 = hpx::make_future<void>(std::move(f1));
+    }
+
+    // test make_future<void>(future<void>)
+    {
+        hpx::future<void> f1 = hpx::make_ready_future();
+        hpx::future<void> f2 = hpx::make_future<void>(std::move(f1));
+    }
+
     // test make_future<T>(future<U>) with given T conv(U)
     {
         hpx::future<int> f1 = hpx::make_ready_future(42);
@@ -57,6 +69,19 @@ void test_make_shared_future()
         hpx::shared_future<double> f2 = hpx::make_future<double>(f1);
         HPX_TEST_EQ(42, f1.get());
         HPX_TEST_EQ(42.0, f2.get());
+    }
+
+    // test make_future<void>(shared_future<U>)
+    {
+        hpx::shared_future<int> f1 = hpx::make_ready_future(42);
+        hpx::shared_future<void> f2 = hpx::make_future<void>(f1);
+        HPX_TEST_EQ(42, f1.get());
+    }
+
+    // test make_future<void>(shared_future<U>)
+    {
+        hpx::shared_future<void> f1 = hpx::make_ready_future();
+        hpx::shared_future<void> f2 = hpx::make_future<void>(f1);
     }
 
     // test make_future<T>(shared_future<U>) with given T conv(U)
