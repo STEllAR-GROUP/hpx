@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >
     >::type
     transform(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
-        Proj && proj = Proj{})
+        Proj && proj = Proj())
     {
         return transform(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng), std::move(dest),

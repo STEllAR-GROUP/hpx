@@ -161,7 +161,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     replace(ExPolicy && policy, FwdIter first, FwdIter last,
-        T1 const& old_value, T2 const& new_value, Proj && proj = Proj{})
+        T1 const& old_value, T2 const& new_value, Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<FwdIter>::iterator_category
             iterator_category;
@@ -323,7 +323,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     replace_if(ExPolicy && policy, FwdIter first, FwdIter last,
-        F && f, T const& new_value, Proj && proj = Proj{})
+        F && f, T const& new_value, Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<FwdIter>::iterator_category
             iterator_category;
@@ -490,7 +490,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     replace_copy(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-        T1 const& old_value, T2 const& new_value, Proj && proj = Proj{})
+        T1 const& old_value, T2 const& new_value, Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
@@ -692,7 +692,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     replace_copy_if(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-        F && f, T const& new_value, Proj && proj = Proj{})
+        F && f, T const& new_value, Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;

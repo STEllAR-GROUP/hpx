@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         {
             typedef future<typename traits::local_raw_iterator> argtype;
             return f.then(
-                [](argtype&& f)
+                [](argtype&& f) -> Iterator
                 {
                     return traits::remote(f.get());
                 });
@@ -150,6 +150,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         {
             return f.then(
                 [](future<arg_type> && f)
+                ->  std::pair<
+                        typename traits1::local_iterator,
+                        typename traits2::local_iterator
+                    >
                 {
                     auto p = f.get();
                     return std::make_pair(
