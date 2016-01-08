@@ -26,6 +26,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/void_guard.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 
@@ -937,29 +938,14 @@ namespace hpx { namespace lcos
 
         template <typename T, typename Future>
         typename std::enable_if<
-            !std::is_convertible<Future, hpx::future<T> >::value
-         && !std::is_void<T>::value,
+            !std::is_convertible<Future, hpx::future<T> >::value,
             hpx::future<T>
         >::type make_future_helper(Future && f)
         {
             return f.then(
                 [](Future && f) -> T
                 {
-                    return f.get();
-                });
-        }
-
-        template <typename T, typename Future>
-        typename std::enable_if<
-            !std::is_convertible<Future, hpx::future<T> >::value
-         && std::is_void<T>::value,
-            hpx::future<T>
-        >::type make_future_helper(Future && f)
-        {
-            return f.then(
-                [](Future && f) -> void
-                {
-                    f.get();
+                    return util::void_guard<T>(), f.get();
                 });
         }
     }
