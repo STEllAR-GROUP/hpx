@@ -78,7 +78,7 @@ void test_make_shared_future()
         HPX_TEST_EQ(42, f1.get());
     }
 
-    // test make_future<void>(shared_future<U>)
+    // test make_future<void>(shared_future<void>)
     {
         hpx::shared_future<void> f1 = hpx::make_ready_future();
         hpx::shared_future<void> f2 = hpx::make_future<void>(f1);

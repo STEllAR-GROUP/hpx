@@ -37,6 +37,7 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace detail
 {
@@ -925,45 +926,42 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename T, typename U>
-        struct make_future_helper
+        template <typename T, typename Future>
+        typename std::enable_if<
+            std::is_convertible<Future, hpx::future<T> >::value,
+            hpx::future<T>
+        >::type make_future_helper(Future && f)
         {
-            static hpx::future<T> call(hpx::future<U> && f)
-            {
-                return f.then(
-                    [](hpx::future<U> && f) -> T
-                    {
-                        return f.get();
-                    });
-            }
+            return std::move(f);
         };
 
-        template <typename T>
-        struct make_future_helper<T, T>
+        template <typename T, typename Future>
+        typename std::enable_if<
+            !std::is_convertible<Future, hpx::future<T> >::value
+         && !std::is_void<T>::value,
+            hpx::future<T>
+        >::type make_future_helper(Future && f)
         {
-            static future<T> call(future<T> && f)
-            {
-                return std::move(f);
-            }
-        };
+            return f.then(
+                [](Future && f) -> T
+                {
+                    return f.get();
+                });
+        }
 
-        template <typename T>
-        struct make_future_helper<void, T>
+        template <typename T, typename Future>
+        typename std::enable_if<
+            !std::is_convertible<Future, hpx::future<T> >::value
+         && std::is_void<T>::value,
+            hpx::future<T>
+        >::type make_future_helper(Future && f)
         {
-            static future<void> call(future<T> && f)
-            {
-                return std::move(f);
-            }
-        };
-
-        template <>
-        struct make_future_helper<void, void>
-        {
-            static future<void> call(future<void> && f)
-            {
-                return std::move(f);
-            }
-        };
+            return f.then(
+                [](Future && f) -> void
+                {
+                    f.get();
+                });
+        }
     }
 
     // Allow to convert any future<U> into any other future<R> based on an
@@ -977,7 +975,7 @@ namespace hpx { namespace lcos
             "the argument type must be implicitly convertible to the requested "
             "result type");
 
-        return detail::make_future_helper<R, U>::call(std::move(f));
+        return detail::make_future_helper<R>(std::move(f));
     }
 
     // Allow to convert any future<U> into any other future<R> based on a given
@@ -1183,61 +1181,18 @@ namespace hpx { namespace lcos
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename T, typename U>
-        struct make_shared_future_helper
-        {
-            static hpx::future<T> call(hpx::shared_future<U> const& f)
-            {
-                return f.then(
-                    [](hpx::shared_future<U> const& f) -> T
-                    {
-                        return f.get();
-                    });
-            }
-        };
-
-        template <typename T>
-        struct make_shared_future_helper<T, T>
-        {
-            static shared_future<T> const& call(shared_future<T> const& f)
-            {
-                return f;
-            }
-        };
-
-        template <typename T>
-        struct make_shared_future_helper<void, T>
-        {
-            static shared_future<void> call(shared_future<T> const& f)
-            {
-                return f;
-            }
-        };
-
-        template <>
-        struct make_shared_future_helper<void, void>
-        {
-            static shared_future<void> const& call(shared_future<void> const& f)
-            {
-                return f;
-            }
-        };
-    }
-
     // Allow to convert any shared_future<U> into any other future<R> based on
     // an existing conversion path U --> R.
     template <typename R, typename U>
     hpx::shared_future<R>
-    make_future(hpx::shared_future<U> const& f)
+    make_future(hpx::shared_future<U> f)
     {
         static_assert(
             std::is_convertible<R, U>::value || std::is_void<R>::value,
             "the argument type must be implicitly convertible to the requested "
             "result type");
 
-        return detail::make_shared_future_helper<R, U>::call(f);
+        return detail::make_future_helper<R>(std::move(f));
     }
 
     // Allow to convert any future<U> into any other future<R> based on a given
