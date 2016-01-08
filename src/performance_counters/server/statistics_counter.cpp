@@ -326,13 +326,30 @@ namespace hpx { namespace performance_counters { namespace server
     bool statistics_counter<Statistic>::ensure_base_counter()
     {
         // lock here to avoid checking out multiple reference counted GIDs
-        // from AGAS
-        boost::lock_guard<mutex_type> l(mtx_);
+        // from AGAS. This
+        boost::unique_lock<mutex_type> l(mtx_);
 
         if (!base_counter_id_) {
             // get or create the base counter
             error_code ec(lightweight);
-            base_counter_id_ = get_counter(base_counter_name_, ec);
+            hpx::id_type base_counter_id;
+            {
+                // We need to unlock the lock here since get_counter might suspend
+                util::unlock_guard<boost::unique_lock<mutex_type> > unlock(l);
+                base_counter_id = get_counter(base_counter_name_, ec);
+            }
+            // After reacquiring the lock, we need to check again if base_counter_id_
+            // hasn't been set yet
+            if(!base_counter_id_)
+            {
+                base_counter_id_ = base_counter_id;
+            }
+            else
+            {
+                // If it was set already by a different thread, return true.
+                return true;
+            }
+
             if (HPX_UNLIKELY(ec || !base_counter_id_))
             {
                 // base counter could not be retrieved
