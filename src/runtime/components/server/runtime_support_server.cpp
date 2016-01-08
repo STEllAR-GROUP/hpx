@@ -55,6 +55,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <set>
@@ -1595,10 +1596,26 @@ namespace hpx { namespace components { namespace server
 
             fs::path lib;
             try {
+                std::string component_path;
                 if (sect.has_entry("path"))
-                    lib = hpx::util::create_path(sect.get_entry("path"));
+                    component_path = sect.get_entry("path");
                 else
-                    lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
+                    component_path = HPX_DEFAULT_COMPONENT_PATH;
+
+                typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+                boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
+                tokenizer tokens(component_path, sep);
+                boost::system::error_code fsec;
+                for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+                {
+                    lib = hpx::util::create_path(*it);
+                    fs::path lib_path = lib / std::string(HPX_MAKE_DLL_STRING(component));
+                    if(fs::exists(lib_path, fsec))
+                    {
+                        break;
+                    }
+                    lib.clear();
+                }
 
                 if (sect.get_entry("static", "0") == "1") {
                     load_component_static(ini, instance,
@@ -2106,10 +2123,26 @@ namespace hpx { namespace components { namespace server
 
             fs::path lib;
             try {
+                std::string component_path;
                 if (sect.has_entry("path"))
-                    lib = hpx::util::create_path(sect.get_entry("path"));
+                    component_path = sect.get_entry("path");
                 else
-                    lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
+                    component_path = HPX_DEFAULT_COMPONENT_PATH;
+
+                typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+                boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
+                tokenizer tokens(component_path, sep);
+                boost::system::error_code fsec;
+                for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+                {
+                    lib = hpx::util::create_path(*it);
+                    fs::path lib_path = lib / std::string(HPX_MAKE_DLL_STRING(component));
+                    if(fs::exists(lib_path, fsec))
+                    {
+                        break;
+                    }
+                    lib.clear();
+                }
 
                 if (sect.get_entry("static", "0") == "1") {
                     // FIXME: implement statically linked plugins

@@ -656,6 +656,7 @@ namespace hpx { namespace parcelset
         boost::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
+
         if (it == handlers_.end()) {
             boost::shared_ptr<policies::message_handler> p;
 
@@ -1342,7 +1343,11 @@ namespace hpx { namespace parcelset
                 "$[hpx.parcel.array_optimization]}",
             "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}",
+#if defined(HPX_HAVE_PARCEL_COALESCING)
+            "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:1}"
+#else
             "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}"
+#endif
             ;
 
         for (plugins::parcelport_factory_base* factory : get_parcelport_factories())

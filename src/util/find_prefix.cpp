@@ -89,6 +89,11 @@ namespace hpx { namespace util
                 result += HPX_INI_PATH_DELIMITER;
             result += *it;
             result += suffix;
+
+            result += HPX_INI_PATH_DELIMITER;
+            result += *it;
+            result += "/lib";
+            result += suffix;
         }
         return result;
     }
