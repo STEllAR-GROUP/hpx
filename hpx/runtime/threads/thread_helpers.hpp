@@ -410,6 +410,7 @@ namespace hpx { namespace threads
 #endif
 
     HPX_API_EXPORT std::size_t& get_continuation_recursion_count();
+    HPX_API_EXPORT void reset_continuation_recursion_count();
 
     /// Returns a reference to the executor which was used to create
     /// the given thread.
