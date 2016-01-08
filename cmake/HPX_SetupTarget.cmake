@@ -104,8 +104,6 @@ function(hpx_setup_target target)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                 "HPX_APPLICATION_NAME=${name}"
-                 "HPX_APPLICATION_STRING=\"${name}\""
                  "HPX_PREFIX=\"${_prefix}\""
                  "HPX_APPLICATION_EXPORTS")
   endif()
@@ -176,18 +174,6 @@ function(hpx_setup_target target)
     # hpx is an imported target, so set HPX_DEBUG based on build config of hpx library
     set(_USE_CONFIG 0)
   endif()
-  if(CMAKE_MAJOR_VERSION GREATER 2)
-    if(_USE_CONFIG)
-      set_property(TARGET ${target} APPEND PROPERTY
-        COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
-    else()
-      set_property(TARGET ${target} APPEND PROPERTY
-        COMPILE_DEFINITIONS $<$<STREQUAL:${HPX_IMPORT_CONFIG},DEBUG>:HPX_DEBUG>)
-    endif()
-  else()
-    set_property(TARGET ${target} APPEND PROPERTY
-      COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)
-  endif()
 
   # linker instructions
   if(NOT target_NOLIBS)
@@ -206,6 +192,8 @@ function(hpx_setup_target target)
     if(DEFINED HPX_LIBRARIES)
       set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
     endif()
+  else()
+    target_compile_options(${target} PUBLIC ${CXX_FLAG})
   endif()
 
   target_link_libraries(${target} ${hpx_libs} ${target_DEPENDENCIES})
