@@ -244,8 +244,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return f.then(
                 [=](hpx::future<copy_return_type> && result)
+                ->  hpx::future<copy_return_type>
                 {
-                    std::pair<FwdIter, OutIter> p1 = result.get();
+                    copy_return_type p1 = result.get();
                     return detail::copy<copy_return_type>().call(
                         p, non_seq(), first, new_first, p1.second);
                 });
