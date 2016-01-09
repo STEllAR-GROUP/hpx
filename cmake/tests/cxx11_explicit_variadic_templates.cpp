@@ -6,7 +6,8 @@
 template <typename  ... Ts>
 struct tuple
 {
-    tuple() {}
+    template <typename  ... Args>
+    tuple(Args && ...) {}
 };
 
 struct tag1 {};
@@ -26,12 +27,22 @@ struct tagged_type
 };
 
 template <typename ... Tags, typename ... Ts>
-tuple<typename tagged_type<Tags, Ts>::type...> foo(Ts && ...)
+tuple<typename tagged_type<Tags, Ts>::type...>
+foo(Ts && ...)
+{
+    return tuple<typename tagged_type<Tags, Ts>::type...>();
+}
+
+template <typename ... Tags, typename ... Ts>
+tuple<typename tagged_type<Tags, Ts>::type...>
+foo(tuple<Ts...> && t)
 {
     return tuple<typename tagged_type<Tags, Ts>::type...>();
 }
 
 int main()
 {
-    auto t = foo<tag1, tag2, tag3>(42, 43, 44);
+    auto t1 = foo<tag1, tag2, tag3>(42, 43, 44);
+    auto t2 = foo<tag1, tag2, tag3>(tuple<int, int, int>(42, 43, 44));
 }
+
