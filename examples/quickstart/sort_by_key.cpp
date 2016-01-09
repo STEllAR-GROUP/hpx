@@ -14,24 +14,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-// BADBAD: This overload of swap in std namespace is necessary to work around
-//         the problems caused by zip_iterator not being a real random access
-//         iterator. Dereferencing zip_iterator does not yield a true reference
-//         but only a temporary tuple holding true references.
-//
-// A real fix for this problem is proposed in PR0022R0
-// (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0022r0.html)
-//
-namespace std
-{
-    template <typename ...Ts>
-    void swap(hpx::util::tuple<Ts&...> && lhs, hpx::util::tuple<Ts&...> && rhs)
-    {
-        lhs.swap(rhs);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace parallel
 {
     struct extract_key

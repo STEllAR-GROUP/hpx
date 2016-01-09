@@ -968,6 +968,24 @@ namespace hpx { namespace util
     {
         x.swap(y);
     }
+
+#if defined(HPX_HAVE_TUPLE_RVALUE_SWAP)
+    // BADBAD: This overload of swap is necessary to work around the problems
+    //         caused by zip_iterator not being a real random access iterator.
+    //         Dereferencing zip_iterator does not yield a true reference but
+    //         only a temporary tuple holding true references.
+    //
+    // A real fix for this problem is proposed in PR0022R0
+    // (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0022r0.html)
+    //
+    template <typename ...Ts>
+    HPX_FORCEINLINE
+    void swap(tuple<Ts&...> && x, tuple<Ts&...> && y)
+        HPX_NOEXCEPT_IF(HPX_NOEXCEPT_EXPR((x.swap(y))))
+    {
+        x.swap(y);
+    }
+#endif
 }}
 
 #include <hpx/util/detail/fusion_adapt_tuple.hpp>
