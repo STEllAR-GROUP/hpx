@@ -8,7 +8,13 @@
 #define HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015
 
 #include <hpx/parallel/algorithms/sort.hpp>
-#include <hpx/parallel/algorithms/detail/tuple_iterator.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
+//
+#include <utility>
+//
+#ifndef HPX_HAVE_TUPLE_RVALUE_SWAP
+#error "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP is defined"
+#endif
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -95,9 +101,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
     ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a Iter
+    ///           \a parallel_task_execution_policy and returns \a void
     ///           otherwise.
-    ///           It returns \a void.
     //-----------------------------------------------------------------------------
 
     template <

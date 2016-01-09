@@ -14,36 +14,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace parallel
-{
-    struct extract_key
-    {
-        template <typename Tuple>
-        auto operator() (Tuple && t) const
-        ->  decltype(hpx::util::get<0>(std::forward<Tuple>(t)))
-        {
-            return hpx::util::get<0>(std::forward<Tuple>(t));
-        }
-    };
-
-    template <typename KeyIter, typename ValueIter>
-    void sort_by_key(KeyIter k_first, KeyIter k_last, ValueIter v_first)
-    {
-        typedef typename std::iterator_traits<KeyIter>::value_type key_value_type;
-
-        ValueIter v_last = v_first;
-        std::advance(v_last, std::distance(k_first, k_last));
-
-        hpx::parallel::sort(
-            hpx::parallel::par,
-            hpx::util::make_zip_iterator(k_first, v_first),
-            hpx::util::make_zip_iterator(k_last, v_last),
-            std::less<key_value_type>(),
-            extract_key());
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 void print_sequence(std::vector<int> const& keys, std::vector<char> const& values)
 {
     for (std::size_t i = 0; i != keys.size(); ++i)
@@ -74,7 +44,11 @@ int hpx_main()
         hpx::cout << "unsorted sequence: {";
         print_sequence(keys, values);
 
-        parallel::sort_by_key(keys.begin(), keys.end(), values.begin());
+        hpx::parallel::sort_by_key(
+            hpx::parallel::par,
+            keys.begin(),
+            keys.end(),
+            values.begin());
 
         hpx::cout << "sorted sequence:   {";
         print_sequence(keys, values);
