@@ -7,9 +7,7 @@
 #define HPX_PARALLEL_SORT_NOV_01_2015_1003AM
 
 #include <hpx/parallel/algorithms/sort.hpp>
-#ifdef HPX_HAVE_TUPLE_RVALUE_SWAP
-# include <hpx/parallel/algorithms/sort_by_key.hpp>
-#endif
+#include <hpx/parallel/algorithms/sort_by_key.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 
 #endif

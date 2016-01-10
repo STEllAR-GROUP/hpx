@@ -9,12 +9,13 @@
 
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/util/tuple.hpp>
 //
+#include <algorithm>
+#include <iterator>
+#include <type_traits>
 #include <utility>
 //
-#ifndef HPX_HAVE_TUPLE_RVALUE_SWAP
-#error "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP is defined"
-#endif
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -37,12 +38,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     //-----------------------------------------------------------------------------
     /// Sorts one range of data using keys supplied in another range.
-    /// The key elements in the range [key_first, key_last) are sorted in   
+    /// The key elements in the range [key_first, key_last) are sorted in
     /// ascending order with the corresponding elements in the value range
-    /// moved to follow the sorted order.        
-    /// The algorithm is not stable, the order of equal elements is not guaranteed 
-    /// to be preserved. 
-    /// The function uses the given comparison function object comp (defaults 
+    /// moved to follow the sorted order.
+    /// The algorithm is not stable, the order of equal elements is not guaranteed
+    /// to be preserved.
+    /// The function uses the given comparison function object comp (defaults
     /// to using operator<()).
     ///
     /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
@@ -69,7 +70,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param key_first    Refers to the beginning of the sequence of key 
+    /// \param key_first    Refers to the beginning of the sequence of key
     ///                     elements the algorithm will be applied to.
     /// \param key_last     Refers to the end of the sequence of key elements the
     ///                     algorithm will be applied to.
@@ -111,7 +112,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename std::iterator_traits<KeyIter>::value_type
       >
     >
-
     typename util::detail::algorithm_result<ExPolicy, void>::type
     sort_by_key(ExPolicy &&policy,
                 KeyIter key_first,
@@ -119,6 +119,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 ValueIter value_first,
                 Compare &&comp = Compare())
     {
+#if !defined(HPX_HAVE_TUPLE_RVALUE_SWAP)
+        static_assert(sizeof(KeyIter) == 0, // always false
+            "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP "
+            "is defined");
+#else
         typedef typename std::iterator_traits<KeyIter>::iterator_category
             iterator_category;
         typedef typename std::iterator_traits<ValueIter>::iterator_category
@@ -144,6 +149,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             hpx::util::make_zip_iterator(key_last, v_last),
             std::forward<Compare>(comp),
             detail::extract_key());
+#endif
     }
 }}}
 
