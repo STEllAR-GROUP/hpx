@@ -193,7 +193,7 @@ namespace hpx { namespace parcelset
 
     protected:
         void put_parcel_await(
-            locality const & dest, parcel p, write_handler_type f, bool trigger
+            locality const & dest, parcel p, write_handler_type f
           , boost::shared_ptr<archive_type> const & archive
           , boost::shared_ptr<future_await_container_type> const & future_await)
         {
@@ -210,16 +210,10 @@ namespace hpx { namespace parcelset
             //      needs to split.
             if(future_await->has_futures())
             {
-                void (parcelport_impl::*awaiter)(
-                    locality const &, parcel, write_handler_type, bool
-                  , boost::shared_ptr<archive_type> const &
-                  , boost::shared_ptr<future_await_container_type> const &
-                )
-                    = &parcelport_impl::put_parcel_await;
                 (*future_await)(
                     util::bind(
-                        util::one_shot(awaiter), this,
-                        dest, std::move(p), std::move(f), true,
+                        util::one_shot(&parcelport_impl::put_parcel_await), this,
+                        dest, std::move(p), std::move(f),
                         archive, future_await)
                 );
                 return;
@@ -229,18 +223,11 @@ namespace hpx { namespace parcelset
             enqueue_parcel(dest, std::move(p), std::move(f),
                 std::move(future_await->new_gids_));
 
-            if (trigger)
-                get_connection_and_send_parcels(dest);
+            get_connection_and_send_parcels(dest);
         }
 
     public:
         void put_parcel(locality const & dest, parcel p, write_handler_type f)
-        {
-            put_parcel(dest, std::move(p), std::move(f), true);
-        }
-
-        void put_parcel(locality const & dest, parcel p, write_handler_type f,
-            bool trigger)
         {
             HPX_ASSERT(dest.type() == type());
 
@@ -249,21 +236,20 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<archive_type> archive =
                 boost::make_shared<archive_type>(*future_await);
 
-            put_parcel_await(dest, std::move(p), std::move(f), trigger,
-                archive, future_await);
+            put_parcel_await(dest, std::move(p), std::move(f), archive,
+                future_await);
         }
-
 
     protected:
         void put_parcels_await(
             locality const& dest, std::vector<parcel> parcels,
-            std::vector<write_handler_type> handlers, bool trigger
-          , boost::shared_ptr<archive_type> const & archive
-          , boost::shared_ptr<future_await_container_type> const & future_await)
+            std::vector<write_handler_type> handlers
+          , boost::shared_ptr<archive_type> const& archive
+          , boost::shared_ptr<future_await_container_type> const& future_await)
         {
             future_await->reset();
 
-            for (parcel const& p :parcels)
+            for (parcel const& p : parcels)
                 (*archive) << p;
 
             // We are doing a fixed point iteration until we are sure that the
@@ -275,17 +261,10 @@ namespace hpx { namespace parcelset
             //      needs to split.
             if (future_await->has_futures())
             {
-                void (parcelport_impl::*awaiter)(
-                    locality const &, std::vector<parcel>,
-                    std::vector<write_handler_type>, bool
-                  , boost::shared_ptr<archive_type> const &
-                  , boost::shared_ptr<future_await_container_type> const &
-                )
-                    = &parcelport_impl::put_parcels_await;
                 (*future_await)(
                     util::bind(
-                        util::one_shot(awaiter), this,
-                        dest, std::move(parcels), std::move(handlers), true,
+                        util::one_shot(&parcelport_impl::put_parcels_await), this,
+                        dest, std::move(parcels), std::move(handlers),
                         archive, future_await)
                 );
                 return;
@@ -295,19 +274,12 @@ namespace hpx { namespace parcelset
             enqueue_parcels(dest, std::move(parcels), std::move(handlers),
                 std::move(future_await->new_gids_));
 
-            if (trigger)
-                get_connection_and_send_parcels(dest);
+            get_connection_and_send_parcels(dest);
         }
 
     public:
         void put_parcels(locality const& dest, std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers)
-        {
-            put_parcels(dest, std::move(parcels), std::move(handlers), true);
-        }
-
-        void put_parcels(locality const& dest, std::vector<parcel> parcels,
-            std::vector<write_handler_type> handlers, bool trigger)
         {
             if (parcels.size() != handlers.size())
             {
@@ -315,8 +287,6 @@ namespace hpx { namespace parcelset
                     "mismatched number of parcels and handlers");
                 return;
             }
-
-            locality const& locality_id = dest;
 
 #if defined(HPX_DEBUG)
             // make sure all parcels go to the same locality
@@ -335,8 +305,8 @@ namespace hpx { namespace parcelset
 
             // enqueue the outgoing parcels ...
             put_parcels_await(
-                locality_id, std::move(parcels), std::move(handlers), trigger,
-                archive, future_await);
+                dest, std::move(parcels), std::move(handlers), archive,
+                future_await);
         }
 
         void send_early_parcel(locality const & dest, parcel p)
