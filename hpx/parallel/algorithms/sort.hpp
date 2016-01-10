@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -169,21 +170,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             RandomIt it_c = last - 1;
 
             if (comp(*it_b, *it_a))
-            {
-                using namespace std;
-                swap(*it_a, *it_b);
-            }
+                std::iter_swap(it_a, it_b);
+
             if (comp(*it_c, *it_b))
             {
-                using namespace std;
-                swap(*it_c, *it_b);
+                std::iter_swap(it_c, it_b);
                 if (comp(*it_b, *it_a))
-                    swap(*it_a, *it_b);
+                    std::iter_swap(it_a, it_b);
             }
-            {
-                using namespace std;
-                swap(*first, *it_b);
-            }
+
+            std::iter_swap(first, it_b);
 
             typedef
                 typename std::iterator_traits<RandomIt>::reference
@@ -198,17 +194,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 --c_last;
             while (!(c_first > c_last))
             {
-                using namespace std;
-                swap(*(c_first++), *(c_last--));
+                std::iter_swap(c_first++, c_last--);
                 while (comp(*c_first, val))
                     ++c_first;
                 while (comp(val, *c_last))
                     --c_last;
             } // End while
-            {
-                using namespace std;
-                swap(*first, *c_last);
-            }
+
+            std::iter_swap(first, c_last);
 
             // spawn tasks for each sub section
             hpx::future<RandomIt> left =
