@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2015 Hartmut Kaiser
+    Copyright (C) 2007-2016 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,10 +11,18 @@
 
 [heading General Changes]
 
+- We have fixed a couple of issues in AGAS and the parcel layer which have
+  caused hangs, segmentation faults at exit, and a slowdown of applications
+  over time. Fixing those has significantly increased the overall stability
+  and performance of distributed runs.
 - We have started to add parallel algorithm overloads based on the C++
   Extensions for Ranges (__cpp17_n4560__) proposal. This also includes the
   addition of projections to the existing algorithms. Please see [issue 1668]
   for a list of algorithms which have been adapted to __cpp17_n4560__.
+- Added `hpx::make_future<R>(future<T> &&)` allowing to convert a future of
+  any type `T` into a future of any other type `R`, either based on default
+  conversion rules of the embedded types or using a given explicit conversion
+  function.
 
 [heading Breaking Changes]
 
@@ -31,11 +39,28 @@
   `parallel::for_each`, `parallel::copy`, `parallel::rotate`,
   `parallel::reverse` and `parallel::reverse_copy`, `parallel::remove` and
   `parallel::remove_copy`.
+- The facility `hpx::lcos::make_future_void()` has been replaced by
+  `hpx::lcos::make_future<void>()`
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1952] - Adapting test for explicit variadics to fail for gcc 4.6
+* [pr    1948] - Fixed container algorithms for Intel
+* [pr    1947] - Adding workaround for tagged_tuple
+* [issue 1946] - Hang in wait_all() in distributed run
+* [pr    1945] - Fixed container algorithm tests
+* [pr    1943] - Fix a couple of compile errors with clang
+* [pr    1940] - Touching up make_future
+* [pr    1938] - Removing use of unified Boost.Thread header
+* [pr    1937] - Cleaning up the use of Boost.Accumulator headers
+* [pr    1936] - Making sure interval timer is started for aggregating
+                 performance counters
+* [pr    1935] - Tagged results
+* [pr    1934] - Fix remote async with deferred launch policy
+* [issue 1933] - Floating point exception in
+                 `statistics_counter<boost::accumulators::tag::mean>::get_counter_value`
 * [pr    1932] - Removing superfluous includes of
                  boost/lockfree/detail/branch_hints.hpp
 * [pr    1931] - fix compilation with clang 3.8.0
@@ -44,6 +69,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1928] - Revert "Using ninja for circle-ci builds"
 * [pr    1927] - Using ninja for circle-ci builds
 * [pr    1926] - Fixing serialization of std::array
+* [issue 1925] - Issues with static HPX libraries
 * [issue 1924] - Peformance degrading over time
 * [issue 1923] - serialization of std::array appears broken in latest commit
 * [pr    1922] - Container algorithms
@@ -128,6 +154,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1803] - wait_all documentation
 * [issue 1796] - Outdated documentation to be revised
 * [issue 1748] - All public HPX headers need to be self contained
+* [issue 1523] - Remote async with deferred launch policy never executes
 * [issue 1472] - Serialization issues
 * [issue 1457] - Implement N4392: C++ Latches and Barriers
 * [issue 1265] - Enable dataflow() to be usable with actions
