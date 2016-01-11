@@ -138,8 +138,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires a random access iterator.");
 
-        typedef typename std::iterator_traits<KeyIter>::value_type key_value_type;
-
         ValueIter v_last = value_first;
         std::advance(v_last, std::distance(key_first, key_last));
 
