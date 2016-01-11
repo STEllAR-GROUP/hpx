@@ -128,6 +128,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             iterator_category;
         typedef typename std::iterator_traits<ValueIter>::iterator_category
             iterator_category2;
+        typedef typename util::detail::algorithm_result<ExPolicy, void>::type
+            result_type;
 
         static_assert(
             (boost::is_base_of<
@@ -141,12 +143,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ValueIter v_last = value_first;
         std::advance(v_last, std::distance(key_first, key_last));
 
-        hpx::parallel::sort(
-            std::forward<ExPolicy>(policy),
-            hpx::util::make_zip_iterator(key_first, value_first),
-            hpx::util::make_zip_iterator(key_last, v_last),
-            std::forward<Compare>(comp),
-            detail::extract_key());
+        return hpx::util::void_guard<result_type>(),
+            hpx::parallel::sort(
+                std::forward<ExPolicy>(policy),
+                hpx::util::make_zip_iterator(key_first, value_first),
+                hpx::util::make_zip_iterator(key_last, v_last),
+                std::forward<Compare>(comp),
+                detail::extract_key());
 #endif
     }
 }}}

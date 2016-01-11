@@ -395,12 +395,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           \a hpx::future<void> if the execution policy is of
     ///           type
     ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a Iter
+    ///           \a parallel_task_execution_policy and returns \a void
     ///           otherwise.
-    ///           It returns \a last.
     //-----------------------------------------------------------------------------
     template <typename ExPolicy, typename RandomIt,
         typename Proj = util::projection_identity,
