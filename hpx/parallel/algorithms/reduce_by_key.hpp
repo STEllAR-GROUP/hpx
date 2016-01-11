@@ -329,7 +329,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return result::get(std::make_pair(keys_output,values_output));
         }
 
-        using namespace hpx::parallel::detail;
+        using namespace hpx::parallel::v1::detail;
         using namespace hpx::util;
         //we need to determine based on the keys what is the keystate for
         //each key. The states are start, middle, end of a series and the special
