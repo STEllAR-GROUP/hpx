@@ -88,6 +88,7 @@ set(tests
     set_symmetric_difference
     set_union
     sort
+    sort_by_key
     sort_exceptions
     swapranges
     transform
