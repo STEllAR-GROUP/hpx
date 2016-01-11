@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2015 Nidhi Makhijani
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #if !defined(HPX_RUNTIME_THREADS_RESOURCE_MANAGER_JAN_16_2013_0830AM)
 #define HPX_RUNTIME_THREADS_RESOURCE_MANAGER_JAN_16_2013_0830AM
 
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -150,17 +150,15 @@ namespace hpx { namespace  threads
 
         ///////////////////////////////////////////////////////////////////////
         // Used to store information during static and dynamic allocation.
-        struct static_allocation_data
+        struct allocation_data
         {
-            static_allocation_data()
+            allocation_data()
               : allocation_(0),
                 scaled_allocation_(0.0),
                 num_borrowed_cores_(0),
                 num_owned_cores_(0),
                 min_proxy_cores_(0),
-                max_proxy_cores_(0),
-                adjusted_desired_(0),
-                num_cores_stolen_(0)
+                max_proxy_cores_(0)
             {}
 
             // The scheduler proxy this allocation data is for.
@@ -177,6 +175,14 @@ namespace hpx { namespace  threads
             std::size_t num_owned_cores_;    // owned cores held by scheduler
             std::size_t min_proxy_cores_;    // min cores required by scheduler
             std::size_t max_proxy_cores_;    // max cores required by scheduler
+        };
+
+        struct static_allocation_data : public allocation_data
+        {
+            static_allocation_data()
+              : adjusted_desired_(0),
+                num_cores_stolen_(0)
+            {}
 
             // A field used during static allocation to decide on an allocation
             // proportional to each scheduler's desired value.
@@ -188,7 +194,7 @@ namespace hpx { namespace  threads
 
         typedef std::map<std::size_t, static_allocation_data>
             allocation_data_map_type;
-        allocation_data_map_type proxies_static_allocation_data_;
+        allocation_data_map_type proxies_static_allocation_data;
 
         // stores static allocation data for all schedulers
         void preprocess_static_allocation(std::size_t min_punits,
@@ -207,7 +213,7 @@ namespace hpx { namespace  threads
         // release cores from all schedulers
         // calls release_scheduler_resources
         std::size_t release_cores_on_existing_schedulers(
-            std::size_t request, std::size_t number_to_free,
+            std::size_t number_to_free,
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 
         // distribute cores to schedulers proportional to max_punits of

@@ -5,7 +5,6 @@
 
 set(tests
     lockfree_fifo
-    resource_manager
     set_thread_state
     thread
     thread_affinity

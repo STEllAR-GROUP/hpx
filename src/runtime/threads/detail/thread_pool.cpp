@@ -613,7 +613,7 @@ namespace hpx { namespace threads { namespace detail
                     // threads exist or if some other thread has terminated
                     HPX_ASSERT(!sched_.Scheduler::get_thread_count(
                             unknown, thread_priority_default, num_thread) ||
-                        sched_.get_state(num_thread) >= state_terminating);
+                        sched_.get_state(num_thread) == state_terminating);
                 }
                 catch (hpx::exception const& e) {
                     LFATAL_ //-V128

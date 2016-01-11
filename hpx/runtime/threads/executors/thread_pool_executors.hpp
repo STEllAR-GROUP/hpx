@@ -122,7 +122,6 @@ namespace hpx { namespace threads { namespace executors
             // policy elements
             std::size_t const max_punits_;
             std::size_t const min_punits_;
-            boost::atomic<std::size_t> curr_punits_;
 
             // resource manager registration
             std::size_t cookie_;
