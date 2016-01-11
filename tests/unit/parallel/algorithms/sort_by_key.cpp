@@ -11,7 +11,11 @@
 //
 #include <boost/random/uniform_int_distribution.hpp>
 //
+#if defined(HPX_DEBUG)
+#define HPX_SORT_BY_KEY_TEST_SIZE (1 << 16)
+#else
 #define HPX_SORT_BY_KEY_TEST_SIZE (1 << 18)
+#endif
 //
 #include "sort_tests.hpp"
 //
@@ -21,7 +25,7 @@ namespace debug {
     template<typename T>
     void output(const std::string &name, const std::vector<T> &v)
     {
-#ifdef EXTRA_DEBUG
+#ifdef EXTRA_DEBUG7
         std::cout << name.c_str() << "\t : {" << v.size() << "} : ";
         std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
         std::cout << "\n";
@@ -55,7 +59,8 @@ namespace debug {
         << std::setw(8)  << #d << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
+template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
+    typename HelperOp>
 void test_sort_by_key1(ExPolicy &&policy, Tkey, Tval, const Op &op, const HelperOp &ho)
 {
     static_assert(hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -78,12 +83,13 @@ void test_sort_by_key1(ExPolicy &&policy, Tkey, Tval, const Op &op, const Helper
     // shuffle the keys up,
     std::random_shuffle(keys.begin(), keys.end());
 
-    // make copies of inital states
+    // make copies of initial states
     o_keys = keys;
     o_values = values;
 
     // sort_by_key, blocking when seq, par, par_vec
-    hpx::parallel::sort_by_key(std::forward<ExPolicy>(policy), keys.begin(), keys.end(),
+    hpx::parallel::sort_by_key(
+        std::forward<ExPolicy>(policy), keys.begin(), keys.end(),
         values.begin());
 
     // after sorting by key, the values should be equal to the original keys
@@ -101,7 +107,8 @@ void test_sort_by_key1(ExPolicy &&policy, Tkey, Tval, const Op &op, const Helper
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
+template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
+    typename HelperOp>
 void test_sort_by_key_async(ExPolicy &&policy, Tkey, Tval, const Op &op,
     const HelperOp &ho)
 {
@@ -125,13 +132,14 @@ void test_sort_by_key_async(ExPolicy &&policy, Tkey, Tval, const Op &op,
     // shuffle the keys up,
     std::random_shuffle(keys.begin(), keys.end());
 
-    // make copies of inital states
+    // make copies of initial states
     o_keys = keys;
     o_values = values;
 
     // sort_by_key, blocking when seq, par, par_vec
-    auto fresult = hpx::parallel::sort_by_key(std::forward<ExPolicy>(policy), keys.begin(), keys.end(),
-        values.begin());
+    auto fresult =
+        hpx::parallel::sort_by_key(std::forward<ExPolicy>(policy),
+            keys.begin(), keys.end(), values.begin());
     fresult.get();
 
     // after sorting by key, the values should be equal to the original keys
@@ -204,8 +212,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 {
     unsigned int seed = (unsigned int) std::time(0);
     if (vm.count("seed"))
-        seed = vm["seed"].as < unsigned
-    int > ();
+        seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
@@ -226,7 +233,7 @@ int main(int argc, char *argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-                  boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

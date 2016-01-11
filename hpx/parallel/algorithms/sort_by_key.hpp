@@ -7,9 +7,12 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015)
 #define HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015
 
+#include <hpx/config.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/tagged_pair.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/parallel/tagspec.hpp>
 //
 #include <algorithm>
 #include <iterator>
@@ -98,26 +101,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<void> if the execution policy is of
-    ///           type
+    /// \returns  The \a sort_by-key algorithm returns a
+    /// \a hpx::future<tagged_pair<tag::in1(KeyIter>, tag::in2(ValueIter)> >
+    ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a void
+    ///           \a parallel_task_execution_policy and returns \a
+    ///           \a tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>
     ///           otherwise.
+    ///           The algorithm returns a pair holding an iterator pointing to
+    ///           the first element after the last element in the input key
+    ///           sequence and an iterator pointing to the first element after
+    ///           the last element in the input value sequence.
     //-----------------------------------------------------------------------------
 
     template <
-      typename ExPolicy, typename KeyIter, typename ValueIter,
-      typename Compare = std::less<
-        typename std::iterator_traits<KeyIter>::value_type
-      >
+        typename ExPolicy, typename KeyIter, typename ValueIter,
+        typename Compare = std::less<
+            typename std::iterator_traits<KeyIter>::value_type
+        >
     >
-    typename util::detail::algorithm_result<ExPolicy, void>::type
-    sort_by_key(ExPolicy &&policy,
+    typename util::detail::algorithm_result<
+        ExPolicy,
+        hpx::util::tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>
+    >::type
+    sort_by_key(ExPolicy && policy,
                 KeyIter key_first,
                 KeyIter key_last,
                 ValueIter value_first,
-                Compare &&comp = Compare())
+                Compare && comp = Compare())
     {
 #if !defined(HPX_HAVE_TUPLE_RVALUE_SWAP)
         static_assert(sizeof(KeyIter) == 0, // always false
@@ -128,8 +139,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             iterator_category;
         typedef typename std::iterator_traits<ValueIter>::iterator_category
             iterator_category2;
-        typedef typename util::detail::algorithm_result<ExPolicy, void>::type
-            result_type;
+        typedef typename util::detail::algorithm_result<
+                ExPolicy,
+                hpx::util::tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>
+            >::type result_type;
 
         static_assert(
             (boost::is_base_of<
@@ -140,16 +153,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires a random access iterator.");
 
-        ValueIter v_last = value_first;
-        std::advance(v_last, std::distance(key_first, key_last));
+        ValueIter value_last = value_first;
+        std::advance(value_last, std::distance(key_first, key_last));
 
-        return hpx::util::void_guard<result_type>(),
+        return detail::get_iter_tagged_pair<tag::in1, tag::in2>(
             hpx::parallel::sort(
                 std::forward<ExPolicy>(policy),
                 hpx::util::make_zip_iterator(key_first, value_first),
-                hpx::util::make_zip_iterator(key_last, v_last),
+                hpx::util::make_zip_iterator(key_last, value_last),
                 std::forward<Compare>(comp),
-                detail::extract_key());
+                detail::extract_key()));
 #endif
     }
 }}}

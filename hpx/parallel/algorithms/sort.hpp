@@ -395,11 +395,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<void> if the execution policy is of
+    ///           \a hpx::future<RandomIt> if the execution policy is of
     ///           type
     ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a void
+    ///           \a parallel_task_execution_policy and returns \a RandomIt
     ///           otherwise.
+    ///           The algorithm returns an iterator pointing to the first
+    ///           element after the last element in the input sequence.
     //-----------------------------------------------------------------------------
     template <typename ExPolicy, typename RandomIt,
         typename Proj = util::projection_identity,
