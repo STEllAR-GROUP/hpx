@@ -49,7 +49,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         shutdown_sem_(0),
         current_concurrency_(0), max_current_concurrency_(0),
         tasks_scheduled_(0), tasks_completed_(0),
-        max_punits_(max_punits), min_punits_(min_punits), cookie_(0),
+        max_punits_(max_punits), min_punits_(min_punits), curr_punits_(0),
+        cookie_(0),
         self_(max_punits)
     {
         if (max_punits < min_punits)
@@ -339,7 +340,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, virt_core) ||
-                state == state_terminating);
+                state >= state_terminating);
         }
     }
 
@@ -369,9 +370,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             return max_punits_;
 
         case threads::detail::current_concurrency:
-            return current_concurrency_ ?
-                static_cast<std::size_t>(current_concurrency_)
-              : min_punits_;
+            return curr_punits_;
 
         default:
             break;
@@ -392,6 +391,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         hpx::state expected = state_initialized;
         if (state.compare_exchange_strong(expected, state_starting))
         {
+            ++curr_punits_;
             register_thread_nullary(
                 util::bind(
                     util::one_shot(&thread_pool_executor::run),
@@ -413,6 +413,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         hpx::state oldstate = state.exchange(state_stopped);
         HPX_ASSERT(oldstate == state_running || oldstate == state_suspended ||
             oldstate == state_stopped);
+        --curr_punits_;
     }
 }}}}
 
