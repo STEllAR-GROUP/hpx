@@ -27,8 +27,8 @@ void test_replace(ExPolicy policy, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::copy(boost::begin(c), boost::end(c), boost::begin(d));
+    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
+    std::copy(boost::begin(c.base()), boost::end(c.base()), boost::begin(d));
 
     std::size_t idx = std::rand() % c.size(); //-V104
 
@@ -37,7 +37,8 @@ void test_replace(ExPolicy policy, IteratorTag)
     std::replace(boost::begin(d), boost::end(d), d[idx], d[idx]+1);
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(boost::begin(c.base()), boost::end(c.base()),
+        boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -56,8 +57,8 @@ void test_replace_async(ExPolicy p, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::copy(boost::begin(c), boost::end(c), boost::begin(d));
+    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
+    std::copy(boost::begin(c.base()), boost::end(c.base()), boost::begin(d));
 
     std::size_t idx = std::rand() % c.size(); //-V104
 
@@ -67,7 +68,8 @@ void test_replace_async(ExPolicy p, IteratorTag)
     std::replace(boost::begin(d), boost::end(d), d[idx], d[idx]+1);
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(boost::begin(c.base()), boost::end(c.base()),
+        boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;

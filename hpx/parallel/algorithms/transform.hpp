@@ -185,7 +185,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     transform(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-        F && f, Proj && proj = Proj{})
+        F && f, Proj && proj = Proj())
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;

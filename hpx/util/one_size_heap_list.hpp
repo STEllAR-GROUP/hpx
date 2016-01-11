@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2013 Hartmut Kaiser
+//  Copyright (c) 1998-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,6 @@
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 

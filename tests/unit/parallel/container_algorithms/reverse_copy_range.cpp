@@ -29,12 +29,12 @@ void test_reverse_copy(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
 
-    hpx::parallel::reverse_copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d1));
+    hpx::parallel::reverse_copy(policy, c, boost::begin(d1));
 
-    std::reverse_copy(boost::begin(c), boost::end(c), boost::begin(d2));
+    std::reverse_copy(boost::begin(c.base()), boost::end(c.base()),
+        boost::begin(d2));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(d1), boost::end(d1), boost::begin(d2),
@@ -58,12 +58,13 @@ void test_reverse_copy_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
 
     auto f = hpx::parallel::reverse_copy(p, c, boost::begin(d1));
     f.wait();
 
-    std::reverse_copy(boost::begin(c), boost::end(c), boost::begin(d2));
+    std::reverse_copy(boost::begin(c.base()), boost::end(c.base()),
+        boost::begin(d2));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(d1), boost::end(d1), boost::begin(d2),

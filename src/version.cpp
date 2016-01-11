@@ -106,7 +106,7 @@ namespace hpx
             "A general purpose parallel C++ runtime system for\
              distributed applications\n"
             "of any scale.\n\n"
-            "Copyright (c) 2007-2015, The STE||AR Group,\n"
+            "Copyright (c) 2007-2016, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, \
              Version 1.0. (See accompanying\n"

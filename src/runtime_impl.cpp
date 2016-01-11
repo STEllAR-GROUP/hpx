@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,8 +24,11 @@
 
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/ref.hpp>
 
 #include <iostream>
 #include <sstream>

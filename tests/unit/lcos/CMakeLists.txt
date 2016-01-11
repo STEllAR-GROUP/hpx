@@ -35,6 +35,7 @@ set(tests
     local_dataflow_executor
     local_event
     local_mutex
+    make_future
     packaged_action
     promise
     reduce

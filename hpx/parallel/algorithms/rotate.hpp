@@ -80,14 +80,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             detail::reverse<FwdIter> r;
             return dataflow(
-                [=](hpx::future<FwdIter>&&, hpx::future<FwdIter>&&) mutable
+                [=](hpx::future<FwdIter>&& f1, hpx::future<FwdIter>&& f2) mutable
                 ->  hpx::future<std::pair<FwdIter, FwdIter> >
                 {
+                    // propagate exceptions
+                    f1.get(); f2.get();
+
                     hpx::future<FwdIter> f = r.call(p, non_seq(), first, last);
                     return f.then(
-                        [=] (hpx::future<FwdIter> &&) mutable
+                        [=] (hpx::future<FwdIter> && f) mutable
                         ->  std::pair<FwdIter, FwdIter>
                         {
+                            f.get();    // propagate exceptions
                             std::advance(first, std::distance(new_first, last));
                             return std::make_pair(first, last);
                         });
@@ -240,8 +244,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return f.then(
                 [=](hpx::future<copy_return_type> && result)
+                ->  hpx::future<copy_return_type>
                 {
-                    std::pair<FwdIter, OutIter> p1 = result.get();
+                    copy_return_type p1 = result.get();
                     return detail::copy<copy_return_type>().call(
                         p, non_seq(), first, new_first, p1.second);
                 });
