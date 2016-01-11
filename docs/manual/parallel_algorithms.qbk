@@ -298,7 +298,10 @@ __hpx__ provides implementations of the following parallel algorithms:
      [Returns `true` if each true element for a predicate precedes the false elements in a range]
      [`<hpx/include/parallel_is_partitioned.hpp>`]]
     [[ [algoref sort] ]
-     [Sorts the elements in a range in ascending order]
+     [Sorts the elements in a range]
+     [`<hpx/include/parallel_sort.hpp>`]]
+    [[ [algoref sort_by_key] ]
+     [Sorts one range of data using keys supplied in another range]
      [`<hpx/include/parallel_sort.hpp>`]]
 ]
 
