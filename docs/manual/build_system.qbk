@@ -6,43 +6,104 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ===============================================================================/]
 
-[section:build_system The HPX Build System]
+[section:build_system The __hpx__ Build System]
 
 The buildsystem for __hpx__ is based on __cmake__. CMake is a cross-platform
 build-generator tool. CMake does not build the project, it generates the files
 needed by your build tool (GNU make, Visual Studio, etc) for building __hpx__.
 
-This section gives an introduction on how to use our build system to build HPX
-and how to use HPX in your own projects.
+This section gives an introduction on how to use our build system to build __hpx__
+and how to use __hpx__ in your own projects.
 
 [include build_system/cmake_basics.qbk]
 [include build_system/prerequisites.qbk]
 
-[section:building_hpx Building HPX]
+[section:building_hpx Building __hpx__]
+
+[heading:info Basic Information]
+
+Once __cmake__ has been run, the build process can be started. The __hpx__ build process
+is highly configurable through __cmake__ and various __cmake__ variables influence
+the build process. The build process consists of the following parts:
+
+* [*The __hpx__ core libraries]: This forms the basic set of __hpx__ libraries. The generated targets are:
+  * hpx: The core __hpx__ library (always enabled).
+  * hpx_init: The __hpx__ initialization library that applications need to link
+    against to define the __hpx__ entry points (disabled for static builds).
+  * iostreams_component: The component used for (distributed) IO (always enabled).
+  * component_storage_component: The component needed for migration to persistant storage.
+  * unordered_component: The component needed for a distributed hash table.
+* [*__hpx__ Examples]: This target is enabled by default and builds all __hpx__ examples
+  (disable by setting HPX_WITH_BUILD_EXAMPLES=Off). __hpx__ examples are part of the
+  'all' target and are included in the installation if enabled.
+* [*__hpx__ Tests]: This target builds the __hpx__ test suite and is enabled by default
+  (disable by setting HPX_WITH_BUILD_TESTS=Off). They are not built by the 'all'
+  target and have to be built separately.
+* [*__hpx__ Documentation]: This target builds the Documentation, this is not
+  enabled by default. For more information see
+  [link hpx.manual.build_system.building_hpx.doc_tools Setting up the __hpx__ Documentation Tool Chain].
+
+For a complete list of available __cmake__ variables that influence the build of
+__hpx__ see [link hpx.manual.build_system.building_hpx.cmake_variables CMake Variables used to configure __hpx__].
+
+The variables can be used to refine the recipes that can be found
+[link hpx.manual.build_system.building_hpx.build_recipes here] which show some basic steps on
+how to build HPX for a specific platform
+
+In order to use __hpx__, only the core libraries are required (the ones marked
+as optional above are truly optional). When building against __hpx__, the __cmake__
+variable `HPX_LIBRARIES` will contain hpx and hpx_init (for pkgconfig, those are
+added to the `Libs` sections). In order to use the optional libraries, you need
+to specify them as link dependencies in your build.
+
+As __hpx__ is a modern C++ Library we require a certain minimal set of features
+from the C++11 standard. In addition, we make use of certain C++14 features if
+the used compiler supports them. This means that the __hpx__ build system will
+try to determine the highest support C++ standard flavor and check for availability
+of those features. If you want to force __hpx__ to use a specific C++ standard
+version you can use the following __cmake__ variables:
+
+* [*`HPX_WITH_CXX0X`]: Enables Pre-C++11 support (This is the minimal required
+    mode on older gcc versions).
+* [*`HPX_WITH_CXX11`]: Enables C++11 support
+* [*`HPX_WITH_CXX14`]: Enables C++14 support
+* [*`HPX_WITH_CXX0Y`]: Enables (experimental) C++17 support
+
+[heading:build_types Build Types]
+
+__cmake__ can be configured to generate project files suitable that enabled
+debugging support or for an optimized build. The __cmake__ variable used to set
+the build type is `CMAKE_BUILD_TYPE` (for more information see the
+[@https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html CMake
+Documentation]). Available build types are:
+
+* [*Debug]: Full debug symbols available and additional assertions to help debugging. To enable the debug
+  build type for the __hpx__ API, the C++ Macro `HPX_DEBUG` is defined.
+* [*RelWithDebInfo]: Release build with debugging symbols. This is most useful for profiling applications
+* [*Release]: Release build. This disables assertions and enables default compiler optimizations.
+
+[important We currently don't guarantee ABI compatibility between Debug and Release builds.
+  Please make sure that applications built against __hpx__ use the same build type.
+  For __cmake__ builds, this means that the `CMAKE_BUILD_TYPE` variables have to match
+  and for projects not using __cmake__, the `HPX_DEBUG` macro has to be set.]
+
+[heading:platform Platform specific notes]
+
+Some Platforms require to have special link and/or compiler flags specified to
+build HPX. This is handled via __cmake__'s support for different toolchains (see
+[@https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html cmake-toolchains(7)]
+for more information). This is also used for cross compilation.
+
+__hpx__ ships with a set of toolchains that can be used for compilation of __hpx__
+itself and applications depending on __hpx__. Please see
+[link hpx.manual.build_system.building_hpx.cmake_toolchains CMake Toolchains shipped with HPX]
+for more information.
+
+In order to enable full static linking with the __libraries, the __cmake__ variable
+`HPX_WITH_STATIC_LINKING` has to be set to `On`.
 
 [include build_system/cmake_variables.qbk]
-
-[/
-[section:cmake_modules Custom CMake Modules shipped with HPX]
-
-TODO...
-
-[endsect] [/ Custom CMake Modules shipped with HPX]
-
 [include build_system/cmake_toolchains.qbk]
-
-[section:cpp_macros C++ Preprocessor Macros that influence the build]
-
-* HPX_DEBUG
-* HPX_ENABLE_ASSERTS
-* ...
-
-TODO ...
-
-[endsect] [/ C++ Preprocessor Macros that influence the build]
-]
-
-[include build_system/doc_tools.qbk]
 
 [section:build_recipes Build recipes]
 
@@ -54,13 +115,15 @@ TODO ...
 
 [endsect] [/ Build reciepts]
 
-[endsect] [/ Builing HPX]
+[include build_system/doc_tools.qbk]
 
-[section:using_hpx Building Projects using HPX]
+[endsect] [/ Building __hpx__]
+
+[section:using_hpx Building Projects using __hpx__]
 
 [include build_system/using_hpx_pkgconfig.qbk]
 [include build_system/using_hpx_cmake.qbk]
 
-[endsect] [/ Using Building Projects using HPX]
+[endsect] [/ Using Building Projects using __hpx__]
 
-[endsect] [/ The HPX Build System]
+[endsect] [/ The __hpx__ Build System]
