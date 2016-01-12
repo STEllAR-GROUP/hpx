@@ -198,6 +198,11 @@ namespace hpx { namespace threads
         return *continuation_recursion_count.get();
     }
 
+    void reset_continuation_recursion_count()
+    {
+        delete continuation_recursion_count.get();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void run_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {

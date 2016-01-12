@@ -535,6 +535,8 @@ namespace hpx
         runtime::uptime_.reset();
         runtime::runtime_.reset();
         util::reset_held_lock_data();
+
+        threads::reset_continuation_recursion_count();
     }
 
     std::string runtime::get_thread_name()
