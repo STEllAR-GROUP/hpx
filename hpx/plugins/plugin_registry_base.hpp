@@ -61,5 +61,9 @@ namespace hpx { namespace plugins
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, plugin)                  \
 /**/
 
+#define HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()                         \
+    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_PLUGIN_PREFIX, plugin)          \
+/**/
+
 #endif
 

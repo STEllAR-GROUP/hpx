@@ -579,9 +579,19 @@ if(HPX_WITH_RUN_MAIN_EVERYWHERE)
 endif()
 
 # Options for our plugins
-hpx_option(HPX_WITH_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
-hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
-hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_WITH_COMPRESSION_BZIP2 BOOL
+  "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL
+  "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL
+  "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
+
+# Parcel coalescing is used by the main HPX library, enable it always
+hpx_option(HPX_WITH_PARCEL_COALESCING BOOL
+  "Enable the parcel coalescing plugin (default: ON)." ON ADVANCED)
+if(HPX_WITH_PARCEL_COALESCING)
+  hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+endif()
 
 ################################################################################
 # Backwards compatibility options (edit for each release)
@@ -1330,9 +1340,6 @@ endif()
 if(HPX_WITH_COMPRESSION_ZLIB)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_ZLIB)
 endif()
-
-# Parcel coalescing is used by the main HPX library, enable it always
-hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
 
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)

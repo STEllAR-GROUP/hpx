@@ -142,7 +142,7 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<locality> dests,
+        virtual void put_parcels(locality const& dests,
             std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers) = 0;
 
