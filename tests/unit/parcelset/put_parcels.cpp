@@ -47,7 +47,7 @@ void test_plain_argument(hpx::id_type const& id)
 
     // create parcels
     std::vector<hpx::parcelset::parcel> parcels;
-    for (int i = 0; i != numparcels_default; ++i)
+    for (std::size_t i = 0; i != numparcels_default; ++i)
     {
         hpx::lcos::promise<hpx::id_type> p;
         parcels.push_back(
@@ -85,7 +85,7 @@ void test_future_argument(hpx::id_type const& id)
 
     // create parcels
     std::vector<hpx::parcelset::parcel> parcels;
-    for (int i = 0; i != numparcels_default; ++i)
+    for (std::size_t i = 0; i != numparcels_default; ++i)
     {
         hpx::lcos::local::promise<double> p_arg;
         hpx::lcos::promise<hpx::id_type> p_cont;
@@ -130,7 +130,7 @@ void test_mixed_arguments(hpx::id_type const& id)
 
     // create parcels
     std::vector<hpx::parcelset::parcel> parcels;
-    for (int i = 0; i != numparcels_default; ++i)
+    for (std::size_t i = 0; i != numparcels_default; ++i)
     {
         hpx::lcos::promise<hpx::id_type> p_cont;
 
