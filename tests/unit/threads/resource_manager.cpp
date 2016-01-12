@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
@@ -27,10 +28,16 @@ namespace test
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void verify_resource_allocation(std::size_t num_execs)
+void verify_resource_allocation(std::size_t num_execs, std::size_t num_pus)
 {
     std::vector<hpx::threads::resource_allocation> alloc_data =
-        hpx::threads::resource_manager::get_resource_allocation();
+        hpx::threads::get_resource_allocation();
+
+    HPX_TEST_EQ(num_execs, alloc_data.size());
+    for (hpx::threads::resource_allocation const& data : alloc_data)
+    {
+        HPX_TEST_EQ(num_pus, data.core_ids_.size());
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +59,7 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
         for (std::size_t i = 0; i != num_execs; ++i)
             execs.push_back(Executor(num_pus));
 
-        verify_resource_allocation(execs.size());
+        verify_resource_allocation(num_execs, num_pus);
 
         // give executors a chance to get started
         hpx::this_thread::yield();
