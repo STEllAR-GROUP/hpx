@@ -140,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         util::loop_n(dst, part_size - 1,
                             [=, &val](OutIter it)
                             {
-                                *it = op(*it, val);
+                                *it = op(val, *it);
                             });
                     },
                     // step 4 use this return value
