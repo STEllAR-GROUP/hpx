@@ -278,7 +278,7 @@ HPX_INLINE_NAMESPACE(v1)
             for (int c = 0; c < n_chunks; ++c) {
                 // spawn a task to do a sequential update on this chunk
                 hpx::future<T> w1 = hpx::async(
-                    &TagType::template sequential_update_n<FwdIter, FwdIter, T, Op>,
+                    &TagType::template sequential_update_n<FwdIter, OutIter, T, Op>,
                     std::get < 0 > (work_chunks[c]),
                     std::get < 1 > (work_chunks[c]),
                     std::get < 2 > (work_chunks[c]),
