@@ -374,44 +374,6 @@ HPX_INLINE_NAMESPACE(v1)
     /// \a inclusive_scan may be non-deterministic.
     ///
 
-
-    template<typename ExPolicy, typename InIter, typename OutIter, typename T>
-    inline typename boost::enable_if<
-            is_execution_policy<ExPolicy>,
-            typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
-    prefix_scan_inclusive(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-                          T init)
-    {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-                iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-                output_iterator_category;
-
-        static_assert(
-                (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
-                "Requires at least input iterator.");
-
-        static_assert(
-                (boost::mpl::or_<
-                        boost::is_base_of<
-                                std::forward_iterator_tag, output_iterator_category>,
-                        boost::is_same<
-                                std::output_iterator_tag, output_iterator_category>
-                >::value),
-                "Requires at least output iterator.");
-
-        typedef typename boost::mpl::or_<
-                is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, iterator_category>,
-                boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
-
-        return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
-                std::forward < ExPolicy > (policy), is_seq(),
-                first, last, dest, std::move(init), std::plus<T>());
-    }
-
     template<typename ExPolicy, typename InIter, typename OutIter, typename T,
     typename Op>
     inline typename boost::enable_if<
@@ -448,6 +410,86 @@ HPX_INLINE_NAMESPACE(v1)
         return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
             std::forward < ExPolicy > (policy), is_seq(),
             first, last, dest, std::move(init), std::forward < Op > (op));
+    }
+
+    template<typename ExPolicy, typename InIter, typename OutIter, typename T>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    >::type
+    prefix_scan_inclusive(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+        T init)
+    {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+            iterator_category;
+        typedef typename std::iterator_traits<OutIter>::iterator_category
+            output_iterator_category;
+
+        static_assert(
+            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+            "Requires at least input iterator.");
+
+        static_assert(
+            (boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value),
+            "Requires at least output iterator.");
+
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>,
+            boost::is_same<std::output_iterator_tag, output_iterator_category>
+        >::type is_seq;
+
+        return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
+            std::forward < ExPolicy > (policy),
+            is_seq(),
+            first, last, dest,
+            std::move(init),
+            std::plus<T>());
+    }
+
+    template<typename ExPolicy, typename InIter, typename OutIter>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    >::type
+    prefix_scan_inclusive(ExPolicy&& policy, InIter first, InIter last, OutIter dest)
+    {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+            iterator_category;
+        typedef typename std::iterator_traits<OutIter>::iterator_category
+            output_iterator_category;
+
+        static_assert(
+            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+            "Requires at least input iterator.");
+
+        static_assert(
+            (boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value),
+            "Requires at least output iterator.");
+
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>,
+            boost::is_same<std::output_iterator_tag, output_iterator_category>
+        >::type is_seq;
+
+        typedef typename std::iterator_traits<InIter>::value_type value_type;
+
+        return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
+            std::forward < ExPolicy > (policy),
+            is_seq(),
+            first, last, dest,
+            value_type(), std::plus<value_type>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
