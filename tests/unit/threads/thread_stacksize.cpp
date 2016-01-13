@@ -9,18 +9,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-// Define the amount of stack space that we need to reserve for management
-// purposes.
-#if defined(HPX_DEBUG)
-    static const std::size_t management_space = 0x1600;
-#else
-#if defined(HPX_INTEL_VERSION)
-    static const std::size_t management_space = 0x2000;
-#else
-    static const std::size_t management_space = 0x800;
-#endif
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 void test_small_stacksize()
 {
@@ -30,8 +18,8 @@ void test_small_stacksize()
         hpx::get_runtime().get_config().get_stack_size(
             hpx::threads::thread_stacksize_small));
 
-    // allocate HPX_SMALL_STACK_SIZE - management_space memory on the stack
-    char array[HPX_SMALL_STACK_SIZE-management_space];
+    // allocate HPX_SMALL_STACK_SIZE - HPX_THREADS_STACK_OVERHEAD memory on the stack
+    char array[HPX_SMALL_STACK_SIZE-HPX_THREADS_STACK_OVERHEAD];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -48,8 +36,8 @@ void test_medium_stacksize()
         hpx::get_runtime().get_config().get_stack_size(
             hpx::threads::thread_stacksize_medium));
 
-    // allocate HPX_MEDIUM_STACK_SIZE - management_space memory on the stack
-    char array[HPX_MEDIUM_STACK_SIZE-management_space];
+    // allocate HPX_MEDIUM_STACK_SIZE - HPX_THREADS_STACK_OVERHEAD memory on the stack
+    char array[HPX_MEDIUM_STACK_SIZE-HPX_THREADS_STACK_OVERHEAD];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -66,8 +54,8 @@ void test_large_stacksize()
         hpx::get_runtime().get_config().get_stack_size(
             hpx::threads::thread_stacksize_large));
 
-    // allocate HPX_LARGE_STACK_SIZE - management_space memory on the stack
-    char array[HPX_LARGE_STACK_SIZE-management_space];
+    // allocate HPX_LARGE_STACK_SIZE - HPX_THREADS_STACK_OVERHEAD memory on the stack
+    char array[HPX_LARGE_STACK_SIZE-HPX_THREADS_STACK_OVERHEAD];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -84,8 +72,8 @@ void test_huge_stacksize()
         hpx::get_runtime().get_config().get_stack_size(
             hpx::threads::thread_stacksize_huge));
 
-    // allocate HPX_LARGE_STACK_SIZE - management_space memory on the stack
-    char array[HPX_HUGE_STACK_SIZE-management_space];
+    // allocate HPX_LARGE_STACK_SIZE - HPX_THREADS_STACK_OVERHEAD memory on the stack
+    char array[HPX_HUGE_STACK_SIZE-HPX_THREADS_STACK_OVERHEAD];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));

@@ -2,7 +2,7 @@
 //  Copyright (c) 2007 Robert Perricone
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2013 Thomas Heller
+//  Copyright (c) 2013-2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,6 +18,7 @@
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/util/coroutine/detail/get_stack_pointer.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <sys/param.h>
@@ -236,6 +237,12 @@ namespace hpx { namespace util { namespace coroutines
           m_sp[cb_idx] = m_sp[backup_cb_idx];
           m_sp[funp_idx] = m_sp[backup_funp_idx];
         }
+      }
+
+      std::ptrdiff_t get_available_stack_space()
+      {
+        return
+          get_stack_ptr() - reinterpret_cast<boost::uintptr_t>(m_stack) - context_size;
       }
 
       typedef boost::atomic<boost::int64_t> counter_type;
