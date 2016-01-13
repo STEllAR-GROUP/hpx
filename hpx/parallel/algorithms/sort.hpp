@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -44,12 +45,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             template <typename Compare_, typename Proj_>
             compare_projected(Compare_ && comp, Proj_ && proj)
-              : comp_(std::forward<Compare>(comp)),
-                proj_(std::forward<Proj>(proj))
+              : comp_(std::forward<Compare_>(comp)),
+                proj_(std::forward<Proj_>(proj))
             {}
 
-            template <typename T>
-            inline bool operator()(T const& t1, T const& t2)
+            template <typename T1, typename T2>
+            inline bool operator()(T1 && t1, T2 && t2)
             {
                 return hpx::util::invoke(comp_,
                     hpx::util::invoke(proj_, t1),
@@ -169,14 +170,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             RandomIt it_c = last - 1;
 
             if (comp(*it_b, *it_a))
-                std::swap(*it_a, *it_b);
+                std::iter_swap(it_a, it_b);
+
             if (comp(*it_c, *it_b))
             {
-                std::swap(*it_c, *it_b);
+                std::iter_swap(it_c, it_b);
                 if (comp(*it_b, *it_a))
-                    std::swap(*it_a, *it_b);
+                    std::iter_swap(it_a, it_b);
             }
-            std::swap(*first, *it_b);
+
+            std::iter_swap(first, it_b);
 
             typedef
                 typename std::iterator_traits<RandomIt>::reference
@@ -191,13 +194,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 --c_last;
             while (!(c_first > c_last))
             {
-                std::swap(*(c_first++), *(c_last--));
+                std::iter_swap(c_first++, c_last--);
                 while (comp(*c_first, val))
                     ++c_first;
                 while (comp(val, *c_last))
                     --c_last;
             } // End while
-            std::swap(*first, *c_last);
+
+            std::iter_swap(first, c_last);
 
             // spawn tasks for each sub section
             hpx::future<RandomIt> left =
@@ -391,12 +395,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           \a hpx::future<RandomIt> if the execution policy is of
     ///           type
     ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a Iter
+    ///           \a parallel_task_execution_policy and returns \a RandomIt
     ///           otherwise.
-    ///           It returns \a last.
+    ///           The algorithm returns an iterator pointing to the first
+    ///           element after the last element in the input sequence.
     //-----------------------------------------------------------------------------
     template <typename ExPolicy, typename RandomIt,
         typename Proj = util::projection_identity,

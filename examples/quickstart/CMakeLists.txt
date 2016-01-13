@@ -85,6 +85,13 @@ if(HPX_WITH_CXX11_LAMBDAS)
   set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 
+if(HPX_WITH_TUPLE_RVALUE_SWAP)
+  set(example_programs ${example_programs}
+      sort_by_key
+     )
+  set(sort_by_key_FLAGS COMPONENT_DEPENDENCIES iostreams)
+endif()
+
 foreach(example_program ${example_programs})
   set(sources
       ${example_program}.cpp)

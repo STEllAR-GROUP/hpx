@@ -13,6 +13,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tagged.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <utility>
@@ -72,6 +73,43 @@ namespace hpx { namespace util
         return result_type(p);
     }
 
+    template <typename Tag1, typename Tag2, typename ... Ts>
+    HPX_CONSTEXPR HPX_FORCEINLINE
+    tagged_pair<
+        Tag1(typename tuple_element<0, tuple<Ts...> >::type),
+        Tag2(typename tuple_element<1, tuple<Ts...> >::type)
+    >
+    make_tagged_pair(tuple<Ts...> && p)
+    {
+        static_assert(sizeof...(Ts) >= 2, "tuple must have at least 2 elements");
+
+        typedef tagged_pair<
+                Tag1(typename tuple_element<0, tuple<Ts...> >::type),
+                Tag2(typename tuple_element<1, tuple<Ts...> >::type)
+            > result_type;
+
+        return result_type(std::move(get<0>(p)), std::move(get<1>(p)));
+    }
+
+    template <typename Tag1, typename Tag2, typename ... Ts>
+    HPX_CONSTEXPR HPX_FORCEINLINE
+    tagged_pair<
+        Tag1(typename tuple_element<0, tuple<Ts...> >::type),
+        Tag2(typename tuple_element<1, tuple<Ts...> >::type)
+    >
+    make_tagged_pair(tuple<Ts...> const& p)
+    {
+        static_assert(sizeof...(Ts) >= 2, "tuple must have at least 2 elements");
+
+        typedef tagged_pair<
+                Tag1(typename tuple_element<0, tuple<Ts...> >::type),
+                Tag2(typename tuple_element<1, tuple<Ts...> >::type)
+            > result_type;
+
+        return result_type(get<0>(p), get<1>(p));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2, typename T1, typename T2>
     hpx::future<tagged_pair<
         Tag1(typename decay<T1>::type), Tag2(typename decay<T2>::type)
@@ -79,11 +117,32 @@ namespace hpx { namespace util
     make_tagged_pair(hpx::future<std::pair<T1, T2> > && f)
     {
         typedef hpx::util::tagged_pair<
-            Tag1(typename decay<T1>::type), Tag2(typename decay<T2>::type)
-        > result_type;
+                Tag1(typename decay<T1>::type), Tag2(typename decay<T2>::type)
+            > result_type;
 
         return lcos::make_future<result_type>(std::move(f),
             [](std::pair<T1, T2> && p) -> result_type
+            {
+                return make_tagged_pair<Tag1, Tag2>(std::move(p));
+            });
+    }
+
+    template <typename Tag1, typename Tag2, typename ... Ts>
+    hpx::future<tagged_pair<
+        Tag1(typename tuple_element<0, tuple<Ts...> >::type),
+        Tag2(typename tuple_element<1, tuple<Ts...> >::type)
+    > >
+    make_tagged_pair(hpx::future<tuple<Ts...> > && f)
+    {
+        static_assert(sizeof...(Ts) >= 2, "tuple must have at least 2 elements");
+
+        typedef hpx::util::tagged_pair<
+                Tag1(typename tuple_element<0, tuple<Ts...> >::type),
+                Tag2(typename tuple_element<1, tuple<Ts...> >::type)
+            > result_type;
+
+        return lcos::make_future<result_type>(std::move(f),
+            [](tuple<Ts...> && p) -> result_type
             {
                 return make_tagged_pair<Tag1, Tag2>(std::move(p));
             });

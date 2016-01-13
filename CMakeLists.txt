@@ -620,6 +620,21 @@ if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
 endif()
 
+# BADBAD: This enables an overload of swap is necessary to work around the
+#         problems caused by zip_iterator not being a real random access iterator.
+#         Dereferencing zip_iterator does not yield a true reference but
+#         only a temporary tuple holding true references.
+#
+# A real fix for this problem is proposed in PR0022R0
+# (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0022r0.html)
+#
+hpx_option(HPX_WITH_TUPLE_RVALUE_SWAP BOOL
+  "Enable swapping of rvalue tuples (needed for parallel::sort_by_key, default: ON)."
+  ON CATEGORY "Utility" ADVANCED)
+if(HPX_WITH_TUPLE_RVALUE_SWAP)
+  hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
