@@ -104,6 +104,8 @@ function(hpx_setup_target target)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
+                 "HPX_APPLICATION_NAME=${name}"
+                 "HPX_APPLICATION_STRING=\"${name}\""
                  "HPX_PREFIX=\"${_prefix}\""
                  "HPX_APPLICATION_EXPORTS")
   endif()
