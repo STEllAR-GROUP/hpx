@@ -544,5 +544,16 @@ namespace hpx { namespace this_thread
     {
         return threads::get_executor(threads::get_self_id(), ec);
     }
+
+    std::ptrdiff_t get_available_stack_space()
+    {
+        threads::thread_self *self = threads::get_self_ptr();
+        if(self)
+        {
+            return self->get_available_stack_space();
+        }
+
+        return (std::numeric_limits<std::ptrdiff_t>::max)();
+    }
 }}
 

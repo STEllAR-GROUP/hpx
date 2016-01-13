@@ -545,6 +545,9 @@ namespace hpx { namespace this_thread
     ///
     HPX_EXPORT threads::executors::current_executor
         get_executor(error_code& ec = throws);
+
+    // returns the remaining available stack space
+    HPX_EXPORT std::ptrdiff_t get_available_stack_space();
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

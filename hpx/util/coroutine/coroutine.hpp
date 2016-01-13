@@ -276,6 +276,15 @@ namespace hpx { namespace util { namespace coroutines
       return m_pimpl == 0;
     }
 
+    std::ptrdiff_t get_available_stack_space()
+    {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+        return m_pimpl->get_available_stack_space();
+#else
+        return (std::numeric_limits<std::ptrdiff_t>::max)();
+#endif
+    }
+
   protected:
     // The second parameter is used to avoid calling this constructor
     // by mistake from other member functions (specifically operator=).
