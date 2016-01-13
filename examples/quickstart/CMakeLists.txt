@@ -87,9 +87,9 @@ endif()
 
 if(HPX_WITH_TUPLE_RVALUE_SWAP)
   set(example_programs ${example_programs}
-      sort_by_key
+      sort_by_key_demo
      )
-  set(sort_by_key_FLAGS COMPONENT_DEPENDENCIES iostreams)
+  set(sort_by_key_demo_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 
 foreach(example_program ${example_programs})
