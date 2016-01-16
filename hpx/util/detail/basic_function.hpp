@@ -222,10 +222,9 @@ namespace hpx { namespace util { namespace detail
         {
             typedef typename std::remove_cv<T>::type target_type;
 
-            BOOST_STATIC_ASSERT_MSG(
-                (traits::is_callable<target_type&(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
+            static_assert(
+                traits::is_callable<target_type&(Ts...), R>::value
+              , "T shall be Callable with the function signature");
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())
@@ -239,10 +238,9 @@ namespace hpx { namespace util { namespace detail
         {
             typedef typename std::remove_cv<T>::type target_type;
 
-            BOOST_STATIC_ASSERT_MSG(
-                (traits::is_callable<target_type&(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
+            static_assert(
+                traits::is_callable<target_type&(Ts...), R>::value
+              , "T shall be Callable with the function signature");
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())
