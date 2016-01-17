@@ -12,8 +12,6 @@
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/static_assert.hpp>
-
 #include <type_traits>
 #include <utility>
 
@@ -84,8 +82,9 @@ namespace hpx { namespace util
     inline detail::deferred<F(Ts&&...)>
     deferred_call(F&& f, Ts&&... vs)
     {
-        BOOST_STATIC_ASSERT(
-            traits::detail::is_deferred_callable<F(Ts&&...)>::value);
+        static_assert(
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value
+          , "F shall be Callable with decay_t<Ts> arguments");
 
         return detail::deferred<F(Ts&&...)>(
             std::forward<F>(f), std::forward<Ts>(vs)...);
@@ -96,8 +95,9 @@ namespace hpx { namespace util
     inline typename std::decay<F>::type
     deferred_call(F&& f)
     {
-        BOOST_STATIC_ASSERT(
-            traits::detail::is_deferred_callable<F()>::value);
+        static_assert(
+            traits::detail::is_deferred_callable<F()>::value
+          , "F shall be Callable with no arguments");
 
         return std::forward<F>(f);
     }
