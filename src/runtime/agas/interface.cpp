@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -504,6 +504,12 @@ hpx::future<bool> end_migration(naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.end_migration_async(id);
+}
+
+bool mark_as_migrated(naming::id_type const& id)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.mark_as_migrated(id);
 }
 
 }}

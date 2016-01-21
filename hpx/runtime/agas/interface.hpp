@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -309,7 +309,7 @@ HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >
         naming::id_type const& id,
         naming::id_type const& target_locality);
 HPX_API_EXPORT hpx::future<bool> end_migration(naming::id_type const& id);
-
+HPX_API_EXPORT bool mark_as_migrated(naming::id_type const& id);
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

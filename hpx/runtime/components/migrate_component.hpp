@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/traits/is_component.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -48,8 +49,8 @@ namespace hpx { namespace components
     migrate(naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
-        typedef server::trigger_migrate_component_action<Component> action_type;
-        return async<action_type>(naming::get_locality_from_id(to_migrate),
+        typedef server::perform_migrate_component_action<Component> action_type;
+        return hpx::detail::async_colocated<action_type>(to_migrate,
             to_migrate, target_locality);
     }
 

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1466,6 +1466,10 @@ public:
 
     /// Maintain list of migrated objects
     bool was_object_migrated(naming::id_type const* ids, std::size_t size);
+
+    /// Mark the given object as being migrated (if the object is unpinned).
+    /// Delay migration until the object is unpinned otherwise.
+    bool mark_as_migrated(naming::id_type const& id);
 };
 
 }}

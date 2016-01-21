@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -3219,6 +3219,34 @@ void addressing_service::send_refcnt_requests_sync(
         ec = make_success_code();
 }
 
+bool addressing_service::mark_as_migrated(
+    naming::id_type const& id
+    )
+{
+    typedef std::pair<naming::id_type, naming::address> result_type;
+
+    if (!id)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::mark_as_migrated",
+            "invalid reference id");
+        return false;
+    }
+
+    // insert the object's new locality into the map of migrated objects
+    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    migrated_objects_table_type::iterator it =
+        migrated_objects_table_.find(id.get_gid());
+
+    if (it == migrated_objects_table_.end())
+    {
+        migrated_objects_table_.insert(id.get_gid());
+        return true;
+    }
+
+    return false;
+}
+
 hpx::future<std::pair<naming::id_type, naming::address> >
 addressing_service::begin_migration_async(
     naming::id_type const& id
@@ -3229,28 +3257,21 @@ addressing_service::begin_migration_async(
 
     if (!id)
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::begin_migration_async",
-            "invalid reference id");
-        return make_ready_future(result_type(naming::invalid_id, naming::address()));
+        return make_exceptional_future<result_type>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::begin_migration_async",
+                "invalid reference id"));
     }
 
     naming::gid_type gid = id.get_gid();
-
-    // insert the object's new locality into the map of migrated objects
-    {
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-        migrated_objects_table_.insert(gid);
-    }
 
     agas::request req(agas::primary_ns_begin_migration, gid);
     naming::id_type service_target(
         agas::stubs::primary_namespace::get_service_instance(gid)
       , naming::id_type::unmanaged);
 
-    return stubs::primary_namespace::service_async<
-            std::pair<naming::id_type, naming::address>
-        >(service_target, req);
+    return stubs::primary_namespace::service_async<result_type>(
+        service_target, req);
 }
 
 hpx::future<bool> addressing_service::end_migration_async(
@@ -3259,10 +3280,10 @@ hpx::future<bool> addressing_service::end_migration_async(
 {
     if (!id)
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::end_migration_async",
-            "invalid reference id");
-        return make_ready_future(false);
+        return make_exceptional_future<bool>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::end_migration_async",
+                "invalid reference id"));
     }
 
     agas::request req(agas::primary_ns_end_migration, id.get_gid());

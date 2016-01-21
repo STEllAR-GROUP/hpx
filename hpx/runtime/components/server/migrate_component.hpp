@@ -93,7 +93,7 @@ namespace hpx { namespace components { namespace server
     //       migrated which will delete it once the shared pointer goes out of
     //       scope.
     //
-    //    The entry in the AGAS client side representation on locality A which
+    //    The entry in the AGAS client side representation on locality B which
     //    marks the object as 'was migrated' will be left untouched (for now).
     //    This is necessary to allow for all parcels which where still resolved
     //    to the old locality will be properly forwarded to the new location
@@ -133,20 +133,20 @@ namespace hpx { namespace components { namespace server
 
             if (pin_count == ~0x0u)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "hpx::components::server::migrate_component",
-                    "attempting to migrate an instance of a component which was "
-                    "already migrated");
-                return make_ready_future(naming::invalid_id);
+                return make_exceptional_future<hpx::id_type>(
+                    HPX_GET_EXCEPTION(invalid_status,
+                        "hpx::components::server::migrate_component",
+                        "attempting to migrate an instance of a component "
+                        "which was already migrated"));
             }
 
             if (pin_count > 1)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "hpx::components::server::migrate_component",
-                    "attempting to migrate an instance of a component which is "
-                    "currently pinned");
-                return make_ready_future(naming::invalid_id);
+                return make_exceptional_future<hpx::id_type>(
+                    HPX_GET_EXCEPTION(invalid_status,
+                        "hpx::components::server::migrate_component",
+                        "attempting to migrate an instance of a component "
+                        "which is currently pinned"));
             }
 
             return runtime_support::migrate_component_async<Component>(
@@ -171,11 +171,11 @@ namespace hpx { namespace components { namespace server
 
         if (!Component::supports_migration())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::components::server::migrate_component",
-                "attempting to migrate an instance of a component which "
-                "does not support migration");
-            return make_ready_future(naming::invalid_id);
+            return make_exceptional_future<hpx::id_type>(
+                HPX_GET_EXCEPTION(invalid_status,
+                    "hpx::components::server::migrate_component",
+                    "attempting to migrate an instance of a component which "
+                    "does not support migration"));
         }
 
         // retrieve pointer to object (must be local)
@@ -208,34 +208,32 @@ namespace hpx { namespace components { namespace server
     {
         if (!Component::supports_migration())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::components::server::trigger_migrate_component",
-                "attempting to migrate an instance of a component which "
-                "does not support migration");
-            return make_ready_future(naming::invalid_id);
+            return make_exceptional_future<naming::id_type>(
+                HPX_GET_EXCEPTION(invalid_status,
+                    "hpx::components::server::trigger_migrate_component",
+                    "attempting to migrate an instance of a component which "
+                    "does not support migration"));
         }
 
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::components::server::trigger_migrate_component",
-                "this function has to be executed on the locality responsible "
-                "for managing the address of the given object");
-            return make_ready_future(naming::invalid_id);
+            return make_exceptional_future<naming::id_type>(
+                HPX_GET_EXCEPTION(invalid_status,
+                    "hpx::components::server::trigger_migrate_component",
+                    "this function has to be executed on the locality "
+                    "responsible for managing the address of the given object"));
         }
 
         return agas::begin_migration(to_migrate, target_locality)
             .then(
-                [to_migrate, target_locality](
-                    future<std::pair<naming::id_type, naming::address> > && f)
-                        -> future<naming::id_type>
+                [=](future<std::pair<naming::id_type, naming::address> > && f)
+                    ->  future<naming::id_type>
                 {
                     // rethrow errors
                     std::pair<naming::id_type, naming::address> r = f.get();
 
                     // perform actual object migration
-                    typedef server::migrate_component_action<Component>
-                        action_type;
+                    typedef migrate_component_action<Component> action_type;
                     return async<action_type>(r.first, to_migrate, r.second,
                         target_locality);
                 })
@@ -266,7 +264,55 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
-        return make_ready_future(naming::invalid_id);
+        if (!Component::supports_migration())
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::components::server::perform_migrate_component",
+                "attempting to migrate an instance of a component which "
+                "does not support migration");
+            return make_ready_future(naming::invalid_id);
+        }
+
+        // retrieve pointer to object (must be local)
+        return hpx::get_ptr<Component>(to_migrate)
+            .then(
+                [=](hpx::future<boost::shared_ptr<Component> > && f)
+                    ->  hpx::future<hpx::id_type>
+                {
+                    hpx::future<void> trigger_migration;
+
+                    {
+                        boost::shared_ptr<Component> ptr = f.get();
+
+                        // Delay the start of the migration operation until no
+                        // more actions (threads) are pending or currently
+                        // running for the given object (until the object is
+                        // unpinned).
+                        trigger_migration = ptr->mark_as_migrated(target_locality);
+
+                        // Unpin the object, will trigger migration if this is
+                        // the only pin-count.
+                    }
+
+                    // Once the migration is possible (object is not pinned
+                    // anymore trigger the necessary actions)
+                    return trigger_migration
+                        .then(
+                            [=](hpx::future<void> && f)
+                                ->  hpx::future<hpx::id_type>
+                            {
+                                f.get();        // rethrow exceptions
+
+                                // now trigger 2nd step of migration
+                                typedef trigger_migrate_component_action<
+                                        Component
+                                    > action_type;
+
+                                return async<action_type>(
+                                    naming::get_locality_from_id(to_migrate),
+                                    to_migrate, target_locality);
+                            });
+                });
     }
 
     template <typename Component>
@@ -277,7 +323,6 @@ namespace hpx { namespace components { namespace server
           , &perform_migrate_component<Component>
           , perform_migrate_component_action<Component> >
     {};
-
 }}}
 
 #endif
