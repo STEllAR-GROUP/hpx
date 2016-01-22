@@ -1,30 +1,32 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM)
-#define HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM
+#if !defined(HPX_TRAITS_ACTION_WAS_OBJECT_MIGRATED_JAN_22_2016_1115AM)
+#define HPX_TRAITS_ACTION_WAS_OBJECT_MIGRATED_JAN_22_2016_1115AM
 
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
+
+#include <utility>
 
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action capabilities
     template <typename Action, typename Enable>
-    struct action_schedule_thread
+    struct action_was_object_migrated
     {
         // returns whether target was migrated to another locality
-        static void
-        call(naming::address::address_type lva, threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
+        static std::pair<bool, components::pinned_ptr>
+        call(hpx::id_type const& id, naming::address::address_type lva)
         {
             // by default we forward this to the component type
             typedef typename Action::component_type component_type;
-            component_type::schedule_thread(lva, data, initial_state);
+            return component_type::was_object_migrated(id, lva);
         }
     };
 }}

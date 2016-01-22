@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,7 @@
 #include <hpx/util/protect.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
@@ -355,85 +356,117 @@ namespace hpx { namespace lcos
         template <typename ...Ts>
         void apply(naming::id_type const& id, Ts &&... vs)
         {
+            std::pair<bool, components::pinned_ptr> r;
+
             naming::address addr;
-            if (agas::is_local_address_cached(id, addr)) {
-                // local, direct execution
+            if (agas::is_local_address_cached(id, addr))
+            {
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(action_type::execute_function(
-                    addr.address_, std::forward<Ts>(vs)...));
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    // local, direct execution
+                    (*this->impl_)->set_data(action_type::execute_function(
+                        addr.address_, std::forward<Ts>(vs)...));
+                    return;
+                }
             }
-            else {
-                // remote execution
-                this->do_apply(id, actions::action_priority<action_type>(),
-                    std::forward<Ts>(vs)...);
-            }
+
+            // remote execution
+            this->do_apply(id, actions::action_priority<action_type>(),
+                std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         void apply(naming::address && addr, naming::id_type const& id,
             Ts &&... vs)
         {
-            if (addr.locality_ == hpx::get_locality()) {
-                // local, direct execution
+            std::pair<bool, components::pinned_ptr> r;
+
+            if (addr.locality_ == hpx::get_locality())
+            {
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(action_type::execute_function(
-                    addr.address_, std::forward<Ts>(vs)...));
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    // local, direct execution
+                    (*this->impl_)->set_data(action_type::execute_function(
+                        addr.address_, std::forward<Ts>(vs)...));
+                    return;
+                }
             }
-            else {
-                // remote execution
-                this->do_apply(std::move(addr), id,
-                    actions::action_priority<action_type>(),
-                    std::forward<Ts>(vs)...);
-            }
+
+            // remote execution
+            this->do_apply(std::move(addr), id,
+                actions::action_priority<action_type>(),
+                std::forward<Ts>(vs)...);
         }
 
         template <typename Callback, typename ...Ts>
         void apply_cb(naming::id_type const& id, Callback && cb, Ts&&... vs)
         {
+            std::pair<bool, components::pinned_ptr> r;
+
             naming::address addr;
-            if (agas::is_local_address_cached(id, addr)) {
-                // local, direct execution
+            if (agas::is_local_address_cached(id, addr))
+            {
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(action_type::execute_function(
-                    addr.address_, std::forward<Ts>(vs)...));
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    // local, direct execution
+                    (*this->impl_)->set_data(action_type::execute_function(
+                        addr.address_, std::forward<Ts>(vs)...));
 
-                // invoke callback
-                cb(boost::system::error_code(), parcelset::parcel());
+                    // invoke callback
+                    cb(boost::system::error_code(), parcelset::parcel());
+                    return;
+                }
             }
-            else {
-                // remote execution
-                this->do_apply_cb(id, actions::action_priority<action_type>(),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-            }
+
+            // remote execution
+            this->do_apply_cb(id, actions::action_priority<action_type>(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         template <typename Callback, typename ...Ts>
         void apply_cb(naming::address && addr, naming::id_type const& id,
             Callback && cb, Ts &&... vs)
         {
-            if (addr.locality_ == hpx::get_locality()) {
-                // local, direct execution
+            std::pair<bool, components::pinned_ptr> r;
+
+            if (addr.locality_ == hpx::get_locality())
+            {
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(action_type::execute_function(
-                    addr.address_, std::forward<Ts>(vs)...));
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    // local, direct execution
+                    (*this->impl_)->set_data(action_type::execute_function(
+                        addr.address_, std::forward<Ts>(vs)...));
 
-                // invoke callback
-                cb(boost::system::error_code(), parcelset::parcel());
+                    // invoke callback
+                    cb(boost::system::error_code(), parcelset::parcel());
+                    return;
+                }
             }
-            else {
-                // remote execution
-                this->do_apply_cb(std::move(addr), id,
-                    actions::action_priority<action_type>(),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-            }
+
+            // remote execution
+            this->do_apply_cb(std::move(addr), id,
+                actions::action_priority<action_type>(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
     };
 }}

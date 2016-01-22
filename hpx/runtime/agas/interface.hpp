@@ -14,8 +14,12 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/dynamic_bitset.hpp>
+
+#include <utility>
 
 namespace hpx { namespace agas
 {
@@ -309,7 +313,14 @@ HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >
         naming::id_type const& id,
         naming::id_type const& target_locality);
 HPX_API_EXPORT hpx::future<bool> end_migration(naming::id_type const& id);
-HPX_API_EXPORT bool mark_as_migrated(naming::id_type const& id);
+
+HPX_API_EXPORT hpx::future<void>
+    mark_as_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<hpx::future<void>()> && f);
+
+HPX_API_EXPORT std::pair<bool, components::pinned_ptr>
+    was_object_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<components::pinned_ptr()> && f);
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

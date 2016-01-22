@@ -1263,6 +1263,17 @@ bool addressing_service::is_local_address_cached(
   , error_code& ec
     )
 {
+    // Assume non-local operation if the gid is known to have been migrated
+    {
+        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        if (was_object_migrated_locked(id))
+        {
+            if (&ec != &throws)
+                ec = make_success_code();
+            return false;
+        }
+    }
+
     // Try to resolve the address of the GID from the locally available
     // information.
 
@@ -3219,32 +3230,47 @@ void addressing_service::send_refcnt_requests_sync(
         ec = make_success_code();
 }
 
-bool addressing_service::mark_as_migrated(
-    naming::id_type const& id
+hpx::future<void> addressing_service::mark_as_migrated(
+    naming::gid_type const& gid
+  , util::unique_function_nonser<hpx::future<void>()> && f
     )
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
 
-    if (!id)
+    if (!gid)
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::mark_as_migrated",
-            "invalid reference id");
-        return false;
+        return make_exceptional_future<void>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::mark_as_migrated",
+                "invalid reference gid"));
     }
 
     // insert the object's new locality into the map of migrated objects
     boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-    migrated_objects_table_type::iterator it =
-        migrated_objects_table_.find(id.get_gid());
 
-    if (it == migrated_objects_table_.end())
-    {
-        migrated_objects_table_.insert(id.get_gid());
-        return true;
-    }
+    return f().then(
+        launch::async,      // must be launched on new thread
+        [this, gid](hpx::future<void> && f) -> hpx::future<void>
+        {
+            boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
 
-    return false;
+            migrated_objects_table_type::iterator it =
+                migrated_objects_table_.find(gid);
+
+            if (it == migrated_objects_table_.end())
+            {
+                migrated_objects_table_.insert(gid);
+
+                // remove entry from cache
+                gva_cache_->erase(
+                    [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+                    {
+                        return gid == p.first.get_gid();
+                    });
+            }
+
+            return std::move(f);
+        });
 }
 
 hpx::future<std::pair<naming::id_type, naming::address> >
@@ -3304,20 +3330,17 @@ bool addressing_service::was_object_migrated_locked(
         migrated_objects_table_.end();
 }
 
-bool addressing_service::was_object_migrated(
-    naming::id_type const* ids
-  , std::size_t size)
+std::pair<bool, components::pinned_ptr>
+    addressing_service::was_object_migrated(
+        naming::gid_type const& gid
+      , util::unique_function_nonser<components::pinned_ptr()> && f
+        )
 {
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-    HPX_ASSERT(1 == size);
-
     boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-    return was_object_migrated_locked(ids[0].get_gid());
-#else
-    // #FIXME: it's not really clear how to handle this situation
-    HPX_ASSERT(false);
-    return false;
-#endif
+    if (was_object_migrated_locked(gid))
+        return std::make_pair(true, components::pinned_ptr());
+
+    return std::make_pair(false, f());
 }
 
 }}

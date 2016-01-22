@@ -10,9 +10,11 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 #include <algorithm>
+#include <utility>
 
 namespace hpx { namespace agas
 {
@@ -506,10 +508,19 @@ hpx::future<bool> end_migration(naming::id_type const& id)
     return resolver.end_migration_async(id);
 }
 
-bool mark_as_migrated(naming::id_type const& id)
+hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
+    util::unique_function_nonser<hpx::future<void>()> && f)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.mark_as_migrated(id);
+    return resolver.mark_as_migrated(gid, std::move(f));
+}
+
+std::pair<bool, components::pinned_ptr>
+    was_object_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<components::pinned_ptr()> && f)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.was_object_migrated(gid, std::move(f));
 }
 
 }}

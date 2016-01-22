@@ -11,11 +11,13 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <boost/thread/locks.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace components
 {
@@ -28,6 +30,31 @@ namespace hpx { namespace components
         typedef Mutex mutex_type;
         typedef BaseComponent base_type;
         typedef typename base_type::this_component_type this_component_type;
+
+        hpx::future<void> mark_as_migrated_callback(
+            hpx::id_type const& target_location)
+        {
+            boost::lock_guard<mutex_type> l(mtx_);
+
+            // make sure that no migration is currently in flight
+            if (migration_target_locality_)
+            {
+                return make_exceptional_future<void>(
+                    HPX_GET_EXCEPTION(invalid_status,
+                        "migration_support::mark_as_migrated",
+                        "migration operation is already in flight"));
+            }
+
+            if (1 == pin_count_)
+            {
+                // all is well, migration can be triggered now
+                return make_ready_future();
+            }
+
+            // delay migrate operation until pin count goes to zero
+            migration_target_locality_ = target_location;
+            return trigger_migration_.get_future();
+        }
 
     public:
         template <typename ...Arg>
@@ -51,7 +78,8 @@ namespace hpx { namespace components
         void pin()
         {
             boost::lock_guard<mutex_type> l(mtx_);
-            ++pin_count_;
+            if (pin_count_ != ~0x0u)
+                ++pin_count_;
         }
         void unpin()
         {
@@ -66,8 +94,17 @@ namespace hpx { namespace components
                     if (trigger_migration_.valid() && migration_target_locality_)
                     {
                         migration_target_locality_ = naming::invalid_id;
-                        agas::mark_as_migrated(this->base_type::get_unmanaged_id());
+
+                        hpx::future<void> f =
+                            agas::mark_as_migrated(this->gid_,
+                                []() -> hpx::future<void>
+                                {
+                                    return make_ready_future();
+                                });
+
                         trigger_migration_.set_value();
+
+                        f.get();        //rethrow exception
                     }
                 }
             }
@@ -85,30 +122,15 @@ namespace hpx { namespace components
             pin_count_ = ~0x0u;
         }
 
-        hpx::future<void>
-        mark_as_migrated(hpx::id_type const& target_location)
+        hpx::future<void> mark_as_migrated(hpx::id_type const& to_migrate,
+            hpx::id_type const& target_location)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
-
-            // make sure that no migration is currently in flight
-            if (migration_target_locality_)
-            {
-                return make_exceptional_future<void>(
-                    HPX_GET_EXCEPTION(invalid_status,
-                        "migration_support::mark_as_migrated",
-                        "migration operation is already in flight"));
-            }
-
-            if (1 == pin_count_)
-            {
-                // all is well, migration can be triggered now
-                agas::mark_as_migrated(this->base_type::get_unmanaged_id());
-                return make_ready_future();
-            }
-
-            // delay migrate operation until pin count goes to zero
-            migration_target_locality_ = target_location;
-            return trigger_migration_.get_future();
+            // we need to first lock the AGAS migrated objects table, only then
+            // access (lock) the object
+            return agas::mark_as_migrated(to_migrate.get_gid(),
+                util::bind(
+                    util::one_shot(&migration_support::mark_as_migrated_callback),
+                    this, target_location));
         }
 
         /// This is the hook implementation for decorate_action which makes
@@ -118,44 +140,39 @@ namespace hpx { namespace components
         static threads::thread_function_type
         decorate_action(naming::address::address_type lva, F && f)
         {
-            this_component_type* this_ =
-                get_lva<this_component_type>::call(lva);
-
-            // pin the component whenever a thread is being scheduled
-            this_->pin();
-
-            // make sure we unpin the component once the thread runs to
-            // completion
+            // Make sure we pin the thread at construction of the bound object
+            // which will also unpin the component once the thread runs to
+            // completion (the bound object goes out of scope).
             return util::bind(
                 util::one_shot(&migration_support::thread_function),
-                this_, util::placeholders::_1,
-                base_type::decorate_action(lva, std::forward<F>(f)));
+                get_lva<this_component_type>::call(lva),
+                util::placeholders::_1,
+                base_type::decorate_action(lva, std::forward<F>(f)),
+                components::pinned_ptr::create<this_component_type>(lva));
+        }
+
+
+        // Return whether the given object was migrated, if it was not
+        // migrated, it also returns a pinned pointer.
+        static std::pair<bool, components::pinned_ptr>
+        was_object_migrated(hpx::id_type const& id,
+            naming::address::address_type lva)
+        {
+            return agas::was_object_migrated(id.get_gid(),
+                [lva]() -> components::pinned_ptr
+                {
+                    return components::pinned_ptr::create<this_component_type>(lva);
+                });
         }
 
     protected:
-        struct scoped_unpinner
-        {
-            scoped_unpinner(migration_support& outer)
-              : outer_(outer)
-            {}
-
-            ~scoped_unpinner()
-            {
-                // unpin component once thread runs to completion, this may
-                // trigger any pending migration operation
-                outer_.unpin();
-            }
-
-            migration_support& outer_;
-        };
-
-        // Execute the wrapped action. This pins the object making sure that
-        // no migration will happen while an operation is in flight.
+        // Execute the wrapped action. This function is bound in decorate_action
+        // above. The bound object performs the pinning/unpinning.
         threads::thread_state_enum thread_function(
             threads::thread_state_ex_enum state,
-            threads::thread_function_type && f)
+            threads::thread_function_type && f,
+            components::pinned_ptr)
         {
-            scoped_unpinner sp(*this);
             return f(state);
         }
 

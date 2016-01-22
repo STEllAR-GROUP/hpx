@@ -12,14 +12,15 @@
 #include <hpx/config.hpp>
 
 #include <hpx/exception.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
@@ -1465,11 +1466,14 @@ public:
     hpx::future<bool> end_migration_async(naming::id_type const& id);
 
     /// Maintain list of migrated objects
-    bool was_object_migrated(naming::id_type const* ids, std::size_t size);
+    std::pair<bool, components::pinned_ptr>
+        was_object_migrated(naming::gid_type const& gid,
+            util::unique_function_nonser<components::pinned_ptr()> && f);
 
     /// Mark the given object as being migrated (if the object is unpinned).
     /// Delay migration until the object is unpinned otherwise.
-    bool mark_as_migrated(naming::id_type const& id);
+    hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<hpx::future<void>()> && f);
 };
 
 }}

@@ -34,6 +34,7 @@ namespace hpx { namespace lcos { namespace server
         using base_type::finalize;
         using base_type::decorate_action;
         using base_type::schedule_thread;
+        using base_type::was_object_migrated;
         using base_type::is_target_valid;
 
         typedef base_type::wrapping_type wrapping_type;

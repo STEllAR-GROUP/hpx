@@ -72,6 +72,8 @@ namespace hpx
         class memory;
         class memory_block;
 
+        struct pinned_ptr_base;
+
         namespace stubs
         {
             struct runtime_support;

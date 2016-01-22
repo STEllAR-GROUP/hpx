@@ -288,7 +288,8 @@ namespace hpx { namespace components { namespace server
                         // more actions (threads) are pending or currently
                         // running for the given object (until the object is
                         // unpinned).
-                        trigger_migration = ptr->mark_as_migrated(target_locality);
+                        trigger_migration = ptr->mark_as_migrated(
+                            to_migrate, target_locality);
 
                         // Unpin the object, will trigger migration if this is
                         // the only pin-count.

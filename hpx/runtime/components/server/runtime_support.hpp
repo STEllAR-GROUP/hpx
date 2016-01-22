@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Thomas Heller
 //
@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -331,6 +332,14 @@ namespace hpx { namespace components { namespace server
             threads::thread_state_enum initial_state)
         {
             hpx::threads::register_work_plain(data, initial_state); //-V106
+        }
+
+        /// Return whether the given object was migrated
+        static std::pair<bool, components::pinned_ptr>
+            was_object_migrated(hpx::id_type const&,
+                naming::address::address_type)
+        {
+            return std::make_pair(false, components::pinned_ptr());
         }
 
         ///////////////////////////////////////////////////////////////////////
