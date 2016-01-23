@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c)      2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -180,6 +181,59 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
     return true;
 }
 
+bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
+{
+    test_client t1 = hpx::new_<test_client>(source, 42);
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+
+    // the new object should live on the source locality
+    HPX_TEST_EQ(t1.call(), source);
+    HPX_TEST_EQ(t1.get_data(), 42);
+
+    std::size_t N = 1000;
+
+    // First, spawn a thread (locally) that will migrate the object between
+    // source and target a few times
+    hpx::future<void> migrate_future = hpx::async(
+        [source, target, t1, N]() mutable
+        {
+            for(std::size_t i = 0; i < N; ++i)
+            {
+                // migrate of t1 to the target (loc2)
+                test_client t2(hpx::components::migrate(t1, target));
+
+                HPX_TEST_EQ(t1.get_data(), 42);
+
+                // wait for migration to be done
+                HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+                // the migrated object should have the same id as before
+                HPX_TEST_EQ(t1.get_id(), t2.get_id());
+
+                // the migrated object should life on the target now
+                HPX_TEST_EQ(t2.call(), target);
+                HPX_TEST_EQ(t2.get_data(), 42);
+
+                std::swap(source, target);
+            }
+        }
+    );
+
+    // Second, we generate tons of work which should automatically follow
+    // the migration.
+    hpx::future<void> create_work = hpx::async(
+        [t1, N]()
+        {
+            for(std::size_t i = 0; i < N; ++i)
+            {
+                HPX_TEST_EQ(t1.get_data(), 42);
+            }
+        }
+    );
+
+    hpx::wait_all(migrate_future, create_work);
+    return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
@@ -194,6 +248,12 @@ int main()
     {
         HPX_TEST(test_migrate_busy_component(hpx::find_here(), id));
         HPX_TEST(test_migrate_busy_component(id, hpx::find_here()));
+    }
+
+    for (hpx::id_type const& id : localities)
+    {
+        HPX_TEST(test_migrate_busy_component2(hpx::find_here(), id));
+        HPX_TEST(test_migrate_busy_component2(id, hpx::find_here()));
     }
 
     return hpx::util::report_errors();
