@@ -37,9 +37,9 @@ namespace hpx { namespace components { namespace server
     // Object migration is performed in several steps:
     //
     // 1) The migration is triggered on locality A by invoking the `migrate()`
-    //    function. This invokes the action `perform_migration_action`
+    //    function. This invokes the action `perform_migrate_component_action`
     //    on the locality where the object to migrate is currently located
-    //    locality B).
+    //    (locality B).
     //
     //    The action `perform_migrate_component_action` executes the following
     //    steps:
