@@ -18,7 +18,7 @@ struct test_server
         hpx::components::component_base<test_server>
     >
 {
-    test_server() {}
+    test_server(int data = 0) : data_(data) {}
     ~test_server() {}
 
     hpx::id_type call() const
@@ -26,23 +26,46 @@ struct test_server
         return hpx::find_here();
     }
 
+    void busy_work() const
+    {
+        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    }
+
+    int get_data() const
+    {
+        return data_;
+    }
+
     // Components which should be migrated using hpx::migrate<> need to
     // be Serializable and CopyConstructable. Components can be
     // MoveConstructable in which case the serialized data is moved into the
     // components constructor.
-    test_server(test_server const& rhs) {}
-    test_server(test_server && rhs) {}
+    test_server(test_server const& rhs) : data_(rhs.data_) {}
+    test_server(test_server && rhs) : data_(rhs.data_) {}
 
-    test_server& operator=(test_server const &) { return *this; }
-    test_server& operator=(test_server &&) { return *this; }
+    test_server& operator=(test_server const & rhs)
+    {
+        data_ = rhs.data_;
+        return *this;
+    }
+    test_server& operator=(test_server && rhs)
+    {
+        data_ = rhs.data_;
+        return *this;
+    }
 
     HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, busy_work, busy_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, get_data, get_data_action);
 
     template <typename Archive>
-    void serialize(Archive&ar, unsigned version) {}
+    void serialize(Archive& ar, unsigned version)
+    {
+        ar & data_;
+    }
 
 private:
-    ;
+    int data_;
 };
 
 typedef hpx::components::simple_component<test_server> server_type;
@@ -51,6 +74,14 @@ HPX_REGISTER_COMPONENT(server_type, test_server);
 typedef test_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);
 HPX_REGISTER_ACTION(call_action);
+
+typedef test_server::busy_work_action busy_work_action;
+HPX_REGISTER_ACTION_DECLARATION(busy_work_action);
+HPX_REGISTER_ACTION(busy_work_action);
+
+typedef test_server::get_data_action get_data_action;
+HPX_REGISTER_ACTION_DECLARATION(get_data_action);
+HPX_REGISTER_ACTION(get_data_action);
 
 struct test_client
   : hpx::components::client_base<test_client, test_server>
@@ -65,17 +96,28 @@ struct test_client
     {
         return call_action()(this->get_id());
     }
+
+    hpx::future<void> busy_work() const
+    {
+        return hpx::async<busy_work_action>(this->get_id());
+    }
+
+    int get_data() const
+    {
+        return get_data_action()(this->get_id());
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 bool test_migrate_component(hpx::id_type source, hpx::id_type target)
 {
     // create component on given locality
-    test_client t1 = hpx::new_<test_client>(source);
+    test_client t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
+    HPX_TEST_EQ(t1.get_data(), 42);
 
     try {
         // migrate of t1 to the target
@@ -89,6 +131,7 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
 
         // the migrated object should life on the target now
         HPX_TEST_EQ(t2.call(), target);
+        HPX_TEST_EQ(t2.get_data(), 42);
     }
     catch (hpx::exception const&) {
         return false;
@@ -98,90 +141,24 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct busy_test_server
-  : hpx::components::migration_support<
-        hpx::components::component_base<busy_test_server>
-    >
-{
-    busy_test_server() {}
-    ~busy_test_server() {}
-
-    void busy_work()
-    {
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
-    }
-
-    hpx::id_type call() const
-    {
-        return hpx::find_here();
-    }
-
-    // Components which should be migrated using hpx::migrate<> need to
-    // be Serializable and CopyConstructable. Components can be
-    // MoveConstructable in which case the serialized data is moved into the
-    // components constructor.
-    busy_test_server(busy_test_server const& rhs) {}
-    busy_test_server(busy_test_server && rhs) {}
-
-    busy_test_server& operator=(busy_test_server const &) { return *this; }
-    busy_test_server& operator=(busy_test_server &&) { return *this; }
-
-    HPX_DEFINE_COMPONENT_ACTION(busy_test_server, busy_work);
-    HPX_DEFINE_COMPONENT_ACTION(busy_test_server, call);
-
-    template <typename Archive>
-    void serialize(Archive&ar, unsigned version) {}
-
-private:
-    ;
-};
-
-typedef hpx::components::simple_component<busy_test_server> busy_server_type;
-HPX_REGISTER_COMPONENT(busy_server_type, busy_test_server);
-
-typedef busy_test_server::call_action busy_call_action;
-HPX_REGISTER_ACTION_DECLARATION(busy_call_action);
-HPX_REGISTER_ACTION(busy_call_action);
-
-typedef busy_test_server::busy_work_action busy_work_action;
-HPX_REGISTER_ACTION_DECLARATION(busy_work_action);
-HPX_REGISTER_ACTION(busy_work_action);
-
-struct busy_test_client
-  : hpx::components::client_base<busy_test_client, busy_test_server>
-{
-    typedef hpx::components::client_base<busy_test_client, busy_test_server>
-        base_type;
-
-    busy_test_client() {}
-    busy_test_client(hpx::shared_future<hpx::id_type> const& id) : base_type(id) {}
-
-    hpx::id_type call() const
-    {
-        return busy_call_action()(this->get_id());
-    }
-
-    hpx::future<void> busy_work()
-    {
-        return hpx::async<busy_work_action>(this->get_id());
-    }
-};
-
 bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
 {
     // create component on given locality
-    busy_test_client t1 = hpx::new_<busy_test_client>(source);
+    test_client t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
+    HPX_TEST_EQ(t1.get_data(), 42);
 
     // add some concurrent busy work
     hpx::future<void> busy_work = t1.busy_work();
 
     try {
         // migrate of t1 to the target
-        busy_test_client t2(hpx::components::migrate(t1, target));
+        test_client t2(hpx::components::migrate(t1, target));
+
+        HPX_TEST_EQ(t1.get_data(), 42);
 
         // wait for migration to be done
         HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
@@ -191,11 +168,13 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
 
         // the migrated object should life on the target now
         HPX_TEST_EQ(t2.call(), target);
+        HPX_TEST_EQ(t2.get_data(), 42);
     }
     catch (hpx::exception const&) {
         return false;
     }
 
+    // the busy work should be finished by now, wait anyways
     busy_work.wait();
 
     return true;
@@ -205,15 +184,15 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-//     for (hpx::id_type const& id : localities)
-//     {
-//         HPX_TEST(test_migrate_component(hpx::find_here(), id));
-//         HPX_TEST(test_migrate_component(id, hpx::find_here()));
-//     }
+    for (hpx::id_type const& id : localities)
+    {
+        HPX_TEST(test_migrate_component(hpx::find_here(), id));
+        HPX_TEST(test_migrate_component(id, hpx::find_here()));
+    }
 
     for (hpx::id_type const& id : localities)
     {
-//         HPX_TEST(test_migrate_busy_component(hpx::find_here(), id));
+        HPX_TEST(test_migrate_busy_component(hpx::find_here(), id));
         HPX_TEST(test_migrate_busy_component(id, hpx::find_here()));
     }
 

@@ -83,7 +83,7 @@ namespace hpx { namespace components
         }
         void unpin()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             HPX_ASSERT(pin_count_ != 0);
             if (pin_count_ != ~0x0u)
             {
@@ -104,7 +104,8 @@ namespace hpx { namespace components
 
                         trigger_migration_.set_value();
 
-                        f.get();        //rethrow exception
+                        l.unlock();     // avoid holding lock during suspension
+                        f.get();        // rethrow exception
                     }
                 }
             }
