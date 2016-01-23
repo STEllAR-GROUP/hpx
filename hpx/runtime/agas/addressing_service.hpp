@@ -1473,7 +1473,8 @@ public:
     /// Mark the given object as being migrated (if the object is unpinned).
     /// Delay migration until the object is unpinned otherwise.
     hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-        util::unique_function_nonser<hpx::future<void>()> && f);
+        util::unique_function_nonser<
+            std::pair<bool, hpx::future<void> >()> && f);
 };
 
 }}

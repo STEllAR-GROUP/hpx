@@ -299,6 +299,7 @@ namespace hpx { namespace components { namespace server
                     // anymore trigger the necessary actions)
                     return trigger_migration
                         .then(
+                            launch::async,  // run on separate thread
                             [=](hpx::future<void> && f)
                                 ->  hpx::future<hpx::id_type>
                             {

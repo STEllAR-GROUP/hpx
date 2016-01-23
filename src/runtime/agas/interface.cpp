@@ -509,7 +509,7 @@ hpx::future<bool> end_migration(naming::id_type const& id)
 }
 
 hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-    util::unique_function_nonser<hpx::future<void>()> && f)
+    util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.mark_as_migrated(gid, std::move(f));

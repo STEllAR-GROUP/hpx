@@ -3232,7 +3232,7 @@ void addressing_service::send_refcnt_requests_sync(
 
 hpx::future<void> addressing_service::mark_as_migrated(
     naming::gid_type const& gid
-  , util::unique_function_nonser<hpx::future<void>()> && f
+  , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f
     )
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
@@ -3245,32 +3245,36 @@ hpx::future<void> addressing_service::mark_as_migrated(
                 "invalid reference gid"));
     }
 
-    // insert the object's new locality into the map of migrated objects
+    // always first grab the AGAS lock before invoking the user supplied
+    // function
     boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
 
-    return f().then(
-        launch::async,      // must be launched on new thread
-        [this, gid](hpx::future<void> && f) -> hpx::future<void>
-        {
-            boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    // call the user code for the component instance to be migrated, the
+    // returned future becomes ready whenever the component instance can be
+    // migrated (no threads are pending/active any more)
+    std::pair<bool, hpx::future<void> > result = f();
 
-            migrated_objects_table_type::iterator it =
-                migrated_objects_table_.find(gid);
+    // mark the gid as 'migrated' right away - the worst what can happen is
+    // that a parcel which comes in for this object is bouncing between this
+    // locality and the locality managing the address resolution for the object
+    if (result.first)
+    {
+        migrated_objects_table_type::iterator it =
+            migrated_objects_table_.find(gid);
 
-            if (it == migrated_objects_table_.end())
+        // insert the object into the map of migrated objects
+        if (it == migrated_objects_table_.end())
+            migrated_objects_table_.insert(gid);
+
+        // remove entry from cache
+        gva_cache_->erase(
+            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
             {
-                migrated_objects_table_.insert(gid);
+                return gid == p.first.get_gid();
+            });
+    }
 
-                // remove entry from cache
-                gva_cache_->erase(
-                    [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
-                    {
-                        return gid == p.first.get_gid();
-                    });
-            }
-
-            return std::move(f);
-        });
+    return std::move(result.second);
 }
 
 hpx::future<std::pair<naming::id_type, naming::address> >

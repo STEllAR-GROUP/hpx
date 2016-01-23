@@ -316,7 +316,8 @@ HPX_API_EXPORT hpx::future<bool> end_migration(naming::id_type const& id);
 
 HPX_API_EXPORT hpx::future<void>
     mark_as_migrated(naming::gid_type const& gid,
-        util::unique_function_nonser<hpx::future<void>()> && f);
+        util::unique_function_nonser<
+            std::pair<bool, hpx::future<void> >()> && f);
 
 HPX_API_EXPORT std::pair<bool, components::pinned_ptr>
     was_object_migrated(naming::gid_type const& gid,

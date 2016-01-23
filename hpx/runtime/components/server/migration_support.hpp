@@ -31,31 +31,6 @@ namespace hpx { namespace components
         typedef BaseComponent base_type;
         typedef typename base_type::this_component_type this_component_type;
 
-        hpx::future<void> mark_as_migrated_callback(
-            hpx::id_type const& target_location)
-        {
-            boost::lock_guard<mutex_type> l(mtx_);
-
-            // make sure that no migration is currently in flight
-            if (migration_target_locality_)
-            {
-                return make_exceptional_future<void>(
-                    HPX_GET_EXCEPTION(invalid_status,
-                        "migration_support::mark_as_migrated",
-                        "migration operation is already in flight"));
-            }
-
-            if (1 == pin_count_)
-            {
-                // all is well, migration can be triggered now
-                return make_ready_future();
-            }
-
-            // delay migrate operation until pin count goes to zero
-            migration_target_locality_ = target_location;
-            return trigger_migration_.get_future();
-        }
-
     public:
         template <typename ...Arg>
         migration_support(Arg &&... arg)
@@ -83,32 +58,29 @@ namespace hpx { namespace components
         }
         void unpin()
         {
-            typename mutex_type::scoped_lock l(mtx_);
-            HPX_ASSERT(pin_count_ != 0);
-            if (pin_count_ != ~0x0u)
-            {
-                if (--pin_count_ == 0)
+            // make sure to always grab to AGAS lock first
+            agas::mark_as_migrated(this->gid_,
+                [this]()
+                ->  std::pair<bool, hpx::future<void> >
                 {
-                    // trigger pending migration if this was the last unpin and
-                    // a migration operation is pending
-                    if (trigger_migration_.valid() && migration_target_locality_)
+                    boost::lock_guard<mutex_type> l(mtx_);
+                    HPX_ASSERT(pin_count_ != 0);
+                    if (pin_count_ != ~0x0u)
                     {
-                        migration_target_locality_ = naming::invalid_id;
-
-                        hpx::future<void> f =
-                            agas::mark_as_migrated(this->gid_,
-                                []() -> hpx::future<void>
-                                {
-                                    return make_ready_future();
-                                });
-
-                        trigger_migration_.set_value();
-
-                        l.unlock();     // avoid holding lock during suspension
-                        f.get();        // rethrow exception
+                        if (--pin_count_ == 0)
+                        {
+                            // trigger pending migration if this was the last
+                            // unpin and a migration operation is pending
+                            if (trigger_migration_.valid() && migration_target_locality_)
+                            {
+                                migration_target_locality_ = naming::invalid_id;
+                                trigger_migration_.set_value();
+                                return std::make_pair(true, make_ready_future());
+                            }
+                        }
                     }
-                }
-            }
+                    return std::make_pair(false, make_ready_future());
+                });
         }
 
         boost::uint32_t pin_count() const
@@ -129,9 +101,32 @@ namespace hpx { namespace components
             // we need to first lock the AGAS migrated objects table, only then
             // access (lock) the object
             return agas::mark_as_migrated(to_migrate.get_gid(),
-                util::bind(
-                    util::one_shot(&migration_support::mark_as_migrated_callback),
-                    this, target_location));
+                [this, target_location]()
+                ->  std::pair<bool, hpx::future<void> >
+                {
+                    boost::lock_guard<mutex_type> l(mtx_);
+
+                    // make sure that no migration is currently in flight
+                    if (migration_target_locality_)
+                    {
+                        return std::make_pair(false,
+                            make_exceptional_future<void>(
+                                HPX_GET_EXCEPTION(invalid_status,
+                                    "migration_support::mark_as_migrated",
+                                    "migration operation is already in flight")
+                            ));
+                    }
+
+                    if (1 == pin_count_)
+                    {
+                        // all is well, migration can be triggered now
+                        return std::make_pair(true, make_ready_future());
+                    }
+
+                    // delay migrate operation until pin count goes to zero
+                    migration_target_locality_ = target_location;
+                    return std::make_pair(true, trigger_migration_.get_future());
+                });
         }
 
         /// This is the hook implementation for decorate_action which makes
@@ -141,9 +136,9 @@ namespace hpx { namespace components
         static threads::thread_function_type
         decorate_action(naming::address::address_type lva, F && f)
         {
-            // Make sure we pin the thread at construction of the bound object
-            // which will also unpin the component once the thread runs to
-            // completion (the bound object goes out of scope).
+            // Make sure we pin the component at construction of the bound object
+            // which will also unpin it once the thread runs to completion (the
+            // bound object goes out of scope).
             return util::bind(
                 util::one_shot(&migration_support::thread_function),
                 get_lva<this_component_type>::call(lva),
