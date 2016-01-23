@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct apply_execute_at_helper
         {
             template <typename Executor, typename F>
-            static void call(wrap_int, Executor& exec,
+            static void call(hpx::traits::detail::wrap_int, Executor& exec,
                 util::steady_time_point const& abs_time, F && f)
             {
                 make_ready_future_at(abs_time).then(
@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct apply_execute_at_helper<sequential_execution_tag>
         {
             template <typename Executor, typename F>
-            static void call(wrap_int, Executor& exec,
+            static void call(hpx::traits::detail::wrap_int, Executor& exec,
                 util::steady_time_point const& abs_time, F && f)
             {
                 this_thread::sleep_until(abs_time);
@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct async_execute_at_helper
         {
             template <typename Executor, typename F>
-            static auto call(wrap_int, Executor& exec,
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec,
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename future_type<
@@ -124,7 +124,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct async_execute_at_helper<sequential_execution_tag>
         {
             template <typename Executor, typename F>
-            static auto call(wrap_int, Executor& exec,
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec,
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename future_type<
@@ -178,7 +178,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct execute_at_helper
         {
             template <typename Executor, typename F>
-            static auto call(wrap_int, Executor& exec,
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec,
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename hpx::util::result_of<
@@ -208,7 +208,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct execute_at_helper<sequential_execution_tag>
         {
             template <typename Executor, typename F>
-            static auto call(wrap_int, Executor& exec,
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec,
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename hpx::util::result_of<

@@ -72,7 +72,7 @@ namespace hpx
         class memory;
         class memory_block;
 
-        struct pinned_ptr_base;
+        class pinned_ptr;
 
         namespace stubs
         {

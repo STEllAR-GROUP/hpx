@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
@@ -271,14 +270,6 @@ namespace hpx { namespace components
             threads::thread_state_enum initial_state)
         {
             hpx::threads::register_work_plain(data, initial_state); //-V106
-        }
-
-        /// Return whether the given object was migrated
-        static std::pair<bool, components::pinned_ptr>
-            was_object_migrated(hpx::id_type const&,
-                naming::address::address_type)
-        {
-            return std::make_pair(false, components::pinned_ptr());
         }
 
         // This component type requires valid id for its actions to be invoked

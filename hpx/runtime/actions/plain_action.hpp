@@ -16,7 +16,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
-#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -50,14 +49,6 @@ namespace hpx { namespace actions
                 threads::thread_state_enum initial_state)
             {
                 hpx::threads::register_work_plain(data, initial_state); //-V106
-            }
-
-            /// Return whether the given object was migrated
-            static std::pair<bool, components::pinned_ptr>
-                was_object_migrated(hpx::id_type const&,
-                    naming::address::address_type)
-            {
-                return std::make_pair(false, components::pinned_ptr());
             }
         };
     }

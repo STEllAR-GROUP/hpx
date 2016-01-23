@@ -478,7 +478,7 @@ namespace hpx { namespace applier
             }
 
             // make sure the target has not been migrated away
-            auto r = act->was_object_migrated(ids[0], lva);
+            auto r = act->was_object_migrated(ids[i], lva);
             if (r.first)
             {
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)

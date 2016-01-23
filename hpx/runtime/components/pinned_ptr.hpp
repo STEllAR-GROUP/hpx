@@ -85,7 +85,7 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct pinned_ptr
+    class pinned_ptr
     {
     private:
         template <typename T> struct id {};

@@ -10,6 +10,15 @@
 
 namespace hpx { namespace traits
 {
+    namespace detail
+    {
+        // wraps int so that int argument is favored over wrap_int
+        struct wrap_int
+        {
+            wrap_int(int) {}
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename Enable = void>
     struct promise_remote_result;

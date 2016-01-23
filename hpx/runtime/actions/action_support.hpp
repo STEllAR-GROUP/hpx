@@ -19,6 +19,7 @@
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>

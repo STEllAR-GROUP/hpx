@@ -44,7 +44,6 @@ struct B : A, hpx::components::managed_component_base<B>
         wrapping_type;
     using hpx::components::managed_component_base<B>::decorate_action;
     using hpx::components::managed_component_base<B>::schedule_thread;
-    using hpx::components::managed_component_base<B>::was_object_migrated;
     using hpx::components::managed_component_base<B>::is_target_valid;
 
     typedef B type_holder;
@@ -77,7 +76,6 @@ struct C : B, hpx::components::managed_component_base<C>
         wrapped_type;
     using hpx::components::managed_component_base<C>::decorate_action;
     using hpx::components::managed_component_base<C>::schedule_thread;
-    using hpx::components::managed_component_base<C>::was_object_migrated;
     using hpx::components::managed_component_base<C>::set_back_ptr;
     using hpx::components::managed_component_base<C>::finalize;
     using hpx::components::managed_component_base<C>::is_target_valid;
