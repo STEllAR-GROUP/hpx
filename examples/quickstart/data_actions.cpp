@@ -42,11 +42,11 @@ struct plain_data
     }
 
     /// Return whether the given object was migrated
-    static std::pair<bool, components::pinned_ptr>
+    static std::pair<bool, hpx::components::pinned_ptr>
         was_object_migrated(hpx::id_type const& id,
-            naming::address::address_type)
+            hpx::naming::address::address_type)
     {
-        return std::make_pair(false, components::pinned_ptr());
+        return std::make_pair(false, hpx::components::pinned_ptr());
     }
 };
 
