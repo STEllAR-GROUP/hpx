@@ -1150,7 +1150,8 @@ public:
         parcelset::parcel p
       , util::function_nonser<void(boost::system::error_code const&,
             parcelset::parcel const&)> &&
-        );
+      , threads::thread_priority local_priority =
+            threads::thread_priority_default);
 
     /// \brief Increment the global reference count for the given id
     ///

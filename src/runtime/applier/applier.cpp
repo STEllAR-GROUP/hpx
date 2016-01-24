@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -491,10 +491,12 @@ namespace hpx { namespace applier
                     p.set_continuation(std::move(cont));
 
                 // route parcel to new locality of target
-                client.route(std::move(p),
+                client.route(
+                    std::move(p),
                     util::bind(&detail::parcel_sent_handler,
                         std::ref(parcel_handler_),
-                        util::placeholders::_1, util::placeholders::_2));
+                        util::placeholders::_1, util::placeholders::_2),
+                    threads::thread_priority_normal);
                 break;
             }
 

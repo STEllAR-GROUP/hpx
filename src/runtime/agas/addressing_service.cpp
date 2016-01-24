@@ -1876,6 +1876,7 @@ void addressing_service::route(
     parcelset::parcel p
   , util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> && f
+  , threads::thread_priority local_priority
     )
 {
     // compose request
@@ -1887,15 +1888,27 @@ void addressing_service::route(
 
     typedef server::primary_namespace::route_action action_type;
 
+    std::pair<bool, components::pinned_ptr> r;
+
     // Determine whether the gid is local or remote
     naming::address addr;
     if (is_local_address_cached(target.get_gid(), addr))
     {
-        // route through the local AGAS service instance
-        applier::detail::apply_l_p<action_type>(
-            target, std::move(addr), action_priority_, std::move(p));
-        f(boost::system::error_code(), parcelset::parcel());      // invoke callback
-        return;
+        r = traits::action_was_object_migrated<action_type>::call(
+            target, addr.address_);
+        if (!r.first)
+        {
+            // route through the local AGAS service instance
+            applier::detail::apply_l_p<action_type>(
+                target, std::move(addr),
+                local_priority == threads::thread_priority_default ?
+                    action_priority_ : local_priority,
+                std::move(p));
+
+            // invoke callback
+            f(boost::system::error_code(), parcelset::parcel());
+            return;
+        }
     }
 
     // apply remotely, route through main AGAS service if the destination is
@@ -3110,21 +3123,21 @@ void addressing_service::send_refcnt_requests_non_blocking(
             HPX_ASSERT(e.second < 0);
 
             naming::gid_type raw(e.first);
-            request const req(primary_ns_decrement_credit, raw, raw, e.second);
+            request req(primary_ns_decrement_credit, raw, raw, e.second);
 
             naming::id_type target(
                 stubs::primary_namespace::get_service_instance(raw)
               , naming::id_type::unmanaged);
 
-            requests[target].push_back(req);
+            requests[target].push_back(std::move(req));
         }
 
         // send requests to all locality
-        requests_type::const_iterator end = requests.end();
-        for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+        requests_type::iterator end = requests.end();
+        for (requests_type::iterator it = requests.begin(); it != end; ++it)
         {
             stubs::primary_namespace::bulk_service_non_blocking(
-                (*it).first, (*it).second, action_priority_);
+                (*it).first, std::move((*it).second), action_priority_);
         }
 
         if (&ec != &throws)
@@ -3231,18 +3244,21 @@ void addressing_service::send_refcnt_requests_sync(
         ec = make_success_code();
 }
 
+///////////////////////////////////////////////////////////////////////////////
 hpx::future<void> addressing_service::mark_as_migrated(
-    naming::gid_type const& gid
+    naming::gid_type const& gid_
   , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f
     )
 {
-    if (!gid)
+    if (!gid_)
     {
         return make_exceptional_future<void>(
             HPX_GET_EXCEPTION(bad_parameter,
                 "addressing_service::mark_as_migrated",
                 "invalid reference gid"));
     }
+
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
     // always first grab the AGAS lock before invoking the user supplied
     // function
@@ -3269,27 +3285,32 @@ hpx::future<void> addressing_service::mark_as_migrated(
             migrated_objects_table_.insert(gid);
 
         // remove entry from cache
-        gva_cache_->erase(
-            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
-            {
-                return gid == p.first.get_gid();
-            });
+        if (caching_)
+        {
+            gva_cache_->erase(
+                [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+                {
+                    return gid == p.first.get_gid();
+                });
+        }
     }
 
     return std::move(result.second);
 }
 
 void addressing_service::unmark_as_migrated(
-    naming::gid_type const& gid
+    naming::gid_type const& gid_
     )
 {
-    if (!gid)
+    if (!gid_)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
             "addressing_service::unmark_as_migrated",
             "invalid reference gid");
         return;
     }
+
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
     boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
 
@@ -3302,11 +3323,14 @@ void addressing_service::unmark_as_migrated(
         migrated_objects_table_.erase(it);
 
         // remove entry from cache
-        gva_cache_->erase(
-            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
-            {
-                return gid == p.first.get_gid();
-            });
+        if (caching_)
+        {
+            gva_cache_->erase(
+                [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+                {
+                    return gid == p.first.get_gid();
+                });
+        }
     }
 }
 
@@ -3326,7 +3350,7 @@ addressing_service::begin_migration_async(
                 "invalid reference id"));
     }
 
-    naming::gid_type gid = id.get_gid();
+    naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
 
     agas::request req(agas::primary_ns_begin_migration, gid);
     naming::id_type service_target(
@@ -3349,9 +3373,11 @@ hpx::future<bool> addressing_service::end_migration_async(
                 "invalid reference id"));
     }
 
-    agas::request req(agas::primary_ns_end_migration, id.get_gid());
+    naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
+
+    agas::request req(agas::primary_ns_end_migration, gid);
     naming::id_type service_target(
-        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+        agas::stubs::primary_namespace::get_service_instance(gid)
       , naming::id_type::unmanaged);
 
     return stubs::primary_namespace::service_async<bool>(
@@ -3359,11 +3385,13 @@ hpx::future<bool> addressing_service::end_migration_async(
 }
 
 bool addressing_service::was_object_migrated_locked(
-    naming::gid_type const& id
+    naming::gid_type const& gid_
     )
 {
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
     return
-        migrated_objects_table_.find(id) !=
+        migrated_objects_table_.find(gid) !=
         migrated_objects_table_.end();
 }
 
@@ -3373,6 +3401,14 @@ std::pair<bool, components::pinned_ptr>
       , util::unique_function_nonser<components::pinned_ptr()> && f
         )
 {
+    if (!gid)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::was_object_migrated",
+            "invalid reference gid");
+        return std::make_pair(false, components::pinned_ptr());
+    }
+
     typedef boost::unique_lock<cache_mutex_type> lock_type;
 
     lock_type lock(gva_cache_mtx_);
