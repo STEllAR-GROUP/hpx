@@ -206,6 +206,7 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
 
                 // wait for migration to be done
                 HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+
                 // the migrated object should have the same id as before
                 HPX_TEST_EQ(t1.get_id(), t2.get_id());
 

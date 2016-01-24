@@ -27,6 +27,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -3245,7 +3246,10 @@ hpx::future<void> addressing_service::mark_as_migrated(
 
     // always first grab the AGAS lock before invoking the user supplied
     // function
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    typedef boost::unique_lock<cache_mutex_type> lock_type;
+
+    lock_type lock(gva_cache_mtx_);
+    util::ignore_while_checking<lock_type> ignore(&lock);
 
     // call the user code for the component instance to be migrated, the
     // returned future becomes ready whenever the component instance can be
@@ -3369,10 +3373,14 @@ std::pair<bool, components::pinned_ptr>
       , util::unique_function_nonser<components::pinned_ptr()> && f
         )
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    typedef boost::unique_lock<cache_mutex_type> lock_type;
+
+    lock_type lock(gva_cache_mtx_);
+
     if (was_object_migrated_locked(gid))
         return std::make_pair(true, components::pinned_ptr());
 
+    util::ignore_while_checking<lock_type> ignore(&lock);
     return std::make_pair(false, f());
 }
 
