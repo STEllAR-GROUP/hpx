@@ -190,7 +190,7 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.get_data(), 42);
 
-    std::size_t N = 1000;
+    std::size_t N = 100;
 
     // First, spawn a thread (locally) that will migrate the object between
     // source and target a few times

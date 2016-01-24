@@ -322,6 +322,8 @@ HPX_API_EXPORT hpx::future<void>
 HPX_API_EXPORT std::pair<bool, components::pinned_ptr>
     was_object_migrated(naming::gid_type const& gid,
         util::unique_function_nonser<components::pinned_ptr()> && f);
+
+HPX_API_EXPORT void unmark_as_migrated(naming::gid_type const& gid);
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

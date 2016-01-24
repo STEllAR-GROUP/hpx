@@ -3235,8 +3235,6 @@ hpx::future<void> addressing_service::mark_as_migrated(
   , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f
     )
 {
-    typedef std::pair<naming::id_type, naming::address> result_type;
-
     if (!gid)
     {
         return make_exceptional_future<void>(
@@ -3275,6 +3273,37 @@ hpx::future<void> addressing_service::mark_as_migrated(
     }
 
     return std::move(result.second);
+}
+
+void addressing_service::unmark_as_migrated(
+    naming::gid_type const& gid
+    )
+{
+    if (!gid)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::unmark_as_migrated",
+            "invalid reference gid");
+        return;
+    }
+
+    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+
+    migrated_objects_table_type::iterator it =
+        migrated_objects_table_.find(gid);
+
+    // insert the object into the map of migrated objects
+    if (it != migrated_objects_table_.end())
+    {
+        migrated_objects_table_.erase(it);
+
+        // remove entry from cache
+        gva_cache_->erase(
+            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+            {
+                return gid == p.first.get_gid();
+            });
+    }
 }
 
 hpx::future<std::pair<naming::id_type, naming::address> >

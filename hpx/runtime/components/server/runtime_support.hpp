@@ -775,6 +775,12 @@ namespace hpx { namespace components { namespace server
             << " of type: " << components::get_component_type_name(type)
             << " to locality: " << find_here();
 
+        // At this point the object has been fully migrated. We now remove
+        // the object from the AGAS table of migrated objects. This is
+        // necessary as this object might have been migrated off this locality
+        // before it was migrated back.
+        agas::unmark_as_migrated(id);
+
         to_migrate.make_unmanaged();
         return id;
     }

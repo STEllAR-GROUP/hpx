@@ -523,5 +523,11 @@ std::pair<bool, components::pinned_ptr>
     return resolver.was_object_migrated(gid, std::move(f));
 }
 
+void unmark_as_migrated(naming::gid_type const& gid)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.unmark_as_migrated(gid);
+}
+
 }}
 

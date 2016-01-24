@@ -1475,6 +1475,9 @@ public:
     hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
         util::unique_function_nonser<
             std::pair<bool, hpx::future<void> >()> && f);
+
+    /// Remove the given object from the table of migrated objects
+    void unmark_as_migrated(naming::gid_type const& gid);
 };
 
 }}
