@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_GENERATE_OCT_06_2014_1007AM
 
 #include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/segmented_algorithms/generate.hpp>
 
 #endif
 

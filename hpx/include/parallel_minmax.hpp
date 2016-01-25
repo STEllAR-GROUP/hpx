@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_MINMAX_AUG_20_2014_0454PM
 
 #include <hpx/parallel/algorithms/minmax.hpp>
+#include <hpx/parallel/segmented_algorithms/minmax.hpp>
 
 #endif
 

@@ -31,7 +31,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct generate : public detail::algorithm<generate>
         {
             generate()
-                : generate::algorithm("generate")
+              : generate::algorithm("generate")
             {}
 
             template <typename ExPolicy, typename FwdIter, typename F>
@@ -54,11 +54,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     for_each_n<FwdIter>().call(
                         policy, boost::mpl::false_(),
                         first, std::distance(first, last),
-                        [f](type& v) {
+                        [f](type& v) mutable
+                        {
                             v = f();
                         });
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // non-segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, void>::type
+        generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            std::false_type)
+        {
+            typedef typename std::iterator_traits<FwdIter>::iterator_category
+                iterator_category;
+
+            typedef typename parallel::is_sequential_execution_policy<
+                    ExPolicy
+                >::type is_seq;
+
+            return detail::generate().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                iterator_category;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, void>::type
+        generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            std::true_type);
+
         /// \endcond
     }
 
@@ -125,11 +156,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward_iterator_tag, iterator_category>::value),
             "Required at least forward iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::generate().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        return detail::generate_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::forward<F>(f), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -163,7 +195,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return
                     for_each_n<OutIter>().call(
                         policy, boost::mpl::false_(), first, count,
-                        [f](type& v) {
+                        [f](type& v) mutable
+                        {
                             v = f();
                         });
             }

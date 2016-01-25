@@ -534,24 +534,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return result;
         }
 
-        template <typename FwdIter>
+        template <typename Iter>
         struct minmax_element
           : public detail::algorithm<
-                minmax_element<FwdIter>, std::pair<FwdIter, FwdIter>
+                minmax_element<Iter>, std::pair<Iter, Iter>
             >
         {
             minmax_element()
               : minmax_element::algorithm("minmax_element")
             {}
 
-            template <typename ExPolicy, typename F>
+            template <typename ExPolicy, typename FwdIter, typename F>
             static std::pair<FwdIter, FwdIter>
             sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
             {
                 return std::minmax_element(first, last, std::forward<F>(f));
             }
 
-            template <typename ExPolicy, typename F>
+            template <typename ExPolicy, typename FwdIter, typename F>
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, FwdIter>
             >::type
@@ -582,6 +582,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // non-segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<
+            ExPolicy, std::pair<FwdIter, FwdIter>
+        >::type
+        minmax_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            std::false_type)
+        {
+            typedef typename std::iterator_traits<FwdIter>::iterator_category
+                iterator_category;
+
+            static_assert(
+                (boost::is_base_of<
+                    std::forward_iterator_tag, iterator_category>::value),
+                "Required at least forward iterator.");
+
+            typedef typename parallel::is_sequential_execution_policy<
+                    ExPolicy
+                >::type is_seq;
+
+            return detail::minmax_element<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<
+            ExPolicy, std::pair<FwdIter, FwdIter>
+        >::type
+        minmax_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            std::true_type);
+
         /// \endcond
     }
 
@@ -664,11 +700,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward_iterator_tag, iterator_category>::value),
             "Required at least forward iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::minmax_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        return detail::minmax_element_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::forward<F>(f), is_segmented());
     }
 
     /// Finds the greatest element in the range [first, last) using the given
@@ -735,11 +772,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward_iterator_tag, iterator_category>::value),
             "Required at least forward iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
-        return detail::minmax_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::less<value_type>());
+        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+
+        return detail::minmax_element_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::less<value_type>(), is_segmented());
     }
 }}}
 
