@@ -182,6 +182,16 @@ namespace hpx { namespace components
     class managed_component_base
       : public traits::detail::managed_component_tag, boost::noncopyable
     {
+    private:
+        Component& derived()
+        {
+            return static_cast<Component&>(*this);
+        }
+        Component const& derived() const
+        {
+            return static_cast<Component const&>(*this);
+        }
+
     public:
         typedef typename boost::mpl::if_<
             boost::is_same<Component, detail::this_type>,
@@ -704,7 +714,7 @@ namespace hpx { namespace components
         get_id() const
     {
         // all credits should have been taken already
-        naming::gid_type gid = get_base_gid();
+        naming::gid_type gid = derived().get_base_gid();
 
         // The underlying heap will always give us a full set of credits, but
         // those are valid for the first invocation of get_base_gid() only.

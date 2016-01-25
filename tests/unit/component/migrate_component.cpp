@@ -9,6 +9,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/chrono.hpp>
@@ -134,7 +135,8 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
         HPX_TEST_EQ(t2.call(), target);
         HPX_TEST_EQ(t2.get_data(), 42);
     }
-    catch (hpx::exception const&) {
+    catch (hpx::exception const& e) {
+        hpx::cout << hpx::get_error_what(e) << std::endl;
         return false;
     }
 
@@ -171,7 +173,8 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
         HPX_TEST_EQ(t2.call(), target);
         HPX_TEST_EQ(t2.get_data(), 42);
     }
-    catch (hpx::exception const&) {
+    catch (hpx::exception const& e) {
+        hpx::cout << hpx::get_error_what(e) << std::endl;
         return false;
     }
 
@@ -215,7 +218,8 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
             std::swap(source, target);
         }
     }
-    catch (hpx::exception const&) {
+    catch (hpx::exception const& e) {
+        hpx::cout << hpx::get_error_what(e) << std::endl;
         return false;
     }
 
@@ -279,7 +283,8 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
         migrate_future.get();
         create_work.get();
     }
-    catch (hpx::exception const&) {
+    catch (hpx::exception const& e) {
+        hpx::cout << hpx::get_error_what(e) << std::endl;
         return false;
     }
 

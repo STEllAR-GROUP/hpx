@@ -46,6 +46,15 @@ namespace hpx { namespace components
                 simple_component_base, Component
             >::type this_component_type;
 
+        Component& derived()
+        {
+            return static_cast<Component&>(*this);
+        }
+        Component const& derived() const
+        {
+            return static_cast<Component const&>(*this);
+        }
+
     public:
         typedef this_component_type wrapped_type;
         typedef this_component_type base_type_holder;
@@ -190,7 +199,7 @@ namespace hpx { namespace components
         naming::id_type get_id() const
         {
             // all credits should have been taken already
-            naming::gid_type gid = get_base_gid();
+            naming::gid_type gid = derived().get_base_gid();
             HPX_ASSERT(!naming::detail::has_credits(gid));
 
             // any (subsequent) invocation causes the credits to be replenished
@@ -200,7 +209,8 @@ namespace hpx { namespace components
 
         naming::id_type get_unmanaged_id() const
         {
-            return naming::id_type(get_base_gid(), naming::id_type::managed);
+            return naming::id_type(derived().get_base_gid(),
+                naming::id_type::managed);
         }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)

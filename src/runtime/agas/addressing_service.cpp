@@ -3285,7 +3285,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
             migrated_objects_table_.insert(gid);
 
         // remove entry from cache
-        if (caching_)
+        if (caching_ && naming::detail::store_in_cache(gid))
         {
             gva_cache_->erase(
                 [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
@@ -3323,7 +3323,7 @@ void addressing_service::unmark_as_migrated(
         migrated_objects_table_.erase(it);
 
         // remove entry from cache
-        if (caching_)
+        if (caching_ && naming::detail::store_in_cache(gid))
         {
             gva_cache_->erase(
                 [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)

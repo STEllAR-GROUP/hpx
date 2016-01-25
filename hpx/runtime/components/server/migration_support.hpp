@@ -48,6 +48,15 @@ namespace hpx { namespace components
                 this->gid_ = naming::invalid_gid;
         }
 
+        naming::gid_type get_base_gid(
+            naming::gid_type const& assign_gid = naming::invalid_gid) const
+        {
+            // we don't store migrating objects in the AGAS cache
+            naming::gid_type result = this->base_type::get_base_gid(assign_gid);
+            naming::detail::set_dont_store_in_cache(result);
+            return result;
+        }
+
         // This component type supports migration.
         static HPX_CONSTEXPR bool supports_migration() { return true; }
 
