@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// make inspect happy: hpxinspect:nominmax
+
 #if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_TAGSPEC_DEC_23_2015_1156AM)
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_TAGSPEC_DEC_23_2015_1156AM
 
