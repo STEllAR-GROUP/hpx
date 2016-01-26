@@ -7,8 +7,9 @@
 #define HPX_PARALLEL_UTIL_COMPARE_PROJECTED_JAN_25_2016_1144AM
 
 #include <hpx/config.hpp>
+#include <hpx/util/invoke.hpp>
 
-#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { namespace util
 {

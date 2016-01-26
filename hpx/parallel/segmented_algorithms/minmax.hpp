@@ -37,6 +37,276 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F, typename Proj>
+        static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
+        segmented_minormax(Algo && algo, ExPolicy const& policy,
+            SegIter first, SegIter last, F && f, Proj && proj,
+            boost::mpl::true_)
+        {
+            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef typename traits::segment_iterator segment_iterator;
+            typedef typename traits::local_iterator local_iterator_type;
+
+            using boost::mpl::true_;
+
+            segment_iterator sit = traits::segment(first);
+            segment_iterator send = traits::segment(last);
+
+            std::vector<SegIter> positions;
+
+            if (sit == send)
+            {
+                // all elements are on the same partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::local(last);
+                if (beg != end)
+                {
+                    local_iterator_type out = dispatch(
+                        traits::get_id(sit), algo, policy, true_(),
+                        beg, end, f, proj);
+
+                    positions.push_back(traits::compose(send, out));
+                }
+            }
+            else {
+                // handle the remaining part of the first partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::end(sit);
+
+                if (beg != end)
+                {
+                    local_iterator_type out = dispatch(
+                        traits::get_id(sit), algo, policy, true_(),
+                        beg, end, f, proj);
+
+                    positions.push_back(traits::compose(sit, out));
+                }
+
+                // handle all of the full partitions
+                for (++sit; sit != send; ++sit)
+                {
+                    beg = traits::begin(sit);
+                    end = traits::end(sit);
+
+                    if (beg != end)
+                    {
+                        local_iterator_type out = dispatch(
+                            traits::get_id(sit), algo, policy, true_(),
+                            beg, end, f, proj);
+
+                        positions.push_back(traits::compose(sit, out));
+                    }
+                }
+
+                // handle the beginning of the last partition
+                beg = traits::begin(sit);
+                end = traits::local(last);
+                if (beg != end)
+                {
+                    local_iterator_type out = dispatch(
+                        traits::get_id(sit), algo, policy, true_(),
+                        beg, end, f, proj);
+
+                    positions.push_back(traits::compose(sit, out));
+                }
+            }
+
+            return Algo::sequential_minmax_element_ind(
+                positions.begin(), positions.size(), f, proj);
+        }
+
+        // parallel remote implementation
+        template <typename Algo, typename ExPolicy, typename SegIter,
+            typename F, typename Proj>
+        static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
+        segmented_minormax(Algo && algo, ExPolicy const& policy,
+            SegIter first, SegIter last, F && f, Proj && proj,
+            boost::mpl::false_)
+        {
+            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef typename traits::segment_iterator segment_iterator;
+            typedef typename traits::local_iterator local_iterator_type;
+
+            typedef typename std::iterator_traits<SegIter>::iterator_category
+                iterator_category;
+            typedef typename boost::mpl::bool_<boost::is_same<
+                    iterator_category, std::input_iterator_tag
+                >::value> forced_seq;
+            typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
+
+            segment_iterator sit = traits::segment(first);
+            segment_iterator send = traits::segment(last);
+
+            std::vector<future<SegIter> > segments;
+            segments.reserve(std::distance(sit, send));
+
+            if (sit == send)
+            {
+                // all elements are on the same partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::local(last);
+                if (beg != end)
+                {
+                    segments.push_back(
+                        hpx::make_future<SegIter>(
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy, forced_seq(), beg, end, f, proj),
+                            [send](local_iterator_type const& out)
+                                -> SegIter
+                            {
+                                return traits::compose(send, out);
+                            }));
+                }
+            }
+            else {
+                // handle the remaining part of the first partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::end(sit);
+                if (beg != end)
+                {
+                    segments.push_back(
+                        hpx::make_future<SegIter>(
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy, forced_seq(), beg, end, f, proj),
+                            [sit](local_iterator_type const& out)
+                                -> SegIter
+                            {
+                                return traits::compose(sit, out);
+                            }));
+                }
+
+                // handle all of the full partitions
+                for (++sit; sit != send; ++sit)
+                {
+                    beg = traits::begin(sit);
+                    end = traits::end(sit);
+                    if (beg != end)
+                    {
+                        segments.push_back(
+                            hpx::make_future<SegIter>(
+                                dispatch_async(traits::get_id(sit), algo,
+                                    policy, forced_seq(), beg, end, f, proj),
+                                [sit](local_iterator_type const& out)
+                                    -> SegIter
+                                {
+                                    return traits::compose(sit, out);
+                                }));
+                    }
+                }
+
+                // handle the beginning of the last partition
+                beg = traits::begin(sit);
+                end = traits::local(last);
+                if (beg != end)
+                {
+                    segments.push_back(
+                        hpx::make_future<SegIter>(
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy, forced_seq(), beg, end, f, proj),
+                            [sit](local_iterator_type const& out)
+                                -> SegIter
+                            {
+                                return traits::compose(sit, out);
+                            }));
+                }
+            }
+
+            return result::get(
+                dataflow(
+                    [=](std::vector<hpx::future<SegIter> > && r)
+                        ->  SegIter
+                    {
+                        // handle any remote exceptions, will throw on error
+                        std::list<boost::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
+
+                        std::vector<SegIter> res =
+                            hpx::util::unwrapped(std::move(r));
+                        return Algo::sequential_minmax_element_ind(
+                            res.begin(), res.size(), f, proj);
+                    },
+                    std::move(segments)));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // segmented implementation
+        template <typename ExPolicy, typename SegIter, typename F, typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
+        min_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
+            Proj && proj, std::true_type)
+        {
+            typedef typename parallel::is_sequential_execution_policy<
+                    ExPolicy
+                >::type is_seq;
+
+            SegIter result = first;
+            if (first == last || ++first == last)
+            {
+                return util::detail::algorithm_result<
+                        ExPolicy, SegIter
+                    >::get(std::move(result));
+            }
+
+             typedef hpx::traits::segmented_iterator_traits<SegIter>
+                iterator_traits;
+
+           return segmented_minormax(
+                min_element<typename iterator_traits::local_iterator>(),
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<F>(f), std::forward<Proj>(proj), is_seq());
+        }
+
+        template <typename ExPolicy, typename SegIter, typename F, typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
+        max_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
+            Proj && proj, std::true_type)
+        {
+            typedef typename parallel::is_sequential_execution_policy<
+                    ExPolicy
+                >::type is_seq;
+
+            SegIter result = first;
+            if (first == last || ++first == last)
+            {
+                return util::detail::algorithm_result<
+                        ExPolicy, SegIter
+                    >::get(std::move(result));
+            }
+
+             typedef hpx::traits::segmented_iterator_traits<SegIter>
+                iterator_traits;
+
+           return segmented_minormax(
+                max_element<typename iterator_traits::local_iterator>(),
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<F>(f), std::forward<Proj>(proj), is_seq());
+        }
+
+        // forward declare the non-segmented version of those algorithm
+        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        min_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            Proj && proj, std::false_type);
+
+        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        max_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            Proj && proj, std::false_type);
+
+        /// \endcond
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // segmented_minmax
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        /// \cond NOINTERNAL
+
+        // sequential remote implementation
+        template <typename Algo, typename ExPolicy, typename SegIter,
+            typename F, typename Proj>
         static typename util::detail::algorithm_result<
             ExPolicy, std::pair<SegIter, SegIter>
         >::type
@@ -285,9 +555,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 iterator_traits;
 
            return segmented_minmax(
-                detail::minmax_element<
-                    typename iterator_traits::local_iterator
-                >(),
+                minmax_element<typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::forward<F>(f), std::forward<Proj>(proj), is_seq());
         }

@@ -44,7 +44,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, value_type> result;
+            typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
 
             using boost::mpl::true_;
 

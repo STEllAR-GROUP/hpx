@@ -42,6 +42,42 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+double run_min_element_benchmark(int test_count,
+    hpx::partitioned_vector<int> const& v)
+{
+    boost::uint64_t time = hpx::util::high_resolution_clock::now();
+
+    for (int i = 0; i != test_count; ++i)
+    {
+        // invoke minmax
+        using namespace hpx::parallel;
+        auto iters = min_element(par, v.begin(), v.end());
+    }
+
+    time = hpx::util::high_resolution_clock::now() - time;
+
+    return (time * 1e-9) / test_count;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+double run_max_element_benchmark(int test_count,
+    hpx::partitioned_vector<int> const& v)
+{
+    boost::uint64_t time = hpx::util::high_resolution_clock::now();
+
+    for (int i = 0; i != test_count; ++i)
+    {
+        // invoke minmax
+        using namespace hpx::parallel;
+        auto iters = max_element(par, v.begin(), v.end());
+    }
+
+    time = hpx::util::high_resolution_clock::now() - time;
+
+    return (time * 1e-9) / test_count;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 double run_minmax_element_benchmark(int test_count,
     hpx::partitioned_vector<int> const& v)
 {
@@ -78,10 +114,16 @@ int hpx_main(boost::program_options::variables_map& vm)
         generate(par, v.begin(), v.end(), random_fill());
 
         // run benchmark
-        double time = run_minmax_element_benchmark(test_count, v);
+        double time_minmax = run_minmax_element_benchmark(test_count, v);
+        double time_min = run_min_element_benchmark(test_count, v);
+        double time_max = run_max_element_benchmark(test_count, v);
 
         // if (csvoutput)
-            std::cout << test_count << "," << time << std::endl;
+        {
+            std::cout << "minmax" << test_count << "," << time_minmax << std::endl;
+            std::cout << "min" << test_count << "," << time_min << std::endl;
+            std::cout << "max" << test_count << "," << time_max << std::endl;
+        }
 
         return hpx::finalize();
     }
