@@ -7,6 +7,7 @@
 set(subdirs
     agas
     actions
+    build
     block_matrix
     iostreams
     lcos

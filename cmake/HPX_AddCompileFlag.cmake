@@ -5,6 +5,112 @@
 
 include(CMakeParseArguments)
 
+# on startup, this is unset, but we'll set it to an empty string anyway
+set_property(GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS "")
+set_property(GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS "")
+
+macro(hpx_add_target_compile_option FLAG)
+  set(options)
+  set(one_value_args)
+  set(multi_value_args CONFIGURATIONS)
+  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_configurations "none")
+  if(HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS)
+    set(_configurations "${HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS}")
+  endif()
+
+  foreach(_config ${_configurations})
+    set(_conf "${FLAG}")
+    if(NOT _config STREQUAL "none")
+      set(_conf "$<$<CONFIG:${_config}>:${FLAG}>")
+    endif()
+    set_property(GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_OPTIONS "${_conf}")
+  endforeach()
+
+  get_property(HPX_TARGET_COMPILE_OPTIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
+endmacro()
+
+macro(hpx_remove_target_compile_option FLAG)
+  set(options)
+  set(one_value_args)
+  set(multi_value_args CONFIGURATIONS)
+  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_configurations "none")
+  if(HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS)
+    set(_configurations "${HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS}")
+  endif()
+
+  get_property(HPX_TARGET_COMPILE_OPTIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
+  set_property(GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS "")
+
+  foreach(_config ${_configurations})
+    set(_conf "${FLAG}")
+    if(NOT _config STREQUAL "none")
+      set(_conf "$<$<CONFIG:${_config}>:${FLAG}>")
+    endif()
+    foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
+      if(NOT ${_flag} STREQUAL ${_conf})
+        set_property(GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_OPTIONS "${_flag}")
+      endif()
+    endforeach()
+  endforeach()
+
+  get_property(HPX_TARGET_COMPILE_OPTIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
+endmacro()
+
+macro(hpx_add_target_compile_definition FLAG)
+  set(options)
+  set(one_value_args)
+  set(multi_value_args CONFIGURATIONS)
+  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_DEFINITION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_configurations "none")
+  if(HPX_ADD_TARGET_COMPILE_DEFINITION_CONFIGURATIONS)
+    set(_configurations "${HPX_ADD_TARGET_COMPILE_DEFINITION_CONFIGURATIONS}")
+  endif()
+
+  foreach(_config ${_configurations})
+    set(_conf "${FLAG}")
+    if(NOT _config STREQUAL "none")
+      set(_conf "$<$<CONFIG:${_config}>:${FLAG}>")
+    endif()
+    set_property(GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_DEFINITIONS "${_conf}")
+  endforeach()
+
+  get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
+endmacro()
+
+macro(hpx_remove_target_compile_definition FLAG)
+  set(options)
+  set(one_value_args)
+  set(multi_value_args CONFIGURATIONS)
+  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_DEFINITION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_configurations "none")
+  if(HPX_ADD_TARGET_COMPILE_DEFINITION_CONFIGURATIONS)
+    set(_configurations "${HPX_ADD_TARGET_COMPILE_DEFINITION_CONFIGURATIONS}")
+  endif()
+
+  get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
+  set_property(GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS "")
+
+  foreach(_config ${_configurations})
+    set(_conf "${FLAG}")
+    if(NOT _config STREQUAL "none")
+      set(_conf "$<$<CONFIG:${_config}>:${FLAG}>")
+    endif()
+    foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
+      if(NOT ${_flag} STREQUAL ${_conf})
+        set_property(GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_DEFINITIONS "${_flag}")
+      endif()
+    endforeach()
+  endforeach()
+
+  get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
+endmacro()
+
 macro(hpx_add_compile_flag FLAG)
   set(options)
   set(one_value_args)

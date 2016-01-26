@@ -50,6 +50,16 @@ foreach(lib ${HPX_LIBRARIES})
   endif()
 endforeach()
 
+if(HPX_WITH_STATIC_LINKING)
+  set(HPX_CONF_LIBRARIES "hpx;${HPX_LIBRARIES}")
+  set(HPX_PKG_LIBRARIES "-lhpx ${HPX_PKG_LIBRARIES}")
+  set(HPX_PKG_DEBUG_LIBRARIES "-lhpxd ${HPX_PKG_DEBUG_LIBRARIES}")
+else()
+  set(HPX_CONF_LIBRARIES "hpx;hpx_init;${HPX_LIBRARIES}")
+  set(HPX_PKG_LIBRARIES "-lhpx -lhpx_init ${HPX_PKG_LIBRARIES}")
+  set(HPX_PKG_DEBUG_LIBRARIES "-lhpxd -lhpx_initd ${HPX_PKG_DEBUG_LIBRARIES}")
+endif()
+
 # Get the include directories we need ...
 get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
