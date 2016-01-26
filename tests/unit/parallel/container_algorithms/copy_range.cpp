@@ -24,7 +24,9 @@ void test_copy(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
     hpx::parallel::copy(policy, c, boost::begin(d));
@@ -45,7 +47,9 @@ void test_copy_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
@@ -72,7 +76,9 @@ void test_copy_outiter(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d(0);
     std::iota(boost::begin(c), boost::end(c), std::rand());
     hpx::parallel::copy(policy, c, std::back_inserter(d));
@@ -93,7 +99,9 @@ void test_copy_outiter_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d(0);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 

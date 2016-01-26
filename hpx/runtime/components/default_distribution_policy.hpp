@@ -61,6 +61,12 @@ namespace hpx { namespace components
             return default_distribution_policy(locs);
         }
 
+        default_distribution_policy operator()(
+            std::vector<id_type> && locs) const
+        {
+            return default_distribution_policy(std::move(locs));
+        }
+
         /// Create a new \a default_distribution policy representing the given
         /// locality
         ///
@@ -309,6 +315,10 @@ namespace hpx { namespace components
         /// \cond NOINTERNAL
         default_distribution_policy(std::vector<id_type> const& localities)
           : localities_(localities)
+        {}
+
+        default_distribution_policy(std::vector<id_type> && localities)
+          : localities_(std::move(localities))
         {}
 
         default_distribution_policy(id_type const& locality)

@@ -291,6 +291,19 @@ namespace hpx { namespace components
             return binpacking_distribution_policy(locs, counter_name);
         }
 
+        binpacking_distribution_policy operator()(
+            std::vector<id_type> && locs,
+            char const* counter_name = default_binpacking_counter_name) const
+        {
+#if defined(HPX_DEBUG)
+            for (id_type const& loc: locs)
+            {
+                HPX_ASSERT(naming::is_locality(loc));
+            }
+#endif
+            return binpacking_distribution_policy(std::move(locs), counter_name);
+        }
+
         /// Create a new \a default_distribution policy representing the given
         /// locality
         ///
@@ -434,6 +447,12 @@ namespace hpx { namespace components
         binpacking_distribution_policy(std::vector<id_type> const& localities,
                 char const* counter_name)
           : localities_(localities),
+            counter_name_(counter_name)
+        {}
+
+        binpacking_distribution_policy(std::vector<id_type> && localities,
+                char const* counter_name)
+          : localities_(std::move(localities)),
             counter_name_(counter_name)
         {}
 

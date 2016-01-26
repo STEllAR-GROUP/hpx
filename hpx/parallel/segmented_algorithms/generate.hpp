@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F>
-        static typename util::detail::algorithm_result<ExPolicy, void>::type
+        static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         segmented_generate(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, F && f, boost::mpl::true_)
         {
@@ -58,17 +58,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    dispatch(traits::get_id(sit), algo, policy, true_(),
-                        beg, end, f);
+                    local_iterator_type out = dispatch(traits::get_id(sit),
+                        algo, policy, true_(), beg, end, f);
+                    last = traits::compose(send, out);
                 }
             }
             else {
                 // handle the remaining part of the first partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::end(sit);
+                local_iterator_type out = traits::local(last);
+
                 if (beg != end)
                 {
-                    dispatch(traits::get_id(sit), algo, policy, true_(),
+                    out = dispatch(traits::get_id(sit), algo, policy, true_(),
                         beg, end, f);
                 }
 
@@ -79,8 +82,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        dispatch(traits::get_id(sit), algo, policy, true_(),
-                            beg, end, f);
+                        out = dispatch(traits::get_id(sit), algo, policy,
+                            true_(), beg, end, f);
                     }
                 }
 
@@ -89,16 +92,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    dispatch(traits::get_id(sit), algo, policy, true_(),
+                    out = dispatch(traits::get_id(sit), algo, policy, true_(),
                         beg, end, f);
                 }
+
+                last = traits::compose(send, out);
             }
+
+            return result::get(std::move(last));
         }
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F>
-        static typename util::detail::algorithm_result<ExPolicy, void>::type
+        static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         segmented_generate(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, F && f, boost::mpl::false_)
         {
@@ -111,12 +118,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename boost::mpl::bool_<boost::is_same<
                     iterator_category, std::input_iterator_tag
                 >::value> forced_seq;
-            typedef util::detail::algorithm_result<ExPolicy, void> result;
+            typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            std::vector<shared_future<void> > segments;
+            std::vector<shared_future<local_iterator_type> > segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -162,13 +169,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
             }
 
-            return result::get(dataflow(hpx::util::unwrapped([=](){}), segments));
+            return result::get(
+                dataflow(
+                    [=](std::vector<hpx::shared_future<local_iterator_type> > && r)
+                        ->  SegIter
+                    {
+                        // handle any remote exceptions, will throw on error
+                        std::list<boost::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
+                        return traits::compose(send, r.back().get());
+                    },
+                    std::move(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename FwdIter, typename F>
-        inline typename util::detail::algorithm_result<ExPolicy, void>::type
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type)
         {
@@ -177,16 +196,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 >::type is_seq;
 
             if (first == last)
-                return util::detail::algorithm_result<ExPolicy>::get();
+            {
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
+                return result::get(std::move(last));
+            }
+
+            typedef hpx::traits::segmented_iterator_traits<FwdIter>
+                iterator_traits;
 
             return segmented_generate(
-                generate(), std::forward<ExPolicy>(policy),
-                first, last, std::forward<F>(f), is_seq());
+                generate<typename iterator_traits::local_iterator>(),
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<F>(f), is_seq());
         }
 
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename FwdIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, void>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         generate_(ExPolicy&& policy, FwdIter first, FwdIter last, F && f,
             std::false_type);
 

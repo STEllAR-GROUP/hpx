@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_GENERATE_OCT_06_2014_1007AM
 
 #include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/container_algorithms/generate.hpp>
 #include <hpx/parallel/segmented_algorithms/generate.hpp>
 
 #endif

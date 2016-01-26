@@ -22,6 +22,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 
@@ -38,28 +39,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         static const std::size_t sort_limit_per_task = 65536ul;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Compare, typename Proj>
-        struct compare_projected
-        {
-            template <typename Compare_, typename Proj_>
-            compare_projected(Compare_ && comp, Proj_ && proj)
-              : comp_(std::forward<Compare_>(comp)),
-                proj_(std::forward<Proj_>(proj))
-            {}
-
-            template <typename T1, typename T2>
-            inline bool operator()(T1 && t1, T2 && t2)
-            {
-                return hpx::util::invoke(comp_,
-                    hpx::util::invoke(proj_, t1),
-                    hpx::util::invoke(proj_, t2));
-            }
-
-            Compare comp_;
-            Proj proj_;
-        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename R>
@@ -309,7 +288,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Compare && comp, Proj && proj)
             {
                 std::sort(first, last,
-                    compare_projected<Compare, Proj>(
+                    util::compare_projected<Compare, Proj>(
                             std::forward<Compare>(comp),
                             std::forward<Proj>(proj)
                         ));
@@ -327,7 +306,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // depending on execution policy
                 return util::detail::algorithm_result<ExPolicy, RandomIt>::get(
                     parallel_sort_async(policy, first, last,
-                        compare_projected<Compare, Proj>(
+                        util::compare_projected<Compare, Proj>(
                             std::forward<Compare>(comp),
                             std::forward<Proj>(proj)
                         )));
@@ -412,7 +391,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<RandomIt>::value &&
+        traits::is_iterator<RandomIt>::value &&
         traits::is_projected<Proj, RandomIt>::value &&
         traits::is_indirect_callable<
             Compare,

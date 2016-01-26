@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,8 @@
 
 #include <hpx/parallel/container_algorithms/copy.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
+#include <hpx/parallel/container_algorithms/generate.hpp>
+#include <hpx/parallel/container_algorithms/minmax.hpp>
 #include <hpx/parallel/container_algorithms/remove_copy.hpp>
 #include <hpx/parallel/container_algorithms/replace.hpp>
 #include <hpx/parallel/container_algorithms/reverse.hpp>

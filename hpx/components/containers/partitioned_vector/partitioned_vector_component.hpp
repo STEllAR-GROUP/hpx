@@ -373,7 +373,7 @@ namespace hpx { namespace server
 #define HPX_REGISTER_VECTOR_DECLARATION(...)                                  \
     HPX_REGISTER_VECTOR_DECLARATION_(__VA_ARGS__)                             \
 /**/
-#define HPX_REGISTER_VECTOR_DECLARATION_(...)                                 \
+#define HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION_(...)                     \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_REGISTER_VECTOR_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
     )(__VA_ARGS__))                                                           \

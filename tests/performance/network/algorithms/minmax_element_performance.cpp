@@ -42,9 +42,21 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_minmax_element_benchmark()
+double run_minmax_element_benchmark(int test_count,
+    hpx::partitioned_vector<int> const& v)
 {
-    return 0.0;
+    boost::uint64_t time = hpx::util::high_resolution_clock::now();
+
+    for (int i = 0; i != test_count; ++i)
+    {
+        // invoke minmax
+        using namespace hpx::parallel;
+        auto iters = minmax_element(par, v.begin(), v.end());
+    }
+
+    time = hpx::util::high_resolution_clock::now() - time;
+
+    return (time * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,16 +70,18 @@ int hpx_main(boost::program_options::variables_map& vm)
         int test_count = vm["test_count"].as<int>();
 
         // create as many partitions as we have localities
-        std::vector<hpx::id_type> localities = hpx::find_all_localities();
-        hpx::partitioned_vector<int> v(size, hpx::container_layout(localities));
+        hpx::partitioned_vector<int> v(
+            size, hpx::container_layout(hpx::find_all_localities()));
 
         // initialize data
-        hpx::parallel::generate(
-            hpx::parallel::par, v.begin(), v.end(), random_fill());
+        using namespace hpx::parallel;
+        generate(par, v.begin(), v.end(), random_fill());
 
-        // invoke minmax
-        auto iters = hpx::parallel::minmax_element(
-            hpx::parallel::par, v.begin(), v.end());
+        // run benchmark
+        double time = run_minmax_element_benchmark(test_count, v);
+
+        // if (csvoutput)
+            std::cout << test_count << "," << time << std::endl;
 
         return hpx::finalize();
     }

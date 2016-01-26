@@ -175,8 +175,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
-        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_iterator<InIter>::value &&
+        traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
@@ -378,9 +378,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter1>::value &&
-        traits::detail::is_iterator<InIter2>::value &&
-        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_iterator<InIter1>::value &&
+        traits::is_iterator<InIter2>::value &&
+        traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
         traits::is_projected<Proj2, InIter2>::value &&
         traits::is_indirect_callable<
@@ -603,9 +603,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter1>::value &&
-        traits::detail::is_iterator<InIter2>::value &&
-        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_iterator<InIter1>::value &&
+        traits::is_iterator<InIter2>::value &&
+        traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
         traits::is_projected<Proj2, InIter2>::value &&
         traits::is_indirect_callable<

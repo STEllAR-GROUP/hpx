@@ -8,6 +8,10 @@ set(tests
     copyif_range
     foreach_range
     foreach_range_projection
+    generate_range
+    max_element_range
+    min_element_range
+    minmax_element_range
     remove_copy_range
     remove_copy_if_range
     replace_range

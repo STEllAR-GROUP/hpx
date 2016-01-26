@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<FwdIter>::value)>
+        traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
@@ -333,8 +333,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<FwdIter>::value &&
-        traits::detail::is_iterator<OutIter>::value)>
+        traits::is_iterator<FwdIter>::value &&
+        traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
