@@ -33,7 +33,7 @@ int hpx_main(boost::program_options::variables_map&)
 
     performance_counter::start(id);
 
-    // perform n stores, active counter
+    // perform n ops, active counter
     volatile size_t i;
     volatile double a = 0.0, b = 0.0, c = 0.0;
     for (i = 0; i < n; i++) a=b+c;
@@ -42,19 +42,19 @@ int hpx_main(boost::program_options::variables_map&)
     // stop the counter w/o resetting
     performance_counter::stop(id);
 
-    // perform n stores (should be uncounted)
+    // perform n ops (should be uncounted)
     for (i = 0; i < n; i++) a=b+c;
     // get value and reset, and start again
     counter_value value2 = performance_counter::get_value(id, true);
     performance_counter::start(id);
 
-    // perform 2*n stores, counted from 0 (or close to it)
+    // perform 2*n ops, counted from 0 (or close to it)
     for (i = 0; i < 2*n; i++) a=b+c;
     counter_value value3 = performance_counter::get_value(id);
     // reset counter using reset-only interface
     performance_counter::reset(id);
 
-    // perform n stores, counted from 0 (or close to it)
+    // perform n ops, counted from 0 (or close to it)
     for (i = 0; i < n; i++) a=b+c;
     counter_value value4 = performance_counter::get_value(id);
 
