@@ -17,6 +17,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <limits>
+
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     inline boost::uintptr_t get_stack_ptr()

@@ -360,7 +360,8 @@ namespace detail
 #if defined(HPX_WINDOWS)
             bool recurse_asynchronously = false;
 #elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-            std::ptrdiff_t remaining_stack = this_thread::get_available_stack_space();
+            std::ptrdiff_t remaining_stack =
+                this_thread::get_available_stack_space();
 
             if(remaining_stack < 0)
             {
@@ -368,10 +369,12 @@ namespace detail
                     "future_data::handle_on_completed",
                     "Stack overflow");
             }
-            bool recurse_asynchronously = remaining_stack < 8 * HPX_THREADS_STACK_OVERHEAD;
+            bool recurse_asynchronously =
+                remaining_stack < 8 * HPX_THREADS_STACK_OVERHEAD;
 #else
             handle_continuation_recursion_count cnt;
-            bool recurse_asynchronously = cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+            bool recurse_asynchronously =
+                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
 #endif
 
             if (!recurse_asynchronously)
