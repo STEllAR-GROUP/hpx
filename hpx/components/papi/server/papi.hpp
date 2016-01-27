@@ -256,7 +256,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         {
             // if active, clear the previous contents of low level counter
             if (status_ == PAPI_COUNTER_ACTIVE)
-            counters_->read_value(this, true);
+                counters_->read_value(this, true);
 
             value_ = 0;
         }
