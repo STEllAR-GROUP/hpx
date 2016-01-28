@@ -173,14 +173,20 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    inclusive_scan_test1();
-    inclusive_scan_test2();
-    inclusive_scan_test3();
+    if (vm.count("benchmark")) {
+        inclusive_scan_benchmark();
+    }
+    else {
+        inclusive_scan_test1();
+        inclusive_scan_test2();
+        inclusive_scan_test3();
 
-    inclusive_scan_exception_test();
-    inclusive_scan_bad_alloc_test();
+        inclusive_scan_exception_test();
+        inclusive_scan_bad_alloc_test();
 
-    inclusive_scan_validate();
+        inclusive_scan_validate();
+        inclusive_scan_benchmark();
+    }
 
     return hpx::finalize();
 }
@@ -194,8 +200,11 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+        "the random number generator seed to use for this run");
+
+    desc_commandline.add_options()
+        ("benchmark", "run a timing benchmark only");
+
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
