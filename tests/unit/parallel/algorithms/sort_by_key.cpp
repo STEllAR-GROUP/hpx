@@ -59,6 +59,43 @@ namespace debug {
         << std::setw(8)  << #d << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
+void sort_by_key_benchmark()
+{
+    const int bench_size = HPX_SORT_BY_KEY_TEST_SIZE*256;
+    // vector of values, and keys
+    std::vector<double> values, o_values;
+    std::vector<int64_t> keys, o_keys;
+    //
+    values.assign(bench_size,0);
+    keys.assign(bench_size,0);
+
+    // generate a sequence as the values
+    std::iota(values.begin(), values.end(), 0);
+    // generate a sequence as the keys
+    std::iota(keys.begin(), keys.end(), 0);
+
+    // shuffle the keys up,
+    std::random_shuffle(keys.begin(), keys.end());
+
+    // make copies of initial states
+    o_keys = keys;
+    o_values = values;
+
+    hpx::util::high_resolution_timer t;
+    hpx::parallel::sort_by_key(
+        hpx::parallel::par, keys.begin(), keys.end(), values.begin());
+    double elapsed = t.elapsed();
+
+    // after sorting by key, the values should be equal to the original keys
+    bool is_equal = std::equal(keys.begin(), keys.begin(), o_values.begin());
+    HPX_TEST(is_equal);
+    if (is_equal) {
+        std::cout << "<DartMeasurement name=\"SortByKeyTime\" \n"
+        << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_sort_by_key1(ExPolicy &&policy, Tkey, Tval, const Op &op, const HelperOp &ho)
@@ -217,7 +254,13 @@ int hpx_main(boost::program_options::variables_map &vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    test_sort_by_key1();
+    if (vm.count("benchmark")) {
+        sort_by_key_benchmark();
+    }
+    else {
+        test_sort_by_key1();
+        sort_by_key_benchmark();
+    }
     return hpx::finalize();
 }
 
@@ -227,8 +270,11 @@ int main(int argc, char *argv[])
     using namespace boost::program_options;
     options_description desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+    desc_commandline.add_options() ("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
+
+    desc_commandline.add_options()
+        ("benchmark", "run a timing benchmark only");
 
     // By default this test should run on all available cores
     std::vector<std::string> cfg;

@@ -8,12 +8,35 @@
 
 // use smaller array sizes for debug tests
 #if defined(HPX_DEBUG)
-#define HPX_SORT_TEST_SIZE          50000
-#define HPX_SORT_TEST_SIZE_STRINGS  10000
+#define HPX_SORT_TEST_SIZE          50000L
+#define HPX_SORT_TEST_SIZE_STRINGS  10000L
 #endif
 
 #include "sort_tests.hpp"
 
+////////////////////////////////////////////////////////////////////////////////
+// this function times a sort and outputs the time for cDash to plot it
+void sort_benchmark()
+{
+    using namespace hpx::parallel;
+    // Fill vector with random values
+    std::vector<double> c(HPX_SORT_TEST_SIZE << 4);
+    rnd_fill<double>(c, (std::numeric_limits<double>::min)(),
+        (std::numeric_limits<double>::max)(), double(std::rand()));
+
+    hpx::util::high_resolution_timer t;
+    // sort, blocking when seq, par, par_vec
+    hpx::parallel::sort(par, c.begin(), c.end());
+    double elapsed = t.elapsed();
+
+    bool is_sorted = (verify(c, std::less<double>(), elapsed, true)!=0);
+    HPX_TEST(is_sorted);
+    if (is_sorted) {
+        std::cout << "<DartMeasurement name=\"SortDoublesTime\" \n"
+            << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+    }
+
+}
 ////////////////////////////////////////////////////////////////////////////////
 void test_sort1()
 {
@@ -129,8 +152,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    test_sort1();
-    test_sort2();
+    if (vm.count("benchmark")) {
+        sort_benchmark();
+    }
+    else {
+        test_sort1();
+        test_sort2();
+        sort_benchmark();
+    }
     return hpx::finalize();
 }
 
@@ -141,10 +170,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    desc_commandline.add_options() ("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
+
     desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+        ("benchmark", "run a timing benchmark only");
 
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
