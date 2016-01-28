@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     inline uintptr_type get_stack_ptr()
     {
-        boost::uintptr_t stack_ptr = (std::numeric_limits<uintptr_type>::max)();
+        uintptr_type stack_ptr = (std::numeric_limits<uintptr_type>::max)();
 #if defined(__x86_64__) || defined(__amd64)
         asm("movq %%rsp, %0" : "=r"(stack_ptr));
 #elif defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
