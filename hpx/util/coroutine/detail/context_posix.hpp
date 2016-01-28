@@ -242,7 +242,7 @@ namespace hpx { namespace util { namespace coroutines {
         {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
                 return
-                    get_stack_ptr() - reinterpret_cast<boost::uintptr_t>(m_stack);
+                    get_stack_ptr() - reinterpret_cast<uintptr_type>(m_stack);
 #else
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif
