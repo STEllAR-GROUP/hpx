@@ -407,6 +407,27 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+
+#if !defined(HPX_THREADS_STACK_OVERHEAD)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREADS_STACK_OVERHEAD 0x2800
+#  else
+#    if defined(HPX_INTEL_VERSION)
+#    define HPX_THREADS_STACK_OVERHEAD 0x2800
+#    else
+#    define HPX_THREADS_STACK_OVERHEAD 0x800
+#    endif
+#  endif
+#endif
+
+#if !defined(HPX_SMALL_STACK_SIZE)
+#  if defined(__has_feature)
+#    if __has_feature(address_sanitizer)
+#      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
+#    endif
+#  endif
+#endif
+
 #if !defined(HPX_SMALL_STACK_SIZE)
 #  if defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 #    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
@@ -432,12 +453,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This limits how deep the internal recursion of future continuations will go
 // before a new operation is re-spawned.
-#if defined(__has_feature)
-#if __has_feature(address_sanitizer)
+#if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+#  if defined(__has_feature)
+#    if __has_feature(address_sanitizer)
 // if we build under AddressSanitizer we set the max recursion depth to 1 to not
 // run into stack overflows.
-#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 1
-#endif
+#      define HPX_CONTINUATION_MAX_RECURSION_DEPTH 1
+#    endif
+#  endif
 #endif
 
 #if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
