@@ -200,9 +200,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run");
-
-    desc_commandline.add_options()
+        "the random number generator seed to use for this run")
         ("benchmark", "run a timing benchmark only");
 
     // By default this test should run on all available cores

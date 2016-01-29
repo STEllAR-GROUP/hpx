@@ -170,10 +170,9 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options() ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run");
-
     desc_commandline.add_options()
+        ("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run")
         ("benchmark", "run a timing benchmark only");
 
     // By default this test should run on all available cores
