@@ -23,14 +23,14 @@ foreach(benchmark ${benchmarks})
                      FOLDER "Benchmarks/Network/Algorithms/${benchmark}")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.network.algorithms.${benchmark})
+  add_hpx_pseudo_target(tests.performance.network.algorithms_perf.${benchmark})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.network.algorithms
-                              tests.performance.network.algorithms.${benchmark})
+  add_hpx_pseudo_dependencies(tests.performance.network.algorithms_perf
+                              tests.performance.network.algorithms_perf.${benchmark})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.network.algorithms.${benchmark}
+  add_hpx_pseudo_dependencies(tests.performance.network.algorithms_perf.${benchmark}
                               ${benchmark}_exe)
 endforeach()
 

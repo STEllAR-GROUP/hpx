@@ -16,8 +16,8 @@ if(HPX_WITH_CXX11_LAMBDAS)
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.performance.network.${subdir})
+  add_hpx_pseudo_target(tests.performance.network.${subdir}_perf)
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.performance.network tests.performance.network.${subdir})
+  add_hpx_pseudo_dependencies(tests.performance.network tests.performance.network.${subdir}_perf)
 endforeach()
 
