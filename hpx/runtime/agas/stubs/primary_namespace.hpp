@@ -8,10 +8,18 @@
 #if !defined(HPX_5D993B14_5B65_4231_A84E_90AD1807EB8F)
 #define HPX_5D993B14_5B65_4231_A84E_90AD1807EB8F
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/packaged_action.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/agas/request.hpp>
+#include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/lcos/future.hpp>
+
+#include <utility>
+#include <vector>
 
 namespace hpx { namespace agas { namespace stubs
 {
@@ -59,7 +67,7 @@ struct HPX_EXPORT primary_namespace
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future<std::vector<response> > bulk_service_async(
         naming::id_type const& gid
-      , std::vector<request> const& reqs
+      , std::vector<request> reqs
       , threads::thread_priority priority = threads::thread_priority_default
         );
 
@@ -68,18 +76,18 @@ struct HPX_EXPORT primary_namespace
     /// \note This is placed out of line to avoid including applier headers.
     static void bulk_service_non_blocking(
         naming::id_type const& gid
-      , std::vector<request> const& reqs
+      , std::vector<request> reqs
       , threads::thread_priority priority = threads::thread_priority_default
         );
 
     static std::vector<response> bulk_service(
         naming::id_type const& gid
-      , std::vector<request> const& reqs
+      , std::vector<request> reqs
       , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
         )
     {
-        return bulk_service_async(gid, reqs, priority).get(ec);
+        return bulk_service_async(gid, std::move(reqs), priority).get(ec);
     }
 
     static naming::gid_type get_service_instance(naming::gid_type const& dest)

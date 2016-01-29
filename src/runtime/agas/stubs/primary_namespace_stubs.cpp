@@ -85,25 +85,25 @@ void primary_namespace::service_non_blocking(
 lcos::future<std::vector<response> >
     primary_namespace::bulk_service_async(
         naming::id_type const& gid
-      , std::vector<request> const& reqs
+      , std::vector<request> reqs
       , threads::thread_priority priority
         )
 {
     typedef server_type::bulk_service_action action_type;
 
     lcos::packaged_action<action_type> p;
-    p.apply_p(gid, priority, reqs);
+    p.apply_p(gid, priority, std::move(reqs));
     return p.get_future();
 }
 
 void primary_namespace::bulk_service_non_blocking(
    naming::id_type const& gid
-  , std::vector<request> const& reqs
+  , std::vector<request> reqs
   , threads::thread_priority priority
     )
 {
     typedef server_type::bulk_service_action action_type;
-    hpx::apply_p<action_type>(gid, priority, reqs);
+    hpx::apply_p<action_type>(gid, priority, std::move(reqs));
 }
 
 }}}

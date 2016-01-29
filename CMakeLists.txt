@@ -925,8 +925,9 @@ if(WIN32)
       hpx_add_compile_flag(-Zc:throwingNew)
 
       # enable faster linking (requires VS2015 Update1)
-      hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
-      hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
+      # disabled for now as this flag crashes debugger
+      # hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
+      # hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
     endif()
 
     # Runtime type information

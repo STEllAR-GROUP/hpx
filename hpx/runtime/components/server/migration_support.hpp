@@ -64,6 +64,7 @@ namespace hpx { namespace components
         void pin()
         {
             boost::lock_guard<mutex_type> l(mtx_);
+            HPX_ASSERT(pin_count_ != ~0x0u);
             if (pin_count_ != ~0x0u)
                 ++pin_count_;
         }

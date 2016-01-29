@@ -215,8 +215,12 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
             HPX_TEST_EQ(t2.call(), target);
             HPX_TEST_EQ(t2.get_data(), 42);
 
+            hpx::cout << "." << std::flush;
+
             std::swap(source, target);
         }
+
+        hpx::cout << std::endl;
     }
     catch (hpx::exception const& e) {
         hpx::cout << hpx::get_error_what(e) << std::endl;
@@ -259,8 +263,12 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
                 HPX_TEST_EQ(t2.call(), target);
                 HPX_TEST_EQ(t2.get_data(), 42);
 
+                hpx::cout << "." << std::flush;
+
                 std::swap(source, target);
             }
+
+            hpx::cout << std::endl;
         }
     );
 
@@ -295,27 +303,36 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+
     for (hpx::id_type const& id : localities)
     {
+        hpx::cout << "test_migrate_component: ->" << id << std::endl;
         HPX_TEST(test_migrate_component(hpx::find_here(), id));
+        hpx::cout << "test_migrate_component: <-" << id << std::endl;
         HPX_TEST(test_migrate_component(id, hpx::find_here()));
     }
 
     for (hpx::id_type const& id : localities)
     {
+        hpx::cout << "test_migrate_busy_component: ->" << id << std::endl;
         HPX_TEST(test_migrate_busy_component(hpx::find_here(), id));
+        hpx::cout << "test_migrate_busy_component: <-" << id << std::endl;
         HPX_TEST(test_migrate_busy_component(id, hpx::find_here()));
     }
 
     for (hpx::id_type const& id : localities)
     {
+        hpx::cout << "test_migrate_component2: ->" << id << std::endl;
         HPX_TEST(test_migrate_component2(hpx::find_here(), id));
+        hpx::cout << "test_migrate_component2: <-" << id << std::endl;
         HPX_TEST(test_migrate_component2(id, hpx::find_here()));
     }
 
     for (hpx::id_type const& id : localities)
     {
+        hpx::cout << "test_migrate_busy_component2: ->" << id << std::endl;
         HPX_TEST(test_migrate_busy_component2(hpx::find_here(), id));
+        hpx::cout << "test_migrate_busy_component2: <-" << id << std::endl;
         HPX_TEST(test_migrate_busy_component2(id, hpx::find_here()));
     }
 
