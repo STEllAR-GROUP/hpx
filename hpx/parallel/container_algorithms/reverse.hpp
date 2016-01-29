@@ -133,7 +133,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
-        traits::detail::is_iterator<OutIter>::value)>
+        traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<

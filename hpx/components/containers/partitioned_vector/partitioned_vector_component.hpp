@@ -370,7 +370,7 @@ namespace hpx { namespace server
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_VECTOR_DECLARATION(...)                                  \
+#define HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(...)                      \
     HPX_REGISTER_VECTOR_DECLARATION_(__VA_ARGS__)                             \
 /**/
 #define HPX_REGISTER_VECTOR_DECLARATION_(...)                                 \

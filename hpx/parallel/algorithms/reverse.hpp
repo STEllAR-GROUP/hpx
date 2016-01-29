@@ -123,7 +123,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<BidirIter>::value)>
+        traits::is_iterator<BidirIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
     {
@@ -259,8 +259,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<BidirIter>::value &&
-        traits::detail::is_iterator<OutIter>::value)>
+        traits::is_iterator<BidirIter>::value &&
+        traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
     >::type
