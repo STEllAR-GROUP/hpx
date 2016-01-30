@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return for_each_n<FwdIter>().call(
                         policy, boost::mpl::false_(),
                         first, std::distance(first, last),
-                        [f](type& v) mutable
+                        [f](type& v)
                         {
                             v = f();
                         });
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return
                     for_each_n<OutIter>().call(
                         policy, boost::mpl::false_(), first, count,
-                        [f](type& v) mutable
+                        [f](type& v)
                         {
                             v = f();
                         });

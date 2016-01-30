@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Proj && proj = Proj())
             {
                 return util::loop_n(first, count,
-                    [&f, &proj](Iter const& curr)
+                    [&f, &proj](Iter curr)
                     {
                         hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
@@ -76,7 +76,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             // ref
                             util::loop_n(
                                 part_begin, part_size,
-                                [=](Iter const& curr) mutable
+                                [=](Iter curr) mutable
                                 {
                                     hpx::util::invoke(
                                         f, hpx::util::invoke(proj, *curr));
@@ -224,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Proj && proj)
             {
                 return util::loop(first, last,
-                    [&f, &proj](Iter const& curr)
+                    [&f, &proj](Iter curr)
                     {
                         f(hpx::util::invoke(proj, *curr));
                     });
