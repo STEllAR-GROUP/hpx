@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,9 @@
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
@@ -442,6 +445,14 @@ namespace hpx { namespace components
           : counter_name_(counter_name)
         {
             localities_.push_back(locality);
+        }
+
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned int const)
+        {
+            ar & counter_name_ & localities_;
         }
 
         std::vector<id_type> localities_;   // localities to create things on

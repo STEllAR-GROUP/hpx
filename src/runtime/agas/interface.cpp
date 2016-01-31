@@ -495,11 +495,10 @@ hpx::future<hpx::id_type> on_symbol_namespace_event(
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<std::pair<naming::id_type, naming::address> >
-    begin_migration(naming::id_type const& id,
-        naming::id_type const& target_locality)
+    begin_migration(naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.begin_migration_async(id, target_locality);
+    return resolver.begin_migration_async(id);
 }
 
 hpx::future<bool> end_migration(naming::id_type const& id)

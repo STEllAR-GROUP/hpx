@@ -38,6 +38,7 @@ namespace hpx { namespace components
         migration_support(Arg &&... arg)
           : base_type(std::forward<Arg>(arg)...)
           , pin_count_(0)
+          , was_marked_for_migration_(false)
         {}
 
         ~migration_support()
@@ -83,9 +84,9 @@ namespace hpx { namespace components
                         {
                             // trigger pending migration if this was the last
                             // unpin and a migration operation is pending
-                            if (trigger_migration_.valid() && migration_target_locality_)
+                            if (trigger_migration_.valid() && was_marked_for_migration_)
                             {
-                                migration_target_locality_ = naming::invalid_id;
+                                was_marked_for_migration_ = false;
                                 trigger_migration_.set_value();
                                 return std::make_pair(true, make_ready_future());
                             }
@@ -107,19 +108,17 @@ namespace hpx { namespace components
             pin_count_ = ~0x0u;
         }
 
-        hpx::future<void> mark_as_migrated(hpx::id_type const& to_migrate,
-            hpx::id_type const& target_location)
+        hpx::future<void> mark_as_migrated(hpx::id_type const& to_migrate)
         {
             // we need to first lock the AGAS migrated objects table, only then
             // access (lock) the object
             return agas::mark_as_migrated(to_migrate.get_gid(),
-                [this, target_location]()
-                ->  std::pair<bool, hpx::future<void> >
+                [this]() -> std::pair<bool, hpx::future<void> >
                 {
                     boost::lock_guard<mutex_type> l(mtx_);
 
                     // make sure that no migration is currently in flight
-                    if (migration_target_locality_)
+                    if (was_marked_for_migration_)
                     {
                         return std::make_pair(false,
                             make_exceptional_future<void>(
@@ -136,7 +135,7 @@ namespace hpx { namespace components
                     }
 
                     // delay migrate operation until pin count goes to zero
-                    migration_target_locality_ = target_location;
+                    was_marked_for_migration_ = true;
                     return std::make_pair(true, trigger_migration_.get_future());
                 });
         }
@@ -188,7 +187,7 @@ namespace hpx { namespace components
         mutable mutex_type mtx_;
         boost::uint32_t pin_count_;
         hpx::lcos::local::promise<void> trigger_migration_;
-        hpx::id_type migration_target_locality_;
+        bool was_marked_for_migration_;
     };
 }}
 

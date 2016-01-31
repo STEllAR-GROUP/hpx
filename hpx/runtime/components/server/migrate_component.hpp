@@ -121,11 +121,10 @@ namespace hpx { namespace components { namespace server
         }
 
         // trigger the actual migration
-        template <typename Component>
+        template <typename Component, typename DistPolicy>
         future<naming::id_type> migrate_component_postproc(
             boost::shared_ptr<Component> const& ptr,
-            naming::id_type const& to_migrate,
-            naming::id_type const& target_locality)
+            naming::id_type const& to_migrate, DistPolicy const& policy)
         {
             using components::stubs::runtime_support;
 
@@ -150,21 +149,20 @@ namespace hpx { namespace components { namespace server
             }
 
             return runtime_support::migrate_component_async<Component>(
-                        target_locality, ptr, to_migrate)
+                        policy, ptr, to_migrate)
                 .then(util::bind(
                     &detail::migrate_component_cleanup<Component>,
                     util::placeholders::_1, ptr, to_migrate));
         }
     }
 
-    template <typename Component>
+    template <typename Component, typename DistPolicy>
     future<naming::id_type> migrate_component(
-        naming::id_type const& to_migrate,
-        naming::address const& addr,
-        naming::id_type const& target_locality)
+        naming::id_type const& to_migrate, naming::address const& addr,
+        DistPolicy const& policy)
     {
         // 'migration' to same locality as before is a no-op
-        if (target_locality == hpx::find_here())
+        if (policy.get_next_target() == hpx::find_here())
         {
             return make_ready_future(to_migrate);
         }
@@ -184,16 +182,16 @@ namespace hpx { namespace components { namespace server
 
         // perform actual migration by sending data over to target locality
         return detail::migrate_component_postproc<Component>(
-            ptr, to_migrate, target_locality);
+            ptr, to_migrate, policy);
     }
 
-    template <typename Component>
+    template <typename Component, typename DistPolicy>
     struct migrate_component_action
       : ::hpx::actions::action<
             future<naming::id_type> (*)(naming::id_type const&,
-                naming::address const&, naming::id_type const&)
-          , &migrate_component<Component>
-          , migrate_component_action<Component> >
+                naming::address const&, DistPolicy const&)
+          , &migrate_component<Component, DistPolicy>
+          , migrate_component_action<Component, DistPolicy> >
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -201,10 +199,9 @@ namespace hpx { namespace components { namespace server
     //
     // This is executed on the locality responsible for managing the address
     // resolution for the given object.
-    template <typename Component>
+    template <typename Component, typename DistPolicy>
     future<naming::id_type> trigger_migrate_component(
-        naming::id_type const& to_migrate,
-        naming::id_type const& target_locality)
+        naming::id_type const& to_migrate, DistPolicy const& policy)
     {
         if (!Component::supports_migration())
         {
@@ -224,7 +221,7 @@ namespace hpx { namespace components { namespace server
                     "responsible for managing the address of the given object"));
         }
 
-        return agas::begin_migration(to_migrate, target_locality)
+        return agas::begin_migration(to_migrate)
             .then(
                 [=](future<std::pair<naming::id_type, naming::address> > && f)
                     ->  future<naming::id_type>
@@ -233,9 +230,11 @@ namespace hpx { namespace components { namespace server
                     std::pair<naming::id_type, naming::address> r = f.get();
 
                     // perform actual object migration
-                    typedef migrate_component_action<Component> action_type;
+                    typedef migrate_component_action<
+                            Component, DistPolicy
+                        > action_type;
                     return async<action_type>(r.first, to_migrate, r.second,
-                        target_locality);
+                        policy);
                 })
             .then(
                 [to_migrate](future<naming::id_type> && f) -> naming::id_type
@@ -245,13 +244,12 @@ namespace hpx { namespace components { namespace server
                 });
     }
 
-    template <typename Component>
+    template <typename Component, typename DistPolicy>
     struct trigger_migrate_component_action
       : ::hpx::actions::action<
-            future<naming::id_type> (*)(naming::id_type const&,
-                naming::id_type const&)
-          , &trigger_migrate_component<Component>
-          , trigger_migrate_component_action<Component> >
+            future<naming::id_type> (*)(naming::id_type const&, DistPolicy const&)
+          , &trigger_migrate_component<Component, DistPolicy>
+          , trigger_migrate_component_action<Component, DistPolicy> >
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -259,10 +257,9 @@ namespace hpx { namespace components { namespace server
     //
     // This is executed on the locality where the object to migrate is
     // currently located.
-    template <typename Component>
+    template <typename Component, typename DistPolicy>
     future<naming::id_type> perform_migrate_component(
-        naming::id_type const& to_migrate,
-        naming::id_type const& target_locality)
+        naming::id_type const& to_migrate, DistPolicy const& policy)
     {
         if (!Component::supports_migration())
         {
@@ -288,8 +285,7 @@ namespace hpx { namespace components { namespace server
                         // more actions (threads) are pending or currently
                         // running for the given object (until the object is
                         // unpinned).
-                        trigger_migration = ptr->mark_as_migrated(
-                            to_migrate, target_locality);
+                        trigger_migration = ptr->mark_as_migrated(to_migrate);
 
                         // Unpin the object, will trigger migration if this is
                         // the only pin-count.
@@ -307,23 +303,22 @@ namespace hpx { namespace components { namespace server
 
                                 // now trigger 2nd step of migration
                                 typedef trigger_migrate_component_action<
-                                        Component
+                                        Component, DistPolicy
                                     > action_type;
 
                                 return async<action_type>(
                                     naming::get_locality_from_id(to_migrate),
-                                    to_migrate, target_locality);
+                                    to_migrate, policy);
                             });
                 });
     }
 
-    template <typename Component>
+    template <typename Component, typename DistPolicy>
     struct perform_migrate_component_action
       : ::hpx::actions::action<
-            future<naming::id_type> (*)(naming::id_type const&,
-                naming::id_type const&)
-          , &perform_migrate_component<Component>
-          , perform_migrate_component_action<Component> >
+            future<naming::id_type> (*)(naming::id_type const&, DistPolicy const&)
+          , &perform_migrate_component<Component, DistPolicy>
+          , perform_migrate_component_action<Component, DistPolicy> >
     {};
 }}}
 

@@ -3335,10 +3335,7 @@ void addressing_service::unmark_as_migrated(
 }
 
 hpx::future<std::pair<naming::id_type, naming::address> >
-addressing_service::begin_migration_async(
-    naming::id_type const& id
-  , naming::id_type const& target_locality
-    )
+addressing_service::begin_migration_async(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
 
