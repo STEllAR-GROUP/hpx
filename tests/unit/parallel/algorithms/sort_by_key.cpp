@@ -61,7 +61,7 @@ namespace debug {
 ////////////////////////////////////////////////////////////////////////////////
 void sort_by_key_benchmark()
 {
-    const int bench_size = HPX_SORT_BY_KEY_TEST_SIZE*256;
+    const int bench_size = HPX_SORT_BY_KEY_TEST_SIZE*128;
     // vector of values, and keys
     std::vector<double> values, o_values;
     std::vector<int64_t> keys, o_keys;
