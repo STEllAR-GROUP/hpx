@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 #if !defined(HPX_MIGRATE_TO_STORAGE_FEB_04_2015_1245PM)
 #define HPX_MIGRATE_TO_STORAGE_FEB_04_2015_1245PM
 
+#include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/traits.hpp>
@@ -47,9 +48,9 @@ namespace hpx { namespace components
     migrate_to_storage(naming::id_type const& to_migrate,
         naming::id_type const& target_storage)
     {
-        typedef server::trigger_migrate_to_storage_here_action<Component>
+        typedef server::perform_migrate_to_storage_action<Component>
             action_type;
-        return async<action_type>(naming::get_locality_from_id(to_migrate),
+        return hpx::detail::async_colocated<action_type>(to_migrate,
             to_migrate, target_storage);
     }
 

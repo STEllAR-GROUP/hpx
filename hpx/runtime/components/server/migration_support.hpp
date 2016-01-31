@@ -76,7 +76,7 @@ namespace hpx { namespace components
                 [this]()
                 ->  std::pair<bool, hpx::future<void> >
                 {
-                    boost::lock_guard<mutex_type> l(mtx_);
+                    boost::unique_lock<mutex_type> l(mtx_);
                     HPX_ASSERT(pin_count_ != 0);
                     if (pin_count_ != ~0x0u)
                     {
@@ -87,6 +87,8 @@ namespace hpx { namespace components
                             if (trigger_migration_.valid() && was_marked_for_migration_)
                             {
                                 was_marked_for_migration_ = false;
+
+                                l.unlock();
                                 trigger_migration_.set_value();
                                 return std::make_pair(true, make_ready_future());
                             }
@@ -115,11 +117,12 @@ namespace hpx { namespace components
             return agas::mark_as_migrated(to_migrate.get_gid(),
                 [this]() -> std::pair<bool, hpx::future<void> >
                 {
-                    boost::lock_guard<mutex_type> l(mtx_);
+                    boost::unique_lock<mutex_type> l(mtx_);
 
                     // make sure that no migration is currently in flight
                     if (was_marked_for_migration_)
                     {
+                        l.unlock();
                         return std::make_pair(false,
                             make_exceptional_future<void>(
                                 HPX_GET_EXCEPTION(invalid_status,
@@ -136,6 +139,8 @@ namespace hpx { namespace components
 
                     // delay migrate operation until pin count goes to zero
                     was_marked_for_migration_ = true;
+
+                    l.unlock();
                     return std::make_pair(true, trigger_migration_.get_future());
                 });
         }

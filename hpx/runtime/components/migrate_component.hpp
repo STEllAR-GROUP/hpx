@@ -23,7 +23,6 @@
 
 namespace hpx { namespace components
 {
-
     /// Migrate the given component to the specified target locality
     ///
     /// The function \a migrate<Component> will migrate the component
@@ -35,6 +34,11 @@ namespace hpx { namespace components
     ///                        component to migrate.
     /// \param policy          [in] A distribution policy which will be used to
     ///                        determine the locality to migrate this object to.
+    ///
+    /// \tparam  Component     Specifies the component type of the
+    ///                        component to migrate.
+    /// \tparam  DistPolicy    Specifies the distribution policy to use to
+    ///                        determine the destination locality.
     ///
     /// \returns A future representing the global id of the migrated
     ///          component instance. This should be the same as \a migrate_to.
@@ -58,6 +62,42 @@ namespace hpx { namespace components
             to_migrate, policy);
     }
 
+    /// Migrate the given component to the specified target locality
+    ///
+    /// The function \a migrate<Component> will migrate the component
+    /// referenced by \a to_migrate to the locality specified with
+    /// \a target_locality. It returns a future referring to the migrated
+    /// component instance.
+    ///
+    /// \param to_migrate      [in] The client side representation of the
+    ///                        component to migrate.
+    /// \param policy          [in] A distribution policy which will be used to
+    ///                        determine the locality to migrate this object to.
+    ///
+    /// \tparam  Derived       Specifies the component type of the
+    ///                        component to migrate.
+    /// \tparam  DistPolicy    Specifies the distribution policy to use to
+    ///                        determine the destination locality.
+    ///
+    /// \returns A future representing the global id of the migrated
+    ///          component instance. This should be the same as \a migrate_to.
+    ///
+    template <typename Derived, typename Stub, typename DistPolicy>
+#if defined(DOXYGEN)
+    Derived
+#else
+    inline typename boost::enable_if_c<
+        traits::is_distribution_policy<DistPolicy>::value, Derived
+    >::type
+#endif
+    migrate(client_base<Derived, Stub> const& to_migrate,
+        DistPolicy const& policy)
+    {
+        typedef typename client_base<Derived, Stub>::server_component_type
+            component_type;
+        return Derived(migrate<component_type>(to_migrate.get_id(), policy));
+    }
+
     /// Migrate the component with the given id to the specified target locality
     ///
     /// The function \a migrate<Component> will migrate the component
@@ -69,7 +109,7 @@ namespace hpx { namespace components
     /// \param target_locality [in] The locality where the component should be
     ///                        migrated to.
     ///
-    /// \tparam  The only template argument specifies the component type of the
+    /// \tparam  Component     Specifies the component type of the
     ///          component to migrate.
     ///
     /// \returns A future representing the global id of the migrated
@@ -100,6 +140,9 @@ namespace hpx { namespace components
     ///                        component to migrate.
     /// \param target_locality [in] The id of the locality to migrate
     ///                        this object to.
+    ///
+    /// \tparam  Derived       Specifies the component type of the
+    ///                        component to migrate.
     ///
     /// \returns A client side representation of representing of the migrated
     ///          component instance. This should be the same as \a migrate_to.

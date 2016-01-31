@@ -277,8 +277,11 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
     hpx::future<void> create_work = hpx::async(
         [t1, N]()
         {
-            for(std::size_t i = 0; i < N; ++i)
+            for(std::size_t i = 0; i < 2*N; ++i)
             {
+                hpx::cout
+                    << hpx::naming::get_locality_id_from_id(t1.call())
+                    << std::flush;
                 HPX_TEST_EQ(t1.get_data(), 42);
             }
         }
