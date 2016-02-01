@@ -152,13 +152,16 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
+    // if benchmark is requested we run it even in debug mode
     if (vm.count("benchmark")) {
         sort_benchmark();
     }
     else {
         test_sort1();
         test_sort2();
+#ifndef HPX_DEBUG
         sort_benchmark();
+#endif
     }
     return hpx::finalize();
 }
