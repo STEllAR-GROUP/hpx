@@ -51,7 +51,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return std::copy(first, last, dest);
             }
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter_>
+            template <typename
+
+            ExPolicy, typename FwdIter, typename OutIter_>
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter_
             >::type

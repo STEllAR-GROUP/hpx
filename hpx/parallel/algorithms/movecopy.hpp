@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/move.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM)
-#define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
+#if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM_ALGO)
+#define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM_ALGO
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -17,7 +17,6 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/parallel/algorithms/movecopy.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -32,46 +31,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // move
     namespace detail
     {
-        /// \cond NOINTERNAL
-
-        template <typename OutIter>
-        struct move : public detail::algorithm<move<OutIter>, OutIter>
+        template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        algo_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+              std::false_type)
         {
-            move()
-              : move::algorithm("move")
-            {}
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                    input_iterator_category;
+            typedef typename std::iterator_traits<OutIter>::iterator_category
+                    output_iterator_category;
 
-            template <typename ExPolicy, typename InIter, typename OutIter_>
-            static OutIter_
-            sequential(ExPolicy, InIter first, InIter last, OutIter_ dest)
-            {
-                return std::move(first, last, dest);
-            }
+            typedef typename boost::mpl::or_<
+                    parallel::is_sequential_execution_policy<ExPolicy>,
+                    boost::is_same<std::input_iterator_tag, input_iterator_category>,
+                    boost::is_same<std::output_iterator_tag, output_iterator_category>
+            >::type is_seq;
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter_>
-            static typename util::detail::algorithm_result<
-                ExPolicy, OutIter_
-            >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                OutIter_ dest)
-            {
-                typedef hpx::util::zip_iterator<FwdIter, OutIter_> zip_iterator;
-                typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, OutIter_
-                    >::type result_type;
+            return ParAlgo().call(
+                    std::forward<ExPolicy>(policy), is_seq(),
+                    first, last, dest);
+        }
 
-                return get_iter<1, result_type>(
-                    for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
-                        hpx::util::make_zip_iterator(first, dest),
-                        std::distance(first, last),
-                        [](reference t) {
-                            using hpx::util::get;
-                            get<1>(t) = std::move(get<0>(t)); //-V573
-                        }));
-            }
-        };
+        // forward declare the segmented version of this algorithm
+        template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        algo_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+            std::true_type);
+
+        /// \endcond
     }
 
     /// Moves the elements in the range [first, last), to another range
@@ -120,18 +107,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a move algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
-    template <typename ExPolicy, typename InIter, typename OutIter>
+    ///
+    template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
-    move(ExPolicy && policy, InIter first, InIter last, OutIter dest)
+            >::type
+    algo(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        typedef hpx::traits::segmented_iterator_traits<OutIter>
-            output_iterator_traits;
-        return algo<detail::move<OutIter>,
-            detail::move<typename output_iterator_traits::local_iterator>>(
-            policy, first, last, dest);
+        typedef typename std::iterator_traits<InIter>::iterator_category
+            input_iterator_category;
+        typedef typename std::iterator_traits<OutIter>::iterator_category
+            output_iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value),
+            "Required at least input iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value),
+            "Requires at least output iterator.");
+
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, input_iterator_category>,
+            boost::is_same<std::output_iterator_tag, output_iterator_category>
+        >::type is_seq;
+
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+
+        return detail::algo_<ParAlgo, SegAlgo>(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            is_segmented());
     }
 }}}
 

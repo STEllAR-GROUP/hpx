@@ -146,6 +146,7 @@ void move_tests()
     std::size_t const length = 12;
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
+
     {
         hpx::partitioned_vector<T> v;
         move_tests(v);
@@ -165,7 +166,7 @@ void move_tests()
     move_tests_with_policy<T>(length, 3, hpx::container_layout(3));
     move_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
     move_tests_with_policy<T>(length, localities.size(),
-        hpx::container_layout(localities));
+    hpx::container_layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
