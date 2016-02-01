@@ -13,6 +13,7 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
+#include <hpx/util/coroutine/detail/get_stack_pointer.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 
@@ -226,6 +227,16 @@ namespace hpx { namespace util { namespace coroutines
             std::ptrdiff_t get_stacksize() const
             {
                 return stack_size_;
+            }
+
+            std::ptrdiff_t get_available_stack_space()
+            {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+                return
+                    reinterpret_cast<uintptr_type>(stack_pointer_) - get_stack_ptr();
+#else
+                return (std::numeric_limits<std::ptrdiff_t>::max)();
+#endif
             }
 
             // global functions to be called for each OS-thread after it started

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,7 +31,7 @@ void test_minmax_element(ExPolicy policy, IteratorTag)
     iterator end(boost::end(c));
     base_iterator ref_end(boost::end(c));
 
-    std::pair<iterator, iterator> r = hpx::parallel::minmax_element(policy,
+    auto r = hpx::parallel::minmax_element(policy,
         iterator(boost::begin(c)), iterator(end),
         std::less<std::size_t>());
     HPX_TEST(r.first != end && r.second != end);
@@ -65,11 +65,11 @@ void test_minmax_element_async(ExPolicy p, IteratorTag)
     iterator end(boost::end(c));
     base_iterator ref_end(boost::end(c));
 
-    hpx::future<std::pair<iterator, iterator> > r =
+    auto r =
         hpx::parallel::minmax_element(p,
             iterator(boost::begin(c)), iterator(end),
             std::less<std::size_t>());
-    std::pair<iterator, iterator> rit = r.get();
+    auto rit = r.get();
     HPX_TEST(rit.first != end && rit.second != end);
 
     std::pair<base_iterator, base_iterator> ref = std::minmax_element(
@@ -189,7 +189,7 @@ void test_minmax_element_exception_async(ExPolicy p, IteratorTag)
         bool caught_exception = false;
 
         try {
-            hpx::future<std::pair<decorated_iterator, decorated_iterator> > f =
+            auto f =
                 hpx::parallel::minmax_element(p,
                     decorated_iterator(
                         boost::begin(c),
@@ -220,7 +220,7 @@ void test_minmax_element_exception_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
 
         try {
-            hpx::future<std::pair<decorated_iterator, decorated_iterator> > f =
+            auto f =
                 hpx::parallel::minmax_element(p,
                     decorated_iterator(
                         boost::begin(c),
@@ -343,7 +343,7 @@ void test_minmax_element_bad_alloc_async(ExPolicy p, IteratorTag)
         bool caught_exception = false;
 
         try {
-            hpx::future<std::pair<decorated_iterator, decorated_iterator> > f =
+            auto f =
                 hpx::parallel::minmax_element(p,
                     decorated_iterator(
                         boost::begin(c),
@@ -373,7 +373,7 @@ void test_minmax_element_bad_alloc_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
 
         try {
-            hpx::future<std::pair<decorated_iterator, decorated_iterator> > f =
+            auto f =
                 hpx::parallel::minmax_element(p,
                     decorated_iterator(
                         boost::begin(c),

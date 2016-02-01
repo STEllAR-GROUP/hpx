@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
-        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             std::equal_to<T>,
@@ -204,7 +204,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
-        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             F, traits::projected_range<Proj, Rng>

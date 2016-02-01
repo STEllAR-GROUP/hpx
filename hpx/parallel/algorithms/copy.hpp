@@ -180,8 +180,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
-        traits::detail::is_iterator<OutIter>::value)>
+        traits::is_iterator<InIter>::value &&
+        traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
@@ -336,8 +336,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
-        traits::detail::is_iterator<OutIter>::value)>
+        traits::is_iterator<InIter>::value &&
+        traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
@@ -583,8 +583,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
-        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_iterator<InIter>::value &&
+        traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>

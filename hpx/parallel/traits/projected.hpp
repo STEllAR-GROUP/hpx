@@ -58,6 +58,11 @@ namespace hpx { namespace parallel { namespace traits
         };
     }
 
+    template <typename Iter, typename Enable = void>
+    struct is_iterator
+      : detail::is_iterator<typename hpx::util::decay<Iter>::type>
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {

@@ -220,12 +220,11 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         T* target() HPX_NOEXCEPT
         {
-            BOOST_STATIC_ASSERT_MSG(
-                (traits::is_callable<T(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
+            typedef typename std::remove_cv<T>::type target_type;
 
-            typedef typename std::decay<T>::type target_type;
+            static_assert(
+                traits::is_callable<target_type&(Ts...), R>::value
+              , "T shall be Callable with the function signature");
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())
@@ -237,12 +236,11 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         T const* target() const HPX_NOEXCEPT
         {
-            BOOST_STATIC_ASSERT_MSG(
-                (traits::is_callable<T(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
+            typedef typename std::remove_cv<T>::type target_type;
 
-            typedef typename std::decay<T>::type target_type;
+            static_assert(
+                traits::is_callable<target_type&(Ts...), R>::value
+              , "T shall be Callable with the function signature");
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())

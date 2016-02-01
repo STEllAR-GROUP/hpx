@@ -99,6 +99,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/minmax.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/remove_copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/replace.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/reverse.hpp"

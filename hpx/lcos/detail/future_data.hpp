@@ -357,9 +357,27 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
-            handle_continuation_recursion_count cnt;
+#if defined(HPX_WINDOWS)
+            bool recurse_asynchronously = false;
+#elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            std::ptrdiff_t remaining_stack =
+                this_thread::get_available_stack_space();
 
-            if (cnt.count_ <= HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+            if(remaining_stack < 0)
+            {
+                HPX_THROW_EXCEPTION(out_of_memory,
+                    "future_data::handle_on_completed",
+                    "Stack overflow");
+            }
+            bool recurse_asynchronously =
+                remaining_stack < 8 * HPX_THREADS_STACK_OVERHEAD;
+#else
+            handle_continuation_recursion_count cnt;
+            bool recurse_asynchronously =
+                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+#endif
+
+            if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
                 on_completed();

@@ -244,6 +244,26 @@ if(NOT HPX_WITH_STATIC_LINKING)
   set(hpx_targets ${hpx_targets} hpx_init)
 endif()
 
+get_property(HPX_TARGET_COMPILE_DEFININTIONS_VAR
+  GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
+foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
+  target_compile_definitions(hpx INTERFACE ${_flag})
+  target_compile_definitions(hpx PUBLIC ${_flag})
+  if(NOT HPX_WITH_STATIC_LINKING)
+    target_compile_definitions(hpx_init PUBLIC ${_flag})
+  endif()
+endforeach()
+
+get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
+  GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
+foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
+  target_compile_options(hpx INTERFACE ${_flag})
+  target_compile_options(hpx PUBLIC ${_flag})
+  if(NOT HPX_WITH_STATIC_LINKING)
+    target_compile_options(hpx_init PUBLIC ${_flag})
+  endif()
+endforeach()
+
 set(_optional)
 if(HPX_WITH_DEFAULT_TARGETS)
   set(_optional OPTIONAL)

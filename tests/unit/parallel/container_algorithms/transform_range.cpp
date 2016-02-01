@@ -21,21 +21,20 @@ void test_transform(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     auto result =
         hpx::parallel::transform(policy,
-            boost::make_iterator_range(
-                iterator(boost::begin(c)), iterator(boost::end(c))
-            ),
-            boost::begin(d),
+            c, boost::begin(d),
             [](std::size_t v) {
                 return v + 1;
             });
 
-    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c)));
+    HPX_TEST(hpx::util::get<0>(result) == boost::end(c));
     HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
 
     // verify values
@@ -55,23 +54,24 @@ void test_transform_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    typedef test::test_container<
+            std::vector<std::size_t>, IteratorTag
+        > test_vector;
+
+    test_vector c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     auto f =
         hpx::parallel::transform(p,
-            boost::make_iterator_range(
-                iterator(boost::begin(c)), iterator(boost::end(c))
-            ),
-            boost::begin(d),
+            c, boost::begin(d),
             [](std::size_t& v) {
                 return v + 1;
             });
     f.wait();
 
-    hpx::util::tuple<iterator, base_iterator> result = f.get();
-    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c)));
+    auto result = f.get();
+    HPX_TEST(hpx::util::get<0>(result) == boost::end(c));
     HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
 
     // verify values

@@ -77,6 +77,8 @@ namespace hpx
         typedef local_vector_iterator<T> local_iterator;
         typedef const_local_vector_iterator<T> local_const_iterator;
 
+        local_raw_vector_iterator() {}
+
         local_raw_vector_iterator(base_iterator const& it,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
           : base_type(it), data_(data)
@@ -118,6 +120,8 @@ namespace hpx
     public:
         typedef const_local_vector_iterator<T> local_iterator;
         typedef const_local_vector_iterator<T> local_const_iterator;
+
+        const_local_raw_vector_iterator() {}
 
         const_local_raw_vector_iterator(base_iterator const& it,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
@@ -509,6 +513,10 @@ namespace hpx
             > base_type;
 
     public:
+        segment_vector_iterator()
+          : data_(0)
+        {}
+
         segment_vector_iterator(BaseIter const& it, partitioned_vector<T>* data = 0)
           : base_type(it), data_(data)
         {}
@@ -538,6 +546,10 @@ namespace hpx
             > base_type;
 
     public:
+        const_segment_vector_iterator()
+          : data_(0)
+        {}
+
         const_segment_vector_iterator(BaseIter const& it,
                 partitioned_vector<T> const* data = 0)
           : base_type(it), data_(data)
@@ -595,6 +607,9 @@ namespace hpx
         typedef detail::is_requested_locality<BaseIter> predicate;
 
     public:
+        local_segment_vector_iterator()
+        {}
+
         local_segment_vector_iterator(BaseIter const& end)
           : base_type(end), predicate_(), end_(end)
         {}

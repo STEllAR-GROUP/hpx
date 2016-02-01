@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Proj && proj = Proj())
             {
                 return util::loop_n(first, count,
-                    [&f, &proj](Iter const& curr)
+                    [&f, &proj](Iter curr)
                     {
                         hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
@@ -76,7 +76,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             // ref
                             util::loop_n(
                                 part_begin, part_size,
-                                [=](Iter const& curr)
+                                [=](Iter curr) mutable
                                 {
                                     hpx::util::invoke(
                                         f, hpx::util::invoke(proj, *curr));
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
+        traits::is_iterator<InIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
@@ -224,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Proj && proj)
             {
                 return util::loop(first, last,
-                    [&f, &proj](Iter const& curr)
+                    [&f, &proj](Iter curr)
                     {
                         f(hpx::util::invoke(proj, *curr));
                     });
@@ -365,7 +365,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
+        traits::is_iterator<InIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>

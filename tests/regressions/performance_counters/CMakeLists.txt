@@ -1,5 +1,5 @@
 # Copyright (c) 2007-2015 Hartmut Kaiser
-# Copyright (c) 2013 Maciej Brodowicz
+# Copyright (c) 2013,2016 Maciej Brodowicz
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +8,7 @@ set(tests
     discover_counters_1787
     uptime_1737)
 
-if(PAPI_FOUND)
+if(HPX_WITH_PAPI)
   set(tests ${tests}
     papi_counters_active_interface
     papi_counters_basic_functions

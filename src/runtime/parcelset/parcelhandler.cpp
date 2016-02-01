@@ -1294,7 +1294,7 @@ namespace hpx { namespace parcelset
         static std::vector<plugins::parcelport_factory_base *> factories;
         if(factories.empty())
         {
-            init_static_parcelport_factories();
+            init_static_parcelport_factories(factories);
         }
 
         return factories;
@@ -1302,7 +1302,12 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::add_parcelport_factory(plugins::parcelport_factory_base *factory)
     {
-        get_parcelport_factories().push_back(factory);
+        auto & factories = get_parcelport_factories();
+        if(std::find(factories.begin(), factories.end(), factory) != factories.end())
+        {
+            return;
+        }
+        factories.push_back(factory);
     }
 
     void parcelhandler::init(int *argc, char ***argv, util::command_line_handling &cfg)
