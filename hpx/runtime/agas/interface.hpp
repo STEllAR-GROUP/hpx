@@ -243,6 +243,17 @@ HPX_API_EXPORT bool bind_sync(
   , error_code& ec = throws
     );
 
+HPX_API_EXPORT hpx::future<naming::address> unbind(
+    naming::gid_type const& id
+  , boost::uint64_t count = 1
+    );
+
+HPX_API_EXPORT naming::address unbind_sync(
+    naming::gid_type const& id
+  , boost::uint64_t count = 1
+  , error_code& ec = throws
+    );
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT void garbage_collect_non_blocking(
     error_code& ec = throws

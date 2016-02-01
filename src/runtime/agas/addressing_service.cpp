@@ -1186,6 +1186,20 @@ hpx::future<bool> addressing_service::bind_range_async(
         ));
 }
 
+hpx::future<naming::address> addressing_service::unbind_range_async(
+    naming::gid_type const& lower_id
+  , boost::uint64_t count
+    )
+{
+    agas::request req(primary_ns_unbind_gid, lower_id, count);
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(lower_id)
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<naming::address>(
+        service_target, req);
+}
+
 bool addressing_service::unbind_range_local(
     naming::gid_type const& lower_id
   , boost::uint64_t count
@@ -1197,23 +1211,25 @@ bool addressing_service::unbind_range_local(
         request req(primary_ns_unbind_gid, lower_id, count);
         response rep;
 
-//         if (get_status() == running &&
-//             naming::get_locality_id_from_gid(lower_id) !=
-//                 naming::get_locality_id_from_gid(locality_))
-//         {
-//             naming::id_type target(
-//                 stubs::primary_namespace::get_service_instance(lower_id)
-//               , naming::id_type::unmanaged);
-//
-//             rep = stubs::primary_namespace::service(
-//                 target, req, threads::thread_priority_default, ec);
-//         }
-//         else
+        // if this id is managed by another locality, forward the request
+        if (get_status() == state_running &&
+            naming::get_locality_id_from_gid(lower_id) !=
+                naming::get_locality_id_from_gid(locality_))
+        {
+            naming::id_type target(
+                stubs::primary_namespace::get_service_instance(lower_id)
+              , naming::id_type::unmanaged);
 
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
+            rep = stubs::primary_namespace::service(
+                target, req, threads::thread_priority_default, ec);
+        }
         else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        {
+            if (is_bootstrap())
+                rep = bootstrap->primary_ns_server_.service(req, ec);
+            else
+                rep = hosted->primary_ns_server_.service(req, ec);
+        }
 
         if (ec || (success != rep.get_status()))
             return false;

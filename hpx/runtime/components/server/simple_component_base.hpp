@@ -67,7 +67,11 @@ namespace hpx { namespace components
         /// \brief Destruct a simple_component
         ~simple_component_base()
         {
-            if (gid_) applier::unbind_gid_local(gid_);
+            if (gid_)
+            {
+                error_code ec;
+                agas::unbind_sync(gid_, 1, ec);
+            }
         }
 
         // Copy construction and copy assignment should not copy the gid_.

@@ -11,8 +11,57 @@
 namespace hpx { namespace components { namespace server
 {
     component_storage::component_storage()
-      : data_(container_layout(find_all_localities()))
+      : data_()
     {}
+
+    component_storage::component_storage(hpx::id_type const& locality)
+      : data_(container_layout(locality))
+    {}
+
+    component_storage::component_storage(
+            std::vector<hpx::id_type> const& localities)
+      : data_(container_layout(localities))
+    {}
+
+    component_storage::~component_storage()
+    {
+        typedef data_store_type::partition_data_type partition_data_type;
+
+        // unregister all stored objects from AGAS
+        try {
+            std::size_t num_partitions = data_.get_num_partitions();
+
+            std::vector<hpx::future<partition_data_type> > partdata;
+            partdata.reserve(num_partitions);
+
+            data_store_type::const_segment_iterator end = data_.segment_cend();
+            for (data_store_type::const_segment_iterator it = data_.segment_cbegin();
+                 it != end; ++it)
+            {
+                partdata.push_back((*it).get_data());
+            }
+            hpx::wait_all(partdata);
+
+            std::vector<hpx::future<naming::address> > agas_requests;
+            for (auto& f : partdata)
+            {
+                partition_data_type partition = f.get();
+
+                partition_data_type::const_iterator dend = partition.end();
+                for (partition_data_type::const_iterator dit = partition.begin();
+                     dit != dend; ++dit)
+                {
+                    agas_requests.push_back(
+                            hpx::agas::unbind((*dit).first)
+                        );
+                }
+            }
+            hpx::wait_all(agas_requests);
+        }
+        catch (...) {
+            // just ignore all errors
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type component_storage::migrate_to_here(
@@ -74,7 +123,7 @@ namespace hpx { namespace components { namespace server
 
         data_store_type::const_segment_iterator end = data_.segment_cend();
         for (data_store_type::const_segment_iterator it = data_.segment_cbegin();
-                it != end; ++it)
+             it != end; ++it)
         {
             partdata.push_back((*it).get_data());
         }
@@ -91,7 +140,7 @@ namespace hpx { namespace components { namespace server
             archive << num_partitions;
 
             // store the data from each of the partitions
-            for (auto && f : partdata)
+            for (auto& f : partdata)
             {
                 archive << f.get();
             }

@@ -16,6 +16,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <utility>

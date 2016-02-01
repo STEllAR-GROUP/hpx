@@ -876,6 +876,11 @@ public:
       , error_code& ec = throws
         );
 
+    hpx::future<naming::address> unbind_range_async(
+        naming::gid_type const& lower_id
+      , boost::uint64_t count = 1
+        );
+
     /// \brief Test whether the given address refers to a local object.
     ///
     /// This function will test whether the given address refers to an object

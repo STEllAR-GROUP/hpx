@@ -339,6 +339,27 @@ bool bind_sync(
     return agas_.bind_async(gid_, addr, locality_).get(ec);
 }
 
+hpx::future<naming::address> unbind(
+    naming::gid_type const& id
+  , boost::uint64_t count
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type gid(naming::detail::get_stripped_gid(id));
+    return agas_.unbind_range_async(gid);
+}
+
+naming::address unbind_sync(
+    naming::gid_type const& id
+  , boost::uint64_t count
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type gid(naming::detail::get_stripped_gid(id));
+    return agas_.unbind_range_async(gid).get(ec);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 void garbage_collect_non_blocking(
     error_code& ec

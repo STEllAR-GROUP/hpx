@@ -34,6 +34,10 @@ namespace hpx { namespace components { namespace server
 
     public:
         component_storage();
+        component_storage(hpx::id_type const& locality);
+        component_storage(std::vector<hpx::id_type> const& localities);
+
+        ~component_storage();
 
         naming::gid_type migrate_to_here(std::vector<char> const&,
             naming::id_type const& , naming::address const&);

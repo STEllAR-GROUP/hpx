@@ -7,6 +7,10 @@
 
 #include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/agas/request.hpp>
+#include <hpx/runtime/agas/response.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {
@@ -48,6 +52,13 @@ template lcos::future<boost::int64_t>
 
 template lcos::future<naming::id_type>
     primary_namespace::service_async<naming::id_type>(
+        naming::id_type const& gid
+      , request const& req
+      , threads::thread_priority priority
+        );
+
+template lcos::future<naming::address>
+    primary_namespace::service_async<naming::address>(
         naming::id_type const& gid
       , request const& req
       , threads::thread_priority priority
