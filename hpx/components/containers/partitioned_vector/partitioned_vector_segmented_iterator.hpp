@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http:// ww.boost.org/LICENSE_1_0.txt)
@@ -86,14 +86,16 @@ namespace hpx
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
-            return local_iterator(partition_vector<T>(data_->get_id()),
+            return local_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
-            return local_const_iterator(partition_vector<T>(data_->get_id()),
+            return local_const_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -126,14 +128,16 @@ namespace hpx
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
-            return local_const_iterator(partition_vector<T>(data_->get_id()),
+            return local_const_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
-            return local_const_iterator(partition_vector<T>(data_->get_id()),
+            return local_const_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -251,7 +255,7 @@ namespace hpx
           : partition_(), local_index_(size_type(-1))
         {}
 
-        local_vector_iterator(partition_vector<T> partition,
+        local_vector_iterator(partitioned_vector_partition<T> partition,
                 size_type local_index,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
           : partition_(partition),
@@ -332,8 +336,8 @@ namespace hpx
         }
 
     public:
-        partition_vector<T>& get_partition() { return partition_; }
-        partition_vector<T> get_partition() const { return partition_; }
+        partitioned_vector_partition<T>& get_partition() { return partition_; }
+        partitioned_vector_partition<T> get_partition() const { return partition_; }
 
         size_type get_local_index() const { return local_index_; }
 
@@ -348,7 +352,7 @@ namespace hpx
 
     protected:
         // refer to a partition of the vector
-        partition_vector<T> partition_;
+        partitioned_vector_partition<T> partition_;
 
         // local position in the referenced partition
         size_type local_index_;
@@ -380,7 +384,7 @@ namespace hpx
           : partition_(), local_index_(size_type(-1))
         {}
 
-        const_local_vector_iterator(partition_vector<T> partition,
+        const_local_vector_iterator(partitioned_vector_partition<T> partition,
                 size_type local_index,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
           : partition_(partition),
@@ -465,7 +469,10 @@ namespace hpx
         }
 
     public:
-        partition_vector<T> const& get_partition() const { return partition_; }
+        partitioned_vector_partition<T> const& get_partition() const
+        {
+            return partition_;
+        }
         size_type get_local_index() const { return local_index_; }
 
         boost::shared_ptr<server::partitioned_vector<T> >& get_data()
@@ -479,7 +486,7 @@ namespace hpx
 
     protected:
         // refer to a partition of the vector
-        partition_vector<T> partition_;
+        partitioned_vector_partition<T> partition_;
 
         // local position in the referenced partition
         size_type local_index_;

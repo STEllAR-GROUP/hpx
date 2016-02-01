@@ -316,6 +316,17 @@ bool bind_sync(
     return agas_.bind_async(gid_, addr, locality_id).get(ec);
 }
 
+hpx::future<bool> bind(
+    naming::gid_type const& gid
+  , naming::address const& addr
+  , naming::gid_type const& locality_
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.bind_async(gid_, addr, locality_);
+}
+
 bool bind_sync(
     naming::gid_type const& gid
   , naming::address const& addr

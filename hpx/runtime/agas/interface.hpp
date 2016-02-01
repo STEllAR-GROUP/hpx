@@ -230,6 +230,12 @@ HPX_API_EXPORT bool bind_sync(
   , error_code& ec = throws
     );
 
+HPX_API_EXPORT hpx::future<bool> bind(
+    naming::gid_type const& id
+  , naming::address const& addr
+  , naming::gid_type const& locality_
+    );
+
 HPX_API_EXPORT bool bind_sync(
     naming::gid_type const& id
   , naming::address const& addr

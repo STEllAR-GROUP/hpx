@@ -108,217 +108,82 @@ struct test_client
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-bool test_migrate_component_to_storage(hpx::id_type const& source,
+hpx::id_type test_migrate_component_to_storage(hpx::id_type const& source,
     hpx::components::component_storage storage, hpx::id_type::management_type t)
 {
-    hpx::id_type oldid;
+    // create component on given locality
+    test_client t1 = hpx::new_<test_client>(source, 42);
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
-    {
-        // create component on given locality
-        test_client t1 = hpx::new_<test_client>(source, 42);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    // the new object should live on the source locality
+    HPX_TEST_EQ(t1.call(), source);
+    HPX_TEST_EQ(t1.get_data(), 42);
 
-        // the new object should live on the source locality
-        HPX_TEST_EQ(t1.call(), source);
-        HPX_TEST_EQ(t1.get_data(), 42);
+    // remember the original id for later resurrection
+    hpx::id_type  oldid = hpx::id_type(t1.get_id().get_gid(), t);
 
-        // remember the original id for later resurrection
-        oldid = hpx::id_type(t1.get_id().get_gid(), t);
-
-        try {
-            // migrate of t1 to the target storage
-            test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
-        }
-        catch (hpx::exception const&) {
-            return false;
-        }
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
-
-        // make sure all local references go out of scope if t == unmanaged
+    try {
+        // migrate of t1 to the target storage
+        test_client t2(hpx::components::migrate_to_storage(t1, storage));
+        HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
+    }
+    catch (hpx::exception const&) {
+        return hpx::invalid_id;
     }
 
     HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
-
-    {
-        test_client t1(hpx::components::migrate_from_storage<test_server>(oldid));
-
-        // the id of the newly resurrected object should be the same as the old id
-        HPX_TEST_EQ(oldid, t1.get_id());
-
-        // the new object should live on the (original) source locality
-        HPX_TEST_EQ(t1.call(), source);
-        HPX_TEST_EQ(t1.get_data(), 42);
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
-    }
-
-    return true;
+    return oldid;
 }
 
-bool test_migrate_component_to_storage(hpx::id_type const& source,
-    hpx::id_type const& target, hpx::components::component_storage storage,
-    hpx::id_type::management_type t)
+void test_migrate_component_from_storage(hpx::id_type const& oldid,
+    hpx::components::component_storage storage, hpx::id_type const& target)
 {
-    hpx::id_type oldid;
+    test_client t1(hpx::components::migrate_from_storage<test_server>(
+        oldid, target));
 
-    {
-        // create component on given locality
-        test_client t1 = hpx::new_<test_client>(source, 42);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    // the id of the newly resurrected object should be the same as the old id
+    HPX_TEST_EQ(oldid, t1.get_id());
 
-        // the new object should live on the source locality
-        HPX_TEST_EQ(t1.call(), source);
-        HPX_TEST_EQ(t1.get_data(), 42);
+    // the new object should now live on the target locality
+    HPX_TEST_EQ(t1.call(), target);
+    HPX_TEST_EQ(t1.get_data(), 42);
 
-        // remember the original id for later resurrection
-        oldid = hpx::id_type(t1.get_id().get_gid(), t);
-
-        try {
-            // migrate of t1 to the target storage
-            test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
-        }
-        catch (hpx::exception const&) {
-            return false;
-        }
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
-
-        // make sure all local references go out of scope if t == unmanaged
-    }
-
-    HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
-
-    {
-        test_client t1(hpx::components::migrate_from_storage<test_server>(
-            oldid, target));
-
-        // the id of the newly resurrected object should be the same as the old id
-        HPX_TEST_EQ(oldid, t1.get_id());
-        HPX_TEST_EQ(t1.get_data(), 42);
-
-        // the new object should now live on the target locality
-        HPX_TEST_EQ(t1.call(), target);
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
-    }
-
-    return true;
+    HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool test_migrate_busy_component_to_storage(hpx::id_type const& source,
+hpx::id_type test_migrate_busy_component_to_storage(hpx::id_type const& source,
     hpx::components::component_storage storage, hpx::id_type::management_type t)
 {
-    hpx::id_type oldid;
+    // create component on given locality
+    test_client t1 = hpx::new_<test_client>(source, 42);
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
-    {
-        // create component on given locality
-        test_client t1 = hpx::new_<test_client>(source, 42);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    // the new object should live on the source locality
+    HPX_TEST_EQ(t1.call(), source);
+    HPX_TEST_EQ(t1.get_data(), 42);
 
-        // the new object should live on the source locality
-        HPX_TEST_EQ(t1.call(), source);
-        HPX_TEST_EQ(t1.get_data(), 42);
+    // remember the original id for later resurrection
+    hpx::id_type oldid = hpx::id_type(t1.get_id().get_gid(), t);
 
-        // remember the original id for later resurrection
-        oldid = hpx::id_type(t1.get_id().get_gid(), t);
+    // add some concurrent busy work
+    hpx::future<void> busy_work = t1.busy_work();
 
-        // add some concurrent busy work
-        hpx::future<void> busy_work = t1.busy_work();
-
-        try {
-            // migrate of t1 to the target storage
-            test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
-        }
-        catch (hpx::exception const&) {
-            return false;
-        }
-
-        // the busy work should be finished by now, wait anyways
-        busy_work.wait();
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
-
-        // make sure all local references go out of scope if t == unmanaged
+    try {
+        // migrate of t1 to the target storage
+        test_client t2(hpx::components::migrate_to_storage(t1, storage));
+        HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
     }
+    catch (hpx::exception const&) {
+        return hpx::invalid_id;
+    }
+
+    // the busy work should be finished by now, wait anyways
+    busy_work.wait();
 
     HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
 
-    {
-        test_client t1(hpx::components::migrate_from_storage<test_server>(oldid));
-
-        // the id of the newly resurrected object should be the same as the old id
-        HPX_TEST_EQ(oldid, t1.get_id());
-
-        // the new object should live on the (original) source locality
-        HPX_TEST_EQ(t1.call(), source);
-        HPX_TEST_EQ(t1.get_data(), 42);
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
-    }
-
-    return true;
-}
-
-bool test_migrate_busy_component_to_storage(hpx::id_type const& source,
-    hpx::id_type const& target, hpx::components::component_storage storage,
-    hpx::id_type::management_type t)
-{
-    hpx::id_type oldid;
-
-    {
-        // create component on given locality
-        test_client t1 = hpx::new_<test_client>(source, 42);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
-
-        // the new object should live on the source locality
-        HPX_TEST_EQ(t1.call(), source);
-        HPX_TEST_EQ(t1.get_data(), 42);
-
-        // remember the original id for later resurrection
-        oldid = hpx::id_type(t1.get_id().get_gid(), t);
-
-        // add some concurrent busy work
-        hpx::future<void> busy_work = t1.busy_work();
-
-        try {
-            // migrate of t1 to the target storage
-            test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
-        }
-        catch (hpx::exception const&) {
-            return false;
-        }
-
-        // the busy work should be finished by now, wait anyways
-        busy_work.wait();
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
-
-        // make sure all local references go out of scope if t == unmanaged
-    }
-
-    HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
-
-    {
-        test_client t1(hpx::components::migrate_from_storage<test_server>(
-            oldid, target));
-
-        // the id of the newly resurrected object should be the same as the old id
-        HPX_TEST_EQ(oldid, t1.get_id());
-        HPX_TEST_EQ(t1.get_data(), 42);
-
-        // the new object should now live on the target locality
-        HPX_TEST_EQ(t1.call(), target);
-
-        HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
-    }
-
-    return true;
+    return oldid;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -371,71 +236,156 @@ bool test_migrate_busy_component_to_storage(hpx::id_type const& source,
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_storage(hpx::id_type const& here, hpx::id_type const& there)
+void test_in_memory_storage(hpx::id_type const& storage_locality,
+    hpx::id_type const& here, hpx::id_type const& there,
+    hpx::id_type::management_type t)
 {
     // create a new storage instance
-    hpx::components::component_storage storage(here);
+    hpx::components::component_storage storage(storage_locality);
     HPX_TEST_NEQ(hpx::naming::invalid_id, storage.get_id());
 
+    hpx::id_type oldid = test_migrate_component_to_storage(here, storage, t);
+    HPX_TEST_NEQ(hpx::invalid_id, oldid);
+
+    HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
+    test_migrate_component_from_storage(oldid, storage, there);
+    HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
+}
+
+void test_in_memory_storage(hpx::id_type const& storage_locality,
+    hpx::id_type const& here, hpx::id_type const& there)
+{
+    test_in_memory_storage(storage_locality, here, there,
+        hpx::id_type::unmanaged);
+    test_in_memory_storage(storage_locality, here, there,
+        hpx::id_type::managed);
+}
+
+void test_in_memory_storage()
+{
+    hpx::id_type here = hpx::find_here();
+    test_in_memory_storage(here, here, here);
+
+    for (hpx::id_type const& id: hpx::find_remote_localities())
     {
-        HPX_TEST(test_migrate_component_to_storage(here, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_component_to_storage(here, storage,
-            hpx::id_type::managed));
+        test_in_memory_storage(here, here, id);
+        test_in_memory_storage(here, id, here);
+        test_in_memory_storage(here, id, id);
 
-        HPX_TEST(test_migrate_component_to_storage(there, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_component_to_storage(there, storage,
-            hpx::id_type::managed));
+        test_in_memory_storage(id, here, here);
+        test_in_memory_storage(id, here, id);
+        test_in_memory_storage(id, id, here);
+        test_in_memory_storage(id, id, id);
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void test_in_memory_storage_busy(hpx::id_type const& storage_locality,
+    hpx::id_type const& here, hpx::id_type const& there,
+    hpx::id_type::management_type t)
+{
+    // create a new storage instance
+    hpx::components::component_storage storage(storage_locality);
+    HPX_TEST_NEQ(hpx::naming::invalid_id, storage.get_id());
+
+    hpx::id_type oldid =
+        test_migrate_busy_component_to_storage(here, storage, t);
+    HPX_TEST_NEQ(hpx::invalid_id, oldid);
+
+    HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
+    test_migrate_component_from_storage(oldid, storage, there);
+    HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
+}
+
+void test_in_memory_storage_busy(hpx::id_type const& storage_locality,
+    hpx::id_type const& here, hpx::id_type const& there)
+{
+    test_in_memory_storage_busy(storage_locality, here, there,
+        hpx::id_type::unmanaged);
+    test_in_memory_storage_busy(storage_locality, here, there,
+        hpx::id_type::managed);
+}
+
+void test_in_memory_storage_busy()
+{
+    hpx::id_type here = hpx::find_here();
+    test_in_memory_storage_busy(here, here, here);
+
+    for (hpx::id_type const& id: hpx::find_remote_localities())
     {
-        HPX_TEST(test_migrate_component_to_storage(here, there, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_component_to_storage(here, there, storage,
-            hpx::id_type::managed));
+        test_in_memory_storage_busy(here, here, id);
+        test_in_memory_storage_busy(here, id, here);
+        test_in_memory_storage_busy(here, id, id);
 
-        HPX_TEST(test_migrate_component_to_storage(there, here, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_component_to_storage(there, here, storage,
-            hpx::id_type::managed));
+        test_in_memory_storage_busy(id, here, here);
+        test_in_memory_storage_busy(id, here, id);
+        test_in_memory_storage_busy(id, id, here);
+        test_in_memory_storage_busy(id, id, id);
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void test_file_storage(hpx::id_type const& storage_locality,
+    hpx::id_type const& here, hpx::id_type const& there,
+    hpx::id_type::management_type t)
+{
+    hpx::id_type oldid;
+
     {
-        HPX_TEST(test_migrate_busy_component_to_storage(here, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_busy_component_to_storage(here, storage,
-            hpx::id_type::managed));
+        // create a new storage instance
+        hpx::components::component_storage storage(storage_locality);
+        HPX_TEST_NEQ(hpx::naming::invalid_id, storage.get_id());
 
-        HPX_TEST(test_migrate_busy_component_to_storage(there, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_busy_component_to_storage(there, storage,
-            hpx::id_type::managed));
+        oldid = test_migrate_component_to_storage(here, storage, t);
+        HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
+
+        storage.write_to_disk_sync("test.migrate_to_disk");
     }
+
     {
-        HPX_TEST(test_migrate_busy_component_to_storage(here, there, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_busy_component_to_storage(here, there, storage,
-            hpx::id_type::managed));
+        // create a new storage instance
+        hpx::components::component_storage storage(storage_locality);
+        HPX_TEST_NEQ(hpx::naming::invalid_id, storage.get_id());
 
-        HPX_TEST(test_migrate_busy_component_to_storage(there, here, storage,
-            hpx::id_type::unmanaged));
-        HPX_TEST(test_migrate_busy_component_to_storage(there, here, storage,
-            hpx::id_type::managed));
+        storage.read_from_disk_sync("test.migrate_to_disk");
+        HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
+
+        test_migrate_component_from_storage(oldid, storage, there);
+        HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
     }
+}
 
-// transparent resurrection is not implemented yet
-//     HPX_TEST(test_migrate_component_from_storage(here, storage));
+void test_file_storage(hpx::id_type const& storage_locality,
+    hpx::id_type const& here, hpx::id_type const& there)
+{
+    test_file_storage(storage_locality, here, there, hpx::id_type::unmanaged);
+    test_file_storage(storage_locality, here, there, hpx::id_type::managed);
+}
+
+void test_file_storage()
+{
+    hpx::id_type here = hpx::find_here();
+    test_file_storage(here, here, here);
+
+    for (hpx::id_type const& id: hpx::find_remote_localities())
+    {
+        test_file_storage(here, here, id);
+        test_file_storage(here, id, here);
+        test_file_storage(here, id, id);
+
+        test_file_storage(id, here, here);
+        test_file_storage(id, here, id);
+        test_file_storage(id, id, here);
+        test_file_storage(id, id, id);
+    }
 }
 
 int main()
 {
-    test_storage(hpx::find_here(), hpx::find_here());
+    test_in_memory_storage();
+    test_in_memory_storage_busy();
 
-    for (hpx::id_type const& id: hpx::find_remote_localities())
-    {
-        test_storage(hpx::find_here(), id);
-        test_storage(id, hpx::find_here());
-        test_storage(id, id);
-    }
+    test_file_storage();
 
     return hpx::util::report_errors();
 }
