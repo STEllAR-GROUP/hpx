@@ -767,9 +767,9 @@ namespace hpx
         ///
         /// \return This returns the data of the partition_vector
         ///
-        auto set_data_sync(typename server_type::data_type && other) const
+        void set_data_sync(typename server_type::data_type && other) const
         {
-            return set_data(std::forward<data_type>(other)).get();
+            set_data(std::forward<typename server_type::data_type>(other)).get();
         }
 
         /// Updates the data owned by the partition_vector
@@ -777,11 +777,11 @@ namespace hpx
         ///
         /// \return This returns the hpx::future of type void
         ///
-        auto set_data(typename server_type::data_type && other) const
+        hpx::future<void> set_data(typename server_type::data_type && other) const
         {
             HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::set_data_action>(
-                this->get_id(), std::forward<data_type>(other) );
+                this->get_id(), std::forward<typename server_type::data_type>(other) );
         }
    };
 }
