@@ -102,7 +102,8 @@ namespace hpx { namespace server
             if (this != &rhs)
             {
                 this->base_type::operator=(std::move(rhs));
-                partitioned_vector_partition_ = std::move(rhs.partitioned_vector_partition_);
+                partitioned_vector_partition_ =
+                    std::move(rhs.partitioned_vector_partition_);
             }
             return *this;
         }
@@ -194,11 +195,13 @@ namespace hpx { namespace server
         /// Request the change in partitioned_vector_partition capacity so that it
         /// can hold \a n elements.
         ///
-        /// This function request partitioned_vector_partition capacity should be at least
-        /// enough to contain n elements. If n is greater than current
-        /// partitioned_vector_partition capacity, the function causes the partitioned_vector_partition to
+        /// This function request partitioned_vector_partition capacity should
+        /// be at least enough to contain n elements. If n is greater than current
+        /// partitioned_vector_partition capacity, the function causes the
+        /// partitioned_vector_partition to
         /// reallocate its storage increasing its capacity to n (or greater).
-        /// In other cases the partitioned_vector_partition capacity does not got affected.
+        /// In other cases the partitioned_vector_partition capacity does not
+        /// got affected.
         /// It does not change the partitioned_vector_partition size.
         ///
         /// \param n minimum capacity of partitioned_vector_partition
@@ -213,8 +216,8 @@ namespace hpx { namespace server
         // Element access API's
         ///////////////////////////////////////////////////////////////////////
 
-        /// Return the element at the position \a pos in the partitioned_vector_partition
-        /// container.
+        /// Return the element at the position \a pos in the
+        /// partitioned_vector_partition container.
         ///
         /// \param pos Position of the element in the partitioned_vector_partition
         ///
@@ -226,10 +229,11 @@ namespace hpx { namespace server
             return partitioned_vector_partition_[pos];
         }
 
-        /// Return the element at the position \a pos in the partitioned_vector_partition
-        /// container.
+        /// Return the element at the position \a pos in the
+        /// partitioned_vector_partition container.
         ///
-        /// \param pos Positions of the elements in the partitioned_vector_partition
+        /// \param pos Positions of the elements in the
+        ///            partitioned_vector_partition
         ///
         /// \return Return the values of the elements at position represented
         ///         by \a pos.
@@ -246,22 +250,24 @@ namespace hpx { namespace server
         }
 
 
-        /// \brief Access the value of first element in the partitioned_vector_partition.
+        /// Access the value of first element in the partitioned_vector_partition.
         ///
         /// Calling the function on empty container cause undefined behavior.
         ///
-        /// \return Return the value of the first element in the partitioned_vector_partition
+        /// \return Return the value of the first element in the
+        ///         partitioned_vector_partition
         ///
         T front() const
         {
             return partitioned_vector_partition_.front();
         }
 
-        /// \brief Access the value of last element in the partitioned_vector_partition.
+        /// Access the value of last element in the partitioned_vector_partition.
         ///
         /// Calling the function on empty container cause undefined behavior.
         ///
-        /// \return Return the value of the last element in the partitioned_vector_partition
+        /// \return Return the value of the last element in the
+        ///         partitioned_vector_partition
         ///
         T back() const
         {
@@ -272,8 +278,8 @@ namespace hpx { namespace server
         // Modifiers API's in server class
         ///////////////////////////////////////////////////////////////////////
 
-        /// Assigns new contents to the partitioned_vector_partition, replacing its
-        /// current contents and modifying its size accordingly.
+        /// Assigns new contents to the partitioned_vector_partition, replacing
+        /// its current contents and modifying its size accordingly.
         ///
         /// \param n     new size of partitioned_vector_partition
         /// \param val   Value to fill the container with
@@ -307,7 +313,8 @@ namespace hpx { namespace server
         /// Copy the value of \a val in the element at position \a pos in the
         /// partitioned_vector_partition container.
         ///
-        /// \param pos   Position of the element in the partitioned_vector_partition
+        /// \param pos   Position of the element in the
+        ///              partitioned_vector_partition
         ///
         /// \param val   The value to be copied
         ///
@@ -319,7 +326,8 @@ namespace hpx { namespace server
         /// Copy the value of \a val for the elements at positions \a pos in
         /// the partitioned_vector_partition container.
         ///
-        /// \param pos   Positions of the elements in the partitioned_vector_partition
+        /// \param pos   Positions of the elements in the
+        ///              partitioned_vector_partition
         ///
         /// \param val   The value to be copied
         ///
@@ -482,7 +490,8 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         //  Capacity related API's in partitioned_vector_partition client class
 
-        /// Asynchronously return the size of the partitioned_vector_partition component.
+        /// Asynchronously return the size of the partitioned_vector_partition
+        /// component.
         ///
         /// \return This returns size as the hpx::future of type size_type
         ///
@@ -511,8 +520,8 @@ namespace hpx
 //             return max_size_async().get();
 //         }
 
-        /// \brief Resize the partitioned_vector_partition component. If the \a val is not
-        ///         it use default constructor instead.
+        /// Resize the partitioned_vector_partition component.
+        /// If the \a val is not specified it use default constructor instead.
         ///
         /// \param n    New size of the partitioned_vector_partition
         /// \param val  Value to be copied if \a n is greater than the current
@@ -523,8 +532,8 @@ namespace hpx
             return resize_async(n, val).get();
         }
 
-        /// \brief Resize the partitioned_vector_partition component. If the \a val is not
-        ///         it use default constructor instead.
+        /// Resize the partitioned_vector_partition component.
+        /// If the \a val is not specified it use default constructor instead.
         ///
         /// \param n    New size of the partitioned_vector_partition
         /// \param val  Value to be copied if \a n is greater than the current

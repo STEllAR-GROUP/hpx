@@ -1341,20 +1341,20 @@ namespace hpx
             return set_value(pos, val).get();
         }
 
-//             //CLEAR
-//             //TODO if number of partitions is kept constant every time then
-//             // clear should modified (clear each partitioned_vector_partition one by one).
-// //            void clear()
-// //            {
-// //                //It is keeping one gid hence iterator does not go
-// //                //in an invalid state
-// //                partitions_.erase(partitions_.begin() + 1,
-// //                                           partitions_.end()-1);
-// //                partitioned_vector_partition_stub::clear_async((partitions_[0].second).get())
-// //                        .get();
-// //                HPX_ASSERT(partitions_.size() > 1);
-// //                //As this function changes the size we should have LAST always.
-// //            }
+//   //CLEAR
+//   //TODO if number of partitions is kept constant every time then
+//   // clear should modified (clear each partitioned_vector_partition one by one).
+//     void clear()
+//     {
+//         //It is keeping one gid hence iterator does not go
+//         //in an invalid state
+//         partitions_.erase(partitions_.begin() + 1,
+//                                    partitions_.end()-1);
+//         partitioned_vector_partition_stub::clear_async((partitions_[0].second).get())
+//                 .get();
+//         HPX_ASSERT(partitions_.size() > 1);
+//         //As this function changes the size we should have LAST always.
+//     }
 
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first segment located
