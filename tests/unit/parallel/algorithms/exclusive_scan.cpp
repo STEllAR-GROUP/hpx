@@ -14,6 +14,40 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+void exclusive_scan_benchmark()
+{
+    try {
+      std::vector<double> c(100000000);
+      std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+
+      double const val(0);
+      auto op =
+          [val](double v1, double v2) {
+              return v1 + v2;
+          };
+
+      hpx::util::high_resolution_timer t;
+      hpx::parallel::inclusive_scan(hpx::parallel::par,
+          boost::begin(c), boost::end(c), boost::begin(c),
+          val, op);
+      double elapsed = t.elapsed();
+
+      // verify values
+      std::vector<double> e(c.size());
+      hpx::parallel::v1::detail::sequential_exclusive_scan(
+          boost::begin(c), boost::end(c), boost::begin(e), val, op);
+
+      bool ok = std::equal(boost::begin(c), boost::end(c), boost::begin(e));
+      HPX_TEST(ok);
+      if (ok) {
+          std::cout << "<DartMeasurement name=\"ExclusiveScanTime\" \n"
+              << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+      }
+    }
+    catch (...) {}
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_exclusive_scan1(ExPolicy policy, IteratorTag)
 {
@@ -113,7 +147,16 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    exclusive_scan_test1();
+    // if benchmark is requested we run it even in debug mode
+    if (vm.count("benchmark")) {
+        exclusive_scan_benchmark();
+    }
+    else {
+        exclusive_scan_test1();
+#ifndef HPX_DEBUG
+        exclusive_scan_benchmark();
+#endif
+    }
 
   return hpx::finalize();
 }
