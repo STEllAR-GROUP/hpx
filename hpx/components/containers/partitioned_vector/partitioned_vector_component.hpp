@@ -124,7 +124,7 @@ namespace hpx { namespace server
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void set_data(data_type other)
+        void set_data(data_type && other)
         {
             partition_vector_ = other;
         }
@@ -781,7 +781,7 @@ namespace hpx
         {
             HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::set_data_action>(
-                this->get_id(), std::forward<typename server_type::data_type>(other) );
+                this->get_id(), std::move(other) );
         }
    };
 }
