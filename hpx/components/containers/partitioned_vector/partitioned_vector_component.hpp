@@ -126,7 +126,7 @@ namespace hpx { namespace server
         ///////////////////////////////////////////////////////////////////////
         void set_data(data_type && other)
         {
-            partition_vector_ = other;
+            partition_vector_ = std::move(other);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -769,7 +769,7 @@ namespace hpx
         ///
         void set_data_sync(typename server_type::data_type && other) const
         {
-            set_data(std::forward<typename server_type::data_type>(other)).get();
+            set_data(std::move(other)).get();
         }
 
         /// Updates the data owned by the partition_vector
