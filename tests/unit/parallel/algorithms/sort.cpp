@@ -18,25 +18,28 @@
 // this function times a sort and outputs the time for cDash to plot it
 void sort_benchmark()
 {
-    using namespace hpx::parallel;
-    // Fill vector with random values
-    std::vector<double> c(HPX_SORT_TEST_SIZE << 4);
-    rnd_fill<double>(c, (std::numeric_limits<double>::min)(),
-        (std::numeric_limits<double>::max)(), double(std::rand()));
+    try {
+        using namespace hpx::parallel;
+        // Fill vector with random values
+        std::vector<double> c(HPX_SORT_TEST_SIZE << 4);
+        rnd_fill<double>(c, (std::numeric_limits<double>::min)(),
+            (std::numeric_limits<double>::max)(), double(std::rand()));
 
-    hpx::util::high_resolution_timer t;
-    // sort, blocking when seq, par, par_vec
-    hpx::parallel::sort(par, c.begin(), c.end());
-    double elapsed = t.elapsed();
+        hpx::util::high_resolution_timer t;
+        // sort, blocking when seq, par, par_vec
+        hpx::parallel::sort(par, c.begin(), c.end());
+        double elapsed = t.elapsed();
 
-    bool is_sorted = (verify(c, std::less<double>(), elapsed, true)!=0);
-    HPX_TEST(is_sorted);
-    if (is_sorted) {
-        std::cout << "<DartMeasurement name=\"SortDoublesTime\" \n"
-            << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+        bool is_sorted = (verify(c, std::less<double>(), elapsed, true)!=0);
+        HPX_TEST(is_sorted);
+        if (is_sorted) {
+            std::cout << "<DartMeasurement name=\"SortDoublesTime\" \n"
+                << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+        }
     }
-
+    catch (...) {}
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 void test_sort1()
 {
@@ -152,13 +155,16 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
+    // if benchmark is requested we run it even in debug mode
     if (vm.count("benchmark")) {
         sort_benchmark();
     }
     else {
         test_sort1();
         test_sort2();
+#ifndef HPX_DEBUG
         sort_benchmark();
+#endif
     }
     return hpx::finalize();
 }
