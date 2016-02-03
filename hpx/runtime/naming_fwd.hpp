@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,7 @@ namespace hpx
         typedef agas::addressing_service resolver_client;
 
         struct HPX_EXPORT gid_type;
+
         // NOTE: We do not export the symbol here as id_type was already
         //       exported and generates a warning on gcc otherwise.
         struct id_type;
