@@ -546,6 +546,20 @@ namespace hpx { namespace naming
             return id;
         }
 
+        inline boost::uint64_t strip_internal_bits_except_dont_cache_from_gid(
+            boost::uint64_t msb)
+        {
+            return msb & ~(gid_type::credit_bits_mask | gid_type::is_locked_mask);
+        }
+
+        inline gid_type& strip_internal_bits_except_dont_cache_from_gid(
+            gid_type& id)
+        {
+            id.set_msb(
+                strip_internal_bits_except_dont_cache_from_gid(id.get_msb()));
+            return id;
+        }
+
         inline boost::uint64_t get_internal_bits(boost::uint64_t msb)
         {
             return msb & gid_type::internal_bits_mask;
@@ -580,6 +594,17 @@ namespace hpx { namespace naming
         inline gid_type get_stripped_gid(gid_type const& id)
         {
             boost::uint64_t const msb = strip_internal_bits_from_gid(id.get_msb());
+            boost::uint64_t const lsb = id.get_lsb();
+            return gid_type(msb, lsb);
+        }
+
+        inline gid_type get_stripped_gid_except_dont_cache(gid_type const& id)
+            HPX_PURE;
+
+        inline gid_type get_stripped_gid_except_dont_cache(gid_type const& id)
+        {
+            boost::uint64_t const msb =
+                strip_internal_bits_except_dont_cache_from_gid(id.get_msb());
             boost::uint64_t const lsb = id.get_lsb();
             return gid_type(msb, lsb);
         }

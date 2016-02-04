@@ -1107,7 +1107,7 @@ bool addressing_service::bind_range_local(
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        if(range_caching_)
+        if (range_caching_)
         {
             // Put the range into the cache.
             update_cache_entry(lower_id, g, ec);
@@ -1173,7 +1173,10 @@ hpx::future<bool> addressing_service::bind_range_async(
         stubs::primary_namespace::get_service_instance(lower_id)
       , naming::id_type::unmanaged);
 
-    request req(primary_ns_bind_gid, lower_id, g, locality);
+    naming::gid_type id(
+        naming::detail::get_stripped_gid_except_dont_cache(lower_id));
+
+    request req(primary_ns_bind_gid, id, g, locality);
     response rep;
 
     using util::placeholders::_1;
@@ -1182,7 +1185,7 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     return f.then(util::bind(
             util::one_shot(&addressing_service::bind_postproc),
-            this, _1, lower_id, g
+            this, _1, id, g
         ));
 }
 
@@ -1191,7 +1194,8 @@ hpx::future<naming::address> addressing_service::unbind_range_async(
   , boost::uint64_t count
     )
 {
-    agas::request req(primary_ns_unbind_gid, lower_id, count);
+    agas::request req(primary_ns_unbind_gid,
+        naming::detail::get_stripped_gid(lower_id), count);
     naming::id_type service_target(
         agas::stubs::primary_namespace::get_service_instance(lower_id)
       , naming::id_type::unmanaged);
@@ -1275,12 +1279,14 @@ bool addressing_service::unbind_range_local(
 // }
 
 bool addressing_service::is_local_address_cached(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec
     )
 {
     // Assume non-local operation if the gid is known to have been migrated
+    naming::gid_type id(naming::detail::get_stripped_gid_except_dont_cache(gid));
+
     {
         boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
         if (was_object_migrated_locked(id))
@@ -1503,22 +1509,25 @@ bool addressing_service::resolve_full_local(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if (addr.address_)
+        if (naming::detail::store_in_cache(id))
         {
-            if(range_caching_)
+            if (addr.address_)
             {
-                // Put the range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
+                if(range_caching_)
+                {
+                    // Put the range into the cache.
+                    update_cache_entry(base_gid, base_gva, ec);
+                }
+                else
+                {
+                    // Put the fully resolved gva into the cache.
+                    update_cache_entry(id, g, ec);
+                }
             }
             else
             {
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(id, g, ec);
+                remove_cache_entry(id, ec);
             }
-        }
-        else
-        {
-            remove_cache_entry(id, ec);
         }
 
         if (ec)
@@ -1536,11 +1545,13 @@ bool addressing_service::resolve_full_local(
 } // }}}
 
 bool addressing_service::resolve_cached(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec
     )
 { // {{{ resolve_cached implementation
+
+    naming::gid_type id = naming::detail::get_stripped_gid(gid);
 
     // special cases
     if (resolve_locally_known_addresses(id, addr))
@@ -1716,15 +1727,18 @@ naming::address addressing_service::resolve_full_postproc(
     addr.type_ = g.type;
     addr.address_ = g.lva();
 
-    if(range_caching_)
+    if (naming::detail::store_in_cache(id))
     {
-        // Put the range into the cache.
-        update_cache_entry(base_gid, base_gva);
-    }
-    else
-    {
-        // Put the fully resolved gva into the cache.
-        update_cache_entry(id, g);
+        if (range_caching_)
+        {
+            // Put the range into the cache.
+            update_cache_entry(base_gid, base_gva);
+        }
+        else
+        {
+            // Put the fully resolved gva into the cache.
+            update_cache_entry(id, g);
+        }
     }
 
     return addr;
@@ -1824,15 +1838,18 @@ bool addressing_service::resolve_full_local(
             addr.type_ = g.type;
             addr.address_ = g.lva();
 
-            if(range_caching_)
+            if (naming::detail::store_in_cache(gids[i]))
             {
-                // Put the range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
-            }
-            else
-            {
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(gids[i], g, ec);
+                if (range_caching_)
+                {
+                    // Put the range into the cache.
+                    update_cache_entry(base_gid, base_gva, ec);
+                }
+                else
+                {
+                    // Put the fully resolved gva into the cache.
+                    update_cache_entry(gids[i], g, ec);
+                }
             }
 
             if (ec)
@@ -1959,11 +1976,13 @@ boost::int64_t addressing_service::synchronize_with_async_incref(
 }
 
 lcos::future<boost::int64_t> addressing_service::incref_async(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , boost::int64_t credit
   , naming::id_type const& keep_alive
     )
 { // {{{ incref implementation
+    naming::gid_type raw(naming::detail::get_stripped_gid(id));
+
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -1974,7 +1993,7 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
           , naming::id_type const&
         ) = &addressing_service::incref_async;
 
-        return async(incref_async_ptr, this, gid, credit, keep_alive);
+        return async(incref_async_ptr, this, raw, credit, keep_alive);
     }
 
     if (HPX_UNLIKELY(0 >= credit))
@@ -2007,8 +2026,6 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         boost::lock_guard<mutex_type> l(refcnt_requests_mtx_);
 
         typedef refcnt_requests_type::iterator iterator;
-
-        naming::gid_type raw = naming::detail::get_stripped_gid(gid);
 
         iterator matches = refcnt_requests_->find(raw);
         if (matches != refcnt_requests_->end())
@@ -2075,11 +2092,13 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::decref(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ decref implementation
+    naming::gid_type gid(naming::detail::get_stripped_gid(id));
+
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -2151,7 +2170,7 @@ bool addressing_service::register_name(
     )
 { // {{{
     try {
-        request req(symbol_ns_bind, name, id);
+        request req(symbol_ns_bind, name, naming::detail::get_stripped_gid(id));
         response rep;
 
         if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
@@ -2268,8 +2287,7 @@ bool addressing_service::resolve_name(
             return true;
         }
 
-        else
-            return false;
+        return false;
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_name");
@@ -2382,12 +2400,11 @@ bool addressing_service::iterate_ids(
 } // }}}
 
 void addressing_service::insert_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , gva const& g
   , error_code& ec
     )
 { // {{{
-
     // If caching is disabled, we silently pretend success.
     if (!caching_)
     {
@@ -2397,12 +2414,14 @@ void addressing_service::insert_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cacheable
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -2470,7 +2489,7 @@ bool check_for_collisions(
 }
 
 void addressing_service::update_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , gva const& g
   , error_code& ec
     )
@@ -2484,12 +2503,14 @@ void addressing_service::update_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cache-able
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -2576,7 +2597,7 @@ void addressing_service::clear_cache(
 } // }}}
 
 void addressing_service::remove_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , error_code& ec
     )
 {
@@ -2589,12 +2610,14 @@ void addressing_service::remove_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cache-able
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -3301,7 +3324,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
             migrated_objects_table_.insert(gid);
 
         // remove entry from cache
-        if (caching_ && naming::detail::store_in_cache(gid))
+        if (caching_ && naming::detail::store_in_cache(gid_))
         {
             gva_cache_->erase(
                 [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
@@ -3339,7 +3362,7 @@ void addressing_service::unmark_as_migrated(
         migrated_objects_table_.erase(it);
 
         // remove entry from cache
-        if (caching_ && naming::detail::store_in_cache(gid))
+        if (caching_ && naming::detail::store_in_cache(gid_))
         {
             gva_cache_->erase(
                 [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
