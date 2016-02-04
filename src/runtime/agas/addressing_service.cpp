@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -39,7 +40,6 @@
 
 namespace hpx { namespace agas
 {
-
 struct addressing_service::bootstrap_data_type
 { // {{{
     bootstrap_data_type()
@@ -166,6 +166,10 @@ struct addressing_service::gva_cache_key
       , gva_cache_key const& rhs
         )
     {
+        // Direct hit
+        if(lhs.key_ == rhs.key_)
+            return true;
+
         // Is lhs in rhs?
         if (1 == lhs.get_count() && 1 != rhs.get_count())
             return boost::icl::contains(rhs.key_, lhs.key_);
@@ -174,32 +178,8 @@ struct addressing_service::gva_cache_key
         else if (1 != lhs.get_count() && 1 == rhs.get_count())
             return boost::icl::contains(lhs.key_, rhs.key_);
 
-        // Direct hit
-        return lhs.key_ == rhs.key_;
+        return false;
     }
-}; // }}}
-
-struct addressing_service::gva_erase_policy
-{ // {{{ gva_erase_policy implementation
-    gva_erase_policy(
-        naming::gid_type const& id
-      , boost::uint64_t count
-        )
-      : entry(id, count)
-    {}
-
-    typedef std::pair<
-        gva_cache_key, boost::cache::entries::lfu_entry<gva>
-    > entry_type;
-
-    bool operator()(
-        entry_type const& p
-        ) const
-    {
-        return p.first == entry;
-    }
-
-    gva_cache_key entry;
 }; // }}}
 
 addressing_service::addressing_service(
@@ -406,25 +386,19 @@ void addressing_service::launch_hosted()
     hosted = boost::make_shared<hosted_data_type>();
 }
 
-void addressing_service::adjust_local_cache_size()
+void addressing_service::adjust_local_cache_size(std::size_t cache_size)
 { // {{{
-    // adjust the local AGAS cache size for the number of connected localities
+    // adjust the local AGAS cache size for the number of worker threads and
+    // create the hierarchy based on the topology
     if (caching_)
     {
-        util::runtime_configuration const& cfg = get_runtime().get_config();
-        std::size_t local_cache_size = cfg.get_agas_local_cache_size();
-        std::size_t local_cache_size_per_thread =
-            cfg.get_agas_local_cache_size_per_thread();
-
-        std::size_t cache_size = (std::max)(local_cache_size,
-                local_cache_size_per_thread * std::size_t(get_num_overall_threads()));
-        if (cache_size > gva_cache_->capacity())
-            gva_cache_->reserve(cache_size);
+        std::size_t previous = gva_cache_->size();
+        gva_cache_->reserve(cache_size);
 
         LAGAS_(info) << (boost::format(
-            "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
-            "local_cache_size_per_thread(%2%), cache_size(%3%)")
-            % local_cache_size % local_cache_size_per_thread % cache_size);
+            "addressing_service::adjust_local_cache_size, previous size: %1%, "
+            "new size: %3%")
+            % previous % cache_size);
     }
 } // }}}
 
@@ -1217,12 +1191,6 @@ bool addressing_service::unbind_range_local(
         if (ec || (success != rep.get_status()))
             return false;
 
-        // I'm afraid that this will break the first form of paged caching,
-        // so it's commented out for now.
-        //boost::lock_guard<cache_mutex_type> lock(hosted->gva_cache_mtx_);
-        //gva_erase_policy ep(lower_id, count);
-        //hosted->gva_cache_->erase(ep);
-
         gva const& gaddr = rep.get_gva();
         addr.locality_ = gaddr.prefix;
         addr.type_ = gaddr.type;
@@ -1475,22 +1443,17 @@ bool addressing_service::resolve_full_local(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if (addr.address_)
+        HPX_ASSERT(addr.address_);
+
+        if(range_caching_)
         {
-            if(range_caching_)
-            {
-                // Put the range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
-            }
-            else
-            {
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(id, g, ec);
-            }
+            // Put the range into the cache.
+            update_cache_entry(base_gid, base_gva, ec);
         }
         else
         {
-            remove_cache_entry(id, ec);
+            // Put the fully resolved gva into the cache.
+            update_cache_entry(id, g, ec);
         }
 
         if (ec)
@@ -1543,42 +1506,25 @@ bool addressing_service::resolve_cached(
         return false;
     }
 
-    // first look up the requested item in the cache
-    gva_cache_key k(id);
-    gva_cache_key idbase;
-    gva_cache_type::entry_type e;
-
-    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-
     // force routing if target object was migrated
-    if (was_object_migrated_locked(id))
     {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return false;
-    }
-
-    // Check if the entry is currently in the cache
-    if (gva_cache_->get_entry(k, idbase, e))
-    {
-        const boost::uint64_t id_msb =
-            naming::detail::strip_internal_bits_from_gid(id.get_msb());
-
-        if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
+        boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
+        if (was_object_migrated_locked(id))
         {
-            HPX_THROWS_IF(ec, internal_server_error
-              , "addressing_service::resolve_cached"
-              , "bad entry in cache, MSBs of GID base and GID do not match");
+            if (&ec != &throws)
+                ec = make_success_code();
             return false;
         }
+    }
 
-        gva const& g = e.get();
-
+    // first look up the requested item in the cache
+    gva g;
+    naming::gid_type idbase;
+    if (get_cache_entry(id, g, idbase, ec))
+    {
         addr.locality_ = g.prefix;
         addr.type_ = g.type;
-        addr.address_ = g.lva(id, idbase.get_gid());
-
-        lock.unlock();
+        addr.address_ = g.lva(id, idbase);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -2340,83 +2286,6 @@ bool addressing_service::iterate_ids(
     }
 } // }}}
 
-void addressing_service::insert_cache_entry(
-    naming::gid_type const& gid
-  , gva const& g
-  , error_code& ec
-    )
-{ // {{{
-
-    // If caching is disabled, we silently pretend success.
-    if (!caching_)
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    // don't look at cache if id is marked as non-cacheable
-    if (!naming::detail::store_in_cache(gid))
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    // don't look at the cache if the id is locally managed
-    if (naming::get_locality_id_from_gid(gid) ==
-        naming::get_locality_id_from_gid(locality_))
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    try {
-        // The entry in AGAS for a locality's RTS component has a count of 0,
-        // so we convert it to 1 here so that the cache doesn't break.
-        const boost::uint64_t count = (g.count ? g.count : 1);
-
-        LAGAS_(debug) <<
-            ( boost::format(
-            "addressing_service::insert_cache_entry, gid(%1%), count(%2%)")
-            % gid % count);
-
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-
-        const gva_cache_key key(gid, count);
-
-        if (!gva_cache_->insert(key, g))
-        {
-            // Figure out who we collided with.
-            gva_cache_key idbase;
-            gva_cache_type::entry_type e;
-
-            if (!gva_cache_->get_entry(key, idbase, e))
-            {
-                // This is impossible under sane conditions.
-                HPX_THROWS_IF(ec, invalid_data
-                  , "addressing_service::insert_cache_entry"
-                  , "data corruption or lock error occurred in cache");
-                return;
-            }
-
-            LAGAS_(warning) <<
-                ( boost::format(
-                    "addressing_service::insert_cache_entry, "
-                    "aborting insert due to key collision in cache, "
-                    "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                ) % gid % count % idbase.get_gid() % idbase.get_count());
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::insert_cache_entry");
-    }
-} // }}}
-
 // This function has to return false if the key is already in the cache (true
 // means go ahead with the cache update).
 bool check_for_collisions(
@@ -2426,6 +2295,18 @@ bool check_for_collisions(
 {
     return (new_key.get_gid() != old_key.get_gid())
         || (new_key.get_count() != old_key.get_count());
+}
+
+void update_cache(
+    addressing_service::mutex_type& mtx
+  , addressing_service::gva_cache_type& cache
+  , addressing_service::gva_cache_key const& key
+  , gva const& g
+  , hpx::naming::gid_type const& gid
+  , boost::uint64_t count
+  , error_code& ec = hpx::throws
+    )
+{
 }
 
 void addressing_service::update_cache_entry(
@@ -2469,33 +2350,34 @@ void addressing_service::update_cache_entry(
             "addressing_service::update_cache_entry, gid(%1%), count(%2%)"
             ) % gid % count);
 
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-
         const gva_cache_key key(gid, count);
 
-        if (!gva_cache_->update_if(key, g, check_for_collisions))
         {
-            if (LAGAS_ENABLED(warning))
+            boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            if (!gva_cache_->update_if(key, g, check_for_collisions))
             {
-                // Figure out who we collided with.
-                gva_cache_key idbase;
-                gva_cache_type::entry_type e;
-
-                if (!gva_cache_->get_entry(key, idbase, e))
+                if (LAGAS_ENABLED(warning))
                 {
-                    // This is impossible under sane conditions.
-                    HPX_THROWS_IF(ec, invalid_data
-                      , "addressing_service::update_cache_entry"
-                      , "data corruption or lock error occurred in cache");
-                    return;
-                }
+                    // Figure out who we collided with.
+                    addressing_service::gva_cache_key idbase;
+                    addressing_service::gva_cache_type::entry_type e;
 
-                LAGAS_(warning) <<
-                    ( boost::format(
-                        "addressing_service::update_cache_entry, "
-                        "aborting update due to key collision in cache, "
-                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                    ) % gid % count % idbase.get_gid() % idbase.get_count());
+                    if (!gva_cache_->get_entry(key, idbase, e))
+                    {
+                        // This is impossible under sane conditions.
+                        HPX_THROWS_IF(ec, invalid_data
+                          , "addressing_service::update_cache_entry"
+                          , "data corruption or lock error occurred in cache");
+                        return;
+                    }
+
+                    LAGAS_(warning) <<
+                        ( boost::format(
+                            "addressing_service::update_cache_entry, "
+                            "aborting update due to key collision in cache, "
+                            "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
+                        ) % gid % count % idbase.get_gid() % idbase.get_count());
+                }
             }
         }
 
@@ -2506,6 +2388,38 @@ void addressing_service::update_cache_entry(
         HPX_RETHROWS_IF(ec, e, "addressing_service::update_cache_entry");
     }
 } // }}}
+
+bool addressing_service::get_cache_entry(
+    naming::gid_type const& gid
+  , gva& gva
+  , naming::gid_type& idbase
+  , error_code& ec
+    )
+{
+    gva_cache_key k(gid);
+    gva_cache_key idbase_key;
+
+    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    if(gva_cache_->get_entry(k, idbase_key, gva))
+    {
+        const boost::uint64_t id_msb =
+            naming::detail::strip_internal_bits_from_gid(gid.get_msb());
+
+        if (HPX_UNLIKELY(id_msb != idbase_key.get_gid().get_msb()))
+        {
+            lock.unlock();
+            HPX_THROWS_IF(ec, internal_server_error
+              , "addressing_service::get_cache_entry"
+              , "bad entry in cache, MSBs of GID base and GID do not match");
+            return false;
+        }
+        idbase = idbase_key.get_gid();
+        return true;
+    }
+
+    return false;
+}
+
 
 void addressing_service::clear_cache(
     error_code& ec
@@ -2522,7 +2436,7 @@ void addressing_service::clear_cache(
     try {
         LAGAS_(warning) << "addressing_service::clear_cache, clearing cache";
 
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
 
         gva_cache_->clear();
 
@@ -2533,55 +2447,6 @@ void addressing_service::clear_cache(
         HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
     }
 } // }}}
-
-void addressing_service::remove_cache_entry(
-    naming::gid_type const& gid
-  , error_code& ec
-    )
-{
-    // If caching is disabled, we silently pretend success.
-    if (!caching_)
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    // don't look at cache if id is marked as non-cache-able
-    if (!naming::detail::store_in_cache(gid))
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    // don't look at the cache if the id is locally managed
-    if (naming::get_locality_id_from_gid(gid) ==
-        naming::get_locality_id_from_gid(locality_))
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    try {
-        LAGAS_(warning) << "addressing_service::remove_cache_entry";
-
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-
-        gva_cache_->erase(
-            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
-            {
-                return gid == p.first.get_gid();
-            });
-
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
-    }
-}
 
 // Disable refcnt caching during shutdown
 void addressing_service::start_shutdown(error_code& ec)
@@ -2751,76 +2616,82 @@ bool addressing_service::retrieve_statistics_counter(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
+boost::uint64_t addressing_service::get_cache_entries(bool reset)
+{
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
+    return gva_cache_->size();
+}
+
 boost::uint64_t addressing_service::get_cache_hits(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().hits(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_misses(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().misses(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_evictions(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().evictions(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_insertions(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().insertions(reset);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t addressing_service::get_cache_get_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_count(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_insert_entry_count(bool reset)
+boost::uint64_t addressing_service::get_cache_insertion_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_count(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_update_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_count(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_erase_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_count(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_get_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_time(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_insert_entry_time(bool reset)
+boost::uint64_t addressing_service::get_cache_insertion_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_time(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_update_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_time(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_time(reset);
 }
 
@@ -2828,6 +2699,8 @@ boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 void addressing_service::register_counter_types()
 { // {{{
     // install
+    util::function_nonser<boost::int64_t(bool)> cache_entries(
+        boost::bind(&addressing_service::get_cache_entries, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_hits(
         boost::bind(&addressing_service::get_cache_hits, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_misses(
@@ -2838,25 +2711,42 @@ void addressing_service::register_counter_types()
         boost::bind(&addressing_service::get_cache_insertions, this, ::_1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_count(
-        boost::bind(&addressing_service::get_cache_get_entry_count, this, ::_1));
-    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_count(
-        boost::bind(&addressing_service::get_cache_insert_entry_count, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_get_entry_count, this, ::_1));
+    util::function_nonser<boost::int64_t(bool)> cache_insertion_count(
+        boost::bind(
+            &addressing_service::get_cache_insertion_entry_count, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_count(
-        boost::bind(&addressing_service::get_cache_update_entry_count, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_update_entry_count, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_count(
-        boost::bind(&addressing_service::get_cache_erase_entry_count, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_erase_entry_count, this, ::_1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_time(
-        boost::bind(&addressing_service::get_cache_get_entry_time, this, ::_1));
-    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_time(
-        boost::bind(&addressing_service::get_cache_insert_entry_time, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_get_entry_time, this, ::_1));
+    util::function_nonser<boost::int64_t(bool)> cache_insertion_time(
+        boost::bind(
+            &addressing_service::get_cache_insertion_entry_time, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_time(
-        boost::bind(&addressing_service::get_cache_update_entry_time, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_update_entry_time, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_time(
-        boost::bind(&addressing_service::get_cache_erase_entry_time, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_erase_entry_time, this, ::_1));
+
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {
+        { "/agas/count/cache/entries", performance_counters::counter_raw,
+          "returns the number of cache entries in the AGAS cache",
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_entries, _2),
+          &performance_counters::locality_counter_discoverer,
+          ""
+        },
         { "/agas/count/cache/hits", performance_counters::counter_raw,
           "returns the number of cache hits while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2889,7 +2779,6 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-
         { "/agas/count/cache/get_entry", performance_counters::counter_raw,
           "returns the number of invocations of get_entry function of the "
                 "AGAS cache",
@@ -2900,11 +2789,11 @@ void addressing_service::register_counter_types()
           ""
         },
         { "/agas/count/cache/insert_entry", performance_counters::counter_raw,
-          "returns the number of invocations of insert_entry function of the "
+          "returns the number of invocations of insert function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_insert_entry_count, _2),
+              _1, cache_insertion_count, _2),
           &performance_counters::locality_counter_discoverer,
           ""
         },
@@ -2926,7 +2815,6 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-
         { "/agas/time/cache/get_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the get_entry API "
                 "function of the AGAS cache",
@@ -2938,12 +2826,12 @@ void addressing_service::register_counter_types()
         },
         { "/agas/time/cache/insert_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the insert_entry API "
-              "function of the AGAS cache",
+                "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_insert_entry_time, _2),
+              _1, cache_insertion_time, _2),
           &performance_counters::locality_counter_discoverer,
-          "ns"
+          ""
         },
         { "/agas/time/cache/update_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the update_entry API "
@@ -2961,8 +2849,8 @@ void addressing_service::register_counter_types()
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_erase_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
-          "ns"
-        }
+          ""
+        },
     };
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
@@ -3239,7 +3127,7 @@ addressing_service::begin_migration_async(
 
     // insert the object's new locality into the map of migrated objects
     {
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
         migrated_objects_table_.insert(gid);
     }
 
@@ -3290,7 +3178,7 @@ bool addressing_service::was_object_migrated(
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
     HPX_ASSERT(1 == size);
 
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
     return was_object_migrated_locked(ids[0].get_gid());
 #else
     // #FIXME: it's not really clear how to handle this situation

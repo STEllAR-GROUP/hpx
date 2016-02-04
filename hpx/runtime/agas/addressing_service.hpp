@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,8 +23,7 @@
 #include <hpx/util/function.hpp>
 
 #include <boost/make_shared.hpp>
-#include <boost/cache/entries/lfu_entry.hpp>
-#include <boost/cache/local_cache.hpp>
+#include <boost/cache/lru_cache.hpp>
 #include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -61,21 +61,16 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         void(std::string const&, components::component_type)
     > iterate_types_function_type;
 
-    typedef hpx::lcos::local::spinlock cache_mutex_type;
     typedef hpx::lcos::local::spinlock mutex_type;
     // }}}
 
     // {{{ gva cache
     struct gva_cache_key;
-    struct gva_erase_policy;
-    typedef boost::cache::entries::lfu_entry<gva> gva_entry_type;
 
-    typedef boost::cache::local_cache<
-        gva_cache_key, gva_entry_type,
-        std::less<gva_entry_type>,
-        boost::cache::policies::always<gva_entry_type>,
-        std::map<gva_cache_key, gva_entry_type>,
-        boost::cache::statistics::local_full_statistics
+    typedef boost::cache::lru_cache<
+        gva_cache_key
+      , gva
+      , boost::cache::statistics::local_full_statistics
     > gva_cache_type;
     // }}}
 
@@ -85,8 +80,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     struct bootstrap_data_type;
     struct hosted_data_type;
 
-    mutable cache_mutex_type gva_cache_mtx_;
+    mutable mutex_type gva_cache_mtx_;
     boost::shared_ptr<gva_cache_type> gva_cache_;
+
+    mutable mutex_type migrated_objects_mtx_;
     migrated_objects_table_type migrated_objects_table_;
 
     mutable mutex_type console_cache_mtx_;
@@ -142,7 +139,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void initialize(parcelset::parcelhandler& ph, boost::uint64_t rts_lva,
         boost::uint64_t mem_lva);
 
-    void adjust_local_cache_size();
+    /// \brief Adjust the size of the local AGAS Address resolution cache
+    void adjust_local_cache_size(std::size_t);
 
     state get_status() const
     {
@@ -282,18 +280,19 @@ private:
         );
 
     // Helper functions to access the current cache statistics
+    boost::uint64_t get_cache_entries(bool);
     boost::uint64_t get_cache_hits(bool);
     boost::uint64_t get_cache_misses(bool);
     boost::uint64_t get_cache_evictions(bool);
     boost::uint64_t get_cache_insertions(bool);
 
     boost::uint64_t get_cache_get_entry_count(bool reset);
-    boost::uint64_t get_cache_insert_entry_count(bool reset);
+    boost::uint64_t get_cache_insertion_entry_count(bool reset);
     boost::uint64_t get_cache_update_entry_count(bool reset);
     boost::uint64_t get_cache_erase_entry_count(bool reset);
 
     boost::uint64_t get_cache_get_entry_time(bool reset);
-    boost::uint64_t get_cache_insert_entry_time(bool reset);
+    boost::uint64_t get_cache_insertion_entry_time(bool reset);
     boost::uint64_t get_cache_update_entry_time(bool reset);
     boost::uint64_t get_cache_erase_entry_time(bool reset);
 
@@ -1387,28 +1386,6 @@ public:
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
-    void insert_cache_entry(
-        naming::gid_type const& gid
-      , gva const& gva
-      , error_code& ec = throws
-        );
-
-    /// \warning This function is for internal use only. It is dangerous and
-    ///          may break your code if you use it.
-    void insert_cache_entry(
-        naming::gid_type const& gid
-      , naming::address const& addr
-      , boost::uint64_t count = 0
-      , boost::uint64_t offset = 0
-      , error_code& ec = throws
-        )
-    {
-        const gva g(addr.locality_, addr.type_, count, addr.address_, offset);
-        insert_cache_entry(gid, g, ec);
-    }
-
-    /// \warning This function is for internal use only. It is dangerous and
-    ///          may break your code if you use it.
     void update_cache_entry(
         naming::gid_type const& gid
       , gva const& gva
@@ -1431,15 +1408,17 @@ public:
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
-    void clear_cache(
-        error_code& ec = throws
+    bool get_cache_entry(
+        naming::gid_type const& gid
+      , gva& gva
+      , naming::gid_type& idbase
+      , error_code& ec = throws
         );
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
-    void remove_cache_entry(
-        naming::gid_type const& gid
-      , error_code& ec = throws
+    void clear_cache(
+        error_code& ec = throws
         );
 
     // Disable refcnt caching during shutdown

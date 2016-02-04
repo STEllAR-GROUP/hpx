@@ -221,9 +221,7 @@ namespace hpx { namespace util
             "service_mode = hosted",
             "dedicated_server = 0",
             "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE) "}",
-            "local_cache_size_per_thread = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD:"
-                BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) "}",
+                BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
             "use_caching = ${HPX_AGAS_USE_CACHING:1}",
 
@@ -603,24 +601,6 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 cache_size = hpx::util::get_entry_as<std::size_t>(
                     *sec, "local_cache_size", cache_size);
-            }
-        }
-
-        if (cache_size != std::size_t(~0x0ul) && cache_size < 16ul)
-            cache_size = 16;      // limit lower bound
-        return cache_size;
-    }
-
-    std::size_t runtime_configuration
-        ::get_agas_local_cache_size_per_thread(std::size_t dflt) const
-    {
-        std::size_t cache_size = dflt;
-
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                cache_size = hpx::util::get_entry_as<std::size_t>(
-                    *sec, "local_cache_size_per_thread", cache_size);
             }
         }
 
