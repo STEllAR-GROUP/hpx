@@ -19,6 +19,9 @@
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/parallel/algorithms/algo.hpp>
+#include <hpx/parallel/segmented_algorithms/algo.hpp>
+
 
 #include <algorithm>
 #include <iterator>
@@ -51,9 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return std::copy(first, last, dest);
             }
 
-            template <typename
-
-            ExPolicy, typename FwdIter, typename OutIter_>
+            template <typename ExPolicy, typename FwdIter, typename OutIter_>
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter_
             >::type
@@ -78,33 +79,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
-
-        template <typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            std::false_type)
-        {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                input_iterator_category;
-            typedef typename std::iterator_traits<OutIter>::iterator_category
-                output_iterator_category;
-
-            typedef typename boost::mpl::or_<
-                parallel::is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, input_iterator_category>,
-                boost::is_same<std::output_iterator_tag, output_iterator_category>
-            >::type is_seq;
-
-            return detail::copy<OutIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest);
-        }
-
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            std::true_type);
 
         /// \endcond
     }
@@ -153,6 +127,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
+
     template <typename ExPolicy, typename InIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -160,32 +135,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
-        BOOST_STATIC_ASSERT_MSG(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Required at least input iterator.");
-
-        BOOST_STATIC_ASSERT_MSG(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
-            "Requires at least output iterator.");
-
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
-
-        return detail::copy_(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            is_segmented());
-    }
+        typedef hpx::traits::segmented_iterator_traits<OutIter>
+            output_iterator_traits;
+        return algo<detail::copy<OutIter>,
+            detail::copy<typename output_iterator_traits::local_iterator>>(
+            policy, first, last, dest);
+        }
 
     /////////////////////////////////////////////////////////////////////////////
     // copy_n

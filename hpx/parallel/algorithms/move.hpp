@@ -17,7 +17,8 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/parallel/algorithms/movecopy.hpp>
+#include <hpx/parallel/algorithms/algo.hpp>
+#include <hpx/parallel/segmented_algorithms/algo.hpp>
 
 #include <algorithm>
 #include <iterator>

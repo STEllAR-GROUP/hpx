@@ -1,12 +1,12 @@
-//  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2014 Minh-Khanh Do
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/move.hpp
+/// \file parallel/algorithms/algo.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM_ALGO)
-#define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM_ALGO
+#if !defined(HPX_PARALLEL_DETAIL_ALGO)
+#define HPX_PARALLEL_DETAIL_ALGO
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -28,9 +28,10 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // move
+    // algo
     namespace detail
     {
+        // parallel version
         template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         algo_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
@@ -52,7 +53,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     first, last, dest);
         }
 
-        // forward declare the segmented version of this algorithm
+        // forward declare segmented version
         template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         algo_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
@@ -61,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Moves the elements in the range [first, last), to another range
+    /// Executes algorithm on the elements in the range [first, last), to another range
     /// beginning at \a dest. After this operation the elements in the
     /// moved-from range will still contain valid values of the appropriate
     /// type, but not necessarily the same values as before the move.
@@ -133,12 +134,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     std::output_iterator_tag, output_iterator_category>
             >::value),
             "Requires at least output iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
 
         typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
         typedef typename iterator_traits::is_segmented_iterator is_segmented;

@@ -8,7 +8,6 @@
 #define HPX_PARALLEL_MOVE_JUN_28_2014_0827AM
 
 #include <hpx/parallel/algorithms/move.hpp>
-#include <hpx/parallel/segmented_algorithms/move.hpp>
 
 #endif
 
