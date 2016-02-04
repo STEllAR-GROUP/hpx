@@ -18,18 +18,19 @@ void exclusive_scan_benchmark()
 {
     try {
       std::vector<double> c(100000000);
+      std::vector<double> d(c.size());
       std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
       double const val(0);
       auto op =
-          [val](double v1, double v2) {
-              return v1 + v2;
-          };
+        [val](double v1, double v2) {
+          return v1 + v2;
+      };
 
       hpx::util::high_resolution_timer t;
-      hpx::parallel::inclusive_scan(hpx::parallel::par,
-          boost::begin(c), boost::end(c), boost::begin(c),
-          val, op);
+      hpx::parallel::exclusive_scan(hpx::parallel::par,
+        boost::begin(c), boost::end(c), boost::begin(d),
+        val, op);
       double elapsed = t.elapsed();
 
       // verify values
@@ -37,7 +38,7 @@ void exclusive_scan_benchmark()
       hpx::parallel::v1::detail::sequential_exclusive_scan(
           boost::begin(c), boost::end(c), boost::begin(e), val, op);
 
-      bool ok = std::equal(boost::begin(c), boost::end(c), boost::begin(e));
+      bool ok = std::equal(boost::begin(d), boost::end(d), boost::begin(e));
       HPX_TEST(ok);
       if (ok) {
           std::cout << "<DartMeasurement name=\"ExclusiveScanTime\" \n"

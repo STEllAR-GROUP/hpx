@@ -20,6 +20,7 @@ void inclusive_scan_benchmark()
 {
     try {
       std::vector<double> c(100000000);
+      std::vector<double> d(c.size());
       std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
       double const val(0);
@@ -30,7 +31,7 @@ void inclusive_scan_benchmark()
 
       hpx::util::high_resolution_timer t;
       hpx::parallel::inclusive_scan(hpx::parallel::par,
-          boost::begin(c), boost::end(c), boost::begin(c),
+          boost::begin(c), boost::end(c), boost::begin(d),
           val, op);
       double elapsed = t.elapsed();
 
@@ -39,7 +40,7 @@ void inclusive_scan_benchmark()
       hpx::parallel::v1::detail::sequential_inclusive_scan(
           boost::begin(c), boost::end(c), boost::begin(e), val, op);
 
-      bool ok = std::equal(boost::begin(c), boost::end(c), boost::begin(e));
+      bool ok = std::equal(boost::begin(d), boost::end(d), boost::begin(e));
       HPX_TEST(ok);
       if (ok) {
           std::cout << "<DartMeasurement name=\"InclusiveScanTime\" \n"
