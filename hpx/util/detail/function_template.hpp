@@ -9,31 +9,20 @@
 #define HPX_UTIL_DETAIL_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/access.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
-#include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/copyable_vtable.hpp>
-#include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
-#include <boost/type_traits/is_same.hpp>
-#include <boost/utility/enable_if.hpp>
-
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
-    template <typename Function>
-    struct init_registration;
-
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, typename IAr, typename OAr>
-    struct function_vtable_ptr;
-
     template <typename Sig>
-    struct function_vtable_ptr<Sig, void, void>
+    struct function_vtable_ptr
     {
         typename callable_vtable<Sig>::invoke_t invoke;
         copyable_vtable::copy_t copy;
@@ -43,101 +32,58 @@ namespace hpx { namespace util { namespace detail
         bool empty;
 
         template <typename T>
-        function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
+        function_vtable_ptr(construct_vtable<T>) HPX_NOEXCEPT
           : invoke(&callable_vtable<Sig>::template invoke<T>)
           , copy(&copyable_vtable::template copy<T>)
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)
           , delete_(&vtable::template delete_<T>)
-          , empty(boost::is_same<T, empty_function<Sig> >::value)
+          , empty(std::is_same<T, empty_function<Sig> >::value)
         {}
 
         template <typename T, typename Arg>
-        BOOST_FORCEINLINE static void construct(void** v, Arg&& arg)
+        HPX_FORCEINLINE static void construct(void** v, Arg&& arg)
         {
             vtable::construct<T>(v, std::forward<Arg>(arg));
         }
 
         template <typename T, typename Arg>
-        BOOST_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
+        HPX_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
         {
             vtable::reconstruct<T>(v, std::forward<Arg>(arg));
         }
     };
-
-    template <typename Sig, typename IAr, typename OAr>
-    struct function_vtable_ptr
-      : function_vtable_ptr<Sig, void, void>
-    {
-        char const* name;
-        typename serializable_vtable<IAr, OAr>::save_object_t save_object;
-        typename serializable_vtable<IAr, OAr>::load_object_t load_object;
-
-        template <typename T>
-        function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
-          : function_vtable_ptr<Sig, void, void>(boost::mpl::identity<T>())
-          , name("empty")
-          , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
-          , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
-        {
-            if(!this->empty)
-                name = get_function_name<util::tuple<function_vtable_ptr, T> >();
-            init_registration<
-                util::tuple<function_vtable_ptr, T>
-            >::g.register_function();
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // registration code for serialization
-    template <typename Sig, typename IAr, typename OAr, typename T>
-    struct init_registration<
-        util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
-    >
-    {
-        typedef util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
-
-        static automatic_function_registration<vtable_ptr> g;
-    };
-
-    template <typename Sig, typename IAr, typename OAr, typename T>
-    automatic_function_registration<
-        util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
-    > init_registration<
-        util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
-    >::g =  automatic_function_registration<
-                util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
-            >();
 }}}
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Sig
-      , typename IArchive = serialization::input_archive
-      , typename OArchive = serialization::output_archive
-    >
-    class function
+    template <typename Sig, bool Serializable = true>
+    class function;
+
+    template <typename R, typename ...Ts, bool Serializable>
+    class function<R(Ts...), Serializable>
       : public detail::basic_function<
-            detail::function_vtable_ptr<Sig, IArchive, OArchive>
-          , Sig
+            detail::function_vtable_ptr<R(Ts...)>
+          , R(Ts...), Serializable
         >
     {
-        typedef detail::function_vtable_ptr<Sig, IArchive, OArchive> vtable_ptr;
-        typedef detail::basic_function<vtable_ptr, Sig> base_type;
+        typedef detail::function_vtable_ptr<R(Ts...)> vtable_ptr;
+        typedef detail::basic_function<vtable_ptr, R(Ts...), Serializable> base_type;
 
     public:
         typedef typename base_type::result_type result_type;
 
-        function() BOOST_NOEXCEPT
+        function() HPX_NOEXCEPT
           : base_type()
         {}
 
         function(function const& other)
           : base_type()
         {
-            detail::vtable::destruct<detail::empty_function<Sig> >(&this->object);
+            detail::vtable::delete_<
+                detail::empty_function<R(Ts...)>
+            >(&this->object);
 
             this->vptr = other.vptr;
             if (!this->vptr->empty)
@@ -146,17 +92,21 @@ namespace hpx { namespace util
             }
         }
 
-        function(function&& other) BOOST_NOEXCEPT
+        function(function&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        template <typename F>
-        function(F&& f,
-            typename boost::disable_if<
-                boost::is_same<function, typename util::decay<F>::type>
-            >::type* = 0
-        ) : base_type()
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, function>::value
+             && traits::is_callable<FD&(Ts...), R>::value
+            >::type>
+        function(F&& f)
+          : base_type()
         {
+            static_assert(
+                std::is_constructible<FD, FD const&>::value,
+                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
         }
 
@@ -165,7 +115,9 @@ namespace hpx { namespace util
             if (this != &other)
             {
                 reset();
-                detail::vtable::destruct<detail::empty_function<Sig> >(&this->object);
+                detail::vtable::delete_<
+                    detail::empty_function<R(Ts...)>
+                >(&this->object);
 
                 this->vptr = other.vptr;
                 if (!this->vptr->empty)
@@ -176,136 +128,22 @@ namespace hpx { namespace util
             return *this;
         }
 
-        function& operator=(function&& other) BOOST_NOEXCEPT
+        function& operator=(function&& other) HPX_NOEXCEPT
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
         }
 
-        template <typename F>
-        typename boost::disable_if<
-            boost::is_same<function, typename util::decay<F>::type>
-          , function&
-        >::type operator=(F&& f)
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, function>::value
+             && traits::is_callable<FD&(Ts...), R>::value
+            >::type>
+        function& operator=(F&& f)
         {
-            assign(std::forward<F>(f));
-            return *this;
-        }
-
-        using base_type::operator();
-        using base_type::assign;
-        using base_type::reset;
-        using base_type::empty;
-        using base_type::target_type;
-        using base_type::target;
-
-    private:
-        friend class hpx::serialization::access;
-
-        void load(IArchive& ar, const unsigned version)
-        {
-            reset();
-
-            bool is_empty = false;
-            ar >> is_empty;
-            if (!is_empty)
-            {
-                std::string name;
-                ar >> name;
-
-                this->vptr = detail::get_table_ptr<vtable_ptr>(name);
-                this->vptr->load_object(&this->object, ar, version);
-            }
-        }
-
-        void save(OArchive& ar, const unsigned version) const
-        {
-            bool is_empty = empty();
-            ar << is_empty;
-            if (!is_empty)
-            {
-                std::string function_name = this->vptr->name;
-                ar << function_name;
-
-                this->vptr->save_object(&this->object, ar, version);
-            }
-        }
-
-        HPX_SERIALIZATION_SPLIT_MEMBER()
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
-    class function<Sig, void, void>
-      : public detail::basic_function<
-            detail::function_vtable_ptr<Sig, void, void>
-          , Sig
-        >
-    {
-        typedef detail::function_vtable_ptr<Sig, void, void> vtable_ptr;
-        typedef detail::basic_function<vtable_ptr, Sig> base_type;
-
-    public:
-        typedef typename base_type::result_type result_type;
-
-        function() BOOST_NOEXCEPT
-          : base_type()
-        {}
-
-        function(function const& other)
-          : base_type()
-        {
-            detail::vtable::destruct<detail::empty_function<Sig> >(&this->object);
-
-            this->vptr = other.vptr;
-            if (!this->vptr->empty)
-            {
-                this->vptr->copy(&this->object, &other.object);
-            }
-        }
-
-        function(function&& other) BOOST_NOEXCEPT
-          : base_type(static_cast<base_type&&>(other))
-        {}
-
-        template <typename F>
-        function(F&& f,
-            typename boost::disable_if<
-                boost::is_same<function, typename util::decay<F>::type>
-            >::type* = 0
-        ) : base_type()
-        {
-            assign(std::forward<F>(f));
-        }
-
-        function& operator=(function const& other)
-        {
-            if (this != &other)
-            {
-                reset();
-                detail::vtable::destruct<detail::empty_function<Sig> >(&this->object);
-
-                this->vptr = other.vptr;
-                if (!this->vptr->empty)
-                {
-                    this->vptr->copy(&this->object, &other.object);
-                }
-            }
-            return *this;
-        }
-
-        function& operator=(function&& other) BOOST_NOEXCEPT
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
-        }
-
-        template <typename F>
-        typename boost::disable_if<
-            boost::is_same<function, typename util::decay<F>::type>
-          , function&
-        >::type operator=(F&& f)
-        {
+            static_assert(
+                std::is_constructible<FD, FD const&>::value,
+                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
             return *this;
         }
@@ -318,9 +156,9 @@ namespace hpx { namespace util
         using base_type::target;
     };
 
-    template <typename Sig, typename IArchive, typename OArchive>
-    static bool is_empty_function(function<Sig, IArchive,
-        OArchive> const& f) BOOST_NOEXCEPT
+    template <typename Sig, bool Serializable>
+    static bool is_empty_function(
+        function<Sig, Serializable> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }
@@ -329,18 +167,21 @@ namespace hpx { namespace util
 #   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename Sig>
-    using function_nonser = function<Sig, void, void>;
+    using function_nonser = function<Sig, false>;
 
 #   else
 
-    template <typename Sig>
-    class function_nonser
-      : public function<Sig, void, void>
+    template <typename T>
+    class function_nonser;
+
+    template <typename R, typename ...Ts>
+    class function_nonser<R(Ts...)>
+      : public function<R(Ts...), false>
     {
-        typedef function<Sig, void, void> base_type;
+        typedef function<R(Ts...), false> base_type;
 
     public:
-        function_nonser() BOOST_NOEXCEPT
+        function_nonser() HPX_NOEXCEPT
           : base_type()
         {}
 
@@ -348,16 +189,17 @@ namespace hpx { namespace util
           : base_type(static_cast<base_type const&>(other))
         {}
 
-        function_nonser(function_nonser&& other) BOOST_NOEXCEPT
+        function_nonser(function_nonser&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        template <typename F>
-        function_nonser(F&& f,
-            typename boost::disable_if<
-                boost::is_same<function_nonser, typename util::decay<F>::type>
-            >::type* = 0
-        ) : base_type(std::forward<F>(f))
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, function_nonser>::value
+             && traits::is_callable<FD&(Ts...), R>::value
+            >::type>
+        function_nonser(F&& f)
+          : base_type(std::forward<F>(f))
         {}
 
         function_nonser& operator=(function_nonser const& other)
@@ -366,17 +208,18 @@ namespace hpx { namespace util
             return *this;
         }
 
-        function_nonser& operator=(function_nonser&& other) BOOST_NOEXCEPT
+        function_nonser& operator=(function_nonser&& other) HPX_NOEXCEPT
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
         }
 
-        template <typename F>
-        typename boost::disable_if<
-            boost::is_same<function_nonser, typename util::decay<F>::type>
-          , function_nonser&
-        >::type operator=(F&& f)
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, function_nonser>::value
+             && traits::is_callable<FD&(Ts...), R>::value
+            >::type>
+        function_nonser& operator=(F&& f)
         {
             base_type::operator=(std::forward<F>(f));
             return *this;
@@ -384,7 +227,8 @@ namespace hpx { namespace util
     };
 
     template <typename Sig>
-    static bool is_empty_function(function_nonser<Sig> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(
+        function_nonser<Sig> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }

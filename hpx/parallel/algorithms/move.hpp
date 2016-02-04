@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -34,7 +33,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-
         template <typename OutIter>
         struct move : public detail::algorithm<move<OutIter>, OutIter>
         {
@@ -73,6 +71,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+        /// \endcond
     }
 
     /// Moves the elements in the range [first, last), to another range
@@ -121,6 +120,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a move algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
+    ///
     template <typename ExPolicy, typename InIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -128,11 +128,39 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     move(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+            input_iterator_category;
+        typedef typename std::iterator_traits<OutIter>::iterator_category
+            output_iterator_category;
+
         typedef hpx::traits::segmented_iterator_traits<OutIter>
             output_iterator_traits;
         return algo<detail::move<OutIter>,
             detail::move<typename output_iterator_traits::local_iterator>>(
             policy, first, last, dest);
+        static_assert(
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value),
+            "Required at least input iterator.");
+
+        static_assert(
+            (boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value),
+            "Requires at least output iterator.");
+
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, input_iterator_category>,
+            boost::is_same<std::output_iterator_tag, output_iterator_category>
+        >::type is_seq;
+
+        return detail::move<OutIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest);
     }
 }}}
 

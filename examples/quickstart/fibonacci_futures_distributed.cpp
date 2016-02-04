@@ -50,7 +50,7 @@ struct when_all_wrapper
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-BOOST_NOINLINE boost::uint64_t fibonacci_serial_sub(boost::uint64_t n)
+HPX_NOINLINE boost::uint64_t fibonacci_serial_sub(boost::uint64_t n)
 {
     if (n < 2)
         return n;

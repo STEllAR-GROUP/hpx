@@ -16,8 +16,7 @@
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
@@ -123,11 +122,9 @@ namespace hpx { namespace actions
             // you have a HPX_REGISTER_TYPED_CONTINUATION macro somewhere in a
             // source file, but the header in which the continuation is defined
             // misses a HPX_REGISTER_TYPED_CONTINUATION_DECLARATION
-            BOOST_MPL_ASSERT_MSG(
-                traits::needs_automatic_registration<Continuation>::value
-              , HPX_REGISTER_TYPED_CONTINUATION_DECLARATION_MISSING
-              , (Continuation)
-            );
+            static_assert(
+                traits::needs_automatic_registration<Continuation>::value,
+                "HPX_REGISTER_TYPED_CONTINUATION_DECLARATION missing");
             return util::type_id<Continuation>::typeid_.type_id();
         }
 #endif
@@ -197,7 +194,6 @@ namespace hpx { namespace actions
         boost::is_void<typename util::result_of<F(Ts...)>::type>::value
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
-        typedef typename util::result_of<F(Ts...)>::type result_type;
         try {
             cont.trigger(util::invoke(std::forward<F>(f),
                 std::forward<Ts>(vs)...));
@@ -236,7 +232,7 @@ namespace hpx { namespace actions
         };
 
         template <typename T>
-        BOOST_FORCEINLINE T operator()(naming::id_type const& lco, T && t) const
+        HPX_FORCEINLINE T operator()(naming::id_type const& lco, T && t) const
         {
             hpx::set_lco_value(lco, std::forward<T>(t));
 
@@ -290,7 +286,7 @@ namespace hpx { namespace actions
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+        HPX_FORCEINLINE void serialize(Archive& ar, unsigned int const)
         {
             ar & cont_ & target_;
         }
@@ -354,7 +350,7 @@ namespace hpx { namespace actions
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+        HPX_FORCEINLINE void serialize(Archive& ar, unsigned int const)
         {
             ar & cont_ & target_ & f_;
         }
@@ -441,35 +437,17 @@ namespace hpx { namespace actions
         /// serialization support
         friend class hpx::serialization::access;
 
-        void serialize(serialization::input_archive & ar)
-        {
-            // serialize function
-            bool have_function = false;
-            ar >> have_function;
-            if (have_function)
-                ar >> f_;
-        }
-
-        void serialize(serialization::output_archive & ar)
-        {
-            // serialize function
-            bool have_function = !f_.empty();
-            ar << have_function;
-            if (have_function)
-                ar << f_;
-        }
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
             // serialize base class
             ar & hpx::serialization::base_object<continuation>(*this);
-
-            serialize(ar);
+            ar & f_;
         }
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , detail::get_continuation_name<typed_continuation>()
-        );
+        )
 
         function_type f_;
     };
@@ -545,35 +523,18 @@ namespace hpx { namespace actions
         /// serialization support
         friend class hpx::serialization::access;
 
-        void serialize(serialization::input_archive & ar)
-        {
-            // serialize function
-            bool have_function = false;
-            ar >> have_function;
-            if (have_function)
-                ar >> f_;
-        }
-
-        void serialize(serialization::output_archive & ar)
-        {
-            // serialize function
-            bool have_function = !f_.empty();
-            ar << have_function;
-            if (have_function)
-                ar << f_;
-        }
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
             // serialize base class
             ar & hpx::serialization::base_object<continuation>(*this);
 
-            serialize(ar);
+            ar & f_;
         }
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
           , "hpx_void_typed_continuation"
-        );
+        )
 
         function_type f_;
     };

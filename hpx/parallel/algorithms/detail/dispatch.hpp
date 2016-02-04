@@ -34,6 +34,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             >::local_raw_iterator type;
     };
 
+    template <typename Result1, typename Result2>
+    struct local_algorithm_result<std::pair<Result1, Result2> >
+    {
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+                Result1
+            >::local_raw_iterator type1;
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+                Result2
+            >::local_raw_iterator type2;
+
+        typedef std::pair<type1, type2> type;
+    };
+
     template <>
     struct local_algorithm_result<void>
     {

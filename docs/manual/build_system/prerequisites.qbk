@@ -73,6 +73,16 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
       for compiling __hpx__ if you use gcc V4.6.x. Please use either
       an earlier or a later version of Boost with this compiler.]
 
+[important When compiling with the Intel Compiler on Linux systems, we only support
+  C++ Standard Libraries provided by gcc 4.6 and upwards. If the 'g++' in your
+  path is older than 4.6, please specify the path of a newer g++ by setting
+  CMAKE_CXX_FLAGS='-gxx-name=/path/to/g++' via cmake.]
+
+[important When building Boost using gcc please note that it is always a good
+      idea to specify a `cxxflags=-std=c++11` command line argument to `b2`
+      (`bjam`). Note however, that this is absolutely necessary when using
+      gcc V5.2 and above.]
+
 [table Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
@@ -115,6 +125,9 @@ listed below.
          diagnostics.]]
     [[__libunwind__              ][0.99               ][0.97            ]
         [Dependency of google-perftools on x86-64, used for stack unwinding.]]
+    [[__openmpi__                ][1.10.1             ][1.8.0           ]
+        [Can be used as a highspeed communication library backend for the
+         parcelport.]]
 ]
 
 [table Optional Software Prerequisites for __hpx__ on Linux systems
@@ -158,6 +171,11 @@ listed below.
 [important Because of a problem in Boost V1.55.0 this version can't be used
       for compiling __hpx__ if you use MSVC2013. Please use either
       an earlier or a later version of Boost with this compiler.]
+
+[important When building Boost using gcc please note that it is always a good
+      idea to specify a `cxxflags=-std=c++11` command line argument to `b2`
+      (`bjam`). Note however, that this is absolutely necessary when using
+      gcc V5.2 and above.]
 
 The easiest way to create a working Boost installation is to compile Boost from
 sources yourself. This is particularly important as many high performance

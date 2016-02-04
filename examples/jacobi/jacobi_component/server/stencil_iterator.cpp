@@ -101,7 +101,7 @@ namespace jacobi
     }
 }
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     jacobi::server::stencil_iterator
 > stencil_iterator_type;
 

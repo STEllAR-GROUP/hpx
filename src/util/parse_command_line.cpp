@@ -408,7 +408,7 @@ namespace hpx { namespace util
                 ("hpx:expect-connecting-localities",
                   "this locality expects other localities to dynamically connect "
                   "(implied if the number of initial localities is larger than 1)")
-#if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
+#if defined(HPX_HAVE_HWLOC) || defined(HPX_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
@@ -499,7 +499,7 @@ namespace hpx { namespace util
                   "parcel transport logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
-#if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)
+#if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
                 ("hpx:attach-debugger",
                   value<std::string>()->implicit_value("startup"),
                   "wait for a debugger to be attached, possible values: "
@@ -671,7 +671,7 @@ namespace hpx { namespace util
         std::vector<std::string>* unregistered_options)
     {
         using namespace boost::program_options;
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
         std::vector<std::string> args = split_winmain(cmdline);
 #else
         std::vector<std::string> args = split_unix(cmdline);

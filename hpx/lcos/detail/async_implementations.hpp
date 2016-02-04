@@ -15,79 +15,16 @@
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/util/move.hpp>
 
+#include <boost/mpl/bool.hpp>
+
 namespace hpx { namespace detail
 {
     /// \cond NOINTERNAL
-    BOOST_FORCEINLINE bool has_async_policy(BOOST_SCOPED_ENUM(launch) policy)
+    HPX_FORCEINLINE bool has_async_policy(BOOST_SCOPED_ENUM(launch) policy)
     {
         return (static_cast<int>(policy) &
             static_cast<int>(launch::async_policies)) ? true : false;
     }
-
-    template <typename Action, typename Result>
-    struct sync_local_invoke
-    {
-        template <typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<Result> call(
-            naming::id_type const& gid, naming::address const&,
-            Ts&&... vs)
-        {
-            lcos::packaged_action<Action, Result> p;
-            p.apply(launch::sync, gid, std::forward<Ts>(vs)...);
-            return p.get_future();
-        }
-    };
-
-    template <typename Action, typename R>
-    struct sync_local_invoke<Action, lcos::future<R> >
-    {
-        template <typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<R> call(
-            boost::mpl::true_, naming::id_type const&,
-            naming::address const& addr, Ts&&... vs)
-        {
-            HPX_ASSERT(traits::component_type_is_compatible<
-                typename Action::component_type>::call(addr));
-            return Action::execute_function(addr.address_,
-                std::forward<Ts>(vs)...);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Result>
-    struct sync_local_invoke_cb
-    {
-        template <typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<Result> call(
-            naming::id_type const& gid, naming::address const&,
-            Callback&& cb, Ts&&... vs)
-        {
-            lcos::packaged_action<Action, Result> p;
-            p.apply_cb(launch::sync, gid, std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
-            return p.get_future();
-        }
-    };
-
-    template <typename Action, typename R>
-    struct sync_local_invoke_cb<Action, lcos::future<R> >
-    {
-        template <typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static lcos::future<R> call(
-            boost::mpl::true_, naming::id_type const&,
-            naming::address const& addr, Callback&& cb, Ts&&... vs)
-        {
-            HPX_ASSERT(traits::component_type_is_compatible<
-                typename Action::component_type>::call(addr));
-            lcos::future<R> f = Action::execute_function(addr.address_,
-                std::forward<Ts>(vs)...);
-
-            // invoke callback
-            cb(boost::system::error_code(), parcelset::parcel());
-
-            return f;
-        }
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     struct keep_id_alive
@@ -99,6 +36,125 @@ namespace hpx { namespace detail
         void operator()() const {}
 
         naming::id_type gid_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename Result>
+    struct sync_local_invoke
+    {
+        template <typename ...Ts>
+        static lcos::future<Result>
+        call(naming::id_type const& id, naming::address && addr, Ts &&... vs)
+        {
+            bool target_is_managed = false;
+            naming::id_type id1;
+
+            if (id.get_management_type() == naming::id_type::managed)
+            {
+                id1 = naming::id_type(id.get_gid(), naming::id_type::unmanaged);
+                target_is_managed = true;
+            }
+
+            lcos::packaged_action<Action, Result> p;
+            p.apply(std::move(addr), target_is_managed ? id1 : id,
+                std::forward<Ts>(vs)...);
+
+            // keep id alive, if needed - this allows to send the destination
+            // as an unmanaged id
+            future<Result> f = p.get_future();
+
+            if (target_is_managed)
+            {
+                typedef typename traits::detail::shared_state_ptr_for<
+                    future<Result>
+                >::type shared_state_ptr;
+
+                shared_state_ptr const& state = traits::detail::get_shared_state(f);
+                state->set_on_completed(hpx::detail::keep_id_alive(id));
+            }
+
+            return f;
+        }
+    };
+
+    template <typename Action, typename Result>
+    struct sync_local_invoke<Action, lcos::future<Result> >
+    {
+        template <typename ...Ts>
+        HPX_FORCEINLINE static lcos::future<Result>
+        call(naming::id_type const&, naming::address && addr, Ts &&... vs)
+        {
+            HPX_ASSERT(!!addr);
+            HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type
+                >::call(addr));
+
+            return Action::execute_function(addr.address_,
+                std::forward<Ts>(vs)...);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename Result>
+    struct sync_local_invoke_cb
+    {
+        template <typename Callback, typename ...Ts>
+        static lcos::future<Result>
+        call(naming::id_type const& id, naming::address && addr, Callback && cb,
+            Ts &&... vs)
+        {
+            bool target_is_managed = false;
+            naming::id_type id1;
+
+            if (id.get_management_type() == naming::id_type::managed)
+            {
+                id1 = naming::id_type(id.get_gid(), naming::id_type::unmanaged);
+                target_is_managed = true;
+            }
+
+            lcos::packaged_action<Action, Result> p;
+            p.apply_cb(std::move(addr), target_is_managed ? id1 : id,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+
+            // keep id alive, if needed - this allows to send the destination
+            // as an unmanaged id
+            future<Result> f = p.get_future();
+
+            if (target_is_managed)
+            {
+                typedef typename traits::detail::shared_state_ptr_for<
+                    future<Result>
+                >::type shared_state_ptr;
+
+                shared_state_ptr const& state = traits::detail::get_shared_state(f);
+                state->set_on_completed(hpx::detail::keep_id_alive(id));
+            }
+
+            return f;
+        }
+    };
+
+    template <typename Action, typename Result>
+    struct sync_local_invoke_cb<Action, lcos::future<Result> >
+    {
+        template <typename Callback, typename ...Ts>
+        HPX_FORCEINLINE static lcos::future<Result>
+        call(naming::id_type const&, naming::address && addr, Callback && cb,
+            Ts &&... vs)
+        {
+            HPX_ASSERT(!!addr);
+            HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type
+                >::call(addr));
+
+            lcos::future<Result> f = Action::execute_function(
+                addr.address_, std::forward<Ts>(vs)...);
+
+            // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());
+
+            return f;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -119,33 +175,42 @@ namespace hpx { namespace detail
         if (agas::is_local_address_cached(id, addr) && policy == launch::sync)
         {
             return hpx::detail::sync_local_invoke<action_type, result_type>::
-                call(id, addr, std::forward<Ts>(vs)...);
+                call(id, std::move(addr), std::forward<Ts>(vs)...);
         }
 
-        lcos::packaged_action<action_type, result_type> p;
-
         bool target_is_managed = false;
+        naming::id_type id1;
+        future<result_type> f;
+
+        if (id.get_management_type() == naming::id_type::managed)
+        {
+            id1 = naming::id_type(id.get_gid(), naming::id_type::unmanaged);
+            target_is_managed = true;
+        }
+
         if (policy == launch::sync || hpx::detail::has_async_policy(policy))
         {
-            if (addr) {
-                p.apply(policy, std::move(addr), id,
-                    std::forward<Ts>(vs)...);
-            }
-            else if (id.get_management_type() == naming::id_type::managed) {
-                p.apply(policy,
-                    naming::id_type(id.get_gid(), naming::id_type::unmanaged),
-                    std::forward<Ts>(vs)...);
-                target_is_managed = true;
-            }
-            else {
-                p.apply(policy, id, std::forward<Ts>(vs)...);
-            }
+            lcos::packaged_action<action_type, result_type> p;
+            p.apply(std::move(addr), target_is_managed ? id1 : id,
+                std::forward<Ts>(vs)...);
+            f = p.get_future();
+        }
+        else if (policy == launch::deferred)
+        {
+            lcos::packaged_action<action_type, result_type> p;
+            p.apply_deferred(std::move(addr), target_is_managed ? id1 : id,
+                std::forward<Ts>(vs)...);
+            f = p.get_future();
+        }
+        else
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "async_impl", "unknown launch policy");
+            return f;
         }
 
         // keep id alive, if needed - this allows to send the destination as an
         // unmanaged id
-        future<result_type> f = p.get_future();
-
         if (target_is_managed)
         {
             typedef typename traits::detail::shared_state_ptr_for<
@@ -179,35 +244,43 @@ namespace hpx { namespace detail
         if (agas::is_local_address_cached(id, addr) && policy == launch::sync)
         {
             return hpx::detail::sync_local_invoke_cb<action_type, result_type>::
-                call(id, addr, std::forward<Callback>(cb),
+                call(id, std::move(addr), std::forward<Callback>(cb),
                     std::forward<Ts>(vs)...);
         }
 
-        lcos::packaged_action<action_type, result_type> p;
-
+        future<result_type> f;
         bool target_is_managed = false;
+        naming::id_type id1;
+
+        if (id.get_management_type() == naming::id_type::managed)
+        {
+            id1 = naming::id_type(id.get_gid(), naming::id_type::unmanaged);
+            target_is_managed = true;
+        }
+
         if (policy == launch::sync || hpx::detail::has_async_policy(policy))
         {
-            if (addr) {
-                p.apply_cb(policy, std::move(addr), id,
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-            }
-            else if (id.get_management_type() == naming::id_type::managed) {
-                p.apply_cb(policy,
-                    naming::id_type(id.get_gid(), naming::id_type::unmanaged),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-                target_is_managed = true;
-            }
-            else {
-                p.apply_cb(policy, id, std::forward<Callback>(cb),
-                    std::forward<Ts>(vs)...);
-            }
+            lcos::packaged_action<action_type, result_type> p;
+            p.apply_cb(std::move(addr), target_is_managed ? id1 : id,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            f = p.get_future();
+        }
+        else if (policy == launch::deferred)
+        {
+            lcos::packaged_action<action_type, result_type> p;
+            p.apply_deferred_cb(std::move(addr), target_is_managed ? id1 : id,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            f = p.get_future();
+        }
+        else
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "async_cb_impl", "unknown launch policy");
+            return f;
         }
 
         // keep id alive, if needed - this allows to send the destination
         // as an unmanaged id
-        future<result_type> f = p.get_future();
-
         if (target_is_managed)
         {
             typedef typename traits::detail::shared_state_ptr_for<

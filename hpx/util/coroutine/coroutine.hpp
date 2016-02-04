@@ -30,6 +30,8 @@
 #ifndef HPX_COROUTINE_COROUTINE_HPP_20060512
 #define HPX_COROUTINE_COROUTINE_HPP_20060512
 
+#include <hpx/config.hpp>
+
 // This needs to be first for building on Macs
 #include <hpx/util/coroutine/detail/default_context_impl.hpp>
 
@@ -38,12 +40,11 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/vector.hpp>
-#include <boost/type_traits.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <boost/call_traits.hpp>
 #include <utility>
 
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
-#include <hpx/util/coroutine/detail/is_callable.hpp>
 #include <hpx/util/coroutine/detail/signature.hpp>
 #include <hpx/util/coroutine/detail/index.hpp>
 #include <hpx/util/coroutine/detail/coroutine_traits.hpp>
@@ -113,7 +114,7 @@ namespace hpx { namespace util { namespace coroutines
   class coroutine
   {
   private:
-    HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine);
+    HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine)
 
   public:
     typedef coroutine<Signature, Heap, ContextImpl> type;
@@ -198,7 +199,7 @@ namespace hpx { namespace util { namespace coroutines
 #endif
 
     template <typename Functor>
-    void rebind(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+    void rebind(Functor && f, naming::id_type && target,
         thread_id_repr_type id = 0)
     {
         HPX_ASSERT(exited());
@@ -215,7 +216,7 @@ namespace hpx { namespace util { namespace coroutines
         static const int arity = 1;
     };
 
-    BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
+    HPX_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
     {
       HPX_ASSERT(m_pimpl);
       HPX_ASSERT(m_pimpl->is_ready());
@@ -273,6 +274,15 @@ namespace hpx { namespace util { namespace coroutines
     bool empty() const
     {
       return m_pimpl == 0;
+    }
+
+    std::ptrdiff_t get_available_stack_space()
+    {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+        return m_pimpl->get_available_stack_space();
+#else
+        return (std::numeric_limits<std::ptrdiff_t>::max)();
+#endif
     }
 
   protected:

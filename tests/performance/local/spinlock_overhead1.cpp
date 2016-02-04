@@ -80,7 +80,7 @@ namespace test
             }
             else
             {
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
                 Sleep(0);
 #else
                 // g++ -Wextra warns on {} or {0}
@@ -125,7 +125,7 @@ namespace test
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
@@ -146,7 +146,7 @@ namespace test
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
             *const_cast<boost::uint64_t volatile*>(&v_) = 0;
 #else

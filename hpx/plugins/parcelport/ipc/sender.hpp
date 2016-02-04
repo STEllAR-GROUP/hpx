@@ -7,6 +7,9 @@
 #ifndef HPX_PARCELSET_POLICIES_IPC_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_IPC_SENDER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/plugins/parcelport/ipc/data_window.hpp>
@@ -179,5 +182,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         data_buffer_cache& cache_;
     };
 }}}}
+
+#endif
 
 #endif

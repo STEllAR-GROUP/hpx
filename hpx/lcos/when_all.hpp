@@ -48,7 +48,7 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param futures  [in] A container holding an arbitrary amount of \a future
+    /// \param values   [in] A range holding an arbitrary amount of \a future
     ///                 or \a shared_future objects for which \a when_all
     ///                 should wait.
     ///
@@ -68,7 +68,7 @@ namespace hpx
     ///       but the futures held in the output collection may.
     template <typename Range>
     future<Range>
-    when_all(Range&& values)
+    when_all(Range&& values);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -213,7 +213,7 @@ namespace hpx { namespace lcos
         protected:
             // End of the tuple is reached
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&&, boost::mpl::true_)
             {
                 this->set_value(when_all_result<Tuple>::call(std::move(t_)));
@@ -265,7 +265,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::false_, boost::mpl::true_)
             {
                 await_range(iter,
@@ -275,7 +275,7 @@ namespace hpx { namespace lcos
 
             // Current element is a simple future
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -325,7 +325,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&& iter, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -339,7 +339,7 @@ namespace hpx { namespace lcos
             }
 
         public:
-            BOOST_FORCEINLINE void do_await()
+            HPX_FORCEINLINE void do_await()
             {
                 typedef typename boost::fusion::result_of::begin<Tuple>::type
                     begin_type;

@@ -17,7 +17,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -34,7 +34,7 @@ namespace hpx { namespace threads
     struct register_work_tag {};
     struct set_state_tag {};
 
-    struct thread_init_data;
+    class thread_init_data;
 
     ///////////////////////////////////////////////////////////////////////////
     struct threadmanager_base : private boost::noncopyable

@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2015 Louisiana State University
+.. Copyright (c) 2007-2016 Louisiana State University
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -51,20 +51,20 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.10) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.10/html/index.html>`_.
+The documentation for the latest release of HPX (currently V0.9.11) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.11/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.16302.svg
-     :target: http://dx.doi.org/10.5281/zenodo.16302
+.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.33656.svg
+     :target: http://dx.doi.org/10.5281/zenodo.33656
 
-Additionally, we regularily upload the current status of the documentation
+Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
 `here <http://stellar-group.github.io/hpx/docs/html/>`_. We also have a
 single-page version of the documentation `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.10) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
+(currently HPX V0.9.11) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
@@ -125,7 +125,7 @@ Linux
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.10
+            ~/downloads/hpx_0.9.11
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -154,108 +154,52 @@ for more information about building HPX on a Linux system.
 OS X (Mac)
 ----------
 
-The standard system compiler on OS X is too old to build HPX. You will
-have to install a newer compiler manually, either Clang or GCC. Below
-we describe two possibilities:
-
-1) Install a recent version of LLVM and Clang.
-   In order to build hpx you will need a fairly recent version of Clang
-   (at least version 3.2 of Clang and LLVM). For more instructions please
-   see http://clang.llvm.org/get_started.html.
-
-   If you're using Homebrew, ``brew install llvm --with-clang`` will do the trick.
-   This will install Clang V3.2 into ``/usr/local/bin``.
-
-2) Visit http://libcxx.llvm.org/ to get the latest version of the "libc++" C++
-   standard library. You need to use the trunk version; what's currently bundled
-   with XCode or OS X aren't quite there yet. You can follow the steps in
-   http://libcxx.llvm.org/ if you choose, but here's briefly how it could be built::
-
-      cd /path/to
-      git clone http://llvm.org/git/libcxx.git
-      cd libcxx/lib
-      CXX=clang++-3.2 CC=clang-3.2 TRIPLE=-apple- ./buildit
-
-   The library is then found in ``/path/to/libcxx/include`` and
-   ``/path/to/libcxx/lib``, respectively.
-
-3) Build (and install) a recent version of Boost, using Clang and libc++::
-
-   To build Boost with Clang and make it link to libc++ as standard library,
-   you'll need to set up the following in your Boost ``~/user-config.jam``
-   file::
-
-      # user-config.jam (put this file into your home directory)
-      # ...
-      # Clang 3.2
-      using clang
-        : 3.2
-        : "/usr/local/bin/clang++"
-        : <cxxflags>"-std=c++11 -stdlib=libc++ -isystem /path/to/libcxx/include"
-          <linkflags>"-stdlib=libc++ -L/path/to/libcxx/lib"
-        ;
-
-   You can then use this as your build command::
-
-      b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang-3.2 install -j5
-
-4) Clone the master HPX git repository (or a stable tag)::
+1) Clone the master HPX git repository (or a stable tag)::
 
     git clone git://github.com/STEllAR-GROUP/hpx.git
 
-5) Build HPX, finally::
+2) Create a build directory. HPX requires an out-of-tree build. This means you
+   will be unable to run CMake in the HPX source directory::
 
-    cd hpx
-    mkdir my_hpx_build
-    cd my_hpx_build
+      cd hpx
+      mkdir my_hpx_build
+      cd my_hpx_build
 
-   To build with Clang 3.2, execute::
+3) Invoke CMake from your build directory, pointing the CMake driver to the root
+   of your HPX source tree::
 
-    cmake /path/to/hpx/source/tree \
-         -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \
-         -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.2 \
-         -DBOOST_ROOT=/your_boost_directory \
-         -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
-         -DLINK_FLAGS="-L /path/to/libcxx/lib"
-    make -j5
+      cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -DBOOST_ROOT=/your_boost_directory    \
+            [other CMake variable definitions]    \
+            /path/to/hpx/source/tree
 
-6) To complete the build and install HPX::
+   for instance::
 
-    make install
+      cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -DBOOST_ROOT=~/packages/boost \
+            -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
+            ~/downloads/hpx_0.9.11
+
+4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
+   add the -jN flag to your make invocation, where N is the number of cores
+   on your machine plus one::
+
+      make -j5
+
+5) To complete the build and install HPX::
+
+      make install
 
    This will build and install the essential core components of HPX only. Use::
 
-    make tests
+      make tests
 
    to build and run the tests and::
 
-    make examples
-    make install
+      make examples
+      make install
 
    to build and install the examples.
-
-Alternatively, you can install a recent version of gcc as well as all
-required libraries via MacPorts:
-
-1) Install MacPorts <http://www.macports.org/>
-
-2) Install Boost, CMake, gcc 4.8, and hwloc::
-
-    sudo port install boost
-    sudo port install gcc48
-    sudo port install hwloc
-
-   You may also want::
-
-    sudo port install cmake
-    sudo port install git-core
-
-3) Make this version of gcc your default compiler::
-
-    sudo port install gcc_select
-    sudo port select gcc mp-gcc48
-
-4) Build HPX as described above in the ``Linux'' section.
 
 For more information and additional options, please see the corresponding
 `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.macos_installation>`_.
@@ -401,6 +345,7 @@ The following images are currently available:
   `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
   build status)
 * ``stellargroup/hpx:latest``	(latest release)
+* ``stellargroup/hpx:0.9.11``	(release v0.9.11)
 * ``stellargroup/hpx:0.9.10``	(release v0.9.10)
 
 While a more detailed introduction to docker can be found at the official

@@ -1,6 +1,7 @@
 [/=============================================================================
     Copyright (C) 2012 Adrian Serio
     Copyright (C) 2012 Vinay C Amatya
+    Copyright (C) 2015 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -163,7 +164,7 @@ function that is to be wrapped and the name of the action that you are
 creating.
 
 This picture should now start making sense. The function `fibonacci()` is
-wrapped in an action `fibonacci_action`, which was run synchronously but 
+wrapped in an action `fibonacci_action`, which was run synchronously but
 created asynchronous work, then returns a `boost::uint64_t`
 representing the result of the function `fibonacci()`. Now, lets look at the
 function `fibonacci()`:
@@ -333,9 +334,7 @@ component actions.
 
 Components are globally named, meaning that a component action can be called
 remotely (e.g.  from another machine). There are two accumulator examples in
-__hpx__; managed_accumulator and simple_accumulator (we will talk more about the
-differences between the two later). This tutorial will examine the
-managed_accumulator variant.
+__hpx__; accumulator.
 
 In the __fibonacci_example__ and the
 __hello_world_example__, we introduced plain actions, which wrapped global
@@ -362,19 +361,19 @@ accumulator instance.
 [teletype]
 
 The source code for this example can be found here:
-[hpx_link examples/accumulator/managed_accumulator_client.cpp..managed_accumulator_client.cpp].
+[hpx_link examples/accumulators/accumulator_client.cpp..accumulator_client.cpp].
 
 To compile this program, go to your __hpx__ build directory (see __getting_started__
 for information on configuring and building __hpx__) and enter:
 
 ``
-    make examples.accumulator.managed_accumulator
+    make examples.accumulator.accumulator
 ``
 
 To run the program type:
 
 ``
-    ./bin/managed_accumulator_client
+    ./bin/accumulator_client
 ``
 
 Once the program starts running, it will print the following prompt and then
@@ -400,145 +399,93 @@ wait for input. An example session is given below:
 
 [c++]
 
-Now, let's take a look at the source code of the managed_accumulator example. This
+Now, let's take a look at the source code of the accumulator example. This
 example consists of two parts: an __hpx__ component library (a library that exposes
 an __hpx__ component) and a client application which uses the library. This
 walkthrough will cover the __hpx__ component library. The code for the client
 application can be found here:
-[hpx_link examples/accumulator/managed_accumulator_client.cpp..managed_accumulator_client.cpp].
+[hpx_link examples/accumulators/accumulator_client.cpp..accumulator_client.cpp].
 
-An __hpx__ component is represented by three C++ classes:
+An __hpx__ component is represented by two C++ classes:
 
 * [*A server class] - The implementation of the components functionality.
-* [*A stubs class] - A lower-level interface to instances of the component.
 * [*A client class] - A high-level interface that acts as a proxy for an
   instance of the component.
 
-Typically, these three classes all have the same name, but stubs and server
-classes usually live in different sub-namespaces (`server` and `stubs`
-respectively).  For example, the full names of the three classes in
-managed_accumulator are:
+Typically, these two classes all have the same name, but the server
+class usually lives in different sub-namespaces (`server`).  For example, the
+full names of the two classes in accumulator are:
 
-* `examples::server::managed_accumulator` (server class)
-* `examples::stubs::managed_accumulator` (stubs class)
-* `examples::managed_accumulator` (client class)
+* `examples::server::accumulator` (server class)
+* `examples::accumulator` (client class)
 
 [heading The Server Class]
 
 The following code is from:
-[hpx_link examples/accumulator/accumulators/server/managed_accumulator.hpp..server/managed_accumulator.hpp].
+[hpx_link examples/accumulators/server/accumulator.hpp..server/accumulator.hpp].
 
-All __hpx__ component server classes must inherit publicly from an __hpx__ component
-base class. There are currently two component base classes:
+All __hpx__ component server classes must inherit publicly from the __hpx__ component
+base class: [classref hpx::components::component_base]`<>`
 
-* [classref hpx::components::managed_component_base]`<>` - Managed components are components
-  which are allocated in bulk by __hpx__. Managed components are more efficient if
-  you are creating a large number (e.g. hundreds or more per machine) of
-  component instances.
-* [classref hpx::components::simple_component_base]`<>` - Simple components are components
-  which are allocated individually by __hpx__. Simple components are more efficient
-  if you are creating a small number (e.g. only a handful per machine) of
-  component instances.
-
-The managed_accumulator component inherits from [classref hpx::components::locking_hock]`<>`.
+The accumulator component inherits from [classref hpx::components::locking_hock]`<>`.
 This allows the runtime system to ensure that all action invocations are
 serialized. That means that the system ensures that no two actions are invoked
 at the same time on a given component instance. This makes the component thread
 safe and no additional locking has to be implemented by the user. Moreover,
-managed_accumulator component is a managed component, because it also inherits
-from [classref hpx::components::managed_component_base]`<>` (the template
+accumulator component is a component, because it also inherits
+from [classref hpx::components::component_base]`<>` (the template
 argument passed to locking_hook is used as its base class). The following
 snippet shows the corresponding code:
 
-[import ../../examples/accumulator/accumulators/server/managed_accumulator.hpp]
-[managed_accumulator_server_inherit]
+[import ../../examples/accumulators/server/accumulator.hpp]
+[accumulator_server_inherit]
 
 Our accumulator class will need a data member to store its value in, so let's
 declare a data member:
 
-[managed_accumulator_server_data_member]
+[accumulator_server_data_member]
 
 The constructor for this class simply initializes `value_` to 0:
 
-[managed_accumulator_server_ctor]
+[accumulator_server_ctor]
 
 Next, let's look at the three methods of this component that we will be exposing
 as component actions:
 
-[managed_accumulator_methods]
+[accumulator_methods]
 
 Here are the action types. These types wrap the methods we're exposing. The
 wrapping technique is very similar to the one used in the __fibonacci_example__
 and the __hello_world_example__:
 
-[managed_accumulator_action_types]
+[accumulator_action_types]
 
 The last piece of code in the server class header is the declaration of the
 action type registration code:
 
-[managed_accumulator_registration_declarations]
+[accumulator_registration_declarations]
 
 [note The code above must be placed in the global namespace.]
 
 The rest of the registration code is in
-[hpx_link examples/accumulator/accumulators/managed_accumulator.cpp..managed_accumulator.cpp].
+[hpx_link examples/accumulators/accumulator.cpp..accumulator.cpp].
 
-[import ../../examples/accumulator/accumulators/managed_accumulator.cpp]
-[managed_accumulator_registration_definitions]
+[import ../../examples/accumulators/accumulator.cpp]
+[accumulator_registration_definitions]
 
 [note The code above must be placed in the global namespace.]
-
-[heading The Stubs Class]
-
-The following code is from
-[hpx_link examples/accumulator/accumulators/stubs/managed_accumulator.hpp..stubs/managed_accumulator.hpp].
-
-All stubs classes must inherit from the stubs base class, [classref hpx::components::stub_base]`<>`:
-
-[import ../../examples/accumulator/accumulators/stubs/managed_accumulator.hpp]
-[managed_accumulator_stubs_inherit]
-
-The stubs class contains helper functions which invoke actions on component
-instances. There are a few different ways of invoking actions:
-
-* [*Non-blocking]: For actions which don't have return types, or when we do not
-  care about the result of an action, we can invoke the action using
-  fire-and-forget semantics. This means that once we have asked __hpx__ to compute
-  the action, we forget about it completely and continue with our computation.
-  We use [funcref hpx::applier::apply]`<>()` instead of
-  [funcref hpx::async]`<>()` to invoke an action in a non-blocking fashion.
-  Here's an example from the managed_accumulator stubs class:
-
-[managed_accumulator_stubs_reset_non_blocking]
-
-* [*Asynchronous]: Futures, as demonstrated in __fibonacci_example__ and the
-  __hello_world_example__, enable asynchronous action invocation. Here's an
-  example from the managed_accumulator stubs class:
-
-[managed_accumulator_stubs_query_async]
-
-* [*Synchronous]: To invoke an action in a fully synchronous manner, we can
-  simply call [classref hpx::async]`<>().get()` (e.g., create a future and
-  immediately wait on it to be ready). Here's an example from the
-  managed_accumulator stubs class:
-
-[managed_accumulator_stubs_add_sync]
-
-[classref hpx::naming::id_type] is a type which represents a global identifier
-in __hpx__. This is the type that is returned by [funcref hpx::find_here]`()`. This
-type specifies the target of an action.
 
 [heading The Client Class]
 
 The following code is from
-[hpx_link examples/accumulator/accumulators/managed_accumulator.hpp..managed_accumulator.hpp].
+[hpx_link examples/accumulators/accumulator.hpp..accumulator.hpp].
 
 The client class is the primary interface to a component instance. Client classes
 are used to create components:
 
 ``
-    examples::managed_accumulator c;
-    c.create(hpx::find_here()); // Create a component on this machine.
+    // Create a component on this locality.
+    examples::accumulator c = hpx::new_<examples::accumulator>(hpx::find_here());
 ``
 
 and to invoke component actions:
@@ -547,26 +494,51 @@ and to invoke component actions:
     c.add_sync(4);
 ``
 
-Clients, like stubs and servers, need to inherit from a base class, this time,
+Clients, like servers, need to inherit from a base class, this time,
 [classref hpx::components::client_base]`<>`:
 
-[import ../../examples/accumulator/accumulators/managed_accumulator.hpp]
-[managed_accumulator_client_inherit]
+[import ../../examples/accumulators/accumulator.hpp]
+[accumulator_client_inherit]
 
 For readability, we typedef the base class like so:
 
-[managed_accumulator_base_type]
+[accumulator_base_type]
 
 Here are examples of how to expose actions through a client class:
 
-[managed_accumulator_client_reset_non_blocking]
+There are a few different ways of invoking actions:
 
-[managed_accumulator_client_query_async]
+* [*Non-blocking]: For actions which don't have return types, or when we do not
+  care about the result of an action, we can invoke the action using
+  fire-and-forget semantics. This means that once we have asked __hpx__ to compute
+  the action, we forget about it completely and continue with our computation.
+  We use [funcref hpx::apply]`<>()` instead of
+  [funcref hpx::async]`<>()` to invoke an action in a non-blocking fashion.
 
-[managed_accumulator_client_add_sync]
+[accumulator_client_reset_non_blocking]
 
-Note that `this->gid_` references a data member of the
-[classref hpx::components::client_base]`<>` base class.
+* [*Asynchronous]: Futures, as demonstrated in __fibonacci_example__ and the
+  __hello_world_example__, enable asynchronous action invocation. Here's an
+  example from the accumulator client class:
+
+[accumulator_client_query_async]
+
+* [*Synchronous]: To invoke an action in a fully synchronous manner, we can
+  simply call [classref hpx::async]`<>().get()` (e.g., create a future and
+  immediately wait on it to be ready). Here's an example from the
+  accumulator client class:
+
+[accumulator_client_add_sync]
+
+Note that `this->get_id()` references a data member of the
+[classref hpx::components::client_base]`<>` base class which identifies the
+server accumulator instance.
+
+[classref hpx::naming::id_type `hpx::id_type`] is a type which represents a
+global identifier in __hpx__. This type specifies the target of an action.
+This is the type that is returned by [funcref hpx::find_here]`()` in which case
+it represents the locality the code is running on.
+
 
 [endsect] [/Accumulator]
 
@@ -665,13 +637,13 @@ first place our principal and rate into shares futures by passing the variables
 In this way [classref hpx::shared_future]`<double> principal` and `rate`
 will be initialized to `init_principal` and `init_rate` when
 [classref hpx::make_ready_future]`<double>` returns a future containing
-those inital values. These shared futures then enter the for loop and are 
-passed to `interest`. Next `principal` and `interest` are passed to the 
-reassignment of `principal` using a [classref dataflow]. A dataflow will 
+those inital values. These shared futures then enter the for loop and are
+passed to `interest`. Next `principal` and `interest` are passed to the
+reassignment of `principal` using a [classref dataflow]. A dataflow will
 first wait for it's arguments to be ready before launching any callbacks,
 so `add` in this case will not begin until both `principal` and `interest` are ready.
-This loop continues for each compound period that must be calculated. To 
-see how `interest` and `principal` are calculated in the loop let us look 
+This loop continues for each compound period that must be calculated. To
+see how `interest` and `principal` are calculated in the loop let us look
 at `calc_action` and `add_action`:
 
 [interest_calc_add_action]
@@ -684,8 +656,8 @@ following statement:
 ``
 
 This statement calls [memberref hpx::future::get]`()` on the shared future prinipcal
-which had it's value calculated by our for loop. The program will wait here until the 
-entire dataflow tree has been calculated and the value assigned to result. The program 
+which had it's value calculated by our for loop. The program will wait here until the
+entire dataflow tree has been calculated and the value assigned to result. The program
 then prints out the final value of the investment and the amount of interest made by subtracting
 the final value of the investment from the initial value of the investment.
 

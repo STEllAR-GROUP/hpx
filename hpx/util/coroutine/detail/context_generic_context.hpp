@@ -13,6 +13,7 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
+#include <hpx/util/coroutine/detail/get_stack_pointer.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 
@@ -23,12 +24,12 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/version.hpp>
+#include <boost/cstdint.hpp>
 
 #if BOOST_VERSION < 105100
 #error Boost.Context is available only with Boost V1.51 or later
 #endif
 
-#include <boost/config.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>
@@ -154,7 +155,7 @@ namespace hpx { namespace util { namespace coroutines
         // Generic implementation for the context_impl_base class based on
         // Boost.Context.
         template <typename T>
-        BOOST_FORCEINLINE void trampoline(intptr_t pv)
+        HPX_FORCEINLINE void trampoline(intptr_t pv)
         {
             T* fun = reinterpret_cast<T*>(pv);
             HPX_ASSERT(fun);
@@ -226,6 +227,16 @@ namespace hpx { namespace util { namespace coroutines
             std::ptrdiff_t get_stacksize() const
             {
                 return stack_size_;
+            }
+
+            std::ptrdiff_t get_available_stack_space()
+            {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+                return
+                    reinterpret_cast<uintptr_type>(stack_pointer_) - get_stack_ptr();
+#else
+                return (std::numeric_limits<std::ptrdiff_t>::max)();
+#endif
             }
 
             // global functions to be called for each OS-thread after it started

@@ -10,10 +10,10 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
@@ -24,7 +24,7 @@ namespace nqueen
 namespace server
 {
     class board
-        : public hpx::components::managed_component_base<board>
+        : public hpx::components::component_base<board>
     {
     private:
         list_type list_;

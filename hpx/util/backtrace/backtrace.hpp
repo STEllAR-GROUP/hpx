@@ -10,41 +10,21 @@
 #ifndef HPX_BACKTRACE_HPP
 #define HPX_BACKTRACE_HPP
 
-#include <boost/config.hpp>
+#include <hpx/config/export_definitions.hpp>
 #include <string>
 #include <vector>
 #include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
-//#ifdef BOOST_HAS_DECLSPEC // defined by boost.config
-// we need to import/export our code only if the user has specifically
-// asked for it by defining either BOOST_ALL_DYN_LINK if they want all boost
-// libraries to be dynamically linked, or HPX_BACKTRACE_DYN_LINK
-// if they want just this one to be dynamically linked:
-#if defined(BOOST_ALL_DYN_LINK) || defined(HPX_BACKTRACE_DYN_LINK)
-// export if this is our own source, otherwise import:
-#ifdef HPX_BACKTRACE_SOURCE
-# define HPX_BACKTRACE_DECL BOOST_SYMBOL_EXPORT
-#else
-# define HPX_BACKTRACE_DECL BOOST_SYMBOL_IMPORT
-#endif  // HPX_BACKTRACE_SOURCE
-#endif  // DYN_LINK
-//#endif  // BOOST_HAS_DECLSPEC
-//
-// if HPX_BACKTRACE_DECL isn't defined yet define it now:
-#ifndef HPX_BACKTRACE_DECL
-#define HPX_BACKTRACE_DECL
-#endif
-
 namespace hpx { namespace util
 {
     namespace stack_trace
     {
-        HPX_BACKTRACE_DECL std::size_t trace(void **addresses, std::size_t size);
-        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,
+        HPX_API_EXPORT std::size_t trace(void **addresses, std::size_t size);
+        HPX_API_EXPORT void write_symbols(void *const *addresses,
             std::size_t size,std::ostream &);
-        HPX_BACKTRACE_DECL std::string get_symbol(void *address);
-        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address,
+        HPX_API_EXPORT std::string get_symbol(void *address);
+        HPX_API_EXPORT std::string get_symbols(void * const *address,
             std::size_t size);
     } // stack_trace
 
@@ -99,7 +79,7 @@ namespace hpx { namespace util
             return stack_trace::get_symbols(&frames_.front(),frames_.size());
         }
 
-        HPX_BACKTRACE_DECL std::string trace_on_new_stack() const;
+        HPX_API_EXPORT std::string trace_on_new_stack() const;
 
         void trace(std::ostream &out) const
         {

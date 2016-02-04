@@ -9,7 +9,7 @@
 #define HPX_UNUSED_FEB_01_2009_1217PM
 
 #include <hpx/config.hpp>
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 # pragma warning(push)
 # pragma warning(disable: 4522) // multiple assignment operators specified warning
 #endif
@@ -66,7 +66,7 @@ namespace hpx { namespace util
 // use this to silence compiler warnings related to unused function arguments.
 #define HPX_UNUSED(x)  ::hpx::util::unused = (x)
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 # pragma warning(pop)
 #endif
 

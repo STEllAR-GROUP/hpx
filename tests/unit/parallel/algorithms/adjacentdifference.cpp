@@ -15,7 +15,9 @@
 template <typename ExPolicy>
 void test_adjacent_difference(ExPolicy policy)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d(10007);
@@ -38,7 +40,9 @@ void test_adjacent_difference(ExPolicy policy)
 template <typename ExPolicy>
 void test_adjacent_difference_async(ExPolicy p)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d(10007);

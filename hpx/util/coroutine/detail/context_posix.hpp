@@ -47,7 +47,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
 
 #if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) \
@@ -145,6 +145,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #include <signal.h>                 // SIGSTKSZ
 #include <boost/noncopyable.hpp>
 #include <hpx/util/coroutine/exception.hpp>
+#include <hpx/util/coroutine/detail/get_stack_pointer.hpp>
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 
@@ -235,6 +236,16 @@ namespace hpx { namespace util { namespace coroutines {
         std::ptrdiff_t get_stacksize() const
         {
             return m_stack_size;
+        }
+
+        std::ptrdiff_t get_available_stack_space()
+        {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+                return
+                    get_stack_ptr() - reinterpret_cast<uintptr_type>(m_stack);
+#else
+                return (std::numeric_limits<std::ptrdiff_t>::max)();
+#endif
         }
 
         // global functions to be called for each OS-thread after it started

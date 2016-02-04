@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -14,7 +14,7 @@
 #include "sine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     ::performance_counters::sine::server::sine_counter
 > sine_counter_type;
 

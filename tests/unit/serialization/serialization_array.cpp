@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <numeric>
-
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/multi_array.hpp>
@@ -15,6 +13,8 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
+
+#include <numeric>
 
 template <typename T>
 struct A
@@ -154,6 +154,43 @@ void test_boost_array(T first)
     }
 }
 
+#ifdef HPX_HAVE_CXX11_STD_ARRAY
+template <class T, std::size_t N>
+void test_std_array(T first)
+{
+    {
+        std::vector<char> buffer;
+        hpx::serialization::output_archive oarchive(buffer);
+        std::array<T, N> oarray;
+        std::iota(oarray.begin(), oarray.end(), first);
+        oarchive << oarray;
+
+        hpx::serialization::input_archive iarchive(buffer);
+        std::array<T, N> iarray;
+        iarchive >> iarray;
+        for(std::size_t i = 0; i < oarray.size(); ++i)
+        {
+            HPX_TEST_EQ(oarray[i], iarray[i]);
+        }
+    }
+    {
+        std::vector<char> buffer;
+        hpx::serialization::output_archive oarchive(buffer);
+        std::array<A<T>, N> oarray;
+        std::iota(oarray.begin(), oarray.end(), first);
+        oarchive << oarray;
+
+        hpx::serialization::input_archive iarchive(buffer);
+        std::array<A<T> , N> iarray;
+        iarchive >> iarray;
+        for(std::size_t i = 0; i < oarray.size(); ++i)
+        {
+            HPX_TEST_EQ(oarray[i].t_, iarray[i].t_);
+        }
+    }
+}
+#endif
+
 template <class T>
 void test_multi_array(T first)
 {
@@ -260,6 +297,12 @@ int main()
     test_boost_array<char, 100U>('\0');
     test_boost_array<double, 40U>((std::numeric_limits<double>::min)());
     test_boost_array<float, 100U>(0.f);
+
+#ifdef HPX_HAVE_CXX11_STD_ARRAY
+    test_std_array<char, 100U>('\0');
+    test_std_array<double, 40U>((std::numeric_limits<double>::min)());
+    test_std_array<float, 100U>(0.f);
+#endif
 
     test_multi_array(0);
     test_multi_array(0.);

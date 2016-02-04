@@ -45,33 +45,6 @@ struct Seventeen
 //        int value;
 //    };
 //}
-//
-//#ifndef BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP
-//
-//namespace contain_test {
-//# ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
-//    bool function_equal(const ReturnIntFE& x, const ReturnIntFE& y)
-//    { return x.value == y.value; }
-//# else
-//    bool function_equal_impl(const ReturnIntFE& x, const ReturnIntFE& y, int)
-//    { return x.value == y.value; }
-//# endif // #ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
-//}
-//#else // BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP
-//namespace boost {
-//# ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
-//    bool
-//        function_equal(const contain_test::ReturnIntFE& x,
-//        const contain_test::ReturnIntFE& y)
-//    { return x.value == y.value; }
-//# else
-//    bool
-//        function_equal_impl(const contain_test::ReturnIntFE& x,
-//        const contain_test::ReturnIntFE& y, int)
-//    { return x.value == y.value; }
-//# endif
-//}
-//#endif
 
 static void target_test()
 {
@@ -98,10 +71,8 @@ static void target_test()
 //    f = &forty_two;
 //    HPX_TEST(f == &forty_two);
 //    HPX_TEST(f != ReturnInt(17));
-//#if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //    HPX_TEST(&forty_two == f);
 //    HPX_TEST(ReturnInt(17) != f);
-//#endif
 //
 //    HPX_TEST(f.contains(&forty_two));
 //
@@ -109,11 +80,9 @@ static void target_test()
 //    HPX_TEST(f != &forty_two);
 //    HPX_TEST(f == ReturnInt(17));
 //    HPX_TEST(f != ReturnInt(16));
-//#if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //    HPX_TEST(&forty_two != f);
 //    HPX_TEST(ReturnInt(17) == f);
 //    HPX_TEST(ReturnInt(16) != f);
-//#endif
 //
 //    HPX_TEST(f.contains(ReturnInt(17)));
 //
@@ -121,35 +90,27 @@ static void target_test()
 //    HPX_TEST(f != &forty_two);
 //    HPX_TEST(f == contain_test::ReturnIntFE(17));
 //    HPX_TEST(f != contain_test::ReturnIntFE(16));
-//#if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //    HPX_TEST(&forty_two != f);
 //    HPX_TEST(contain_test::ReturnIntFE(17) == f);
 //    HPX_TEST(contain_test::ReturnIntFE(16) != f);
-//#endif
 //
 //    HPX_TEST(f.contains(contain_test::ReturnIntFE(17)));
 //
-//#if !defined(BOOST_FUNCTION_NO_FUNCTION_TYPE_SYNTAX)
 //    hpx::util::function_nonser<int(void)> g;
 //
 //    g = &forty_two;
 //    HPX_TEST(g == &forty_two);
 //    HPX_TEST(g != ReturnInt(17));
-//#  if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //    HPX_TEST(&forty_two == g);
 //    HPX_TEST(ReturnInt(17) != g);
-//#  endif
 //
 //    g = ReturnInt(17);
 //    HPX_TEST(g != &forty_two);
 //    HPX_TEST(g == ReturnInt(17));
 //    HPX_TEST(g != ReturnInt(16));
-//#  if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //    HPX_TEST(&forty_two != g);
 //    HPX_TEST(ReturnInt(17) == g);
 //    HPX_TEST(ReturnInt(16) != g);
-//#  endif
-//#endif
 //}
 //
 //static void ref_equal_test()
@@ -165,10 +126,8 @@ static void target_test()
 //        HPX_TEST(!(f != boost::ref(ri)));
 //        HPX_TEST(!(f != ri));
 //        HPX_TEST(!(boost::ref(ri) != f));
-//#if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //        HPX_TEST(ri == f);
 //        HPX_TEST(!(ri != f));
-//#endif
 //
 //        // Values equal, references inequal
 //        ReturnInt ri2(17);
@@ -178,13 +137,10 @@ static void target_test()
 //        HPX_TEST(!(f != ri2));
 //        HPX_TEST(!(f == boost::ref(ri2)));
 //        HPX_TEST(!(boost::ref(ri2) == f));
-//#if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //        HPX_TEST(ri2 == f);
 //        HPX_TEST(!(ri2 != f));
-//#endif
 //    }
 //
-//#if !defined(BOOST_FUNCTION_NO_FUNCTION_TYPE_SYNTAX)
 //    {
 //        ReturnInt ri(17);
 //        hpx::util::function_nonser<int(void)> f = boost::ref(ri);
@@ -196,10 +152,8 @@ static void target_test()
 //        HPX_TEST(!(f != boost::ref(ri)));
 //        HPX_TEST(!(f != ri));
 //        HPX_TEST(!(boost::ref(ri) != f));
-//#  if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //        HPX_TEST(ri == f);
 //        HPX_TEST(!(ri != f));
-//#  endif
 //
 //        // Values equal, references inequal
 //        ReturnInt ri2(17);
@@ -209,12 +163,9 @@ static void target_test()
 //        HPX_TEST(!(f != ri2));
 //        HPX_TEST(!(f == boost::ref(ri2)));
 //        HPX_TEST(!(boost::ref(ri2) == f));
-//#  if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //        HPX_TEST(ri2 == f);
 //        HPX_TEST(!(ri2 != f));
-//#  endif
 //    }
-//#endif
 //}
 
 int main(int, char*[])

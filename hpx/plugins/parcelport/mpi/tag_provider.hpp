@@ -6,6 +6,9 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_TAG_PROVIDER_HPP
 #define HPX_PARCELSET_POLICIES_MPI_TAG_PROVIDER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <deque>
@@ -54,5 +57,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         std::deque<int> free_tags_;
     };
 }}}}
+
+#endif
 
 #endif

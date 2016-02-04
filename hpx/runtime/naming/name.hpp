@@ -13,6 +13,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -68,21 +69,26 @@ namespace hpx { namespace naming
         typedef gid_type size_type;
         typedef gid_type difference_type;
 
-        static boost::uint64_t const credit_base_mask = 0x1ful;
+        static boost::uint64_t const credit_base_mask = 0x1full;
         static boost::uint16_t const credit_shift = 24;
 
         static boost::uint64_t const credit_mask = credit_base_mask << credit_shift;
-        static boost::uint64_t const was_split_mask = 0x80000000ul; //-V112
-        static boost::uint64_t const has_credits_mask = 0x40000000ul; //-V112
-        static boost::uint64_t const is_locked_mask = 0x20000000ul; //-V112
+        static boost::uint64_t const was_split_mask = 0x80000000ull; //-V112
+        static boost::uint64_t const has_credits_mask = 0x40000000ull; //-V112
+        static boost::uint64_t const is_locked_mask = 0x20000000ull; //-V112
 
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
-        static boost::uint64_t const virtual_memory_mask = 0xffffffull;
+        static boost::uint16_t const locality_id_shift = 32;
+
+        static boost::uint64_t const virtual_memory_mask = 0x7fffffull;
+
+        // don't cache this id in the AGAS caches
+        static boost::uint64_t const dont_cache_mask = 0x800000ull; //-V112
 
         static boost::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
         static boost::uint64_t const internal_bits_mask =
-            credit_bits_mask | is_locked_mask;
+            credit_bits_mask | is_locked_mask | dont_cache_mask;
         static boost::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask;
 
@@ -404,14 +410,16 @@ namespace hpx { namespace naming
 
     inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
     {
-        return gid_type(boost::uint64_t(locality_id+1) << 32, 0); //-V112
+        return gid_type(
+            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            0);
     }
 
     inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb)
     {
-        return boost::uint32_t(msb >> 32)-1; //-V112
+        return boost::uint32_t(msb >> gid_type::locality_id_shift) - 1;
     }
 
     inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
@@ -451,8 +459,6 @@ namespace hpx { namespace naming
         msb |= get_gid_from_locality_id(locality_id).get_msb();
         return gid_type(msb, gid.get_lsb());
     }
-
-    BOOST_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
 
     ///////////////////////////////////////////////////////////////////////////
     inline bool refers_to_virtual_memory(gid_type const& gid)
@@ -495,6 +501,17 @@ namespace hpx { namespace naming
         inline void set_credit_split_mask_for_gid(gid_type& id)
         {
             id.set_msb(id.get_msb() | gid_type::was_split_mask);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline bool store_in_cache(gid_type const& id)
+        {
+            return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
+        }
+
+        inline void set_dont_store_in_cache(id_type& id)
+        {
+            id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -637,9 +654,6 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
-        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(
-            gid_type::mutex_type::scoped_lock &l, gid_type& gid);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
@@ -772,7 +786,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(id_type_impl);
+            HPX_MOVABLE_BUT_NOT_COPYABLE(id_type_impl)
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t);
@@ -805,8 +819,9 @@ namespace hpx { namespace naming
             }
 
             // serialization
-            void save(serialization::output_archive& ar) const;
-            void load(serialization::input_archive& ar);
+            void save(serialization::output_archive& ar, unsigned) const;
+            void load(serialization::input_archive& ar, unsigned);
+            HPX_SERIALIZATION_SPLIT_MEMBER()
 
         private:
             // credit management (called during serialization), this function
@@ -853,15 +868,16 @@ namespace hpx { namespace naming
 
     inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
     {
-        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged);
-        //-V112
+        return id_type(
+            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            0, id_type::unmanaged);
     }
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> 32) - 1; //-V112
+        return boost::uint32_t(id.get_msb() >> gid_type::locality_id_shift) - 1;
     }
 
     inline id_type get_locality_from_id(id_type const& id)

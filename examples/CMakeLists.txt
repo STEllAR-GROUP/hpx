@@ -7,7 +7,7 @@
 
 set(subdirs
     1d_hydro
-    accumulator
+    accumulators
     allgather
     async_io
     balancing
@@ -23,17 +23,21 @@ set(subdirs
     quickstart
     qt
     random_mem_access
-    sheneos
     spell_check
     startup_shutdown
     thread_aware_timer
     throttle
    )
 
+if(HPX_WITH_FORTRAN)
+  set(subdirs ${subdirs}
+    sheneos
+    )
+endif()
+
 if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
       1d_stencil
-      diskperf
       tuplespace
       transpose
      )

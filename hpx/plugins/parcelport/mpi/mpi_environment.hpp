@@ -7,6 +7,8 @@
 #define HPX_UTIL_MPI_ENV_HPP
 
 #include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <mpi.h>
@@ -33,6 +35,8 @@ namespace hpx { namespace util
         static MPI_Comm& communicator();
 
         static std::string get_processor_name();
+
+        static bool check_mpi_environment(runtime_configuration const& cfg);
 
         struct scoped_lock
         {
@@ -63,5 +67,7 @@ namespace hpx { namespace util
         static MPI_Comm communicator_;
     };
 }}
+
+#endif
 
 #endif

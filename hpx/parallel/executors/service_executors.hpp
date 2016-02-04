@@ -28,8 +28,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
       : threads::executors::service_executor
 #endif
     {
-        // Associate the static_chunk_size executor parameters type as a default
-        // with this executor.
+        /// Associate the static_chunk_size executor parameters type as a default
+        /// with this executor.
         typedef static_chunk_size executor_parameters_type;
 
         /// Create a new service executor for the given HPX thread pool

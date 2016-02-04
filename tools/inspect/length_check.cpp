@@ -7,6 +7,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "length_check.hpp"
+#include "function_hyper.hpp"
 #include <iostream>
 #include <functional>
 #include <string>
@@ -23,11 +24,8 @@ namespace boost
 {
     namespace inspect
     {
-        size_t limit;
-
-        length_check::length_check(size_t setting)
-            : m_files_with_errors(0)
-
+        length_check::length_check(std::size_t setting)
+            : m_files_with_errors(0), limit(setting)
         {
             register_signature(".c");
             register_signature(".cpp");
@@ -39,8 +37,6 @@ namespace boost
             register_signature(".inc");
             register_signature(".ipp");
             register_signature(".txt");
-
-            limit = setting;
         }
 
         struct pattern
@@ -49,11 +45,13 @@ namespace boost
             int pos_;
         };
 
+        // lines to ignore
         static pattern const patterns[] =
         {
-            { "\\s*#\\s*error", 0 },
-            { "\\s*#\\s*include", 0 },
-            { "https?://", -1 },
+            { "\\s*#\\s*error", 0 },        // #error
+            { "\\s*#\\s*include", 0 },      // #include
+            { "https?://", -1 },            // urls
+            { "///", -1 }                   // doc-strings
         };
 
         void length_check::inspect(
@@ -75,13 +73,13 @@ namespace boost
 
             string total, linenum;
             long errors = 0, currline = 0;
-            size_t p = 0;
+            std::size_t p = 0;
             vector<string> someline, lineorder;
 
             char_separator<char> sep("\n", "", boost::keep_empty_tokens);
-            tokenizer<char_separator<char>> tokens(contents, sep);
+            tokenizer<char_separator<char> > tokens(contents, sep);
             for (const auto& t : tokens) {
-                size_t rend = t.find_first_of("\r"), size = t.size();
+                std::size_t rend = t.find_first_of("\r"), size = t.size();
                 if (rend == size - 1)
                 {
                     someline.push_back(t);
@@ -89,7 +87,7 @@ namespace boost
                 else
                 {
                     char_separator<char> sep2("\r", "", boost::keep_empty_tokens);
-                    tokenizer<char_separator<char>> tokens2(t, sep2);
+                    tokenizer<char_separator<char> > tokens2(t, sep2);
                     for (const auto& u : tokens2) {
                         someline.push_back(u);
                     }
@@ -99,8 +97,8 @@ namespace boost
             while (p < someline.size())
             {
                 currline++;
-                size_t rend = someline[p].find_last_of("\r");
-                bool check_not = 0;
+                std::size_t rend = someline[p].find_last_of("\r");
+                bool check_not = false;
                 boost::regex error_note, http_note;
 
                 for (std::size_t i = 0;
@@ -114,12 +112,12 @@ namespace boost
                         // skip this line if either no position is specified
                         // or the pattern was found at the given position
                         if (patterns[i].pos_ == -1 || m.position() == patterns[i].pos_)
-                            check_not = 1;
+                            check_not = true;
                     }
                 }
 
-                size_t size = someline[p].size();
-                if (size > limit && check_not == 0)
+                std::size_t size = someline[p].size();
+                if (size > limit && !check_not)
                 {
                     errors++;
                     linenum = to_string(currline);
@@ -131,7 +129,8 @@ namespace boost
             p = 0;
             while (p < lineorder.size())
             {
-                total += lineorder[p];
+                total += linelink(full_path, lineorder[p]);
+                //linelink is located in function_hyper.hpp
                 if (p < lineorder.size() - 1)
                 {
                     total += ", ";

@@ -21,7 +21,7 @@
 // the documentation
 #error this is obsolete
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 

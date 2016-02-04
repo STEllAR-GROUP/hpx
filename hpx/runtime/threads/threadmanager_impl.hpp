@@ -26,9 +26,9 @@
 
 #include <boost/atomic.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <vector>
 #include <memory>
@@ -277,14 +277,14 @@ namespace hpx { namespace threads
             return pool_.get_used_processing_units();
         }
 
-        void reset_thread_distribution()
-        {
-            pool_.reset_thread_distribution();
-        }
-
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
             pool_.set_scheduler_mode(mode);
+        }
+
+        void reset_thread_distribution()
+        {
+            pool_.reset_thread_distribution();
         }
 
     private:

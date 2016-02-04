@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
+
 struct ___itt_caller;
 struct ___itt_string_handle;
 struct ___itt_domain;

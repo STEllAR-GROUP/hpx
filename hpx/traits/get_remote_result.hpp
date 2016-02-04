@@ -7,9 +7,8 @@
 #define HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM
 
 #include <hpx/traits.hpp>
-#include <hpx/util/move.hpp>
 
-#include <boost/config.hpp>
+#include <utility>
 
 namespace hpx { namespace traits
 {
@@ -34,17 +33,11 @@ namespace hpx { namespace traits
         {
             return rhs;
         }
-#if __GNUC__ == 4 && __GNUC_MINOR__ == 4
-        static Result&& call(Result&& rhs)
-        {
-            return rhs;
-        }
-#else
+
         static Result && call(Result && rhs)
         {
             return std::move(rhs);
         }
-#endif
     };
 }}
 

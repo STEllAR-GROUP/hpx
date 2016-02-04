@@ -38,9 +38,10 @@
 #endif
 
 #if defined(__INTEL_COMPILER)
-
 # define HPX_INTEL_VERSION __INTEL_COMPILER
-
+# if defined(_WIN32) || (_WIN64)
+#  define HPX_INTEL_WIN HPX_INTEL_VERSION
+# endif
 #else
 
 #  undef HPX_INTEL_VERSION
@@ -50,6 +51,15 @@
 // Identify if we compile for the MIC
 #if defined(__MIC)
 #   define HPX_NATIVE_MIC
+#endif
+
+#if defined(_MSC_VER)
+#   define HPX_MSVC _MSC_VER
+#   define HPX_WINDOWS
+#endif
+
+#if defined(__MINGW32__)
+#   define HPX_WINDOWS
 #endif
 
 #endif

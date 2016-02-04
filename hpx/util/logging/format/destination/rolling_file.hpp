@@ -17,14 +17,15 @@
 #ifndef JT28092007_destination_rolling_file_HPP_DEFINED
 #define JT28092007_destination_rolling_file_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma warning ( disable : 4355)
 #endif
 
+#include <hpx/config.hpp>
 #include <boost/version.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>

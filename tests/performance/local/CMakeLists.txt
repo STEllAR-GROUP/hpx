@@ -17,6 +17,7 @@ if(NOT MSVC)
 endif()
 
 set(benchmarks
+    agas_cache_timings
     async_overheads
     delay_baseline
     delay_baseline_threaded

@@ -23,7 +23,7 @@ namespace hpx { namespace lcos
     /// implementing a simple set_event action
     class HPX_API_EXPORT base_lco
     {
-    protected:
+    public:
         virtual void set_event () = 0;
 
         virtual void set_exception (boost::exception_ptr const& e);
@@ -34,7 +34,6 @@ namespace hpx { namespace lcos
         // noop by default
         virtual void disconnect(naming::id_type const &);
 
-    public:
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
         // component

@@ -9,6 +9,7 @@ set(tests
     function_arith
     function_args
     function_ref
+    function_target
     function_test
     nothrow_swap
     stateless_test

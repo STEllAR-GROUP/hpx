@@ -28,12 +28,14 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <string>
 
 #include "boost/shared_ptr.hpp"
 #include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
 #include "boost/program_options.hpp"
+#include "function_hyper.hpp"
 
 #include <stdio.h>  // for popen, pclose
 #if defined(_MSC_VER)
@@ -520,7 +522,7 @@ namespace
         {
           if ( !first ) out << "</pre>\n";
           out << "\n<h3><a name=\"" << itr->library
-                    << "\">" << itr->library << "</a></h3>\n<pre>";
+              << "\">" << itr->library << "</a></h3>\n<pre>";
         }
         if ( current.library != itr->library
           || current.rel_path != itr->rel_path )
@@ -543,8 +545,17 @@ namespace
 
           // print the message
           if (itr->line_number)
-            out << sep << "(line " << itr->line_number << ") " << html_encode(itr->msg);
-          else out << sep << html_encode(itr->msg);
+          {
+              string line = std::to_string(itr->line_number);
+              const path & full_path = itr->library;
+              string link = linelink(full_path, line);
+              out << sep << itr->msg << "(line " << link << ") ";
+              //Since the brackets are not used in inspect besides for formatting
+              //html_encode is unneccessary
+              //out << sep << "(line " << link << ") " << html_encode(itr->msg);
+          }
+          else out << sep << itr->msg;
+          //else out << sep << html_encode(itr->msg);
 
           first_sep = false;
         }
@@ -826,7 +837,8 @@ int cpp_main( int argc_param, char * argv_param[] )
             "the filename to write the output to (default: stdout)")
         ("text,t", "write a text file (default: html)")
         ("brief,b", "write a short report only (default: comprehensive)")
-        ("limit,l", value<std::size_t>(), "set limit to the length check tool (default: 90)")
+        ("limit,l", value<std::size_t>(),
+            "set limit to the length check tool (default: 90)")
 
         ("license", value<bool>(&license_ck)->implicit_value(false),
             "check for Boost license violations (default: off)")
@@ -904,11 +916,13 @@ int cpp_main( int argc_param, char * argv_param[] )
     if (vm.count("hpx:positional"))
     {
         for (auto const& s: vm["hpx:positional"].as<std::vector<std::string> >())
-            search_roots.push_back(fs::canonical(fs::absolute(s, fs::initial_path())));
+            search_roots.push_back(fs::canonical(fs::absolute(s,
+                fs::initial_path())));
     }
     else
     {
-        search_roots.push_back(fs::canonical(fs::absolute(".", fs::initial_path())));
+        search_roots.push_back(fs::canonical(fs::absolute(".",
+            fs::initial_path())));
     }
 
     if (vm.count("text"))
@@ -946,35 +960,50 @@ int cpp_main( int argc_param, char * argv_param[] )
   inspector_list inspectors;
 
   if ( license_ck )
-    inspectors.push_back( inspector_element( new boost::inspect::license_check ) );
+    inspectors.push_back( inspector_element(
+        new boost::inspect::license_check ) );
   if ( copyright_ck )
-    inspectors.push_back( inspector_element( new boost::inspect::copyright_check ) );
+    inspectors.push_back( inspector_element(
+        new boost::inspect::copyright_check ) );
   if ( crlf_ck )
-    inspectors.push_back( inspector_element( new boost::inspect::crlf_check ) );
+    inspectors.push_back( inspector_element(
+        new boost::inspect::crlf_check ) );
   if ( end_ck )
-    inspectors.push_back( inspector_element( new boost::inspect::end_check ) );
+    inspectors.push_back( inspector_element(
+        new boost::inspect::end_check ) );
   if ( link_ck )
-    inspectors.push_back( inspector_element( new boost::inspect::link_check ) );
+    inspectors.push_back( inspector_element(
+        new boost::inspect::link_check ) );
   if ( path_name_ck )
-    inspectors.push_back( inspector_element( new boost::inspect::file_name_check ) );
+    inspectors.push_back( inspector_element(
+        new boost::inspect::file_name_check ) );
   if ( tab_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::tab_check ) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::tab_check ) );
   if ( ascii_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::ascii_check ) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::ascii_check ) );
   if ( apple_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::apple_macro_check ) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::apple_macro_check ) );
   if ( assert_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::assert_macro_check ) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::assert_macro_check ) );
   if ( deprecated_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::deprecated_macro_check ) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::deprecated_macro_check ) );
   if ( minmax_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::minmax_check ) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::minmax_check ) );
   if ( unnamed_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::unnamed_namespace_check ) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::unnamed_namespace_check ) );
   if ( whitespace_ck )
-      inspectors.push_back( inspector_element( new boost::inspect::whitespace_check) );
+      inspectors.push_back( inspector_element(
+          new boost::inspect::whitespace_check) );
   if ( length_ck)
-      inspectors.push_back(inspector_element ( new boost::inspect::length_check(limit)) );
+      inspectors.push_back(inspector_element (
+          new boost::inspect::length_check(limit)) );
 
   //// perform the actual inspection, using the requested type of iteration
     for(auto const& search_root: search_roots)
@@ -1019,6 +1048,11 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       <<
         "HPX Inspection Report\n"
         "Run Date: " << run_date  << "\n"
+        "Commit: " << "<a href = \"https://github.com/STEllAR-GROUP/hpx/commit/"
+                   << HPX_HAVE_GIT_COMMIT
+                   << "\">"
+                   << std::string(HPX_HAVE_GIT_COMMIT, 10)
+                   << "</a>\n"
         "\n"
       ;
 
@@ -1048,13 +1082,20 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       "<tr>\n"
       "<td>"
       "<a href = \"https://github.com/STEllAR-GROUP/hpx\">"
-      "<img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\" alt=\"STE||AR logo\" />"
+      "<img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\""
+      " alt=\"STE||AR logo\" />"
       "</a>\n"
       "</td>\n"
       "<td>\n"
       "<h1>HPX Inspection Report</h1>\n"
-      "<b>Run Date:</b> " << run_date  << "\n"
+      "<b>Run Date:</b> " << run_date  << "<br>\n"
       //"&nbsp;&nbsp;/ " << validator_link( "validate me" ) << " /\n"
+      "<b>Commit:</b> "
+            << "<a href = \"https://github.com/STEllAR-GROUP/hpx/commit/"
+            << HPX_HAVE_GIT_COMMIT
+            << "\">"
+            << std::string(HPX_HAVE_GIT_COMMIT, 10)
+            << "</a>\n"
       "</td>\n"
       "</tr>\n"
       "</table>\n"

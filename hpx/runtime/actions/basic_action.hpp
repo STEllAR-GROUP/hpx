@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/async_fwd.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -59,17 +60,15 @@ namespace hpx { namespace actions
         template <typename Action, typename F, typename ...Ts>
         struct continuation_thread_function
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function);
+            HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function)
 
         public:
-            template <typename F_, typename ...Ts_>
             explicit continuation_thread_function(
-                    std::unique_ptr<continuation> cont,
-                    naming::address::address_type lva, F_&& f, Ts_&&... vs)
+                std::unique_ptr<continuation> cont,
+                naming::address::address_type lva, F&& f, Ts&&... vs)
               : cont_(std::move(cont))
               , lva_(lva)
-              , f_(util::deferred_call(
-                    std::forward<F_>(f), std::forward<Ts_>(vs)...))
+              , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
             {}
 
             continuation_thread_function(continuation_thread_function && other)
@@ -79,7 +78,7 @@ namespace hpx { namespace actions
 
             typedef threads::thread_state_enum result_type;
 
-            BOOST_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
+            HPX_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_->get_id() << ")";
@@ -91,10 +90,7 @@ namespace hpx { namespace actions
         private:
             std::unique_ptr<continuation> cont_;
             naming::address::address_type lva_;
-            util::detail::deferred_call_impl<
-                typename util::decay<F>::type
-              , util::tuple<typename util::decay_unwrap<Ts>::type...>
-            > f_;
+            util::detail::deferred<F(Ts&&...)> f_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -111,19 +107,19 @@ namespace hpx { namespace actions
     struct basic_action<Component, R(Args...), Derived>
     {
         // Flag the use of raw pointer types as action arguments
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !util::detail::any_of<std::is_pointer<Args>...>::value,
             "Using raw pointers as arguments for actions is not supported.");
 
         // Flag the use of array types as action arguments
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !util::detail::any_of<
                 std::is_array<typename std::remove_reference<Args>::type>...
             >::value,
             "Using arrays as arguments for actions is not supported.");
 
         // Flag the use of non-const reference types as action arguments
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !util::detail::any_of<
                 detail::is_non_const_reference<Args>...
             >::value,
@@ -192,7 +188,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
 
             template <typename ...Ts>
-            BOOST_FORCEINLINE result_type operator()(
+            HPX_FORCEINLINE result_type operator()(
                 naming::address::address_type lva, Ts&&... vs) const
             {
                 try {
@@ -255,7 +251,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
-                Derived, invoker, naming::address::address_type, Ts...
+                Derived, invoker, naming::address::address_type&, Ts&&...
             > thread_function;
 
             return traits::action_decorate_function<Derived>::call(lva,
@@ -265,7 +261,7 @@ namespace hpx { namespace actions
 
         // direct execution
         template <typename ...Ts>
-        static BOOST_FORCEINLINE result_type
+        static HPX_FORCEINLINE result_type
         execute_function(naming::address::address_type lva, Ts&&... vs)
         {
             LTM_(debug)
@@ -282,7 +278,7 @@ namespace hpx { namespace actions
         struct sync_invoke
         {
             template <typename IdOrPolicy, typename ...Ts>
-            BOOST_FORCEINLINE static LocalResult call(
+            HPX_FORCEINLINE static LocalResult call(
                 boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
                 IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
@@ -291,7 +287,7 @@ namespace hpx { namespace actions
             }
 
             template <typename IdOrPolicy, typename ...Ts>
-            BOOST_FORCEINLINE static LocalResult call(
+            HPX_FORCEINLINE static LocalResult call(
                 boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
                 IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
@@ -302,7 +298,7 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
@@ -312,14 +308,14 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
             return (*this)(launch::all, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
             Ts&&... vs) const
         {
@@ -327,7 +323,7 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
             return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
@@ -335,7 +331,7 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -351,7 +347,7 @@ namespace hpx { namespace actions
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -364,7 +360,7 @@ namespace hpx { namespace actions
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -377,7 +373,7 @@ namespace hpx { namespace actions
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -413,7 +409,7 @@ namespace hpx { namespace actions
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+        HPX_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
 
         static boost::atomic<boost::int64_t> invocation_count_;
 

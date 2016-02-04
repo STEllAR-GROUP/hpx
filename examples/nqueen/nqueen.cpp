@@ -11,7 +11,7 @@
 
 HPX_REGISTER_COMPONENT_MODULE();
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
         nqueen::server::board
         > board_type;
 

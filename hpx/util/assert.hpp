@@ -28,7 +28,7 @@
 
 #if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
 # define HPX_ASSERT(expr) ((expr) ? (void)0 : __builtin_unreachable())
-#elif defined(_MSC_VER) && !defined(BOOST_INTEL_WIN)
+#elif defined(HPX_MSVC) && !defined(HPX_INTEL_WIN)
 # define HPX_ASSERT(expr) __assume(!!(expr))
 #else
 # define HPX_ASSERT(expr) ((void)0)
@@ -64,7 +64,7 @@ namespace hpx
 
 #if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
 # define HPX_ASSERT_MSG(expr, msg) ((expr) ? (void)0 : __builtin_unreachable())
-#elif defined(_MSC_VER) && !defined(BOOST_INTEL_WIN)
+#elif defined(HPX_MSVC) && !defined(HPX_INTEL_WIN)
 # define HPX_ASSERT_MSG(expr, msg) __assume(!!(expr))
 #else
 # define HPX_ASSERT_MSG(expr, msg) ((void)0)
@@ -107,7 +107,7 @@ namespace hpx { namespace assertion { namespace detail
     // Note: The template is needed to make the function non-inline and
     // avoid linking errors
     template< typename CharT >
-    BOOST_NOINLINE void assertion_failed_msg(CharT const * expr,
+    HPX_NOINLINE void assertion_failed_msg(CharT const * expr,
         char const * msg, char const * function, char const * file, long line)
     {
         HPX_ASSERT_MSG_OSTREAM

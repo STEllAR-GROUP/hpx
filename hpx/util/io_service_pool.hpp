@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -18,8 +18,8 @@
 #include <memory>
 
 #include <boost/asio/io_service.hpp>
-#include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/noncopyable.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ namespace hpx { namespace util
         typedef boost::asio::io_service::work work_type;
 #endif
 
-        BOOST_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
+        HPX_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
         {
             return work_type(
 // FIXME: Intel compilers don't like this

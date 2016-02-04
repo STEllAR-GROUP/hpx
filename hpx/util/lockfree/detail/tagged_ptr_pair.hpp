@@ -13,11 +13,11 @@
 #ifndef BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB
 #define BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB
 
-#include <boost/lockfree/detail/branch_hints.hpp>
-
-#include <cstddef> // for std::size_t
+#include <hpx/config.hpp>
 
 #include <boost/cstdint.hpp>
+
+#include <cstddef> // for std::size_t
 
 namespace boost { namespace lockfree
 {
@@ -37,11 +37,11 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         tag_t tags[8];
     };
 
-    BOOST_STATIC_CONSTANT(std::size_t, left_tag_index = 3);
-    BOOST_STATIC_CONSTANT(std::size_t, right_tag_index = 7);
-    BOOST_STATIC_CONSTANT(std::size_t, left_ptr_index = 0);
-    BOOST_STATIC_CONSTANT(std::size_t, right_ptr_index = 1);
-    BOOST_STATIC_CONSTANT(compressed_ptr_t, ptr_mask = 0xffffffffffff);
+    HPX_STATIC_CONSTEXPR std::size_t left_tag_index = 3;
+    HPX_STATIC_CONSTEXPR std::size_t right_tag_index = 7;
+    HPX_STATIC_CONSTEXPR std::size_t left_ptr_index = 0;
+    HPX_STATIC_CONSTEXPR std::size_t right_ptr_index = 1;
+    HPX_STATIC_CONSTEXPR compressed_ptr_t ptr_mask = 0xffffffffffff;
 
     static Left* extract_left_ptr(volatile compressed_ptr_pair_t const& i)
     {
@@ -225,9 +225,9 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         tag_t tags[8];
     };
 
-    BOOST_STATIC_CONSTANT(std::size_t, left_tag_index = 3);
-    BOOST_STATIC_CONSTANT(std::size_t, right_tag_index = 7);
-    BOOST_STATIC_CONSTANT(compressed_ptr_t, ptr_mask = 0xffffffffffff);
+    HPX_STATIC_CONSTEXPR std::size_t left_tag_index = 3;
+    HPX_STATIC_CONSTEXPR std::size_t right_tag_index = 7;
+    HPX_STATIC_CONSTEXPR compressed_ptr_t ptr_mask = 0xffffffffffff;
 
     static Left* extract_left_ptr(volatile compressed_ptr_pair_t const& i)
     { return reinterpret_cast<Left*>(i.left & ptr_mask); }

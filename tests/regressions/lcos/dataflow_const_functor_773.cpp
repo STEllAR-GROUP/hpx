@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 typedef hpx::lcos::shared_future< double > future_type;
@@ -32,7 +32,7 @@ int main()
 {
     auto functor = hpx::util::unwrapped(mul<double>( 0.5 ));
     future_type f1 = hpx::make_ready_future( 1.0 );
-    future_type f2 = hpx::lcos::local::dataflow( functor , f1 , f1 );
+    future_type f2 = hpx::dataflow( functor , f1 , f1 );
 
     hpx::wait_all(f1, f2);
 

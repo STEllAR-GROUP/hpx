@@ -17,14 +17,14 @@
 namespace test
 {
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator previous(Iterator it)
     {
         return --it;
     }
 
     template <typename Iterator>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     Iterator next(Iterator it)
     {
         return ++it;

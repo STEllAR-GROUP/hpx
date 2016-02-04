@@ -28,7 +28,9 @@ struct equal_f
 template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy_if(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -72,7 +74,7 @@ void test_replace_copy_if_async(ExPolicy p, IteratorTag)
 
     std::size_t idx = std::rand() % c.size(); //-V104
 
-    hpx::future<void> f =
+    auto f =
         hpx::parallel::replace_copy_if(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d1), equal_f(c[idx]), c[idx]+1);
@@ -121,7 +123,9 @@ void replace_copy_if_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy_if_exception(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -166,7 +170,7 @@ void test_replace_copy_if_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::replace_copy_if(p,
                 decorated_iterator(
                     boost::begin(c),
@@ -222,7 +226,9 @@ void replace_copy_if_exception_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -266,7 +272,7 @@ void test_replace_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::replace_copy_if(p,
                 decorated_iterator(
                     boost::begin(c),

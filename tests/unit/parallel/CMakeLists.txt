@@ -47,6 +47,7 @@ endforeach()
 # add subdirectories
 set(subdirs
     algorithms
+    container_algorithms
     executors
    )
 

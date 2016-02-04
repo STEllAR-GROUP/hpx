@@ -47,7 +47,7 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcel
     {
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(parcel);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(parcel)
 
     private:
 #if defined(HPX_DEBUG)
@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset
         struct data
         {
         private:
-            HPX_MOVABLE_BUT_NOT_COPYABLE(data);
+            HPX_MOVABLE_BUT_NOT_COPYABLE(data)
 
         public:
             data()
@@ -414,7 +414,7 @@ namespace hpx { namespace parcelset
             return addrs()[0].locality_;
         }
 
-        double const start_time() const
+        double start_time() const
         {
             return data_.start_time_;
         }
@@ -424,7 +424,7 @@ namespace hpx { namespace parcelset
             data_.start_time_ = time;
         }
 
-        double const creation_time() const
+        double creation_time() const
         {
             return data_.creation_time_;
         }

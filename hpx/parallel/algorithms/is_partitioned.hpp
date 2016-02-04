@@ -20,7 +20,6 @@
 #include <iterator>
 #include <functional>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -136,18 +135,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
     ///                     that the algorithm will be applied to.
-    /// \param pred         Refers to the binary predicate which returns a bool.
-    ///                     The signature of the function should be equivalent
-    ///                     to
+    /// \param pred         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second argument. The signature of the function
+    ///                     should be equivalent to
     ///                     \code
-    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     bool pred(const Type &a, const Type &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
-    ///                     be dereferenced and then implicitly converted to
-    ///                     \a Type1 and \a Type2 respectively
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
     ///
     /// The predicate operations in the parallel \a is_partitioned algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -177,7 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
              std::input_iterator_tag, iterator_category
                  >::value),

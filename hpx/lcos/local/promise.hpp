@@ -22,7 +22,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename R>
         class promise_base
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(promise_base);
+            HPX_MOVABLE_BUT_NOT_COPYABLE(promise_base)
 
             typedef R result_type;
             typedef lcos::detail::future_data<R> shared_state_type;
@@ -34,7 +34,7 @@ namespace hpx { namespace lcos { namespace local
               , has_result_(false)
             {}
 
-            promise_base(promise_base&& other) BOOST_NOEXCEPT
+            promise_base(promise_base&& other) HPX_NOEXCEPT
               : shared_state_(std::move(other.shared_state_))
               , future_retrieved_(other.future_retrieved_)
               , has_result_(other.has_result_)
@@ -54,7 +54,7 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
-            promise_base& operator=(promise_base&& other) BOOST_NOEXCEPT
+            promise_base& operator=(promise_base&& other) HPX_NOEXCEPT
             {
                 if (this != &other)
                 {
@@ -76,14 +76,14 @@ namespace hpx { namespace lcos { namespace local
                 return *this;
             }
 
-            void swap(promise_base& other) BOOST_NOEXCEPT
+            void swap(promise_base& other) HPX_NOEXCEPT
             {
                 boost::swap(shared_state_, other.shared_state_);
                 boost::swap(future_retrieved_, other.future_retrieved_);
                 boost::swap(has_result_, other.has_result_);
             }
 
-            bool valid() const BOOST_NOEXCEPT
+            bool valid() const HPX_NOEXCEPT
             {
                 return shared_state_ != 0;
             }
@@ -171,7 +171,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise : public detail::promise_base<R>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
         typedef detail::promise_base<R> base_type;
 
@@ -185,7 +185,7 @@ namespace hpx { namespace lcos { namespace local
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) BOOST_NOEXCEPT
+        promise(promise&& other) HPX_NOEXCEPT
           : base_type(std::move(other))
         {}
 
@@ -196,7 +196,7 @@ namespace hpx { namespace lcos { namespace local
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) BOOST_NOEXCEPT
+        promise& operator=(promise&& other) HPX_NOEXCEPT
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -206,13 +206,13 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) BOOST_NOEXCEPT
+        void swap(promise& other) HPX_NOEXCEPT
         {
             base_type::swap(other);
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const BOOST_NOEXCEPT
+        bool valid() const HPX_NOEXCEPT
         {
             return base_type::valid();
         }
@@ -279,7 +279,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise<R&> : public detail::promise_base<R&>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
         typedef detail::promise_base<R&> base_type;
 
@@ -293,7 +293,7 @@ namespace hpx { namespace lcos { namespace local
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) BOOST_NOEXCEPT
+        promise(promise&& other) HPX_NOEXCEPT
           : base_type(std::move(other))
         {}
 
@@ -304,7 +304,7 @@ namespace hpx { namespace lcos { namespace local
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) BOOST_NOEXCEPT
+        promise& operator=(promise&& other) HPX_NOEXCEPT
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -314,13 +314,13 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) BOOST_NOEXCEPT
+        void swap(promise& other) HPX_NOEXCEPT
         {
             base_type::swap(other);
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const BOOST_NOEXCEPT
+        bool valid() const HPX_NOEXCEPT
         {
             return base_type::valid();
         }
@@ -369,7 +369,7 @@ namespace hpx { namespace lcos { namespace local
     template <>
     class promise<void> : public detail::promise_base<void>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
         typedef detail::promise_base<void> base_type;
 
@@ -383,7 +383,7 @@ namespace hpx { namespace lcos { namespace local
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) BOOST_NOEXCEPT
+        promise(promise&& other) HPX_NOEXCEPT
           : base_type(std::move(other))
         {}
 
@@ -394,7 +394,7 @@ namespace hpx { namespace lcos { namespace local
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) BOOST_NOEXCEPT
+        promise& operator=(promise&& other) HPX_NOEXCEPT
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -404,13 +404,13 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) BOOST_NOEXCEPT
+        void swap(promise& other) HPX_NOEXCEPT
         {
             base_type::swap(other);
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const BOOST_NOEXCEPT
+        bool valid() const HPX_NOEXCEPT
         {
             return base_type::valid();
         }
@@ -459,7 +459,7 @@ namespace hpx { namespace lcos { namespace local
     };
 
     template <typename R>
-    void swap(promise<R>& x, promise<R>& y) BOOST_NOEXCEPT
+    void swap(promise<R>& x, promise<R>& y) HPX_NOEXCEPT
     {
         x.swap(y);
     }
@@ -476,13 +476,13 @@ namespace hpx { namespace lcos
     // Allow for using __await with an expression which evaluates to
     // hpx::future<T>.
     template <typename T>
-    BOOST_FORCEINLINE bool await_ready(future<T> const& f)
+    HPX_FORCEINLINE bool await_ready(future<T> const& f)
     {
         return f.is_ready();
     }
 
     template <typename T, typename Promise>
-    BOOST_FORCEINLINE void await_suspend(future<T>& f,
+    HPX_FORCEINLINE void await_suspend(future<T>& f,
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](future<T> result) mutable
@@ -490,20 +490,20 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    BOOST_FORCEINLINE T await_resume(future<T>& f)
+    HPX_FORCEINLINE T await_resume(future<T>& f)
     {
         return f.get();
     }
 
     // allow for wrapped futures to be unwrapped, if possible
     template <typename T>
-    BOOST_FORCEINLINE T await_resume(future<future<T> >& f)
+    HPX_FORCEINLINE T await_resume(future<future<T> >& f)
     {
         return f.get().get();
     }
 
     template <typename T>
-    BOOST_FORCEINLINE T await_resume(future<shared_future<T> >& f)
+    HPX_FORCEINLINE T await_resume(future<shared_future<T> >& f)
     {
         return f.get().get();
     }
@@ -511,13 +511,13 @@ namespace hpx { namespace lcos
     // Allow for using __await with an expression which evaluates to
     // hpx::shared_future<T>.
     template <typename T>
-    BOOST_FORCEINLINE bool await_ready(shared_future<T> const& f)
+    HPX_FORCEINLINE bool await_ready(shared_future<T> const& f)
     {
         return f.is_ready();
     }
 
     template <typename T, typename Promise>
-    BOOST_FORCEINLINE void await_suspend(shared_future<T>& f,
+    HPX_FORCEINLINE void await_suspend(shared_future<T>& f,
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](shared_future<T> result) mutable
@@ -525,7 +525,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    BOOST_FORCEINLINE T await_resume(shared_future<T>& f)
+    HPX_FORCEINLINE T await_resume(shared_future<T>& f)
     {
         return f.get();
     }

@@ -73,7 +73,10 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  Bit 95 is a flag that is set if a GID's credit count is
 ///                  ever split (e.g. if the GID is ever passed to another
 ///                  locality).
-///     identifier - Bit 64 to bit 87 of the MSB, and the entire LSB. The
+///                - Bit 87 marks the gid such that it will not be stored in
+///                  any of the AGAS caches. This is used mainly for ids
+///                  which represent 'one-shot' objects (like promises).
+///     identifier - Bit 64 to bit 86 of the MSB, and the entire LSB. The
 ///                  content of these bits depends on the component type of
 ///                  the underlying object. For all user-defined components,
 ///                  these bits contain a unique 88-bit number which is

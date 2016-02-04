@@ -30,8 +30,6 @@ namespace hpx { namespace plugins
     {
         virtual ~parcelport_factory_base() {}
 
-        void force_init() {}
-
         virtual void get_plugin_info(std::vector<std::string> & fillini) = 0;
 
         virtual void init(int *argc, char ***argv, util::command_line_handling &cfg) = 0;

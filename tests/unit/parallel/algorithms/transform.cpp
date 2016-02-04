@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,9 @@
 template <typename ExPolicy, typename IteratorTag>
 void test_transform(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -25,7 +27,7 @@ void test_transform(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::util::tuple<iterator, base_iterator> result =
+    auto result =
         hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
@@ -56,7 +58,7 @@ void test_transform_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<hpx::util::tuple<iterator, base_iterator> > f =
+    auto f =
         hpx::parallel::transform(p,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t& v) {
@@ -110,7 +112,9 @@ void transform_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_exception(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -153,7 +157,7 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
@@ -209,7 +213,9 @@ void transform_exception_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -251,7 +257,7 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        auto f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),

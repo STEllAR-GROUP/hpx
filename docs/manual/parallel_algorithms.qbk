@@ -286,7 +286,7 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_minmax.hpp>`]]
 ]
 
-[table Operations checking various sorting criteria (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Sorting Operations (In Header: <hpx/include/parallel_algorithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref is_sorted] ]
      [Returns `true` if each element in a range is sorted]
@@ -297,6 +297,12 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algoref is_partitioned] ]
      [Returns `true` if each true element for a predicate precedes the false elements in a range]
      [`<hpx/include/parallel_is_partitioned.hpp>`]]
+    [[ [algoref sort] ]
+     [Sorts the elements in a range]
+     [`<hpx/include/parallel_sort.hpp>`]]
+    [[ [algoref sort_by_key] ]
+     [Sorts one range of data using keys supplied in another range]
+     [`<hpx/include/parallel_sort.hpp>`]]
 ]
 
 [table Numeric Parallel Algorithms (In Header: <hpx/include/parallel_numeric.hpp>)
@@ -410,7 +416,7 @@ may choose whether or not to report exceptions, and if so, in what manner they
 are communicated back to the caller. However, all executors in __hpx__
 report exceptions in a manner consistent with the behavior of execution policies
 described by the Parallelism TS, where multiple exceptions are collected into
-an __exception_list__. This list is reported through `async_execute()'s`
+an __exception_list__. This list is reported through `async_execute()`'s
 returned future, or thrown directly by execute().
 
 In __hpx__ we have implemented the following executor types:

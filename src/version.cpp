@@ -106,7 +106,7 @@ namespace hpx
             "A general purpose parallel C++ runtime system for\
              distributed applications\n"
             "of any scale.\n\n"
-            "Copyright (c) 2007-2015, The STE||AR Group,\n"
+            "Copyright (c) 2007-2016, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, \
              Version 1.0. (See accompanying\n"
@@ -209,7 +209,7 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";
 #endif
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #if defined(HPX_HAVE_FIBER_BASED_COROUTINES)
         strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=ON\n";
 #else
@@ -227,9 +227,6 @@ namespace hpx
         strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=OFF\n";
 #endif
 
-#if defined(HPX_LIMIT)
-        strm << "  HPX_LIMIT=" << HPX_LIMIT << "\n";
-#endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS="
              << HPX_PARCEL_MAX_CONNECTIONS << "\n";

@@ -28,12 +28,12 @@ public:
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
-    pointer_allocator() BOOST_NOEXCEPT
+    pointer_allocator() HPX_NOEXCEPT
       : pointer_(0), size_(0)
     {
     }
 
-    pointer_allocator(pointer p, size_type size) BOOST_NOEXCEPT
+    pointer_allocator(pointer p, size_type size) HPX_NOEXCEPT
       : pointer_(p), size_(size)
     {
     }
@@ -89,7 +89,7 @@ typedef hpx::serialization::serialize_buffer<double, pointer_allocator<double> >
 
 ///////////////////////////////////////////////////////////////////////////////
 struct zerocopy_server
-  : hpx::components::managed_component_base<zerocopy_server>
+  : hpx::components::component_base<zerocopy_server>
 {
 private:
     void release_lock()
@@ -141,7 +141,7 @@ private:
     hpx::lcos::local::spinlock mtx_;
 };
 
-typedef hpx::components::managed_component<zerocopy_server> server_type;
+typedef hpx::components::component<zerocopy_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, zerocopy_server);
 
 typedef zerocopy_server::get_here_action zerocopy_get_here_action;

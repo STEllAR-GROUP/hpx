@@ -313,7 +313,9 @@ namespace hpx { namespace util
                     threads = batch_threads; //-V101
                 }
                 else
+                {
                     threads = hpx::util::safe_lexical_cast<std::size_t>(threads_str);
+                }
 
                 if (threads == 0)
                 {
@@ -322,7 +324,8 @@ namespace hpx { namespace util
                 }
 
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
-                if (threads > HPX_HAVE_MAX_CPU_COUNT) {
+                if (threads > HPX_HAVE_MAX_CPU_COUNT)
+                {
                     throw hpx::detail::command_line_error("Requested more than "
                         BOOST_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
@@ -485,7 +488,7 @@ namespace hpx { namespace util
         }
 
         bool enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
-        util::batch_environment env(nodelist, debug_clp, enable_batch_env);
+        util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
 
         if(!nodelist.empty())
         {
@@ -947,14 +950,14 @@ namespace hpx { namespace util
         {
             sleep(1);
         }
-#elif defined(BOOST_WINDOWS)
+#elif defined(HPX_WINDOWS)
         DebugBreak();
 #endif
     }
 
     void command_line_handling::handle_attach_debugger()
     {
-#if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)
+#if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
         if(vm_.count("hpx:attach-debugger"))
         {
             std::string option = vm_["hpx:attach-debugger"].as<std::string>();
@@ -1053,6 +1056,10 @@ namespace hpx { namespace util
 
         std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
             plugin_registries = rtcfg_.load_modules();
+
+        // insert the pre-configured ini settings after loading modules
+        for (std::string const& e : ini_config_)
+            rtcfg_.parse("<user supplied config>", e, true, false);
 
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as

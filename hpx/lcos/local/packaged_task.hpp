@@ -224,7 +224,7 @@ namespace hpx { namespace lcos { namespace local
             return future_access<future<Result> >::create(task_);
         }
 
-        bool valid() const BOOST_NOEXCEPT
+        bool valid() const HPX_NOEXCEPT
         {
             return !!task_;
         }
@@ -275,7 +275,7 @@ namespace hpx { namespace lcos { namespace local
                 return *this;
             }
 
-            void swap(packaged_task_base& other) BOOST_NOEXCEPT
+            void swap(packaged_task_base& other) HPX_NOEXCEPT
             {
                 function_.swap(other.function_);
                 promise_.swap(other.promise_);
@@ -333,7 +333,7 @@ namespace hpx { namespace lcos { namespace local
                 return promise_.get_future();
             }
 
-            bool valid() const BOOST_NOEXCEPT
+            bool valid() const HPX_NOEXCEPT
             {
                 return !function_.empty() && promise_.valid();
             }
@@ -344,7 +344,7 @@ namespace hpx { namespace lcos { namespace local
                     HPX_THROWS_IF(ec, no_state,
                         "packaged_task_base<Signature>::get_future",
                         "this packaged_task has no valid shared state");
-                    return lcos::future<Result>();
+                    return;
                 }
                 promise_ = local::promise<Result>();
             }
@@ -365,7 +365,7 @@ namespace hpx { namespace lcos { namespace local
     class packaged_task<R(Ts...)>
       : private detail::packaged_task_base<R, R(Ts...)>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
 
         typedef detail::packaged_task_base<R, R(Ts...)> base_type;
 
@@ -397,7 +397,7 @@ namespace hpx { namespace lcos { namespace local
             return *this;
         }
 
-        void swap(packaged_task& other) BOOST_NOEXCEPT
+        void swap(packaged_task& other) HPX_NOEXCEPT
         {
             base_type::swap(other);
         }

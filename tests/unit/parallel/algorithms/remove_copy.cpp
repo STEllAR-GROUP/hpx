@@ -16,7 +16,9 @@
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -54,7 +56,7 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
     std::fill(boost::begin(c), middle, 1);
     std::fill(middle, boost::end(c), 2);
 
-    hpx::future<base_iterator> f =
+    auto f =
         hpx::parallel::remove_copy(p, iterator(boost::begin(c)),
             iterator(boost::end(c)), boost::begin(d), std::size_t(2));
 
@@ -73,7 +75,9 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_outiter(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -181,7 +185,9 @@ void remove_copy_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_exception(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -226,7 +232,7 @@ void test_remove_copy_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::remove_copy(p,
                 decorated_iterator(
                     boost::begin(c),
@@ -282,7 +288,9 @@ void remove_copy_exception_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -326,7 +334,7 @@ void test_remove_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::remove_copy(p,
                 decorated_iterator(
                     boost::begin(c),
@@ -414,5 +422,4 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
-
 }

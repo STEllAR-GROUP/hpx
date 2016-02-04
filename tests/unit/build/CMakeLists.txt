@@ -24,9 +24,10 @@ macro(create_cmake_test name hpx_dir)
   if(CMAKE_SYSROOT)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_SYSROOT=${CMAKE_SYSROOT})
   endif()
-  if(MSVC)
+  if(WIN32)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -G "${CMAKE_GENERATOR}")
-  else()
+  endif()
+  if(NOT MSVC)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER})
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER})
   endif()
@@ -115,8 +116,8 @@ if(PKGCONFIG_FOUND AND NOT MSVC)
 endif()
 
 set(tests
-  build_dir
-  install_dir)
+  build_dir_
+  install_dir_)
 
 set(build_systems cmake)
 if(NOT CMAKE_TOOLCHAIN_FILE AND PKGCONFIG_FOUND AND NOT MSVC)
@@ -128,7 +129,7 @@ foreach(system ${build_systems})
   foreach(test ${tests})
     add_hpx_pseudo_target(tests.unit.build.${system}.${test})
     add_hpx_pseudo_dependencies(tests.unit.build.${system}.${test}
-      ${system}_${test}_test)
+      ${system}_${test}test)
     add_hpx_pseudo_dependencies(tests.unit.build.${system}
       tests.unit.build.${system}.${test})
   endforeach()

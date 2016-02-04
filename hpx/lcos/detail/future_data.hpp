@@ -48,8 +48,6 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
 
-namespace local { template <typename T> struct channel; }
-
 namespace detail
 {
     template <typename Result> struct future_data;
@@ -110,7 +108,7 @@ namespace detail
         typedef Result type;
 
         template <typename U>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         U && set(U && u)
         {
             return std::forward<U>(u);
@@ -122,13 +120,13 @@ namespace detail
     {
         typedef Result* type;
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         Result* set(Result* u)
         {
             return u;
         }
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         Result* set(Result& u)
         {
             return &u;
@@ -140,7 +138,7 @@ namespace detail
     {
         typedef util::unused_type type;
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         util::unused_type set(util::unused_type u)
         {
             return u;
@@ -179,7 +177,7 @@ namespace detail
     template <typename F1, typename F2>
     class compose_cb_impl
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl)
 
     public:
         template <typename A1, typename A2>
@@ -206,7 +204,7 @@ namespace detail
     };
 
     template <typename F1, typename F2>
-    static BOOST_FORCEINLINE util::unique_function_nonser<void()>
+    static HPX_FORCEINLINE util::unique_function_nonser<void()>
     compose_cb(F1 && f1, F2 && f2)
     {
         if (!f1)
@@ -245,7 +243,7 @@ namespace detail
     template <typename Result>
     struct future_data : future_data_refcnt_base
     {
-        HPX_NON_COPYABLE(future_data);
+        HPX_NON_COPYABLE(future_data)
 
         typedef typename future_data_result<Result>::type result_type;
         typedef util::unique_function_nonser<void()> completed_callback_type;
@@ -359,9 +357,27 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
-            handle_continuation_recursion_count cnt;
+#if defined(HPX_WINDOWS)
+            bool recurse_asynchronously = false;
+#elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            std::ptrdiff_t remaining_stack =
+                this_thread::get_available_stack_space();
 
-            if (cnt.count_ <= HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+            if(remaining_stack < 0)
+            {
+                HPX_THROW_EXCEPTION(out_of_memory,
+                    "future_data::handle_on_completed",
+                    "Stack overflow");
+            }
+            bool recurse_asynchronously =
+                remaining_stack < 8 * HPX_THREADS_STACK_OVERHEAD;
+#else
+            handle_continuation_recursion_count cnt;
+            bool recurse_asynchronously =
+                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+#endif
+
+            if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
                 on_completed();
@@ -691,12 +707,12 @@ namespace detail
     protected:
         typedef typename future_data<Result>::result_type result_type;
 
-        threads::thread_id_type get_id() const
+        threads::thread_id_type get_thread_id() const
         {
             boost::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
-        void set_id(threads::thread_id_type id)
+        void set_thread_id(threads::thread_id_type id)
         {
             boost::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
@@ -731,8 +747,7 @@ namespace detail
         {
             if (!started_test_and_set())
                 this->do_run();
-            else
-                this->future_data<Result>::wait(ec);
+            this->future_data<Result>::wait(ec);
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
@@ -741,8 +756,7 @@ namespace detail
         {
             if (!started_test())
                 return future_status::deferred; //-V110
-            else
-                return this->future_data<Result>::wait_until(abs_time, ec);
+            return this->future_data<Result>::wait_until(abs_time, ec);
         };
 
     private:
@@ -820,11 +834,11 @@ namespace detail
             reset_id(task_base& target)
               : target_(target)
             {
-                target.set_id(threads::get_self_id());
+                target.set_thread_id(threads::get_self_id());
             }
             ~reset_id()
             {
-                target_.set_id(threads::invalid_thread_id);
+                target_.set_thread_id(threads::invalid_thread_id);
             }
             task_base& target_;
         };
@@ -841,13 +855,11 @@ namespace detail
         template <typename T>
         void set_data(T && result)
         {
-            HPX_ASSERT(started_);
-            this->future_data<Result>::set_value(std::forward<T>(result));
+            this->future_data<Result>::set_data(std::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            HPX_ASSERT(started_);
             this->future_data<Result>::set_exception(e);
         }
 

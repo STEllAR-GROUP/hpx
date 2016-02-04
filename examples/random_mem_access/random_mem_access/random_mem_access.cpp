@@ -12,7 +12,7 @@
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();
 HPX_REGISTER_COMPONENT(
-    hpx::components::simple_component<hpx::components::server::random_mem_access>,
+    hpx::components::component<hpx::components::server::random_mem_access>,
     random_mem_access);
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -18,9 +18,11 @@ namespace boost
         class length_check : public inspector
         {
             long m_files_with_errors;
+            std::size_t limit;
+
         public:
 
-            length_check(size_t setting);
+            length_check(std::size_t setting);
 
             std::string a = "*Line length limit*";
             std::string b = "The line is longer than allowed by the character limit";
@@ -34,7 +36,7 @@ namespace boost
 
             virtual void print_summary(std::ostream& out)
             {
-                string c = " lines exceeding the character limit";
+                string c = " files with lines exceeding the character limit";
                 out << "  " << m_files_with_errors << c << line_break();
             }
 

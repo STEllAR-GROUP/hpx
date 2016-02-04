@@ -19,9 +19,10 @@ namespace hpx { namespace serialization
         typedef typename std::list<T, Allocator>::size_type size_type;
         size_type size;
         ar >> size; //-V128
-        if(size == 0) return;
 
         ls.resize(size);
+        if(size == 0) return;
+
         for(auto & li: ls)
         {
             ar >> li;

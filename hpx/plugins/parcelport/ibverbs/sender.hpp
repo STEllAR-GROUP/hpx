@@ -7,6 +7,9 @@
 #ifndef HPX_PARCELSET_POLICIES_IBVERBS_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_IBVERBS_SENDER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/plugins/parcelport/ibverbs/context.hpp>
@@ -258,5 +261,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         ibv_mr adapted_mr_;
     };
 }}}}
+
+#endif
 
 #endif

@@ -29,13 +29,13 @@ namespace hpx { namespace detail
     // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
     template <typename F, typename Result =
-        typename util::deferred_call_result_of<F>::type>
+        typename util::detail::deferred_result_of<F>::type>
     struct create_future
     {
         typedef lcos::future<Result> type;
     };
 #else
-    template <typename F, typename ResultOf = util::deferred_call_result_of<F> >
+    template <typename F, typename ResultOf = util::detail::deferred_result_of<F> >
     struct create_future
     {
         typedef lcos::future<typename ResultOf::type> type;
@@ -43,14 +43,14 @@ namespace hpx { namespace detail
 #endif
 
     template <typename F>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     typename boost::lazy_enable_if<
-        boost::is_reference<typename util::deferred_call_result_of<F()>::type>
+        boost::is_reference<typename util::detail::deferred_result_of<F()>::type>
       , detail::create_future<F()>
     >::type
     call_sync(F&& f, boost::mpl::false_)
     {
-        typedef typename util::deferred_call_result_of<F()>::type result_type;
+        typedef typename util::detail::deferred_result_of<F()>::type result_type;
         try
         {
             return lcos::make_ready_future(boost::ref(f()));
@@ -61,14 +61,14 @@ namespace hpx { namespace detail
     }
 
     template <typename F>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_reference<typename util::deferred_call_result_of<F()>::type>
+        boost::is_reference<typename util::detail::deferred_result_of<F()>::type>
       , detail::create_future<F()>
     >::type
     call_sync(F&& f, boost::mpl::false_) //-V659
     {
-        typedef typename util::deferred_call_result_of<F()>::type result_type;
+        typedef typename util::detail::deferred_result_of<F()>::type result_type;
         try
         {
             return lcos::make_ready_future(f());
@@ -79,7 +79,7 @@ namespace hpx { namespace detail
     }
 
     template <typename F>
-    BOOST_FORCEINLINE typename detail::create_future<F()>::type
+    HPX_FORCEINLINE typename detail::create_future<F()>::type
     call_sync(F&& f, boost::mpl::true_)
     {
         try
@@ -92,24 +92,22 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // BOOST_SCOPED_ENUM(launch)
-    template <typename Policy>
-    struct async_dispatch<Policy,
+    template <typename Action>
+    struct async_launch_policy_dispatch<Action,
         typename boost::enable_if_c<
-            traits::is_launch_policy<Policy>::value
-         && !traits::is_action<Policy>::value
+            !traits::is_action<Action>::value
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
-        call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
+        call(BOOST_SCOPED_ENUM(launch) launch_policy, F&& f, Ts&&... ts)
         {
-            typedef typename util::deferred_call_result_of<
-                F(Ts...)
+            typedef typename util::detail::deferred_result_of<
+                F(Ts&&...)
             >::type result_type;
 
             if (launch_policy == launch::sync) {
@@ -138,10 +136,10 @@ namespace hpx { namespace detail
     struct async_dispatch
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
         call(F&& f, Ts&&... ts)
         {
@@ -158,15 +156,15 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
         call(Executor& sched, F&& f, Ts&&... ts)
         {
-            typedef typename util::deferred_call_result_of<
-                    F(Ts...)
+            typedef typename util::detail::deferred_result_of<
+                    F(Ts&&...)
                 >::type result_type;
 
             lcos::local::futures_factory<result_type()> p(sched,
@@ -184,10 +182,10 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
         call(Executor& exec, F&& f, Ts&&... ts)
         {
@@ -204,7 +202,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename Action, typename BoundArgs, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         static hpx::future<typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type>
@@ -219,7 +217,7 @@ namespace hpx { namespace detail
 namespace hpx
 {
     template <typename F, typename ...Ts>
-    BOOST_FORCEINLINE auto async(F&& f, Ts&&... ts)
+    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
     ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...
         ))

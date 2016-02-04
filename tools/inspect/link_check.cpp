@@ -7,6 +7,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "link_check.hpp"
+#include "function_hyper.hpp"
 #include "boost/regex.hpp"
 #include "boost/filesystem/operations.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
@@ -185,8 +186,10 @@ namespace boost
               if (!result.second)
               {
                 ++m_duplicate_bookmark_errors;
-                std::size_t ln = std::count( contents.begin(), a_what[3].first, '\n' ) + 1;
-                error( library_name, full_path, "Duplicate bookmark: " + bookmark, ln );
+                std::size_t ln = std::count( contents.begin(),
+                    a_what[3].first, '\n' ) + 1;
+                error( library_name, full_path, "Duplicate bookmark: "
+                    + bookmark, ln );
               }
             }
           }
@@ -250,7 +253,8 @@ namespace boost
 
     void link_check::do_url( const string & url, const string & library_name,
       const path & source_path, bool no_link_errors, bool allow_external_content,
-        std::string::const_iterator contents_begin, std::string::const_iterator url_start )
+        std::string::const_iterator contents_begin,
+        std::string::const_iterator url_start )
         // precondition: source_path.is_complete()
     {
       if(!no_link_errors && url.empty()) {
@@ -326,7 +330,8 @@ namespace boost
               "Invalid URL (hardwired file): " + decoded_url, ln );
           }
         }
-        else if(scheme == "mailto" || scheme == "ftp" || scheme == "news" || scheme == "javascript") {
+        else if(scheme == "mailto" || scheme == "ftp"
+            || scheme == "news" || scheme == "javascript") {
           if ( !no_link_errors && is_css(source_path) ) {
             ++m_invalid_errors;
             std::size_t ln = std::count( contents_begin, url_start, '\n' ) + 1;
@@ -338,7 +343,8 @@ namespace boost
           if(!no_link_errors) {
             ++m_invalid_errors;
             std::size_t ln = std::count( contents_begin, url_start, '\n' ) + 1;
-            error( library_name, source_path, "Unknown protocol: '" + scheme + "' in url: " + decoded_url, ln );
+            error( library_name, source_path,
+                "Unknown protocol: '" + scheme + "' in url: " + decoded_url, ln );
           }
         }
 
@@ -388,7 +394,8 @@ namespace boost
       }
 
       // Detect characters banned by RFC2396:
-      if ( !no_link_errors && decoded_url.find_first_of( " <>\"{}|\\^[]'" ) != string::npos )
+      if ( !no_link_errors
+          && decoded_url.find_first_of( " <>\"{}|\\^[]'" ) != string::npos )
       {
         ++m_invalid_errors;
         std::size_t ln = std::count( contents_begin, url_start, '\n' ) + 1;
@@ -477,7 +484,8 @@ namespace boost
        {
          ++m_unlinked_errors;
          path full_path( search_root_path() / path(itr->first) );
-         error( impute_library( full_path ), full_path, "Unlinked file" );
+         error( impute_library( full_path ), full_path,
+             loclink(full_path, "Unlinked file") );
        }
      }
    }

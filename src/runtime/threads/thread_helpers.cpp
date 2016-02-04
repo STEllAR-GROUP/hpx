@@ -9,7 +9,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
@@ -198,6 +198,11 @@ namespace hpx { namespace threads
         return *continuation_recursion_count.get();
     }
 
+    void reset_continuation_recursion_count()
+    {
+        delete continuation_recursion_count.get();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void run_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {
@@ -342,20 +347,20 @@ namespace hpx { namespace threads
         return id ? id->set_backtrace(bt) : 0;
     }
 
-    threads::executors::generic_thread_pool_executor
+    threads::executors::current_executor
         get_executor(thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_executor",
                 "NULL thread id encountered");
-            return executors::generic_thread_pool_executor(0);
+            return executors::current_executor(0);
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return executors::generic_thread_pool_executor(id->get_scheduler_base());
+        return executors::current_executor(id->get_scheduler_base());
     }
 }}
 
@@ -534,10 +539,21 @@ namespace hpx { namespace this_thread
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::executors::generic_thread_pool_executor
+    threads::executors::current_executor
         get_executor(error_code& ec)
     {
         return threads::get_executor(threads::get_self_id(), ec);
+    }
+
+    std::ptrdiff_t get_available_stack_space()
+    {
+        threads::thread_self *self = threads::get_self_ptr();
+        if(self)
+        {
+            return self->get_available_stack_space();
+        }
+
+        return (std::numeric_limits<std::ptrdiff_t>::max)();
     }
 }}
 

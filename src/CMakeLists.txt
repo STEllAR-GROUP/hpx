@@ -32,6 +32,7 @@ add_hpx_library_sources(hpx
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/*.cpp"
+  EXCLUDE ".*lightweight_test.cpp"
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/lcos/*.cpp"
@@ -166,7 +167,7 @@ set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
 ################################################################################
 # libhpx
 if(HPX_WITH_STATIC_LINKING)
-  set(hpx_SOURCES ${hpx_SOURCES} {hpx_init_SOURCES})
+  set(hpx_SOURCES ${hpx_SOURCES} ${hpx_init_SOURCES})
 endif()
 if(HPX_WITH_DEFAULT_TARGETS)
   add_library(hpx ${hpx_library_link_mode_core}
@@ -205,7 +206,6 @@ set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
-  "HPX_LIMIT=5"
   "HPX_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
@@ -238,12 +238,31 @@ if(NOT HPX_WITH_STATIC_LINKING)
   set_property(TARGET hpx_init APPEND
     PROPERTY COMPILE_DEFINITIONS
     "HPX_APPLICATION_EXPORTS"
-    "HPX_LIMIT=5"
     "HPX_ENABLE_ASSERT_HANDLER")
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
 endif()
+
+get_property(HPX_TARGET_COMPILE_DEFININTIONS_VAR
+  GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
+foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
+  target_compile_definitions(hpx INTERFACE ${_flag})
+  target_compile_definitions(hpx PUBLIC ${_flag})
+  if(NOT HPX_WITH_STATIC_LINKING)
+    target_compile_definitions(hpx_init PUBLIC ${_flag})
+  endif()
+endforeach()
+
+get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
+  GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
+foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
+  target_compile_options(hpx INTERFACE ${_flag})
+  target_compile_options(hpx PUBLIC ${_flag})
+  if(NOT HPX_WITH_STATIC_LINKING)
+    target_compile_options(hpx_init PUBLIC ${_flag})
+  endif()
+endforeach()
 
 set(_optional)
 if(HPX_WITH_DEFAULT_TARGETS)

@@ -26,7 +26,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -188,13 +187,13 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<FwdIter2>::iterator_category
             s_iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, iterator_category
             >::value),
             "Requires at least input iterator.");
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, s_iterator_category
             >::value),
@@ -249,7 +248,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
     ///
@@ -287,13 +286,13 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<FwdIter2>::iterator_category
             s_iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, iterator_category
             >::value),
             "Requires at least input iterator.");
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, s_iterator_category
             >::value),
@@ -466,13 +465,13 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<FwdIter2>::iterator_category
             s_iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, iterator_category
             >::value),
             "Requires at least input iterator.");
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, s_iterator_category
             >::value),
@@ -527,7 +526,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
     ///
@@ -566,13 +565,13 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<FwdIter2>::iterator_category
             s_iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, iterator_category
             >::value),
             "Requires at least input iterator.");
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, s_iterator_category
             >::value),

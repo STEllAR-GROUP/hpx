@@ -246,7 +246,10 @@ numa_domain_worker(std::size_t domain,
             hpx::threads::mask_cref_type thread_mask =
                 traits::get_pu_mask(policy.executor(), topo, thread_num);
 
-            HPX_ASSERT(mem_mask & thread_mask);
+            HPX_ASSERT(hpx::threads::mask_size(mem_mask) ==
+                hpx::threads::mask_size(thread_mask));
+            HPX_ASSERT(hpx::threads::bit_and(mem_mask, thread_mask,
+                hpx::threads::mask_size(mem_mask)));
 #endif
         });
     t = 1.0E6 * (mysecond() - t);

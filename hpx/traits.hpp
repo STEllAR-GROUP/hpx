@@ -6,6 +6,8 @@
 #if !defined(HPX_TRAITS_OCT_26_2011_0838AM)
 #define HPX_TRAITS_OCT_26_2011_0838AM
 
+#include <hpx/config.hpp>
+
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////

@@ -26,7 +26,7 @@ namespace examples { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     class cancelable_action
-      : public hpx::components::simple_component_base<cancelable_action>
+      : public hpx::components::component_base<cancelable_action>
     {
     private:
         typedef hpx::lcos::local::spinlock mutex_type;

@@ -17,8 +17,6 @@
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
-#include <boost/mpl/assert.hpp>
-
 #include <iterator>
 #include <type_traits>
 
@@ -50,9 +48,9 @@ namespace hpx { namespace util
         template <typename T, typename U>
         struct zip_iterator_category_impl
         {
-            BOOST_MPL_ASSERT_MSG(false,
-                unknown_combination_of_iterator_categories,
-                (T, U));
+            static_assert(
+                sizeof(T) == 0 && sizeof(U) == 0,
+                "unknown combination of iterator categories");
         };
 
         // random_access_iterator_tag

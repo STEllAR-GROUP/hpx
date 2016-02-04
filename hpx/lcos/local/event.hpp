@@ -16,7 +16,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/locks.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos { namespace local
     typedef detail::event<> event;
 }}}
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
 

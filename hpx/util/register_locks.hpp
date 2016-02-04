@@ -8,14 +8,13 @@
 #define HPX_UTIL_REGISTER_LOCKS_JUN_26_2012_1029AM
 
 #include <hpx/config.hpp>
-#if !defined(BOOST_NO_SFINAE_EXPR)
+#if defined(HPX_HAVE_CXX11_SFINAE_EXPR)
 #include <hpx/util/always_void.hpp>
-
-#include <boost/utility/declval.hpp>
-
 #else
 #include <boost/thread/locks.hpp>
 #endif
+
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -41,6 +40,7 @@ namespace hpx { namespace util
     HPX_API_EXPORT void reset_ignored(void const* lock);
     HPX_API_EXPORT void ignore_all_locks();
     HPX_API_EXPORT void reset_ignored_all();
+    HPX_API_EXPORT void reset_held_lock_data();
 
     ///////////////////////////////////////////////////////////////////////////
     struct ignore_all_while_checking
@@ -56,11 +56,11 @@ namespace hpx { namespace util
         }
     };
 
-#if !defined(BOOST_NO_SFINAE_EXPR)
+#if defined(HPX_HAVE_CXX11_SFINAE_EXPR)
     template <typename Lock>
     struct ignore_while_checking<Lock,
         typename util::always_void<
-            decltype(boost::declval<Lock>().mutex())
+            decltype(std::declval<Lock>().mutex())
         >::type>
     {
         ignore_while_checking(Lock const* lock)
@@ -187,6 +187,9 @@ namespace hpx { namespace util
     {
     }
     inline void reset_ignored_all()
+    {
+    }
+    inline void reset_held_lock_data()
     {
     }
 #endif

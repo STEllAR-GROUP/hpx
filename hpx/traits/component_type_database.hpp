@@ -6,7 +6,10 @@
 #if !defined(HPX_TRAITS_COMPONENT_TYPE_DATABASE_OCT_27_2011_0420PM)
 #define HPX_TRAITS_COMPONENT_TYPE_DATABASE_OCT_27_2011_0420PM
 
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
+
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace components
 {

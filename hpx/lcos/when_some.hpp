@@ -18,9 +18,11 @@ namespace hpx
     template <typename Sequence>
     struct when_some_result
     {
+        /// List of indices of futures which became ready
         std::vector<std::size_t> indices;
-        ///^ List of indices of futures which became ready
-        Sequence futures;   ///< The sequence of futures as passed to \a hpx::when_some
+
+        ///< The sequence of futures as passed to \a hpx::when_some
+        Sequence futures;
     };
 
     /// The function \a when_some is an operator allowing to join on the result
@@ -356,7 +358,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void operator()(Sequence_& sequence,
                 typename boost::enable_if_c<
                     traits::is_future_range<Sequence_>::value
@@ -366,7 +368,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::enable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -376,7 +378,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::disable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -390,7 +392,7 @@ namespace hpx { namespace lcos
         };
 
         template <typename Sequence>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void set_on_completed_callback(when_some<Sequence>& when)
         {
             set_when_some_callback_impl<Sequence> callback(when);

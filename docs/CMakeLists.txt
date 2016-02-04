@@ -27,11 +27,10 @@ set(documentation_dependencies
     "${PROJECT_SOURCE_DIR}/examples/quickstart/hello_world.cpp"
     "${PROJECT_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
     "${PROJECT_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/server/managed_accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/stubs/managed_accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulator/managed_accumulator_client.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/server/accumulator.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator_client.cpp"
     "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp"
     "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp"
     "${PROJECT_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp"
@@ -89,6 +88,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_intersection.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_symmetric_difference.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_union.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/sort.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/sort_by_key.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
@@ -96,6 +97,16 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/minmax.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/remove_copy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/replace.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/reverse.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/rotate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/sort.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/auto_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/dynamic_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_traits.hpp"
@@ -107,7 +118,11 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/agas_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_id.hpp"
@@ -115,6 +130,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_worker_thread_num.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/launch_policy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/naming_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/parcelset_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/runtime_mode.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
@@ -304,8 +320,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=460
-                boost.image.h=106
+                boost.image.w=479
+                boost.image.h=104
                 boost.image.alt="HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

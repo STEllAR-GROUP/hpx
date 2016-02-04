@@ -101,7 +101,7 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
 struct partition_server
-  : hpx::components::simple_component_base<partition_server>
+  : hpx::components::component_base<partition_server>
 {
     // construct new instances
     partition_server() {}
@@ -135,7 +135,7 @@ private:
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<partition_server> partition_server_type;
+typedef hpx::components::component<partition_server> partition_server_type;
 HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
@@ -217,7 +217,7 @@ struct stepper
     static partition heat_part(partition const& left, partition const& middle,
         partition const& right)
     {
-        using hpx::lcos::local::dataflow;
+        using hpx::dataflow;
         using hpx::util::unwrapped;
 
         return dataflow(
@@ -249,7 +249,7 @@ HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action);
 // time steps
 stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 {
-    using hpx::lcos::local::dataflow;
+    using hpx::dataflow;
 
     // U[t][i] is the state of position i at time t.
     std::vector<space> U(2);

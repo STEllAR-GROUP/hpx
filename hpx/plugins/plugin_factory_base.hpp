@@ -71,5 +71,10 @@ namespace hpx { namespace util { namespace plugin
     HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                     \
 /**/
 
+#define HPX_REGISTER_PLUGIN_MODULE_DYNAMIC()                                  \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, factory);                \
+    HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()                             \
+/**/
+
 #endif
 

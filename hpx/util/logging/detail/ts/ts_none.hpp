@@ -17,11 +17,6 @@
 #ifndef JT28092007_HPX_LOG_TS_HPP_none
 #define JT28092007_HPX_LOG_TS_HPP_none
 
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
 namespace hpx { namespace util { namespace logging {
 
 namespace threading {

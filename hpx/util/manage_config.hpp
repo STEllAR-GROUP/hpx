@@ -6,6 +6,7 @@
 #if !defined(HPX_UTIL_MANAGE_CONFIG_APR_11_2012_0519PM)
 #define HPX_UTIL_MANAGE_CONFIG_APR_11_2012_0519PM
 
+#include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 

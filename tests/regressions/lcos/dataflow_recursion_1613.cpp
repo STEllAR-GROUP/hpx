@@ -13,7 +13,7 @@
 
 #include <boost/atomic.hpp>
 
-#define NUM_FUTURES std::size_t(2*HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+#define NUM_FUTURES std::size_t(300)
 
 // One way to force recursion is to make all futures depend on the next and
 // make the last of the futures ready, triggering a chain of continuations.
@@ -30,7 +30,7 @@ void force_recursion_test1()
     for (std::size_t i = 0; i != NUM_FUTURES; ++i)
     {
         results.push_back(
-            hpx::lcos::local::dataflow(
+            hpx::dataflow(
                 hpx::launch::sync,
                 [&](hpx::shared_future<void> &&)
                 {

@@ -12,8 +12,8 @@ namespace hpx { namespace serialization
         naming::gid_type const & gid,
         naming::gid_type const & splitted_gid)
     {
-        if(new_gids_)
-            (*new_gids_)[gid].push_back(splitted_gid);
+        HPX_ASSERT(is_future_awaiting());
+        buffer_->add_gid(gid, splitted_gid);
     }
 
     naming::gid_type output_archive::get_new_gid(naming::gid_type const & gid)
@@ -21,10 +21,8 @@ namespace hpx { namespace serialization
         if(!new_gids_) return naming::gid_type();
 
         new_gids_map::iterator it = new_gids_->find(gid);
-        if(it == new_gids_->end() || it->second.empty())
-        {
-            return gid;
-        }
+
+        HPX_ASSERT(it != new_gids_->end() && !it->second.empty());
 
         naming::gid_type new_gid = it->second.front();
         it->second.pop_front();

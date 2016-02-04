@@ -23,25 +23,12 @@ namespace jacobi
     namespace server
     {
         struct HPX_COMPONENT_EXPORT stencil_iterator
-            : hpx::components::managed_component_base<
-                stencil_iterator
-              , hpx::components::detail::this_type
-              , hpx::traits::construct_with_back_ptr
-            >
+            : hpx::components::component_base<stencil_iterator>
         {
             typedef
-                hpx::components::managed_component_base<
-                    stencil_iterator
-                  , hpx::components::detail::this_type
-                  , hpx::traits::construct_with_back_ptr
-                >
+                hpx::components::component_base<stencil_iterator>
                 base_type;
-            typedef hpx::components::managed_component<stencil_iterator> component_type;
-
-            stencil_iterator(component_type * back_ptr)
-                : base_type(back_ptr)
-            {
-            }
+            typedef hpx::components::component<stencil_iterator> component_type;
 
             void init(
                 jacobi::row const & r

@@ -6,19 +6,18 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_RECEIVER_CONNECTION_HPP
 #define HPX_PARCELSET_POLICIES_MPI_RECEIVER_CONNECTION_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
-
-#include <hpx/util/memory_chunk_pool.hpp>
-#include <hpx/util/memory_chunk_pool_allocator.hpp>
 
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
-    class parcelport;
-
+    template <typename Parcelport>
     struct receiver_connection
     {
     private:
@@ -33,12 +32,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        typedef util::memory_chunk_pool<mutex_type> memory_pool_type;
-        typedef util::detail::memory_chunk_pool_allocator<
-                char, memory_pool_type
-            > allocator_type;
-        typedef
-            std::vector<char, allocator_type>
+        typedef std::vector<char>
             data_type;
         typedef parcel_buffer<data_type, data_type> buffer_type;
 
@@ -46,15 +40,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         receiver_connection(
             int src
           , header h
-          , parcelport & pp
-          , memory_pool_type & chunk_pool
+          , Parcelport & pp
         )
           : state_(initialized)
           , src_(src)
           , tag_(h.tag())
           , header_(h)
-          , allocator_(chunk_pool)
-          , buffer_(allocator_)
           , request_(MPI_REQUEST_NULL)
           , request_ptr_(0)
           , chunks_idx_(0)
@@ -104,7 +95,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             );
             if(num_zero_copy_chunks != 0)
             {
-                buffer_.chunks_.resize(num_zero_copy_chunks, data_type(allocator_));
+                buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Irecv(
@@ -248,15 +239,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         int src_;
         int tag_;
         header header_;
-        allocator_type allocator_;
         buffer_type buffer_;
 
         MPI_Request request_;
         MPI_Request *request_ptr_;
         std::size_t chunks_idx_;
 
-        parcelport & pp_;
+        Parcelport & pp_;
     };
 }}}}
+
+#endif
 
 #endif

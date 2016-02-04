@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             return result::get(
-                lcos::local::dataflow(
+                dataflow(
                     [=](std::vector<shared_future<T> > && r) -> T
                     {
                         // handle any remote exceptions, will throw on error

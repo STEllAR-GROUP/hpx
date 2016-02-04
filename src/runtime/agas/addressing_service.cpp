@@ -21,10 +21,12 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -1177,9 +1179,10 @@ hpx::future<bool> addressing_service::bind_range_async(
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
 
-    return f.then(
-        util::bind(&addressing_service::bind_postproc, this, _1, lower_id, g)
-    );
+    return f.then(util::bind(
+            util::one_shot(&addressing_service::bind_postproc),
+            this, _1, lower_id, g
+        ));
 }
 
 bool addressing_service::unbind_range_local(
@@ -1523,6 +1526,23 @@ bool addressing_service::resolve_cached(
         return false;
     }
 
+    // don't look at cache if id is marked as non-cache-able
+    if (!naming::detail::store_in_cache(id))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return false;
+    }
+
+    // don't look at the cache if the id is locally managed
+    if (naming::get_locality_id_from_gid(id) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return false;
+    }
+
     // first look up the requested item in the cache
     gva_cache_key k(id);
     gva_cache_key idbase;
@@ -1532,7 +1552,11 @@ bool addressing_service::resolve_cached(
 
     // force routing if target object was migrated
     if (was_object_migrated_locked(id))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return false;
+    }
 
     // Check if the entry is currently in the cache
     if (gva_cache_->get_entry(k, idbase, e))
@@ -1699,9 +1723,10 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     using util::placeholders::_1;
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
-    return f.then(
-        util::bind(&addressing_service::resolve_full_postproc, this, _1, gid)
-    );
+    return f.then(util::bind(
+            util::one_shot(&addressing_service::resolve_full_postproc),
+            this, _1, gid
+        ));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2001,9 +2026,10 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 
     // pass the amount of compensated decrefs to the callback
     using util::placeholders::_1;
-    return f.then(
-        util::bind(&addressing_service::synchronize_with_async_incref,
-            this, _1, keep_alive, pending_decrefs));
+    return f.then(util::bind(
+            util::one_shot(&addressing_service::synchronize_with_async_incref),
+            this, _1, keep_alive, pending_decrefs
+        ));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2130,10 +2156,10 @@ lcos::future<bool> addressing_service::register_name_async(
     if (new_credit != 0)
     {
         using util::placeholders::_1;
-        return f.then(
-            util::bind(correct_credit_on_failure, _1, id,
-                HPX_GLOBALCREDIT_INITIAL, new_credit)
-        );
+        return f.then(util::bind(
+                util::one_shot(&correct_credit_on_failure),
+                _1, id, HPX_GLOBALCREDIT_INITIAL, new_credit
+            ));
     }
 
     return f;
@@ -2223,7 +2249,7 @@ lcos::future<naming::id_type> addressing_service::resolve_name_async(
 namespace detail
 {
     hpx::future<hpx::id_type> on_register_event(hpx::future<bool> f,
-        lcos::promise<hpx::id_type, naming::gid_type> p)
+        hpx::future<hpx::id_type> result_f)
     {
         if (!f.get())
         {
@@ -2232,7 +2258,13 @@ namespace detail
                 "request 'symbol_ns_on_event' failed");
             return hpx::future<hpx::id_type>();
         }
-        return p.get_future();
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+        // The move was added to silence an error produced by intel13
+        return std::move(result_f);
+#else
+        // All other compilers do the right thing (tm)
+        return result_f;
+#endif
     }
 }
 
@@ -2254,7 +2286,9 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         name, req, action_priority_);
 
     using util::placeholders::_1;
-    return f.then(util::bind(&detail::on_register_event, _1, std::move(p)));
+    return f.then(util::bind(
+            util::one_shot(&detail::on_register_event), _1, p.get_future()
+        ));
 }
 
 }}
@@ -2312,9 +2346,29 @@ void addressing_service::insert_cache_entry(
   , error_code& ec
     )
 { // {{{
+
+    // If caching is disabled, we silently pretend success.
     if (!caching_)
     {
-        // If caching is disabled, we silently pretend success.
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
+    // don't look at cache if id is marked as non-cacheable
+    if (!naming::detail::store_in_cache(gid))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
+    // don't look at the cache if the id is locally managed
+    if (naming::get_locality_id_from_gid(gid) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
@@ -2383,13 +2437,25 @@ void addressing_service::update_cache_entry(
     if (!caching_)
     {
         // If caching is disabled, we silently pretend success.
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
+    // don't look at cache if id is marked as non-cache-able
+    if (!naming::detail::store_in_cache(gid))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
+    // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
         naming::get_locality_id_from_gid(locality_))
     {
-        // we prefer not to store any local items in the AGAS cache
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
@@ -2448,6 +2514,8 @@ void addressing_service::clear_cache(
     if (!caching_)
     {
         // If caching is disabled, we silently pretend success.
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
@@ -2473,7 +2541,28 @@ void addressing_service::remove_cache_entry(
 {
     // If caching is disabled, we silently pretend success.
     if (!caching_)
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
+    }
+
+    // don't look at cache if id is marked as non-cache-able
+    if (!naming::detail::store_in_cache(gid))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
+    // don't look at the cache if the id is locally managed
+    if (naming::get_locality_id_from_gid(gid) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
 
     try {
         LAGAS_(warning) << "addressing_service::remove_cache_entry";

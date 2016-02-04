@@ -33,6 +33,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
     };
 
+    template <>
+    struct algorithm_result_helper<future<void> >
+    {
+        static BOOST_FORCEINLINE future<void> call(future<void>&& f)
+        {
+            return std::move(f);
+        }
+    };
+
     template <typename Iterator>
     struct algorithm_result_helper<
         Iterator,
@@ -52,6 +61,40 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
     };
 
+    template <typename Iterator1, typename Iterator2>
+    struct algorithm_result_helper<
+        std::pair<Iterator1, Iterator2>,
+        typename boost::enable_if<
+            typename boost::mpl::or_<
+                typename hpx::traits::segmented_local_iterator_traits<
+                        Iterator1
+                    >::is_segmented_local_iterator,
+                typename hpx::traits::segmented_local_iterator_traits<
+                        Iterator2
+                    >::is_segmented_local_iterator
+            >::type
+        >::type>
+    {
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator1>
+            traits1;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator2>
+            traits2;
+
+        static BOOST_FORCEINLINE
+        std::pair<
+            typename traits1::local_iterator, typename traits2::local_iterator
+        >
+        call(std::pair<
+                typename traits1::local_raw_iterator,
+                typename traits2::local_raw_iterator
+            > && p)
+        {
+            return std::make_pair(
+                traits1::remote(std::move(p.first)),
+                traits2::remote(std::move(p.second)));
+        }
+    };
+
     template <typename Iterator>
     struct algorithm_result_helper<
         future<Iterator>,
@@ -67,16 +110,56 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         call(future<typename traits::local_raw_iterator>&& f)
         {
             typedef future<typename traits::local_raw_iterator> argtype;
-            return f.then([](argtype&& f) { return traits::remote(f.get()); });
+            return f.then(
+                [](argtype&& f) -> Iterator
+                {
+                    return traits::remote(f.get());
+                });
         }
     };
 
-    template <>
-    struct algorithm_result_helper<future<void> >
+    template <typename Iterator1, typename Iterator2>
+    struct algorithm_result_helper<
+        future<std::pair<Iterator1, Iterator2> >,
+        typename boost::enable_if<
+            typename boost::mpl::or_<
+                typename hpx::traits::segmented_local_iterator_traits<
+                        Iterator1
+                    >::is_segmented_local_iterator,
+                typename hpx::traits::segmented_local_iterator_traits<
+                        Iterator2
+                    >::is_segmented_local_iterator
+            >::type
+        >::type>
     {
-        static BOOST_FORCEINLINE future<void> call(future<void>&& f)
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator1>
+            traits1;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator2>
+            traits2;
+
+        typedef std::pair<
+                typename traits1::local_raw_iterator,
+                typename traits2::local_raw_iterator
+            > arg_type;
+
+        static BOOST_FORCEINLINE
+        future<std::pair<
+            typename traits1::local_iterator, typename traits2::local_iterator
+        > >
+        call(future<arg_type> && f)
         {
-            return std::move(f);
+            return f.then(
+                [](future<arg_type> && f)
+                ->  std::pair<
+                        typename traits1::local_iterator,
+                        typename traits2::local_iterator
+                    >
+                {
+                    auto p = f.get();
+                    return std::make_pair(
+                        traits1::remote(p.first),
+                        traits2::remote(p.second));
+                });
         }
     };
 

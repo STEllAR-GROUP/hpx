@@ -16,7 +16,9 @@
 template <typename ExPolicy, typename IteratorTag>
 void test_copy_if_exception(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -58,7 +60,7 @@ void test_copy_if_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::copy_if(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),

@@ -160,6 +160,15 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #endif
     }
 
+    std::ptrdiff_t get_available_stack_space()
+    {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+        return m_pimpl->get_available_stack_space();
+#else
+        return (std::numeric_limits<std::ptrdiff_t>::max)();
+#endif
+    }
+
     explicit coroutine_self(impl_type * pimpl, coroutine_self* next_self = 0)
       : m_pimpl(pimpl), next_self_(next_self)
     {}

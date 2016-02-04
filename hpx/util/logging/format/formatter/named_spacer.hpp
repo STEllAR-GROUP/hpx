@@ -17,14 +17,13 @@
 #ifndef JT28092007_named_spacer_HPP_DEFINED
 #define JT28092007_named_spacer_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_same.hpp>
-#include <boost/static_assert.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/formatter/convert_format.hpp> // do_convert_format
 #include <hpx/util/logging/format/array.hpp> // array
@@ -207,8 +206,9 @@ namespace detail {
             typedef typename formatter::convert_type formatter_convert_type;
             // they must share the same type of conversion
             // - otherwise when trying to prepend we could end up appending or vice versa
-            BOOST_STATIC_ASSERT( (boost::is_same<formatter_convert_type,
-                convert_type>::value) );
+            static_assert( (boost::is_same<formatter_convert_type,
+                convert_type>::value),
+                "boost::is_same<formatter_convert_type, convert_type>::value");
 
             add_impl( name, holder(fmt), boost::false_type() );
         }

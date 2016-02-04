@@ -73,7 +73,7 @@ namespace hpx { namespace traits
     struct future_access<Derived,
         typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<naming::id_type>::type const&
         get_shared_state(Derived const& client)
         {
@@ -89,7 +89,7 @@ namespace hpx { namespace traits
         typedef Derived type;
 
         template <typename T_>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         Derived operator()(T_ && value) const
         {
             return std::forward<T_>(value);
@@ -132,7 +132,7 @@ namespace hpx { namespace components
         {
             typedef shared_future<naming::id_type> result_type;
 
-            BOOST_FORCEINLINE result_type
+            HPX_FORCEINLINE result_type
             operator()(future<Derived> f) const
             {
                 return f.get().share();
@@ -364,15 +364,17 @@ namespace hpx { namespace components
 
     protected:
         template <typename F>
-        static typename lcos::detail::future_then_result<client_base, F>::cont_result
+        static typename lcos::detail::future_then_result<Derived, F>::cont_result
         on_ready(future_type && fut, F f)
         {
-            return f(client_base(std::move(fut)));
+            return f(Derived(std::move(fut)));
         }
 
     public:
         template <typename F>
-        typename lcos::detail::future_then_result<client_base, F>::type
+        typename lcos::detail::future_then_result<
+            Derived, typename util::decay<F>::type
+        >::type
         then(F && f)
         {
             typedef typename util::decay<F>::type func_type;

@@ -52,8 +52,8 @@ namespace hpx
     /// representing the same list of futures after one future of that list
     /// finishes execution.
     ///
-    /// \param futures  [in] A container holding an arbitrary amount of \a future or
-    ///                 \a shared_future objects for which \a when_any should
+    /// \param values   [in] A range holding an arbitrary amount of \a futures
+    ///                 or \a shared_future objects for which \a when_any should
     ///                 wait.
     ///
     /// \return   Returns a when_any_result holding the same list of futures
@@ -66,7 +66,7 @@ namespace hpx
     ///             iterator.
     template <typename Range>
     future<when_any_result<Range>>
-    when_any(Range& values)
+    when_any(Range& values);
 
     /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
@@ -259,7 +259,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void operator()(Sequence_& sequence,
                 typename boost::enable_if_c<
                     traits::is_future_range<Sequence_>::value
@@ -269,7 +269,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::enable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -279,7 +279,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::disable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -293,7 +293,7 @@ namespace hpx { namespace lcos
         };
 
         template <typename Sequence>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void set_on_completed_callback(when_any<Sequence>& when)
         {
             set_when_any_callback_impl<Sequence> callback(when);

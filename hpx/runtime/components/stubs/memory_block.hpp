@@ -6,8 +6,6 @@
 #if !defined(HPX_COMPONENTS_STUBS_MEMORY_BLOCK_JUN_22_2008_0417PM)
 #define HPX_COMPONENTS_STUBS_MEMORY_BLOCK_JUN_22_2008_0417PM
 
-#include <boost/bind.hpp>
-
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/memory.hpp>

@@ -31,7 +31,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #if !defined(BOOST_SYSTEM_NOEXCEPT)
-#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
+#define BOOST_SYSTEM_NOEXCEPT HPX_NOEXCEPT
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ namespace hpx
                 return "";
             }
 
-            std::string message(int) const BOOST_NOEXCEPT
+            std::string message(int) const HPX_NOEXCEPT
             {
                 return "";
             }
@@ -617,7 +617,6 @@ namespace hpx
             }
         };
 
-#ifndef BOOST_NO_TYPEID
         struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast
         {
           private:
@@ -653,7 +652,6 @@ namespace hpx
                 return what_.c_str();
             }
         };
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // types needed to add additional information to the thrown exceptions

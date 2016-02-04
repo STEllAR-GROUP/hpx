@@ -73,9 +73,8 @@ void copy_algo_tests_with_policy(std::size_t size, std::size_t localities,
     fill_vector(v1, T(43));
 
     hpx::partitioned_vector<T> v2(size, policy);
-    typename hpx::partitioned_vector<T>::iterator it =
-        hpx::parallel::copy(copy_policy, v1.begin(), v1.end(), v2.begin());
-    HPX_TEST(it == v2.end());
+    auto p = hpx::parallel::copy(copy_policy, v1.begin(), v1.end(), v2.begin());
+    HPX_TEST(p.out() == v2.end());
     compare_vectors(v1, v2);
 }
 
@@ -89,10 +88,9 @@ void copy_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
     using hpx::parallel::task;
 
     hpx::partitioned_vector<T> v2(size, policy);
-    hpx::future<typename hpx::partitioned_vector<T>::iterator> f =
-        hpx::parallel::copy(copy_policy(task), v1.begin(), v1.end(), v2.begin());
+    auto f = hpx::parallel::copy(copy_policy(task), v1.begin(), v1.end(), v2.begin());
 
-    HPX_TEST(f.get() == v2.end());
+    HPX_TEST(f.get().out() == v2.end());
     compare_vectors(v1, v2);
 }
 

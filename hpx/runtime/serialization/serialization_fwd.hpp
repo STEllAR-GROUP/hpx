@@ -10,13 +10,13 @@
 #include <hpx/config.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) \
-           || HPX_INTEL_VERSION < 1400)
+#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
 #include <boost/shared_ptr.hpp>
 #else
 #include <memory>
 #endif
 
+#include <boost/type_traits/add_const.hpp>
 #include <boost/cstdint.hpp>
 
 namespace hpx { namespace serialization
@@ -24,8 +24,7 @@ namespace hpx { namespace serialization
     namespace detail
     {
         struct ptr_helper;
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) \
-           || HPX_INTEL_VERSION < 1400)
+#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
         typedef boost::shared_ptr<ptr_helper> ptr_helper_ptr;
 #else
         typedef std::unique_ptr<ptr_helper> ptr_helper_ptr;
@@ -37,7 +36,7 @@ namespace hpx { namespace serialization
     struct output_archive;
     struct binary_filter;
 
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     void register_pointer(input_archive & ar, boost::uint64_t pos,
         detail::ptr_helper_ptr helper);
 
@@ -69,12 +68,12 @@ namespace hpx { namespace serialization
     }                                                                               \
 /**/
 #define HPX_SERIALIZATION_SPLIT_FREE(T)                                             \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)         \
     {                                                                               \
         load(ar, t, 0);                                                             \
     }                                                                               \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)        \
     {                                                                               \
         save(ar, const_cast<boost::add_const<T>::type &>(t), 0);                    \
@@ -82,14 +81,14 @@ namespace hpx { namespace serialization
 /**/
 #define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(TEMPLATE, ARGS)                       \
     HPX_UTIL_STRIP(TEMPLATE)                                                        \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::input_archive & ar,                          \
             HPX_UTIL_STRIP(ARGS) & t, unsigned)                                     \
     {                                                                               \
         load(ar, t, 0);                                                             \
     }                                                                               \
     HPX_UTIL_STRIP(TEMPLATE)                                                        \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::output_archive & ar,                         \
             HPX_UTIL_STRIP(ARGS) & t, unsigned)                                     \
     {                                                                               \

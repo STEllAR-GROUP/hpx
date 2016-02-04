@@ -13,6 +13,7 @@ MACRO (hpx_set_lib_name target name)
   hpx_debug("hpx_set_lib_name: target:" ${target} "name: " ${name})
   set_target_properties (${target}
       PROPERTIES
+      OUTPUT_NAME                hpx_${name}
       DEBUG_OUTPUT_NAME          hpx_${name}
       RELEASE_OUTPUT_NAME        hpx_${name}
       MINSIZEREL_OUTPUT_NAME     hpx_${name}

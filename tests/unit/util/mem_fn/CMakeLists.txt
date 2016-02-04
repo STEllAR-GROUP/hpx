@@ -29,10 +29,6 @@ foreach(test ${tests})
 
   add_hpx_unit_test("util.mem_fn" ${test} ${${test}_PARAMETERS})
 
-  set_property(TARGET ${test}_test_exe APPEND
-               PROPERTY COMPILE_DEFINITIONS
-               "HPX_LIMIT=8")
-
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.util.mem_fndir.${test})
 

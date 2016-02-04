@@ -1,5 +1,5 @@
 // Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2013 Hartmut Kaiser
+// Copyright (c) 2005-2015 Hartmut Kaiser
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,13 +12,12 @@
 #include <iostream>
 
 #include <boost/bind.hpp>
-#include <boost/config.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/thread/once.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
@@ -212,7 +211,9 @@ namespace hpx { namespace util { namespace plugin {
             initialize_mutex();
             boost::lock_guard<boost::mutex> lock(mutex_instance());
 
-            BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
+            static_assert(
+                boost::is_pointer<SymbolType>::value,
+                "boost::is_pointer<SymbolType>::value");
 
             SymbolType address = very_detail::nasty_cast<SymbolType>(
                 MyGetProcAddress(dll_handle, symbol_name.c_str()));

@@ -60,7 +60,7 @@ struct stepper
     // do all the work on 'nx' data points for 'nt' time steps
     hpx::future<space> do_work(std::size_t nx, std::size_t nt)
     {
-        using hpx::lcos::local::dataflow;
+        using hpx::dataflow;
         using hpx::util::unwrapped;
 
         // U[t][i] is the state of position i at time t.

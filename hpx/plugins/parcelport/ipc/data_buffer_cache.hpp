@@ -14,6 +14,9 @@
 #if !defined(HPX_IPC_DATA_BUFFER_CACHE_DEC_07_2012_0807AM)
 #define HPX_IPC_DATA_BUFFER_CACHE_DEC_07_2012_0807AM
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/parcelport/ipc/data_buffer.hpp>
 #include <hpx/util/assert.hpp>
@@ -142,5 +145,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         cache_type cache_;
     };
 }}}}
+
+#endif
 
 #endif

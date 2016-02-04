@@ -21,6 +21,7 @@
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
+#include <hpx/config/noexcept.hpp>
 
 #include <boost/version.hpp>
 
@@ -35,7 +36,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
 #define _WINSOCKAPI_
@@ -69,24 +70,6 @@
 /// executable
 #if !defined(HPX_RUNTIME_INSTANCE_LIMIT)
 #  define HPX_RUNTIME_INSTANCE_LIMIT 1
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Properly handle all preprocessing limits
-#if !defined(HPX_LIMIT)
-#  define HPX_LIMIT 5
-#elif (HPX_LIMIT < 5)
-#  error "HPX_LIMIT is too low, it must be at least 5"
-#endif
-
-// make sure Fusion sizes are adjusted appropriately as well
-#if HPX_LIMIT > 5 && !defined(FUSION_MAX_VECTOR_SIZE)
-#  define FUSION_MAX_VECTOR_SIZE 20
-#endif
-
-// make sure boost::result_of is adjusted appropriately as well
-#if HPX_LIMIT > 5 && !defined(BOOST_RESULT_OF_NUM_ARGS)
-#  define BOOST_RESULT_OF_NUM_ARGS 20
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -298,7 +281,7 @@
 //    - to delimit several HPX ini paths
 //    - used as file extensions for shared libraries
 //    - used as path delimiters
-#ifdef BOOST_WINDOWS  // windows
+#ifdef HPX_WINDOWS  // windows
 #  define HPX_INI_PATH_DELIMITER            ";"
 #  define HPX_SHARED_LIB_EXTENSION          ".dll"
 #  define HPX_PATH_DELIMITERS               "\\/"
@@ -315,7 +298,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
 #  if defined(HPX_DEBUG)
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + n + "d" + HPX_SHARED_LIB_EXTENSION
 #  else
@@ -373,7 +356,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS) && _MSC_VER < 1900
+#if defined(HPX_WINDOWS) && defined(HPX_MSVC) && HPX_MSVC < 1900
 #  define snprintf _snprintf
 #endif
 
@@ -424,8 +407,29 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+
+#if !defined(HPX_THREADS_STACK_OVERHEAD)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREADS_STACK_OVERHEAD 0x2800
+#  else
+#    if defined(HPX_INTEL_VERSION)
+#    define HPX_THREADS_STACK_OVERHEAD 0x2800
+#    else
+#    define HPX_THREADS_STACK_OVERHEAD 0x800
+#    endif
+#  endif
+#endif
+
 #if !defined(HPX_SMALL_STACK_SIZE)
-#  if defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
+#  if defined(__has_feature)
+#    if __has_feature(address_sanitizer)
+#      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
+#    endif
+#  endif
+#endif
+
+#if !defined(HPX_SMALL_STACK_SIZE)
+#  if defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 #    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
@@ -450,6 +454,16 @@
 // This limits how deep the internal recursion of future continuations will go
 // before a new operation is re-spawned.
 #if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+#  if defined(__has_feature)
+#    if __has_feature(address_sanitizer)
+// if we build under AddressSanitizer we set the max recursion depth to 1 to not
+// run into stack overflows.
+#      define HPX_CONTINUATION_MAX_RECURSION_DEPTH 1
+#    endif
+#  endif
+#endif
+
+#if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
 #if defined(HPX_DEBUG)
 #define HPX_CONTINUATION_MAX_RECURSION_DEPTH 14
 #else
@@ -458,37 +472,34 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Older Boost versions do not have BOOST_NOEXCEPT defined
-#if !defined(BOOST_NOEXCEPT)
-#  define BOOST_NOEXCEPT
-#  define BOOST_NOEXCEPT_IF(Predicate)
-#  define BOOST_NOEXCEPT_EXPR(Expression) false
+#if defined(HPX_MSVC)
+#   define HPX_NOINLINE __declspec(noinline)
+#elif defined(__GNUC__)
+#   if defined(__CUDACC__)
+        // nvcc doesn't always parse __noinline
+#       define HPX_NOINLINE __attribute__ ((noinline))
+#   else
+#       define HPX_NOINLINE __attribute__ ((__noinline__))
+#   endif
+#else
+#   define HPX_NOINLINE
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Older Boost versions do not have BOOST_NOINLINE defined
-#if !defined(BOOST_NOINLINE)
+#if !defined(HPX_ATTRIBUTE_NORETURN)
 #  if defined(_MSC_VER)
-#    define BOOST_NOINLINE __declspec(noinline)
+#    define HPX_ATTRIBUTE_NORETURN __declspec(noreturn)
+#  elif defined(__GNUC__)
+#    define HPX_ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
 #  else
-#    define BOOST_NOINLINE
+#    define HPX_ATTRIBUTE_NORETURN
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Older Boost versions do not have BOOST_NORETURN defined
-#if defined(BOOST_NORETURN)
-#  define HPX_ATTRIBUTE_NORETURN BOOST_NORETURN
-#elif defined(BOOST_ATTRIBUTE_NORETURN)
-#  define HPX_ATTRIBUTE_NORETURN BOOST_ATTRIBUTE_NORETURN
-#else
-#  define HPX_ATTRIBUTE_NORETURN
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Make sure we have support for more than 64 threads for Xeon Phi
-#if defined(__MIC__) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
-#  define HPX_WITH_MORE_THAN_64_THREADS
+#if defined(__MIC__) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+#  define HPX_HAVE_MORE_THAN_64_THREADS
 #endif
 #if defined(__MIC__) && !defined(HPX_HAVE_MAX_CPU_COUNT)
 #  define HPX_HAVE_MAX_CPU_COUNT 256
@@ -519,7 +530,7 @@
 #if !defined(HPX_NO_DEPRECATED)
 #  define HPX_DEPRECATED_MSG \
    "This function is deprecated and will be removed in the future."
-#  if defined(_MSC_VER)
+#  if defined(HPX_MSVC)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
 #  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))

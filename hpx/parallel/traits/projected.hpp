@@ -7,10 +7,12 @@
 #define HPX_PARALLEL_TRAITS_PROJECTED_JUL_18_2015_1001PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <type_traits>
 #include <iterator>
@@ -39,19 +41,27 @@ namespace hpx { namespace parallel { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        // This implementation of is_iterator seems to work fine even for
+        // VS2013 which has an implementation of std::iterator_traits which is
+        // SFINAE-unfriendly.
         template <typename T>
         struct is_iterator
         {
-            template <typename U>
-            static char test(typename std::iterator_traits<U>::pointer* x);
+            template <typename U, typename =
+                typename std::iterator_traits<U>::pointer>
+            static char test(U&&);
 
-            template <typename U>
             static long test(...);
 
             static bool const value =
-                sizeof(test<T>(0)) == sizeof(char);
+                sizeof(test(std::declval<T>())) == sizeof(char);
         };
     }
+
+    template <typename Iter, typename Enable = void>
+    struct is_iterator
+      : detail::is_iterator<typename hpx::util::decay<Iter>::type>
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

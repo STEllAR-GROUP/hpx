@@ -136,7 +136,7 @@ typedef
 executors_vector execs;
 
 struct block_component
-  : hpx::components::simple_component_base<block_component>
+  : hpx::components::component_base<block_component>
 {
     block_component()
       : data_(0, 0.0, allocator_type(execs_, retrieve_topology()))
@@ -193,7 +193,7 @@ struct block
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<block_component> block_component_type;
+typedef hpx::components::component<block_component> block_component_type;
 HPX_REGISTER_COMPONENT(block_component_type, block_component);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
@@ -443,7 +443,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                                             phase * block_size;
 
                                         phase_futures.push_back(
-                                            hpx::lcos::local::dataflow(
+                                            hpx::dataflow(
                                                 execs[domain]
                                               , &transpose
                                               , A[from_block].get_sub_block(
@@ -489,7 +489,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         ///////////////////////////////////////////////////////////////////////
         // Analyze and output results
-        double epsilon = 1.e-8;
         if(root)
         {
             double errsq = std::accumulate(errsqs.begin(), errsqs.end(), 0.0);

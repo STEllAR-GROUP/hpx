@@ -15,15 +15,15 @@
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/config.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {
     struct once_flag
     {
-        once_flag() BOOST_NOEXCEPT
+        once_flag() HPX_NOEXCEPT
           : status_(0)
         {}
 

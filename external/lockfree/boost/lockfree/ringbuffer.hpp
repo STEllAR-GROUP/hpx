@@ -18,8 +18,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/smart_ptr/scoped_array.hpp>
 
-#include "detail/branch_hints.hpp"
-#include "detail/prefix.hpp"
+#include <boost/lockfree/detail/branch_hints.hpp>
+#include <boost/lockfree/detail/prefix.hpp>
 
 #include <algorithm>
 

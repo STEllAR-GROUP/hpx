@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2014-2016 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,8 +16,7 @@ if(EXISTS "${HPX_DIR}")
   endif()
 
   include_directories(${test_SOURCE_DIR})
-  include_directories(${HPX_INCLUDE_DIR})
-  link_directories(${HPX_LIBRARY_DIR})
+  include_directories(${HPX_INCLUDE_DIRS})
 
   add_library(test_component SHARED test_component.cpp)
   hpx_setup_target(
@@ -25,8 +24,10 @@ if(EXISTS "${HPX_DIR}")
     TYPE COMPONENT
   )
 
-  add_executable(test test.cpp)
-  hpx_setup_target(test
+  add_executable(test_executable test.cpp)
+  target_link_libraries(test_executable ${HPX_LIBRARIES} iostreams_component test_component)
+  target_compile_definitions(test_executable PUBLIC -DHPX_DEBUG)
+  hpx_setup_target(test_executable
     DEPENDENCIES test_component
     COMPONENT_DEPENDENCIES iostreams
   )

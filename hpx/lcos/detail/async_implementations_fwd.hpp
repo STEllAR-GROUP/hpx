@@ -7,8 +7,13 @@
 #define HPX_LCOS_ASYNC_IMPLEMENTATIONS_FWD_APR_13_2015_0829AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+
+#include <boost/detail/scoped_enum_emulation.hpp>
 
 namespace hpx { namespace detail
 {

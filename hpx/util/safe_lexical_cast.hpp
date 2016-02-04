@@ -8,7 +8,7 @@
 #define HPX_UTIL_SEP_21_2014_0840PM
 
 #include <boost/lexical_cast.hpp>
-#include <boost/type_traits.hpp>
+#include <boost/type_traits/is_integral.hpp>
 #include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace util

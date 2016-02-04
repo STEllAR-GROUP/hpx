@@ -14,7 +14,7 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::simple_component<
+typedef hpx::components::component<
     examples::server::cancelable_action
 > cancelable_action_component_type;
 

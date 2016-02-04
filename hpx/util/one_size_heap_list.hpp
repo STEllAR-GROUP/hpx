@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2013 Hartmut Kaiser
+//  Copyright (c) 1998-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,12 +10,13 @@
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
-#include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 

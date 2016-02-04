@@ -13,14 +13,6 @@
 #error This file requires compilation with gcc.
 #endif
 
-#include <boost/config.hpp>
-
-/*
- *  This file should really be a plain assembler file.
- *  Unfortunately Boost.Build v2 doesn't handle asm files (yet).
- *  For now resort to inline asm.
- */
-
 //     RDI is &from.sp
 //     RSI is to.sp
 //

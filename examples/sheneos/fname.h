@@ -14,7 +14,7 @@
 #define FNAME(n_) n_##_
 #elif defined(__PGI)
 #define FNAME(n_) n_##_
-#elif defined(_MSC_VER)
+#elif defined(HPX_MSVC)
 #define FNAME(n_) n_
 #else
 #error "Unknown Fortran name mangling convention"

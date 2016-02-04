@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
 
@@ -17,7 +16,7 @@ int hpx_startup::user_main()
 //     std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
 //
 //     using namespace boost::program_options;
-// #if defined(BOOST_WINDOWS)
+// #if defined(HPX_WINDOWS)
 //     std::vector<std::string> args = split_winmain(cmdline);
 // #else
 //     std::vector<std::string> args = split_unix(cmdline);

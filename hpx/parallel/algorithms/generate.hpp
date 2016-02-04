@@ -8,17 +8,17 @@
 #if !defined(HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM)
 #define HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/util/void_guard.hpp>
 
 #include <algorithm>
 #include <iterator>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -29,37 +29,62 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        struct generate : public detail::algorithm<generate>
+        template <typename Iter>
+        struct generate : public detail::algorithm<generate<Iter>, Iter>
         {
             generate()
-                : generate::algorithm("generate")
+              : generate::algorithm("generate")
             {}
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static hpx::util::unused_type
+            static FwdIter
             sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
             {
                 std::generate(first, last, std::forward<F>(f));
-                return hpx::util::unused;
+                return last;
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename util::detail::algorithm_result<ExPolicy>::type
+            static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
-                return hpx::util::void_guard<result_type>(),
-                    for_each_n<FwdIter>().call(
+                return for_each_n<FwdIter>().call(
                         policy, boost::mpl::false_(),
                         first, std::distance(first, last),
-                        [f](type& v) {
+                        [f](type& v)
+                        {
                             v = f();
                         });
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // non-segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            std::false_type)
+        {
+            typedef typename parallel::is_sequential_execution_policy<
+                    ExPolicy
+                >::type is_seq;
+
+            return detail::generate<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            std::true_type);
+
         /// \endcond
     }
 
@@ -106,31 +131,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<void>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy
-    ///           and returns \a void otherwise.
-    template <typename ExPolicy, typename FwdIter, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, void>::type
-    >::type
+    ///           and returns \a FwdIter otherwise.
+    ///           It returns \a last.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename F,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        traits::is_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     generate(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
         typedef typename std::iterator_traits<FwdIter>::iterator_category
             iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::forward_iterator_tag, iterator_category>::value),
             "Required at least forward iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::generate().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        return detail::generate_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::forward<F>(f), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -164,7 +192,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return
                     for_each_n<OutIter>().call(
                         policy, boost::mpl::false_(), first, count,
-                        [f](type& v) {
+                        [f](type& v)
+                        {
                             v = f();
                         });
             }
@@ -216,22 +245,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<void>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy
-    ///           and returns \a void otherwise.
-    template <typename ExPolicy, typename OutIter, typename Size, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
+    ///           and returns \a OutIter otherwise.
+    ///           It returns \a last.
+    ///
+    template <typename ExPolicy, typename OutIter, typename Size, typename F,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     generate_n(ExPolicy && policy, OutIter first, Size count, F && f)
     {
         typedef typename std::iterator_traits<OutIter>::iterator_category
             iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::mpl::or_<
                 boost::is_base_of<
                     std::forward_iterator_tag, iterator_category>,

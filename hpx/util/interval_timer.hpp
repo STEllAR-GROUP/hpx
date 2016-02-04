@@ -22,7 +22,7 @@
 #include <vector>
 #include <algorithm>
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
@@ -99,7 +99,7 @@ namespace hpx { namespace util
 {
     class HPX_EXPORT interval_timer
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(interval_timer);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(interval_timer)
 
     public:
         interval_timer();
@@ -157,7 +157,7 @@ namespace hpx { namespace util
     };
 }}
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
 

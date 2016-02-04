@@ -6,6 +6,7 @@
 #if !defined(HPX_UTIL_AGAS_INIT_LOGGING_SEP_07_2013_0754PM)
 #define HPX_UTIL_AGAS_INIT_LOGGING_SEP_07_2013_0754PM
 
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/util/ini.hpp>
 

@@ -11,10 +11,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/emulate_deleted.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/async.hpp>
@@ -27,7 +28,6 @@
 #include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
 
-#include <boost/static_assert.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     class task_canceled_exception : public hpx::exception
     {
     public:
-        task_canceled_exception() BOOST_NOEXCEPT
+        task_canceled_exception() HPX_NOEXCEPT
           : hpx::exception(hpx::task_canceled_exception)
         {}
     };
@@ -140,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             typedef typename util::detail::algorithm_result<ExPolicy>::type
                 result_type;
             typedef std::integral_constant<
-                    bool, traits::is_future<result_type>::value
+                    bool, hpx::traits::is_future<result_type>::value
                 > is_fut;
             wait_for_completion(is_fut());
         }
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             return
                 result::get(
-                    hpx::lcos::local::dataflow(
+                    hpx::dataflow(
                         hpx::util::bind(hpx::
                             util::one_shot(&task_block::on_ready),
                             hpx::util::placeholders::_1, std::move(errors)),
@@ -350,7 +350,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     typename util::detail::algorithm_result<ExPolicy>::type
     define_task_block(ExPolicy && policy, F && f)
     {
-        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+        static_assert(
+            parallel::is_execution_policy<ExPolicy>::value,
+            "parallel::is_execution_policy<ExPolicy>::value");
 
         typedef typename hpx::util::decay<ExPolicy>::type policy_type;
         task_block<policy_type> trh(std::forward<ExPolicy>(policy));
@@ -474,7 +476,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     typename util::detail::algorithm_result<ExPolicy>::type
     define_task_block_restore_thread(ExPolicy && policy, F && f)
     {
-        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+        static_assert(
+            parallel::is_execution_policy<ExPolicy>::value,
+            "parallel::is_execution_policy<ExPolicy>::value");
 
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
