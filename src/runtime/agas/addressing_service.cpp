@@ -21,6 +21,8 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/agas/detail/client_bootstrap.hpp>
+#include <hpx/runtime/agas/detail/client_hosted.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -39,84 +41,6 @@
 
 namespace hpx { namespace agas
 {
-
-struct addressing_service::bootstrap_data_type
-{ // {{{
-    bootstrap_data_type()
-      : primary_ns_server_()
-      , locality_ns_server_(&primary_ns_server_)
-      , component_ns_server_()
-      , symbol_ns_server_()
-    {}
-
-    void register_counter_types()
-    {
-        server::locality_namespace::register_counter_types();
-        server::locality_namespace::register_global_counter_types();
-        server::primary_namespace::register_counter_types();
-        server::primary_namespace::register_global_counter_types();
-        server::component_namespace::register_counter_types();
-        server::component_namespace::register_global_counter_types();
-        server::symbol_namespace::register_counter_types();
-        server::symbol_namespace::register_global_counter_types();
-    }
-
-    void register_server_instance(char const* servicename)
-    {
-        locality_ns_server_.register_server_instance(servicename);
-        primary_ns_server_.register_server_instance(servicename);
-        component_ns_server_.register_server_instance(servicename);
-        symbol_ns_server_.register_server_instance(servicename);
-    }
-
-    void unregister_server_instance(error_code& ec)
-    {
-        locality_ns_server_.unregister_server_instance(ec);
-        if (!ec) primary_ns_server_.unregister_server_instance(ec);
-        if (!ec) component_ns_server_.unregister_server_instance(ec);
-        if (!ec) symbol_ns_server_.unregister_server_instance(ec);
-    }
-
-    server::primary_namespace primary_ns_server_;
-    server::locality_namespace locality_ns_server_;
-    server::component_namespace component_ns_server_;
-    server::symbol_namespace symbol_ns_server_;
-}; // }}}
-
-struct addressing_service::hosted_data_type
-{ // {{{
-    hosted_data_type()
-      : primary_ns_server_()
-      , symbol_ns_server_()
-    {}
-
-    void register_counter_types()
-    {
-        server::primary_namespace::register_counter_types();
-        server::primary_namespace::register_global_counter_types();
-        server::symbol_namespace::register_counter_types();
-        server::symbol_namespace::register_global_counter_types();
-    }
-
-    void register_server_instance(char const* servicename
-      , boost::uint32_t locality_id)
-    {
-        primary_ns_server_.register_server_instance(servicename, locality_id);
-        symbol_ns_server_.register_server_instance(servicename, locality_id);
-    }
-
-    void unregister_server_instance(error_code& ec)
-    {
-        primary_ns_server_.unregister_server_instance(ec);
-        if (!ec) symbol_ns_server_.unregister_server_instance(ec);
-    }
-
-    locality_namespace locality_ns_;
-    component_namespace component_ns_;
-
-    server::primary_namespace primary_ns_server_;
-    server::symbol_namespace symbol_ns_server_;
-}; // }}}
 
 struct addressing_service::gva_cache_key
 { // {{{ gva_cache_key implementation
@@ -264,37 +188,37 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
 
 void* addressing_service::get_hosted_primary_ns_ptr() const
 {
-    HPX_ASSERT(0 != hosted.get());
+    HPX_ASSERT(0 != hosted);
     return &hosted->primary_ns_server_;
 }
 
 void* addressing_service::get_hosted_symbol_ns_ptr() const
 {
-    HPX_ASSERT(0 != hosted.get());
+    HPX_ASSERT(0 != hosted);
     return &hosted->symbol_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_locality_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap);
     return &bootstrap->locality_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_primary_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap);
     return &bootstrap->primary_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_component_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap);
     return &bootstrap->component_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_symbol_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap);
     return &bootstrap->symbol_ns_server_;
 }
 
@@ -309,7 +233,12 @@ void addressing_service::launch_bootstrap(
   , util::runtime_configuration const& ini_
     )
 { // {{{
-    bootstrap = boost::make_shared<bootstrap_data_type>();
+    boost::shared_ptr<detail::client_bootstrap> booststrap_client =
+        boost::make_shared<detail::client_bootstrap>();
+
+    client_ = boost::static_pointer_cast<detail::client_implementation_base>(
+            booststrap_client);
+    bootstrap = &booststrap_client->data_;
 
     runtime& rt = get_runtime();
 
@@ -403,7 +332,12 @@ void addressing_service::launch_bootstrap(
 
 void addressing_service::launch_hosted()
 {
-    hosted = boost::make_shared<hosted_data_type>();
+    boost::shared_ptr<detail::client_hosted> booststrap_hosted =
+        boost::make_shared<detail::client_hosted>();
+
+    client_ = boost::static_pointer_cast<detail::client_implementation_base>(
+            booststrap_hosted);
+    hosted = &booststrap_hosted->data_;
 }
 
 void addressing_service::adjust_local_cache_size()
@@ -431,10 +365,7 @@ void addressing_service::adjust_local_cache_size()
 void addressing_service::set_local_locality(naming::gid_type const& g)
 {
     locality_ = g;
-    if (is_bootstrap())
-        bootstrap->primary_ns_server_.set_local_locality(g);
-    else
-        hosted->primary_ns_server_.set_local_locality(g);
+    client_->set_local_locality(g);
 }
 
 response addressing_service::service(

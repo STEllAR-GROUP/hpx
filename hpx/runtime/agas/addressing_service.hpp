@@ -19,6 +19,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/agas/detail/client_implementation_base.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/make_shared.hpp>
@@ -82,9 +83,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef std::set<naming::gid_type> migrated_objects_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
-    struct bootstrap_data_type;
-    struct hosted_data_type;
-
     mutable cache_mutex_type gva_cache_mtx_;
     boost::shared_ptr<gva_cache_type> gva_cache_;
     migrated_objects_table_type migrated_objects_table_;
@@ -110,8 +108,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::uint64_t rts_lva_;
     boost::uint64_t mem_lva_;
 
-    boost::shared_ptr<bootstrap_data_type> bootstrap;
-    boost::shared_ptr<hosted_data_type> hosted;
+    detail::bootstrap_data_type* bootstrap;
+    detail::hosted_data_type* hosted;
+
+    boost::shared_ptr<detail::client_implementation_base> client_;
 
     boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
