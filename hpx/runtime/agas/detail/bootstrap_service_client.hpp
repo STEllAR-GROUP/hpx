@@ -7,7 +7,7 @@
 #if !defined(HPX_AGAS_CLIENT_BOOTSTRAP_FEB_05_2016_114AM)
 #define HPX_AGAS_CLIENT_BOOTSTRAP_FEB_05_2016_114AM
 
-#include <hpx/runtime/agas/detail/client_implementation_base.hpp>
+#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
@@ -63,9 +63,13 @@ namespace hpx { namespace agas { namespace detail
     }; // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    struct client_bootstrap : client_implementation_base
+    struct bootstrap_service_client : agas_service_client
     {
         void set_local_locality(naming::gid_type const& g);
+        response service_primary_ns(request const& req, error_code& ec);
+        /*response service_component_ns(request const& req, error_code& ec);*/
+        response service_symbol_ns(request const& req, error_code& ec);
+        /*response service_locality_ns(request const& req, error_code& ec);*/
 
         bootstrap_data_type data_;
     };

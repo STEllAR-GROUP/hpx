@@ -13,8 +13,8 @@
 #include <hpx/apply.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/agas/detail/client_bootstrap.hpp>
-#include <hpx/runtime/agas/detail/client_hosted.hpp>
+#include <hpx/runtime/agas/detail/bootstrap_service_client.hpp>
+#include <hpx/runtime/agas/detail/hosted_service_client.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -225,12 +225,12 @@ void addressing_service::launch_bootstrap(
   , util::runtime_configuration const& ini_
     )
 { // {{{
-    boost::shared_ptr<detail::client_bootstrap> booststrap_client =
-        boost::make_shared<detail::client_bootstrap>();
+    boost::shared_ptr<detail::bootstrap_service_client> bootstrap_client =
+        boost::make_shared<detail::bootstrap_service_client>();
 
-    client_ = boost::static_pointer_cast<detail::client_implementation_base>(
-            booststrap_client);
-    bootstrap = &booststrap_client->data_;
+    client_ = boost::static_pointer_cast<detail::agas_service_client>(
+            bootstrap_client);
+    bootstrap = &bootstrap_client->data_;
 
     runtime& rt = get_runtime();
 
@@ -324,10 +324,10 @@ void addressing_service::launch_bootstrap(
 
 void addressing_service::launch_hosted()
 {
-    boost::shared_ptr<detail::client_hosted> booststrap_hosted =
-        boost::make_shared<detail::client_hosted>();
+    boost::shared_ptr<detail::hosted_service_client> booststrap_hosted =
+        boost::make_shared<detail::hosted_service_client>();
 
-    client_ = boost::static_pointer_cast<detail::client_implementation_base>(
+    client_ = boost::static_pointer_cast<detail::agas_service_client>(
             booststrap_hosted);
     hosted = &booststrap_hosted->data_;
 }
@@ -367,9 +367,17 @@ response addressing_service::service(
 { // {{{
     if (req.get_action_code() & primary_ns_service)
     {
-        if (is_bootstrap())
+        boost::shared_ptr<detail::bootstrap_service_client> bootstrap_client =
+            boost::make_shared<detail::bootstrap_service_client>();
+
+        client_ = boost::static_pointer_cast<detail::agas_service_client>(
+            bootstrap_client);
+
+
+        return client_->service_primary_ns(req, ec);
+        /*if (is_bootstrap())
             return bootstrap->primary_ns_server_.service(req, ec);
-        return hosted->primary_ns_server_.service(req, ec);
+        return hosted->primary_ns_server_.service(req, ec);*/
     }
 
     else if (req.get_action_code() & component_ns_service)
@@ -381,9 +389,10 @@ response addressing_service::service(
 
     else if (req.get_action_code() & symbol_ns_service)
     {
-        if (is_bootstrap())
+        return client_->service_primary_ns(req, ec);
+        /*if (is_bootstrap())
             return bootstrap->symbol_ns_server_.service(req, ec);
-        return hosted->symbol_ns_server_.service(req, ec);
+        return hosted->symbol_ns_server_.service(req, ec);*/
     }
 
     else if (req.get_action_code() & locality_ns_service)

@@ -19,7 +19,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/agas/detail/client_implementation_base.hpp>
+#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/make_shared.hpp>
@@ -111,7 +111,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     detail::bootstrap_data_type* bootstrap;
     detail::hosted_data_type* hosted;
 
-    boost::shared_ptr<detail::client_implementation_base> client_;
+    boost::shared_ptr<detail::agas_service_client> client_;
 
     boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
