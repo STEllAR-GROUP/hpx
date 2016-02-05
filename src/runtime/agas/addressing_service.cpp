@@ -13,14 +13,6 @@
 #include <hpx/apply.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/agas/component_namespace.hpp>
-#include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/primary_namespace.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/detail/client_bootstrap.hpp>
 #include <hpx/runtime/agas/detail/client_hosted.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>

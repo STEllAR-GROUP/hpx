@@ -11,7 +11,7 @@ namespace hpx { namespace agas { namespace detail
 {
     void client_bootstrap::set_local_locality(naming::gid_type const& g)
     {
-        primary_ns_server_.set_local_locality(g);
+        data_.primary_ns_server_.set_local_locality(g);
     }
 }}}
 

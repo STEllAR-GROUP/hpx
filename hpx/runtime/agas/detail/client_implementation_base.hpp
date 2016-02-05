@@ -7,6 +7,8 @@
 #if !defined(HPX_AGAS_CLIENT_BASE_FEB_05_2016_1144AM)
 #define HPX_AGAS_CLIENT_BASE_FEB_05_2016_1144AM
 
+#include <hpx/runtime/naming_fwd.hpp>
+
 namespace hpx { namespace agas { namespace detail
 {
     struct bootstrap_data_type;
