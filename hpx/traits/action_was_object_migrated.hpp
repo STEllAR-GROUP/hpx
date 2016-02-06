@@ -35,7 +35,7 @@ namespace hpx { namespace traits
             static auto
             call(int, hpx::id_type const& id, naming::address::address_type lva)
             ->  decltype(
-                    typename Action::component_type::was_object_migrated(id, lva)
+                    Action::component_type::was_object_migrated(id, lva)
                 )
             {
                 typedef typename Action::component_type component_type;
