@@ -366,19 +366,7 @@ response addressing_service::service(
     )
 { // {{{
     if (req.get_action_code() & primary_ns_service)
-    {
-        boost::shared_ptr<detail::bootstrap_service_client> bootstrap_client =
-            boost::make_shared<detail::bootstrap_service_client>();
-
-        client_ = boost::static_pointer_cast<detail::agas_service_client>(
-            bootstrap_client);
-
-
         return client_->service_primary_ns(req, ec);
-        /*if (is_bootstrap())
-            return bootstrap->primary_ns_server_.service(req, ec);
-        return hosted->primary_ns_server_.service(req, ec);*/
-    }
 
     else if (req.get_action_code() & component_ns_service)
     {
@@ -388,12 +376,7 @@ response addressing_service::service(
     }
 
     else if (req.get_action_code() & symbol_ns_service)
-    {
-        return client_->service_primary_ns(req, ec);
-        /*if (is_bootstrap())
-            return bootstrap->symbol_ns_server_.service(req, ec);
-        return hosted->symbol_ns_server_.service(req, ec);*/
-    }
+        return client_->service_symbol_ns(req, ec);
 
     else if (req.get_action_code() & locality_ns_service)
     {
