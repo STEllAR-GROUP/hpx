@@ -58,10 +58,16 @@ namespace hpx { namespace agas { namespace detail
     struct hosted_service_client : agas_service_client
     {
         void set_local_locality(naming::gid_type const& g);
-        response service_primary_ns(request const& req, error_code& ec);
-        /*response service_component_ns(request const& req, error_code& ec);*/
-        response service_symbol_ns(request const& req, error_code& ec);
-        /*response service_locality_ns(request const& req, error_code& ec);*/
+        response service(
+            request const& req
+            , threads::thread_priority priority = threads::thread_priority_default
+            , error_code& ec = throws
+            );
+
+        std::vector<response> bulk_service(
+            std::vector<request> const& reqs
+            , error_code& ec
+            );
 
         hosted_data_type data_;
     };

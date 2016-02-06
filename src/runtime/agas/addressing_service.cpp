@@ -365,30 +365,7 @@ response addressing_service::service(
   , error_code& ec
     )
 { // {{{
-    if (req.get_action_code() & primary_ns_service)
-        return client_->service_primary_ns(req, ec);
-
-    else if (req.get_action_code() & component_ns_service)
-    {
-        if (is_bootstrap())
-            return bootstrap->component_ns_server_.service(req, ec);
-        return hosted->component_ns_.service(req, action_priority_, ec);
-    }
-
-    else if (req.get_action_code() & symbol_ns_service)
-        return client_->service_symbol_ns(req, ec);
-
-    else if (req.get_action_code() & locality_ns_service)
-    {
-        if (is_bootstrap())
-            return bootstrap->locality_ns_server_.service(req, ec);
-        return hosted->locality_ns_.service(req, action_priority_, ec);
-    }
-
-    HPX_THROWS_IF(ec, bad_action_code
-        , "addressing_service::service"
-        , "invalid action code encountered in request")
-    return response();
+    return client_->service(req, action_priority_, ec);
 } // }}}
 
 std::vector<response> addressing_service::bulk_service(
@@ -400,9 +377,7 @@ std::vector<response> addressing_service::bulk_service(
     // most requests will end up there anyways. The primary namespace will
     // route the requests to other namespaces (and the other namespaces would
     // also route requests intended for the primary namespace).
-    if (is_bootstrap())
-        return bootstrap->primary_ns_server_.bulk_service(req, ec);
-    return hosted->primary_ns_server_.bulk_service(req, ec);
+    return client_->bulk_service(req, ec);
 } // }}}
 
 bool addressing_service::register_locality(

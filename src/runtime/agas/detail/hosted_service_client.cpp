@@ -14,24 +14,36 @@ namespace hpx { namespace agas { namespace detail
         data_.primary_ns_server_.set_local_locality(g);
     }
 
-    response hosted_service_client::service_primary_ns(request const& req, error_code& ec)
+    response hosted_service_client::service(
+        request const& req
+      , threads::thread_priority priority
+      , error_code& ec
+        )
     {
-        return data_.primary_ns_server_.service(req, ec);
+        if (req.get_action_code() & primary_ns_service)
+            return data_.primary_ns_server_.service(req, ec);
+
+        if (req.get_action_code() & component_ns_service)
+            return data_.component_ns_.service(req, priority, ec);
+
+        if (req.get_action_code() & symbol_ns_service)
+            return data_.symbol_ns_server_.service(req, ec);
+
+        if (req.get_action_code() & locality_ns_service)
+            return data_.locality_ns_.service(req, priority, ec);
+
+        HPX_THROWS_IF(ec, bad_action_code
+            , "addressing_service::service"
+            , "invalid action code encountered in request")
+            return response();
     }
 
-    /*response hosted_service_client::service_component_ns(request const& req, error_code& ec)
+    std::vector<response> hosted_service_client::bulk_service(
+        std::vector<request> const& reqs
+        , error_code& ec
+        )
     {
-        return data_.component_ns_.service(req, ec);
-    }*/
-
-    response hosted_service_client::service_symbol_ns(request const& req, error_code& ec)
-    {
-        return data_.symbol_ns_server_.service(req, ec);
+        return data_.primary_ns_server_.bulk_service(reqs, ec);
     }
-
-    /*response hosted_service_client::service_locality_ns(request const& req, error_code& ec)
-    {
-        return data_.locality_ns_.service(req, ec);
-    }*/
 }}}
 

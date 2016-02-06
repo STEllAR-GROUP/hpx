@@ -21,10 +21,17 @@ namespace hpx { namespace agas { namespace detail
         virtual ~agas_service_client() {}
 
         virtual void set_local_locality(naming::gid_type const& g) = 0;
-        virtual response service_primary_ns(request const& req, error_code& ec) = 0;
-        /*virtual response service_component_ns(request const& req, error_code& ec) = 0;*/
-        virtual response service_symbol_ns(request const& req, error_code& ec) = 0;
-        /*virtual response service_locality_ns(request const& req, error_code& ec) = 0;*/
+
+        virtual response service(
+            request const& req
+            , threads::thread_priority priority = threads::thread_priority_default
+            , error_code& ec = throws
+            ) = 0;
+
+        virtual std::vector<response> bulk_service(
+            std::vector<request> const& reqs
+            , error_code& ec
+            ) = 0;
     };
 }}}
 
