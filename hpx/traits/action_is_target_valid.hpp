@@ -33,7 +33,7 @@ namespace hpx { namespace traits
             static auto
             call(int, naming::id_type const& id)
             ->  decltype(
-                    typename Action::component_type::is_target_valid(id)
+                    Action::component_type::is_target_valid(id)
                 )
             {
                 // by default we forward this to the component type

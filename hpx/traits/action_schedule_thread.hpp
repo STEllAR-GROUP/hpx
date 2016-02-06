@@ -36,7 +36,7 @@ namespace hpx { namespace traits
                     threads::thread_init_data& data,
                     threads::thread_state_enum initial_state)
             ->  decltype(
-                    typename Action::component_type::schedule_thread(
+                    Action::component_type::schedule_thread(
                         lva, data, initial_state)
                 )
             {

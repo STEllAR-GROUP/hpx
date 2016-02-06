@@ -33,7 +33,7 @@ namespace hpx { namespace traits
             static auto
             call(int, naming::address_type lva, F && f)
             ->  decltype(
-                    typename Action::component_type::decorate_action(
+                    Action::component_type::decorate_action(
                         lva, std::forward<F>(f))
                 )
             {
