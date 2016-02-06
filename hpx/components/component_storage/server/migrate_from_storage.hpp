@@ -143,7 +143,7 @@ namespace hpx { namespace components { namespace server
     {
         if (!Component::supports_migration())
         {
-            return make_exceptional_future<id_type>(
+            return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
                     "hpx::components::server::trigger_migrate_from_storage",
                     "attempting to migrate an instance of a component which "
@@ -152,7 +152,7 @@ namespace hpx { namespace components { namespace server
 
         if (naming::get_locality_id_from_id(to_resurrect) != get_locality_id())
         {
-            return make_exceptional_future<id_type>(
+            return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
                     "hpx::components::server::trigger_migrate_from_storage",
                     "this function has to be executed on the locality responsible "

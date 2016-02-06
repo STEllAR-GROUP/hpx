@@ -122,7 +122,7 @@ namespace hpx { namespace components { namespace server
 
             if (pin_count == ~0x0u)
             {
-                return make_exceptional_future<id_type>(
+                return hpx::make_exceptional_future<id_type>(
                     HPX_GET_EXCEPTION(invalid_status,
                         "hpx::components::server::migrate_to_storage_postproc",
                         "attempting to migrate an instance of a component "
@@ -131,7 +131,7 @@ namespace hpx { namespace components { namespace server
 
             if (pin_count > 1)
             {
-                return make_exceptional_future<id_type>(
+                return hpx::make_exceptional_future<id_type>(
                     HPX_GET_EXCEPTION(invalid_status,
                         "hpx::components::server::migrate_to_storage_postproc",
                         "attempting to migrate an instance of a component "
@@ -170,7 +170,7 @@ namespace hpx { namespace components { namespace server
     {
         if (!Component::supports_migration())
         {
-            return make_exceptional_future<hpx::id_type>(
+            return hpx::make_exceptional_future<hpx::id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
                     "hpx::components::server::migrate_component",
                     "attempting to migrate an instance of a component which "
@@ -207,7 +207,7 @@ namespace hpx { namespace components { namespace server
     {
         if (!Component::supports_migration())
         {
-            return make_exceptional_future<id_type>(
+            return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
                     "hpx::components::server::trigger_migrate_to_storage",
                     "attempting to migrate an instance of a component which "
@@ -216,7 +216,7 @@ namespace hpx { namespace components { namespace server
 
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
         {
-            return make_exceptional_future<id_type>(
+            return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
                     "hpx::components::server::trigger_migrate_to_storage",
                     "this function has to be executed on the locality "
@@ -265,7 +265,7 @@ namespace hpx { namespace components { namespace server
     {
         if (!Component::supports_migration())
         {
-            return make_exceptional_future<id_type>(
+            return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
                     "hpx::components::server::perform_migrate_to_storage",
                     "attempting to migrate an instance of a component which "
