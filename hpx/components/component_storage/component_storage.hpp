@@ -36,12 +36,6 @@ namespace hpx { namespace components
 
         future<std::size_t> size() const;
         std::size_t size_sync() const;
-
-        future<void> write_to_disk(std::string const& filename) const;
-        void write_to_disk_sync(std::string const& filename) const;
-
-        future<void> read_from_disk(std::string const& filename);
-        void read_from_disk_sync(std::string const& filename);
     };
 }}
 

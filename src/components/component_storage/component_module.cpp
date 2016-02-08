@@ -29,10 +29,3 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     hpx::components::server::component_storage::size_action,
     component_storage_size_action);
-
-HPX_REGISTER_ACTION(
-    hpx::components::server::component_storage::write_to_disk_action,
-    component_storage_write_to_disk_action);
-HPX_REGISTER_ACTION(
-    hpx::components::server::component_storage::read_from_disk_action,
-    component_storage_read_from_disk_action);
