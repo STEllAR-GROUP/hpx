@@ -1551,7 +1551,7 @@ bool addressing_service::resolve_cached(
     )
 { // {{{ resolve_cached implementation
 
-    naming::gid_type id = naming::detail::get_stripped_gid(gid);
+    naming::gid_type id = naming::detail::get_stripped_gid_except_dont_cache(gid);
 
     // special cases
     if (resolve_locally_known_addresses(id, addr))

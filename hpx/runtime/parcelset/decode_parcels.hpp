@@ -123,7 +123,9 @@ namespace hpx { namespace parcelset
 
                         naming::gid_type const& here = hpx::get_locality();
                         if (hpx::get_runtime_ptr() && here &&
-                            (p.destination_locality() != here))
+                            (naming::get_locality_id_from_gid(
+                                 p.destination_locality()) !=
+                             naming::get_locality_id_from_gid(here)))
                         {
                             std::ostringstream os;
                             os << "parcel destination does not match "
