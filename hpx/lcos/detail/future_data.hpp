@@ -392,7 +392,7 @@ namespace detail
                 if (!run_on_completed_on_new_thread(
                         util::deferred_call(&future_data::run_on_completed,
                             std::move(this_), std::move(on_completed),
-                            std::ref(ptr)),
+                            boost::ref(ptr)),
                         ec))
                 {
                     // thread creation went wrong

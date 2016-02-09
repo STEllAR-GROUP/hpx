@@ -406,7 +406,7 @@ namespace hpx { namespace applier
             using hpx::util::placeholders::_2;
             client.route(std::move(p),
                 util::bind(&detail::parcel_sent_handler,
-                    std::ref(parcel_handler_), _1, _2));
+                    boost::ref(parcel_handler_), _1, _2));
             return;
         }
 
