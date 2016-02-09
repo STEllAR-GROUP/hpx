@@ -210,10 +210,16 @@ namespace hpx { namespace util { namespace batch_environments
                             for(std::size_t i = begin; i <= end; ++i)
                             {
                                 std::string s(prefix);
-                                if(i < 10 && range[0].length() > 1)
-                                    s += "0";
-                                if(i < 100 && range[0].length() > 2)
-                                    s += "0";
+                                std::size_t dec = 10;
+                                // pad with zeros
+                                for(std::size_t j = 0; j < range[0].length()-1; ++j)
+                                {
+                                    if(i < dec)
+                                    {
+                                        s += "0";
+                                    }
+                                    dec *= 10;
+                                }
                                 s += boost::lexical_cast<std::string>(i);
                                 if(push_now)
                                 {
