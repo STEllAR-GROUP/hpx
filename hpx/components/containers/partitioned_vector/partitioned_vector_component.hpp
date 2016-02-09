@@ -127,7 +127,7 @@ namespace hpx { namespace server
         ///////////////////////////////////////////////////////////////////////
         void set_data(data_type && other)
         {
-            partition_vector_ = std::move(other);
+            partitioned_vector_partition_ = std::move(other);
         }
 
         ///////////////////////////////////////////////////////////////////////
