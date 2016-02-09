@@ -119,7 +119,7 @@ namespace hpx { namespace server
         }
 
         /// Duplicate the copy method for action naming
-        data_type const& get_copied_data() const
+        data_type get_copied_data() const
         {
             return partitioned_vector_partition_;
         }
