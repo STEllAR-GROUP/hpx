@@ -73,8 +73,7 @@ namespace hpx { namespace components
         {
             // make sure to always grab to AGAS lock first
             agas::mark_as_migrated(this->gid_,
-                [this]()
-                ->  std::pair<bool, hpx::future<void> >
+                [this]() mutable -> std::pair<bool, hpx::future<void> >
                 {
                     boost::unique_lock<mutex_type> l(mtx_);
                     HPX_ASSERT(pin_count_ != 0);
@@ -115,7 +114,7 @@ namespace hpx { namespace components
             // we need to first lock the AGAS migrated objects table, only then
             // access (lock) the object
             return agas::mark_as_migrated(to_migrate.get_gid(),
-                [this]() -> std::pair<bool, hpx::future<void> >
+                [this]() mutable -> std::pair<bool, hpx::future<void> >
                 {
                     boost::unique_lock<mutex_type> l(mtx_);
 
