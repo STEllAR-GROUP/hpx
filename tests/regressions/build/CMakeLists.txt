@@ -9,7 +9,7 @@ else()
   set(_libraries hpx hpx_init iostreams_component)
 endif()
 
-add_library(test_server_1950 SHARED server_1950.cpp)
+add_library(test_server_1950 SHARED server_1950.cpp server_1950.hpp)
 target_link_libraries(test_server_1950 ${_libraries})
 
 set_target_properties(test_server_1950

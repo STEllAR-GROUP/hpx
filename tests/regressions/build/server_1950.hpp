@@ -8,9 +8,8 @@
 
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/util/lightweight_test.hpp>
 
-struct test_server
+struct HPX_COMPONENT_EXPORT test_server
   : hpx::components::simple_component_base<test_server>
 {
     test_server() {}
