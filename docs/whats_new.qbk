@@ -23,6 +23,14 @@
   any type `T` into a future of any other type `R`, either based on default
   conversion rules of the embedded types or using a given explicit conversion
   function.
+- We finally finished the implementation of transparent migration of components
+  to another locality and/or to a storage objects. It is now possible to trigger
+  a migration operation without 'stopping the world' for the object to migrate.
+  __hpx__ will make sure that no work is being performed on an object before it
+  is migrated and that all susequently scheduled work for the migrated object
+  will be transparently forwarded to the new locality. Please note that the
+  global id of the migrated object does not change, thus the application will
+  not have to be changed in any way to support this new functionality.
 
 [heading Breaking Changes]
 

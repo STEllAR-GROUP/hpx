@@ -13,6 +13,7 @@ set(tests
     serialization_set
     serialization_simple
     serialization_smart_ptr
+    serialization_unordered_map
     serialization_vector
     serialization_variant
     serialize_buffer

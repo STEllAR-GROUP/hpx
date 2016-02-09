@@ -360,6 +360,31 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
 };
 
 template <>
+struct get_remote_result<naming::address, agas::response>
+{
+    static naming::address call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::primary_ns_unbind_gid:
+            {
+                agas::gva g = rep.get_gva();
+                return naming::address(g.prefix, g.type, g.lva());
+            }
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<naming::address>, agas::response>::call",
+            "unexpected action code in result conversion");
+        return naming::address();
+    }
+};
+
+template <>
 struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>
 {
     static std::pair<naming::id_type, naming::address> call(

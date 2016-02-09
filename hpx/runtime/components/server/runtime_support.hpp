@@ -712,45 +712,49 @@ namespace hpx { namespace components { namespace server
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end()) {
-            std::ostringstream strm;
-            strm << "attempt to migrate component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (component type not found in map)";
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::migrate_component_to_here",
-                strm.str());
-            return naming::invalid_gid;
-        }
+        boost::shared_ptr<component_factory_base> factory;
+        naming::gid_type migrated_id;
 
-        if (!(*it).second.first) {
-            std::ostringstream strm;
-            strm << "attempt to migrate component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (map entry is NULL)";
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::migrate_component_to_here",
-                strm.str());
-            return naming::invalid_gid;
-        }
-
-        // create a local instance by copying the bits and remapping the id in
-        // AGAS
-        naming::gid_type migrated_id = to_migrate.get_gid();
-
-        naming::gid_type id;
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
+            boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
+            component_map_type::const_iterator it = components_.find(type);
+            if (it == components_.end()) {
+                std::ostringstream strm;
+                strm << "attempt to migrate component instance of "
+                    << "invalid/unknown type: "
+                    << components::get_component_type_name(type)
+                    << " (component type not found in map)";
 
-            typedef typename Component::wrapping_type wrapping_type;
-            id = factory->create_with_args(migrated_id,
-                detail::construct_function<wrapping_type>(std::move(*p)));
+                l.unlock();
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                    "runtime_support::migrate_component_to_here",
+                    strm.str());
+                return naming::invalid_gid;
+            }
+
+            if (!(*it).second.first) {
+                std::ostringstream strm;
+                strm << "attempt to migrate component instance of "
+                    << "invalid/unknown type: "
+                    << components::get_component_type_name(type)
+                    << " (map entry is NULL)";
+
+                l.unlock();
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                    "runtime_support::migrate_component_to_here",
+                    strm.str());
+                return naming::invalid_gid;
+            }
+
+            // create a local instance by copying the bits and remapping the id in
+            // AGAS
+            migrated_id = to_migrate.get_gid();
+            factory = (*it).second.first;
         }
+
+        typedef typename Component::wrapping_type wrapping_type;
+        naming::gid_type id = factory->create_with_args(migrated_id,
+            detail::construct_function<wrapping_type>(std::move(*p)));
 
         // sanity checks
         if (!id)
@@ -774,6 +778,12 @@ namespace hpx { namespace components { namespace server
         LRT_(info) << "successfully migrated component " << id
             << " of type: " << components::get_component_type_name(type)
             << " to locality: " << find_here();
+
+        // At this point the object has been fully migrated. We now remove
+        // the object from the AGAS table of migrated objects. This is
+        // necessary as this object might have been migrated off this locality
+        // before it was migrated back.
+        agas::unmark_as_migrated(id);
 
         to_migrate.make_unmanaged();
         return id;

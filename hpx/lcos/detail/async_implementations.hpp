@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -171,11 +172,18 @@ namespace hpx { namespace detail
             typename action_type::remote_result_type
         >::type result_type;
 
+        std::pair<bool, components::pinned_ptr> r;
+
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr) && policy == launch::sync)
+        if (agas::is_local_address_cached(id, addr))
         {
-            return hpx::detail::sync_local_invoke<action_type, result_type>::
-                call(id, std::move(addr), std::forward<Ts>(vs)...);
+            r = traits::action_was_object_migrated<Action>::call(
+                id, addr.address_);
+            if (policy == launch::sync && !r.first)
+            {
+                return hpx::detail::sync_local_invoke<action_type, result_type>::
+                    call(id, std::move(addr), std::forward<Ts>(vs)...);
+            }
         }
 
         bool target_is_managed = false;
@@ -240,12 +248,19 @@ namespace hpx { namespace detail
             typename action_type::remote_result_type
         >::type result_type;
 
+        std::pair<bool, components::pinned_ptr> r;
+
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr) && policy == launch::sync)
+        if (agas::is_local_address_cached(id, addr))
         {
-            return hpx::detail::sync_local_invoke_cb<action_type, result_type>::
-                call(id, std::move(addr), std::forward<Callback>(cb),
-                    std::forward<Ts>(vs)...);
+            r = traits::action_was_object_migrated<Action>::call(
+                id, addr.address_);
+            if (policy == launch::sync && !r.first)
+            {
+                return hpx::detail::sync_local_invoke_cb<action_type, result_type>::
+                    call(id, std::move(addr), std::forward<Callback>(cb),
+                        std::forward<Ts>(vs)...);
+            }
         }
 
         future<result_type> f;

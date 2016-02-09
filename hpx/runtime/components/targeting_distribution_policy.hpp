@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,6 +19,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
@@ -69,7 +70,7 @@ namespace hpx { namespace components
             // by default the object will be created on the current
             // locality
             return components::stub_base<Component>::create_async(
-                id_ ? id_ : hpx::find_here(), std::forward<Ts>(vs)...);
+                get_next_target(), std::forward<Ts>(vs)...);
         }
 
         /// \cond NOINTERNAL
@@ -96,7 +97,7 @@ namespace hpx { namespace components
         {
             // by default the object will be created on the current
             // locality
-            hpx::id_type id = id_ ? id_ : hpx::find_here();
+            hpx::id_type id = get_next_target();
             hpx::future<std::vector<hpx::id_type> > f =
                 components::stub_base<Component>::bulk_create_async(
                     id, count, std::forward<Ts>(vs)...);
@@ -126,7 +127,7 @@ namespace hpx { namespace components
         async(BOOST_SCOPED_ENUM(launch) policy, Ts&&... vs) const
         {
             return hpx::detail::async_impl<Action>(policy,
-                id_ ? id_ : hpx::find_here(), std::forward<Ts>(vs)...);
+                get_next_target(), std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -140,7 +141,7 @@ namespace hpx { namespace components
         async_cb(BOOST_SCOPED_ENUM(launch) policy, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::async_cb_impl<Action>(policy,
-                id_ ? id_ : hpx::find_here(), std::forward<Callback>(cb),
+                get_next_target(), std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
         }
 
@@ -152,8 +153,7 @@ namespace hpx { namespace components
             threads::thread_priority priority, Ts&&... vs) const
         {
             return hpx::detail::apply_impl<Action>(std::forward<Continuation>(c),
-                id_ ? id_ : hpx::find_here(), priority,
-                std::forward<Ts>(vs)...);
+                get_next_target(), priority, std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename ...Ts>
@@ -161,8 +161,7 @@ namespace hpx { namespace components
             threads::thread_priority priority, Ts&&... vs) const
         {
             return hpx::detail::apply_impl<Action>(
-                id_ ? id_ : hpx::find_here(), priority,
-                std::forward<Ts>(vs)...);
+                get_next_target(), priority, std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -174,7 +173,7 @@ namespace hpx { namespace components
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::apply_cb_impl<Action>(std::forward<Continuation>(c),
-                id_ ? id_ : hpx::find_here(), priority,
+                get_next_target(), priority,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
@@ -183,7 +182,7 @@ namespace hpx { namespace components
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::apply_cb_impl<Action>(
-                id_ ? id_ : hpx::find_here(), priority,
+                get_next_target(), priority,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
@@ -198,11 +197,26 @@ namespace hpx { namespace components
             return 1;
         }
 
+        /// Returns the locality which is anticipated to be used for the next
+        /// async operation
+        hpx::id_type get_next_target() const
+        {
+            return id_ ? id_ : hpx::find_here();
+        }
+
     protected:
         /// \cond NOINTERNAL
         targeting_distribution_policy(hpx::id_type const& id)
           : id_(id)
         {}
+
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned int const)
+        {
+            ar & id_;
+        }
 
         hpx::id_type id_;   // locality to encapsulate
         /// \endcond

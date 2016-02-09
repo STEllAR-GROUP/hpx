@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,6 +27,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -1106,7 +1107,7 @@ bool addressing_service::bind_range_local(
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        if(range_caching_)
+        if (range_caching_)
         {
             // Put the range into the cache.
             update_cache_entry(lower_id, g, ec);
@@ -1172,7 +1173,10 @@ hpx::future<bool> addressing_service::bind_range_async(
         stubs::primary_namespace::get_service_instance(lower_id)
       , naming::id_type::unmanaged);
 
-    request req(primary_ns_bind_gid, lower_id, g, locality);
+    naming::gid_type id(
+        naming::detail::get_stripped_gid_except_dont_cache(lower_id));
+
+    request req(primary_ns_bind_gid, id, g, locality);
     response rep;
 
     using util::placeholders::_1;
@@ -1181,8 +1185,23 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     return f.then(util::bind(
             util::one_shot(&addressing_service::bind_postproc),
-            this, _1, lower_id, g
+            this, _1, id, g
         ));
+}
+
+hpx::future<naming::address> addressing_service::unbind_range_async(
+    naming::gid_type const& lower_id
+  , boost::uint64_t count
+    )
+{
+    agas::request req(primary_ns_unbind_gid,
+        naming::detail::get_stripped_gid(lower_id), count);
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(lower_id)
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<naming::address>(
+        service_target, req);
 }
 
 bool addressing_service::unbind_range_local(
@@ -1196,23 +1215,25 @@ bool addressing_service::unbind_range_local(
         request req(primary_ns_unbind_gid, lower_id, count);
         response rep;
 
-//         if (get_status() == running &&
-//             naming::get_locality_id_from_gid(lower_id) !=
-//                 naming::get_locality_id_from_gid(locality_))
-//         {
-//             naming::id_type target(
-//                 stubs::primary_namespace::get_service_instance(lower_id)
-//               , naming::id_type::unmanaged);
-//
-//             rep = stubs::primary_namespace::service(
-//                 target, req, threads::thread_priority_default, ec);
-//         }
-//         else
+        // if this id is managed by another locality, forward the request
+        if (get_status() == state_running &&
+            naming::get_locality_id_from_gid(lower_id) !=
+                naming::get_locality_id_from_gid(locality_))
+        {
+            naming::id_type target(
+                stubs::primary_namespace::get_service_instance(lower_id)
+              , naming::id_type::unmanaged);
 
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
+            rep = stubs::primary_namespace::service(
+                target, req, threads::thread_priority_default, ec);
+        }
         else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        {
+            if (is_bootstrap())
+                rep = bootstrap->primary_ns_server_.service(req, ec);
+            else
+                rep = hosted->primary_ns_server_.service(req, ec);
+        }
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -1258,11 +1279,24 @@ bool addressing_service::unbind_range_local(
 // }
 
 bool addressing_service::is_local_address_cached(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec
     )
 {
+    // Assume non-local operation if the gid is known to have been migrated
+    naming::gid_type id(naming::detail::get_stripped_gid_except_dont_cache(gid));
+
+    {
+        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        if (was_object_migrated_locked(id))
+        {
+            if (&ec != &throws)
+                ec = make_success_code();
+            return false;
+        }
+    }
+
     // Try to resolve the address of the GID from the locally available
     // information.
 
@@ -1475,22 +1509,25 @@ bool addressing_service::resolve_full_local(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if (addr.address_)
+        if (naming::detail::store_in_cache(id))
         {
-            if(range_caching_)
+            if (addr.address_)
             {
-                // Put the range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
+                if(range_caching_)
+                {
+                    // Put the range into the cache.
+                    update_cache_entry(base_gid, base_gva, ec);
+                }
+                else
+                {
+                    // Put the fully resolved gva into the cache.
+                    update_cache_entry(id, g, ec);
+                }
             }
             else
             {
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(id, g, ec);
+                remove_cache_entry(id, ec);
             }
-        }
-        else
-        {
-            remove_cache_entry(id, ec);
         }
 
         if (ec)
@@ -1508,11 +1545,13 @@ bool addressing_service::resolve_full_local(
 } // }}}
 
 bool addressing_service::resolve_cached(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec
     )
 { // {{{ resolve_cached implementation
+
+    naming::gid_type id = naming::detail::get_stripped_gid_except_dont_cache(gid);
 
     // special cases
     if (resolve_locally_known_addresses(id, addr))
@@ -1688,15 +1727,18 @@ naming::address addressing_service::resolve_full_postproc(
     addr.type_ = g.type;
     addr.address_ = g.lva();
 
-    if(range_caching_)
+    if (naming::detail::store_in_cache(id))
     {
-        // Put the range into the cache.
-        update_cache_entry(base_gid, base_gva);
-    }
-    else
-    {
-        // Put the fully resolved gva into the cache.
-        update_cache_entry(id, g);
+        if (range_caching_)
+        {
+            // Put the range into the cache.
+            update_cache_entry(base_gid, base_gva);
+        }
+        else
+        {
+            // Put the fully resolved gva into the cache.
+            update_cache_entry(id, g);
+        }
     }
 
     return addr;
@@ -1796,15 +1838,18 @@ bool addressing_service::resolve_full_local(
             addr.type_ = g.type;
             addr.address_ = g.lva();
 
-            if(range_caching_)
+            if (naming::detail::store_in_cache(gids[i]))
             {
-                // Put the range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
-            }
-            else
-            {
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(gids[i], g, ec);
+                if (range_caching_)
+                {
+                    // Put the range into the cache.
+                    update_cache_entry(base_gid, base_gva, ec);
+                }
+                else
+                {
+                    // Put the fully resolved gva into the cache.
+                    update_cache_entry(gids[i], g, ec);
+                }
             }
 
             if (ec)
@@ -1864,6 +1909,7 @@ void addressing_service::route(
     parcelset::parcel p
   , util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> && f
+  , threads::thread_priority local_priority
     )
 {
     // compose request
@@ -1875,15 +1921,27 @@ void addressing_service::route(
 
     typedef server::primary_namespace::route_action action_type;
 
+    std::pair<bool, components::pinned_ptr> r;
+
     // Determine whether the gid is local or remote
     naming::address addr;
     if (is_local_address_cached(target.get_gid(), addr))
     {
-        // route through the local AGAS service instance
-        applier::detail::apply_l_p<action_type>(
-            target, std::move(addr), action_priority_, std::move(p));
-        f(boost::system::error_code(), parcelset::parcel());      // invoke callback
-        return;
+        r = traits::action_was_object_migrated<action_type>::call(
+            target, addr.address_);
+        if (!r.first)
+        {
+            // route through the local AGAS service instance
+            applier::detail::apply_l_p<action_type>(
+                target, std::move(addr),
+                local_priority == threads::thread_priority_default ?
+                    action_priority_ : local_priority,
+                std::move(p));
+
+            // invoke callback
+            f(boost::system::error_code(), parcelset::parcel());
+            return;
+        }
     }
 
     // apply remotely, route through main AGAS service if the destination is
@@ -1918,11 +1976,13 @@ boost::int64_t addressing_service::synchronize_with_async_incref(
 }
 
 lcos::future<boost::int64_t> addressing_service::incref_async(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , boost::int64_t credit
   , naming::id_type const& keep_alive
     )
 { // {{{ incref implementation
+    naming::gid_type raw(naming::detail::get_stripped_gid(id));
+
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -1933,7 +1993,7 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
           , naming::id_type const&
         ) = &addressing_service::incref_async;
 
-        return async(incref_async_ptr, this, gid, credit, keep_alive);
+        return async(incref_async_ptr, this, raw, credit, keep_alive);
     }
 
     if (HPX_UNLIKELY(0 >= credit))
@@ -1966,8 +2026,6 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         boost::lock_guard<mutex_type> l(refcnt_requests_mtx_);
 
         typedef refcnt_requests_type::iterator iterator;
-
-        naming::gid_type raw = naming::detail::get_stripped_gid(gid);
 
         iterator matches = refcnt_requests_->find(raw);
         if (matches != refcnt_requests_->end())
@@ -2034,11 +2092,13 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::decref(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ decref implementation
+    naming::gid_type gid(naming::detail::get_stripped_gid(id));
+
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -2110,7 +2170,7 @@ bool addressing_service::register_name(
     )
 { // {{{
     try {
-        request req(symbol_ns_bind, name, id);
+        request req(symbol_ns_bind, name, naming::detail::get_stripped_gid(id));
         response rep;
 
         if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
@@ -2227,8 +2287,7 @@ bool addressing_service::resolve_name(
             return true;
         }
 
-        else
-            return false;
+        return false;
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_name");
@@ -2341,12 +2400,11 @@ bool addressing_service::iterate_ids(
 } // }}}
 
 void addressing_service::insert_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , gva const& g
   , error_code& ec
     )
 { // {{{
-
     // If caching is disabled, we silently pretend success.
     if (!caching_)
     {
@@ -2356,12 +2414,14 @@ void addressing_service::insert_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cacheable
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -2429,7 +2489,7 @@ bool check_for_collisions(
 }
 
 void addressing_service::update_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , gva const& g
   , error_code& ec
     )
@@ -2443,12 +2503,14 @@ void addressing_service::update_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cache-able
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -2535,7 +2597,7 @@ void addressing_service::clear_cache(
 } // }}}
 
 void addressing_service::remove_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , error_code& ec
     )
 {
@@ -2548,12 +2610,14 @@ void addressing_service::remove_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cache-able
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -3098,21 +3162,21 @@ void addressing_service::send_refcnt_requests_non_blocking(
             HPX_ASSERT(e.second < 0);
 
             naming::gid_type raw(e.first);
-            request const req(primary_ns_decrement_credit, raw, raw, e.second);
+            request req(primary_ns_decrement_credit, raw, raw, e.second);
 
             naming::id_type target(
                 stubs::primary_namespace::get_service_instance(raw)
               , naming::id_type::unmanaged);
 
-            requests[target].push_back(req);
+            requests[target].push_back(std::move(req));
         }
 
         // send requests to all locality
-        requests_type::const_iterator end = requests.end();
-        for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+        requests_type::iterator end = requests.end();
+        for (requests_type::iterator it = requests.begin(); it != end; ++it)
         {
             stubs::primary_namespace::bulk_service_non_blocking(
-                (*it).first, (*it).second, action_priority_);
+                (*it).first, std::move((*it).second), action_priority_);
         }
 
         if (&ec != &throws)
@@ -3219,38 +3283,118 @@ void addressing_service::send_refcnt_requests_sync(
         ec = make_success_code();
 }
 
-hpx::future<std::pair<naming::id_type, naming::address> >
-addressing_service::begin_migration_async(
-    naming::id_type const& id
-  , naming::id_type const& target_locality
+///////////////////////////////////////////////////////////////////////////////
+hpx::future<void> addressing_service::mark_as_migrated(
+    naming::gid_type const& gid_
+  , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f
     )
+{
+    if (!gid_)
+    {
+        return make_exceptional_future<void>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::mark_as_migrated",
+                "invalid reference gid"));
+    }
+
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
+    // always first grab the AGAS lock before invoking the user supplied
+    // function
+    typedef boost::unique_lock<cache_mutex_type> lock_type;
+
+    lock_type lock(gva_cache_mtx_);
+    util::ignore_while_checking<lock_type> ignore(&lock);
+
+    // call the user code for the component instance to be migrated, the
+    // returned future becomes ready whenever the component instance can be
+    // migrated (no threads are pending/active any more)
+    std::pair<bool, hpx::future<void> > result = f();
+
+    // mark the gid as 'migrated' right away - the worst what can happen is
+    // that a parcel which comes in for this object is bouncing between this
+    // locality and the locality managing the address resolution for the object
+    if (result.first)
+    {
+        migrated_objects_table_type::iterator it =
+            migrated_objects_table_.find(gid);
+
+        // insert the object into the map of migrated objects
+        if (it == migrated_objects_table_.end())
+            migrated_objects_table_.insert(gid);
+
+        // remove entry from cache
+        if (caching_ && naming::detail::store_in_cache(gid_))
+        {
+            gva_cache_->erase(
+                [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+                {
+                    return gid == p.first.get_gid();
+                });
+        }
+    }
+
+    return std::move(result.second);
+}
+
+void addressing_service::unmark_as_migrated(
+    naming::gid_type const& gid_
+    )
+{
+    if (!gid_)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::unmark_as_migrated",
+            "invalid reference gid");
+        return;
+    }
+
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
+    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+
+    migrated_objects_table_type::iterator it =
+        migrated_objects_table_.find(gid);
+
+    // insert the object into the map of migrated objects
+    if (it != migrated_objects_table_.end())
+    {
+        migrated_objects_table_.erase(it);
+
+        // remove entry from cache
+        if (caching_ && naming::detail::store_in_cache(gid_))
+        {
+            gva_cache_->erase(
+                [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+                {
+                    return gid == p.first.get_gid();
+                });
+        }
+    }
+}
+
+hpx::future<std::pair<naming::id_type, naming::address> >
+addressing_service::begin_migration_async(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
 
     if (!id)
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::begin_migration_async",
-            "invalid reference id");
-        return make_ready_future(result_type(naming::invalid_id, naming::address()));
+        return make_exceptional_future<result_type>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::begin_migration_async",
+                "invalid reference id"));
     }
 
-    naming::gid_type gid = id.get_gid();
-
-    // insert the object's new locality into the map of migrated objects
-    {
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-        migrated_objects_table_.insert(gid);
-    }
+    naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
 
     agas::request req(agas::primary_ns_begin_migration, gid);
     naming::id_type service_target(
         agas::stubs::primary_namespace::get_service_instance(gid)
       , naming::id_type::unmanaged);
 
-    return stubs::primary_namespace::service_async<
-            std::pair<naming::id_type, naming::address>
-        >(service_target, req);
+    return stubs::primary_namespace::service_async<result_type>(
+        service_target, req);
 }
 
 hpx::future<bool> addressing_service::end_migration_async(
@@ -3259,15 +3403,17 @@ hpx::future<bool> addressing_service::end_migration_async(
 {
     if (!id)
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::end_migration_async",
-            "invalid reference id");
-        return make_ready_future(false);
+        return make_exceptional_future<bool>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::end_migration_async",
+                "invalid reference id"));
     }
 
-    agas::request req(agas::primary_ns_end_migration, id.get_gid());
+    naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
+
+    agas::request req(agas::primary_ns_end_migration, gid);
     naming::id_type service_target(
-        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+        agas::stubs::primary_namespace::get_service_instance(gid)
       , naming::id_type::unmanaged);
 
     return stubs::primary_namespace::service_async<bool>(
@@ -3275,28 +3421,39 @@ hpx::future<bool> addressing_service::end_migration_async(
 }
 
 bool addressing_service::was_object_migrated_locked(
-    naming::gid_type const& id
+    naming::gid_type const& gid_
     )
 {
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
     return
-        migrated_objects_table_.find(id) !=
+        migrated_objects_table_.find(gid) !=
         migrated_objects_table_.end();
 }
 
-bool addressing_service::was_object_migrated(
-    naming::id_type const* ids
-  , std::size_t size)
+std::pair<bool, components::pinned_ptr>
+    addressing_service::was_object_migrated(
+        naming::gid_type const& gid
+      , util::unique_function_nonser<components::pinned_ptr()> && f
+        )
 {
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-    HPX_ASSERT(1 == size);
+    if (!gid)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::was_object_migrated",
+            "invalid reference gid");
+        return std::make_pair(false, components::pinned_ptr());
+    }
 
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-    return was_object_migrated_locked(ids[0].get_gid());
-#else
-    // #FIXME: it's not really clear how to handle this situation
-    HPX_ASSERT(false);
-    return false;
-#endif
+    typedef boost::unique_lock<cache_mutex_type> lock_type;
+
+    lock_type lock(gva_cache_mtx_);
+
+    if (was_object_migrated_locked(gid))
+        return std::make_pair(true, components::pinned_ptr());
+
+    util::ignore_while_checking<lock_type> ignore(&lock);
+    return std::make_pair(false, f());
 }
 
 }}

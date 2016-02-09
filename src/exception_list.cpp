@@ -50,7 +50,7 @@ namespace hpx
     {}
 
     exception_list::exception_list(boost::exception_ptr const& e)
-      : hpx::exception(hpx::get_error(e))
+      : hpx::exception(hpx::get_error(e), hpx::get_error_what(e))
     {
         add(e);
     }

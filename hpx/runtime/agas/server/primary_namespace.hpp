@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2015 Hartmut Kaiser
+//  Copyright (c) 2012-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 
 #include <boost/atomic.hpp>
@@ -138,12 +139,17 @@ struct HPX_EXPORT primary_namespace
     gva_table_type gvas_;
     refcnt_table_type refcnts_;
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-    typedef std::map<naming::gid_type, lcos::local::condition_variable>
-        migration_table_type;
+    typedef std::map<
+            naming::gid_type,
+            hpx::util::tuple<bool, std::size_t, lcos::local::condition_variable>
+        > migration_table_type;
 #else
     typedef std::map<
-            naming::gid_type
-          , boost::shared_ptr<lcos::local::condition_variable>
+            naming::gid_type,
+            hpx::util::tuple<
+                bool, std::size_t,
+                boost::shared_ptr<lcos::local::condition_variable>
+            >
         > migration_table_type;
 #endif
 

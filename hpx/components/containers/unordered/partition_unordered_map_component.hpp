@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -106,6 +106,16 @@ namespace hpx { namespace server
                 partition_unordered_map_ = std::move(rhs.partition_unordered_map_);
             }
             return *this;
+        }
+
+        /// Duplicate the copy method for action naming
+        data_type get_copied_data() const
+        {
+            return partition_unordered_map_;
+        }
+        void set_copied_data(data_type && d)
+        {
+            partition_unordered_map_ = std::move(d);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -296,6 +306,9 @@ namespace hpx { namespace server
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_values);
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, erase);
+
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, get_copied_data);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_copied_data);
     };
 }}
 
@@ -342,6 +355,12 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)::erase_action,        \
         BOOST_PP_CAT(__unordered_map_erase_action_, name));                   \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_copied_data_action,\
+        BOOST_PP_CAT(__unordered_map_get_copied_data_action_, name));         \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_copied_data_action,\
+        BOOST_PP_CAT(__unordered_map_set_copied_data_action_, name));         \
     typedef std::plus<std::size_t>                                            \
         BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
     typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
@@ -395,6 +414,12 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION(                                                      \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)::erase_action,        \
         BOOST_PP_CAT(__unordered_map_erase_action_, name));                   \
+    HPX_REGISTER_ACTION(                                                      \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_copied_data_action,\
+        BOOST_PP_CAT(__unordered_map_get_copied_data_action_, name));         \
+    HPX_REGISTER_ACTION(                                                      \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_copied_data_action,\
+        BOOST_PP_CAT(__unordered_map_set_copied_data_action_, name));         \
     typedef std::plus<std::size_t>                                            \
         BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
     typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
@@ -607,6 +632,19 @@ namespace hpx
             HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::erase_action>(
                 this->get_id(), key);
+        }
+
+        /// Get/set all the data of this partition
+        future<typename server_type::data_type> get_data() const
+        {
+            typedef typename server_type::get_copied_data_action action_type;
+            return async<action_type>(this->get_id());
+        }
+
+        future<void> set_data(typename server_type::data_type && d)
+        {
+            typedef typename server_type::set_copied_data_action action_type;
+            return async<action_type>(this->get_id(), std::move(d));
         }
     };
 }
