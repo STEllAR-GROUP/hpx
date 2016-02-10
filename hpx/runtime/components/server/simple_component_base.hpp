@@ -256,9 +256,6 @@ namespace hpx { namespace components
             return !naming::is_locality(id);
         }
 
-        // This component type does not support migration.
-        static HPX_CONSTEXPR bool supports_migration() { return false; }
-
         // Pinning functionality
         void pin() {}
         void unpin() {}

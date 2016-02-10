@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/get_ptr.hpp>
@@ -167,7 +168,7 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(to_migrate);
         }
 
-        if (!Component::supports_migration())
+        if (!traits::component_supports_migration<Component>::call())
         {
             return hpx::make_exceptional_future<hpx::id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
@@ -203,7 +204,7 @@ namespace hpx { namespace components { namespace server
     future<id_type> trigger_migrate_component(
         id_type const& to_migrate, DistPolicy const& policy)
     {
-        if (!Component::supports_migration())
+        if (!traits::component_supports_migration<Component>::call())
         {
             return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
@@ -261,7 +262,7 @@ namespace hpx { namespace components { namespace server
     future<id_type> perform_migrate_component(
         id_type const& to_migrate, DistPolicy const& policy)
     {
-        if (!Component::supports_migration())
+        if (!traits::component_supports_migration<Component>::call())
         {
             return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(invalid_status,
