@@ -49,6 +49,11 @@ namespace hpx { namespace agas { namespace detail
             , error_code& ec = throws
             ) = 0;
 
+        virtual std::vector<response> service_primary_bulk(
+            std::vector<request> const& reqs
+            , error_code& ec = throws
+            ) = 0;
+
         virtual response service_component(
             request const& req
             , threads::thread_priority priority =

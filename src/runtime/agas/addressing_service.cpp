@@ -389,12 +389,7 @@ bool addressing_service::register_locality(
 { // {{{
     try {
         request req(locality_ns_allocate, endpoints, 0, num_threads, prefix);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -578,12 +573,7 @@ bool addressing_service::get_console_locality(
         std::string key("/0/locality#console");
 
         request req(symbol_ns_resolve, key);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(key, req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (!ec && (rep.get_gid() != naming::invalid_gid) &&
             (rep.get_status() == success))
@@ -628,12 +618,7 @@ bool addressing_service::get_localities(
         if (type != components::component_invalid)
         {
             request req(component_ns_resolve_id, type);
-            response rep;
-
-            if (is_bootstrap())
-                rep = bootstrap->component_ns_server_.service(req, ec);
-            else
-                rep = hosted->component_ns_.service(req, action_priority_, ec);
+            response rep = client_->service_component(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -653,12 +638,7 @@ bool addressing_service::get_localities(
         else
         {
             request req(locality_ns_localities);
-            response rep;
-
-            if (is_bootstrap())
-                rep = bootstrap->locality_ns_server_.service(req, ec);
-            else
-                rep = hosted->locality_ns_.service(req, action_priority_, ec);
+            response rep = client_->service_locality(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -685,11 +665,7 @@ std::map<naming::gid_type, parcelset::endpoints_type>
     addressing_service::get_resolved_localities(error_code& ec)
 { // {{{ get_resolved_localities_async implementation
     request req(locality_ns_resolved_localities);
-    response rep;
-    if(is_bootstrap())
-        rep = bootstrap->locality_ns_server_.service(req, ec);
-    else
-        rep = hosted->locality_ns_.service(req, action_priority_, ec);
+    response rep = client_->service_locality(req, action_priority_, ec);
 
     if(ec || success != rep.get_status())
     {
@@ -711,12 +687,7 @@ boost::uint32_t addressing_service::get_num_localities(
         if (type == components::component_invalid)
         {
             request req(locality_ns_num_localities, type);
-            response rep;
-
-            if (is_bootstrap())
-                rep = bootstrap->locality_ns_server_.service(req, ec);
-            else
-                rep = hosted->locality_ns_.service(req, action_priority_, ec);
+            response rep = client_->service_locality(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return boost::uint32_t(-1);
@@ -725,12 +696,7 @@ boost::uint32_t addressing_service::get_num_localities(
         }
 
         request req(component_ns_num_localities, type);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return boost::uint32_t(-1);
@@ -766,12 +732,7 @@ boost::uint32_t addressing_service::get_num_overall_threads(
 { // {{{ get_num_overall_threads implementation
     try {
         request req(locality_ns_num_threads);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return boost::uint32_t(0);
@@ -797,12 +758,7 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
 { // {{{ get_num_threads implementation
     try {
         request req(locality_ns_num_threads);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return std::vector<boost::uint32_t>();
@@ -946,12 +902,7 @@ bool addressing_service::bind_range_local(
 
         request req(primary_ns_bind_gid, lower_id, g,
             naming::get_locality_from_gid(lower_id));
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
-        else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        response rep = client_->service_primary(req, ec);
 
         error const s = rep.get_status();
 
@@ -1046,7 +997,7 @@ bool addressing_service::unbind_range_local(
 { // {{{ unbind_range implementation
     try {
         request req(primary_ns_unbind_gid, lower_id, count);
-        response rep;
+        response rep = client_->service_primary(req, ec);;
 
 //         if (get_status() == running &&
 //             naming::get_locality_id_from_gid(lower_id) !=
@@ -1060,11 +1011,6 @@ bool addressing_service::unbind_range_local(
 //                 target, req, threads::thread_priority_default, ec);
 //         }
 //         else
-
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
-        else
-            rep = hosted->primary_ns_server_.service(req, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -1612,11 +1558,7 @@ bool addressing_service::resolve_full_local(
             return true;
         }
 
-        std::vector<response> reps;
-        if (is_bootstrap())
-            reps = bootstrap->primary_ns_server_.bulk_service(reqs, ec);
-        else
-            reps = hosted->primary_ns_server_.bulk_service(reqs, ec);
+        std::vector<response> reps = client_->bulk_service(reqs, ec);
 
         if (ec)
             return false;

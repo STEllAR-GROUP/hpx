@@ -84,10 +84,15 @@ namespace hpx { namespace agas { namespace detail
             , error_code& ec = throws
             );
 
+        std::vector<response> service_primary_bulk(
+            std::vector<request> const& reqs
+            , error_code& ec = throws
+            );
+
         response service_component(
             request const& req
             , threads::thread_priority priority =
-            threads::thread_priority_default
+                threads::thread_priority_default
             , error_code& ec = throws
             );
 

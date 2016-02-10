@@ -84,6 +84,13 @@ namespace hpx { namespace agas { namespace detail
         return data_.primary_ns_server_.service(req, ec);
     }
 
+    std::vector<response> bootstrap_service_client::service_primary_bulk(
+        std::vector<request> const& reqs
+        , error_code& ec)
+    {
+        return data_.primary_ns_server_.bulk_service(reqs, ec);
+    }
+
     hpx::agas::response bootstrap_service_client::service_component(
         request const& req
         , threads::thread_priority priority
