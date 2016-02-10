@@ -3291,7 +3291,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
 {
     if (!gid_)
     {
-        return make_exceptional_future<void>(
+        return hpx::make_exceptional_future<void>(
             HPX_GET_EXCEPTION(bad_parameter,
                 "addressing_service::mark_as_migrated",
                 "invalid reference gid"));
@@ -3380,7 +3380,7 @@ addressing_service::begin_migration_async(naming::id_type const& id)
 
     if (!id)
     {
-        return make_exceptional_future<result_type>(
+        return hpx::make_exceptional_future<result_type>(
             HPX_GET_EXCEPTION(bad_parameter,
                 "addressing_service::begin_migration_async",
                 "invalid reference id"));
@@ -3403,7 +3403,7 @@ hpx::future<bool> addressing_service::end_migration_async(
 {
     if (!id)
     {
-        return make_exceptional_future<bool>(
+        return hpx::make_exceptional_future<bool>(
             HPX_GET_EXCEPTION(bad_parameter,
                 "addressing_service::end_migration_async",
                 "invalid reference id"));

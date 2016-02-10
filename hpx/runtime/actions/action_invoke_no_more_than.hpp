@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -86,12 +86,11 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, boost::mpl::false_)
         {
-            typedef typename Action::component_type component_type;
-
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function),
                 util::placeholders::_1,
-                component_type::decorate_action(lva, std::forward<F>(f))
+                traits::action_decorate_function<Action>::call(
+                    lva, std::forward<F>(f))
             );
         }
 
@@ -110,12 +109,11 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, boost::mpl::true_)
         {
-            typedef typename Action::component_type component_type;
-
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function_future),
                 util::placeholders::_1,
-                component_type::decorate_action(lva, std::forward<F>(f))
+                traits::action_decorate_function<Action>::call(
+                    lva, std::forward<F>(f))
             );
         }
 

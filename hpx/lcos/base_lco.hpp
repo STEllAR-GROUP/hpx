@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -42,12 +42,6 @@ namespace hpx { namespace lcos
 
         static components::component_type get_component_type();
         static void set_component_type(components::component_type type);
-
-        // This component type requires valid id for its actions to be invoked
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return !naming::is_locality(id);
-        }
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
@@ -115,24 +109,6 @@ namespace hpx { namespace lcos
         /// The \a set_exception_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
             disconnect_action);
-
-        /// This is the default hook implementation for decorate_action which
-        /// does no hooking at all.
-        template <typename F>
-        static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
-        {
-            return std::forward<F>(f);
-        }
-
-        /// This is the default hook implementation for schedule_thread which
-        /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
-            threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
-        {
-            threads::register_work_plain(data, initial_state); //-V106
-        }
     };
 }}
 
