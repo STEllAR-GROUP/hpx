@@ -18,7 +18,8 @@ namespace hpx { namespace traits
     {
         struct is_target_valid_helper
         {
-            // by default we return an empty value
+            // by default we return true if the given id is not referring to a
+            // locality
             template <typename Action>
             static bool
             call(wrap_int, naming::id_type const& id)

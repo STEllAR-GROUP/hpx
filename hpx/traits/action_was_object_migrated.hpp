@@ -22,7 +22,7 @@ namespace hpx { namespace traits
     {
         struct was_object_migrated_helper
         {
-            // by default we return an empty value
+            // by default we return an empty pinned_ptr value (nothing to pin)
             template <typename Action>
             static std::pair<bool, components::pinned_ptr>
             call(wrap_int, hpx::id_type const&, naming::address::address_type)

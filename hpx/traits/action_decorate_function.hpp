@@ -20,7 +20,7 @@ namespace hpx { namespace traits
     {
         struct decorate_function_helper
         {
-            // by default we return an empty value
+            // by default we return the unchanged function
             template <typename Action, typename F>
             static threads::thread_function_type
             call(wrap_int, naming::address_type lva, F && f)
