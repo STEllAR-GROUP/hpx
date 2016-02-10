@@ -54,6 +54,48 @@ namespace hpx { namespace detail
         return applier::detail::apply_r_p<Action>(std::move(addr),
             std::forward<Continuation>(c), id, priority, std::forward<Ts>(vs)...);
     }
+    template <typename Action, typename Continuation, typename ...Ts>
+    typename boost::enable_if_c<
+        traits::is_continuation<Continuation>::value, bool
+    >::type
+    apply_impl(Continuation && c, hpx::id_type const& id, naming::address addr,
+        threads::thread_priority priority, Ts&&... vs)
+    {
+        if (!traits::action_is_target_valid<Action>::call(id)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
+            return false;
+        }
+
+        // Determine whether the id is local or remote
+        if(addr)
+        {
+            if(addr.locality_ == hpx::get_locality())
+            {
+                std::pair<bool, components::pinned_ptr> r;
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    return applier::detail::apply_l_p<Action>(
+                        std::forward<Continuation>(c), id, std::move(addr),
+                        priority, std::forward<Ts>(vs)...);
+                }
+            }
+            // object was migrated or is not local
+            else
+            {
+                // apply remotely
+                return applier::detail::apply_r_p<Action>(std::move(addr),
+                    std::forward<Continuation>(c), id, priority, std::forward<Ts>(vs)...);
+            }
+        }
+        return
+            apply_impl<Action>(std::forward<Continuation>(c),
+                id, priority, std::forward<Ts>(vs)...);
+    }
 
     template <typename Action, typename ...Ts>
     bool apply_impl(hpx::id_type const& id, threads::thread_priority priority,
@@ -85,6 +127,35 @@ namespace hpx { namespace detail
         // apply remotely
         return applier::detail::apply_r_p<Action>(std::move(addr),
             id, priority, std::forward<Ts>(vs)...);
+    }
+
+    template <typename Action, typename ...Ts>
+    bool apply_impl(hpx::id_type const& id, naming::address addr,
+        threads::thread_priority priority, Ts &&... vs)
+    {
+        // Determine whether the id is local or remote
+        if(addr)
+        {
+            if(addr.locality_ == hpx::get_locality())
+            {
+                std::pair<bool, components::pinned_ptr> r;
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    return applier::detail::apply_l_p<Action>(
+                        id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                }
+            }
+            // object was migrated or is not local
+            else
+            {
+                // apply remotely
+                return applier::detail::apply_r_p<Action>(std::move(addr),
+                    id, priority, std::forward<Ts>(vs)...);
+            }
+        }
+        return apply_impl<Action>(id, priority, std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>

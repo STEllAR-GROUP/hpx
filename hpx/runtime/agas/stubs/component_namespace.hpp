@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 //#include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/runtime/agas/response.hpp>
 #include <hpx/lcos/async.hpp>
 
 namespace hpx { namespace agas {

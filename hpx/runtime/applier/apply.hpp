@@ -16,10 +16,10 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations.hpp>
+#include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
-#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
@@ -39,21 +39,6 @@
 #include <memory>
 
 // FIXME: Error codes?
-
-namespace hpx { namespace actions
-{
-    template <typename Action>
-    threads::thread_priority action_priority()
-    {
-        typedef typename hpx::actions::extract_action<Action>::type action_type_;
-        threads::thread_priority priority =
-            static_cast<threads::thread_priority>(
-                traits::action_priority<action_type_>::value);
-        if (priority == threads::thread_priority_default)
-            priority = threads::thread_priority_normal;
-        return priority;
-    }
-}}
 
 namespace hpx
 {

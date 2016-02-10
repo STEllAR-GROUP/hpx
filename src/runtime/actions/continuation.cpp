@@ -12,105 +12,133 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    void trigger_lco_event(naming::id_type const& id, bool move_credits)
+    void trigger_lco_event(naming::id_type const& id, naming::address const& addr,
+        bool move_credits)
     {
-        lcos::base_lco::set_event_action set;
+        typedef lcos::base_lco::set_event_action set_action;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply(set, target);
+            detail::apply_impl<set_action>(
+                target, addr, actions::action_priority<set_action>());
         }
         else
         {
-            apply(set, id);
+            detail::apply_impl<set_action>(
+                id, addr, actions::action_priority<set_action>());
         }
     }
 
-    void trigger_lco_event(naming::id_type const& id,
+    void trigger_lco_event(naming::id_type const& id, naming::address const& addr,
         naming::id_type const& cont, bool move_credits)
     {
-        lcos::base_lco::set_event_action set;
+        typedef lcos::base_lco::set_event_action set_action;
+        typedef
+            typename hpx::actions::extract_action<set_action>::result_type
+            result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply_c(set, cont, target);
+            detail::apply_impl<set_action>(
+                actions::typed_continuation<result_type>(cont), target, addr,
+                actions::action_priority<set_action>());
         }
         else
         {
-            apply_c(set, cont, id);
+            detail::apply_impl<set_action>(
+                actions::typed_continuation<result_type>(cont), id, addr,
+                actions::action_priority<set_action>());
         }
     }
 
-    void set_lco_error(naming::id_type const& id,
+    void set_lco_error(naming::id_type const& id, naming::address const& addr,
         boost::exception_ptr const& e, bool move_credits)
     {
-        lcos::base_lco::set_exception_action set;
+        typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply(set, target, e);
+            detail::apply_impl<set_action>(
+                target, addr, actions::action_priority<set_action>(), e);
         }
         else
         {
-            apply(set, id, e);
+            detail::apply_impl<set_action>(
+                id, addr, actions::action_priority<set_action>(), e);
         }
     }
 
-    void set_lco_error(naming::id_type const& id, //-V659
+    void set_lco_error(naming::id_type const& id, naming::address const& addr, //-V659
         boost::exception_ptr && e, bool move_credits)
     {
-        lcos::base_lco::set_exception_action set;
+        typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply(set, target, std::move(e));
+            detail::apply_impl<set_action>(
+                target, addr, actions::action_priority<set_action>(), std::move(e));
         }
         else
         {
-            apply(set, id, std::move(e));
+            detail::apply_impl<set_action>(
+                id, addr, actions::action_priority<set_action>(), std::move(e));
         }
     }
 
-    void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e,
+    void set_lco_error(naming::id_type const& id, naming::address const& addr, boost::exception_ptr const& e,
         naming::id_type const& cont, bool move_credits)
     {
-        lcos::base_lco::set_exception_action set;
+        typedef lcos::base_lco::set_exception_action set_action;
+        typedef
+            typename hpx::actions::extract_action<set_action>::result_type
+            result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply_c(set, cont, target, e);
+            detail::apply_impl<set_action>(
+                actions::typed_continuation<result_type>(cont), target, addr,
+                actions::action_priority<set_action>(), e);
         }
         else
         {
-            apply_c(set, cont, id, e);
+            detail::apply_impl<set_action>(
+                actions::typed_continuation<result_type>(cont), id, addr,
+                actions::action_priority<set_action>(), e);
         }
     }
 
-    void set_lco_error(naming::id_type const& id, //-V659
+    void set_lco_error(naming::id_type const& id, naming::address const& addr, //-V659
         boost::exception_ptr && e, naming::id_type const& cont,
         bool move_credits)
     {
-        lcos::base_lco::set_exception_action set;
+        typedef lcos::base_lco::set_exception_action set_action;
+        typedef
+            typename hpx::actions::extract_action<set_action>::result_type
+            result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply_c(set, cont, target, std::move(e));
+            detail::apply_impl<set_action>(
+                actions::typed_continuation<result_type>(cont), target, addr,
+                actions::action_priority<set_action>(), std::move(e));
         }
         else
         {
-            apply_c(set, cont, id, std::move(e));
+            detail::apply_impl<set_action>(
+                actions::typed_continuation<result_type>(cont), id, addr,
+                actions::action_priority<set_action>(), std::move(e));
         }
     }
 
@@ -141,7 +169,7 @@ namespace hpx { namespace actions
         }
 
         LLCO_(info) << "continuation::trigger(" << gid_ << ")";
-        trigger_lco_event(gid_);
+        trigger_lco_event(gid_, addr_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -155,7 +183,7 @@ namespace hpx { namespace actions
         }
 
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
-        set_lco_error(gid_, e);
+        set_lco_error(gid_, addr_, e);
     }
 
     void continuation::trigger_error(boost::exception_ptr && e) //-V659
@@ -168,7 +196,7 @@ namespace hpx { namespace actions
         }
 
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
-        set_lco_error(gid_, std::move(e));
+        set_lco_error(gid_, addr_, std::move(e));
     }
 }}
 

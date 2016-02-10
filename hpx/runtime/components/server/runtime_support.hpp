@@ -24,6 +24,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>

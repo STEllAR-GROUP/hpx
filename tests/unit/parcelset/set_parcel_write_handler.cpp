@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 void test(hpx::id_type const& id)
 {
-    hpx::trigger_lco_event(id);
+    hpx::trigger_lco_event(id, hpx::naming::address());
 }
 HPX_PLAIN_ACTION(test);     // defines test_action
 

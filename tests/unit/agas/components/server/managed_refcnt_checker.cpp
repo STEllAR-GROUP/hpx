@@ -47,7 +47,7 @@ managed_refcnt_checker::~managed_refcnt_checker()
         strm << ( boost::format("[%1%/%2%]: triggering flag %3%\n")
                 % prefix_ % this_ % target_);
 
-        hpx::trigger_lco_event(target_);
+        hpx::trigger_lco_event(target_, naming::address());
     }
 
     std::string const str = strm.str();

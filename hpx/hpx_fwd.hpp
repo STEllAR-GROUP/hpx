@@ -42,6 +42,7 @@
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/util/function.hpp>
 // ^ this has to come before the naming/id_type.hpp below
 #include <hpx/util/move.hpp>
