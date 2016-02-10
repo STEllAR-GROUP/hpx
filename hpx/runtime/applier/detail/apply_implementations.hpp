@@ -61,20 +61,20 @@ namespace hpx { namespace detail
     apply_impl(Continuation && c, hpx::id_type const& id, naming::address addr,
         threads::thread_priority priority, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(id)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
-            return false;
-        }
-
         // Determine whether the id is local or remote
         if(addr)
         {
+            if (!traits::action_is_target_valid<Action>::call(id)) {
+                HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
+                    boost::str(boost::format(
+                        "the target (destination) does not match the action type (%s)"
+                    ) % hpx::actions::detail::get_action_name<Action>()));
+                return false;
+            }
+
+            std::pair<bool, components::pinned_ptr> r;
             if(addr.locality_ == hpx::get_locality())
             {
-                std::pair<bool, components::pinned_ptr> r;
                 r = traits::action_was_object_migrated<Action>::call(
                     id, addr.address_);
                 if (!r.first)
@@ -136,9 +136,17 @@ namespace hpx { namespace detail
         // Determine whether the id is local or remote
         if(addr)
         {
+            if (!traits::action_is_target_valid<Action>::call(id)) {
+                HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
+                    boost::str(boost::format(
+                        "the target (destination) does not match the action type (%s)"
+                    ) % hpx::actions::detail::get_action_name<Action>()));
+                return false;
+            }
+
+            std::pair<bool, components::pinned_ptr> r;
             if(addr.locality_ == hpx::get_locality())
             {
-                std::pair<bool, components::pinned_ptr> r;
                 r = traits::action_was_object_migrated<Action>::call(
                     id, addr.address_);
                 if (!r.first)

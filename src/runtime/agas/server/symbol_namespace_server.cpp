@@ -403,7 +403,7 @@ response symbol_namespace::bind(
                     naming::detail::split_gid_if_needed(*current_gid).get();
 
                 // trigger the lco
-                set_lco_value(id, naming::address(), new_gid);
+                set_lco_value(id, new_gid);
             }
         }
     }
@@ -574,7 +574,7 @@ response symbol_namespace::on_event(
                 handled = true;
 
                 // trigger LCO as name is already bound to an id
-                set_lco_value(lco, naming::address(), new_gid);
+                set_lco_value(lco, new_gid);
             }
         }
     }

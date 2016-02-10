@@ -10,7 +10,6 @@
 
 #include <hpx/runtime/actions/continuation.hpp>
 
-/*
 namespace hpx { namespace applier
 {
 
@@ -47,7 +46,6 @@ inline void trigger_error(
 }
 
 }}
-*/
 
 #endif // HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE
 

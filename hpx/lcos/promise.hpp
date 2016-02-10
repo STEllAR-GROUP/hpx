@@ -538,7 +538,7 @@ namespace hpx { namespace lcos
             return naming::address(
                 hpx::get_locality()
               , impl_->get_component_type()
-              , &*impl_
+              , impl_.get()
             );
         }
 
@@ -692,7 +692,7 @@ namespace hpx { namespace lcos
             return naming::address(
                 hpx::get_locality()
               , impl_->get_component_type()
-              , &*impl_
+              , impl_.get()
             );
         }
 

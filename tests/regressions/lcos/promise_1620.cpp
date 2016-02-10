@@ -70,7 +70,7 @@ int hpx_main(int argc, char* argv[])
 
         // This segfaults, because the promise is not alive any more.
         // It SHOULD get kept alive by AGAS though.
-        hpx::set_lco_value(promise_id, naming::address(), 10, false);
+        hpx::set_lco_value(promise_id, 10, false);
 
     }
     return hpx::finalize();
