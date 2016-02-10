@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -369,7 +369,7 @@ namespace hpx { namespace threads
         }
 #endif
 
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         void set_marked_state(thread_state mark) const
         {
             marked_state_ = mark;
@@ -599,7 +599,7 @@ namespace hpx { namespace threads
             parent_thread_id_(init_data.parent_id),
             parent_thread_phase_(init_data.parent_phase),
 #endif
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             marked_state_(unknown),
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
@@ -655,7 +655,7 @@ namespace hpx { namespace threads
             parent_thread_id_ = init_data.parent_id;
             parent_thread_phase_ = init_data.parent_phase;
 #endif
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             set_marked_state(thread_state(unknown));
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
@@ -709,7 +709,7 @@ namespace hpx { namespace threads
         std::size_t parent_thread_phase_;
 #endif
 
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         mutable thread_state marked_state_;
 #endif
 

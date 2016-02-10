@@ -92,12 +92,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {
         /// \cond NOINTERNAL
 
-        // wraps int so that int argument is favored over wrap_int
-        struct wrap_int
-        {
-            wrap_int(int) {}
-        };
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Enable = void>
         struct execution_category
@@ -134,7 +128,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct apply_helper
         {
             template <typename Executor, typename F>
-            static void call(wrap_int, Executor& exec, F && f)
+            static void call(hpx::traits::detail::wrap_int, Executor& exec, F && f)
             {
                 exec.async_execute(std::forward<F>(f));
             }
@@ -157,7 +151,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct execute_helper
         {
             template <typename Executor, typename F>
-            static auto call(wrap_int, Executor& exec, F && f)
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec, F && f)
             ->  decltype(exec.async_execute(std::forward<F>(f)).get())
             {
                 try {
@@ -213,7 +207,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct bulk_async_execute_helper
         {
             template <typename Executor, typename F, typename S>
-            static auto call(wrap_int, Executor& exec, F && f, S const& shape)
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec,
+                    F && f, S const& shape)
             ->  std::vector<decltype(
                     exec.async_execute(
                         hpx::util::deferred_call(f, *boost::begin(shape))
@@ -298,7 +293,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             // returns void if F returns void
             template <typename Executor, typename F, typename S>
-            static auto call(wrap_int, Executor& exec, F && f, S const& shape)
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec,
+                    F && f, S const& shape)
             ->  typename bulk_result_helper<decltype(
                     exec.async_execute(
                         hpx::util::deferred_call(f, *boost::begin(shape))

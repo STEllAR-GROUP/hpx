@@ -17,13 +17,14 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable>
     struct action_schedule_thread
     {
+        // returns whether target was migrated to another locality
         static void
         call(naming::address::address_type lva, threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
             // by default we forward this to the component type
             typedef typename Action::component_type component_type;
-            return component_type::schedule_thread(lva, data, initial_state);
+            component_type::schedule_thread(lva, data, initial_state);
         }
     };
 }}

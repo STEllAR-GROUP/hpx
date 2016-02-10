@@ -41,6 +41,15 @@ private:
             fixed_component_base, Component
         >::type this_component_type;
 
+    Component& derived()
+    {
+        return static_cast<Component&>(*this);
+    }
+    Component const& derived() const
+    {
+        return static_cast<Component const&>(*this);
+    }
+
 public:
     typedef this_component_type wrapped_type;
     typedef this_component_type base_type_holder;
@@ -130,7 +139,7 @@ public:
     naming::id_type get_id() const
     {
         // fixed_address components are created without any credits
-        naming::gid_type gid = get_base_gid();
+        naming::gid_type gid = derived().get_base_gid();
         HPX_ASSERT(!naming::detail::has_credits(gid));
 
         naming::detail::replenish_credits(gid);
@@ -139,7 +148,8 @@ public:
 
     naming::id_type get_unmanaged_id() const
     {
-        return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        return naming::id_type(derived().get_base_gid(),
+            naming::id_type::unmanaged);
     }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)

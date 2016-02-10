@@ -355,10 +355,15 @@ else()
     SOURCES ${documentation_files})
 endif()
 
+set_target_properties(docs
+    PROPERTIES FOLDER "Documentation/")
+
 if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
   add_custom_target(singlepage_docs
     DEPENDS hpx_singlepage_HTML.manifest
     SOURCES ${documentation_files})
+  set_target_properties(singlepage_docs
+      PROPERTIES FOLDER "Documentation/")
 endif()
 
 # Create links to properly view the docs in the build directory
@@ -399,7 +404,11 @@ add_custom_target(git_docs
     -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake")
 #  VERBATIM)
 
+set_target_properties(git_docs
+    PROPERTIES FOLDER "Documentation/")
+
 add_dependencies(git_docs docs)
 if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
   add_dependencies(git_docs singlepage_docs)
 endif()
+

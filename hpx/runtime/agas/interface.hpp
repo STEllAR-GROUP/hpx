@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,8 +14,12 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/dynamic_bitset.hpp>
+
+#include <utility>
 
 namespace hpx { namespace agas
 {
@@ -226,10 +230,27 @@ HPX_API_EXPORT bool bind_sync(
   , error_code& ec = throws
     );
 
+HPX_API_EXPORT hpx::future<bool> bind(
+    naming::gid_type const& id
+  , naming::address const& addr
+  , naming::gid_type const& locality_
+    );
+
 HPX_API_EXPORT bool bind_sync(
     naming::gid_type const& id
   , naming::address const& addr
   , naming::gid_type const& locality_
+  , error_code& ec = throws
+    );
+
+HPX_API_EXPORT hpx::future<naming::address> unbind(
+    naming::gid_type const& id
+  , boost::uint64_t count = 1
+    );
+
+HPX_API_EXPORT naming::address unbind_sync(
+    naming::gid_type const& id
+  , boost::uint64_t count = 1
   , error_code& ec = throws
     );
 
@@ -305,11 +326,19 @@ HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >
-    begin_migration(
-        naming::id_type const& id,
-        naming::id_type const& target_locality);
+    begin_migration(naming::id_type const& id);
 HPX_API_EXPORT hpx::future<bool> end_migration(naming::id_type const& id);
 
+HPX_API_EXPORT hpx::future<void>
+    mark_as_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<
+            std::pair<bool, hpx::future<void> >()> && f);
+
+HPX_API_EXPORT std::pair<bool, components::pinned_ptr>
+    was_object_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<components::pinned_ptr()> && f);
+
+HPX_API_EXPORT void unmark_as_migrated(naming::gid_type const& gid);
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

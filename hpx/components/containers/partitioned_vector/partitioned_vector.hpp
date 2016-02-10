@@ -107,10 +107,10 @@ namespace hpx
     ///
     /// The hpx::partitioned_vector is a segmented data structure which is a
     /// collection of one
-    /// or more hpx::server::partition_vectors. The hpx::partitioned_vector
+    /// or more hpx::server::partitioned_vector_partitions. The hpx::partitioned_vector
     /// stores the global
-    /// ids of each hpx::server::partition_vector and the size of each
-    /// hpx::server::partition_vector.
+    /// ids of each hpx::server::partitioned_vector_partition and the size of each
+    /// hpx::server::partitioned_vector_partition.
     ///
     /// The storage of the vector is handled automatically, being expanded and
     /// contracted as needed. Vectors usually occupy more space than static arrays,
@@ -161,13 +161,17 @@ namespace hpx
                     server::partitioned_vector_config_data>
             > base_type;
 
-        typedef hpx::server::partitioned_vector<T> partition_vector_server;
-        typedef hpx::partition_vector<T> partition_vector_client;
+        typedef hpx::server::partitioned_vector<T>
+            partitioned_vector_partition_server;
+        typedef hpx::partitioned_vector_partition<T>
+            partitioned_vector_partition_client;
 
         struct partition_data
           : server::partitioned_vector_config_data::partition_data
         {
-            typedef server::partitioned_vector_config_data::partition_data base_type;
+            typedef
+                server::partitioned_vector_config_data::partition_data
+                base_type;
 
             partition_data(id_type const& part, std::size_t size,
                     boost::uint32_t locality_id)
@@ -178,7 +182,7 @@ namespace hpx
               : base_type(std::move(base))
             {}
 
-            boost::shared_ptr<partition_vector_server> local_data_;
+            boost::shared_ptr<partitioned_vector_partition_server> local_data_;
         };
 
         // The list of partitions belonging to this vector.
@@ -190,7 +194,7 @@ namespace hpx
         size_type partition_size_;      // cached partition size
 
         // This is the vector representing the base_index and corresponding
-        // global ID's of the underlying partition_vectors.
+        // global ID's of the underlying partitioned_vector_partitions.
         partitions_vector_type partitions_;
 
     public:
@@ -265,7 +269,7 @@ namespace hpx
                 {
                     using util::placeholders::_1;
                     ptrs.push_back(
-                        get_ptr<partition_vector_server>(it->partition_)
+                        get_ptr<partitioned_vector_partition_server>(it->partition_)
                         .then(
                             util::bind(&partitioned_vector::get_ptr_helper,
                                 l, std::ref(partitions_), _1
@@ -467,7 +471,8 @@ namespace hpx
         create_helper1(DistPolicy const& policy, std::size_t count,
             std::size_t size)
         {
-            typedef typename partition_vector_client::server_component_type
+            typedef
+                typename partitioned_vector_partition_client::server_component_type
                 component_type;
 
             return policy.template bulk_create<component_type>(
@@ -479,7 +484,8 @@ namespace hpx
         create_helper2(DistPolicy const& policy, std::size_t count,
             std::size_t size, T const& val)
         {
-            typedef typename partition_vector_client::server_component_type
+            typedef
+                typename partitioned_vector_partition_client::server_component_type
                 component_type;
 
             return policy.template bulk_create<component_type>(
@@ -488,7 +494,7 @@ namespace hpx
 
         static void get_ptr_helper(std::size_t loc,
             partitions_vector_type& partitions,
-            future<boost::shared_ptr<partition_vector_server> > && f)
+            future<boost::shared_ptr<partitioned_vector_partition_server> > && f)
         {
             partitions[loc].local_data_ = f.get();
         }
@@ -527,7 +533,8 @@ namespace hpx
                     {
                         using util::placeholders::_1;
                         ptrs.push_back(
-                            get_ptr<partition_vector_server>(id).then(
+                            get_ptr<partitioned_vector_partition_server>(id)
+                            .then(
                                 util::bind(&partitioned_vector::get_ptr_helper,
                                     l, std::ref(partitions_), _1
                                 )
@@ -544,7 +551,7 @@ namespace hpx
                         // shrink last partition, if appropriate
                         if (size != part_size)
                         {
-                            partition_vector_client(
+                            partitioned_vector_partition_client(
                                     partitions_.back().partition_
                                 ).resize(size);
                         }
@@ -594,7 +601,8 @@ namespace hpx
             const_iterator end = rhs.partitions_.end();
             for (const_iterator it = rhs.partitions_.begin(); it != end; ++it)
             {
-                typedef typename partition_vector_client::server_component_type
+                typedef
+                    typename partitioned_vector_partition_client::server_component_type
                     component_type;
                 objs.push_back(hpx::components::copy<component_type>(
                     it->partition_));
@@ -616,7 +624,7 @@ namespace hpx
                 if (locality == this_locality)
                 {
                     using util::placeholders::_1;
-                    ptrs.push_back(get_ptr<partition_vector_server>(
+                    ptrs.push_back(get_ptr<partitioned_vector_partition_server>(
                         partitions[i].partition_).then(
                             util::bind(&partitioned_vector::get_ptr_helper,
                                 i, std::ref(partitions), _1)));
@@ -833,7 +841,7 @@ namespace hpx
             if (part_data.local_data_)
                 return part_data.local_data_->get_value(pos);
 
-            return partition_vector_client(part_data.partition_)
+            return partitioned_vector_partition_client(part_data.partition_)
                 .get_value_sync(pos);
         }
 
@@ -867,8 +875,8 @@ namespace hpx
                     partitions_[part].local_data_->get_value(pos));
             }
 
-            return partition_vector_client(partitions_[part].partition_)
-                .get_value(pos);
+            return partitioned_vector_partition_client(
+                partitions_[part].partition_).get_value(pos);
         }
 
         /// Returns the elements at the positions \a pos from the given
@@ -887,7 +895,7 @@ namespace hpx
             if (part_data.local_data_)
                 return part_data.local_data_->get_values(pos);
 
-            return partition_vector_client(part_data.partition_)
+            return partitioned_vector_partition_client(part_data.partition_)
                 .get_values_sync(pos);
         }
 
@@ -907,7 +915,7 @@ namespace hpx
             if (part_data.local_data_)
                 return make_ready_future(part_data.local_data_->get_values(pos));
 
-            return partition_vector_client(part_data.partition_)
+            return partitioned_vector_partition_client(part_data.partition_)
                 .get_values(pos);
         }
 
@@ -1015,7 +1023,7 @@ namespace hpx
 //          */
 //         VALUE_TYPE front() const
 //         {
-//             return partition_vector_stub::front_async(
+//             return partitioned_vector_partition_stub::front_async(
 //                                     (partitions_.front().first).get()
 //                                                   ).get();
 //         }//end of front_value
@@ -1028,7 +1036,7 @@ namespace hpx
 //          */
 //         hpx::future< VALUE_TYPE > front_async() const
 //         {
-//             return partition_vector_stub::front_async(
+//             return partitioned_vector_partition_stub::front_async(
 //                                     (partitions_.front().first).get()
 //                                                   );
 //         }//end of front_async
@@ -1044,7 +1052,7 @@ namespace hpx
 //         {
 //             // As the LAST pair is there and then decrement operator to that
 //             // LAST is undefined hence used the end() function rather than back()
-//             return partition_vector_stub::back_async(
+//             return partitioned_vector_partition_stub::back_async(
 //                             ((partitions_.end() - 2)->first).get()
 //                                                  ).get();
 //         }//end of back_value
@@ -1058,7 +1066,7 @@ namespace hpx
 //         hpx::future< VALUE_TYPE > back_async() const
 //         {
 //             //As the LAST pair is there
-//             return partition_vector_stub::back_async(
+//             return partitioned_vector_partition_stub::back_async(
 //                             ((partitions_.end() - 2)->first).get()
 //                                                  );
 //         }//end of back_async
@@ -1094,7 +1102,8 @@ namespace hpx
 //                 )
 //             {
 //                 assign_lazy_sync.push_back(
-//                     partition_vector_stub::assign_async((p.first).get(), n, val)
+//                     partitioned_vector_partition_stub::assign_async(
+//                          (p.first).get(), n, val)
 //                                           );
 //             }
 //             hpx::wait_all(assign_lazy_sync);
@@ -1135,7 +1144,7 @@ namespace hpx
 //          */
 //         void push_back(VALUE_TYPE const& val)
 //         {
-//             partition_vector_stub::push_back_async(
+//             partitioned_vector_partition_stub::push_back_async(
 //                             ((partitions_.end() - 2 )->first).get(),
 //                                                 val
 //                                                 ).get();
@@ -1171,7 +1180,7 @@ namespace hpx
             }
             else
             {
-                partition_vector_client(part_data.partition_)
+                partitioned_vector_partition_client(part_data.partition_)
                     .set_value_sync(pos, std::forward<T_>(val));
             }
         }
@@ -1212,7 +1221,7 @@ namespace hpx
                 return make_ready_future();
             }
 
-            return partition_vector_client(part_data.partition_)
+            return partitioned_vector_partition_client(part_data.partition_)
                 .set_value(pos, std::forward<T_>(val));
         }
 
@@ -1251,8 +1260,8 @@ namespace hpx
                 return make_ready_future();
             }
 
-            return partition_vector_client(partitions_[part].partition_)
-                .set_values(pos, val);
+            return partitioned_vector_partition_client(
+                partitions_[part].partition_).set_values(pos, val);
         }
 
         /// Asynchronously set the element at position \a pos
@@ -1332,20 +1341,20 @@ namespace hpx
             return set_value(pos, val).get();
         }
 
-//             //CLEAR
-//             //TODO if number of partitions is kept constant every time then
-//             // clear should modified (clear each partition_vector one by one).
-// //            void clear()
-// //            {
-// //                //It is keeping one gid hence iterator does not go
-// //                //in an invalid state
-// //                partitions_.erase(partitions_.begin() + 1,
-// //                                           partitions_.end()-1);
-// //                partition_vector_stub::clear_async((partitions_[0].second).get())
-// //                        .get();
-// //                HPX_ASSERT(partitions_.size() > 1);
-// //                //As this function changes the size we should have LAST always.
-// //            }
+//   //CLEAR
+//   //TODO if number of partitions is kept constant every time then
+//   // clear should modified (clear each partitioned_vector_partition one by one).
+//     void clear()
+//     {
+//         //It is keeping one gid hence iterator does not go
+//         //in an invalid state
+//         partitions_.erase(partitions_.begin() + 1,
+//                                    partitions_.end()-1);
+//         partitioned_vector_partition_stub::clear_async((partitions_[0].second).get())
+//                 .get();
+//         HPX_ASSERT(partitions_.size() > 1);
+//         //As this function changes the size we should have LAST always.
+//     }
 
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first segment located

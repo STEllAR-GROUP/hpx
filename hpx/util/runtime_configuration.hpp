@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -99,6 +99,8 @@ namespace hpx { namespace util
 
         // Enable minimal deadlock detection for HPX threads
         bool enable_minimal_deadlock_detection() const;
+        bool enable_spinlock_deadlock_detection() const;
+        std::size_t get_spinlock_deadlock_detection_limit() const;
 
         // Returns the number of OS threads this locality is running.
         std::size_t get_os_thread_count() const;

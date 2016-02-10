@@ -175,7 +175,7 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(naming::invalid_id);
         }
 
-        return agas::begin_migration(to_migrate, target_storage)
+        return agas::begin_migration(to_migrate)
             .then(
                 [to_migrate, target_storage](
                     future<std::pair<naming::id_type, naming::address> > && f)
