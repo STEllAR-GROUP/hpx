@@ -69,6 +69,35 @@ namespace hpx { namespace agas { namespace detail
             , error_code& ec
             );
 
+        void register_counter_types();
+
+        void register_server_instance(boost::uint32_t locality_id);
+
+        bool unregister_server(
+            request const& req
+            , threads::thread_priority priority =
+            threads::thread_priority_default
+            , error_code& ec = throws);
+
+        response service_primary(
+            request const& req
+            , error_code& ec = throws
+            );
+
+        response service_component(
+            request const& req
+            , threads::thread_priority priority =
+            threads::thread_priority_default
+            , error_code& ec = throws
+            );
+
+        response service_locality(
+            request const& req
+            , threads::thread_priority priority =
+            threads::thread_priority_default
+            , error_code& ec = throws
+            );
+
         hosted_data_type data_;
     };
 }}}

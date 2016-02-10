@@ -24,13 +24,43 @@ namespace hpx { namespace agas { namespace detail
 
         virtual response service(
             request const& req
-            , threads::thread_priority priority = threads::thread_priority_default
+            , threads::thread_priority priority =
+                threads::thread_priority_default
             , error_code& ec = throws
             ) = 0;
 
         virtual std::vector<response> bulk_service(
             std::vector<request> const& reqs
             , error_code& ec
+            ) = 0;
+
+        virtual void register_counter_types() = 0;
+
+        virtual void register_server_instance(boost::uint32_t locality_id) = 0;
+
+        virtual bool unregister_server(
+            request const& req
+            , threads::thread_priority priority =
+                threads::thread_priority_default
+            , error_code& ec = throws) = 0;
+
+        virtual response service_primary(
+            request const& req
+            , error_code& ec = throws
+            ) = 0;
+
+        virtual response service_component(
+            request const& req
+            , threads::thread_priority priority =
+            threads::thread_priority_default
+            , error_code& ec = throws
+            ) = 0;
+
+        virtual response service_locality(
+            request const& req
+            , threads::thread_priority priority =
+            threads::thread_priority_default
+            , error_code& ec = throws
             ) = 0;
     };
 }}}

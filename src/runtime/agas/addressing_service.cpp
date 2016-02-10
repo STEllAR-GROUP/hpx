@@ -521,23 +521,8 @@ bool addressing_service::unregister_locality(
 { // {{{
     try {
         request req(locality_ns_free, gid);
-        response rep;
 
-        if (is_bootstrap())
-            bootstrap->unregister_server_instance(ec);
-        else
-            hosted->unregister_server_instance(ec);
-
-        if (ec)
-            return false;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
-
-        if (ec || (success != rep.get_status()))
-            return false;
+        client_->unregister_server(req, action_priority_, ec);
 
         remove_resolved_locality(gid);
         return true;
@@ -846,12 +831,7 @@ components::component_type addressing_service::get_component_id(
 { /// {{{
     try {
         request req(component_ns_bind_name, name);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
@@ -872,10 +852,7 @@ void addressing_service::iterate_types(
     try {
         request req(component_ns_iterate_types, f);
 
-        if (is_bootstrap())
-            bootstrap->component_ns_server_.service(req, ec);
-        else
-            hosted->component_ns_.service(req, action_priority_, ec);
+        client_->service_component(req, action_priority_, ec);
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::iterate_types");
@@ -889,12 +866,7 @@ std::string addressing_service::get_component_type_name(
 { // {{{
     try {
         request req(component_ns_get_component_type_name, id);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         return rep.get_component_typename();
     }
@@ -912,12 +884,7 @@ components::component_type addressing_service::register_factory(
 { // {{{
     try {
         request req(component_ns_bind_prefix, name, prefix);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status() && no_success != rep.get_status()))
             return components::component_invalid;
@@ -944,12 +911,7 @@ bool addressing_service::get_id_range(
           , parcelset::endpoints_type()
           , count
           , boost::uint32_t(-1));
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
-        else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        response rep = client_->service_primary(req, ec);
 
         error const s = rep.get_status();
 
@@ -1344,12 +1306,7 @@ bool addressing_service::resolve_full_local(
 { // {{{ resolve implementation
     try {
         request req(primary_ns_resolve_gid, id);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
-        else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        response rep = client_->service_primary(req, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -2857,23 +2814,15 @@ void addressing_service::register_counter_types()
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
-    if (is_bootstrap()) {
-        // install counters for services
-        bootstrap->register_counter_types();
+    // install counters for services
+    client_->register_counter_types();
 
-        // always register root server as 'locality#0'
-        bootstrap->register_server_instance("locality#0/");
-    }
-    else {
-        // install counters for services
-        hosted->register_counter_types();
+    // always register root server as 'locality#0' for bootstrap
+    boost::uint32_t locality_id = 0;
+    if (!is_bootstrap())
+        locality_id = naming::get_locality_id_from_gid(get_local_locality());
 
-        boost::uint32_t locality_id =
-            naming::get_locality_id_from_gid(get_local_locality());
-        std::string str("locality#"
-            + boost::lexical_cast<std::string>(locality_id) + "/");
-        hosted->register_server_instance(str.c_str(), locality_id);
-    }
+    client_->register_server_instance(locality_id);
 } // }}}
 
 void addressing_service::garbage_collect_non_blocking(

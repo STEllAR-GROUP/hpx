@@ -45,5 +45,58 @@ namespace hpx { namespace agas { namespace detail
     {
         return data_.primary_ns_server_.bulk_service(reqs, ec);
     }
-}}}
 
+    void hosted_service_client::register_counter_types()
+    {
+        data_.register_counter_types();
+    }
+
+    void hosted_service_client::register_server_instance(
+            boost::uint32_t locality_id)
+    {
+        std::string str("locality#" +
+            boost::lexical_cast<std::string>(locality_id) + "/");
+        return data_.register_server_instance(str.c_str(), locality_id);
+    }
+
+    bool hosted_service_client::unregister_server(
+        request const& req
+        , threads::thread_priority priority,
+        error_code& ec)
+    {
+        data_.unregister_server_instance(ec);
+
+        if (ec)
+            return false;
+
+        response rep = data_.locality_ns_.service(req, priority, ec);
+
+        if (ec || (success != rep.get_status()))
+            return false;
+
+        return true;
+    }
+
+    response hosted_service_client::service_primary(
+        request const& req
+        , error_code& ec)
+    {
+        return data_.primary_ns_server_.service(req, ec);
+    }
+
+    response hosted_service_client::service_component(
+        request const& req
+        , threads::thread_priority priority
+        , error_code& ec)
+    {
+        return data_.component_ns_.service(req, priority, ec);
+    }
+
+    response hosted_service_client::service_locality(
+        request const& req
+        , threads::thread_priority priority
+        , error_code& ec)
+    {
+        return data_.locality_ns_.service(req, priority, ec);
+    }
+}}}
