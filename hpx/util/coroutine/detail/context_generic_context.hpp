@@ -233,7 +233,7 @@ namespace hpx { namespace util { namespace coroutines
             std::ptrdiff_t get_available_stack_space()
             {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-                return get_stack_ptr() - reinterpret_cast<std::size_t>(stack_pointer_);
+                return reinterpret_cast<std::size_t>(stack_pointer_) - get_stack_ptr();
 #else
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif
