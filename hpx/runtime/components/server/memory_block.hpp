@@ -300,13 +300,13 @@ namespace hpx { namespace components
             ar << size; //-V128
             ar << hpx::serialization::detail::raw_ptr(act);
 
-            HPX_ASSERT(act->save());
+            HPX_ASSERT(act->save_function());
             if (config) {
-                act->save()(data->get_ptr(), data->get_size(), ar, version,
+                act->save_function()(data->get_ptr(), data->get_size(), ar, version,
                     config->get_ptr());
             }
             else {
-                act->save()(data->get_ptr(), data->get_size(), ar, version, 0);
+                act->save_function()(data->get_ptr(), data->get_size(), ar, version, 0);
             }
         }
 
@@ -337,13 +337,13 @@ namespace hpx { namespace components
                 new (server::detail::allocate_block<alloc_type>(size))
                     alloc_type(size, act->get_instance()); //-V522
 
-            HPX_ASSERT(act->load()); //-V522
+            HPX_ASSERT(act->load_function()); //-V522
             if (config) {
-                act->load()(p->get_ptr(), size, ar, version, //-V522
+                act->load_function()(p->get_ptr(), size, ar, version, //-V522
                     config->get_ptr());
             }
             else {
-                act->load()(p->get_ptr(), size, ar, version, 0); //-V522
+                act->load_function()(p->get_ptr(), size, ar, version, 0); //-V522
             }
 
             delete act;
