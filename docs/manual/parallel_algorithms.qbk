@@ -118,8 +118,6 @@ __exception_list__ object.
 
 __hpx__ provides implementations of the following parallel algorithms:
 
-[template algoref[name] [funcref hpx::parallel::v1::[name] hpx::parallel::[name]]]
-
 [table Non-modifying Parallel Algorithms (In Header: <hpx/include/parallel_algortithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref all_of] ]

@@ -11,44 +11,56 @@
 
 [heading General Changes]
 
-- We have fixed a couple of issues in AGAS and the parcel layer which have
+This release of __hpx__ is mostly a bug-fix release. Besides cleaning up many
+minor issues and some API inconsistencies, we have also added some new
+functionalities. The most notable addition is the now full implementation
+of object migration (i.e. the ability to transparently move __hpx__ components
+to a different compute node).
+
+* We have fixed a couple of issues in AGAS and the parcel layer which have
   caused hangs, segmentation faults at exit, and a slowdown of applications
   over time. Fixing those has significantly increased the overall stability
   and performance of distributed runs.
-- We have started to add parallel algorithm overloads based on the C++
+* We have started to add parallel algorithm overloads based on the C++
   Extensions for Ranges (__cpp17_n4560__) proposal. This also includes the
   addition of projections to the existing algorithms. Please see [issue 1668]
   for a list of algorithms which have been adapted to __cpp17_n4560__.
-- Added `hpx::make_future<R>(future<T> &&)` allowing to convert a future of
+* Added `hpx::make_future<R>(future<T> &&)` allowing to convert a future of
   any type `T` into a future of any other type `R`, either based on default
   conversion rules of the embedded types or using a given explicit conversion
   function.
-- We finally finished the implementation of transparent migration of components
-  to another locality and/or to a storage objects. It is now possible to trigger
+* We finally finished the implementation of transparent migration of components
+  to another locality. It is now possible to trigger
   a migration operation without 'stopping the world' for the object to migrate.
   __hpx__ will make sure that no work is being performed on an object before it
-  is migrated and that all susequently scheduled work for the migrated object
+  is migrated and that all subsequently scheduled work for the migrated object
   will be transparently forwarded to the new locality. Please note that the
   global id of the migrated object does not change, thus the application will
-  not have to be changed in any way to support this new functionality.
+  not have to be changed in any way to support this new functionality. Please
+  note that this feature is currently considered experimental. See [issue 559]
+  and [pr 1966] for more details.
+* The `hpx::dataflow` facility is now usable with actions. Similarily to
+  `hpx::async`, actions can be specified as an explicit template argument
+  (`hpx::dataflow<Action>(target, ...)`) or as the first argument
+  (`hpx::dataflow(Action(), target, ...)`). We have also enabled the use of
+  distribution policies as the target for dataflow invocations. Please see
+  [issue 1265] and [pr 1912] for more information.
 
 [heading Breaking Changes]
 
-- In order to move the dataflow facility to `namespace hpx` we added a
+* In order to move the dataflow facility to `namespace hpx` we added a
   definition of `hpx::dataflow` which might create ambiguities in existing
   codes. The previous definition of this facility (`hpx::lcos::local::dataflow`)
   has been deprecated and is available only if the constant
   `HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY` is defined at configuration time.
   Please explicitly qualify all uses of the dataflow facility if you enable
   this compatibility setting and encounter ambiguities.
-- The adaptation of the C++ Extensions for Ranges (__cpp17_n4560__) proposal
+* The adaptation of the C++ Extensions for Ranges (__cpp17_n4560__) proposal
   imposes some breaking changes related to the return types of some of the
-  parallel algorithms. Here is the list of algorithms we have changed so far:
-  `parallel::for_each`, `parallel::copy`, `parallel::rotate`,
-  `parallel::reverse` and `parallel::reverse_copy`, `parallel::remove` and
-  `parallel::remove_copy`.
-- The facility `hpx::lcos::make_future_void()` has been replaced by
-  `hpx::lcos::make_future<void>()`
+  parallel algorithms. Please see [issue 1668] for a list of algorithms which
+  have already been adapted.
+* The facility `hpx::lcos::make_future_void()` has been replaced by
+  `hpx::make_future<void>()`.
 
 [heading Bug Fixes (Closed Tickets)]
 
