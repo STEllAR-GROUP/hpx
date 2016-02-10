@@ -441,7 +441,7 @@
 #    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
-#      define HPX_SMALL_STACK_SIZE  0x10000       // 64kByte
+#      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #    else
 #      define HPX_SMALL_STACK_SIZE  0x8000        // 32kByte
 #    endif
