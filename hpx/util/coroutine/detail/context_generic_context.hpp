@@ -38,6 +38,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <stdexcept>
+#include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS) && BOOST_VERSION >= 105300
@@ -232,8 +233,7 @@ namespace hpx { namespace util { namespace coroutines
             std::ptrdiff_t get_available_stack_space()
             {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-                return
-                    reinterpret_cast<uintptr_type>(stack_pointer_) - get_stack_ptr();
+                return get_stack_ptr() - reinterpret_cast<std::size_t>(stack_pointer_);
 #else
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif

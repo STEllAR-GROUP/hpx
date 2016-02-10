@@ -16,28 +16,13 @@
 #endif
 
 #include <boost/cstdint.hpp>
-
-// Only Boost Version > 1.54 defines boost::uintptr_t. For any older versions
-// we use the one defined in the multi index detail namespace. This is safe as
-// it is only needed for older boost versions and thus very unlikely to break
-// in the future.
-#if !defined(BOOST_HAS_INTPTR_T)
-#include <boost/multi_index/detail/uintptr_type.hpp>
-#endif
-
 #include <limits>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
-#if defined(BOOST_HAS_INTPTR_T)
-    typedef boost::uintptr_t uintptr_type;
-#else
-    typedef boost::multi_index::detail::uintptr_type uintptr_type;
-#endif
-
-    inline uintptr_type get_stack_ptr()
+    inline std::size_t get_stack_ptr()
     {
-        uintptr_type stack_ptr = (std::numeric_limits<uintptr_type>::max)();
+        std::size_t stack_ptr = (std::numeric_limits<std::size_t>::max)();
 #if defined(__x86_64__) || defined(__amd64)
         asm("movq %%rsp, %0" : "=r"(stack_ptr));
 #elif defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
