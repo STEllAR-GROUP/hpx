@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -145,11 +145,6 @@ namespace hpx { namespace actions
             std::stringstream name;
             name << "action(" << detail::get_action_name<Derived>() << ")";
             return name.str();
-        }
-
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return true;        // by default we don't do any verification
         }
 
         template <typename ...Ts>
