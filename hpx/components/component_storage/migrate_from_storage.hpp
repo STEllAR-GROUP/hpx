@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2016 Hartmut Kaiser
+//  Copyright (c) 2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,7 +49,7 @@ namespace hpx { namespace components
     migrate_from_storage(naming::id_type const& to_resurrect,
         naming::id_type const& target = naming::invalid_id)
     {
-        typedef server::trigger_migrate_from_storage_action<Component>
+        typedef server::trigger_migrate_from_storage_here_action<Component>
             action_type;
         return async<action_type>(naming::get_locality_from_id(to_resurrect),
             to_resurrect, target);

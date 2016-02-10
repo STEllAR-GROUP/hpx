@@ -9,11 +9,17 @@ else()
   set(_libraries hpx hpx_init iostreams_component)
 endif()
 
-add_library(test_server_1950 SHARED server_1950.cpp)
+add_library(test_server_1950 SHARED server_1950.cpp server_1950.hpp)
 target_link_libraries(test_server_1950 ${_libraries})
+
+set_target_properties(test_server_1950
+    PROPERTIES FOLDER "Tests/Regressions/Build/")
 
 add_executable(test_client_1950 client_1950.cpp)
 target_link_libraries(test_client_1950 ${_libraries} test_server_1950)
+
+set_target_properties(test_client_1950
+    PROPERTIES FOLDER "Tests/Regressions/Build/")
 
 add_hpx_regression_test("build" test_client_1950
   EXECUTABLE "$<TARGET_FILE:test_client_1950>")

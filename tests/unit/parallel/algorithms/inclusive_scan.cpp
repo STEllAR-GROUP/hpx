@@ -173,6 +173,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
+    // if benchmark is requested we run it even in debug mode
     if (vm.count("benchmark")) {
         inclusive_scan_benchmark();
     }
@@ -185,7 +186,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         inclusive_scan_bad_alloc_test();
 
         inclusive_scan_validate();
+#ifndef HPX_DEBUG
         inclusive_scan_benchmark();
+#endif
     }
 
     return hpx::finalize();

@@ -119,9 +119,15 @@ namespace hpx { namespace server
         }
 
         /// Duplicate the copy method for action naming
-        data_type const& get_copied_data() const
+        data_type get_copied_data() const
         {
             return partitioned_vector_partition_;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        void set_data(data_type && other)
+        {
+            partitioned_vector_partition_ = std::move(other);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -374,6 +380,7 @@ namespace hpx { namespace server
 
 //         HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data);
     };
 }}
 
@@ -412,6 +419,9 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partitioned_vector<type>::get_copied_data_action,        \
         BOOST_PP_CAT(__vector_get_copied_data_action_, name));                \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        hpx::server::partitioned_vector<type>::set_data_action,               \
+        BOOST_PP_CAT(__vector_set_data_action_, name));                       \
 /**/
 
 #define HPX_REGISTER_PARTITIONED_VECTOR(...)                                  \
@@ -448,6 +458,9 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION(                                                      \
         hpx::server::partitioned_vector<type>::get_copied_data_action,        \
         BOOST_PP_CAT(__vector_get_copied_data_action_, name));                \
+    HPX_REGISTER_ACTION(                                                      \
+        hpx::server::partitioned_vector<type>::set_data_action,               \
+        BOOST_PP_CAT(__vector_set_data_action_, name));                       \
     typedef ::hpx::components::simple_component<                              \
         ::hpx::server::partitioned_vector<type>                               \
     > BOOST_PP_CAT(__vector_, name);                                          \
@@ -756,6 +769,28 @@ namespace hpx
             HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::get_copied_data_action>(
                 this->get_id());
+        }
+
+        /// Updates the data owned by the partition_vector
+        /// component.
+        ///
+        /// \return This returns the data of the partition_vector
+        ///
+        void set_data_sync(typename server_type::data_type && other) const
+        {
+            set_data(std::move(other)).get();
+        }
+
+        /// Updates the data owned by the partition_vector
+        /// component.
+        ///
+        /// \return This returns the hpx::future of type void
+        ///
+        hpx::future<void> set_data(typename server_type::data_type && other) const
+        {
+            HPX_ASSERT(this->get_id());
+            return hpx::async<typename server_type::set_data_action>(
+                this->get_id(), std::move(other) );
         }
    };
 }

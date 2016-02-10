@@ -13,7 +13,11 @@
 #include <hpx/util/assert.hpp>
 
 #include <type_traits>
+#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
+#include <boost/shared_ptr.hpp>
+#else
 #include <memory>
+#endif
 
 namespace hpx { namespace components
 {
@@ -68,6 +72,21 @@ namespace hpx { namespace components
                 unpin();
             }
 
+#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+            pinned_ptr(pinned_ptr const&) = delete;
+            pinned_ptr(pinned_ptr &&) = delete;
+
+            pinned_ptr& operator= (pinned_ptr const&) = delete;
+            pinned_ptr& operator= (pinned_ptr &&) = delete;
+#else
+        private:
+            pinned_ptr(pinned_ptr const&);
+            pinned_ptr(pinned_ptr &&);
+
+            pinned_ptr& operator= (pinned_ptr const&);
+            pinned_ptr& operator= (pinned_ptr &&);
+#endif
+
         protected:
             void pin()
             {
@@ -93,11 +112,32 @@ namespace hpx { namespace components
     public:
         pinned_ptr() {}
 
+        pinned_ptr(pinned_ptr && rhs)
+          : data_(std::move(rhs.data_))
+        {}
+
+        pinned_ptr& operator= (pinned_ptr && rhs)
+        {
+            data_ = std::move(rhs.data_);
+            return *this;
+        }
+
         template <typename Component>
         static pinned_ptr create(naming::address::address_type lva)
         {
             return pinned_ptr(lva, id<Component>());
         }
+
+#if !defined(HPX_INTEL_VERSION) || (HPX_INTEL_VERSION > 1400)
+#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+        pinned_ptr(pinned_ptr const&) = delete;
+        pinned_ptr& operator= (pinned_ptr const&) = delete;
+#else
+    private:
+        pinned_ptr(pinned_ptr const&);
+        pinned_ptr& operator= (pinned_ptr const&);
+#endif
+#endif
 
     private:
         template <typename Component>
@@ -105,7 +145,11 @@ namespace hpx { namespace components
           : data_(new detail::pinned_ptr<Component>(lva))
         {}
 
+#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
+        boost::shared_ptr<detail::pinned_ptr_base> data_;
+#else
         std::unique_ptr<detail::pinned_ptr_base> data_;
+#endif
     };
 }}
 

@@ -141,6 +141,8 @@ namespace hpx
 
         /// \cond NOINTERNAL
         last_error,
+
+        system_error_flag = 0x4000L,
         error_upper_bound = 0x7fffL   // force this enum type to be at least 16 bits.
         /// \endcond
     };

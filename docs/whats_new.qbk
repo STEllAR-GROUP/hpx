@@ -54,13 +54,49 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1978] - Fix test check that got broken in hasty fix to memory overflow
+* [pr    1976] - Fixes typo in README.rst
+* [pr    1975] - Reduce size of benchmark timing arrays to fix test failures
+* [pr    1974] - Add action to update data owned by the partitioned_vector
+                 component
+* [pr    1972] - Adding partitioned_vector SPMD example
+* [pr    1971] - Fixing 1965
+* [pr    1970] - Papi fixes
+* [pr    1969] - Fixing continuation recursions to not depend on fixed amount
+                 of recursions
+* [pr    1968] - More segmented algorithms
+* [pr    1966] - Migrate components
+* [issue 1964] - fatal error: 'boost/lockfree/detail/branch_hints.hpp' file
+                 not found
+* [issue 1962] - parallel:copy_if has race condition when used on in place
+                 arrays
+* [pr    1963] - Fixing Static Parcelport initialization
+* [pr    1961] - Fix function target
+* [issue 1960] - Papi counters don't reset
+* [pr    1959] - Fixing 1958
+* [issue 1958] - inclusive_scan gives incorrect results with non-commutative
+                 operator
+* [pr    1957] - Fixing #1950
+* [pr    1956] - Sort by key example
+* [pr    1955] - Adding regression test for #1946: Hang in wait_all() in
+                 distributed run
+* [pr    1953] - Adding performance analysis for AGAS cache
 * [pr    1952] - Adapting test for explicit variadics to fail for gcc 4.6
+* [pr    1951] - Fixing memory leak
+* [issue 1950] - Simplify external builds
+* [pr    1949] - Fixing yet another lock that is being held during suspension
 * [pr    1948] - Fixed container algorithms for Intel
 * [pr    1947] - Adding workaround for tagged_tuple
 * [issue 1946] - Hang in wait_all() in distributed run
 * [pr    1945] - Fixed container algorithm tests
+* [issue 1944] - assertion 'p.destination_locality() == hpx::get_locality()'
+                 failed
 * [pr    1943] - Fix a couple of compile errors with clang
+* [pr    1942] - Making parcel coalescing functional
+* [issue 1941] - Re-enable parcel coalescing
 * [pr    1940] - Touching up make_future
+* [pr    1939] - Fixing problems in over-subscription management in the
+                 resource manager
 * [pr    1938] - Removing use of unified Boost.Thread header
 * [pr    1937] - Cleaning up the use of Boost.Accumulator headers
 * [pr    1936] - Making sure interval timer is started for aggregating
@@ -167,6 +203,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1457] - Implement N4392: C++ Latches and Barriers
 * [issue 1265] - Enable dataflow() to be usable with actions
 * [issue 1236] - NUMA aware allocators
+* [issue  559] - Add hpx::migrate facility
 
 [endsect]
 
