@@ -125,6 +125,8 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
+HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)
+
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
