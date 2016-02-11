@@ -12,6 +12,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
