@@ -86,9 +86,19 @@ namespace hpx { namespace detail
             std::pair<bool, components::pinned_ptr> r;
             if(addr.locality_ == hpx::get_locality())
             {
-                r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
-                if (!r.first)
+                typedef typename Action::component_type component_type;
+                if (traits::component_supports_migration<component_type>::call())
+                {
+                    r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                    if (!r.first)
+                    {
+                        return applier::detail::apply_l_p<Action>(
+                            std::forward<Continuation>(c), id, std::move(addr),
+                            priority, std::forward<Ts>(vs)...);
+                    }
+                }
+                else
                 {
                     return applier::detail::apply_l_p<Action>(
                         std::forward<Continuation>(c), id, std::move(addr),
@@ -167,9 +177,18 @@ namespace hpx { namespace detail
             std::pair<bool, components::pinned_ptr> r;
             if(addr.locality_ == hpx::get_locality())
             {
-                r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
-                if (!r.first)
+                typedef typename Action::component_type component_type;
+                if (traits::component_supports_migration<component_type>::call())
+                {
+                    r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                    if (!r.first)
+                    {
+                        return applier::detail::apply_l_p<Action>(
+                            id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                    }
+                }
+                else
                 {
                     return applier::detail::apply_l_p<Action>(
                         id, std::move(addr), priority, std::forward<Ts>(vs)...);
