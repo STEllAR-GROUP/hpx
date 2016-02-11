@@ -95,11 +95,11 @@ namespace hpx { namespace actions
         virtual manage_object_action_base const& get_instance() const;
 
         // serialization support
-        virtual serialize_save_function save() const
+        virtual serialize_save_function save_function() const
         {
             return &manage_object_action_base::save_;
         }
-        virtual serialize_load_function load() const
+        virtual serialize_load_function load_function() const
         {
             return &manage_object_action_base::load_;
         }
@@ -180,11 +180,11 @@ namespace hpx { namespace actions
         }
 
         // serialization support
-        serialize_save_function save() const
+        serialize_save_function save_function() const
         {
             return &manage_object_action::save_;
         }
-        serialize_load_function load() const
+        serialize_load_function load_function() const
         {
             return &manage_object_action::load_;
         }
@@ -273,11 +273,11 @@ namespace hpx { namespace actions
 
     private:
         // serialization support
-        serialize_save_function save() const
+        serialize_save_function save_function() const
         {
             return &manage_object_action::save_;
         }
-        serialize_load_function load() const
+        serialize_load_function load_function() const
         {
             return &manage_object_action::load_;
         }

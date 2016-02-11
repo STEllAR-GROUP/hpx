@@ -1,5 +1,5 @@
 [/=============================================================================
-    Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (C) 2007-2016 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +7,8 @@
 
 [section:providing Providing Performance Counter Data]
 
-__hpx__ offers several ways by which you may provide your own data as a performance counter.
+__hpx__ offers several ways by which you may provide your own data as a
+performance counter.
 This has the benefit of exposing additional, possibly application specific
 information using the existing Performance Counter framework, unifying the
 process of gathering data about your application.
@@ -31,8 +32,8 @@ expected signature of this function is:
 
     boost::int64_t some_performance_data(bool reset);
 
-The argument `bool reset` (which is supplied by the runtime system when the 
-function is invoked) specifies whether the counter value should be reset after 
+The argument `bool reset` (which is supplied by the runtime system when the
+function is invoked) specifies whether the counter value should be reset after
 evaluating the current value (if applicable).
 
 For instance, here is such a function returning how often it was invoked:
@@ -160,8 +161,8 @@ This base class itself is derived from the `performance_counter` interface
 described above.
 
 
-Additionally, full Performance Counter implementation not only exposes the actual value but
-also provides information about
+Additionally, a full Performance Counter implementation not only exposes the
+actual value but also provides information about
 
 * The point in time a particular value was retrieved
 * A (sequential) invocation count

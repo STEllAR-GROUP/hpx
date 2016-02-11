@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2015 Hartmut Kaiser
+//  Copyright (c) 2012-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -385,23 +385,27 @@ response primary_namespace::begin_migration(
     }
 
     migration_table_type::iterator it = migrating_objects_.find(id);
-    if (it != migrating_objects_.end())
+    if (it == migrating_objects_.end())
     {
-        l.unlock();
-
-        HPX_THROWS_IF(ec, bad_parameter
-            , "primary_namespace::begin_migration"
-            , "cannot start migration of object more than once");
-        return response();
+        std::pair<migration_table_type::iterator, bool> p =
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+            migrating_objects_.emplace(std::piecewise_construct,
+                std::forward_as_tuple(id), std::forward_as_tuple());
+#else
+            migrating_objects_.insert(migration_table_type::value_type(
+                id,
+                hpx::util::make_tuple(
+                    false, 0,
+                    boost::make_shared<lcos::local::condition_variable>()
+                )
+            ));
+#endif
+        HPX_ASSERT(p.second);
+        it = p.first;
     }
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-    migrating_objects_.emplace(std::piecewise_construct,
-        std::forward_as_tuple(id), std::forward_as_tuple());
-#else
-    migrating_objects_.insert(migration_table_type::value_type(
-        id, boost::make_shared<lcos::local::condition_variable>()));
-#endif
+    // flag this id as being migrated
+    hpx::util::get<0>(it->second) = true;
 
     return response(primary_ns_begin_migration, at_c<0>(r), at_c<1>(r), at_c<2>(r));
 }
@@ -415,17 +419,20 @@ response primary_namespace::end_migration(
 
     boost::lock_guard<mutex_type> l(mutex_);
 
+    using hpx::util::get;
+
     migration_table_type::iterator it = migrating_objects_.find(id);
-    if (it == migrating_objects_.end())
+    if (it == migrating_objects_.end() || !get<0>(it->second))
         return response(primary_ns_end_migration, no_success);
 
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-    it->second.notify_all(ec);
+    get<2>(it->second).notify_all(ec);
 #else
-    it->second->notify_all(ec);
+    get<2>(it->second)->notify_all(ec);
 #endif
 
-    migrating_objects_.erase(it);
+    // flag this id as not being migrated anymore
+    get<0>(it->second) = false;
 
     return response(primary_ns_end_migration, success);
 }
@@ -438,14 +445,21 @@ void primary_namespace::wait_for_migration_locked(
 {
     HPX_ASSERT_OWNS_LOCK(l);
 
+    using hpx::util::get;
+
     migration_table_type::iterator it = migrating_objects_.find(id);
-    if (it != migrating_objects_.end())
+    if (it != migrating_objects_.end() && get<0>(it->second))
     {
+        ++get<1>(it->second);
+
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-        it->second.wait(l, ec);
+        get<2>(it->second).wait(l, ec);
 #else
-        it->second->wait(l, ec);
+        get<2>(it->second)->wait(l, ec);
 #endif
+
+        if (--get<1>(it->second) == 0 && !get<0>(it->second))
+            migrating_objects_.erase(it);
     }
 }
 

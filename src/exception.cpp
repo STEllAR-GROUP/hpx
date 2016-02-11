@@ -568,7 +568,7 @@ namespace hpx
             return hpx::diagnostic_information(be);
         }
         catch (...) {
-            return std::string();
+            return std::string("<unknown>");
         }
     }
 
@@ -589,7 +589,7 @@ namespace hpx
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
         std::exception const* se = dynamic_cast<std::exception const*>(&e);
-        return se ? se->what() : std::string();
+        return se ? se->what() : std::string("<unknown>");
     }
 
     std::string get_error_what(boost::exception_ptr const& e)
@@ -603,7 +603,7 @@ namespace hpx
             return hpx::get_error_what(be);
         }
         catch (...) {
-            return std::string();
+            return std::string("<unknown>");
         }
     }
 
@@ -682,7 +682,10 @@ namespace hpx
             return he.get_error();
         }
         catch (boost::system::system_error const& e) {
-            return static_cast<hpx::error>(e.code().value());
+            int code = e.code().value();
+            if (code < success || code >= last_error)
+                code |= system_error_flag;
+            return static_cast<hpx::error>(code);
         }
         catch (...) {
             return unknown_error;

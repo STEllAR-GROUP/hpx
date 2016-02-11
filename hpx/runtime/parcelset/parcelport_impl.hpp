@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -538,7 +538,7 @@ namespace hpx { namespace parcelset
                 new_gids_map::iterator it = gids.find(v.first);
                 if(it == gids.end())
                 {
-                    gids.insert(v);
+                    gids.insert(std::move(v));
                 }
                 else
                 {

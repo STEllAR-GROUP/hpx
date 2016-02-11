@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2013 Hartmut Kaiser
+//  Copyright (c) 2005-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -59,24 +59,39 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__)\
          || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace util { namespace coroutines
-{ namespace detail { namespace posix
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // this global (urghhh) variable is used to control whether guard pages
-    // will be used or not
-    HPX_EXPORT bool use_guard_pages = true;
-}}}}}
+    namespace posix
+    {
+        ///////////////////////////////////////////////////////////////////////
+        // this global (urghhh) variable is used to control whether guard pages
+        // will be used or not
+        HPX_EXPORT bool use_guard_pages = true;
+    }
+}}}}
 #endif
 
 namespace hpx { namespace threads { namespace policies
 {
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
     // startup code
     bool minimal_deadlock_detection = true;
+#endif
+}}}
+
+namespace hpx { namespace lcos { namespace local
+{
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+    ///////////////////////////////////////////////////////////////////////////
+    // We globally control whether to do minimal deadlock detection in
+    // spin-locks using this global bool variable. It will be set once by the
+    // runtime configuration startup code
+    bool spinlock_break_on_deadlock = false;
+    std::size_t spinlock_deadlock_detection_limit =
+        HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
 #endif
 }}}
 
@@ -135,12 +150,21 @@ namespace hpx { namespace util
             "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
 #endif
 #endif
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
             "minimal_deadlock_detection = ${HPX_MINIMAL_DEADLOCK_DETECTION:1}",
 #else
             "minimal_deadlock_detection = ${HPX_MINIMAL_DEADLOCK_DETECTION:0}",
 #endif
+#endif
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+#ifdef HPX_DEBUG
+            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
+#else
+            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
+#endif
+            "spinlick_deadlock_detection_limit = "
+                "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}",
 #endif
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
@@ -437,9 +461,15 @@ namespace hpx { namespace util
         if (enable_global_lock_detection())
             util::enable_global_lock_detection();
 #endif
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
             enable_minimal_deadlock_detection();
+#endif
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+        lcos::local::spinlock_break_on_deadlock =
+            enable_spinlock_deadlock_detection();
+        lcos::local::spinlock_deadlock_detection_limit =
+            get_spinlock_deadlock_detection_limit();
 #endif
     }
 
@@ -491,9 +521,15 @@ namespace hpx { namespace util
         if (enable_global_lock_detection())
             util::enable_global_lock_detection();
 #endif
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
             enable_minimal_deadlock_detection();
+#endif
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+        lcos::local::spinlock_break_on_deadlock =
+            enable_spinlock_deadlock_detection();
+        lcos::local::spinlock_deadlock_detection_limit =
+            get_spinlock_deadlock_detection_limit();
 #endif
     }
 
@@ -709,7 +745,7 @@ namespace hpx { namespace util
     // Enable minimal deadlock detection for HPX threads
     bool runtime_configuration::enable_minimal_deadlock_detection() const
     {
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -731,6 +767,51 @@ namespace hpx { namespace util
 
 #else
         return false;
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool runtime_configuration::enable_spinlock_deadlock_detection() const
+    {
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+#ifdef HPX_DEBUG
+                return hpx::util::get_entry_as<int>(
+                    *sec, "spinlock_deadlock_detection", "1") != 0;
+#else
+                return hpx::util::get_entry_as<int>(
+                    *sec, "spinlock_deadlock_detection", "0") != 0;
+#endif
+            }
+        }
+
+#ifdef HPX_DEBUG
+        return true;
+#else
+        return false;
+#endif
+
+#else
+        return false;
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::size_t runtime_configuration::get_spinlock_deadlock_detection_limit() const
+    {
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return hpx::util::get_entry_as<std::size_t>(
+                    *sec, "spinlick_deadlock_detection_limit", "1000000");
+            }
+        }
+        return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
+#else
+        return std::size_t(-1);
 #endif
     }
 

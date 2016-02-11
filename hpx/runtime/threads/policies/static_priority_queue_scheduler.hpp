@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -114,7 +114,7 @@ namespace hpx { namespace threads { namespace policies
                 idle_loop_count, added) && result;
             if (0 != added) return result;
 
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
             if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
             {

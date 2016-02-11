@@ -56,10 +56,10 @@ instances of components using the following __hpx__ API function:
 * [funcref hpx::components::new_() `hpx::new_<Component>()`]: Create a new
   instance of the given `Component` type on the specified locality.
 
-[note __hpx__ does not expose any functionality to delete component instances. 
-      All global addresses (as represented using `hpx::id_type`) are being
-      automatically garbage collected. When the last (global) reference to 
-      a particular component instance goes out of scope the corresponding 
+[note __hpx__ does not expose any functionality to delete component instances.
+      All global addresses (as represented using `hpx::id_type`) are
+      automatically garbage collected. When the last (global) reference to
+      a particular component instance goes out of scope the corresponding
       component instance is automatically deleted.]
 
 [endsect]

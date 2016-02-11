@@ -207,10 +207,18 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable minimal thread deadlock detection in debug builds only.
-#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#    define HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
 #  endif
+#endif
+#if !defined(HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION)
+#  if defined(HPX_DEBUG)
+//#    define HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+#  endif
+#endif
+#if !defined(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)
+#  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 1000000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -429,7 +437,7 @@
 #    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
-#      define HPX_SMALL_STACK_SIZE  0x10000       // 64kByte
+#      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #    else
 #      define HPX_SMALL_STACK_SIZE  0x8000        // 32kByte
 #    endif

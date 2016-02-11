@@ -241,8 +241,8 @@ namespace hpx { namespace util { namespace coroutines
 
       std::ptrdiff_t get_available_stack_space()
       {
-        return
-          get_stack_ptr() - reinterpret_cast<uintptr_type>(m_stack) - context_size;
+        return get_stack_ptr() - reinterpret_cast<std::size_t>(m_stack) -
+            context_size;
       }
 
       typedef boost::atomic<boost::int64_t> counter_type;

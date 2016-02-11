@@ -52,6 +52,7 @@ namespace hpx
                 bool was_migrated = p->pin_count() == ~0x0u;
                 p->unpin();
 
+                HPX_ASSERT(was_migrated);
                 if (was_migrated)
                 {
                     using components::stubs::runtime_support;
