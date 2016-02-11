@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/latch.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
