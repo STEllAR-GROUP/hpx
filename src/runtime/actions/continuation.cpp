@@ -93,8 +93,8 @@ namespace hpx
         }
     }
 
-    void set_lco_error(naming::id_type const& id, naming::address const& addr, boost::exception_ptr const& e,
-        naming::id_type const& cont, bool move_credits)
+    void set_lco_error(naming::id_type const& id, naming::address const& addr,
+        boost::exception_ptr const& e, naming::id_type const& cont, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
         typedef

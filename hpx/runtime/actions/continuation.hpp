@@ -446,12 +446,14 @@ namespace hpx { namespace actions
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr, F && f)
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type && gid, naming::address addr, F && f)
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 
@@ -558,12 +560,14 @@ namespace hpx { namespace actions
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr, F && f)
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type && gid, naming::address addr, F && f)
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 
