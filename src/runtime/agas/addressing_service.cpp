@@ -1258,7 +1258,7 @@ bool addressing_service::is_local_address_cached(
     naming::gid_type id(naming::detail::get_stripped_gid_except_dont_cache(gid));
 
     {
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
         if (was_object_migrated_locked(id))
         {
             if (&ec != &throws)
@@ -1481,22 +1481,16 @@ bool addressing_service::resolve_full_local(
 
         if (naming::detail::store_in_cache(id))
         {
-            if (addr.address_)
+            HPX_ASSERT(addr.address_);
+            if(range_caching_)
             {
-                if(range_caching_)
-                {
-                    // Put the range into the cache.
-                    update_cache_entry(base_gid, base_gva, ec);
-                }
-                else
-                {
-                    // Put the fully resolved gva into the cache.
-                    update_cache_entry(id, g, ec);
-                }
+                // Put the range into the cache.
+                update_cache_entry(base_gid, base_gva, ec);
             }
             else
             {
-                remove_cache_entry(id, ec);
+                // Put the fully resolved gva into the cache.
+                update_cache_entry(id, g, ec);
             }
         }
 
@@ -2556,10 +2550,10 @@ void addressing_service::remove_cache_entry(
     try {
         LAGAS_(warning) << "addressing_service::remove_cache_entry";
 
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
 
         gva_cache_->erase(
-            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+            [&gid](std::pair<gva_cache_key, gva> const& p)
             {
                 return gid == p.first.get_gid();
             });
@@ -3249,10 +3243,10 @@ hpx::future<void> addressing_service::mark_as_migrated(
 
     // always first grab the AGAS lock before invoking the user supplied
     // function
-    typedef boost::unique_lock<cache_mutex_type> lock_type;
+    typedef boost::unique_lock<mutex_type> lock_type;
 
-    lock_type lock(gva_cache_mtx_);
-    util::ignore_while_checking<lock_type> ignore(&lock);
+    lock_type lock(migrated_objects_mtx_);
+    util::ignore_while_checking<lock_type> il(&lock);
 
     // call the user code for the component instance to be migrated, the
     // returned future becomes ready whenever the component instance can be
@@ -3272,14 +3266,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
             migrated_objects_table_.insert(gid);
 
         // remove entry from cache
-        if (caching_ && naming::detail::store_in_cache(gid_))
-        {
-            gva_cache_->erase(
-                [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
-                {
-                    return gid == p.first.get_gid();
-                });
-        }
+        remove_cache_entry(gid_);
     }
 
     return std::move(result.second);
@@ -3299,7 +3286,7 @@ void addressing_service::unmark_as_migrated(
 
     naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
-    boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
+    mutex_type::scoped_lock lock(migrated_objects_mtx_);
 
     migrated_objects_table_type::iterator it =
         migrated_objects_table_.find(gid);
@@ -3313,7 +3300,7 @@ void addressing_service::unmark_as_migrated(
         if (caching_ && naming::detail::store_in_cache(gid_))
         {
             lock.unlock();
-            remove_cache_entry(gid);
+            remove_cache_entry(gid_);
         }
     }
 }

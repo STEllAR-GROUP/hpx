@@ -1424,6 +1424,13 @@ public:
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
+    void remove_cache_entry(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        );
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
     void clear_cache(
         error_code& ec = throws
         );
