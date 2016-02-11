@@ -1929,7 +1929,7 @@ void addressing_service::route(
     naming::address addr;
     if (is_local_address_cached(target.get_gid(), addr))
     {
-        typedef typename action_type::component_type component_type;
+        typedef action_type::component_type component_type;
         if (traits::component_supports_migration<component_type>::call())
         {
             r = traits::action_was_object_migrated<action_type>::call(

@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace stubs
         if (g.prefix == hpx::get_locality() ||
             agas::is_local_address_cached(gid, addr))
         {
-            typedef typename action_type::component_type component_type;
+            typedef action_type::component_type component_type;
             if (traits::component_supports_migration<component_type>::call())
             {
                 r = traits::action_was_object_migrated<action_type>::call(
