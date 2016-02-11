@@ -61,6 +61,14 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_function
     {
+        // This wrapper is needed to stop infinite recursion when
+        // trying to get the possible additional function decoration
+        // from the component
+        struct action_wrapper
+        {
+            typedef typename Action::component_type component_type;
+        };
+
         static_assert(
             !Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
@@ -89,7 +97,7 @@ namespace hpx { namespace actions { namespace detail
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function),
                 util::placeholders::_1,
-                traits::action_decorate_function<Action>::call(
+                traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
             );
         }
@@ -112,7 +120,7 @@ namespace hpx { namespace actions { namespace detail
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function_future),
                 util::placeholders::_1,
-                traits::action_decorate_function<Action>::call(
+                traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
             );
         }
