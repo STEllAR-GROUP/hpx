@@ -11,6 +11,8 @@
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -1927,9 +1929,26 @@ void addressing_service::route(
     naming::address addr;
     if (is_local_address_cached(target.get_gid(), addr))
     {
-        r = traits::action_was_object_migrated<action_type>::call(
-            target, addr.address_);
-        if (!r.first)
+        typedef typename action_type::component_type component_type;
+        if (traits::component_supports_migration<component_type>::call())
+        {
+            r = traits::action_was_object_migrated<action_type>::call(
+                    target, addr.address_);
+            if (!r.first)
+            {
+                // route through the local AGAS service instance
+                applier::detail::apply_l_p<action_type>(
+                    target, std::move(addr),
+                    local_priority == threads::thread_priority_default ?
+                        action_priority_ : local_priority,
+                    std::move(p));
+
+                // invoke callback
+                f(boost::system::error_code(), parcelset::parcel());
+                return;
+            }
+        }
+        else
         {
             // route through the local AGAS service instance
             applier::detail::apply_l_p<action_type>(
@@ -3291,7 +3310,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
 {
     if (!gid_)
     {
-        return make_exceptional_future<void>(
+        return hpx::make_exceptional_future<void>(
             HPX_GET_EXCEPTION(bad_parameter,
                 "addressing_service::mark_as_migrated",
                 "invalid reference gid"));
@@ -3380,7 +3399,7 @@ addressing_service::begin_migration_async(naming::id_type const& id)
 
     if (!id)
     {
-        return make_exceptional_future<result_type>(
+        return hpx::make_exceptional_future<result_type>(
             HPX_GET_EXCEPTION(bad_parameter,
                 "addressing_service::begin_migration_async",
                 "invalid reference id"));
@@ -3403,7 +3422,7 @@ hpx::future<bool> addressing_service::end_migration_async(
 {
     if (!id)
     {
-        return make_exceptional_future<bool>(
+        return hpx::make_exceptional_future<bool>(
             HPX_GET_EXCEPTION(bad_parameter,
                 "addressing_service::end_migration_async",
                 "invalid reference id"));

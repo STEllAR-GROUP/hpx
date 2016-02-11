@@ -16,6 +16,7 @@
 #include <hpx/util/protect.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 
 #include <boost/mpl/bool.hpp>
@@ -389,12 +390,23 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (agas::is_local_address_cached(id, addr))
             {
+                typedef typename Action::component_type component_type;
                 HPX_ASSERT(traits::component_type_is_compatible<
-                    typename Action::component_type>::call(addr));
+                    component_type>::call(addr));
 
-                r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
-                if (!r.first)
+                if (traits::component_supports_migration<component_type>::call())
+                {
+                    r = traits::action_was_object_migrated<Action>::call(
+                            id, addr.address_);
+                    if (!r.first)
+                    {
+                        // local, direct execution
+                        (*this->impl_)->set_data(action_type::execute_function(
+                            addr.address_, std::forward<Ts>(vs)...));
+                        return;
+                    }
+                }
+                else
                 {
                     // local, direct execution
                     (*this->impl_)->set_data(action_type::execute_function(
@@ -416,12 +428,23 @@ namespace hpx { namespace lcos
 
             if (addr.locality_ == hpx::get_locality())
             {
+                typedef typename Action::component_type component_type;
                 HPX_ASSERT(traits::component_type_is_compatible<
-                    typename Action::component_type>::call(addr));
+                    component_type>::call(addr));
 
-                r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
-                if (!r.first)
+                if (traits::component_supports_migration<component_type>::call())
+                {
+                    r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                    if (!r.first)
+                    {
+                        // local, direct execution
+                        (*this->impl_)->set_data(action_type::execute_function(
+                            addr.address_, std::forward<Ts>(vs)...));
+                        return;
+                    }
+                }
+                else
                 {
                     // local, direct execution
                     (*this->impl_)->set_data(action_type::execute_function(
@@ -444,12 +467,26 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (agas::is_local_address_cached(id, addr))
             {
+                typedef typename Action::component_type component_type;
                 HPX_ASSERT(traits::component_type_is_compatible<
-                    typename Action::component_type>::call(addr));
+                    component_type>::call(addr));
 
-                r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
-                if (!r.first)
+                if (traits::component_supports_migration<component_type>::call())
+                {
+                    r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                    if (!r.first)
+                    {
+                        // local, direct execution
+                        (*this->impl_)->set_data(action_type::execute_function(
+                            addr.address_, std::forward<Ts>(vs)...));
+
+                        // invoke callback
+                        cb(boost::system::error_code(), parcelset::parcel());
+                        return;
+                    }
+                }
+                else
                 {
                     // local, direct execution
                     (*this->impl_)->set_data(action_type::execute_function(
@@ -474,12 +511,26 @@ namespace hpx { namespace lcos
 
             if (addr.locality_ == hpx::get_locality())
             {
+                typedef typename Action::component_type component_type;
                 HPX_ASSERT(traits::component_type_is_compatible<
-                    typename Action::component_type>::call(addr));
+                    component_type>::call(addr));
 
-                r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
-                if (!r.first)
+                if (traits::component_supports_migration<component_type>::call())
+                {
+                    r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                    if (!r.first)
+                    {
+                        // local, direct execution
+                        (*this->impl_)->set_data(action_type::execute_function(
+                            addr.address_, std::forward<Ts>(vs)...));
+
+                        // invoke callback
+                        cb(boost::system::error_code(), parcelset::parcel());
+                        return;
+                    }
+                }
+                else
                 {
                     // local, direct execution
                     (*this->impl_)->set_data(action_type::execute_function(

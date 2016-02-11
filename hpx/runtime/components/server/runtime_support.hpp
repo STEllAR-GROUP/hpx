@@ -316,24 +316,6 @@ namespace hpx { namespace components { namespace server
 
         void remove_here_from_connection_cache();
 
-        /// This is the default hook implementation for decorate_action which
-        /// does no hooking at all.
-        template <typename F>
-        static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
-        {
-            return std::forward<F>(f);
-        }
-
-        /// This is the default hook implementation for schedule_thread which
-        /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
-            threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
-        {
-            hpx::threads::register_work_plain(data, initial_state); //-V106
-        }
-
         ///////////////////////////////////////////////////////////////////////
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,

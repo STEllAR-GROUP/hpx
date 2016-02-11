@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/util/move.hpp>
 
@@ -40,9 +41,19 @@ namespace hpx { namespace detail
         naming::address addr;
         if (agas::is_local_address_cached(id, addr))
         {
-            r = traits::action_was_object_migrated<Action>::call(
-                id, addr.address_);
-            if (!r.first)
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    return applier::detail::apply_l_p<Action>(
+                        std::forward<Continuation>(c), id, std::move(addr),
+                        priority, std::forward<Ts>(vs)...);
+                }
+            }
+            else
             {
                 return applier::detail::apply_l_p<Action>(
                     std::forward<Continuation>(c), id, std::move(addr),
@@ -115,9 +126,18 @@ namespace hpx { namespace detail
         naming::address addr;
         if (agas::is_local_address_cached(id, addr))
         {
-            r = traits::action_was_object_migrated<Action>::call(
-                id, addr.address_);
-            if (!r.first)
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    return applier::detail::apply_l_p<Action>(
+                        id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                }
+            }
+            else
             {
                 return applier::detail::apply_l_p<Action>(
                     id, std::move(addr), priority, std::forward<Ts>(vs)...);
@@ -187,8 +207,23 @@ namespace hpx { namespace detail
         naming::address addr;
         if (agas::is_local_address_cached(id, addr))
         {
-            r = traits::action_was_object_migrated<Action>::call(id, addr.address_);
-            if (!r.first)
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    bool result = applier::detail::apply_l_p<Action>(
+                        std::forward<Continuation>(c), id, std::move(addr),
+                        priority, std::forward<Ts>(vs)...);
+
+                    // invoke callback
+                    cb(boost::system::error_code(), parcelset::parcel());
+                    return result;
+                }
+            }
+            else
             {
                 bool result = applier::detail::apply_l_p<Action>(
                     std::forward<Continuation>(c), id, std::move(addr),
@@ -218,16 +253,28 @@ namespace hpx { namespace detail
             return false;
         }
 
-
         std::pair<bool, components::pinned_ptr> r;
 
         // Determine whether the id is local or remote
         naming::address addr;
         if (agas::is_local_address_cached(id, addr))
         {
-            r = traits::action_was_object_migrated<Action>::call(
-                id, addr.address_);
-            if (!r.first)
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    bool result = applier::detail::apply_l_p<Action>(
+                        id, std::move(addr),  priority, std::forward<Ts>(vs)...);
+
+                    // invoke callback
+                    cb(boost::system::error_code(), parcelset::parcel());
+                    return result;
+                }
+            }
+            else
             {
                 bool result = applier::detail::apply_l_p<Action>(
                     id, std::move(addr),  priority, std::forward<Ts>(vs)...);

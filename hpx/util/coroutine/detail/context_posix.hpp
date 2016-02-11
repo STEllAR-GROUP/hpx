@@ -59,6 +59,7 @@
 
 #include "pth/pth.h"
 #include <cerrno>
+#include <limits>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
@@ -241,10 +242,9 @@ namespace hpx { namespace util { namespace coroutines {
         std::ptrdiff_t get_available_stack_space()
         {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-                return
-                    get_stack_ptr() - reinterpret_cast<uintptr_type>(m_stack);
+            return get_stack_ptr() - reinterpret_cast<std::size_t>(m_stack);
 #else
-                return (std::numeric_limits<std::ptrdiff_t>::max)();
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif
         }
 

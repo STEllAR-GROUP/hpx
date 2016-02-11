@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -224,24 +224,6 @@ namespace hpx { namespace components
         }
 #endif
 
-        /// This is the default hook implementation for decorate_action which
-        /// does no hooking at all.
-        template <typename F>
-        static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
-        {
-            return std::forward<F>(f);
-        }
-
-        /// This is the default hook implementation for schedule_thread which
-        /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
-            threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
-        {
-            hpx::threads::register_work_plain(data, initial_state); //-V106
-        }
-
 #if defined(HPX_HAVE_SECURITY)
         static components::security::capability get_required_capabilities(
             components::security::traits::capability<>::capabilities caps)
@@ -249,15 +231,6 @@ namespace hpx { namespace components
             return components::default_component_creation_capabilities(caps);
         }
 #endif
-
-        // This component type requires valid id for its actions to be invoked
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return !naming::is_locality(id);
-        }
-
-        // This component type does not support migration.
-        static HPX_CONSTEXPR bool supports_migration() { return false; }
 
         // Pinning functionality
         void pin() {}

@@ -15,7 +15,7 @@ namespace hpx { namespace traits
         // wraps int so that int argument is favored over wrap_int
         struct wrap_int
         {
-            wrap_int(int) {}
+            HPX_CONSTEXPR wrap_int(int) {}
         };
     }
 
@@ -42,6 +42,9 @@ namespace hpx { namespace traits
 
     template <typename Component, typename Enable = void>
     struct component_type_is_compatible;
+
+    template <typename Component, typename Enable = void>
+    struct component_supports_migration;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>

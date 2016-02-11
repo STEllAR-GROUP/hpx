@@ -103,13 +103,13 @@ namespace hpx
     {
         char const* const copyright =
             "HPX - High Performance ParalleX\n"
-            "A general purpose parallel C++ runtime system for\
-             distributed applications\n"
+            "A general purpose parallel C++ runtime system for "
+            "distributed applications\n"
             "of any scale.\n\n"
             "Copyright (c) 2007-2016, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
-            "Distributed under the Boost Software License, \
-             Version 1.0. (See accompanying\n"
+            "Distributed under the Boost Software License, "
+            "Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
         return copyright;
     }

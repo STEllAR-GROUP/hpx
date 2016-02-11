@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -55,12 +55,6 @@ namespace hpx { namespace actions
             return name.str();
         }
 
-        // Let the component decide whether the id is valid
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return Component::is_target_valid(id);
-        }
-
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva, Ts&&... vs)
         {
@@ -92,12 +86,6 @@ namespace hpx { namespace actions
                  << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
                  << ")";
             return name.str();
-        }
-
-        // Let the component decide whether the id is valid
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return Component::is_target_valid(id);
         }
 
         template <typename ...Ts>

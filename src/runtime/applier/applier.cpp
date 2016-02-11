@@ -494,7 +494,7 @@ namespace hpx { namespace applier
                 client.route(
                     std::move(p),
                     util::bind(&detail::parcel_sent_handler,
-                        std::ref(parcel_handler_),
+                        boost::ref(parcel_handler_),
                         util::placeholders::_1, util::placeholders::_2),
                     threads::thread_priority_normal);
                 break;

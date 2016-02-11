@@ -37,18 +37,10 @@ namespace hpx { namespace actions
     {
         struct plain_function
         {
-            template <typename F>
-            static threads::thread_function_type
-            decorate_action(naming::address_type, F && f)
+            // Only localities are valid targets for a plain action
+            static bool is_target_valid(naming::id_type const& id)
             {
-                return std::forward<F>(f);
-            }
-
-            static void schedule_thread(naming::address_type,
-                threads::thread_init_data& data,
-                threads::thread_state_enum initial_state)
-            {
-                hpx::threads::register_work_plain(data, initial_state); //-V106
+                return naming::is_locality(id);
             }
         };
     }
@@ -72,12 +64,6 @@ namespace hpx { namespace actions
             std::stringstream name;
             name << "plain action(" << detail::get_action_name<Derived>() << ")";
             return name.str();
-        }
-
-        // Only localities are valid targets for a plain action
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return naming::is_locality(id);
         }
 
         template <typename ...Ts>

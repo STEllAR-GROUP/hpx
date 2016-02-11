@@ -158,7 +158,8 @@ namespace hpx { namespace components
                 util::one_shot(&migration_support::thread_function),
                 get_lva<this_component_type>::call(lva),
                 util::placeholders::_1,
-                base_type::decorate_action(lva, std::forward<F>(f)),
+                traits::action_decorate_function<base_type>::call(
+                    lva, std::forward<F>(f)),
                 components::pinned_ptr::create<this_component_type>(lva));
         }
 
