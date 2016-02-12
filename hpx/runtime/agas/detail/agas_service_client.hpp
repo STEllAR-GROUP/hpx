@@ -75,7 +75,7 @@ namespace hpx { namespace agas { namespace detail
           , threads::thread_priority priority
           , error_code& ec) = 0;
 
-        virtual response symbol_service(
+        virtual response service_symbol(
             request const& req
           , threads::thread_priority priority
           , std::string const& name

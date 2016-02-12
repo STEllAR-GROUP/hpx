@@ -61,14 +61,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         void(std::string const&, components::component_type)
     > iterate_types_function_type;
 
-    typedef hpx::lcos::local::spinlock cache_mutex_type;
     typedef hpx::lcos::local::spinlock mutex_type;
     // }}}
 
     // {{{ gva cache
     struct gva_cache_key;
-    struct gva_erase_policy;
-    typedef boost::cache::entries::lfu_entry<gva> gva_entry_type;
 
     typedef boost::cache::lru_cache<
         gva_cache_key
@@ -80,7 +77,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef std::set<naming::gid_type> migrated_objects_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
-    mutable cache_mutex_type gva_cache_mtx_;
+    mutable mutex_type gva_cache_mtx_;
     boost::shared_ptr<gva_cache_type> gva_cache_;
 
     mutable mutex_type migrated_objects_mtx_;

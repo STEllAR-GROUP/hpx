@@ -46,7 +46,6 @@
 
 namespace hpx { namespace agas
 {
-
 struct addressing_service::gva_cache_key
 { // {{{ gva_cache_key implementation
   private:
@@ -1325,12 +1324,12 @@ bool addressing_service::resolve_cached(
     // force routing if target object was migrated
     {
         boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
-    if (was_object_migrated_locked(id))
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return false;
-    }
+        if (was_object_migrated_locked(id))
+        {
+            if (&ec != &throws)
+                ec = make_success_code();
+            return false;
+        }
     }
 
     // first look up the requested item in the cache
@@ -1907,7 +1906,7 @@ bool addressing_service::register_name(
 { // {{{
     try {
         request req(symbol_ns_bind, name, id);
-        response rep = client_->symbol_service(req, action_priority_, name, ec);
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         return !ec && (success == rep.get_status());
     }
@@ -1965,7 +1964,7 @@ bool addressing_service::unregister_name(
 { // {{{
     try {
         request req(symbol_ns_unbind, name);
-        response rep = client_->symbol_service(req, action_priority_, name, ec);
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2000,7 +1999,7 @@ bool addressing_service::resolve_name(
 { // {{{
     try {
         request req(symbol_ns_resolve, name);
-        response rep = client_->symbol_service(req, action_priority_, name, ec);
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2493,7 +2492,7 @@ bool addressing_service::retrieve_statistics_counter(
 
         // compose request
         request req(service_code, name);
-        response rep= client_->symbol_service(req, action_priority_, name, ec);
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {

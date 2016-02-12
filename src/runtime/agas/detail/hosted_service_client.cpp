@@ -109,7 +109,7 @@ namespace hpx { namespace agas { namespace detail
         return data_.locality_ns_.service(req, priority, ec);
     }
 
-    response hosted_service_client::symbol_service(
+    response hosted_service_client::service_symbol(
         request const& req
       , threads::thread_priority priority
       , std::string const& name

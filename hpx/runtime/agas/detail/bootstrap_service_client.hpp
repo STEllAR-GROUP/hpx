@@ -129,17 +129,17 @@ namespace hpx { namespace agas { namespace detail
         response service_locality(
             request const& req
           , threads::thread_priority priority
-          , error_code& ec);
+            , error_code& ec);
+
+        response service_symbol(
+            request const& req
+            , threads::thread_priority priority
+            , std::string const& name
+            , error_code& ec);
 
         future<parcelset::endpoints_type> get_endpoints(
             request const& req
           , threads::thread_priority priority
-          , error_code& ec);
-
-        response symbol_service(
-            request const& req
-          , threads::thread_priority priority
-          , std::string const& name
           , error_code& ec);
 
         bootstrap_data_type data_;
