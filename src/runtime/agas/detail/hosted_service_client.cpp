@@ -36,16 +36,10 @@ namespace hpx { namespace agas { namespace detail
             return data_.locality_ns_.service(req, priority, ec);
 
         HPX_THROWS_IF(ec, bad_action_code
-            , "addressing_service::service"
-            , "invalid action code encountered in request")
-            return response();
-    }
+          , "addressing_service::service"
+          , "invalid action code encountered in request");
 
-    std::vector<response> hosted_service_client::bulk_service(
-        std::vector<request> const& reqs
-      , error_code& ec)
-    {
-        return data_.primary_ns_server_.bulk_service(reqs, ec);
+        return response();
     }
 
     void hosted_service_client::register_counter_types()

@@ -89,10 +89,6 @@ namespace hpx { namespace agas { namespace detail
           , threads::thread_priority priority
           , error_code& ec);
 
-        std::vector<response> bulk_service(
-            std::vector<request> const& reqs
-          , error_code& ec);
-
         void register_counter_types();
 
         void register_server_instance(

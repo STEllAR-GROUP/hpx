@@ -366,7 +366,7 @@ std::vector<response> addressing_service::bulk_service(
     // most requests will end up there anyways. The primary namespace will
     // route the requests to other namespaces (and the other namespaces would
     // also route requests intended for the primary namespace).
-    return client_->bulk_service(req, ec);
+    return client_->service_primary_bulk(req, ec);
 } // }}}
 
 bool addressing_service::register_locality(
@@ -1528,7 +1528,7 @@ bool addressing_service::resolve_full_local(
             return true;
         }
 
-        std::vector<response> reps = client_->bulk_service(reqs, ec);
+        std::vector<response> reps = client_->service_primary_bulk(reqs, ec);
 
         if (ec)
             return false;
@@ -1904,7 +1904,7 @@ bool addressing_service::register_name(
     )
 { // {{{
     try {
-        request req(symbol_ns_bind, name, id);
+        request req(symbol_ns_bind, name, naming::detail::get_stripped_gid(id));
         response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         return !ec && (success == rep.get_status());
