@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,9 +10,11 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 #include <algorithm>
+#include <utility>
 
 namespace hpx { namespace agas
 {
@@ -24,8 +26,7 @@ bool register_name_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-    return agas_.register_name(name, gid_);
+    return agas_.register_name(name, gid);
 }
 
 bool register_name_sync(
@@ -94,12 +95,7 @@ bool resolve_name_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-
-    if (agas_.resolve_name(name, gid_, ec) && !ec)
-        return true;
-
-    return false;
+    return agas_.resolve_name(name, gid, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,8 +248,7 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-    return naming::get_agas_client().is_local_address_cached(gid_, ec);
+    return naming::get_agas_client().is_local_address_cached(gid, ec);
 }
 
 bool is_local_address_cached(
@@ -262,8 +257,7 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-    return naming::get_agas_client().is_local_address_cached(gid_, addr, ec);
+    return naming::get_agas_client().is_local_address_cached(gid, addr, ec);
 }
 
 bool is_local_lva_encoded_address(
@@ -298,8 +292,7 @@ hpx::future<bool> bind(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-    return agas_.bind_async(gid_, addr, locality_id);
+    return agas_.bind_async(gid, addr, locality_id);
 }
 
 bool bind_sync(
@@ -310,8 +303,17 @@ bool bind_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-    return agas_.bind_async(gid_, addr, locality_id).get(ec);
+    return agas_.bind_async(gid, addr, locality_id).get(ec);
+}
+
+hpx::future<bool> bind(
+    naming::gid_type const& gid
+  , naming::address const& addr
+  , naming::gid_type const& locality_
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.bind_async(gid, addr, locality_);
 }
 
 bool bind_sync(
@@ -322,8 +324,26 @@ bool bind_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-    return agas_.bind_async(gid_, addr, locality_).get(ec);
+    return agas_.bind_async(gid, addr, locality_).get(ec);
+}
+
+hpx::future<naming::address> unbind(
+    naming::gid_type const& id
+  , boost::uint64_t count
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.unbind_range_async(id);
+}
+
+naming::address unbind_sync(
+    naming::gid_type const& id
+  , boost::uint64_t count
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.unbind_range_async(id).get(ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -425,8 +445,7 @@ void decref(
   )
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
-    resolver.decref(gid_, credits, ec);
+    resolver.decref(gid, credits, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -439,13 +458,12 @@ hpx::future<boost::int64_t> incref_async(
     HPX_ASSERT(!naming::detail::is_locked(gid));
 
     naming::resolver_client& resolver = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
 
     if (keep_alive_)
-        return resolver.incref_async(gid_, credits, keep_alive_);
+        return resolver.incref_async(gid, credits, keep_alive_);
 
     naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
-    return resolver.incref_async(gid_, credits, keep_alive);
+    return resolver.incref_async(gid, credits, keep_alive);
 }
 
 boost::int64_t incref(
@@ -458,13 +476,12 @@ boost::int64_t incref(
     HPX_ASSERT(!naming::detail::is_locked(gid));
 
     naming::resolver_client& resolver = naming::get_agas_client();
-    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
 
     if (keep_alive_)
-        return resolver.incref_async(gid_, credits, keep_alive_).get();
+        return resolver.incref_async(gid, credits, keep_alive_).get();
 
     naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
-    return resolver.incref_async(gid_, credits, keep_alive).get();
+    return resolver.incref_async(gid, credits, keep_alive).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -493,17 +510,37 @@ hpx::future<hpx::id_type> on_symbol_namespace_event(
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<std::pair<naming::id_type, naming::address> >
-    begin_migration(naming::id_type const& id,
-        naming::id_type const& target_locality)
+    begin_migration(naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.begin_migration_async(id, target_locality);
+    return resolver.begin_migration_async(id);
 }
 
 hpx::future<bool> end_migration(naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.end_migration_async(id);
+}
+
+hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
+    util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.mark_as_migrated(gid, std::move(f));
+}
+
+std::pair<bool, components::pinned_ptr>
+    was_object_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<components::pinned_ptr()> && f)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.was_object_migrated(gid, std::move(f));
+}
+
+void unmark_as_migrated(naming::gid_type const& gid)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.unmark_as_migrated(gid);
 }
 
 }}

@@ -255,7 +255,62 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             hpx::future<void> result =
                 executor_traits<executor_type>::async_execute(
-                    policy_.executor(), std::move(f));
+                    policy_.executor(), std::forward<F>(f));
+
+            boost::lock_guard<mutex_type> l(mtx_);
+            tasks_.push_back(std::move(result));
+        }
+
+        /// Causes the expression f() to be invoked asynchronously using the
+        /// given executor.
+        /// The invocation of f is permitted to run on an unspecified thread
+        /// associated with the given executor and in an unordered fashion
+        /// relative to the sequence of operations following the call to
+        /// run(exec, f) (the continuation), or indeterminately sequenced
+        /// within the same thread as the continuation.
+        ///
+        /// The call to \a run synchronizes with the invocation of f. The
+        /// completion of f() synchronizes with the next invocation of wait on
+        /// the same task_block or completion of the nearest enclosing
+        /// task block (i.e., the \a define_task_block or
+        /// \a define_task_block_restore_thread that created this task block).
+        ///
+        /// Requires: Executor shall be a type modeling the Executor concept.
+        ///           F shall be MoveConstructible. The expression, (void)f(),
+        ///           shall be well-formed.
+        ///
+        /// Precondition: this shall be the active task_block.
+        ///
+        /// Postconditions: A call to run may return on a different thread than
+        ///                 that on which it was called.
+        ///
+        /// \note The call to \a run is sequenced before the continuation as if
+        ///       \a run returns on the same thread.
+        ///       The invocation of the user-supplied callable object f may be
+        ///       immediate or may be delayed until compute resources are
+        ///       available. \a run might or might not return before invocation
+        ///       of f completes.
+        ///
+        /// \throw This function may throw \a task_canceled_exception, as
+        ///        described in Exception Handling.
+        ///
+        template <typename Executor, typename F>
+        void run(Executor& exec, F && f)
+        {
+            // The proposal requires that the task_block should be
+            // 'active' to be usable.
+            if (id_ != threads::get_self_id())
+            {
+                HPX_THROW_EXCEPTION(task_block_not_active,
+                    "task_block::run",
+                    "the task_block is not active");
+            }
+
+            typedef typename ExPolicy::executor_type executor_type;
+
+            hpx::future<void> result =
+                executor_traits<Executor>::async_execute(
+                    exec, std::forward<F>(f));
 
             boost::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));

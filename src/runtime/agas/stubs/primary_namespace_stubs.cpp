@@ -7,6 +7,10 @@
 
 #include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/agas/request.hpp>
+#include <hpx/runtime/agas/response.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {
@@ -53,6 +57,13 @@ template lcos::future<naming::id_type>
       , threads::thread_priority priority
         );
 
+template lcos::future<naming::address>
+    primary_namespace::service_async<naming::address>(
+        naming::id_type const& gid
+      , request const& req
+      , threads::thread_priority priority
+        );
+
 template lcos::future<std::pair<naming::id_type, naming::address> >
     primary_namespace::service_async<std::pair<naming::id_type, naming::address> >(
     naming::id_type const& gid
@@ -85,25 +96,25 @@ void primary_namespace::service_non_blocking(
 lcos::future<std::vector<response> >
     primary_namespace::bulk_service_async(
         naming::id_type const& gid
-      , std::vector<request> const& reqs
+      , std::vector<request> reqs
       , threads::thread_priority priority
         )
 {
     typedef server_type::bulk_service_action action_type;
 
     lcos::packaged_action<action_type> p;
-    p.apply_p(gid, priority, reqs);
+    p.apply_p(gid, priority, std::move(reqs));
     return p.get_future();
 }
 
 void primary_namespace::bulk_service_non_blocking(
    naming::id_type const& gid
-  , std::vector<request> const& reqs
+  , std::vector<request> reqs
   , threads::thread_priority priority
     )
 {
     typedef server_type::bulk_service_action action_type;
-    hpx::apply_p<action_type>(gid, priority, reqs);
+    hpx::apply_p<action_type>(gid, priority, std::move(reqs));
 }
 
 }}}

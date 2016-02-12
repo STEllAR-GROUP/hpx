@@ -48,7 +48,7 @@ namespace hpx { namespace agas { namespace server
                 wait_for_migration_locked(l, gid, ec);
 
                 cache_addresses.push_back(resolve_gid_locked(l, gid, ec));
-                resolved_type const& r = cache_addresses.back();
+                resolved_type& r = cache_addresses.back();
 
                 if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
                 {
@@ -62,6 +62,13 @@ namespace hpx { namespace agas { namespace server
                             ) % id));
 
                     return response(primary_ns_route, no_success);
+                }
+
+                // retain don't store in cache flag
+                if (!naming::detail::store_in_cache(gid))
+                {
+                    naming::detail::set_dont_store_in_cache(
+                        boost::fusion::at_c<0>(r));
                 }
 
                 gva const g = boost::fusion::at_c<1>(r).resolve(

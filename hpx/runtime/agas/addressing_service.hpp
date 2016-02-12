@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Parsa Amini
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,8 +20,10 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
@@ -862,6 +865,11 @@ public:
       , error_code& ec = throws
         );
 
+    hpx::future<naming::address> unbind_range_async(
+        naming::gid_type const& lower_id
+      , boost::uint64_t count = 1
+        );
+
     /// \brief Test whether the given address refers to a local object.
     ///
     /// This function will test whether the given address refers to an object
@@ -1136,7 +1144,8 @@ public:
         parcelset::parcel p
       , util::function_nonser<void(boost::system::error_code const&,
             parcelset::parcel const&)> &&
-        );
+      , threads::thread_priority local_priority =
+            threads::thread_priority_default);
 
     /// \brief Increment the global reference count for the given id
     ///
@@ -1445,14 +1454,22 @@ public:
     ///
     /// \returns Current locality and address of the object to migrate
     hpx::future<std::pair<naming::id_type, naming::address> >
-        begin_migration_async(
-            naming::id_type const& id
-          , naming::id_type const& target_locality
-            );
+        begin_migration_async(naming::id_type const& id);
     hpx::future<bool> end_migration_async(naming::id_type const& id);
 
     /// Maintain list of migrated objects
-    bool was_object_migrated(naming::id_type const* ids, std::size_t size);
+    std::pair<bool, components::pinned_ptr>
+        was_object_migrated(naming::gid_type const& gid,
+            util::unique_function_nonser<components::pinned_ptr()> && f);
+
+    /// Mark the given object as being migrated (if the object is unpinned).
+    /// Delay migration until the object is unpinned otherwise.
+    hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<
+            std::pair<bool, hpx::future<void> >()> && f);
+
+    /// Remove the given object from the table of migrated objects
+    void unmark_as_migrated(naming::gid_type const& gid);
 };
 
 }}

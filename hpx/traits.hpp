@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,15 @@
 
 namespace hpx { namespace traits
 {
+    namespace detail
+    {
+        // wraps int so that int argument is favored over wrap_int
+        struct wrap_int
+        {
+            HPX_CONSTEXPR wrap_int(int) {}
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename Enable = void>
     struct promise_remote_result;
@@ -33,6 +42,9 @@ namespace hpx { namespace traits
 
     template <typename Component, typename Enable = void>
     struct component_type_is_compatible;
+
+    template <typename Component, typename Enable = void>
+    struct component_supports_migration;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
@@ -104,6 +116,9 @@ namespace hpx { namespace traits
 
     template <typename Action, typename Enable = void>
     struct action_schedule_thread;
+
+    template <typename Action, typename Enable = void>
+    struct action_was_object_migrated;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename A, typename Enable = void>

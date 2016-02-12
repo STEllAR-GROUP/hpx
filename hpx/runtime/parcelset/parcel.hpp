@@ -352,6 +352,10 @@ namespace hpx { namespace parcelset
         {
             return std::move(cont_);
         }
+        void set_continuation(std::unique_ptr<actions::continuation> cont)
+        {
+            cont_ = std::move(cont);
+        }
 
         naming::id_type const& source_id() const
         {

@@ -1,5 +1,6 @@
 [/=============================================================================
     Copyright (C) 2012 Bryce Adelstein-Lelbach
+    Copyright (C) 2007-2016 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -139,15 +140,13 @@ allowing to compose several futures in a more flexible way.
 [table Facilities for Composing hpx::futures
  [[Facility][Description][Comment]]
  [[[funcref hpx::when_any `hpx::when_any`],[br]
-   [funcref hpx::when_any_n `hpx::when_any_n`],[br]
-   [funcref hpx::when_any_back `hpx::when_any_back`],[br]
-   [funcref hpx::when_any_back_n `hpx::when_any_back_n`]]
+   [funcref hpx::when_any_n `hpx::when_any_n`]]
   [Asynchronously wait for at least one of multiple future or shared_future
    objects to finish.][__cpp11_n4107__, `..._n` versions are __hpx__ only]]
  [[[funcref hpx::wait_any `hpx::wait_any`],[br]
    [funcref hpx::wait_any_n `hpx::wait_any_n`]]
   [Synchronously wait for at least one of multiple future or shared_future
-   objects to finish.][__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+   objects to finish.][__hpx__ only]]
 
  [[[funcref hpx::when_all `hpx::when_all`],[br]
    [funcref hpx::when_all_n `hpx::when_all_n`]]
@@ -156,7 +155,7 @@ allowing to compose several futures in a more flexible way.
  [[[funcref hpx::wait_all `hpx::wait_all`],[br]
    [funcref hpx::wait_all_n `hpx::wait_all_n`]]
   [Synchronously wait for all future and shared_future objects to finish.]
-  [__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+  [__hpx__ only]]
 
  [[[funcref hpx::when_some `hpx::when_some`],[br]
    [funcref hpx::when_some_n `hpx::when_some_n`]]

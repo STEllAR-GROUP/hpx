@@ -19,6 +19,7 @@ namespace hpx { namespace traits
     {
         struct fixed_component_tag {};
         struct simple_component_tag {};
+        struct component_tag : simple_component_tag {};
         struct managed_component_tag {};
     }
 

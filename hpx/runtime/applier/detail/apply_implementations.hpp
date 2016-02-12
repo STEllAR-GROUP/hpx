@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,7 +12,11 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/util/move.hpp>
+
+#include <utility>
 
 namespace hpx { namespace detail
 {
@@ -31,11 +35,30 @@ namespace hpx { namespace detail
             return false;
         }
 
+        std::pair<bool, components::pinned_ptr> r;
+
         // Determine whether the id is local or remote
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr)) {
-            return applier::detail::apply_l_p<Action>(std::forward<Continuation>(c),
-                id, std::move(addr), priority, std::forward<Ts>(vs)...);
+        if (agas::is_local_address_cached(id, addr))
+        {
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    return applier::detail::apply_l_p<Action>(
+                        std::forward<Continuation>(c), id, std::move(addr),
+                        priority, std::forward<Ts>(vs)...);
+                }
+            }
+            else
+            {
+                return applier::detail::apply_l_p<Action>(
+                    std::forward<Continuation>(c), id, std::move(addr),
+                    priority, std::forward<Ts>(vs)...);
+            }
         }
 
         // apply remotely
@@ -44,8 +67,8 @@ namespace hpx { namespace detail
     }
 
     template <typename Action, typename ...Ts>
-    bool apply_impl(hpx::id_type const& id,
-        threads::thread_priority priority, Ts&&... vs)
+    bool apply_impl(hpx::id_type const& id, threads::thread_priority priority,
+        Ts &&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
@@ -55,11 +78,28 @@ namespace hpx { namespace detail
             return false;
         }
 
+        std::pair<bool, components::pinned_ptr> r;
+
         // Determine whether the id is local or remote
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr)) {
-            return applier::detail::apply_l_p<Action>(
-                id, std::move(addr), priority, std::forward<Ts>(vs)...);
+        if (agas::is_local_address_cached(id, addr))
+        {
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    return applier::detail::apply_l_p<Action>(
+                        id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                }
+            }
+            else
+            {
+                return applier::detail::apply_l_p<Action>(
+                    id, std::move(addr), priority, std::forward<Ts>(vs)...);
+            }
         }
 
         // apply remotely
@@ -82,17 +122,38 @@ namespace hpx { namespace detail
             return false;
         }
 
-        // Determine whether the gid is local or remote
-        naming::address addr;
-        if (agas::is_local_address_cached(id, addr)) {
-            // apply locally
-            bool result = applier::detail::apply_l_p<Action>(
-                std::forward<Continuation>(c), id, std::move(addr), priority,
-                std::forward<Ts>(vs)...);
+        std::pair<bool, components::pinned_ptr> r;
 
-            // invoke callback
-            cb(boost::system::error_code(), parcelset::parcel());
-            return result;
+        // Determine whether the id is local or remote
+        naming::address addr;
+        if (agas::is_local_address_cached(id, addr))
+        {
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    bool result = applier::detail::apply_l_p<Action>(
+                        std::forward<Continuation>(c), id, std::move(addr),
+                        priority, std::forward<Ts>(vs)...);
+
+                    // invoke callback
+                    cb(boost::system::error_code(), parcelset::parcel());
+                    return result;
+                }
+            }
+            else
+            {
+                bool result = applier::detail::apply_l_p<Action>(
+                    std::forward<Continuation>(c), id, std::move(addr),
+                    priority, std::forward<Ts>(vs)...);
+
+                // invoke callback
+                cb(boost::system::error_code(), parcelset::parcel());
+                return result;
+            }
         }
 
         // apply remotely
@@ -113,17 +174,36 @@ namespace hpx { namespace detail
             return false;
         }
 
-        // Determine whether the gid is local or remote
-        naming::address addr;
-        if (agas::is_local_address_cached(id, addr)) {
-            // apply locally
-            bool result = applier::detail::apply_l_p<Action>(
-                id, std::move(addr), priority,
-                std::forward<Ts>(vs)...);
+        std::pair<bool, components::pinned_ptr> r;
 
-            // invoke callback
-            cb(boost::system::error_code(), parcelset::parcel());
-            return result;
+        // Determine whether the id is local or remote
+        naming::address addr;
+        if (agas::is_local_address_cached(id, addr))
+        {
+            typedef typename Action::component_type component_type;
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    bool result = applier::detail::apply_l_p<Action>(
+                        id, std::move(addr),  priority, std::forward<Ts>(vs)...);
+
+                    // invoke callback
+                    cb(boost::system::error_code(), parcelset::parcel());
+                    return result;
+                }
+            }
+            else
+            {
+                bool result = applier::detail::apply_l_p<Action>(
+                    id, std::move(addr),  priority, std::forward<Ts>(vs)...);
+
+                // invoke callback
+                cb(boost::system::error_code(), parcelset::parcel());
+                return result;
+            }
         }
 
         // apply remotely

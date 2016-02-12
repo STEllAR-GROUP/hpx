@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Thomas Heller
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -402,7 +402,6 @@ namespace hpx { namespace agas
       , data(std::move(other.data))
     {
         other.mc = invalid_request;
-        other.data.reset(new request_data(util::make_tuple()));
     }
 
     // copy assignment
@@ -423,7 +422,6 @@ namespace hpx { namespace agas
         mc = other.mc;
         data = std::move(other.data);
         other.mc = invalid_request;
-        other.data.reset(new request_data(util::make_tuple()));
         return *this;
     }
 

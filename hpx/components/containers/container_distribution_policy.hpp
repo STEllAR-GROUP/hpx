@@ -35,6 +35,11 @@ namespace hpx
             return container_distribution_policy(num_partitions, localities_);
         }
 
+        container_distribution_policy operator()(hpx::id_type const& locality) const
+        {
+            return container_distribution_policy(locality);
+        }
+
         container_distribution_policy operator()(
             std::vector<id_type> const& localities) const
         {
@@ -96,10 +101,16 @@ namespace hpx
             num_partitions_(num_partitions)
         {}
 
+
         container_distribution_policy(std::size_t num_partitions,
                 std::vector<id_type> && localities)
           : components::default_distribution_policy(std::move(localities)),
             num_partitions_(num_partitions)
+        {}
+
+        container_distribution_policy(hpx::id_type const& locality)
+          : components::default_distribution_policy(locality),
+            num_partitions_(1)
         {}
 
     private:
