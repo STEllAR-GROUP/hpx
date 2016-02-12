@@ -598,8 +598,7 @@ to `ON`).
     max_pending_refcnt_requests = ${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:<hpx_initial_agas_max_pending_refcnt_requests>}
     use_caching = ${HPX_AGAS_USE_CACHING:1}
     use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
-    local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_initial_agas_local_cache_size>}
-    local_cache_size_per_thread = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD:<hpx_initial_agas_local_cache_size_per_thread>}
+    local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_agas_local_cache_size>}
 ``
 [c++]
 
@@ -644,23 +643,8 @@ to `ON`).
       for AGAS services. This property is ignored if `hpx.agas.use_caching` is
       false. Note that if `hpx.agas.use_range_caching` is true, this size will
       refer to the maximum number of ranges stored in the cache, not the number
-      of entries spanned by the cache. Note also, that the size of the cache
-      will be determined by the larger of the following two numbers: the value
-      of this key and the value of `hpx.agas.local_cache_size_per_thread`
-      multiplied by the number of threads used systemwide in the running application.
-      The default depends on the compile time preprocessor constant
-      `HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE` (`256`).]]
-    [[`hpx.agas.local_cache_size_per_thread`]
-     [This property defines the size of the software address translation cache
-      for AGAS services on a per node basis. This property is ignored if
-      `hpx.agas.use_caching` is false. Note that if `hpx.agas.use_range_caching`
-      is true, this size will refer to the maximum number of ranges stored in
-      the cache, not the number of entries spanned by the cache. Note also,
-      that the size of the cache will be determined by the larger of the following
-      two numbers: the `hpx.agas.local_cache_size` and the value of this key
-      multiplied by the number of threads used system wide in the running application.
-      The default depends on the compile time preprocessor constant
-      `HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD` (`32`).]]
+      of entries spanned by the cache. The default depends on the compile time
+      preprocessor constant `HPX_AGAS_LOCAL_CACHE_SIZE` (`4096`).]]
 ]
 
 ['[*The `hpx.commandline` Configuration Section]]

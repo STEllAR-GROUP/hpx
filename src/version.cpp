@@ -235,13 +235,9 @@ namespace hpx
         strm << "  HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY="
              << HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY << "\n";
 #endif
-#if defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
-        strm << "  HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE="
-             << HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE << "\n";
-#endif
-#if defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD)
-        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD="
-             << HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD << "\n";
+#if defined(HPX_AGAS_LOCAL_CACHE_SIZE)
+        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE="
+             << HPX_AGAS_LOCAL_CACHE_SIZE << "\n";
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
         strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="

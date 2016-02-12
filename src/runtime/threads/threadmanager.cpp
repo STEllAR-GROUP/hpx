@@ -511,6 +511,9 @@ namespace hpx { namespace threads
         char const* individual_name, std::size_t individual_count,
         error_code& ec)
     {
+
+        std::cout << paths.instancename_ << ' ' << individual_name << '\n';
+
         if (paths.parentinstance_is_basename_) {
             HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
                 "invalid counter instance parent name: " +

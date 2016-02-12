@@ -68,9 +68,7 @@ namespace hpx { namespace util
 
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size(
-            std::size_t dflt = HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE) const;
-        std::size_t get_agas_local_cache_size_per_thread(
-            std::size_t dflt = HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) const;
+            std::size_t dflt = HPX_AGAS_LOCAL_CACHE_SIZE) const;
 
         bool get_agas_caching_mode() const;
 
