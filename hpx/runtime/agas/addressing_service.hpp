@@ -34,10 +34,6 @@
 #include <map>
 #include <vector>
 
-// TODO: split into a base class and two implementations (one for bootstrap,
-// one for hosted).
-// TODO: Use \copydoc.
-
 namespace hpx { namespace util
 {
     class runtime_configuration;
@@ -108,9 +104,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::uint64_t rts_lva_;
     boost::uint64_t mem_lva_;
 
-    detail::bootstrap_data_type* bootstrap;
-    detail::hosted_data_type* hosted;
-
     boost::shared_ptr<detail::agas_service_client> client_;
 
     boost::atomic<hpx::state> state_;
@@ -146,7 +139,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     state get_status() const
     {
-        if (!hosted && !bootstrap)
+        if (!client_)
             return state_stopping;
         return state_.load();
     }
@@ -202,13 +195,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         error_code& ec = throws
         );
 
-    void* get_hosted_primary_ns_ptr() const;
-    void* get_hosted_symbol_ns_ptr() const;
+    naming::address::address_type get_hosted_primary_ns_ptr() const;
+    naming::address::address_type get_hosted_symbol_ns_ptr() const;
 
-    void* get_bootstrap_locality_ns_ptr() const;
-    void* get_bootstrap_primary_ns_ptr() const;
-    void* get_bootstrap_component_ns_ptr() const;
-    void* get_bootstrap_symbol_ns_ptr() const;
+    naming::address::address_type get_bootstrap_locality_ns_ptr() const;
+    naming::address::address_type get_bootstrap_primary_ns_ptr() const;
+    naming::address::address_type get_bootstrap_component_ns_ptr() const;
+    naming::address::address_type get_bootstrap_symbol_ns_ptr() const;
 
     boost::int64_t synchronize_with_async_incref(
         hpx::future<boost::int64_t> fut
@@ -218,18 +211,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     naming::address::address_type get_primary_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
-            is_bootstrap() ?
-                get_bootstrap_primary_ns_ptr() :
-                get_hosted_primary_ns_ptr());
+        return client_->get_primary_ns_ptr();
     }
 
     naming::address::address_type get_symbol_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
-            is_bootstrap() ?
-                get_bootstrap_symbol_ns_ptr() :
-                get_hosted_symbol_ns_ptr());
+        return client_->get_symbol_ns_ptr();
     }
 
 protected:

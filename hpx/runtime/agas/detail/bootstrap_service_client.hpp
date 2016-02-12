@@ -65,48 +65,82 @@ namespace hpx { namespace agas { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct bootstrap_service_client : agas_service_client
     {
-        void set_local_locality(naming::gid_type const& g);
+        ///////////////////////////////////////////////////////////////////////
+        naming::address::address_type get_primary_ns_ptr() const
+        {
+            return reinterpret_cast<naming::address::address_type>(
+                &data_.primary_ns_server_);
+        }
+
+        naming::address::address_type get_symbol_ns_ptr() const
+        {
+            return reinterpret_cast<naming::address::address_type>(
+                &data_.symbol_ns_server_);
+        }
+
+        naming::address::address_type get_component_ns_ptr() const
+        {
+            return reinterpret_cast<naming::address::address_type>(
+                &data_.component_ns_server_);
+        }
+
+        naming::address::address_type get_locality_ns_ptr() const
+        {
+            return reinterpret_cast<naming::address::address_type>(
+                &data_.locality_ns_server_);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        void set_local_locality(
+            naming::gid_type const& g);
+
         response service(
             request const& req
-            , threads::thread_priority priority = threads::thread_priority_default
-            , error_code& ec = throws
-            );
+          , threads::thread_priority priority
+          , error_code& ec);
 
         std::vector<response> bulk_service(
             std::vector<request> const& reqs
-            , error_code& ec
-            );
+          , error_code& ec);
 
         void register_counter_types();
 
-        void register_server_instance(boost::uint32_t locality_id);
+        void register_server_instance(
+            boost::uint32_t locality_id);
 
         bool unregister_server(
             request const& req
-            , threads::thread_priority priority =
-            threads::thread_priority_default
-            , error_code& ec = throws);
+          , threads::thread_priority priority
+          , error_code& ec);
 
         response service_primary(
             request const& req
-            , error_code& ec = throws);
+          , error_code& ec);
 
         std::vector<response> service_primary_bulk(
             std::vector<request> const& reqs
-            , error_code& ec = throws
-            );
+          , error_code& ec);
 
         response service_component(
             request const& req
-            , threads::thread_priority priority =
-            threads::thread_priority_default
-            , error_code& ec = throws);
+          , threads::thread_priority priority
+          , error_code& ec);
 
         response service_locality(
             request const& req
-            , threads::thread_priority priority =
-            threads::thread_priority_default
-            , error_code& ec = throws);
+          , threads::thread_priority priority
+          , error_code& ec);
+
+        future<parcelset::endpoints_type> get_endpoints(
+            request const& req
+          , threads::thread_priority priority
+          , error_code& ec);
+
+        response symbol_service(
+            request const& req
+          , threads::thread_priority priority
+          , std::string const& name
+          , error_code& ec);
 
         bootstrap_data_type data_;
     };

@@ -5,11 +5,15 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 #include <hpx/runtime/agas/detail/hosted_service_client.hpp>
+
+#include <string>
 
 namespace hpx { namespace agas { namespace detail
 {
-    void hosted_service_client::set_local_locality(naming::gid_type const& g)
+    void hosted_service_client::set_local_locality(
+        naming::gid_type const& g)
     {
         data_.primary_ns_server_.set_local_locality(g);
     }
@@ -17,8 +21,7 @@ namespace hpx { namespace agas { namespace detail
     response hosted_service_client::service(
         request const& req
       , threads::thread_priority priority
-      , error_code& ec
-        )
+      , error_code& ec)
     {
         if (req.get_action_code() & primary_ns_service)
             return data_.primary_ns_server_.service(req, ec);
@@ -40,8 +43,7 @@ namespace hpx { namespace agas { namespace detail
 
     std::vector<response> hosted_service_client::bulk_service(
         std::vector<request> const& reqs
-        , error_code& ec
-        )
+      , error_code& ec)
     {
         return data_.primary_ns_server_.bulk_service(reqs, ec);
     }
@@ -61,8 +63,8 @@ namespace hpx { namespace agas { namespace detail
 
     bool hosted_service_client::unregister_server(
         request const& req
-        , threads::thread_priority priority,
-        error_code& ec)
+      , threads::thread_priority priority
+      , error_code& ec)
     {
         data_.unregister_server_instance(ec);
 
@@ -79,31 +81,50 @@ namespace hpx { namespace agas { namespace detail
 
     response hosted_service_client::service_primary(
         request const& req
-        , error_code& ec)
+      , error_code& ec)
     {
         return data_.primary_ns_server_.service(req, ec);
     }
 
     std::vector<response> hosted_service_client::service_primary_bulk(
         std::vector<request> const& reqs
-        , error_code& ec)
+      , error_code& ec)
     {
         return data_.primary_ns_server_.bulk_service(reqs, ec);
     }
 
     response hosted_service_client::service_component(
         request const& req
-        , threads::thread_priority priority
-        , error_code& ec)
+      , threads::thread_priority priority
+      , error_code& ec)
     {
         return data_.component_ns_.service(req, priority, ec);
     }
 
     response hosted_service_client::service_locality(
         request const& req
-        , threads::thread_priority priority
-        , error_code& ec)
+      , threads::thread_priority priority
+      , error_code& ec)
     {
         return data_.locality_ns_.service(req, priority, ec);
     }
+
+    response hosted_service_client::symbol_service(
+        request const& req
+      , threads::thread_priority priority
+      , std::string const& name
+      , error_code& ec)
+    {
+        return stubs::symbol_namespace::service(name, req, priority, ec);
+    }
+
+    future<parcelset::endpoints_type> hosted_service_client::get_endpoints(
+        request const& req
+      , threads::thread_priority priority
+      , error_code& ec)
+    {
+        return data_.locality_ns_.service_async<parcelset::endpoints_type>(
+            req, priority);
+    }
 }}}
+
