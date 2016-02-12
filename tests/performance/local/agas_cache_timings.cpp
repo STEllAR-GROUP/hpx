@@ -214,10 +214,9 @@ void test_update(gva_cache_type& cache, hpx::naming::gid_type first_key)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    std::size_t cache_size = HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD;
+    std::size_t cache_size = HPX_AGAS_LOCAL_CACHE_SIZE;
     if (vm.count("cache_size"))
         cache_size = vm["cache_size"].as<std::size_t>();
-    cache_size *= hpx::agas::get_num_overall_threads_sync();
 
     std::size_t num_entries = 1000;
     if (vm.count("num_entries"))
