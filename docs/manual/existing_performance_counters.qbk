@@ -126,6 +126,18 @@ system and application performance.
         [Returns the overall execution time of all AGAS services provided by the
          given AGAS service category since its creation (in nanoseconds).]
     ]
+    [   [`/agas/count/entries`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the AGAS cache should
+          be queried. The locality id is a (zero based) number identifying the
+          locality.
+        ]
+        [None]
+        [Returns the number of cache entries resident in the AGAS cache of the
+        specified locality (see
+         `<cache_statistics>`.]
+    ]
     [   [`/agas/count/<cache_statistics>`
 
           where:[br] `<cache_statistics>` is one of the following:
