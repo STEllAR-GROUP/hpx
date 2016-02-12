@@ -2407,6 +2407,25 @@ void addressing_service::update_cache_entry(
         return;
     }
 
+    if(hpx::threads::get_self_ptr() == 0)
+    {
+        // Don't update the cache while HPX is starting up ...
+        if(hpx::is_starting())
+        {
+            return;
+        }
+        void (addressing_service::*update_cache_entry_ptr)(
+            naming::gid_type const&
+          , gva const &
+          , error_code&
+        ) = &addressing_service::update_cache_entry;
+        threads::register_thread_nullary(
+            util::bind(update_cache_entry_ptr, this, id, g, boost::ref(throws)),
+            "addressing_service::update_cache_entry", threads::pending, true,
+            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_stacksize_default, ec);
+    }
+
     try {
         // The entry in AGAS for a locality's RTS component has a count of 0,
         // so we convert it to 1 here so that the cache doesn't break.
@@ -2463,6 +2482,12 @@ bool addressing_service::get_cache_entry(
   , error_code& ec
     )
 {
+    // Don't use the cache while HPX is starting up
+    if(hpx::is_starting())
+    {
+        return false;
+    }
+    HPX_ASSERT(hpx::threads::get_self_ptr());
     gva_cache_key k(gid);
     gva_cache_key idbase_key;
 
@@ -3245,8 +3270,6 @@ hpx::future<void> addressing_service::mark_as_migrated(
     // function
     typedef boost::unique_lock<mutex_type> lock_type;
 
-    lock_type lock(migrated_objects_mtx_);
-    util::ignore_while_checking<lock_type> il(&lock);
 
     // call the user code for the component instance to be migrated, the
     // returned future becomes ready whenever the component instance can be
@@ -3258,6 +3281,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
     // locality and the locality managing the address resolution for the object
     if (result.first)
     {
+        lock_type lock(migrated_objects_mtx_);
         migrated_objects_table_type::iterator it =
             migrated_objects_table_.find(gid);
 
