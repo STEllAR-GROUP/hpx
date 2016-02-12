@@ -71,7 +71,7 @@ namespace hpx { namespace detail
     typename boost::enable_if_c<
         traits::is_continuation<Continuation>::value, bool
     >::type
-    apply_impl(Continuation && c, hpx::id_type const& id, naming::address addr,
+    apply_impl(Continuation && c, hpx::id_type const& id, naming::address&& addr,
         threads::thread_priority priority, Ts&&... vs)
     {
         // Determine whether the id is local or remote
@@ -162,7 +162,7 @@ namespace hpx { namespace detail
     }
 
     template <typename Action, typename ...Ts>
-    bool apply_impl(hpx::id_type const& id, naming::address addr,
+    bool apply_impl(hpx::id_type const& id, naming::address&& addr,
         threads::thread_priority priority, Ts &&... vs)
     {
         // Determine whether the id is local or remote

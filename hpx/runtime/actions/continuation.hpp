@@ -70,7 +70,7 @@ namespace hpx
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
     template <typename T>
-    void set_lco_value(naming::id_type const& id, naming::address const& addr, T && t,
+    void set_lco_value(naming::id_type const& id, naming::address && addr, T && t,
         bool move_credits)
     {
         typedef typename lcos::base_lco_with_value<
@@ -82,19 +82,19 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_value_action>(
-                target, addr, actions::action_priority<set_value_action>(),
+                target, std::move(addr), actions::action_priority<set_value_action>(),
                 util::detail::make_temporary<T>(t));
         }
         else
         {
             detail::apply_impl<set_value_action>(
-                id, addr, actions::action_priority<set_value_action>(),
+                id, std::move(addr), actions::action_priority<set_value_action>(),
                 util::detail::make_temporary<T>(t));
         }
     }
 
     template <typename T>
-    void set_lco_value(naming::id_type const& id, naming::address const& addr, T && t,
+    void set_lco_value(naming::id_type const& id, naming::address && addr, T && t,
         naming::id_type const& cont, bool move_credits)
     {
         typedef typename lcos::base_lco_with_value<
@@ -109,21 +109,16 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_value_action>(
-                actions::typed_continuation<result_type>(cont), target, addr,
+                actions::typed_continuation<result_type>(cont), target, std::move(addr),
                 util::detail::make_temporary<T>(t));
         }
         else
         {
             detail::apply_impl<set_value_action>(
-                actions::typed_continuation<result_type>(cont), id, addr,
+                actions::typed_continuation<result_type>(cont), id, std::move(addr),
                 util::detail::make_temporary<T>(t));
         }
     }
-
-    /*
-    HPX_EXPORT void set_lco_error(naming::id_type const& id, naming::address const& addr
-        boost::exception_ptr const& e, bool move_credits);
-    */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -179,13 +174,13 @@ namespace hpx { namespace actions
             }
         }
 
-        explicit continuation(naming::id_type const& gid, naming::address addr)
+        explicit continuation(naming::id_type const& gid, naming::address && addr)
           : gid_(gid)
           , addr_(std::move(addr))
         {
         }
 
-        explicit continuation(naming::id_type && gid, naming::address addr)
+        explicit continuation(naming::id_type && gid, naming::address && addr)
           : gid_(std::move(gid))
           , addr_(std::move(addr))
         {
@@ -225,7 +220,7 @@ namespace hpx { namespace actions
             return gid_;
         }
 
-        naming::address const& get_addr() const
+        naming::address get_addr() const
         {
             return addr_;
         }
@@ -437,23 +432,23 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr)
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
           : continuation(gid, std::move(addr))
         {}
 
-        explicit typed_continuation(naming::id_type && gid, naming::address addr)
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
           : continuation(std::move(gid), std::move(addr))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type && gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 
@@ -551,23 +546,23 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr)
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
           : continuation(gid, std::move(addr))
         {}
 
-        explicit typed_continuation(naming::id_type && gid, naming::address addr)
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
           : continuation(std::move(gid), std::move(addr))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type && gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 

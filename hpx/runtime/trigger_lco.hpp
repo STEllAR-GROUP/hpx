@@ -32,7 +32,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id,
-        naming::address const& addr, bool move_credits = true);
+        naming::address && addr, bool move_credits = true);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Trigger the LCO referenced by the given id
@@ -59,7 +59,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id,
-        naming::address const& addr, naming::id_type const& cont,
+        naming::address && addr, naming::id_type const& cont,
         bool move_credits = true);
 
     /// \brief Trigger the LCO referenced by the given id
@@ -88,7 +88,7 @@ namespace hpx
     ///                     message. The default value is \a true.
     template <typename T>
     void set_lco_value(naming::id_type const& id,
-        naming::address const& addr, T && t, bool move_credits = true);
+        naming::address && addr, T && t, bool move_credits = true);
 
     /// \brief Set the result value for the LCO referenced by the given id
     ///
@@ -121,7 +121,7 @@ namespace hpx
     ///                     message. The default value is \a true.
     template <typename T>
     void set_lco_value(naming::id_type const& id,
-        naming::address const& addr, T && t, naming::id_type const& cont,
+        naming::address && addr, T && t, naming::id_type const& cont,
         bool move_credits = true);
 
     /// \brief Set the result value for the LCO referenced by the given id
@@ -153,14 +153,14 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address const& addr, boost::exception_ptr const& e,
+        naming::address && addr, boost::exception_ptr const& e,
         bool move_credits = true);
 
     /// \copydoc hpx::set_lco_error(naming::id_type const& id,
-    /// naming::address const& addr, boost::exception_ptr const& e,
+    /// naming::address && addr, boost::exception_ptr const& e,
     /// bool move_credits)
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address const& addr, boost::exception_ptr && e,
+        naming::address && addr, boost::exception_ptr && e,
         bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
@@ -199,14 +199,14 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address const& addr, boost::exception_ptr const& e,
+        naming::address && addr, boost::exception_ptr const& e,
         naming::id_type const& cont, bool move_credits = true);
 
     /// \copydoc hpx::set_lco_error(naming::id_type const& id,
-    ///  naming::address const& addr boost::exception_ptr const& e,
+    ///  naming::address && addr boost::exception_ptr const& e,
     ///  naming::id_type const& cont, bool move_credits)
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address const& addr, boost::exception_ptr && e,
+        naming::address && addr, boost::exception_ptr && e,
         naming::id_type const& cont, bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id

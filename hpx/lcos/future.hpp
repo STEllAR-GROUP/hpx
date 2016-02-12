@@ -1331,23 +1331,23 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr)
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
           : continuation(gid, std::move(addr))
         {}
 
-        explicit typed_continuation(naming::id_type && gid, naming::address addr)
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
           : continuation(std::move(gid), std::move(addr))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type && gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 
@@ -1466,23 +1466,23 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr)
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
           : continuation(gid, std::move(addr))
         {}
 
-        explicit typed_continuation(naming::id_type && gid, naming::address addr)
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
           : continuation(std::move(gid), std::move(addr))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type && gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 
@@ -1603,23 +1603,23 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr)
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
           : continuation(gid, std::move(addr))
         {}
 
-        explicit typed_continuation(naming::id_type && gid, naming::address addr)
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
           : continuation(std::move(gid), std::move(addr))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type && gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 
@@ -1738,23 +1738,23 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        explicit typed_continuation(naming::id_type const& gid, naming::address addr)
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
           : continuation(gid, std::move(addr))
         {}
 
-        explicit typed_continuation(naming::id_type && gid, naming::address addr)
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
           : continuation(std::move(gid), std::move(addr))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type && gid,
-            naming::address addr, F && f)
+            naming::address && addr, F && f)
           : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
         {}
 

@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    void trigger_lco_event(naming::id_type const& id, naming::address const& addr,
+    void trigger_lco_event(naming::id_type const& id, naming::address && addr,
         bool move_credits)
     {
         typedef lcos::base_lco::set_event_action set_action;
@@ -22,16 +22,16 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                target, addr, actions::action_priority<set_action>());
+                target, std::move(addr), actions::action_priority<set_action>());
         }
         else
         {
             detail::apply_impl<set_action>(
-                id, addr, actions::action_priority<set_action>());
+                id, std::move(addr), actions::action_priority<set_action>());
         }
     }
 
-    void trigger_lco_event(naming::id_type const& id, naming::address const& addr,
+    void trigger_lco_event(naming::id_type const& id, naming::address && addr,
         naming::id_type const& cont, bool move_credits)
     {
         typedef lcos::base_lco::set_event_action set_action;
@@ -44,18 +44,18 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), target, addr,
+                actions::typed_continuation<result_type>(cont), target, std::move(addr),
                 actions::action_priority<set_action>());
         }
         else
         {
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), id, addr,
+                actions::typed_continuation<result_type>(cont), id, std::move(addr),
                 actions::action_priority<set_action>());
         }
     }
 
-    void set_lco_error(naming::id_type const& id, naming::address const& addr,
+    void set_lco_error(naming::id_type const& id, naming::address && addr,
         boost::exception_ptr const& e, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
@@ -65,16 +65,16 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                target, addr, actions::action_priority<set_action>(), e);
+                target, std::move(addr), actions::action_priority<set_action>(), e);
         }
         else
         {
             detail::apply_impl<set_action>(
-                id, addr, actions::action_priority<set_action>(), e);
+                id, std::move(addr), actions::action_priority<set_action>(), e);
         }
     }
 
-    void set_lco_error(naming::id_type const& id, naming::address const& addr, //-V659
+    void set_lco_error(naming::id_type const& id, naming::address && addr, //-V659
         boost::exception_ptr && e, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
@@ -84,16 +84,18 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                target, addr, actions::action_priority<set_action>(), std::move(e));
+                target, std::move(addr), actions::action_priority<set_action>(),
+                std::move(e));
         }
         else
         {
             detail::apply_impl<set_action>(
-                id, addr, actions::action_priority<set_action>(), std::move(e));
+                id, std::move(addr), actions::action_priority<set_action>(),
+                std::move(e));
         }
     }
 
-    void set_lco_error(naming::id_type const& id, naming::address const& addr,
+    void set_lco_error(naming::id_type const& id, naming::address && addr,
         boost::exception_ptr const& e, naming::id_type const& cont, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
@@ -106,18 +108,18 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), target, addr,
+                actions::typed_continuation<result_type>(cont), target, std::move(addr),
                 actions::action_priority<set_action>(), e);
         }
         else
         {
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), id, addr,
+                actions::typed_continuation<result_type>(cont), id, std::move(addr),
                 actions::action_priority<set_action>(), e);
         }
     }
 
-    void set_lco_error(naming::id_type const& id, naming::address const& addr, //-V659
+    void set_lco_error(naming::id_type const& id, naming::address && addr, //-V659
         boost::exception_ptr && e, naming::id_type const& cont,
         bool move_credits)
     {
@@ -131,13 +133,13 @@ namespace hpx
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), target, addr,
+                actions::typed_continuation<result_type>(cont), target, std::move(addr),
                 actions::action_priority<set_action>(), std::move(e));
         }
         else
         {
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), id, addr,
+                actions::typed_continuation<result_type>(cont), id, std::move(addr),
                 actions::action_priority<set_action>(), std::move(e));
         }
     }
@@ -169,7 +171,7 @@ namespace hpx { namespace actions
         }
 
         LLCO_(info) << "continuation::trigger(" << gid_ << ")";
-        trigger_lco_event(gid_, addr_);
+        trigger_lco_event(gid_, this->get_addr());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -183,7 +185,7 @@ namespace hpx { namespace actions
         }
 
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
-        set_lco_error(gid_, addr_, e);
+        set_lco_error(gid_, this->get_addr(), e);
     }
 
     void continuation::trigger_error(boost::exception_ptr && e) //-V659
@@ -196,7 +198,7 @@ namespace hpx { namespace actions
         }
 
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
-        set_lco_error(gid_, addr_, std::move(e));
+        set_lco_error(gid_, this->get_addr(), std::move(e));
     }
 }}
 
