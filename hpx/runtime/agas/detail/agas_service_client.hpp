@@ -19,9 +19,6 @@
 
 namespace hpx { namespace agas { namespace detail
 {
-    struct bootstrap_data_type;
-    struct hosted_data_type;
-
     struct agas_service_client
     {
         virtual ~agas_service_client() {}

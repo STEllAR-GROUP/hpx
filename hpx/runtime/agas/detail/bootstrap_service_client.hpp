@@ -142,6 +142,7 @@ namespace hpx { namespace agas { namespace detail
           , threads::thread_priority priority
           , error_code& ec);
 
+    private:
         bootstrap_data_type data_;
     };
 }}}

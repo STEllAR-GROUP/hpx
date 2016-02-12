@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
@@ -1257,17 +1256,17 @@ bool addressing_service::resolve_full_local(
         if (naming::detail::store_in_cache(id))
         {
             HPX_ASSERT(addr.address_);
-                if(range_caching_)
-                {
-                    // Put the range into the cache.
-                    update_cache_entry(base_gid, base_gva, ec);
-                }
-                else
-                {
-                    // Put the fully resolved gva into the cache.
-                    update_cache_entry(id, g, ec);
-                }
+            if(range_caching_)
+            {
+                // Put the range into the cache.
+                update_cache_entry(base_gid, base_gva, ec);
             }
+            else
+            {
+                // Put the fully resolved gva into the cache.
+                update_cache_entry(id, g, ec);
+            }
+        }
 
         if (ec)
             return false;
@@ -2196,31 +2195,31 @@ void addressing_service::update_cache_entry(
 
         {
             boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
-        if (!gva_cache_->update_if(key, g, check_for_collisions))
-        {
-            if (LAGAS_ENABLED(warning))
+            if (!gva_cache_->update_if(key, g, check_for_collisions))
             {
-                // Figure out who we collided with.
+                if (LAGAS_ENABLED(warning))
+                {
+                    // Figure out who we collided with.
                     addressing_service::gva_cache_key idbase;
                     addressing_service::gva_cache_type::entry_type e;
 
-                if (!gva_cache_->get_entry(key, idbase, e))
-                {
-                    // This is impossible under sane conditions.
-                    HPX_THROWS_IF(ec, invalid_data
-                      , "addressing_service::update_cache_entry"
-                      , "data corruption or lock error occurred in cache");
-                    return;
-                }
+                    if (!gva_cache_->get_entry(key, idbase, e))
+                    {
+                        // This is impossible under sane conditions.
+                        HPX_THROWS_IF(ec, invalid_data
+                          , "addressing_service::update_cache_entry"
+                          , "data corruption or lock error occurred in cache");
+                        return;
+                    }
 
-                LAGAS_(warning) <<
-                    ( boost::format(
-                        "addressing_service::update_cache_entry, "
-                        "aborting update due to key collision in cache, "
-                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                    ) % gid % count % idbase.get_gid() % idbase.get_count());
+                    LAGAS_(warning) <<
+                        ( boost::format(
+                            "addressing_service::update_cache_entry, "
+                            "aborting update due to key collision in cache, "
+                            "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
+                        ) % gid % count % idbase.get_gid() % idbase.get_count());
+                }
             }
-        }
         }
 
         if (&ec != &throws)
@@ -2749,12 +2748,12 @@ void addressing_service::register_counter_types()
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
-        // install counters for services
+    // install counters for services
     client_->register_counter_types();
 
     // register root server
-        boost::uint32_t locality_id =
-            naming::get_locality_id_from_gid(get_local_locality());
+    boost::uint32_t locality_id =
+        naming::get_locality_id_from_gid(get_local_locality());
     client_->register_server_instance(locality_id);
 } // }}}
 

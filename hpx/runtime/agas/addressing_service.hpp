@@ -12,9 +12,7 @@
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
 #include <hpx/config.hpp>
-
 #include <hpx/exception.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
