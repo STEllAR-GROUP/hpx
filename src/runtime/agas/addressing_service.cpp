@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Parsa Amini
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
@@ -146,10 +146,8 @@ addressing_service::addressing_service(
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
 
-    if (service_type == service_mode_bootstrap)
-    {
+    if (is_bootstrap())
         launch_bootstrap(pp, ph.endpoints(), ini_);
-    }
 } // }}}
 
 void addressing_service::initialize(parcelset::parcelhandler& ph,
@@ -163,7 +161,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
     if(pp)
         pp->run(false);
 
-    if (service_type == service_mode_bootstrap)
+    if (is_bootstrap())
     {
         get_big_boot_barrier().wait_bootstrap();
     }
@@ -172,46 +170,52 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
         launch_hosted();
         get_big_boot_barrier().wait_hosted(
             pp->get_locality_name(),
-            &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
+            client_->get_primary_ns_ptr(), client_->get_symbol_ns_ptr());
     }
 
     set_status(state_running);
 } // }}}
 
-void* addressing_service::get_hosted_primary_ns_ptr() const
+naming::address::address_type
+addressing_service::get_hosted_primary_ns_ptr() const
 {
-    HPX_ASSERT(0 != hosted);
-    return &hosted->primary_ns_server_;
+    HPX_ASSERT(!is_bootstrap());
+    return client_->get_primary_ns_ptr();
 }
 
-void* addressing_service::get_hosted_symbol_ns_ptr() const
+naming::address::address_type
+addressing_service::get_hosted_symbol_ns_ptr() const
 {
-    HPX_ASSERT(0 != hosted);
-    return &hosted->symbol_ns_server_;
+    HPX_ASSERT(!is_bootstrap());
+    return client_->get_symbol_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_locality_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_locality_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap);
-    return &bootstrap->locality_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_locality_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_primary_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_primary_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap);
-    return &bootstrap->primary_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_primary_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_component_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_component_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap);
-    return &bootstrap->component_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_component_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_symbol_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_symbol_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap);
-    return &bootstrap->symbol_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_symbol_ns_ptr();
 }
 
 namespace detail
@@ -229,8 +233,7 @@ void addressing_service::launch_bootstrap(
         boost::make_shared<detail::bootstrap_service_client>();
 
     client_ = boost::static_pointer_cast<detail::agas_service_client>(
-            bootstrap_client);
-    bootstrap = &bootstrap_client->data_;
+        bootstrap_client);
 
     runtime& rt = get_runtime();
 
@@ -250,34 +253,34 @@ void addressing_service::launch_bootstrap(
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
     gva locality_gva(here,
         server::locality_namespace::get_component_type(), 1U,
-            get_bootstrap_locality_ns_ptr());
+            client_->get_locality_ns_ptr());
     locality_ns_addr_ = naming::address(here,
         server::locality_namespace::get_component_type(),
-            get_bootstrap_locality_ns_ptr());
+            client_->get_locality_ns_ptr());
 
     naming::gid_type const primary_gid = bootstrap_primary_namespace_gid();
     gva primary_gva(here,
         server::primary_namespace::get_component_type(), 1U,
-            get_bootstrap_primary_ns_ptr());
+            client_->get_primary_ns_ptr());
     primary_ns_addr_ = naming::address(here,
         server::primary_namespace::get_component_type(),
-            get_bootstrap_primary_ns_ptr());
+            client_->get_primary_ns_ptr());
 
     naming::gid_type const component_gid = bootstrap_component_namespace_gid();
     gva component_gva(here,
         server::component_namespace::get_component_type(), 1U,
-            get_bootstrap_component_ns_ptr());
+            client_->get_component_ns_ptr());
     component_ns_addr_ = naming::address(here,
         server::component_namespace::get_component_type(),
-            get_bootstrap_component_ns_ptr());
+            client_->get_component_ns_ptr());
 
     naming::gid_type const symbol_gid = bootstrap_symbol_namespace_gid();
     gva symbol_gva(here,
         server::symbol_namespace::get_component_type(), 1U,
-            get_bootstrap_symbol_ns_ptr());
+            client_->get_symbol_ns_ptr());
     symbol_ns_addr_ = naming::address(here,
         server::symbol_namespace::get_component_type(),
-            get_bootstrap_symbol_ns_ptr());
+            client_->get_symbol_ns_ptr());
 
     set_local_locality(here);
     rt.get_config().parse("assigned locality",
@@ -287,7 +290,7 @@ void addressing_service::launch_bootstrap(
     boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
         ini_, "hpx.os_threads", 1u);
     request locality_req(locality_ns_allocate, endpoints, 4, num_threads); //-V112
-    bootstrap->locality_ns_server_.remote_service(locality_req);
+    client_->service_locality(locality_req, action_priority_, throws);
 
     naming::gid_type runtime_support_gid1(here);
     runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
@@ -311,7 +314,7 @@ void addressing_service::launch_bootstrap(
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
-        bootstrap->primary_ns_server_.remote_service(reqs[i]);
+        client_->service_primary(reqs[i], throws);
 
     register_name("/0/agas/locality#0", here);
     if (is_console())
@@ -329,7 +332,6 @@ void addressing_service::launch_hosted()
 
     client_ = boost::static_pointer_cast<detail::agas_service_client>(
             booststrap_hosted);
-    hosted = &booststrap_hosted->data_;
 }
 
 void addressing_service::adjust_local_cache_size()
@@ -440,52 +442,33 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
 { // {{{
     boost::unique_lock<mutex_type> l(resolved_localities_mtx_);
     resolved_localities_type::iterator it = resolved_localities_.find(gid);
-    if(it == resolved_localities_.end())
+    if (it == resolved_localities_.end())
     {
         // The locality hasn't been requested to be resolved yet. Do it now.
         parcelset::endpoints_type endpoints;
         request req(locality_ns_resolve_locality, gid);
 
-        if(is_bootstrap())
         {
-            endpoints
-                = bootstrap->locality_ns_server_.service(req, ec).get_endpoints();
-            if(ec)
+            hpx::util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+            future<parcelset::endpoints_type> endpoints_future =
+                client_->get_endpoints(req, action_priority_, ec);
+
+            if (0 == threads::get_self_ptr())
             {
-                l.unlock();
+                // this should happen only during bootstrap
+                HPX_ASSERT(hpx::is_starting());
 
-                HPX_THROWS_IF(ec, internal_server_error
-                  , "addressing_service::resolve_locality"
-                  , "could not resolve locality to endpoints");
-                return resolved_localities_[naming::invalid_gid];
-            }
-        }
-        else
-        {
-            {
-                hpx::util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
-                future<parcelset::endpoints_type> endpoints_future =
-                    hosted->locality_ns_.service_async<parcelset::endpoints_type>(
-                        req
-                      , action_priority_
-                    );
-
-                if (0 == threads::get_self_ptr())
-                {
-                    // this should happen only during bootstrap
-                    HPX_ASSERT(hpx::is_starting());
-
-                    while(!endpoints_future.is_ready())
-                        /**/;
-                }
-                endpoints = endpoints_future.get(ec);
+                while(!endpoints_future.is_ready())
+                    /**/;
             }
 
-            // Search again ... might have been added by a different thread already
-            it = resolved_localities_.find(gid);
+            endpoints = endpoints_future.get(ec);
         }
 
-        if(it == resolved_localities_.end())
+        // Search again ... might have been added by a different thread already
+        it = resolved_localities_.find(gid);
+
+        if (it == resolved_localities_.end())
         {
             if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
                     std::make_pair(
@@ -1181,22 +1164,15 @@ bool addressing_service::resolve_locally_known_addresses(
         // primary AGAS service on this locality?
         if (locality_msb == msb)
         {
-            if (is_bootstrap())
-            {
-                addr = primary_ns_addr_;
-            }
-            else
-            {
-                addr = naming::address(get_local_locality(),
-                    server::primary_namespace::get_component_type(),
-                    get_hosted_primary_ns_ptr());
-            }
+            addr = naming::address(get_local_locality(),
+                server::primary_namespace::get_component_type(),
+                client_->get_primary_ns_ptr());
             return true;
         }
 
         // primary AGAS service on any locality
         if (naming::detail::strip_internal_bits_and_locality_from_gid(msb) ==
-            HPX_AGAS_NS_MSB)
+                HPX_AGAS_NS_MSB)
         {
             addr.locality_ = naming::get_locality_from_gid(id);
             addr.type_ = server::primary_namespace::get_component_type();
@@ -1217,22 +1193,15 @@ bool addressing_service::resolve_locally_known_addresses(
         // symbol AGAS service on this locality?
         if (locality_msb == msb)
         {
-            if (is_bootstrap())
-            {
-                addr = symbol_ns_addr_;
-            }
-            else
-            {
-                addr = naming::address(get_local_locality(),
-                    server::symbol_namespace::get_component_type(),
-                    get_hosted_symbol_ns_ptr());
-            }
+            addr = naming::address(get_local_locality(),
+                server::symbol_namespace::get_component_type(),
+                client_->get_symbol_ns_ptr());
             return true;
         }
 
         // symbol AGAS service on any locality
         if (naming::detail::strip_internal_bits_and_locality_from_gid(msb) ==
-            HPX_AGAS_NS_MSB)
+                HPX_AGAS_NS_MSB)
         {
             addr.locality_ = naming::get_locality_from_gid(id);
             addr.type_ = server::symbol_namespace::get_component_type();
@@ -1900,12 +1869,7 @@ bool addressing_service::register_name(
 { // {{{
     try {
         request req(symbol_ns_bind, name, id);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        response rep = client_->symbol_service(req, action_priority_, name, ec);
 
         return !ec && (success == rep.get_status());
     }
@@ -1963,12 +1927,7 @@ bool addressing_service::unregister_name(
 { // {{{
     try {
         request req(symbol_ns_unbind, name);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        response rep = client_->symbol_service(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2003,12 +1962,7 @@ bool addressing_service::resolve_name(
 { // {{{
     try {
         request req(symbol_ns_resolve, name);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        response rep = client_->symbol_service(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2517,12 +2471,7 @@ bool addressing_service::retrieve_statistics_counter(
 
         // compose request
         request req(service_code, name);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        response rep= client_->symbol_service(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2759,11 +2708,9 @@ void addressing_service::register_counter_types()
     // install counters for services
     client_->register_counter_types();
 
-    // always register root server as 'locality#0' for bootstrap
-    boost::uint32_t locality_id = 0;
-    if (!is_bootstrap())
-        locality_id = naming::get_locality_id_from_gid(get_local_locality());
-
+    // register root server
+    boost::uint32_t locality_id =
+        naming::get_locality_id_from_gid(get_local_locality());
     client_->register_server_instance(locality_id);
 } // }}}
 
