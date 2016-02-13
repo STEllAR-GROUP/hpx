@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>

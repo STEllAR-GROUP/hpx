@@ -10,8 +10,11 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -41,6 +44,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    namespace actions {
+        template <typename Result>
+        struct typed_continuation;
+    }
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Action, typename ...Ts>
@@ -63,7 +70,8 @@ namespace hpx
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
     template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t, bool move_credits)
+    void set_lco_value(naming::id_type const& id, naming::address && addr, T && t,
+        bool move_credits)
     {
         typedef typename lcos::base_lco_with_value<
             typename util::decay<T>::type
@@ -73,38 +81,44 @@ namespace hpx
             naming::id_type target(id.get_gid(), naming::id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply<set_value_action>(target, util::detail::make_temporary<T>(t));
+            detail::apply_impl<set_value_action>(
+                target, std::move(addr), actions::action_priority<set_value_action>(),
+                util::detail::make_temporary<T>(t));
         }
         else
         {
-            apply<set_value_action>(id, util::detail::make_temporary<T>(t));
+            detail::apply_impl<set_value_action>(
+                id, std::move(addr), actions::action_priority<set_value_action>(),
+                util::detail::make_temporary<T>(t));
         }
     }
 
     template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t,
+    void set_lco_value(naming::id_type const& id, naming::address && addr, T && t,
         naming::id_type const& cont, bool move_credits)
     {
         typedef typename lcos::base_lco_with_value<
             typename util::decay<T>::type
         >::set_value_action set_value_action;
+        typedef
+            typename hpx::actions::extract_action<set_value_action>::result_type
+            result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), naming::id_type::managed_move_credit);
             id.make_unmanaged();
 
-            apply_c<set_value_action>(cont, target,
+            detail::apply_impl<set_value_action>(
+                actions::typed_continuation<result_type>(cont), target, std::move(addr),
                 util::detail::make_temporary<T>(t));
         }
         else
         {
-            apply_c<set_value_action>(cont, id,
+            detail::apply_impl<set_value_action>(
+                actions::typed_continuation<result_type>(cont), id, std::move(addr),
                 util::detail::make_temporary<T>(t));
         }
     }
-
-    HPX_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e, bool move_credits);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,10 +157,32 @@ namespace hpx { namespace actions
         explicit continuation(naming::id_type const& gid)
           : gid_(gid)
         {
+            // Try to resolve the address locally ...
+            if(!agas::is_local_address_cached(gid_, addr_))
+            {
+                addr_ = naming::address();
+            }
         }
 
         explicit continuation(naming::id_type && gid)
           : gid_(std::move(gid))
+        {
+            // Try to resolve the address locally ...
+            if(!agas::is_local_address_cached(gid_, addr_))
+            {
+                addr_ = naming::address();
+            }
+        }
+
+        explicit continuation(naming::id_type const& gid, naming::address && addr)
+          : gid_(gid)
+          , addr_(std::move(addr))
+        {
+        }
+
+        explicit continuation(naming::id_type && gid, naming::address && addr)
+          : gid_(std::move(gid))
+          , addr_(std::move(addr))
         {
         }
 
@@ -168,7 +204,7 @@ namespace hpx { namespace actions
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
-            ar & gid_;
+            ar & gid_ & addr_;
         }
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(continuation);
 
@@ -184,8 +220,14 @@ namespace hpx { namespace actions
             return gid_;
         }
 
+        naming::address get_addr() const
+        {
+            return addr_;
+        }
+
     protected:
         naming::id_type gid_;
+        naming::address addr_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -390,6 +432,26 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
+          : continuation(gid, std::move(addr))
+        {}
+
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
+          : continuation(std::move(gid), std::move(addr))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address && addr, F && f)
+          : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address && addr, F && f)
+          : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
+        {}
+
         template <typename F,
             typename Enable
                 = typename std::enable_if<
@@ -405,7 +467,7 @@ namespace hpx { namespace actions
         // replace by typed_continuation(typed_continuation && o) = default;
         // when all compiler support it
         typed_continuation(typed_continuation && o)
-          : continuation(std::move(o.gid_)), f_(std::move(o.f_))
+          : continuation(std::move(o.gid_), std::move(o.addr_)), f_(std::move(o.f_))
         {}
 
         virtual void trigger_value(Result && result)
@@ -421,7 +483,7 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_id(), std::move(result));
+                hpx::set_lco_value(this->get_id(), this->get_addr(), std::move(result));
             }
             else {
                 f_(this->get_id(), std::move(result));
@@ -484,6 +546,26 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
+          : continuation(gid, std::move(addr))
+        {}
+
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
+          : continuation(std::move(gid), std::move(addr))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address && addr, F && f)
+          : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address && addr, F && f)
+          : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
+        {}
+
         template <typename F>
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
@@ -502,7 +584,7 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                trigger_lco_event(this->get_id());
+                trigger_lco_event(this->get_id(), this->get_addr());
             }
             else {
                 f_(this->get_id());

@@ -11,9 +11,9 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/util/unique_function.hpp>
 

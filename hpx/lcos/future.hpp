@@ -1331,6 +1331,26 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
+          : continuation(gid, std::move(addr))
+        {}
+
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
+          : continuation(std::move(gid), std::move(addr))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address && addr, F && f)
+          : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address && addr, F && f)
+          : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
+        {}
+
         template <typename F,
             typename Enable
                 = typename std::enable_if<
@@ -1351,7 +1371,7 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_id(), result.get());
+                hpx::set_lco_value(this->get_id(), this->get_addr(), result.get());
             }
             else {
                 f_(this->get_id(), result.get());
@@ -1446,6 +1466,26 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
+          : continuation(gid, std::move(addr))
+        {}
+
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
+          : continuation(std::move(gid), std::move(addr))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address && addr, F && f)
+          : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address && addr, F && f)
+          : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
+        {}
+
         template <typename F,
             typename Enable
                 = typename std::enable_if<
@@ -1467,7 +1507,7 @@ namespace hpx { namespace actions
                     return;
                 }
                 result.get();
-                hpx::trigger_lco_event(this->get_id());
+                hpx::trigger_lco_event(this->get_id(), this->get_addr());
             }
             else {
                 result.get();
@@ -1563,6 +1603,26 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
+          : continuation(gid, std::move(addr))
+        {}
+
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
+          : continuation(std::move(gid), std::move(addr))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address && addr, F && f)
+          : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address && addr, F && f)
+          : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
+        {}
+
         template <typename F,
             typename Enable
                 = typename std::enable_if<
@@ -1583,7 +1643,7 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_id(), result.get());
+                hpx::set_lco_value(this->get_id(), this->get_addr(), result.get());
             }
             else {
                 f_(this->get_id(), result.get());
@@ -1678,6 +1738,26 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
+        explicit typed_continuation(naming::id_type const& gid, naming::address && addr)
+          : continuation(gid, std::move(addr))
+        {}
+
+        explicit typed_continuation(naming::id_type && gid, naming::address && addr)
+          : continuation(std::move(gid), std::move(addr))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+            naming::address && addr, F && f)
+          : continuation(gid, std::move(addr)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+            naming::address && addr, F && f)
+          : continuation(std::move(gid), std::move(addr)), f_(std::forward<F>(f))
+        {}
+
         template <typename F,
             typename Enable
                 = typename std::enable_if<
@@ -1699,7 +1779,7 @@ namespace hpx { namespace actions
                     return;
                 }
                 result.get();
-                hpx::trigger_lco_event(this->get_id());
+                hpx::trigger_lco_event(this->get_id(), this->get_addr());
             }
             else {
                 result.get();

@@ -7,6 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_BASE_MAR_03_2009_0741M
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
