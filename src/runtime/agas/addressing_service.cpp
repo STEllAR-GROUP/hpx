@@ -2879,7 +2879,6 @@ void addressing_service::register_counter_types()
         boost::bind(
             &addressing_service::get_cache_erase_entry_time, this, ::_1));
 
-
     performance_counters::generic_counter_type_data const counter_types[] =
     {
         { "/agas/count/cache/entries", performance_counters::counter_raw,
@@ -3270,6 +3269,9 @@ hpx::future<void> addressing_service::mark_as_migrated(
     // function
     typedef boost::unique_lock<mutex_type> lock_type;
 
+    // this lock needs to be acquired before calling the callback
+    lock_type lock(migrated_objects_mtx_);
+    util::ignore_while_checking<lock_type> ignore(&lock);
 
     // call the user code for the component instance to be migrated, the
     // returned future becomes ready whenever the component instance can be
@@ -3281,7 +3283,6 @@ hpx::future<void> addressing_service::mark_as_migrated(
     // locality and the locality managing the address resolution for the object
     if (result.first)
     {
-        lock_type lock(migrated_objects_mtx_);
         migrated_objects_table_type::iterator it =
             migrated_objects_table_.find(gid);
 
