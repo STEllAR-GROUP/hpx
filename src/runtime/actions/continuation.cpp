@@ -36,7 +36,7 @@ namespace hpx
     {
         typedef lcos::base_lco::set_event_action set_action;
         typedef
-            typename hpx::actions::extract_action<set_action>::result_type
+            hpx::actions::extract_action<set_action>::result_type
             result_type;
         if (move_credits)
         {
@@ -100,7 +100,7 @@ namespace hpx
     {
         typedef lcos::base_lco::set_exception_action set_action;
         typedef
-            typename hpx::actions::extract_action<set_action>::result_type
+            hpx::actions::extract_action<set_action>::result_type
             result_type;
         if (move_credits)
         {
@@ -125,7 +125,7 @@ namespace hpx
     {
         typedef lcos::base_lco::set_exception_action set_action;
         typedef
-            typename hpx::actions::extract_action<set_action>::result_type
+            hpx::actions::extract_action<set_action>::result_type
             result_type;
         if (move_credits)
         {
