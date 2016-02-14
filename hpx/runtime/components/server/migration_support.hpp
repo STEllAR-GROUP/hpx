@@ -50,7 +50,7 @@ namespace hpx { namespace components
         }
 
         naming::gid_type get_base_gid(
-               naming::gid_type const& assign_gid = naming::invalid_gid) const
+            naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
             // we don't store migrating objects in the AGAS cache
             naming::gid_type result = this->base_type::get_base_gid(assign_gid);

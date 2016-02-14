@@ -3265,11 +3265,15 @@ hpx::future<void> addressing_service::mark_as_migrated(
 
     naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
-    // always first grab the AGAS lock before invoking the user supplied
-    // function
+    // Always first grab the AGAS lock before invoking the user supplied
+    // function. The user supplied code will grab another lock. Both locks have
+    // to be acquired and always in the same sequence.
+    // The AGAS lock needs to be acquired first as the migrated object might
+    // not exist on this locality, in which case it should not be accessed
+    // anymore. The only way to determine whether the object still exists on
+    // this locality is to query the migrated objects table in AGAS.
     typedef boost::unique_lock<mutex_type> lock_type;
 
-    // this lock needs to be acquired before calling the callback
     lock_type lock(migrated_objects_mtx_);
     util::ignore_while_checking<lock_type> ignore(&lock);
 
@@ -3289,6 +3293,9 @@ hpx::future<void> addressing_service::mark_as_migrated(
         // insert the object into the map of migrated objects
         if (it == migrated_objects_table_.end())
             migrated_objects_table_.insert(gid);
+
+        // avoid interactions with the locking in the cache
+        lock.unlock();
 
         // remove entry from cache
         remove_cache_entry(gid_);
@@ -3311,7 +3318,7 @@ void addressing_service::unmark_as_migrated(
 
     naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
-    mutex_type::scoped_lock lock(migrated_objects_mtx_);
+    boost::unique_lock<mutex_type> lock(migrated_objects_mtx_);
 
     migrated_objects_table_type::iterator it =
         migrated_objects_table_.find(gid);
@@ -3324,7 +3331,10 @@ void addressing_service::unmark_as_migrated(
         // remove entry from cache
         if (caching_ && naming::detail::store_in_cache(gid_))
         {
+            // avoid interactions with the locking in the cache
             lock.unlock();
+
+            // remove entry from cache
             remove_cache_entry(gid_);
         }
     }
@@ -3402,6 +3412,13 @@ std::pair<bool, components::pinned_ptr>
         return std::make_pair(false, components::pinned_ptr());
     }
 
+    // Always first grab the AGAS lock before invoking the user supplied
+    // function. The user supplied code will grab another lock. Both locks have
+    // to be acquired and always in the same sequence.
+    // The AGAS lock needs to be acquired first as the migrated object might
+    // not exist on this locality, in which case it should not be accessed
+    // anymore. The only way to determine whether the object still exists on
+    // this locality is to query the migrated objects table in AGAS.
     typedef boost::unique_lock<mutex_type> lock_type;
 
     lock_type lock(migrated_objects_mtx_);
@@ -3409,7 +3426,7 @@ std::pair<bool, components::pinned_ptr>
     if (was_object_migrated_locked(gid))
         return std::make_pair(true, components::pinned_ptr());
 
-    lock.unlock();
+    util::ignore_while_checking<lock_type> ignore(&lock);
     return std::make_pair(false, f());
 }
 
