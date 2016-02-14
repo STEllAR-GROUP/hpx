@@ -414,7 +414,7 @@ namespace boost { namespace cache
         void touch(typename storage_type::iterator it)
         {
             storage_.splice(
-                storage_.end(),
+                storage_.begin(),
                 storage_,
                 it
             );
