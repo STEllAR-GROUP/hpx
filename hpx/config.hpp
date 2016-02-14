@@ -281,6 +281,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// The default size of the storage space used for small object optimizations
+// in util::functions
+#if !defined(HPX_FUNCTION_STORAGE_NUM_POINTERS)
+#  define HPX_FUNCTION_STORAGE_NUM_POINTERS 4
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 //  Characters used
 //    - to delimit several HPX ini paths
 //    - used as file extensions for shared libraries

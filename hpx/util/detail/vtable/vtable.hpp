@@ -28,7 +28,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static T& get(void** v)
         {
-            if (sizeof(T) <= sizeof(void*))
+            if (sizeof(T) <= HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*))
             {
                 return *reinterpret_cast<T*>(v);
             } else {
@@ -39,7 +39,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static T const& get(void* const* v)
         {
-            if (sizeof(T) <= sizeof(void*))
+            if (sizeof(T) <= HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*))
             {
                 return *reinterpret_cast<T const*>(v);
             } else {
@@ -50,7 +50,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static void default_construct(void** v)
         {
-            if (sizeof(T) <= sizeof(void*))
+            if (sizeof(T) <= HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*))
             {
                 ::new (static_cast<void*>(v)) T;
             } else {
@@ -61,7 +61,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T, typename Arg>
         HPX_FORCEINLINE static void construct(void** v, Arg&& arg)
         {
-            if (sizeof(T) <= sizeof(void*))
+            if (sizeof(T) <= HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*))
             {
                 ::new (static_cast<void*>(v)) T(std::forward<Arg>(arg));
             } else {
@@ -86,7 +86,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static void delete_(void** v)
         {
-            if (sizeof(T) <= sizeof(void*))
+            if (sizeof(T) <= HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*))
             {
                 destruct<T>(v);
             } else {

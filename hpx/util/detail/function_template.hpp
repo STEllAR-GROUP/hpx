@@ -83,12 +83,12 @@ namespace hpx { namespace util
         {
             detail::vtable::delete_<
                 detail::empty_function<R(Ts...)>
-            >(&this->object);
+            >(this->object);
 
             this->vptr = other.vptr;
             if (!this->vptr->empty)
             {
-                this->vptr->copy(&this->object, &other.object);
+                this->vptr->copy(this->object, other.object);
             }
         }
 
@@ -117,12 +117,12 @@ namespace hpx { namespace util
                 reset();
                 detail::vtable::delete_<
                     detail::empty_function<R(Ts...)>
-                >(&this->object);
+                >(this->object);
 
                 this->vptr = other.vptr;
                 if (!this->vptr->empty)
                 {
-                    this->vptr->copy(&this->object, &other.object);
+                    this->vptr->copy(this->object, other.object);
                 }
             }
             return *this;

@@ -24,6 +24,7 @@
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
+#include <cstring>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -126,22 +127,24 @@ namespace hpx { namespace util { namespace detail
     public:
         function_base() HPX_NOEXCEPT
           : vptr(&empty_table)
-          , object(0)
         {
-            vtable::default_construct<empty_function<R(Ts...)> >(&object);
+            std::memset(object, 0, HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*));
+            vtable::default_construct<empty_function<R(Ts...)> >(object);
         }
 
         function_base(function_base&& other) HPX_NOEXCEPT
           : vptr(other.vptr)
-          , object(other.object) // move-construct
         {
+            // move-construct
+            std::memcpy(object, other.object,
+                HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*));
             other.vptr = &empty_table;
-            vtable::default_construct<empty_function<R(Ts...)> >(&other.object);
+            vtable::default_construct<empty_function<R(Ts...)> >(other.object);
         }
 
         ~function_base()
         {
-            vptr->delete_(&object);
+            vptr->delete_(object);
         }
 
         function_base& operator=(function_base&& other) HPX_NOEXCEPT
@@ -164,13 +167,13 @@ namespace hpx { namespace util { namespace detail
                 VTablePtr const* f_vptr = get_table_ptr<target_type>();
                 if (vptr == f_vptr)
                 {
-                    vtable::reconstruct<target_type>(&object, std::forward<F>(f));
+                    vtable::reconstruct<target_type>(object, std::forward<F>(f));
                 } else {
                     reset();
-                    vtable::delete_<empty_function<R(Ts...)> >(&object);
+                    vtable::delete_<empty_function<R(Ts...)> >(object);
 
                     vptr = f_vptr;
-                    vtable::construct<target_type>(&object, std::forward<F>(f));
+                    vtable::construct<target_type>(object, std::forward<F>(f));
                 }
             } else {
                 reset();
@@ -181,10 +184,10 @@ namespace hpx { namespace util { namespace detail
         {
             if (!vptr->empty)
             {
-                vptr->delete_(&object);
+                vptr->delete_(object);
 
                 vptr = &empty_table;
-                vtable::default_construct<empty_function<R(Ts...)> >(&object);
+                vtable::default_construct<empty_function<R(Ts...)> >(object);
             }
         }
 
@@ -230,7 +233,7 @@ namespace hpx { namespace util { namespace detail
             if (vptr != f_vptr || empty())
                 return 0;
 
-            return &vtable::get<target_type>(&object);
+            return &vtable::get<target_type>(object);
         }
 
         template <typename T>
@@ -246,12 +249,12 @@ namespace hpx { namespace util { namespace detail
             if (vptr != f_vptr || empty())
                 return 0;
 
-            return &vtable::get<target_type>(&object);
+            return &vtable::get<target_type>(object);
         }
 
         HPX_FORCEINLINE R operator()(Ts... vs) const
         {
-            return vptr->invoke(&object, std::forward<Ts>(vs)...);
+            return vptr->invoke(object, std::forward<Ts>(vs)...);
         }
 
     private:
@@ -263,7 +266,7 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         VTablePtr const *vptr;
-        mutable void *object;
+        mutable void* object[HPX_FUNCTION_STORAGE_NUM_POINTERS];
     };
 
     template <typename VTablePtr, typename R, typename ...Ts>
@@ -324,7 +327,7 @@ namespace hpx { namespace util { namespace detail
                 ar >> name;
 
                 this->vptr = detail::get_table_ptr<vtable_ptr>(name);
-                this->vptr->load_object(&this->object, ar, version);
+                this->vptr->load_object(this->object, ar, version);
             }
         }
 
@@ -337,7 +340,7 @@ namespace hpx { namespace util { namespace detail
                 std::string function_name = this->vptr->name;
                 ar << function_name;
 
-                this->vptr->save_object(&this->object, ar, version);
+                this->vptr->save_object(this->object, ar, version);
             }
         }
 
