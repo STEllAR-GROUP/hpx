@@ -128,7 +128,7 @@ namespace hpx { namespace util { namespace detail
         function_base() HPX_NOEXCEPT
           : vptr(&empty_table)
         {
-            std::memset(object, 0, HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*));
+            std::memset(object, 0, vtable::function_storage_size);
             vtable::default_construct<empty_function<R(Ts...)> >(object);
         }
 
@@ -136,8 +136,7 @@ namespace hpx { namespace util { namespace detail
           : vptr(other.vptr)
         {
             // move-construct
-            std::memcpy(object, other.object,
-                HPX_FUNCTION_STORAGE_NUM_POINTERS*sizeof(void*));
+            std::memcpy(object, other.object, vtable::function_storage_size);
             other.vptr = &empty_table;
             vtable::default_construct<empty_function<R(Ts...)> >(other.object);
         }
@@ -266,7 +265,7 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         VTablePtr const *vptr;
-        mutable void* object[HPX_FUNCTION_STORAGE_NUM_POINTERS];
+        mutable void* object[vtable::function_storage_size];
     };
 
     template <typename VTablePtr, typename R, typename ...Ts>
