@@ -8,7 +8,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -875,7 +874,8 @@ namespace detail
 
 void big_boot_barrier::wait_hosted(
     std::string const& locality_name,
-    void* primary_ns_server, void* symbol_ns_server)
+    naming::address::address_type primary_ns_server,
+    naming::address::address_type symbol_ns_server)
 { // {{{
     HPX_ASSERT(service_mode_bootstrap != service_type);
 
@@ -906,8 +906,8 @@ void big_boot_barrier::wait_hosted(
     // contact the bootstrap AGAS node
     registration_header hdr(
           rt.endpoints()
-        , reinterpret_cast<boost::uint64_t>(primary_ns_server)
-        , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
+        , primary_ns_server
+        , symbol_ns_server
         , cores_needed
         , num_threads
         , locality_name

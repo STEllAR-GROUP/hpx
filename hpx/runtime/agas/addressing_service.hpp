@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +12,6 @@
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
 #include <hpx/config.hpp>
-
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
@@ -20,6 +20,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -33,10 +34,6 @@
 
 #include <map>
 #include <vector>
-
-// TODO: split into a base class and two implementations (one for bootstrap,
-// one for hosted).
-// TODO: Use \copydoc.
 
 namespace hpx { namespace util
 {
@@ -78,9 +75,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef std::set<naming::gid_type> migrated_objects_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
-    struct bootstrap_data_type;
-    struct hosted_data_type;
-
     mutable mutex_type gva_cache_mtx_;
     boost::shared_ptr<gva_cache_type> gva_cache_;
 
@@ -108,8 +102,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::uint64_t rts_lva_;
     boost::uint64_t mem_lva_;
 
-    boost::shared_ptr<bootstrap_data_type> bootstrap;
-    boost::shared_ptr<hosted_data_type> hosted;
+    boost::shared_ptr<detail::agas_service_client> client_;
 
     boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
@@ -145,7 +138,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     state get_status() const
     {
-        if (!hosted && !bootstrap)
+        if (!client_)
             return state_stopping;
         return state_.load();
     }
@@ -201,13 +194,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         error_code& ec = throws
         );
 
-    void* get_hosted_primary_ns_ptr() const;
-    void* get_hosted_symbol_ns_ptr() const;
+    naming::address::address_type get_hosted_primary_ns_ptr() const;
+    naming::address::address_type get_hosted_symbol_ns_ptr() const;
 
-    void* get_bootstrap_locality_ns_ptr() const;
-    void* get_bootstrap_primary_ns_ptr() const;
-    void* get_bootstrap_component_ns_ptr() const;
-    void* get_bootstrap_symbol_ns_ptr() const;
+    naming::address::address_type get_bootstrap_locality_ns_ptr() const;
+    naming::address::address_type get_bootstrap_primary_ns_ptr() const;
+    naming::address::address_type get_bootstrap_component_ns_ptr() const;
+    naming::address::address_type get_bootstrap_symbol_ns_ptr() const;
 
     boost::int64_t synchronize_with_async_incref(
         hpx::future<boost::int64_t> fut
@@ -217,18 +210,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     naming::address::address_type get_primary_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
-            is_bootstrap() ?
-                get_bootstrap_primary_ns_ptr() :
-                get_hosted_primary_ns_ptr());
+        return client_->get_primary_ns_ptr();
     }
 
     naming::address::address_type get_symbol_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
-            is_bootstrap() ?
-                get_bootstrap_symbol_ns_ptr() :
-                get_hosted_symbol_ns_ptr());
+        return client_->get_symbol_ns_ptr();
     }
 
 protected:
