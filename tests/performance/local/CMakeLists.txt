@@ -24,6 +24,7 @@ set(benchmarks
     hpx_homogeneous_timed_task_spawn_executors
     hpx_heterogeneous_timed_task_spawn
     print_heterogeneous_payloads
+    skynet
     timed_task_spawn
 )
 
@@ -83,6 +84,7 @@ endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
+set(skynet_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
