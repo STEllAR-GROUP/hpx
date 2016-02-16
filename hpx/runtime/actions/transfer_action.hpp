@@ -325,30 +325,15 @@ namespace hpx { namespace actions
 
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
-                if(direct_execution::value && hpx::threads::get_self_ptr())
-                {
-                    get_thread_function(std::move(cont), lva)(
-                        threads::thread_state_ex(threads::wait_signaled));
-                }
-                else
-                {
-                    traits::action_schedule_thread<derived_type>::call(lva,
-                        get_thread_init_data(std::move(cont), target, lva, data),
-                        initial_state);
-                }
+                traits::action_schedule_thread<derived_type>::call(lva,
+                    get_thread_init_data(std::move(cont), target, lva, data),
+                    initial_state);
+
             }
             else
             {
-                if(direct_execution::value && hpx::threads::get_self_ptr())
-                {
-                    get_thread_function(lva)(
-                        threads::thread_state_ex(threads::wait_signaled));
-                }
-                else
-                {
-                    traits::action_schedule_thread<derived_type>::call(lva,
-                        get_thread_init_data(target, lva, data), initial_state);
-                }
+                traits::action_schedule_thread<derived_type>::call(lva,
+                    get_thread_init_data(target, lva, data), initial_state);
             }
 
             // keep track of number of invocations
@@ -367,17 +352,10 @@ namespace hpx { namespace actions
             threads::thread_init_data data;
             data.num_os_thread = num_thread;
 
-            if(direct_execution::value && hpx::threads::get_self_ptr())
-            {
-                get_thread_function(std::move(cont), lva)(
-                    threads::thread_state_ex(threads::wait_signaled));
-            }
-            else
-            {
-                traits::action_schedule_thread<derived_type>::call(lva,
-                    get_thread_init_data(std::move(cont), target, lva, data),
-                    initial_state);
-            }
+            traits::action_schedule_thread<derived_type>::call(lva,
+                get_thread_init_data(std::move(cont), target, lva, data),
+                initial_state);
+
 
             // keep track of number of invocations
             increment_invocation_count();
