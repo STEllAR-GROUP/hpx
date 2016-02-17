@@ -148,11 +148,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename F>
+        struct execute_result_helper
+        {
+            typedef typename hpx::util::result_of<
+                    typename hpx::util::decay<F>::type()
+                >::type result_type;
+            typedef typename std::remove_reference<result_type>::type type;
+        };
+
         struct execute_helper
         {
             template <typename Executor, typename F>
-            static auto call(hpx::traits::detail::wrap_int, Executor& exec, F && f)
-            ->  decltype(exec.async_execute(std::forward<F>(f)).get())
+            static typename execute_result_helper<F>::type
+            call(hpx::traits::detail::wrap_int, Executor& exec, F && f)
             {
                 try {
                     return exec.async_execute(std::forward<F>(f)).get();
