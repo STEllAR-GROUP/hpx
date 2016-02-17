@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -700,31 +700,18 @@ namespace detail
     template <typename Result>
     struct task_base : future_data<Result>
     {
-    private:
+    protected:
         typedef typename future_data<Result>::mutex_type mutex_type;
         typedef boost::intrusive_ptr<task_base> future_base_type;
-
-    protected:
         typedef typename future_data<Result>::result_type result_type;
-
-        threads::thread_id_type get_thread_id() const
-        {
-            boost::lock_guard<mutex_type> l(this->mtx_);
-            return id_;
-        }
-        void set_thread_id(threads::thread_id_type id)
-        {
-            boost::lock_guard<mutex_type> l(this->mtx_);
-            id_ = id;
-        }
 
     public:
         task_base()
-          : started_(false), id_(threads::invalid_thread_id), sched_(0)
+          : started_(false), sched_(0)
         {}
 
         task_base(threads::executor& sched)
-          : started_(false), id_(threads::invalid_thread_id),
+          : started_(false),
             sched_(sched ? &sched : 0)
         {}
 
@@ -776,6 +763,7 @@ namespace detail
             return false;
         }
 
+    protected:
         void check_started()
         {
             boost::lock_guard<mutex_type> l(this->mtx_);
@@ -797,7 +785,7 @@ namespace detail
         }
 
         // run in a separate thread
-        void apply(BOOST_SCOPED_ENUM(launch) policy,
+        virtual void apply(BOOST_SCOPED_ENUM(launch) policy,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
@@ -828,25 +816,9 @@ namespace detail
             }
         }
 
-    private:
-        struct reset_id
-        {
-            reset_id(task_base& target)
-              : target_(target)
-            {
-                target.set_thread_id(threads::get_self_id());
-            }
-            ~reset_id()
-            {
-                target_.set_thread_id(threads::invalid_thread_id);
-            }
-            task_base& target_;
-        };
-
     protected:
         threads::thread_state_enum run_impl()
         {
-            reset_id r(*this);
             this->do_run();
             return threads::terminated;
         }
@@ -863,8 +835,104 @@ namespace detail
             this->future_data<Result>::set_exception(e);
         }
 
-        virtual void do_run() = 0;
+        virtual void do_run()
+        {
+            HPX_ASSERT(false);      // shouldn't ever be called
+        }
 
+    protected:
+        bool started_;
+        threads::executor* sched_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    struct cancelable_task_base : task_base<Result>
+    {
+    protected:
+        typedef typename task_base<Result>::mutex_type mutex_type;
+        typedef boost::intrusive_ptr<cancelable_task_base> future_base_type;
+        typedef typename future_data<Result>::result_type result_type;
+
+    protected:
+        threads::thread_id_type get_thread_id() const
+        {
+            boost::lock_guard<mutex_type> l(this->mtx_);
+            return id_;
+        }
+        void set_thread_id(threads::thread_id_type id)
+        {
+            boost::lock_guard<mutex_type> l(this->mtx_);
+            id_ = id;
+        }
+
+    public:
+        cancelable_task_base()
+          : task_base<Result>(), id_(threads::invalid_thread_id)
+        {}
+
+        cancelable_task_base(threads::executor& sched)
+          : task_base<Result>(sched), id_(threads::invalid_thread_id)
+        {}
+
+    private:
+        struct reset_id
+        {
+            reset_id(cancelable_task_base& target)
+              : target_(target)
+            {
+                target.set_thread_id(threads::get_self_id());
+            }
+            ~reset_id()
+            {
+                target_.set_thread_id(threads::invalid_thread_id);
+            }
+            cancelable_task_base& target_;
+        };
+
+    protected:
+        // run in a separate thread
+        void apply(BOOST_SCOPED_ENUM(launch) policy,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize, error_code& ec)
+        {
+            this->check_started();
+
+            future_base_type this_(this);
+
+            char const* desc = hpx::threads::get_thread_description(
+                hpx::threads::get_self_id());
+
+            if (sched_) {
+                sched_->add(
+                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
+                    desc ? desc : "cancelable_task_base::apply",
+                    threads::pending, false, stacksize, ec);
+            }
+            else if (policy == launch::fork) {
+                threads::register_thread_plain(
+                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
+                    desc ? desc : "cancelable_task_base::apply",
+                    threads::pending, false, threads::thread_priority_boost,
+                    get_worker_thread_num(), stacksize, ec);
+            }
+            else {
+                threads::register_thread_plain(
+                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
+                    desc ? desc : "cancelable_task_base::apply",
+                    threads::pending, false, priority, std::size_t(-1),
+                    stacksize, ec);
+            }
+        }
+
+        threads::thread_state_enum run_impl()
+        {
+            reset_id r(*this);
+            this->do_run();
+            return threads::terminated;
+        }
+
+    public:
         // cancellation support
         bool cancelable() const
         {
@@ -906,9 +974,7 @@ namespace detail
         }
 
     protected:
-        bool started_;
         threads::thread_id_type id_;
-        threads::executor* sched_;
     };
 }}}
 
