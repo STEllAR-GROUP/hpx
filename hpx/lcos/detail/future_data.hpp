@@ -903,8 +903,8 @@ namespace detail
             char const* desc = hpx::threads::get_thread_description(
                 hpx::threads::get_self_id());
 
-            if (sched_) {
-                sched_->add(
+            if (this->sched_) {
+                this->sched_->add(
                     util::bind(&cancelable_task_base::run_impl, std::move(this_)),
                     desc ? desc : "cancelable_task_base::apply",
                     threads::pending, false, stacksize, ec);
