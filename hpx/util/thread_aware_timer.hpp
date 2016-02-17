@@ -9,7 +9,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/io_service_pool.hpp>
 
 #include <boost/cstdint.hpp>
 
@@ -74,17 +73,7 @@ namespace hpx { namespace util
             p.set_value(util::high_resolution_clock::now());
         }
 
-        static boost::uint64_t take_time_stamp()
-        {
-            hpx::lcos::local::promise<boost::uint64_t> p;
-
-            // Get a reference to the Timer specific HPX io_service object ...
-            hpx::util::io_service_pool* pool = hpx::get_thread_pool("timer_pool");
-
-            // ... and schedule the handler to run on the first of its OS-threads.
-            pool->get_io_service(0).post(hpx::util::bind(&sample_time, boost::ref(p)));
-            return p.get_future().get();
-        }
+        HPX_EXPORT static boost::uint64_t take_time_stamp();
 
     private:
         boost::uint64_t start_time_;

@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
@@ -44,11 +45,6 @@ namespace hpx
     HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
 
     /// \cond NOINTERNAL
-    namespace util
-    {
-        class HPX_EXPORT io_service_pool;
-        class HPX_EXPORT runtime_configuration;
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();

@@ -22,6 +22,18 @@
 #include <string>
 #include <sstream>
 
+#if defined(HPX_WINDOWS)
+// Prevent asio from initialising Winsock, the object must be constructed
+// before any Asio's own global objects. With MSVC, this may be accomplished
+// by adding the following code to the DLL:
+
+#pragma warning(push)
+#pragma warning(disable:4073)
+#pragma init_seg(lib)
+boost::asio::detail::winsock_init<>::manual manual_winsock_init;
+#pragma warning(pop)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
