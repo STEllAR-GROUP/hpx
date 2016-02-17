@@ -68,7 +68,6 @@ namespace hpx { namespace traits
     struct acquire_shared_state_impl<T,
         typename boost::disable_if_c<is_future_or_future_range<T>::value>::type>
     {
-        typedef T type;
 
         template <typename T_>
         HPX_FORCEINLINE
