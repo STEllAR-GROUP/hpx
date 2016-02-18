@@ -11,6 +11,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/util/io_service_pool.hpp>
 
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write,
