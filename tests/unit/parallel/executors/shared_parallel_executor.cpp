@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <vector>
+#include <type_traits>
 
 #include <boost/range/functions.hpp>
 
@@ -31,6 +32,17 @@ struct shared_parallel_executor
     async_execute(F && f)
     {
         return hpx::async(std::forward<F>(f));
+    }
+
+    template <typename F>
+    typename std::remove_reference<
+        typename hpx::util::result_of<
+            typename hpx::util::decay<F>::type()
+        >::type
+    >::type
+    execute(F && f)
+    {
+        return async_execute(std::forward<F>(f)).get();
     }
 };
 
