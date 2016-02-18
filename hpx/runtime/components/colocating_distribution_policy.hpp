@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,6 +18,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
@@ -189,7 +190,8 @@ namespace hpx { namespace components
         {
             if (!id_)
             {
-                return hpx::detail::apply_impl<Action>(std::forward<Continuation>(c),
+                return hpx::detail::apply_impl<Action>(
+                    std::forward<Continuation>(c),
                     hpx::find_here(), priority, std::forward<Ts>(vs)...);
             }
             return hpx::detail::apply_colocated<Action>(
@@ -197,8 +199,7 @@ namespace hpx { namespace components
         }
 
         template <typename Action, typename ...Ts>
-        bool apply(
-            threads::thread_priority priority, Ts&&... vs) const
+        bool apply(threads::thread_priority priority, Ts&&... vs) const
         {
             if (!id_)
             {
@@ -219,12 +220,15 @@ namespace hpx { namespace components
         {
             if (!id_)
             {
-                return hpx::detail::apply_cb_impl<Action>(std::forward<Continuation>(c),
+                return hpx::detail::apply_cb_impl<Action>(
+                    std::forward<Continuation>(c),
                     hpx::find_here(), priority, std::forward<Callback>(cb),
                     std::forward<Ts>(vs)...);
             }
-            return hpx::detail::apply_colocated_cb<Action>(std::forward<Continuation>(c),
-                id_, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            return hpx::detail::apply_colocated_cb<Action>(
+                std::forward<Continuation>(c),
+                id_, std::forward<Callback>(cb),
+                std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename Callback, typename ...Ts>
@@ -252,11 +256,26 @@ namespace hpx { namespace components
             return 1;
         }
 
+        /// Returns the locality which is anticipated to be used for the next
+        /// async operation
+        hpx::id_type get_next_target() const
+        {
+            return id_ ? id_ : hpx::find_here();
+        }
+
     protected:
         /// \cond NOINTERNAL
         colocating_distribution_policy(id_type const& id)
           : id_(id)
         {}
+
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned int const)
+        {
+            ar & id_;
+        }
 
         hpx::id_type id_;   // the global address of the object with which the
                             // new objects will be colocated

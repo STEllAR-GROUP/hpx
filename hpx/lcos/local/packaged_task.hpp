@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,13 +28,12 @@ namespace hpx { namespace lcos { namespace local
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result, typename F>
-        struct task_object
-          : lcos::detail::task_base<Result>
+        template <typename Result, typename F,
+            typename Base = lcos::detail::task_base<Result> >
+        struct task_object : Base
         {
-            typedef lcos::detail::task_base<Result> base_type;
-            typedef typename lcos::detail::task_base<Result>::result_type
-                result_type;
+            typedef Base base_type;
+            typedef typename Base::result_type result_type;
 
             F f_;
 
@@ -65,13 +64,11 @@ namespace hpx { namespace lcos { namespace local
             }
         };
 
-        template <typename F>
-        struct task_object<void, F>
-          : lcos::detail::task_base<void>
+        template <typename F, typename Base>
+        struct task_object<void, F, Base> : Base
         {
-            typedef lcos::detail::task_base<void> base_type;
-            typedef typename lcos::detail::task_base<void>::result_type
-                result_type;
+            typedef Base base_type;
+            typedef typename Base::result_type result_type;
 
             F f_;
 
@@ -102,6 +99,32 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
         };
+
+        template <typename Result, typename F>
+        struct cancelable_task_object
+          : task_object<Result, F, lcos::detail::cancelable_task_base<Result> >
+        {
+            typedef task_object<
+                    Result, F, lcos::detail::cancelable_task_base<Result>
+                > base_type;
+            typedef typename base_type::result_type result_type;
+
+            cancelable_task_object(F const& f)
+              : base_type(f)
+            {}
+
+            cancelable_task_object(F && f)
+              : base_type(std::move(f))
+            {}
+
+            cancelable_task_object(threads::executor& sched, F const& f)
+              : base_type(sched, f)
+            {}
+
+            cancelable_task_object(threads::executor& sched, F && f)
+              : base_type(sched, std::move(f))
+            {}
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -110,11 +133,77 @@ namespace hpx { namespace lcos { namespace local
     // We provide this class to avoid semantic differences to the C++11
     // std::packaged_task, while otoh it is a very convenient way for us to
     // implement hpx::async.
-    template <typename Func>
+    template <typename Func, bool Cancelable = false>
     class futures_factory;
 
-    template <typename Result>
-    class futures_factory<Result()>
+    namespace detail
+    {
+        template <typename Result, bool Cancelable>
+        struct create_task_object
+        {
+            typedef boost::intrusive_ptr<lcos::detail::task_base<Result> >
+                return_type;
+
+            template <typename F>
+            static return_type call(threads::executor& sched, F && f)
+            {
+                return new task_object<Result, F>(sched, std::forward<F>(f));
+            }
+
+            template <typename R>
+            static return_type call(threads::executor& sched, R (*f)())
+            {
+                return new task_object<Result, Result (*)()>(sched, f);
+            }
+
+            template <typename F>
+            static return_type call(F && f)
+            {
+                return new task_object<Result, F>(std::forward<F>(f));
+            }
+
+            template <typename R>
+            static return_type call(R (*f)())
+            {
+                return new task_object<Result, Result (*)()>(f);
+            }
+        };
+
+        template <typename Result>
+        struct create_task_object<Result, true>
+        {
+            typedef boost::intrusive_ptr<lcos::detail::task_base<Result> >
+                return_type;
+
+            template <typename F>
+            static return_type call(threads::executor& sched, F && f)
+            {
+                return new cancelable_task_object<Result, F>(
+                    sched, std::forward<F>(f));
+            }
+
+            template <typename R>
+            static return_type call(threads::executor& sched, R (*f)())
+            {
+                return new cancelable_task_object<Result, Result (*)()>(sched, f);
+            }
+
+            template <typename F>
+            static return_type call(F && f)
+            {
+                return new cancelable_task_object<Result, F>(std::forward<F>(f));
+            }
+
+            template <typename R>
+            static return_type call(R (*f)())
+            {
+                return new cancelable_task_object<Result, Result (*)()>(f);
+            }
+        };
+    }
+
+    template <typename Result, bool Cancelable>
+    class futures_factory<Result(), Cancelable>
     {
     protected:
         typedef lcos::detail::task_base<Result> task_impl_type;
@@ -131,23 +220,25 @@ namespace hpx { namespace lcos { namespace local
 
         template <typename F>
         explicit futures_factory(threads::executor& sched, F && f)
-          : task_(new detail::task_object<Result, F>(sched, std::forward<F>(f))),
+          : task_(detail::create_task_object<Result, Cancelable>::call(
+                sched, std::forward<F>(f))),
             future_obtained_(false)
         {}
 
         explicit futures_factory(threads::executor& sched, Result (*f)())
-          : task_(new detail::task_object<Result , Result (*)()>(sched, f)),
+          : task_(detail::create_task_object<Result, Cancelable>::call(sched, f)),
             future_obtained_(false)
         {}
 
         template <typename F>
         explicit futures_factory(F && f)
-          : task_(new detail::task_object<Result, F>(std::forward<F>(f))),
+          : task_(detail::create_task_object<Result, Cancelable>::call(
+                std::forward<F>(f))),
             future_obtained_(false)
         {}
 
         explicit futures_factory(Result (*f)())
-          : task_(new detail::task_object<Result , Result (*)()>(f)),
+          : task_(detail::create_task_object<Result, Cancelable>::call(f)),
             future_obtained_(false)
         {}
 

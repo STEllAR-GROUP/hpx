@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,8 +25,8 @@
 #include <boost/detail/atomic_count.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <utility>
 
+#include <utility>
 #include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,6 +182,16 @@ namespace hpx { namespace components
     class managed_component_base
       : public traits::detail::managed_component_tag, boost::noncopyable
     {
+    private:
+        Component& derived()
+        {
+            return static_cast<Component&>(*this);
+        }
+        Component const& derived() const
+        {
+            return static_cast<Component const&>(*this);
+        }
+
     public:
         typedef typename boost::mpl::if_<
             boost::is_same<Component, detail::this_type>,
@@ -255,29 +265,6 @@ namespace hpx { namespace components
         naming::gid_type get_base_gid() const;
 
     public:
-        /// This is the default hook implementation for decorate_action which
-        template <typename F>
-        static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
-        {
-            return std::forward<F>(f);
-        }
-
-        /// This is the default hook implementation for schedule_thread which
-        /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
-            threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
-        {
-            hpx::threads::register_work_plain(data, initial_state); //-V106
-        }
-
-        // This component type requires valid id for its actions to be invoked
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return !naming::is_locality(id);
-        }
-
         // This component type does not support migration.
         static HPX_CONSTEXPR bool supports_migration() { return false; }
 
@@ -704,7 +691,7 @@ namespace hpx { namespace components
         get_id() const
     {
         // all credits should have been taken already
-        naming::gid_type gid = get_base_gid();
+        naming::gid_type gid = derived().get_base_gid();
 
         // The underlying heap will always give us a full set of credits, but
         // those are valid for the first invocation of get_base_gid() only.

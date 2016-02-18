@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -300,13 +300,13 @@ namespace hpx { namespace components
             ar << size; //-V128
             ar << hpx::serialization::detail::raw_ptr(act);
 
-            HPX_ASSERT(act->save());
+            HPX_ASSERT(act->save_function());
             if (config) {
-                act->save()(data->get_ptr(), data->get_size(), ar, version,
+                act->save_function()(data->get_ptr(), data->get_size(), ar, version,
                     config->get_ptr());
             }
             else {
-                act->save()(data->get_ptr(), data->get_size(), ar, version, 0);
+                act->save_function()(data->get_ptr(), data->get_size(), ar, version, 0);
             }
         }
 
@@ -337,13 +337,13 @@ namespace hpx { namespace components
                 new (server::detail::allocate_block<alloc_type>(size))
                     alloc_type(size, act->get_instance()); //-V522
 
-            HPX_ASSERT(act->load()); //-V522
+            HPX_ASSERT(act->load_function()); //-V522
             if (config) {
-                act->load()(p->get_ptr(), size, ar, version, //-V522
+                act->load_function()(p->get_ptr(), size, ar, version, //-V522
                     config->get_ptr());
             }
             else {
-                act->load()(p->get_ptr(), size, ar, version, 0); //-V522
+                act->load_function()(p->get_ptr(), size, ar, version, 0); //-V522
             }
 
             delete act;
@@ -431,24 +431,6 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         // This component type requires valid id for its actions to be invoked
         static bool is_target_valid(naming::id_type const& id) { return true; }
-
-        /// This is the default hook implementation for decorate_action which
-        /// does no hooking at all.
-        template <typename F>
-        static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
-        {
-            return std::forward<F>(f);
-        }
-
-        /// This is the default hook implementation for schedule_thread which
-        /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
-            threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
-        {
-            hpx::threads::register_work_plain(data, initial_state); //-V106
-        }
     };
 }}}}
 

@@ -18,7 +18,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static void copy(void** v, void* const* src)
         {
-            if (sizeof(T) <= sizeof(void*))
+            if (sizeof(T) <= vtable::function_storage_size)
             {
                 new (v) T(get<T>(src));
             } else {

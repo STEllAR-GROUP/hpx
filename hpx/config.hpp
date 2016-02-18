@@ -166,22 +166,18 @@
 #endif
 
 /// This defines the number of AGAS address translations kept in the local
-/// cache on a per OS-thread basis (system wide used OS threads).
-#if !defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD)
-#  define HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD 32
-#endif
-
-/// This defines the number of AGAS address translations kept in the local
 /// cache. This is just the initial size which may be adjusted depending on the
-/// load of the system, etc. It must be a minimum of 3 for AGAS v3
+/// load of the system (not implemented yet), etc. It must be a minimum of 3 for AGAS v3
 /// bootstrapping.
-/// The actual number of local cache entries used is determined by
 ///
-///  max(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE,
-///      HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD * num_nodes)
+/// This value can be changes at runtime by setting the configuration parameter:
 ///
-#if !defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
-#  define HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE 256
+///   hpx.agas.local_cache_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_AGAS_LOCAL_CACHE_SIZE)
+#if !defined(HPX_AGAS_LOCAL_CACHE_SIZE)
+#  define HPX_AGAS_LOCAL_CACHE_SIZE 4096
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,10 +207,18 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable minimal thread deadlock detection in debug builds only.
-#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#    define HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
 #  endif
+#endif
+#if !defined(HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION)
+#  if defined(HPX_DEBUG)
+//#    define HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+#  endif
+#endif
+#if !defined(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)
+#  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 1000000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -433,7 +437,7 @@
 #    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
-#      define HPX_SMALL_STACK_SIZE  0x10000       // 64kByte
+#      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #    else
 #      define HPX_SMALL_STACK_SIZE  0x8000        // 32kByte
 #    endif

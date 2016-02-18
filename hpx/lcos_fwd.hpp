@@ -22,7 +22,8 @@ namespace hpx
             struct future_data_refcnt_base;
         }
 
-        class base_lco;
+        class HPX_API_EXPORT base_lco;
+
         template <typename Result, typename RemoteResult = Result>
         class base_lco_with_value;
 

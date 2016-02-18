@@ -19,6 +19,7 @@
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
@@ -231,7 +232,7 @@ namespace hpx { namespace actions
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
 
-        /// Return all data needed for thread initialization
+        /// Perform thread initialization
         virtual void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
             threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
@@ -239,6 +240,11 @@ namespace hpx { namespace actions
         virtual void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
+
+        /// Return whether the given object was migrated
+        virtual std::pair<bool, components::pinned_ptr>
+            was_object_migrated(hpx::id_type const&,
+                naming::address::address_type) = 0;
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.

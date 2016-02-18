@@ -532,7 +532,17 @@ namespace hpx { namespace lcos
             future_obtained_ = false;
         }
 
-        /// \brief Return the global id of this \a future instance
+        /// \brief Return the resolved address of this \a promise instance
+        naming::address resolve() const
+        {
+            return naming::address(
+                hpx::get_locality()
+              , impl_->get_component_type()
+              , impl_.get()
+            );
+        }
+
+        /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
             return (*impl_)->get_id();
@@ -676,7 +686,17 @@ namespace hpx { namespace lcos
             future_obtained_ = false;
         }
 
-        /// \brief Return the global id of this \a future instance
+        /// \brief Return the resolved address of this \a promise instance
+        naming::address resolve() const
+        {
+            return naming::address(
+                hpx::get_locality()
+              , impl_->get_component_type()
+              , impl_.get()
+            );
+        }
+
+        /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
             return (*impl_)->get_id();

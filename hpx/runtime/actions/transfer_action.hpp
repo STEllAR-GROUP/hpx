@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -17,6 +17,7 @@
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -30,6 +31,7 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>
@@ -40,6 +42,7 @@
 #include <boost/atomic.hpp>
 
 #include <memory>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -319,11 +322,13 @@ namespace hpx { namespace actions
             std::unique_ptr<continuation> cont;
             threads::thread_init_data data;
             data.num_os_thread = num_thread;
+
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
                     get_thread_init_data(std::move(cont), target, lva, data),
                     initial_state);
+
             }
             else
             {
@@ -346,12 +351,22 @@ namespace hpx { namespace actions
             // now, schedule the thread
             threads::thread_init_data data;
             data.num_os_thread = num_thread;
+
             traits::action_schedule_thread<derived_type>::call(lva,
                 get_thread_init_data(std::move(cont), target, lva, data),
                 initial_state);
 
+
             // keep track of number of invocations
             increment_invocation_count();
+        }
+
+        /// Return whether the given object was migrated
+        std::pair<bool, components::pinned_ptr>
+            was_object_migrated(hpx::id_type const& id,
+                naming::address::address_type lva)
+        {
+            return traits::action_was_object_migrated<derived_type>::call(id, lva);
         }
 
         /// Return a pointer to the filter to be used while serializing an

@@ -52,7 +52,8 @@ namespace hpx
             {
                 if (value >= success && value < last_error)
                     return std::string("HPX(") + error_names[value] + ")"; //-V108
-
+                if (value & system_error_flag)
+                    return std::string("HPX(system_error)");
                 return "HPX(unknown_error)";
             }
         };
@@ -410,7 +411,7 @@ namespace hpx
         explicit exception(error e = success)
           : boost::system::system_error(make_error_code(e, plain))
         {
-            HPX_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -435,7 +436,7 @@ namespace hpx
         exception(error e, char const* msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
-            HPX_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -453,7 +454,7 @@ namespace hpx
         exception(error e, std::string const& msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
-            HPX_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
             LERR_(error) << "created exception: " << this->what();
         }
 

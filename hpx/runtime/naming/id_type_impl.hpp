@@ -29,7 +29,7 @@ namespace hpx { namespace naming
             static_cast<detail::id_type_management>(t)))
     {
         if (t == unmanaged)
-            detail::strip_internal_bits_from_gid(*gid_);
+            detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
     }
 
     inline id_type::id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
@@ -38,7 +38,7 @@ namespace hpx { namespace naming
             static_cast<detail::id_type_management>(t)))
     {
         if (t == unmanaged)
-            detail::strip_internal_bits_from_gid(*gid_);
+            detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
     }
 
     inline gid_type& id_type::get_gid() { return *gid_; }

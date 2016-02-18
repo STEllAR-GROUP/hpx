@@ -122,7 +122,7 @@ namespace hpx { namespace components { namespace server
         naming::address const& addr,
         naming::id_type const& target_storage)
     {
-        if (!Component::supports_migration())
+        if (!traits::component_supports_migration<Component>::call())
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "hpx::components::server::migrate_to_storage_here",
@@ -157,7 +157,7 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& to_migrate,
         naming::id_type const& target_storage)
     {
-        if (!Component::supports_migration())
+        if (!traits::component_supports_migration<Component>::call())
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "hpx::components::server::trigger_migrate_to_storage_here",
@@ -175,7 +175,7 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(naming::invalid_id);
         }
 
-        return agas::begin_migration(to_migrate, target_storage)
+        return agas::begin_migration(to_migrate)
             .then(
                 [to_migrate, target_storage](
                     future<std::pair<naming::id_type, naming::address> > && f)

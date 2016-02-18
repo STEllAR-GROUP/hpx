@@ -41,7 +41,7 @@ the `COMPONENT_DEPENDENCIES` parameter, for instance:
 ```
 
 [note The `hpx::cout` and `hpx::cerr` streams buffer all output locally until
-      a `std::endl` of `std::flush` is encountered. That means that no output
+      a `std::endl` or `std::flush` is encountered. That means that no output
       will appear on the console as long as either of those is explicitly
       used.]
 

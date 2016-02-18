@@ -45,6 +45,7 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/copy_component.hpp>
 #include <hpx/runtime/components/migrate_component.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
