@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,23 +26,10 @@ struct shared_parallel_executor
     };
 
     template <typename F>
-    hpx::shared_future<typename hpx::util::result_of<
-        typename hpx::util::decay<F>::type()
-    >::type>
+    hpx::shared_future<typename hpx::util::result_of<F()>::type>
     async_execute(F && f)
     {
         return hpx::async(std::forward<F>(f));
-    }
-
-    template <typename F>
-    typename std::remove_reference<
-        typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
-    >::type
-    execute(F && f)
-    {
-        return async_execute(std::forward<F>(f)).get();
     }
 };
 
