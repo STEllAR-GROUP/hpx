@@ -13,12 +13,10 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/parallel/algorithms/algo.hpp>
-#include <hpx/parallel/segmented_algorithms/algo.hpp>
+#include <hpx/parallel/algorithms/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -33,34 +31,48 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename OutIter>
-        struct move : public detail::algorithm<move<OutIter>, OutIter>
+        // sequential move
+        template <typename InIter, typename OutIter>
+        inline std::pair<InIter, OutIter>
+        sequential_move(InIter first, InIter last, OutIter dest)
+        {
+            while (first != last)
+            {
+                *dest++ = std::move(*first++);
+            }
+            return std::make_pair(first, dest);
+        }
+
+
+        template <typename IterPair>
+        struct move
+            : public detail::algorithm<move<IterPair>, IterPair>
         {
             move()
               : move::algorithm("move")
             {}
 
-            template <typename ExPolicy, typename InIter, typename OutIter_>
-            static OutIter_
-            sequential(ExPolicy, InIter first, InIter last, OutIter_ dest)
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
-                return std::move(first, last, dest);
+                return sequential_move(first, last, dest);
             }
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter_>
+            template <typename ExPolicy, typename FwdIter, typename OutIter>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter_
+                ExPolicy, std::pair<FwdIter, OutIter>
             >::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                OutIter_ dest)
+                OutIter dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter, OutIter_> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef typename util::detail::algorithm_result<
-                        ExPolicy, OutIter_
+                        ExPolicy, std::pair<FwdIter, OutIter>
                     >::type result_type;
 
-                return get_iter<1, result_type>(
+                return get_iter_pair(
                     for_each_n<zip_iterator>().call(
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
@@ -121,46 +133,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    template <typename ExPolicy, typename InIter, typename OutIter,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        traits::is_iterator<InIter>::value &&
+        traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     move(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
+            typedef hpx::traits::segmented_iterator_traits<InIter>
+                input_iterator_traits;
+            typedef hpx::traits::segmented_iterator_traits<OutIter>
+                output_iterator_traits;
+            typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+            typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        typedef hpx::traits::segmented_iterator_traits<OutIter>
-            output_iterator_traits;
-        return algo<detail::move<OutIter>,
-            detail::move<typename output_iterator_traits::local_iterator>>(
-            policy, first, last, dest);
-        static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Required at least input iterator.");
+            typedef std::pair<
+                    typename input_iterator_traits::local_iterator,
+                    typename output_iterator_traits::local_iterator
+                > result_iterator_pair;
 
-        static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
-            "Requires at least output iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
-
-        return detail::move<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest);
+            return transfer<detail::move<std::pair<InIter, OutIter>>, detail::move<result_iterator_pair>>(
+                std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}
 

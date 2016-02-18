@@ -3,8 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM
+/// \file parallel/segmented_algorithms/transfer.hpp
+
+#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFER)
+#define HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFER
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -13,8 +15,6 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
@@ -28,7 +28,7 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // segmented algo
+    // segmented tranfer
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static typename util::detail::algorithm_result<
             ExPolicy, std::pair<SegIter, SegOutIter>
         >::type
-        segmented_algo(SegAlgo && algo, ExPolicy const& policy, boost::mpl::true_,
+        segmented_transfer(SegAlgo && algo, ExPolicy const& policy, boost::mpl::true_,
             SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -136,7 +136,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static typename util::detail::algorithm_result<
             ExPolicy, std::pair<SegIter, SegOutIter>
         >::type
-        segmented_algo(SegAlgo && algo, ExPolicy const& policy, boost::mpl::false_,
+        segmented_transfer(SegAlgo && algo, ExPolicy const& policy, boost::mpl::false_,
                        SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -247,7 +247,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
-        algo_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+        transfer_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
             std::true_type)
         {
             if (first == last)
@@ -261,18 +261,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     ExPolicy
                 >::type is_seq;
 
-            typedef hpx::traits::segmented_iterator_traits<InIter>
-                input_iterator_traits;
-            typedef hpx::traits::segmented_iterator_traits<OutIter>
-                output_iterator_traits;
-
-            return segmented_algo(
-                SegAlgo(),
-                    typename output_iterator_traits::local_iterator
-                > result_iterator_pair;
-
-            return segmented_copy(
-                SegAlgo<result_iterator_pair>(),
+            return segmented_transfer(SegAlgo(),
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest);
         }
@@ -282,7 +271,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
-        copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+        transfer_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
             std::false_type);
 
         /// \endcond

@@ -3,20 +3,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/algo.hpp
+/// \file parallel/algorithms/transfer.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_ALGO)
-#define HPX_PARALLEL_DETAIL_ALGO
+#if !defined(HPX_PARALLEL_ALGORITHMS_TRANSFER)
+#define HPX_PARALLEL_ALGORITHMS_TRANSFER
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/parallel/tagspec.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/parallel/segmented_algorithms/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -28,13 +27,15 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // algo
+    // transfer
     namespace detail
     {
         // parallel version
         template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        algo_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+        typename util::detail::algorithm_result<
+            ExPolicy, std::pair<InIter, OutIter>
+        >::type
+        transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
               std::false_type)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
@@ -55,8 +56,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare segmented version
         template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        algo_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+        typename util::detail::algorithm_result<
+            ExPolicy, std::pair<InIter, OutIter>
+        >::type
+        transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
             std::true_type);
 
         /// \endcond
@@ -109,24 +112,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-            >::type
-    algo(ExPolicy && policy, InIter first, InIter last, OutIter dest)
+    template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        traits::is_iterator<InIter>::value &&
+        traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    >::type
+    transfer(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
         typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::input_iterator_tag, input_iterator_category>::value),
             "Required at least input iterator.");
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::mpl::or_<
                 boost::is_base_of<
                     std::forward_iterator_tag, output_iterator_category>,
@@ -138,9 +144,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
         typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::algo_<ParAlgo, SegAlgo>(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            is_segmented());
+        return hpx::util::make_tagged_pair<tag::in, tag::out>(
+            detail::transfer_<ParAlgo, SegAlgo>(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                is_segmented())
+            );
     }
 }}}
 

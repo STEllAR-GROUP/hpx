@@ -26,9 +26,7 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/traits/projected.hpp>
-#include <hpx/parallel/algorithms/algo.hpp>
-#include <hpx/parallel/segmented_algorithms/algo.hpp>
-
+#include <hpx/parallel/algorithms/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -98,38 +96,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
-
-        template <typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
-        >::type
-        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            std::false_type)
-        {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                input_iterator_category;
-            typedef typename std::iterator_traits<OutIter>::iterator_category
-                output_iterator_category;
-
-            typedef typename boost::mpl::or_<
-                parallel::is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, input_iterator_category>,
-                boost::is_same<std::output_iterator_tag, output_iterator_category>
-            >::type is_seq;
-
-            return detail::copy<std::pair<InIter, OutIter> >().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest);
-        }
-
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
-        >::type
-        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            std::true_type);
-
         /// \endcond
     }
 
@@ -190,39 +156,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        typedef hpx::traits::segmented_iterator_traits<OutIter>
-            output_iterator_traits;
-        return algo<detail::copy<OutIter>,
-            detail::copy<typename output_iterator_traits::local_iterator>>(
-            policy, first, last, dest);
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
+            typedef hpx::traits::segmented_iterator_traits<InIter>
+                input_iterator_traits;
+            typedef hpx::traits::segmented_iterator_traits<OutIter>
+                output_iterator_traits;
+            typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+            typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Required at least input iterator.");
+            typedef std::pair<
+                    typename input_iterator_traits::local_iterator,
+                    typename output_iterator_traits::local_iterator
+                > result_iterator_pair;
 
-        static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
-            "Requires at least output iterator.");
-
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
-
-        return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::copy_(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                is_segmented()));
-        }
+            return transfer<detail::copy<std::pair<InIter, OutIter>>, detail::copy<result_iterator_pair>>(
+                std::forward<ExPolicy>(policy), first, last, dest);
     }
+
 
     /////////////////////////////////////////////////////////////////////////////
     // copy_n
