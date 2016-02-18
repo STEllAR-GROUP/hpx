@@ -108,8 +108,8 @@ namespace hpx { namespace threads { namespace policies
         // Add this number of threads to the work items queue each time the
         // function \a add_new() is called if the queue is empty.
         enum {
-            min_add_new_count = 100,
-            max_add_new_count = 100,
+            min_add_new_count = 10,
+            max_add_new_count = 10,
             max_delete_count = 1000
         };
 
