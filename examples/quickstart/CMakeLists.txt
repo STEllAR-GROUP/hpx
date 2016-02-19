@@ -29,6 +29,7 @@ set(example_programs
     latch_local
     latch_remote
     non_atomic_rma
+    partitioned_vector_spmd_foreach
     pingpong
     print_to_console
     quicksort
@@ -52,6 +53,8 @@ set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(partitioned_vector_spmd_foreach_FLAGS
+    COMPONENT_DEPENDENCIES iostreams partitioned_vector)
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -83,6 +86,13 @@ if(HPX_WITH_CXX11_LAMBDAS)
   endif()
   set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
   set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
+endif()
+
+if(HPX_WITH_TUPLE_RVALUE_SWAP)
+  set(example_programs ${example_programs}
+      sort_by_key_demo
+     )
+  set(sort_by_key_demo_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 
 foreach(example_program ${example_programs})

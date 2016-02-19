@@ -36,7 +36,7 @@
 #ifdef __APPLE__
 #include <crt_externs.h>
 #define environ (*_NSGetEnviron())
-#elif !defined(BOOST_WINDOWS)
+#elif !defined(HPX_WINDOWS)
 extern char **environ;
 #endif
 

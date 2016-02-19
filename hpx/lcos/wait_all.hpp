@@ -14,7 +14,7 @@ namespace hpx
 {
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param first    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
@@ -32,7 +32,7 @@ namespace hpx
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param futures  A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_all should
@@ -47,7 +47,7 @@ namespace hpx
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param futures  An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
@@ -62,7 +62,7 @@ namespace hpx
 
     /// The function \a wait_all_n is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
+    /// returns after they finished executing.
     ///
     /// \param begin    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
@@ -172,7 +172,7 @@ namespace hpx { namespace lcos
         protected:
             // End of the tuple is reached
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&&, boost::mpl::true_)
             {
                 this->set_value(util::unused);     // simply make ourself ready
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::false_, boost::mpl::true_)
             {
                 await_range(iter,
@@ -237,7 +237,7 @@ namespace hpx { namespace lcos
 
             // Current element is a simple future
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -283,7 +283,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&& iter, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -332,13 +332,13 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    BOOST_FORCEINLINE void wait_all(std::vector<Future>& values)
+    HPX_FORCEINLINE void wait_all(std::vector<Future>& values)
     {
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Future>
-    BOOST_FORCEINLINE void wait_all(std::vector<Future>&& values)
+    HPX_FORCEINLINE void wait_all(std::vector<Future>&& values)
     {
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }

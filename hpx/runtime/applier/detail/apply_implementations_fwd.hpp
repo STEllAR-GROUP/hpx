@@ -53,6 +53,13 @@ namespace hpx { namespace detail
     apply_impl(Continuation && c,
         hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs);
 
+    template <typename Action, typename Continuation, typename ...Ts>
+    typename boost::enable_if_c<
+        traits::is_continuation<Continuation>::value, bool
+    >::type
+    apply_impl(Continuation && c, hpx::id_type const& id, naming::address&& addr,
+        threads::thread_priority priority, Ts&&... vs);
+
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
     typename boost::enable_if_c<
         traits::is_continuation<Continuation>::value, bool
@@ -64,6 +71,11 @@ namespace hpx { namespace detail
     template <typename Action, typename ...Ts>
     bool apply_impl(
         hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs);
+
+    template <typename Action, typename ...Ts>
+    bool apply_impl(
+        hpx::id_type const& id, naming::address&&, threads::thread_priority priority,
+        Ts&&... vs);
 
     template <typename Action, typename Callback, typename ...Ts>
     bool apply_cb_impl(

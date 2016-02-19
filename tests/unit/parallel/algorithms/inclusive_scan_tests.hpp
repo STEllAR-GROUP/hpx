@@ -15,12 +15,48 @@
 #include <boost/range/functions.hpp>
 
 #include "test_utils.hpp"
+///////////////////////////////////////////////////////////////////////////////
+void inclusive_scan_benchmark()
+{
+    try {
+      std::vector<double> c(100000000);
+      std::vector<double> d(c.size());
+      std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+
+      double const val(0);
+      auto op =
+          [val](double v1, double v2) {
+              return v1 + v2;
+          };
+
+      hpx::util::high_resolution_timer t;
+      hpx::parallel::inclusive_scan(hpx::parallel::par,
+          boost::begin(c), boost::end(c), boost::begin(d),
+          val, op);
+      double elapsed = t.elapsed();
+
+      // verify values
+      std::vector<double> e(c.size());
+      hpx::parallel::v1::detail::sequential_inclusive_scan(
+          boost::begin(c), boost::end(c), boost::begin(e), val, op);
+
+      bool ok = std::equal(boost::begin(d), boost::end(d), boost::begin(e));
+      HPX_TEST(ok);
+      if (ok) {
+          std::cout << "<DartMeasurement name=\"InclusiveScanTime\" \n"
+              << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+      }
+    }
+    catch (...) {}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_inclusive_scan1(ExPolicy && policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -81,7 +117,9 @@ void test_inclusive_scan1_async(ExPolicy && p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_inclusive_scan2(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -134,7 +172,9 @@ void test_inclusive_scan2_async(ExPolicy p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_inclusive_scan3(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -183,7 +223,9 @@ void test_inclusive_scan3_async(ExPolicy p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_inclusive_scan_exception(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -258,7 +300,9 @@ void test_inclusive_scan_exception_async(ExPolicy p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_inclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;

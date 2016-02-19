@@ -23,6 +23,7 @@
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
 
+#include <memory>
 #include <numeric>
 
 namespace hpx { namespace agas
@@ -112,6 +113,8 @@ struct HPX_EXPORT response
       , parcelset::endpoints_type const& endpoints_
       , error status_ = success
         );
+
+    ~response();
 
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
@@ -220,9 +223,7 @@ struct HPX_EXPORT response
 
     namespace_action_code mc; //-V707
     error status;
-
-    // FIXME: std::unique_ptr doesn't seem to work with incomplete types
-    boost::shared_ptr<response_data> data;
+    std::unique_ptr<response_data> data;
 };
 
 }
@@ -253,7 +254,6 @@ struct get_remote_result<naming::id_type, agas::response>
 
                 return naming::id_type(raw_gid, naming::id_type::unmanaged);
             }
-            break;
 
         default:
             break;
@@ -356,6 +356,31 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
             "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call",
             "unexpected action code in result conversion");
         return std::vector<boost::uint32_t>();
+    }
+};
+
+template <>
+struct get_remote_result<naming::address, agas::response>
+{
+    static naming::address call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::primary_ns_unbind_gid:
+            {
+                agas::gva g = rep.get_gva();
+                return naming::address(g.prefix, g.type, g.lva());
+            }
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<naming::address>, agas::response>::call",
+            "unexpected action code in result conversion");
+        return naming::address();
     }
 };
 

@@ -38,7 +38,7 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_PLUGIN_MODULE();
+HPX_REGISTER_PLUGIN_MODULE_DYNAMIC();
 HPX_REGISTER_MESSAGE_HANDLER_FACTORY(
     hpx::plugins::parcel::coalescing_message_handler,
     coalescing_message_handler);
@@ -79,7 +79,7 @@ namespace hpx { namespace plugins { namespace parcel
     {}
 
     void coalescing_message_handler::put_parcel(
-        parcelset::locality const & dest, parcelset::parcel p,
+        parcelset::locality const& dest, parcelset::parcel p,
         write_handler_type f)
     {
         boost::unique_lock<mutex_type> l(mtx_);
@@ -92,7 +92,7 @@ namespace hpx { namespace plugins { namespace parcel
         }
 
         detail::message_buffer::message_buffer_append_state s =
-            buffer_.append(dest, std::move(p), f);
+            buffer_.append(dest, std::move(p), std::move(f));
 
         switch(s) {
         case detail::message_buffer::first_message:

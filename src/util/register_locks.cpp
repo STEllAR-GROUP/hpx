@@ -135,6 +135,11 @@ namespace hpx { namespace util
 
                 m->ignore_all_locks_ = enable;
             }
+
+            static void reset_held_lock_data()
+            {
+                held_locks_.reset();
+            }
         };
 
         hpx::util::thread_specific_ptr<
@@ -359,6 +364,11 @@ namespace hpx { namespace util
     {
         detail::register_locks::set_ignore_all_locks(false);
     }
+
+    void reset_held_lock_data()
+    {
+        detail::register_locks::reset_held_lock_data();
+    }
 #else
 
     bool register_lock(void const*, util::register_lock_data*)
@@ -392,6 +402,10 @@ namespace hpx { namespace util
     }
 
     void reset_ignored_all()
+    {
+    }
+
+    void reset_held_lock_data()
     {
     }
 #endif

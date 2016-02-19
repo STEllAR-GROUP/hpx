@@ -54,6 +54,12 @@ namespace hpx { namespace plugins
             parcelset::parcelhandler::add_parcelport_factory(this);
         }
 
+        parcelport_factory(
+            std::vector<plugins::parcelport_factory_base*>& factories)
+        {
+            factories.push_back(this);
+        }
+
         ///
         ~parcelport_factory() {}
 
@@ -64,7 +70,7 @@ namespace hpx { namespace plugins
             fillini += std::string("[hpx.parcel.") + name + "]";
             fillini += "name = " HPX_PLUGIN_STRING;
             fillini += std::string("path = ") +
-                util::find_prefixes("/lib/hpx", HPX_PLUGIN_STRING);
+                util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
             fillini += "enable = 1";
 
             std::string name_uc = boost::to_upper_copy(name);
@@ -137,11 +143,14 @@ namespace hpx { namespace plugins
     HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
         BOOST_PP_CAT(pluginname, _plugin_factory_type), pp)                   \
     template struct hpx::plugins::parcelport_factory<Parcelport>;             \
-    static BOOST_PP_CAT(pluginname, _plugin_factory_type)                     \
-        BOOST_PP_CAT(pluginname, _factory);                                   \
-    HPX_EXPORT hpx::plugins::parcelport_factory_base *                        \
-        BOOST_PP_CAT(pluginname, _factory_base_ptr) =                         \
-            &BOOST_PP_CAT(pluginname, _factory);                              \
+    HPX_EXPORT hpx::plugins::parcelport_factory_base*                         \
+    BOOST_PP_CAT(pluginname, _factory_init)                                   \
+    (std::vector<hpx::plugins::parcelport_factory_base *>& factories)         \
+    {                                                                         \
+        static BOOST_PP_CAT(pluginname, _plugin_factory_type) factory(factories);\
+        return &factory;                                                      \
+    }                                                                         \
+/**/
 
 #define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                       \
         HPX_REGISTER_PARCELPORT_(Parcelport,                                  \

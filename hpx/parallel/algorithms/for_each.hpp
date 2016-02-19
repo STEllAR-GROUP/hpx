@@ -29,7 +29,6 @@
 #include <iterator>
 #include <type_traits>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -55,9 +54,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Proj && proj = Proj())
             {
                 return util::loop_n(first, count,
-                    [&f, &proj](Iter const& curr)
+                    [&f, &proj](Iter curr)
                     {
-                        f(hpx::util::invoke(proj, *curr));
+                        hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
             }
 
@@ -73,11 +72,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, first, count,
                         [f, proj](Iter part_begin, std::size_t part_size)
                         {
-                            // VS2015 bails out when proj ot f are captured by ref
-                            util::loop_n(part_begin, part_size,
-                                [=](Iter const& curr)
+                            // VS2015 bails out when proj or f are captured by
+                            // ref
+                            util::loop_n(
+                                part_begin, part_size,
+                                [=](Iter curr) mutable
                                 {
-                                    f(hpx::util::invoke(proj, *curr));
+                                    hpx::util::invoke(
+                                        f, hpx::util::invoke(proj, *curr));
                                 });
                         });
                 }
@@ -165,11 +167,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           It returns \a first + \a count for non-negative values of
     ///           \a count and \a first for negative values.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename Size, typename F,
+    template <typename ExPolicy, typename InIter, typename Size, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
+        traits::is_iterator<InIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
@@ -181,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
@@ -222,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Proj && proj)
             {
                 return util::loop(first, last,
-                    [&f, &proj](Iter const& curr)
+                    [&f, &proj](Iter curr)
                     {
                         f(hpx::util::invoke(proj, *curr));
                     });
@@ -359,11 +361,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename F,
+    template <typename ExPolicy, typename InIter, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::detail::is_iterator<InIter>::value &&
+        traits::is_iterator<InIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
@@ -375,7 +377,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 

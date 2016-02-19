@@ -10,7 +10,7 @@
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 // wait for all tasks to finish
-                return hpx::lcos::local::dataflow(
+                return hpx::dataflow(
                     [f2, errors](std::vector<hpx::future<Result> > && r) mutable -> R
                     {
                         detail::handle_local_exceptions<ExPolicy>::call(r, errors);
@@ -319,7 +319,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 // wait for all tasks to finish
-                return hpx::lcos::local::dataflow(
+                return hpx::dataflow(
                     [f2, errors](std::vector<hpx::future<Result> > && r) mutable -> R
                     {
                         detail::handle_local_exceptions<ExPolicy>::call(r, errors);
@@ -373,7 +373,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 // wait for all tasks to finish
-                return hpx::lcos::local::dataflow(
+                return hpx::dataflow(
                     [f2, errors](std::vector<hpx::future<Result> > && r)
                         mutable -> R
                     {

@@ -66,41 +66,41 @@ namespace hpx { namespace serialization
             T*& t;
         };
 
-        template <class T> BOOST_FORCEINLINE
+        template <class T> HPX_FORCEINLINE
         raw_ptr_proxy<T> raw_ptr(T*& t)
         {
             return raw_ptr_proxy<T>(t);
         }
 
-        template <class T> BOOST_FORCEINLINE
+        template <class T> HPX_FORCEINLINE
         raw_ptr_proxy<T> raw_ptr(T* const & t)
         {
             return raw_ptr_proxy<T>(t);
         }
 
         // allow raw_ptr_type to be serialized as prvalue
-        template <class T> BOOST_FORCEINLINE
+        template <class T> HPX_FORCEINLINE
         output_archive & operator<<(output_archive & ar, raw_ptr_proxy<T> t)
         {
             t.serialize(ar);
             return ar;
         }
 
-        template <class T> BOOST_FORCEINLINE
+        template <class T> HPX_FORCEINLINE
         input_archive & operator>>(input_archive & ar, raw_ptr_proxy<T> t)
         {
             t.serialize(ar);
             return ar;
         }
 
-        template <class T> BOOST_FORCEINLINE
+        template <class T> HPX_FORCEINLINE
         output_archive & operator&(output_archive & ar, raw_ptr_proxy<T> t) //-V524
         {
             t.serialize(ar);
             return ar;
         }
 
-        template <class T> BOOST_FORCEINLINE
+        template <class T> HPX_FORCEINLINE
         input_archive & operator&(input_archive & ar, raw_ptr_proxy<T> t) //-V524
         {
             t.serialize(ar);

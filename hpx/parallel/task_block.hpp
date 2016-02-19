@@ -11,10 +11,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/emulate_deleted.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/async.hpp>
@@ -27,7 +28,6 @@
 #include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
 
-#include <boost/static_assert.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     class task_canceled_exception : public hpx::exception
     {
     public:
-        task_canceled_exception() BOOST_NOEXCEPT
+        task_canceled_exception() HPX_NOEXCEPT
           : hpx::exception(hpx::task_canceled_exception)
         {}
     };
@@ -140,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             typedef typename util::detail::algorithm_result<ExPolicy>::type
                 result_type;
             typedef std::integral_constant<
-                    bool, traits::is_future<result_type>::value
+                    bool, hpx::traits::is_future<result_type>::value
                 > is_fut;
             wait_for_completion(is_fut());
         }
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             return
                 result::get(
-                    hpx::lcos::local::dataflow(
+                    hpx::dataflow(
                         hpx::util::bind(hpx::
                             util::one_shot(&task_block::on_ready),
                             hpx::util::placeholders::_1, std::move(errors)),
@@ -255,7 +255,62 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             hpx::future<void> result =
                 executor_traits<executor_type>::async_execute(
-                    policy_.executor(), std::move(f));
+                    policy_.executor(), std::forward<F>(f));
+
+            boost::lock_guard<mutex_type> l(mtx_);
+            tasks_.push_back(std::move(result));
+        }
+
+        /// Causes the expression f() to be invoked asynchronously using the
+        /// given executor.
+        /// The invocation of f is permitted to run on an unspecified thread
+        /// associated with the given executor and in an unordered fashion
+        /// relative to the sequence of operations following the call to
+        /// run(exec, f) (the continuation), or indeterminately sequenced
+        /// within the same thread as the continuation.
+        ///
+        /// The call to \a run synchronizes with the invocation of f. The
+        /// completion of f() synchronizes with the next invocation of wait on
+        /// the same task_block or completion of the nearest enclosing
+        /// task block (i.e., the \a define_task_block or
+        /// \a define_task_block_restore_thread that created this task block).
+        ///
+        /// Requires: Executor shall be a type modeling the Executor concept.
+        ///           F shall be MoveConstructible. The expression, (void)f(),
+        ///           shall be well-formed.
+        ///
+        /// Precondition: this shall be the active task_block.
+        ///
+        /// Postconditions: A call to run may return on a different thread than
+        ///                 that on which it was called.
+        ///
+        /// \note The call to \a run is sequenced before the continuation as if
+        ///       \a run returns on the same thread.
+        ///       The invocation of the user-supplied callable object f may be
+        ///       immediate or may be delayed until compute resources are
+        ///       available. \a run might or might not return before invocation
+        ///       of f completes.
+        ///
+        /// \throw This function may throw \a task_canceled_exception, as
+        ///        described in Exception Handling.
+        ///
+        template <typename Executor, typename F>
+        void run(Executor& exec, F && f)
+        {
+            // The proposal requires that the task_block should be
+            // 'active' to be usable.
+            if (id_ != threads::get_self_id())
+            {
+                HPX_THROW_EXCEPTION(task_block_not_active,
+                    "task_block::run",
+                    "the task_block is not active");
+            }
+
+            typedef typename ExPolicy::executor_type executor_type;
+
+            hpx::future<void> result =
+                executor_traits<Executor>::async_execute(
+                    exec, std::forward<F>(f));
 
             boost::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));
@@ -350,7 +405,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     typename util::detail::algorithm_result<ExPolicy>::type
     define_task_block(ExPolicy && policy, F && f)
     {
-        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+        static_assert(
+            parallel::is_execution_policy<ExPolicy>::value,
+            "parallel::is_execution_policy<ExPolicy>::value");
 
         typedef typename hpx::util::decay<ExPolicy>::type policy_type;
         task_block<policy_type> trh(std::forward<ExPolicy>(policy));
@@ -474,7 +531,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     typename util::detail::algorithm_result<ExPolicy>::type
     define_task_block_restore_thread(ExPolicy && policy, F && f)
     {
-        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+        static_assert(
+            parallel::is_execution_policy<ExPolicy>::value,
+            "parallel::is_execution_policy<ExPolicy>::value");
 
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.

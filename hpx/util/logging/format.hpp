@@ -17,7 +17,7 @@
 #ifndef JT28092007_format_HPP_DEFINED
 #define JT28092007_format_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
@@ -638,9 +638,7 @@ thread-safe access to an instance of this clas (used internally).
                 switch ( b->m_type) {
                 case route::is_fmt:       append_formatter( b->m_fmt); break;
                 case route::is_dest:      append_destination( b->m_dest); break;
-                    break;
                 case route::is_clear:     append_clear_format(); break;
-                    break;
                 }
             }
         }

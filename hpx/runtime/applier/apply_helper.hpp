@@ -7,8 +7,6 @@
 #if !defined(HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM)
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
-#include <boost/mpl/bool.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -17,6 +15,8 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+
+#include <boost/mpl/bool.hpp>
 
 #include <memory>
 

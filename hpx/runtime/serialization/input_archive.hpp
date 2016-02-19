@@ -148,11 +148,11 @@ namespace hpx { namespace serialization
         template <typename T>
         void load_bitwise(T & t, boost::mpl::true_)
         {
-            BOOST_STATIC_ASSERT_MSG(!boost::is_abstract<T>::value,
+            static_assert(!boost::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {
-                serialize(*this, t, 0);
+                access::serialize(*this, t, 0);
             }
             else
             {
@@ -163,7 +163,7 @@ namespace hpx { namespace serialization
         template <class T>
         void load_nonintrusively_polymorphic(T& t, boost::mpl::false_)
         {
-            serialize(*this, t, 0);
+            access::serialize(*this, t, 0);
         }
 
         template <class T>

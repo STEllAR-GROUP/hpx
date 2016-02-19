@@ -1,16 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Parsa Amini
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -21,11 +24,15 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/agas/detail/bootstrap_service_client.hpp>
+#include <hpx/runtime/agas/detail/hosted_service_client.hpp>
+#include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -38,85 +45,6 @@
 
 namespace hpx { namespace agas
 {
-
-struct addressing_service::bootstrap_data_type
-{ // {{{
-    bootstrap_data_type()
-      : primary_ns_server_()
-      , locality_ns_server_(&primary_ns_server_)
-      , component_ns_server_()
-      , symbol_ns_server_()
-    {}
-
-    void register_counter_types()
-    {
-        server::locality_namespace::register_counter_types();
-        server::locality_namespace::register_global_counter_types();
-        server::primary_namespace::register_counter_types();
-        server::primary_namespace::register_global_counter_types();
-        server::component_namespace::register_counter_types();
-        server::component_namespace::register_global_counter_types();
-        server::symbol_namespace::register_counter_types();
-        server::symbol_namespace::register_global_counter_types();
-    }
-
-    void register_server_instance(char const* servicename)
-    {
-        locality_ns_server_.register_server_instance(servicename);
-        primary_ns_server_.register_server_instance(servicename);
-        component_ns_server_.register_server_instance(servicename);
-        symbol_ns_server_.register_server_instance(servicename);
-    }
-
-    void unregister_server_instance(error_code& ec)
-    {
-        locality_ns_server_.unregister_server_instance(ec);
-        if (!ec) primary_ns_server_.unregister_server_instance(ec);
-        if (!ec) component_ns_server_.unregister_server_instance(ec);
-        if (!ec) symbol_ns_server_.unregister_server_instance(ec);
-    }
-
-    server::primary_namespace primary_ns_server_;
-    server::locality_namespace locality_ns_server_;
-    server::component_namespace component_ns_server_;
-    server::symbol_namespace symbol_ns_server_;
-}; // }}}
-
-struct addressing_service::hosted_data_type
-{ // {{{
-    hosted_data_type()
-      : primary_ns_server_()
-      , symbol_ns_server_()
-    {}
-
-    void register_counter_types()
-    {
-        server::primary_namespace::register_counter_types();
-        server::primary_namespace::register_global_counter_types();
-        server::symbol_namespace::register_counter_types();
-        server::symbol_namespace::register_global_counter_types();
-    }
-
-    void register_server_instance(char const* servicename
-      , boost::uint32_t locality_id)
-    {
-        primary_ns_server_.register_server_instance(servicename, locality_id);
-        symbol_ns_server_.register_server_instance(servicename, locality_id);
-    }
-
-    void unregister_server_instance(error_code& ec)
-    {
-        primary_ns_server_.unregister_server_instance(ec);
-        if (!ec) symbol_ns_server_.unregister_server_instance(ec);
-    }
-
-    locality_namespace locality_ns_;
-    component_namespace component_ns_;
-
-    server::primary_namespace primary_ns_server_;
-    server::symbol_namespace symbol_ns_server_;
-}; // }}}
-
 struct addressing_service::gva_cache_key
 { // {{{ gva_cache_key implementation
   private:
@@ -165,6 +93,10 @@ struct addressing_service::gva_cache_key
       , gva_cache_key const& rhs
         )
     {
+        // Direct hit
+        if(lhs.key_ == rhs.key_)
+            return true;
+
         // Is lhs in rhs?
         if (1 == lhs.get_count() && 1 != rhs.get_count())
             return boost::icl::contains(rhs.key_, lhs.key_);
@@ -173,32 +105,8 @@ struct addressing_service::gva_cache_key
         else if (1 != lhs.get_count() && 1 == rhs.get_count())
             return boost::icl::contains(lhs.key_, rhs.key_);
 
-        // Direct hit
-        return lhs.key_ == rhs.key_;
+        return false;
     }
-}; // }}}
-
-struct addressing_service::gva_erase_policy
-{ // {{{ gva_erase_policy implementation
-    gva_erase_policy(
-        naming::gid_type const& id
-      , boost::uint64_t count
-        )
-      : entry(id, count)
-    {}
-
-    typedef std::pair<
-        gva_cache_key, boost::cache::entries::lfu_entry<gva>
-    > entry_type;
-
-    bool operator()(
-        entry_type const& p
-        ) const
-    {
-        return p.first == entry;
-    }
-
-    gva_cache_key entry;
 }; // }}}
 
 addressing_service::addressing_service(
@@ -255,46 +163,52 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
         launch_hosted();
         get_big_boot_barrier().wait_hosted(
             pp->get_locality_name(),
-            &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
+            client_->get_primary_ns_ptr(), client_->get_symbol_ns_ptr());
     }
 
     set_status(state_running);
 } // }}}
 
-void* addressing_service::get_hosted_primary_ns_ptr() const
+naming::address::address_type
+addressing_service::get_hosted_primary_ns_ptr() const
 {
-    HPX_ASSERT(0 != hosted.get());
-    return &hosted->primary_ns_server_;
+    HPX_ASSERT(!is_bootstrap());
+    return client_->get_primary_ns_ptr();
 }
 
-void* addressing_service::get_hosted_symbol_ns_ptr() const
+naming::address::address_type
+addressing_service::get_hosted_symbol_ns_ptr() const
 {
-    HPX_ASSERT(0 != hosted.get());
-    return &hosted->symbol_ns_server_;
+    HPX_ASSERT(!is_bootstrap());
+    return client_->get_symbol_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_locality_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_locality_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
-    return &bootstrap->locality_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_locality_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_primary_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_primary_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
-    return &bootstrap->primary_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_primary_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_component_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_component_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
-    return &bootstrap->component_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_component_ns_ptr();
 }
 
-void* addressing_service::get_bootstrap_symbol_ns_ptr() const
+naming::address::address_type
+addressing_service::get_bootstrap_symbol_ns_ptr() const
 {
-    HPX_ASSERT(0 != bootstrap.get());
-    return &bootstrap->symbol_ns_server_;
+    HPX_ASSERT(is_bootstrap());
+    return client_->get_symbol_ns_ptr();
 }
 
 namespace detail
@@ -308,7 +222,11 @@ void addressing_service::launch_bootstrap(
   , util::runtime_configuration const& ini_
     )
 { // {{{
-    bootstrap = boost::make_shared<bootstrap_data_type>();
+    boost::shared_ptr<detail::bootstrap_service_client> bootstrap_client =
+        boost::make_shared<detail::bootstrap_service_client>();
+
+    client_ = boost::static_pointer_cast<detail::agas_service_client>(
+        bootstrap_client);
 
     runtime& rt = get_runtime();
 
@@ -328,34 +246,34 @@ void addressing_service::launch_bootstrap(
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
     gva locality_gva(here,
         server::locality_namespace::get_component_type(), 1U,
-            get_bootstrap_locality_ns_ptr());
+            client_->get_locality_ns_ptr());
     locality_ns_addr_ = naming::address(here,
         server::locality_namespace::get_component_type(),
-            get_bootstrap_locality_ns_ptr());
+            client_->get_locality_ns_ptr());
 
     naming::gid_type const primary_gid = bootstrap_primary_namespace_gid();
     gva primary_gva(here,
         server::primary_namespace::get_component_type(), 1U,
-            get_bootstrap_primary_ns_ptr());
+            client_->get_primary_ns_ptr());
     primary_ns_addr_ = naming::address(here,
         server::primary_namespace::get_component_type(),
-            get_bootstrap_primary_ns_ptr());
+            client_->get_primary_ns_ptr());
 
     naming::gid_type const component_gid = bootstrap_component_namespace_gid();
     gva component_gva(here,
         server::component_namespace::get_component_type(), 1U,
-            get_bootstrap_component_ns_ptr());
+            client_->get_component_ns_ptr());
     component_ns_addr_ = naming::address(here,
         server::component_namespace::get_component_type(),
-            get_bootstrap_component_ns_ptr());
+            client_->get_component_ns_ptr());
 
     naming::gid_type const symbol_gid = bootstrap_symbol_namespace_gid();
     gva symbol_gva(here,
         server::symbol_namespace::get_component_type(), 1U,
-            get_bootstrap_symbol_ns_ptr());
+            client_->get_symbol_ns_ptr());
     symbol_ns_addr_ = naming::address(here,
         server::symbol_namespace::get_component_type(),
-            get_bootstrap_symbol_ns_ptr());
+            client_->get_symbol_ns_ptr());
 
     set_local_locality(here);
     rt.get_config().parse("assigned locality",
@@ -365,7 +283,7 @@ void addressing_service::launch_bootstrap(
     boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
         ini_, "hpx.os_threads", 1u);
     request locality_req(locality_ns_allocate, endpoints, 4, num_threads); //-V112
-    bootstrap->locality_ns_server_.remote_service(locality_req);
+    client_->service_locality(locality_req, action_priority_, throws);
 
     naming::gid_type runtime_support_gid1(here);
     runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
@@ -389,7 +307,7 @@ void addressing_service::launch_bootstrap(
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
-        bootstrap->primary_ns_server_.remote_service(reqs[i]);
+        client_->service_primary(reqs[i], throws);
 
     register_name("/0/agas/locality#0", here);
     if (is_console())
@@ -402,38 +320,33 @@ void addressing_service::launch_bootstrap(
 
 void addressing_service::launch_hosted()
 {
-    hosted = boost::make_shared<hosted_data_type>();
+    boost::shared_ptr<detail::hosted_service_client> booststrap_hosted =
+        boost::make_shared<detail::hosted_service_client>();
+
+    client_ = boost::static_pointer_cast<detail::agas_service_client>(
+            booststrap_hosted);
 }
 
-void addressing_service::adjust_local_cache_size()
+void addressing_service::adjust_local_cache_size(std::size_t cache_size)
 { // {{{
-    // adjust the local AGAS cache size for the number of connected localities
+    // adjust the local AGAS cache size for the number of worker threads and
+    // create the hierarchy based on the topology
     if (caching_)
     {
-        util::runtime_configuration const& cfg = get_runtime().get_config();
-        std::size_t local_cache_size = cfg.get_agas_local_cache_size();
-        std::size_t local_cache_size_per_thread =
-            cfg.get_agas_local_cache_size_per_thread();
-
-        std::size_t cache_size = (std::max)(local_cache_size,
-                local_cache_size_per_thread * std::size_t(get_num_overall_threads()));
-        if (cache_size > gva_cache_->capacity())
+        std::size_t previous = gva_cache_->size();
             gva_cache_->reserve(cache_size);
 
         LAGAS_(info) << (boost::format(
-            "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
-            "local_cache_size_per_thread(%2%), cache_size(%3%)")
-            % local_cache_size % local_cache_size_per_thread % cache_size);
+            "addressing_service::adjust_local_cache_size, previous size: %1%, "
+            "new size: %3%")
+            % previous % cache_size);
     }
 } // }}}
 
 void addressing_service::set_local_locality(naming::gid_type const& g)
 {
     locality_ = g;
-    if (is_bootstrap())
-        bootstrap->primary_ns_server_.set_local_locality(g);
-    else
-        hosted->primary_ns_server_.set_local_locality(g);
+    client_->set_local_locality(g);
 }
 
 response addressing_service::service(
@@ -441,38 +354,7 @@ response addressing_service::service(
   , error_code& ec
     )
 { // {{{
-    if (req.get_action_code() & primary_ns_service)
-    {
-        if (is_bootstrap())
-            return bootstrap->primary_ns_server_.service(req, ec);
-        return hosted->primary_ns_server_.service(req, ec);
-    }
-
-    else if (req.get_action_code() & component_ns_service)
-    {
-        if (is_bootstrap())
-            return bootstrap->component_ns_server_.service(req, ec);
-        return hosted->component_ns_.service(req, action_priority_, ec);
-    }
-
-    else if (req.get_action_code() & symbol_ns_service)
-    {
-        if (is_bootstrap())
-            return bootstrap->symbol_ns_server_.service(req, ec);
-        return hosted->symbol_ns_server_.service(req, ec);
-    }
-
-    else if (req.get_action_code() & locality_ns_service)
-    {
-        if (is_bootstrap())
-            return bootstrap->locality_ns_server_.service(req, ec);
-        return hosted->locality_ns_.service(req, action_priority_, ec);
-    }
-
-    HPX_THROWS_IF(ec, bad_action_code
-        , "addressing_service::service"
-        , "invalid action code encountered in request")
-    return response();
+    return client_->service(req, action_priority_, ec);
 } // }}}
 
 std::vector<response> addressing_service::bulk_service(
@@ -484,9 +366,7 @@ std::vector<response> addressing_service::bulk_service(
     // most requests will end up there anyways. The primary namespace will
     // route the requests to other namespaces (and the other namespaces would
     // also route requests intended for the primary namespace).
-    if (is_bootstrap())
-        return bootstrap->primary_ns_server_.bulk_service(req, ec);
-    return hosted->primary_ns_server_.bulk_service(req, ec);
+    return client_->service_primary_bulk(req, ec);
 } // }}}
 
 bool addressing_service::register_locality(
@@ -498,12 +378,7 @@ bool addressing_service::register_locality(
 { // {{{
     try {
         request req(locality_ns_allocate, endpoints, 0, num_threads, prefix);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -554,35 +429,16 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
 { // {{{
     boost::unique_lock<mutex_type> l(resolved_localities_mtx_);
     resolved_localities_type::iterator it = resolved_localities_.find(gid);
-    if(it == resolved_localities_.end())
+    if (it == resolved_localities_.end())
     {
         // The locality hasn't been requested to be resolved yet. Do it now.
         parcelset::endpoints_type endpoints;
         request req(locality_ns_resolve_locality, gid);
 
-        if(is_bootstrap())
         {
-            endpoints
-                = bootstrap->locality_ns_server_.service(req, ec).get_endpoints();
-            if(ec)
-            {
-                l.unlock();
-
-                HPX_THROWS_IF(ec, internal_server_error
-                  , "addressing_service::resolve_locality"
-                  , "could not resolve locality to endpoints");
-                return resolved_localities_[naming::invalid_gid];
-            }
-        }
-        else
-        {
-            {
                 hpx::util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 future<parcelset::endpoints_type> endpoints_future =
-                    hosted->locality_ns_.service_async<parcelset::endpoints_type>(
-                        req
-                      , action_priority_
-                    );
+                client_->get_endpoints(req, action_priority_, ec);
 
                 if (0 == threads::get_self_ptr())
                 {
@@ -592,14 +448,14 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                     while(!endpoints_future.is_ready())
                         /**/;
                 }
+
                 endpoints = endpoints_future.get(ec);
             }
 
             // Search again ... might have been added by a different thread already
             it = resolved_localities_.find(gid);
-        }
 
-        if(it == resolved_localities_.end())
+        if (it == resolved_localities_.end())
         {
             if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
                     std::make_pair(
@@ -630,23 +486,8 @@ bool addressing_service::unregister_locality(
 { // {{{
     try {
         request req(locality_ns_free, gid);
-        response rep;
 
-        if (is_bootstrap())
-            bootstrap->unregister_server_instance(ec);
-        else
-            hosted->unregister_server_instance(ec);
-
-        if (ec)
-            return false;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
-
-        if (ec || (success != rep.get_status()))
-            return false;
+        client_->unregister_server(req, action_priority_, ec);
 
         remove_resolved_locality(gid);
         return true;
@@ -702,12 +543,7 @@ bool addressing_service::get_console_locality(
         std::string key("/0/locality#console");
 
         request req(symbol_ns_resolve, key);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(key, req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (!ec && (rep.get_gid() != naming::invalid_gid) &&
             (rep.get_status() == success))
@@ -752,12 +588,7 @@ bool addressing_service::get_localities(
         if (type != components::component_invalid)
         {
             request req(component_ns_resolve_id, type);
-            response rep;
-
-            if (is_bootstrap())
-                rep = bootstrap->component_ns_server_.service(req, ec);
-            else
-                rep = hosted->component_ns_.service(req, action_priority_, ec);
+            response rep = client_->service_component(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -777,12 +608,7 @@ bool addressing_service::get_localities(
         else
         {
             request req(locality_ns_localities);
-            response rep;
-
-            if (is_bootstrap())
-                rep = bootstrap->locality_ns_server_.service(req, ec);
-            else
-                rep = hosted->locality_ns_.service(req, action_priority_, ec);
+            response rep = client_->service_locality(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -809,11 +635,7 @@ std::map<naming::gid_type, parcelset::endpoints_type>
     addressing_service::get_resolved_localities(error_code& ec)
 { // {{{ get_resolved_localities_async implementation
     request req(locality_ns_resolved_localities);
-    response rep;
-    if(is_bootstrap())
-        rep = bootstrap->locality_ns_server_.service(req, ec);
-    else
-        rep = hosted->locality_ns_.service(req, action_priority_, ec);
+    response rep = client_->service_locality(req, action_priority_, ec);
 
     if(ec || success != rep.get_status())
     {
@@ -835,12 +657,7 @@ boost::uint32_t addressing_service::get_num_localities(
         if (type == components::component_invalid)
         {
             request req(locality_ns_num_localities, type);
-            response rep;
-
-            if (is_bootstrap())
-                rep = bootstrap->locality_ns_server_.service(req, ec);
-            else
-                rep = hosted->locality_ns_.service(req, action_priority_, ec);
+            response rep = client_->service_locality(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return boost::uint32_t(-1);
@@ -849,12 +666,7 @@ boost::uint32_t addressing_service::get_num_localities(
         }
 
         request req(component_ns_num_localities, type);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return boost::uint32_t(-1);
@@ -890,12 +702,7 @@ boost::uint32_t addressing_service::get_num_overall_threads(
 { // {{{ get_num_overall_threads implementation
     try {
         request req(locality_ns_num_threads);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return boost::uint32_t(0);
@@ -921,12 +728,7 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
 { // {{{ get_num_threads implementation
     try {
         request req(locality_ns_num_threads);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-        else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return std::vector<boost::uint32_t>();
@@ -955,12 +757,7 @@ components::component_type addressing_service::get_component_id(
 { /// {{{
     try {
         request req(component_ns_bind_name, name);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
@@ -981,10 +778,7 @@ void addressing_service::iterate_types(
     try {
         request req(component_ns_iterate_types, f);
 
-        if (is_bootstrap())
-            bootstrap->component_ns_server_.service(req, ec);
-        else
-            hosted->component_ns_.service(req, action_priority_, ec);
+        client_->service_component(req, action_priority_, ec);
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::iterate_types");
@@ -998,12 +792,7 @@ std::string addressing_service::get_component_type_name(
 { // {{{
     try {
         request req(component_ns_get_component_type_name, id);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         return rep.get_component_typename();
     }
@@ -1021,12 +810,7 @@ components::component_type addressing_service::register_factory(
 { // {{{
     try {
         request req(component_ns_bind_prefix, name, prefix);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->component_ns_server_.service(req, ec);
-        else
-            rep = hosted->component_ns_.service(req, action_priority_, ec);
+        response rep = client_->service_component(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status() && no_success != rep.get_status()))
             return components::component_invalid;
@@ -1053,12 +837,7 @@ bool addressing_service::get_id_range(
           , parcelset::endpoints_type()
           , count
           , boost::uint32_t(-1));
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
-        else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        response rep = client_->service_primary(req, ec);
 
         error const s = rep.get_status();
 
@@ -1093,19 +872,14 @@ bool addressing_service::bind_range_local(
 
         request req(primary_ns_bind_gid, lower_id, g,
             naming::get_locality_from_gid(lower_id));
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
-        else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        response rep = client_->service_primary(req, ec);
 
         error const s = rep.get_status();
 
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        if(range_caching_)
+        if (range_caching_)
         {
             // Put the range into the cache.
             update_cache_entry(lower_id, g, ec);
@@ -1171,7 +945,10 @@ hpx::future<bool> addressing_service::bind_range_async(
         stubs::primary_namespace::get_service_instance(lower_id)
       , naming::id_type::unmanaged);
 
-    request req(primary_ns_bind_gid, lower_id, g, locality);
+    naming::gid_type id(
+        naming::detail::get_stripped_gid_except_dont_cache(lower_id));
+
+    request req(primary_ns_bind_gid, id, g, locality);
     response rep;
 
     using util::placeholders::_1;
@@ -1180,8 +957,23 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     return f.then(util::bind(
             util::one_shot(&addressing_service::bind_postproc),
-            this, _1, lower_id, g
+            this, _1, id, g
         ));
+}
+
+hpx::future<naming::address> addressing_service::unbind_range_async(
+    naming::gid_type const& lower_id
+  , boost::uint64_t count
+    )
+{
+    agas::request req(primary_ns_unbind_gid,
+        naming::detail::get_stripped_gid(lower_id), count);
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(lower_id)
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<naming::address>(
+        service_target, req);
 }
 
 bool addressing_service::unbind_range_local(
@@ -1195,32 +987,25 @@ bool addressing_service::unbind_range_local(
         request req(primary_ns_unbind_gid, lower_id, count);
         response rep;
 
-//         if (get_status() == running &&
-//             naming::get_locality_id_from_gid(lower_id) !=
-//                 naming::get_locality_id_from_gid(locality_))
-//         {
-//             naming::id_type target(
-//                 stubs::primary_namespace::get_service_instance(lower_id)
-//               , naming::id_type::unmanaged);
-//
-//             rep = stubs::primary_namespace::service(
-//                 target, req, threads::thread_priority_default, ec);
-//         }
-//         else
+        // if this id is managed by another locality, forward the request
+        if (get_status() == state_running &&
+            naming::get_locality_id_from_gid(lower_id) !=
+                naming::get_locality_id_from_gid(locality_))
+        {
+            naming::id_type target(
+                stubs::primary_namespace::get_service_instance(lower_id)
+              , naming::id_type::unmanaged);
 
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
+            rep = stubs::primary_namespace::service(
+                target, req, threads::thread_priority_default, ec);
+        }
         else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        {
+            rep = client_->service_primary(req, ec);
+        }
 
         if (ec || (success != rep.get_status()))
             return false;
-
-        // I'm afraid that this will break the first form of paged caching,
-        // so it's commented out for now.
-        //boost::lock_guard<cache_mutex_type> lock(hosted->gva_cache_mtx_);
-        //gva_erase_policy ep(lower_id, count);
-        //hosted->gva_cache_->erase(ep);
 
         gva const& gaddr = rep.get_gva();
         addr.locality_ = gaddr.prefix;
@@ -1257,11 +1042,24 @@ bool addressing_service::unbind_range_local(
 // }
 
 bool addressing_service::is_local_address_cached(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec
     )
 {
+    // Assume non-local operation if the gid is known to have been migrated
+    naming::gid_type id(naming::detail::get_stripped_gid_except_dont_cache(gid));
+
+    {
+        boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
+        if (was_object_migrated_locked(id))
+        {
+            if (&ec != &throws)
+                ec = make_success_code();
+            return false;
+        }
+    }
+
     // Try to resolve the address of the GID from the locally available
     // information.
 
@@ -1382,16 +1180,9 @@ bool addressing_service::resolve_locally_known_addresses(
         // primary AGAS service on this locality?
         if (locality_msb == msb)
         {
-            if (is_bootstrap())
-            {
-                addr = primary_ns_addr_;
-            }
-            else
-            {
                 addr = naming::address(get_local_locality(),
                     server::primary_namespace::get_component_type(),
-                    get_hosted_primary_ns_ptr());
-            }
+                client_->get_primary_ns_ptr());
             return true;
         }
 
@@ -1418,16 +1209,9 @@ bool addressing_service::resolve_locally_known_addresses(
         // symbol AGAS service on this locality?
         if (locality_msb == msb)
         {
-            if (is_bootstrap())
-            {
-                addr = symbol_ns_addr_;
-            }
-            else
-            {
                 addr = naming::address(get_local_locality(),
                     server::symbol_namespace::get_component_type(),
-                    get_hosted_symbol_ns_ptr());
-            }
+                client_->get_symbol_ns_ptr());
             return true;
         }
 
@@ -1453,12 +1237,7 @@ bool addressing_service::resolve_full_local(
 { // {{{ resolve implementation
     try {
         request req(primary_ns_resolve_gid, id);
-        response rep;
-
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server_.service(req, ec);
-        else
-            rep = hosted->primary_ns_server_.service(req, ec);
+        response rep = client_->service_primary(req, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -1474,8 +1253,9 @@ bool addressing_service::resolve_full_local(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if (addr.address_)
+        if (naming::detail::store_in_cache(id))
         {
+            HPX_ASSERT(addr.address_);
             if(range_caching_)
             {
                 // Put the range into the cache.
@@ -1486,10 +1266,6 @@ bool addressing_service::resolve_full_local(
                 // Put the fully resolved gva into the cache.
                 update_cache_entry(id, g, ec);
             }
-        }
-        else
-        {
-            remove_cache_entry(id, ec);
         }
 
         if (ec)
@@ -1507,11 +1283,13 @@ bool addressing_service::resolve_full_local(
 } // }}}
 
 bool addressing_service::resolve_cached(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec
     )
 { // {{{ resolve_cached implementation
+
+    naming::gid_type id = naming::detail::get_stripped_gid_except_dont_cache(gid);
 
     // special cases
     if (resolve_locally_known_addresses(id, addr))
@@ -1542,42 +1320,25 @@ bool addressing_service::resolve_cached(
         return false;
     }
 
-    // first look up the requested item in the cache
-    gva_cache_key k(id);
-    gva_cache_key idbase;
-    gva_cache_type::entry_type e;
-
-    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-
     // force routing if target object was migrated
-    if (was_object_migrated_locked(id))
     {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return false;
-    }
-
-    // Check if the entry is currently in the cache
-    if (gva_cache_->get_entry(k, idbase, e))
-    {
-        const boost::uint64_t id_msb =
-            naming::detail::strip_internal_bits_from_gid(id.get_msb());
-
-        if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
+        boost::lock_guard<mutex_type> lock(migrated_objects_mtx_);
+        if (was_object_migrated_locked(id))
         {
-            HPX_THROWS_IF(ec, internal_server_error
-              , "addressing_service::resolve_cached"
-              , "bad entry in cache, MSBs of GID base and GID do not match");
+            if (&ec != &throws)
+                ec = make_success_code();
             return false;
         }
+    }
 
-        gva const& g = e.get();
-
+    // first look up the requested item in the cache
+    gva g;
+    naming::gid_type idbase;
+    if (get_cache_entry(id, g, idbase, ec))
+    {
         addr.locality_ = g.prefix;
         addr.type_ = g.type;
-        addr.address_ = g.lva(id, idbase.get_gid());
-
-        lock.unlock();
+        addr.address_ = g.lva(id, idbase);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1687,15 +1448,18 @@ naming::address addressing_service::resolve_full_postproc(
     addr.type_ = g.type;
     addr.address_ = g.lva();
 
-    if(range_caching_)
+    if (naming::detail::store_in_cache(id))
     {
-        // Put the range into the cache.
-        update_cache_entry(base_gid, base_gva);
-    }
-    else
-    {
-        // Put the fully resolved gva into the cache.
-        update_cache_entry(id, g);
+        if (range_caching_)
+        {
+            // Put the range into the cache.
+            update_cache_entry(base_gid, base_gva);
+        }
+        else
+        {
+            // Put the fully resolved gva into the cache.
+            update_cache_entry(id, g);
+        }
     }
 
     return addr;
@@ -1764,11 +1528,7 @@ bool addressing_service::resolve_full_local(
             return true;
         }
 
-        std::vector<response> reps;
-        if (is_bootstrap())
-            reps = bootstrap->primary_ns_server_.bulk_service(reqs, ec);
-        else
-            reps = hosted->primary_ns_server_.bulk_service(reqs, ec);
+        std::vector<response> reps = client_->service_primary_bulk(reqs, ec);
 
         if (ec)
             return false;
@@ -1795,15 +1555,18 @@ bool addressing_service::resolve_full_local(
             addr.type_ = g.type;
             addr.address_ = g.lva();
 
-            if(range_caching_)
+            if (naming::detail::store_in_cache(gids[i]))
             {
-                // Put the range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
-            }
-            else
-            {
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(gids[i], g, ec);
+                if (range_caching_)
+                {
+                    // Put the range into the cache.
+                    update_cache_entry(base_gid, base_gva, ec);
+                }
+                else
+                {
+                    // Put the fully resolved gva into the cache.
+                    update_cache_entry(gids[i], g, ec);
+                }
             }
 
             if (ec)
@@ -1863,6 +1626,7 @@ void addressing_service::route(
     parcelset::parcel p
   , util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> && f
+  , threads::thread_priority local_priority
     )
 {
     // compose request
@@ -1874,15 +1638,44 @@ void addressing_service::route(
 
     typedef server::primary_namespace::route_action action_type;
 
+    std::pair<bool, components::pinned_ptr> r;
+
     // Determine whether the gid is local or remote
     naming::address addr;
     if (is_local_address_cached(target.get_gid(), addr))
     {
-        // route through the local AGAS service instance
-        applier::detail::apply_l_p<action_type>(
-            target, std::move(addr), action_priority_, std::move(p));
-        f(boost::system::error_code(), parcelset::parcel());      // invoke callback
-        return;
+        typedef action_type::component_type component_type;
+        if (traits::component_supports_migration<component_type>::call())
+        {
+            r = traits::action_was_object_migrated<action_type>::call(
+                    target, addr.address_);
+            if (!r.first)
+            {
+                // route through the local AGAS service instance
+                applier::detail::apply_l_p<action_type>(
+                    target, std::move(addr),
+                    local_priority == threads::thread_priority_default ?
+                        action_priority_ : local_priority,
+                    std::move(p));
+
+                // invoke callback
+                f(boost::system::error_code(), parcelset::parcel());
+                return;
+            }
+        }
+        else
+        {
+            // route through the local AGAS service instance
+            applier::detail::apply_l_p<action_type>(
+                target, std::move(addr),
+                local_priority == threads::thread_priority_default ?
+                    action_priority_ : local_priority,
+                std::move(p));
+
+            // invoke callback
+            f(boost::system::error_code(), parcelset::parcel());
+            return;
+        }
     }
 
     // apply remotely, route through main AGAS service if the destination is
@@ -1917,11 +1710,13 @@ boost::int64_t addressing_service::synchronize_with_async_incref(
 }
 
 lcos::future<boost::int64_t> addressing_service::incref_async(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , boost::int64_t credit
   , naming::id_type const& keep_alive
     )
 { // {{{ incref implementation
+    naming::gid_type raw(naming::detail::get_stripped_gid(id));
+
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -1932,7 +1727,7 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
           , naming::id_type const&
         ) = &addressing_service::incref_async;
 
-        return async(incref_async_ptr, this, gid, credit, keep_alive);
+        return async(incref_async_ptr, this, raw, credit, keep_alive);
     }
 
     if (HPX_UNLIKELY(0 >= credit))
@@ -1965,8 +1760,6 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         boost::lock_guard<mutex_type> l(refcnt_requests_mtx_);
 
         typedef refcnt_requests_type::iterator iterator;
-
-        naming::gid_type raw = naming::detail::get_stripped_gid(gid);
 
         iterator matches = refcnt_requests_->find(raw);
         if (matches != refcnt_requests_->end())
@@ -2033,11 +1826,13 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::decref(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ decref implementation
+    naming::gid_type gid(naming::detail::get_stripped_gid(id));
+
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -2109,13 +1904,8 @@ bool addressing_service::register_name(
     )
 { // {{{
     try {
-        request req(symbol_ns_bind, name, id);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        request req(symbol_ns_bind, name, naming::detail::get_stripped_gid(id));
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         return !ec && (success == rep.get_status());
     }
@@ -2173,12 +1963,7 @@ bool addressing_service::unregister_name(
 { // {{{
     try {
         request req(symbol_ns_unbind, name);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2213,12 +1998,7 @@ bool addressing_service::resolve_name(
 { // {{{
     try {
         request req(symbol_ns_resolve, name);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2226,8 +2006,7 @@ bool addressing_service::resolve_name(
             return true;
         }
 
-        else
-            return false;
+        return false;
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_name");
@@ -2339,83 +2118,6 @@ bool addressing_service::iterate_ids(
     }
 } // }}}
 
-void addressing_service::insert_cache_entry(
-    naming::gid_type const& gid
-  , gva const& g
-  , error_code& ec
-    )
-{ // {{{
-
-    // If caching is disabled, we silently pretend success.
-    if (!caching_)
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    // don't look at cache if id is marked as non-cacheable
-    if (!naming::detail::store_in_cache(gid))
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    // don't look at the cache if the id is locally managed
-    if (naming::get_locality_id_from_gid(gid) ==
-        naming::get_locality_id_from_gid(locality_))
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-        return;
-    }
-
-    try {
-        // The entry in AGAS for a locality's RTS component has a count of 0,
-        // so we convert it to 1 here so that the cache doesn't break.
-        const boost::uint64_t count = (g.count ? g.count : 1);
-
-        LAGAS_(debug) <<
-            ( boost::format(
-            "addressing_service::insert_cache_entry, gid(%1%), count(%2%)")
-            % gid % count);
-
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-
-        const gva_cache_key key(gid, count);
-
-        if (!gva_cache_->insert(key, g))
-        {
-            // Figure out who we collided with.
-            gva_cache_key idbase;
-            gva_cache_type::entry_type e;
-
-            if (!gva_cache_->get_entry(key, idbase, e))
-            {
-                // This is impossible under sane conditions.
-                HPX_THROWS_IF(ec, invalid_data
-                  , "addressing_service::insert_cache_entry"
-                  , "data corruption or lock error occurred in cache");
-                return;
-            }
-
-            LAGAS_(warning) <<
-                ( boost::format(
-                    "addressing_service::insert_cache_entry, "
-                    "aborting insert due to key collision in cache, "
-                    "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                ) % gid % count % idbase.get_gid() % idbase.get_count());
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::insert_cache_entry");
-    }
-} // }}}
-
 // This function has to return false if the key is already in the cache (true
 // means go ahead with the cache update).
 bool check_for_collisions(
@@ -2428,7 +2130,7 @@ bool check_for_collisions(
 }
 
 void addressing_service::update_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , gva const& g
   , error_code& ec
     )
@@ -2442,12 +2144,14 @@ void addressing_service::update_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cache-able
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -2456,6 +2160,25 @@ void addressing_service::update_cache_entry(
         if (&ec != &throws)
             ec = make_success_code();
         return;
+    }
+
+    if(hpx::threads::get_self_ptr() == 0)
+    {
+        // Don't update the cache while HPX is starting up ...
+        if(hpx::is_starting())
+        {
+            return;
+        }
+        void (addressing_service::*update_cache_entry_ptr)(
+            naming::gid_type const&
+          , gva const &
+          , error_code&
+        ) = &addressing_service::update_cache_entry;
+        threads::register_thread_nullary(
+            util::bind(update_cache_entry_ptr, this, id, g, boost::ref(throws)),
+            "addressing_service::update_cache_entry", threads::pending, true,
+            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_stacksize_default, ec);
     }
 
     try {
@@ -2468,33 +2191,34 @@ void addressing_service::update_cache_entry(
             "addressing_service::update_cache_entry, gid(%1%), count(%2%)"
             ) % gid % count);
 
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-
         const gva_cache_key key(gid, count);
 
-        if (!gva_cache_->update_if(key, g, check_for_collisions))
         {
-            if (LAGAS_ENABLED(warning))
+            boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            if (!gva_cache_->update_if(key, g, check_for_collisions))
             {
-                // Figure out who we collided with.
-                gva_cache_key idbase;
-                gva_cache_type::entry_type e;
-
-                if (!gva_cache_->get_entry(key, idbase, e))
+                if (LAGAS_ENABLED(warning))
                 {
-                    // This is impossible under sane conditions.
-                    HPX_THROWS_IF(ec, invalid_data
-                      , "addressing_service::update_cache_entry"
-                      , "data corruption or lock error occurred in cache");
-                    return;
-                }
+                    // Figure out who we collided with.
+                    addressing_service::gva_cache_key idbase;
+                    addressing_service::gva_cache_type::entry_type e;
 
-                LAGAS_(warning) <<
-                    ( boost::format(
-                        "addressing_service::update_cache_entry, "
-                        "aborting update due to key collision in cache, "
-                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                    ) % gid % count % idbase.get_gid() % idbase.get_count());
+                    if (!gva_cache_->get_entry(key, idbase, e))
+                    {
+                        // This is impossible under sane conditions.
+                        HPX_THROWS_IF(ec, invalid_data
+                          , "addressing_service::update_cache_entry"
+                          , "data corruption or lock error occurred in cache");
+                        return;
+                    }
+
+                    LAGAS_(warning) <<
+                        ( boost::format(
+                            "addressing_service::update_cache_entry, "
+                            "aborting update due to key collision in cache, "
+                            "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
+                        ) % gid % count % idbase.get_gid() % idbase.get_count());
+                }
             }
         }
 
@@ -2505,6 +2229,44 @@ void addressing_service::update_cache_entry(
         HPX_RETHROWS_IF(ec, e, "addressing_service::update_cache_entry");
     }
 } // }}}
+
+bool addressing_service::get_cache_entry(
+    naming::gid_type const& gid
+  , gva& gva
+  , naming::gid_type& idbase
+  , error_code& ec
+    )
+{
+    // Don't use the cache while HPX is starting up
+    if(hpx::is_starting())
+    {
+        return false;
+    }
+    HPX_ASSERT(hpx::threads::get_self_ptr());
+    gva_cache_key k(gid);
+    gva_cache_key idbase_key;
+
+    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    if(gva_cache_->get_entry(k, idbase_key, gva))
+    {
+        const boost::uint64_t id_msb =
+            naming::detail::strip_internal_bits_from_gid(gid.get_msb());
+
+        if (HPX_UNLIKELY(id_msb != idbase_key.get_gid().get_msb()))
+        {
+            lock.unlock();
+            HPX_THROWS_IF(ec, internal_server_error
+              , "addressing_service::get_cache_entry"
+              , "bad entry in cache, MSBs of GID base and GID do not match");
+            return false;
+        }
+        idbase = idbase_key.get_gid();
+        return true;
+    }
+
+    return false;
+}
+
 
 void addressing_service::clear_cache(
     error_code& ec
@@ -2521,7 +2283,7 @@ void addressing_service::clear_cache(
     try {
         LAGAS_(warning) << "addressing_service::clear_cache, clearing cache";
 
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
 
         gva_cache_->clear();
 
@@ -2534,7 +2296,7 @@ void addressing_service::clear_cache(
 } // }}}
 
 void addressing_service::remove_cache_entry(
-    naming::gid_type const& gid
+    naming::gid_type const& id
   , error_code& ec
     )
 {
@@ -2547,12 +2309,14 @@ void addressing_service::remove_cache_entry(
     }
 
     // don't look at cache if id is marked as non-cache-able
-    if (!naming::detail::store_in_cache(gid))
+    if (!naming::detail::store_in_cache(id))
     {
         if (&ec != &throws)
             ec = make_success_code();
         return;
     }
+
+    naming::gid_type gid = naming::detail::get_stripped_gid(id);
 
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
@@ -2566,10 +2330,10 @@ void addressing_service::remove_cache_entry(
     try {
         LAGAS_(warning) << "addressing_service::remove_cache_entry";
 
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+        boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
 
         gva_cache_->erase(
-            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+            [&gid](std::pair<gva_cache_key, gva> const& p)
             {
                 return gid == p.first.get_gid();
             });
@@ -2727,12 +2491,7 @@ bool addressing_service::retrieve_statistics_counter(
 
         // compose request
         request req(service_code, name);
-        response rep;
-
-        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
+        response rep = client_->service_symbol(req, action_priority_, name, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -2750,76 +2509,82 @@ bool addressing_service::retrieve_statistics_counter(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
+boost::uint64_t addressing_service::get_cache_entries(bool reset)
+{
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
+    return gva_cache_->size();
+}
+
 boost::uint64_t addressing_service::get_cache_hits(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().hits(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_misses(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().misses(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_evictions(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().evictions(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_insertions(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().insertions(reset);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t addressing_service::get_cache_get_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_count(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_insert_entry_count(bool reset)
+boost::uint64_t addressing_service::get_cache_insertion_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_count(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_update_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_count(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_erase_entry_count(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_count(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_get_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_time(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_insert_entry_time(bool reset)
+boost::uint64_t addressing_service::get_cache_insertion_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_time(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_update_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_time(reset);
 }
 
 boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 {
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
+    boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_time(reset);
 }
 
@@ -2827,6 +2592,8 @@ boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 void addressing_service::register_counter_types()
 { // {{{
     // install
+    util::function_nonser<boost::int64_t(bool)> cache_entries(
+        boost::bind(&addressing_service::get_cache_entries, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_hits(
         boost::bind(&addressing_service::get_cache_hits, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_misses(
@@ -2837,25 +2604,41 @@ void addressing_service::register_counter_types()
         boost::bind(&addressing_service::get_cache_insertions, this, ::_1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_count(
-        boost::bind(&addressing_service::get_cache_get_entry_count, this, ::_1));
-    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_count(
-        boost::bind(&addressing_service::get_cache_insert_entry_count, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_get_entry_count, this, ::_1));
+    util::function_nonser<boost::int64_t(bool)> cache_insertion_count(
+        boost::bind(
+            &addressing_service::get_cache_insertion_entry_count, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_count(
-        boost::bind(&addressing_service::get_cache_update_entry_count, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_update_entry_count, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_count(
-        boost::bind(&addressing_service::get_cache_erase_entry_count, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_erase_entry_count, this, ::_1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_time(
-        boost::bind(&addressing_service::get_cache_get_entry_time, this, ::_1));
-    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_time(
-        boost::bind(&addressing_service::get_cache_insert_entry_time, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_get_entry_time, this, ::_1));
+    util::function_nonser<boost::int64_t(bool)> cache_insertion_time(
+        boost::bind(
+            &addressing_service::get_cache_insertion_entry_time, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_time(
-        boost::bind(&addressing_service::get_cache_update_entry_time, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_update_entry_time, this, ::_1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_time(
-        boost::bind(&addressing_service::get_cache_erase_entry_time, this, ::_1));
+        boost::bind(
+            &addressing_service::get_cache_erase_entry_time, this, ::_1));
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {
+        { "/agas/count/cache/entries", performance_counters::counter_raw,
+          "returns the number of cache entries in the AGAS cache",
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_entries, _2),
+          &performance_counters::locality_counter_discoverer,
+          ""
+        },
         { "/agas/count/cache/hits", performance_counters::counter_raw,
           "returns the number of cache hits while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2888,7 +2671,6 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-
         { "/agas/count/cache/get_entry", performance_counters::counter_raw,
           "returns the number of invocations of get_entry function of the "
                 "AGAS cache",
@@ -2899,11 +2681,11 @@ void addressing_service::register_counter_types()
           ""
         },
         { "/agas/count/cache/insert_entry", performance_counters::counter_raw,
-          "returns the number of invocations of insert_entry function of the "
+          "returns the number of invocations of insert function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_insert_entry_count, _2),
+              _1, cache_insertion_count, _2),
           &performance_counters::locality_counter_discoverer,
           ""
         },
@@ -2925,7 +2707,6 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-
         { "/agas/time/cache/get_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the get_entry API "
                 "function of the AGAS cache",
@@ -2940,9 +2721,9 @@ void addressing_service::register_counter_types()
               "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_insert_entry_time, _2),
+              _1, cache_insertion_time, _2),
           &performance_counters::locality_counter_discoverer,
-          "ns"
+          ""
         },
         { "/agas/time/cache/update_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the update_entry API "
@@ -2960,29 +2741,19 @@ void addressing_service::register_counter_types()
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_erase_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
-          "ns"
-        }
+          ""
+        },
     };
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
-    if (is_bootstrap()) {
-        // install counters for services
-        bootstrap->register_counter_types();
+    // install counters for services
+    client_->register_counter_types();
 
-        // always register root server as 'locality#0'
-        bootstrap->register_server_instance("locality#0/");
-    }
-    else {
-        // install counters for services
-        hosted->register_counter_types();
-
-        boost::uint32_t locality_id =
-            naming::get_locality_id_from_gid(get_local_locality());
-        std::string str("locality#"
-            + boost::lexical_cast<std::string>(locality_id) + "/");
-        hosted->register_server_instance(str.c_str(), locality_id);
-    }
+    // register root server
+    boost::uint32_t locality_id =
+        naming::get_locality_id_from_gid(get_local_locality());
+    client_->register_server_instance(locality_id);
 } // }}}
 
 void addressing_service::garbage_collect_non_blocking(
@@ -3097,21 +2868,21 @@ void addressing_service::send_refcnt_requests_non_blocking(
             HPX_ASSERT(e.second < 0);
 
             naming::gid_type raw(e.first);
-            request const req(primary_ns_decrement_credit, raw, raw, e.second);
+            request req(primary_ns_decrement_credit, raw, raw, e.second);
 
             naming::id_type target(
                 stubs::primary_namespace::get_service_instance(raw)
               , naming::id_type::unmanaged);
 
-            requests[target].push_back(req);
+            requests[target].push_back(std::move(req));
         }
 
         // send requests to all locality
-        requests_type::const_iterator end = requests.end();
-        for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+        requests_type::iterator end = requests.end();
+        for (requests_type::iterator it = requests.begin(); it != end; ++it)
         {
             stubs::primary_namespace::bulk_service_non_blocking(
-                (*it).first, (*it).second, action_priority_);
+                (*it).first, std::move((*it).second), action_priority_);
         }
 
         if (&ec != &throws)
@@ -3218,38 +2989,119 @@ void addressing_service::send_refcnt_requests_sync(
         ec = make_success_code();
 }
 
-hpx::future<std::pair<naming::id_type, naming::address> >
-addressing_service::begin_migration_async(
-    naming::id_type const& id
-  , naming::id_type const& target_locality
+///////////////////////////////////////////////////////////////////////////////
+hpx::future<void> addressing_service::mark_as_migrated(
+    naming::gid_type const& gid_
+  , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f
     )
+{
+    if (!gid_)
+    {
+        return hpx::make_exceptional_future<void>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::mark_as_migrated",
+                "invalid reference gid"));
+    }
+
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
+    // Always first grab the AGAS lock before invoking the user supplied
+    // function. The user supplied code will grab another lock. Both locks have
+    // to be acquired and always in the same sequence.
+    // The AGAS lock needs to be acquired first as the migrated object might
+    // not exist on this locality, in which case it should not be accessed
+    // anymore. The only way to determine whether the object still exists on
+    // this locality is to query the migrated objects table in AGAS.
+    typedef boost::unique_lock<mutex_type> lock_type;
+
+    lock_type lock(migrated_objects_mtx_);
+    util::ignore_while_checking<lock_type> ignore(&lock);
+
+    // call the user code for the component instance to be migrated, the
+    // returned future becomes ready whenever the component instance can be
+    // migrated (no threads are pending/active any more)
+    std::pair<bool, hpx::future<void> > result = f();
+
+    // mark the gid as 'migrated' right away - the worst what can happen is
+    // that a parcel which comes in for this object is bouncing between this
+    // locality and the locality managing the address resolution for the object
+    if (result.first)
+    {
+        migrated_objects_table_type::iterator it =
+            migrated_objects_table_.find(gid);
+
+        // insert the object into the map of migrated objects
+        if (it == migrated_objects_table_.end())
+            migrated_objects_table_.insert(gid);
+
+        // avoid interactions with the locking in the cache
+        lock.unlock();
+
+        // remove entry from cache
+        remove_cache_entry(gid_);
+    }
+
+    return std::move(result.second);
+}
+
+void addressing_service::unmark_as_migrated(
+    naming::gid_type const& gid_
+    )
+{
+    if (!gid_)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::unmark_as_migrated",
+            "invalid reference gid");
+        return;
+    }
+
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
+    boost::unique_lock<mutex_type> lock(migrated_objects_mtx_);
+
+    migrated_objects_table_type::iterator it =
+        migrated_objects_table_.find(gid);
+
+    // insert the object into the map of migrated objects
+    if (it != migrated_objects_table_.end())
+    {
+        migrated_objects_table_.erase(it);
+
+        // remove entry from cache
+        if (caching_ && naming::detail::store_in_cache(gid_))
+        {
+            // avoid interactions with the locking in the cache
+            lock.unlock();
+
+            // remove entry from cache
+            remove_cache_entry(gid_);
+        }
+    }
+}
+
+hpx::future<std::pair<naming::id_type, naming::address> >
+addressing_service::begin_migration_async(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
 
     if (!id)
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::begin_migration_async",
-            "invalid reference id");
-        return make_ready_future(result_type(naming::invalid_id, naming::address()));
+        return hpx::make_exceptional_future<result_type>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::begin_migration_async",
+                "invalid reference id"));
     }
 
-    naming::gid_type gid = id.get_gid();
-
-    // insert the object's new locality into the map of migrated objects
-    {
-        boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-        migrated_objects_table_.insert(gid);
-    }
+    naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
 
     agas::request req(agas::primary_ns_begin_migration, gid);
     naming::id_type service_target(
         agas::stubs::primary_namespace::get_service_instance(gid)
       , naming::id_type::unmanaged);
 
-    return stubs::primary_namespace::service_async<
-            std::pair<naming::id_type, naming::address>
-        >(service_target, req);
+    return stubs::primary_namespace::service_async<result_type>(
+        service_target, req);
 }
 
 hpx::future<bool> addressing_service::end_migration_async(
@@ -3258,15 +3110,17 @@ hpx::future<bool> addressing_service::end_migration_async(
 {
     if (!id)
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::end_migration_async",
-            "invalid reference id");
-        return make_ready_future(false);
+        return hpx::make_exceptional_future<bool>(
+            HPX_GET_EXCEPTION(bad_parameter,
+                "addressing_service::end_migration_async",
+                "invalid reference id"));
     }
 
-    agas::request req(agas::primary_ns_end_migration, id.get_gid());
+    naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
+
+    agas::request req(agas::primary_ns_end_migration, gid);
     naming::id_type service_target(
-        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+        agas::stubs::primary_namespace::get_service_instance(gid)
       , naming::id_type::unmanaged);
 
     return stubs::primary_namespace::service_async<bool>(
@@ -3274,28 +3128,46 @@ hpx::future<bool> addressing_service::end_migration_async(
 }
 
 bool addressing_service::was_object_migrated_locked(
-    naming::gid_type const& id
+    naming::gid_type const& gid_
     )
 {
+    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
     return
-        migrated_objects_table_.find(id) !=
+        migrated_objects_table_.find(gid) !=
         migrated_objects_table_.end();
 }
 
-bool addressing_service::was_object_migrated(
-    naming::id_type const* ids
-  , std::size_t size)
+std::pair<bool, components::pinned_ptr>
+    addressing_service::was_object_migrated(
+        naming::gid_type const& gid
+      , util::unique_function_nonser<components::pinned_ptr()> && f
+        )
 {
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-    HPX_ASSERT(1 == size);
+    if (!gid)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::was_object_migrated",
+            "invalid reference gid");
+        return std::make_pair(false, components::pinned_ptr());
+    }
 
-    boost::lock_guard<cache_mutex_type> lock(gva_cache_mtx_);
-    return was_object_migrated_locked(ids[0].get_gid());
-#else
-    // #FIXME: it's not really clear how to handle this situation
-    HPX_ASSERT(false);
-    return false;
-#endif
+    // Always first grab the AGAS lock before invoking the user supplied
+    // function. The user supplied code will grab another lock. Both locks have
+    // to be acquired and always in the same sequence.
+    // The AGAS lock needs to be acquired first as the migrated object might
+    // not exist on this locality, in which case it should not be accessed
+    // anymore. The only way to determine whether the object still exists on
+    // this locality is to query the migrated objects table in AGAS.
+    typedef boost::unique_lock<mutex_type> lock_type;
+
+    lock_type lock(migrated_objects_mtx_);
+
+    if (was_object_migrated_locked(gid))
+        return std::make_pair(true, components::pinned_ptr());
+
+    util::ignore_while_checking<lock_type> ignore(&lock);
+    return std::make_pair(false, f());
 }
 
 }}

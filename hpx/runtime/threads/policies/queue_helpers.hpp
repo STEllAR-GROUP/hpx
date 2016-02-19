@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/try_lock_wrapper.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -19,7 +20,7 @@ namespace hpx { namespace threads { namespace policies
 
     struct add_new_tag {};
 
-#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
@@ -41,7 +42,7 @@ namespace detail
     bool dump_suspended_threads(std::size_t num_thread,
         Map& tm, boost::int64_t& idle_loop_count, bool running)
     {
-#ifndef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifndef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         HPX_UNUSED(tm);
         HPX_UNUSED(idle_loop_count);
         HPX_UNUSED(running); //-V601

@@ -42,28 +42,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             shutdown_sem_.signal();
     }
 
-#if defined(BOOST_ASIO_HAS_MOVE) && BOOST_VERSION >= 105500
-    // Schedule the specified function for execution in this executor.
-    // Depending on the subclass implementation, this may block in some
-    // situations.
-    void service_executor::add(closure_type && f,
-        char const* desc, threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
-    {
-        ++task_count_;
-
-        pool_->get_io_service().post(util::bind(
-            util::one_shot(&service_executor::thread_wrapper),
-            this, std::move(f)));
-    }
-
-    void service_executor::add_no_count(closure_type && f)
-    {
-        pool_->get_io_service().post(util::bind(
-            util::one_shot(&service_executor::thread_wrapper),
-            this, std::move(f)));
-    }
-#else
     struct thread_wrapper_helper
     {
         typedef void result_type;
@@ -97,8 +75,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::make_shared<thread_wrapper_helper>(
                 this, std::move(f)));
 
-        pool_->get_io_service().post(util::bind(
-            util::one_shot(&thread_wrapper_helper::invoke), wfp));
+        pool_->get_io_service().post(
+            util::bind(&thread_wrapper_helper::invoke, wfp));
     }
 
     void service_executor::add_no_count(closure_type && f)
@@ -107,56 +85,15 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::make_shared<thread_wrapper_helper>(
                 this, std::move(f)));
 
-        pool_->get_io_service().post(util::bind(
-            util::one_shot(&thread_wrapper_helper::invoke), wfp));
+        pool_->get_io_service().post(
+            util::bind(&thread_wrapper_helper::invoke, wfp));
     }
-#endif
 
     typedef boost::asio::basic_deadline_timer<
         boost::chrono::steady_clock
         , util::chrono_traits<boost::chrono::steady_clock>
     > steady_clock_deadline_timer;
 
-#if defined(BOOST_ASIO_HAS_MOVE) && BOOST_VERSION >= 105500
-    static void delayed_add(
-        boost::intrusive_ptr<service_executor> this_,
-        service_executor::closure_type && f,
-        boost::shared_ptr<steady_clock_deadline_timer>)
-    {
-        this_->add_no_count(std::move(f));
-    }
-
-    // Schedule given function for execution in this executor no sooner
-    // than time abs_time. This call never blocks, and may violate
-    // bounds on the executor's queue size.
-    void service_executor::add_at(
-        boost::chrono::steady_clock::time_point const& abs_time,
-        closure_type && f, char const* desc,
-        threads::thread_stacksize stacksize, error_code& ec)
-    {
-        ++task_count_;
-
-        boost::shared_ptr<steady_clock_deadline_timer> t(
-            boost::make_shared<steady_clock_deadline_timer>(
-                pool_->get_io_service(), abs_time));
-
-        t->async_wait(util::bind(
-            util::one_shot(&delayed_add),
-            this, std::move(f), t));
-    }
-
-    // Schedule given function for execution in this executor no sooner
-    // than time rel_time from now. This call never blocks, and may
-    // violate bounds on the executor's queue size.
-    void service_executor::add_after(
-        boost::chrono::steady_clock::duration const& rel_time,
-        closure_type && f, char const* desc,
-        threads::thread_stacksize stacksize, error_code& ec)
-    {
-        return add_at(boost::chrono::steady_clock::now() + rel_time,
-            std::move(f), desc, stacksize, ec);
-    }
-#else
     struct delayed_add_helper
     {
         typedef void result_type;
@@ -195,8 +132,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::make_shared<delayed_add_helper>(
                 this, std::move(f), pool_->get_io_service(), abs_time));
 
-        wfp->timer_.async_wait(util::bind(
-            util::one_shot(&delayed_add_helper::invoke), wfp));
+        wfp->timer_.async_wait(
+            util::bind(&delayed_add_helper::invoke, wfp));
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -210,7 +147,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return add_at(boost::chrono::steady_clock::now() + rel_time,
             std::move(f), desc, stacksize, ec);
     }
-#endif
 
     // Return an estimate of the number of waiting tasks.
     boost::uint64_t service_executor::num_pending_closures(error_code& ec) const

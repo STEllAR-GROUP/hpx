@@ -9,6 +9,8 @@
 
 struct callable
 {
+    callable() {}
+    explicit callable(int) {}
     int operator()(){ return 0; }
 };
 
@@ -21,4 +23,5 @@ int main()
     decay<int const&>::type* d = &x;
     result_of<callable()>::type* ro = &x;
     is_convertible<int, long>::type ic;
+    is_constructible<callable, int>::type icc;
 }

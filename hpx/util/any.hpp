@@ -14,10 +14,6 @@
 #ifndef HPX_UTIL_ANY_HPP
 #define HPX_UTIL_ANY_HPP
 
-#if defined(_MSC_VER)
-#pragma once
-#endif
-
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
@@ -27,12 +23,10 @@
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 
-#include <boost/config.hpp>
 #include <boost/type_traits/is_reference.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
@@ -43,7 +37,7 @@
 #include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
+#if BOOST_WORKAROUND(HPX_MSVC, >= 1400)
 # pragma warning(push)
 # pragma warning(disable: 4100)   // 'x': unreferenced formal parameter
 # pragma warning(disable: 4127)   // conditional expression is constant
@@ -435,7 +429,7 @@ namespace hpx { namespace util
     {
     public:
         // constructors
-        basic_any() BOOST_NOEXCEPT
+        basic_any() HPX_NOEXCEPT
           : table(detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>()),
             object(0)
@@ -466,7 +460,7 @@ namespace hpx { namespace util
         }
 
         // Move constructor
-        basic_any(basic_any&& x) BOOST_NOEXCEPT
+        basic_any(basic_any&& x) HPX_NOEXCEPT
           : table(x.table),
             object(x.object)
         {
@@ -529,7 +523,7 @@ namespace hpx { namespace util
         }
 
         // move assignement
-        basic_any& operator=(basic_any&& rhs) BOOST_NOEXCEPT
+        basic_any& operator=(basic_any&& rhs) HPX_NOEXCEPT
         {
             rhs.swap(*this);
             basic_any().swap(rhs);
@@ -587,7 +581,7 @@ namespace hpx { namespace util
         }
 
         // utility functions
-        basic_any& swap(basic_any& x) BOOST_NOEXCEPT
+        basic_any& swap(basic_any& x) HPX_NOEXCEPT
         {
             std::swap(table, x.table);
             std::swap(object, x.object);
@@ -617,7 +611,7 @@ namespace hpx { namespace util
         operator T const& () const { return cast<T>(); }
 #endif // implicit casting
 
-        bool empty() const BOOST_NOEXCEPT
+        bool empty() const HPX_NOEXCEPT
         {
             return table == detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>();
@@ -684,13 +678,10 @@ namespace hpx { namespace util
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
-#ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
         template <typename T, typename IArchive_, typename OArchive_, typename Char_>
-        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) BOOST_NOEXCEPT;
-#else
-    public: // types (public so any_cast can be non-friend)
-#endif
+        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) HPX_NOEXCEPT;
+
         // fields
         detail::any::fxn_ptr_table<IArchive, OArchive, Char>* table;
         void* object;
@@ -719,7 +710,7 @@ namespace hpx { namespace util
     {
     public:
         // constructors
-        basic_any() BOOST_NOEXCEPT
+        basic_any() HPX_NOEXCEPT
           : table(detail::any::get_table<
                 detail::any::empty>::template get<void, void, Char>()),
             object(0)
@@ -750,7 +741,7 @@ namespace hpx { namespace util
         }
 
         // Move constructor
-        basic_any(basic_any&& x) BOOST_NOEXCEPT
+        basic_any(basic_any&& x) HPX_NOEXCEPT
           : table(x.table),
             object(x.object)
         {
@@ -869,7 +860,7 @@ namespace hpx { namespace util
         }
 
         // utility functions
-        basic_any& swap(basic_any& x) BOOST_NOEXCEPT
+        basic_any& swap(basic_any& x) HPX_NOEXCEPT
         {
             std::swap(table, x.table);
             std::swap(object, x.object);
@@ -899,7 +890,7 @@ namespace hpx { namespace util
         operator T const& () const { return cast<T>(); }
 #endif // implicit casting
 
-        bool empty() const BOOST_NOEXCEPT
+        bool empty() const HPX_NOEXCEPT
         {
             return table ==
                 detail::any::get_table<detail::any::empty>::
@@ -931,13 +922,10 @@ namespace hpx { namespace util
         operator<< (std::basic_ostream<Char_>& o,
             basic_any<IArchive_, OArchive_, Char_> const& obj);
 
-#ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
         template <typename T, typename IArchive_, typename OArchive_, typename Char_>
-        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) BOOST_NOEXCEPT;
-#else
-    public: // types (public so any_cast can be non-friend)
-#endif
+        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) HPX_NOEXCEPT;
+
         // fields
         detail::any::fxn_ptr_table<void, void, Char>* table;
         void* object;
@@ -946,14 +934,14 @@ namespace hpx { namespace util
 
     template <typename IArchive, typename OArchive, typename Char>
     void swap(basic_any<IArchive, OArchive, Char>& lhs,
-        basic_any<IArchive, OArchive, Char>& rhs) BOOST_NOEXCEPT
+        basic_any<IArchive, OArchive, Char>& rhs) HPX_NOEXCEPT
     {
         lhs.swap(rhs);
     }
 
     // boost::any-like casting
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    inline T* any_cast (basic_any<IArchive, OArchive, Char>* operand) BOOST_NOEXCEPT
+    inline T* any_cast (basic_any<IArchive, OArchive, Char>* operand) HPX_NOEXCEPT
     {
         if (operand && operand->type() == BOOST_SP_TYPEID(T)) {
             return hpx::util::detail::any::get_table<T>::is_small::value ?
@@ -965,7 +953,7 @@ namespace hpx { namespace util
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
     inline T const* any_cast(basic_any<IArchive, OArchive,
-        Char> const* operand) BOOST_NOEXCEPT
+        Char> const* operand) HPX_NOEXCEPT
     {
         return any_cast<T>(const_cast<basic_any<IArchive, OArchive, Char>*>(operand));
     }
@@ -973,17 +961,7 @@ namespace hpx { namespace util
     template <typename T, typename IArchive, typename OArchive, typename Char>
     T any_cast(basic_any<IArchive, OArchive, Char>& operand)
     {
-        typedef BOOST_DEDUCED_TYPENAME boost::remove_reference<T>::type nonref;
-
-#ifdef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-        // If 'nonref' is still reference type, it means the user has not
-        // specialized 'remove_reference'.
-
-        // Please use BOOST_BROKEN_COMPILER_TYPE_TRAITS_SPECIALIZATION macro
-        // to generate specialization of remove_reference for your class
-        // See type traits library documentation for details
-        BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
-#endif
+        typedef typename boost::remove_reference<T>::type nonref;
 
         nonref* result = any_cast<nonref>(&operand);
         if(!result)
@@ -994,13 +972,7 @@ namespace hpx { namespace util
     template <typename T, typename IArchive, typename OArchive, typename Char>
     T const& any_cast(basic_any<IArchive, OArchive, Char> const& operand)
     {
-        typedef BOOST_DEDUCED_TYPENAME boost::remove_reference<T>::type nonref;
-
-#ifdef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-        // The comment in the above version of 'any_cast' explains when this
-        // assert is fired and what to do.
-        BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
-#endif
+        typedef typename boost::remove_reference<T>::type nonref;
 
         return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive,
             Char> &>(operand));
@@ -1079,7 +1051,7 @@ namespace hpx { namespace util
 }}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
+#if BOOST_WORKAROUND(HPX_MSVC, >= 1400)
 # pragma warning(pop)
 #endif
 

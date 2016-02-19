@@ -112,12 +112,14 @@ void test_initialization_from_vector(std::size_t max_size)
         }
 
         // default init mode is "copy"
-        hpx::serialization::serialize_buffer<T> send_buffer(send_vec[0], send_vec.size());
+        hpx::serialization::serialize_buffer<T> send_buffer(
+            send_vec[0], send_vec.size());
         hpx::serialization::serialize_buffer<T> recv_buffer;
         std::copy(send_vec.begin(), send_vec.end(), send_buffer.begin());
         recv_buffer = send_buffer;
 
-        std::copy(recv_buffer.begin(), recv_buffer.end(), std::back_inserter(recv_vec));
+        std::copy(recv_buffer.begin(), recv_buffer.end(),
+            std::back_inserter(recv_vec));
         HPX_TEST(send_vec == recv_vec);
     }
 }

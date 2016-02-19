@@ -23,11 +23,13 @@
 #ifndef JT28092007_profiler_HPP_DEFINED
 #define JT28092007_profiler_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
+
+#include <hpx/util/function.hpp>
 
 #include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -112,7 +114,7 @@ struct compute {
         last_ = on_other_thread
     };
 
-    typedef ::hpx::util::function<void(const std::string&)> log_function;
+    typedef ::hpx::util::function_nonser<void(const std::string&)> log_function;
     static void nothing(const std::string&) {}
 
     static compute & inst() {

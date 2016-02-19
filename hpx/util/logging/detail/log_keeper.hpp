@@ -17,7 +17,7 @@
 #ifndef JT28092007_log_keeper_HPP_DEFINED
 #define JT28092007_log_keeper_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
@@ -147,11 +147,7 @@ private:
 */
 struct ensure_early_log_creation {
     template<class type> ensure_early_log_creation ( type & log) {
-#ifndef BOOST_NO_INT64_T
     typedef boost::int64_t long_type ;
-#else
-    typedef long long_type ;
-#endif
         long_type ignore = reinterpret_cast<long_type>(&log);
         // we need to force the compiler to force creation of the log
         if ( time(0) < 0)

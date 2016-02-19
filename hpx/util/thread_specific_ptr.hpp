@@ -8,13 +8,15 @@
 #if !defined(HPX_BABB0428_2085_4DCF_851A_8819D186835E)
 #define HPX_BABB0428_2085_4DCF_851A_8819D186835E
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
-
-#include <boost/config.hpp>
 
 #include <hpx/config/export_definitions.hpp>
 
-#if !defined(BOOST_WINDOWS)
+// Needed to get potentially get _GLIBCXX_HAVE_TLS
+#include <cstdlib>
+
+#if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_THREAD_SPECIFIC_PTR HPX_EXPORT
 #else
 #  define HPX_EXPORT_THREAD_SPECIFIC_PTR
@@ -25,14 +27,22 @@
 
 #if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
 
-#if defined(_GLIBCXX_HAVE_TLS)
-#  define HPX_NATIVE_TLS __thread
-#elif defined(BOOST_WINDOWS)
-#  define HPX_NATIVE_TLS __declspec(thread)
-#elif defined(__FreeBSD__) || (defined(__APPLE__) && defined(__MACH__))
-#  define HPX_NATIVE_TLS __thread
-#else
-#  error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
+#if defined(__has_feature)
+#  if __has_feature(cxx_thread_local)
+#    define HPX_NATIVE_TLS thread_local
+#  endif
+#endif
+
+#if !defined(HPX_NATIVE_TLS)
+#  if defined(_GLIBCXX_HAVE_TLS)
+#    define HPX_NATIVE_TLS __thread
+#  elif defined(HPX_WINDOWS)
+#    define HPX_NATIVE_TLS __declspec(thread)
+#  elif defined(__FreeBSD__) || (defined(__APPLE__) && defined(__MACH__))
+#    define HPX_NATIVE_TLS __thread
+#  else
+#    error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
+#  endif
 #endif
 
 namespace hpx { namespace util

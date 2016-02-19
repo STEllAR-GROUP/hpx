@@ -22,7 +22,7 @@
 #error HPX cannot be compiled with a Boost version earlier than V1.49.
 #endif
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #if !defined(WIN32)
 #  define WIN32
 #endif
@@ -42,14 +42,18 @@
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/util/function.hpp>
 // ^ this has to come before the naming/id_type.hpp below
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/runtime/applier_fwd.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -69,153 +73,12 @@ namespace hpx
 
     HPX_EXCEPTION_EXPORT extern error_code throws;
 
-    /// \namespace applier
-    ///
-    /// The namespace \a applier contains all definitions needed for the
-    /// class \a hpx#applier#applier and its related functionality. This
-    /// namespace is part of the HPX core module.
-    namespace applier
-    {
-        class HPX_API_EXPORT applier;
-
-        /// The function \a get_applier returns a reference to the (thread
-        /// specific) applier instance.
-        HPX_API_EXPORT applier& get_applier();
-        HPX_API_EXPORT applier* get_applier_ptr();
-    }
-
-    /// \namespace naming
-    ///
-    /// The namespace \a naming contains all definitions needed for the AGAS
-    /// (Active Global Address Space) service.
-    namespace naming
-    {
-        typedef agas::addressing_service resolver_client;
-
-        struct HPX_API_EXPORT gid_type;
-        // NOTE: We do not export the symbol here as id_type was already
-        //       exported and generates a warning on gcc otherwise.
-        struct id_type;
-        struct HPX_API_EXPORT address;
-
-        HPX_API_EXPORT resolver_client& get_agas_client();
-
-        typedef boost::uint64_t address_type;
-    }
-
-    class HPX_API_EXPORT runtime;
-    class HPX_API_EXPORT thread;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
-    class HPX_API_EXPORT runtime_impl;
-
-    /// The function \a get_runtime returns a reference to the (thread
-    /// specific) runtime instance.
-    HPX_API_EXPORT runtime& get_runtime();
-    HPX_API_EXPORT runtime* get_runtime_ptr();
-
-    /// The function \a get_locality returns a reference to the locality prefix
-    HPX_API_EXPORT naming::gid_type const& get_locality();
-
-    /// The function \a get_runtime_instance_number returns a unique number
-    /// associated with the runtime instance the current thread is running in.
-    HPX_API_EXPORT std::size_t get_runtime_instance_number();
-
-    HPX_API_EXPORT void report_error(std::size_t num_thread
-      , boost::exception_ptr const& e);
-
-    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
-
-    /// Register a function to be called during system shutdown
-    HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
-
-    enum logging_destination
-    {
-        destination_hpx = 0,
-        destination_timing = 1,
-        destination_agas = 2,
-        destination_parcel = 3,
-        destination_app = 4,
-        destination_debuglog = 5
-    };
-
-    /// \namespace components
-    namespace components
-    {
-        /// \ cond NODETAIL
-        namespace detail
-        {
-            struct this_type {};
-        }
-        /// \ endcond
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Component = detail::this_type>
-        class fixed_component_base;
-
-        template <typename Component>
-        class fixed_component;
-
-        template <typename Component = detail::this_type>
-        class abstract_simple_component_base;
-
-        template <typename Component = detail::this_type>
-        class simple_component_base;
-
-        template <typename Component>
-        class simple_component;
-
-        template <typename Component, typename Derived = detail::this_type>
-        class abstract_managed_component_base;
-
-        template <typename Component, typename Wrapper = detail::this_type,
-            typename CtorPolicy = traits::construct_without_back_ptr,
-            typename DtorPolicy = traits::managed_object_controls_lifetime>
-        class managed_component_base;
-
-        template <typename Component, typename Derived = detail::this_type>
-        class managed_component;
-
-        struct HPX_API_EXPORT component_factory_base;
-
-        template <typename Component>
-        struct component_factory;
-
-        class runtime_support;
-        class memory;
-        class memory_block;
-
-        namespace stubs
-        {
-            struct runtime_support;
-            struct memory;
-            struct memory_block;
-        }
-
-        namespace server
-        {
-            class HPX_API_EXPORT runtime_support;
-            class HPX_API_EXPORT memory;
-            class HPX_API_EXPORT memory_block;
-        }
-
-        HPX_EXPORT void console_logging(logging_destination dest,
-            std::size_t level, std::string const& msg);
-        HPX_EXPORT void cleanup_logging();
-        HPX_EXPORT void activate_logging();
-    }
-
-    HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
-
     /// \namespace util
     namespace util
     {
         struct binary_filter;
 
         class HPX_EXPORT section;
-        class HPX_EXPORT runtime_configuration;
-        class HPX_EXPORT io_service_pool;
 
         /// \brief Expand INI variables in a string
         HPX_API_EXPORT std::string expand(std::string const& expand);
@@ -229,22 +92,11 @@ namespace hpx
         struct counter_info;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT bool is_scheduler_numa_sensitive();
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT util::runtime_configuration const& get_config();
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(
-        char const* name, char const* pool_name_suffix = "");
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
-    using naming::id_type;
     using naming::invalid_id;
-
-    /// \endcond
 }
 
 namespace hpx

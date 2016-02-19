@@ -6,6 +6,7 @@
 set(tests
     minimal_findend
     scan_different_inits
+    scan_non_commutative
     scan_shortlength
     search_zerolength
    )

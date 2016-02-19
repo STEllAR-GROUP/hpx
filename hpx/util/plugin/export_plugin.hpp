@@ -9,16 +9,16 @@
 #ifndef HPX_EXPORT_PLUGIN_VP_2004_08_25
 #define HPX_EXPORT_PLUGIN_VP_2004_08_25
 
-#include <string>
-#include <map>
+#include <hpx/config.hpp>
+#include <hpx/util/plugin/config.hpp>
+#include <hpx/util/plugin/concrete_factory.hpp>
 
-#include <boost/config.hpp>
 #include <boost/any.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
-#include <hpx/util/plugin/config.hpp>
-#include <hpx/util/plugin/concrete_factory.hpp>
+#include <string>
+#include <map>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_NAME_2(name1, name2)                                       \

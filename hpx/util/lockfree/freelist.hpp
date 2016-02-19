@@ -6,7 +6,6 @@
 #if !defined(HPX_UTIL_LOCKFREE_FIFO_AUG_31_2012_0935PM)
 #define HPX_UTIL_LOCKFREE_FIFO_AUG_31_2012_0935PM
 
-#include <boost/config.hpp>
 #include <boost/version.hpp>
 
 // use released library Boost.Lockfree starting V1.53.0

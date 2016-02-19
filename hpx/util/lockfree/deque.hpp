@@ -18,10 +18,11 @@
 #if !defined(HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0)
 #define HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0
 
+#include <hpx/config.hpp>
+
 #include <iostream>
 #include <boost/thread/thread.hpp>
 
-#include <boost/config.hpp>
 #include <boost/atomic.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -165,8 +166,8 @@ struct deque: private boost::noncopyable
     anchor anchor_;
     pool pool_;
 
-    BOOST_STATIC_CONSTANT(int, //-V103
-        padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor));
+    HPX_STATIC_CONSTEXPR int //-V103
+        padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor);
     char padding[padding_size];
 
     node* alloc_node(node* lptr, node* rptr, T const& v,

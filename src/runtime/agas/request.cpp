@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Thomas Heller
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@
 
 namespace hpx { namespace agas
 {
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma warning (push)
 #pragma warning (disable: 4521)
 #endif
@@ -227,7 +227,7 @@ namespace hpx { namespace agas
 
         data_type data;
     };
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma warning (pop)
 #endif
 
@@ -382,6 +382,9 @@ namespace hpx { namespace agas
         HPX_ASSERT(type_ == symbol_ns_on_event);
     }
 
+    request::~request()
+    {}
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     request::request(
@@ -399,7 +402,6 @@ namespace hpx { namespace agas
       , data(std::move(other.data))
     {
         other.mc = invalid_request;
-        other.data.reset(new request_data(util::make_tuple()));
     }
 
     // copy assignment
@@ -420,7 +422,6 @@ namespace hpx { namespace agas
         mc = other.mc;
         data = std::move(other.data);
         other.mc = invalid_request;
-        other.data.reset(new request_data(util::make_tuple()));
         return *this;
     }
 

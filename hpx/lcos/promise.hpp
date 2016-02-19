@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
@@ -26,7 +27,6 @@
 #include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/exception_ptr.hpp>
 
@@ -202,25 +202,40 @@ namespace hpx { namespace lcos { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
-    class promise;
+    class promise_common;
 
     template <typename Result, typename RemoteResult>
-    void intrusive_ptr_add_ref(promise<Result, RemoteResult>* p);
+    void intrusive_ptr_add_ref(promise_common<Result, RemoteResult>* p);
 
     template <typename Result, typename RemoteResult>
-    void intrusive_ptr_release(promise<Result, RemoteResult>* p);
+    void intrusive_ptr_release(promise_common<Result, RemoteResult>* p);
 
     ///////////////////////////////////////////////////////////////////////////
     /// A promise can be used by a single thread to invoke a (remote)
     /// action and wait for the result.
     template <typename Result, typename RemoteResult>
-    class promise
+    class promise_common
       : public promise_base<Result, RemoteResult>,
-        public lcos::detail::future_data<Result>
+        public task_base<Result>
     {
-    protected:
-        typedef lcos::detail::future_data<Result> future_data_type;
-        typedef typename future_data_type::result_type result_type;
+    private:
+        void do_run()
+        {
+            if (!f_)
+                return;         // do nothing if no deferred task is given
+
+            try
+            {
+                f_();           // trigger action
+                this->wait();   // wait for value to come back
+            }
+            catch(...)
+            {
+                this->set_exception(boost::current_exception());
+            }
+        }
+
+        util::unique_function_nonser<void()> f_;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -228,22 +243,18 @@ namespace hpx { namespace lcos { namespace detail
         // to associate this component with a given action.
         enum { value = components::component_promise };
 
-        promise()
-        {}
+        promise_common() {}
 
         // The implementation of the component is responsible for deleting the
         // actual managed component object
-        ~promise()
+        ~promise_common()
         {
             this->finalize();
         }
 
-        // helper functions for setting data (if successful) or the error (if
-        // non-successful)
-        template <typename T>
-        void set_local_data(T && result)
+        void set_task(util::unique_function_nonser<void()> && f)
         {
-            return this->set_data(std::forward<result_type>(result));
+            f_ = std::move(f);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -258,16 +269,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void set_exception(boost::exception_ptr const& e)
         {
-            return this->future_data_type::set_exception(e);
-        }
-
-        Result get_value(error_code& ec = throws)
-        {
-            typedef typename future_data_type::result_type result_type;
-            result_type* result = this->get_result();
-
-            // no error has been reported, return the result
-            return std::move(*result);
+            return this->task_base<Result>::set_exception(e);
         }
 
         void add_ref()
@@ -312,17 +314,33 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // disambiguate reference counting
-        friend void intrusive_ptr_add_ref(promise* p)
+        friend void intrusive_ptr_add_ref(promise_common* p)
         {
             ++p->count_;
         }
 
-        friend void intrusive_ptr_release(promise* p)
+        friend void intrusive_ptr_release(promise_common* p)
         {
             if (p->requires_delete())
                 delete p;
         }
+    };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result, typename RemoteResult>
+    class promise : public promise_common<Result, RemoteResult>
+    {
+    public:
+        Result get_value(error_code& /*ec*/ = throws)
+        {
+            typedef typename task_base<Result>::result_type result_type;
+            result_type* result = this->get_result();
+
+            // no error has been reported, return the result
+            return std::move(*result);
+        }
+
+    private:
         template <typename>
         friend struct components::detail_adl_barrier::init;
 
@@ -334,121 +352,25 @@ namespace hpx { namespace lcos { namespace detail
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
     template <>
     class promise<void, util::unused_type>
-      : public promise_base<void, util::unused_type>,
-        public lcos::detail::future_data<void>
+      : public promise_common<void, util::unused_type>
     {
-    protected:
-        typedef lcos::detail::future_data<void> future_data_type;
-        typedef future_data_type::result_type result_type;
-
     public:
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        enum { value = components::component_promise };
-
-        promise()
-        {}
-
-        // The implementation of the component is responsible for deleting the
-        // actual managed component object
-        ~promise()
-        {
-            this->finalize();
-        }
-
-        // helper functions for setting data (if successful) or the error (if
-        // non-successful)
-        template <typename T>
-        void set_local_data(T && result)
-        {
-            return set_data(std::forward<result_type>(result));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
-
-        // trigger the future, set the result
-        void set_value (util::unused_type && result)
-        {
-            // set the received result, reset error status
-            set_data(std::move(result));
-        }
-
-        void set_exception(boost::exception_ptr const& e)
-        {
-            return this->future_data_type::set_exception(e);
-        }
-
         util::unused_type get_value(error_code& /*ec*/ = throws)
         {
             this->get_result();
             return util::unused;
         }
 
-        void add_ref()
-        {
-            intrusive_ptr_add_ref(this);
-        }
-
-        void release()
-        {
-            intrusive_ptr_release(this);
-        }
-
-        long count() const
-        {
-            return this->count_;
-        }
-
     private:
-        bool requires_delete()
-        {
-            boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
-            long counter = --this->count_;
-
-            // special precautions for it to go out of scope
-            if (1 == counter && naming::detail::has_credits(this->gid_))
-            {
-                // At this point, the remaining count has to be held by AGAS
-                // for this reason, we break the self-reference to allow for
-                // proper destruction
-
-                // move all credits to a temporary id_type
-                naming::gid_type gid = this->gid_;
-                naming::detail::strip_credits_from_gid(this->gid_);
-
-                naming::id_type id (gid, id_type::managed);
-                l.unlock();
-
-                return false;
-            }
-
-            return 0 == counter;
-        }
-
-        // disambiguate reference counting
-        friend void intrusive_ptr_add_ref(promise* p)
-        {
-            ++p->count_;
-        }
-
-        friend void intrusive_ptr_release(promise* p)
-        {
-            if (p->requires_delete())
-                delete p;
-        }
-
         template <typename>
         friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<promise>* bp)
         {
             HPX_ASSERT(bp);
-            HPX_ASSERT(gid_ == naming::invalid_gid);
+            HPX_ASSERT(this->gid_ == naming::invalid_gid);
             this->gid_ = bp->get_base_gid();
         }
     };
@@ -541,7 +463,7 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class promise
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
     public:
         typedef detail::promise<Result, RemoteResult> wrapped_type;
@@ -590,6 +512,11 @@ namespace hpx { namespace lcos
             return *this;
         }
 
+        void set_task(util::unique_function_nonser<void()> && f)
+        {
+            (*impl_)->set_task(std::move(f));
+        }
+
     protected:
         template <typename Impl>
         promise(Impl* impl)
@@ -605,7 +532,17 @@ namespace hpx { namespace lcos
             future_obtained_ = false;
         }
 
-        /// \brief Return the global id of this \a future instance
+        /// \brief Return the resolved address of this \a promise instance
+        naming::address resolve() const
+        {
+            return naming::address(
+                hpx::get_locality()
+              , impl_->get_component_type()
+              , impl_.get()
+            );
+        }
+
+        /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
             return (*impl_)->get_id();
@@ -673,12 +610,6 @@ namespace hpx { namespace lcos
             (*impl_)->set_exception(e);      // set the received error
         }
 
-        template <typename T>
-        void set_local_data(T && result)
-        {
-            (*impl_)->set_local_data(std::forward<Result>(result));
-        }
-
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
@@ -688,13 +619,13 @@ namespace hpx { namespace lcos
     template <>
     class promise<void, util::unused_type>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
 
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
-        /// Construct a new \a future instance. The supplied
+        /// Construct a new \a promise instance. The supplied
         /// \a thread will be notified as soon as the result of the
         /// operation associated with this future instance has been
         /// returned.
@@ -722,8 +653,7 @@ namespace hpx { namespace lcos
             rhs.future_obtained_ = false;
         }
 
-        virtual ~promise()
-        {}
+        virtual ~promise() {}
 
         promise& operator=(promise && rhs)
         {
@@ -734,6 +664,11 @@ namespace hpx { namespace lcos
                 rhs.future_obtained_ = false;
             }
             return *this;
+        }
+
+        void set_task(util::unique_function_nonser<void()> && f)
+        {
+            (*impl_)->set_task(std::move(f));
         }
 
     protected:
@@ -751,7 +686,17 @@ namespace hpx { namespace lcos
             future_obtained_ = false;
         }
 
-        /// \brief Return the global id of this \a future instance
+        /// \brief Return the resolved address of this \a promise instance
+        naming::address resolve() const
+        {
+            return naming::address(
+                hpx::get_locality()
+              , impl_->get_component_type()
+              , impl_.get()
+            );
+        }
+
+        /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
             return (*impl_)->get_id();

@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -24,6 +25,7 @@
 #endif
 
 #include <memory>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
@@ -398,18 +400,6 @@ namespace hpx { namespace applier
         naming::id_type const* ids = p.destinations();
         naming::address const* addrs = p.addrs();
 
-        // make sure the target has not been migrated away
-        naming::resolver_client& client = hpx::naming::get_agas_client();
-        if (client.was_object_migrated(ids, size))
-        {
-            using hpx::util::placeholders::_1;
-            using hpx::util::placeholders::_2;
-            client.route(std::move(p),
-                util::bind(&detail::parcel_sent_handler,
-                    std::ref(parcel_handler_), _1, _2));
-            return;
-        }
-
         // decode the action-type in the parcel
         std::unique_ptr<actions::continuation> cont = p.get_continuation();
         actions::base_action * act = p.get_action();
@@ -443,6 +433,8 @@ namespace hpx { namespace applier
         // single destination
         HPX_ASSERT(!cont || size == 1);
 
+        naming::resolver_client& client = hpx::naming::get_agas_client();
+
         // schedule a thread for each of the destinations
         for (std::size_t i = 0; i != size; ++i)
         {
@@ -454,8 +446,8 @@ namespace hpx { namespace applier
             // decode the local virtual address of the parcel
             naming::address::address_type lva = addr.address_;
 
-            // by convention, a zero address references the local runtime
-            // support component
+            // by convention, a zero address references either the local
+            // runtime support component or one of the AGAS components
             if (0 == lva)
             {
                 switch(comptype)
@@ -483,6 +475,29 @@ namespace hpx { namespace applier
             {
                 HPX_ASSERT(naming::refers_to_virtual_memory(ids[i].get_gid()));
                 lva = get_memory_raw_gid().get_lsb();
+            }
+
+            // make sure the target has not been migrated away
+            auto r = act->was_object_migrated(ids[i], lva);
+            if (r.first)
+            {
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+                // it's unclear at this point what could be done if there is
+                // more than one destination
+                HPX_ASSERT(size == 1);
+#endif
+                // set continuation in outgoing parcel
+                if (cont)
+                    p.set_continuation(std::move(cont));
+
+                // route parcel to new locality of target
+                client.route(
+                    std::move(p),
+                    util::bind(&detail::parcel_sent_handler,
+                        boost::ref(parcel_handler_),
+                        util::placeholders::_1, util::placeholders::_2),
+                    threads::thread_priority_normal);
+                break;
             }
 
 #if defined(HPX_HAVE_SECURITY)

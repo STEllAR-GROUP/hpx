@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http:// ww.boost.org/LICENSE_1_0.txt)
@@ -77,6 +77,8 @@ namespace hpx
         typedef local_vector_iterator<T> local_iterator;
         typedef const_local_vector_iterator<T> local_const_iterator;
 
+        local_raw_vector_iterator() {}
+
         local_raw_vector_iterator(base_iterator const& it,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
           : base_type(it), data_(data)
@@ -86,14 +88,16 @@ namespace hpx
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
-            return local_iterator(partition_vector<T>(data_->get_id()),
+            return local_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
-            return local_const_iterator(partition_vector<T>(data_->get_id()),
+            return local_const_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -117,6 +121,8 @@ namespace hpx
         typedef const_local_vector_iterator<T> local_iterator;
         typedef const_local_vector_iterator<T> local_const_iterator;
 
+        const_local_raw_vector_iterator() {}
+
         const_local_raw_vector_iterator(base_iterator const& it,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
           : base_type(it), data_(data)
@@ -126,14 +132,16 @@ namespace hpx
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
-            return local_const_iterator(partition_vector<T>(data_->get_id()),
+            return local_const_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
-            return local_const_iterator(partition_vector<T>(data_->get_id()),
+            return local_const_iterator(
+                partitioned_vector_partition<T>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -251,7 +259,7 @@ namespace hpx
           : partition_(), local_index_(size_type(-1))
         {}
 
-        local_vector_iterator(partition_vector<T> partition,
+        local_vector_iterator(partitioned_vector_partition<T> partition,
                 size_type local_index,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
           : partition_(partition),
@@ -332,8 +340,8 @@ namespace hpx
         }
 
     public:
-        partition_vector<T>& get_partition() { return partition_; }
-        partition_vector<T> get_partition() const { return partition_; }
+        partitioned_vector_partition<T>& get_partition() { return partition_; }
+        partitioned_vector_partition<T> get_partition() const { return partition_; }
 
         size_type get_local_index() const { return local_index_; }
 
@@ -348,7 +356,7 @@ namespace hpx
 
     protected:
         // refer to a partition of the vector
-        partition_vector<T> partition_;
+        partitioned_vector_partition<T> partition_;
 
         // local position in the referenced partition
         size_type local_index_;
@@ -380,7 +388,7 @@ namespace hpx
           : partition_(), local_index_(size_type(-1))
         {}
 
-        const_local_vector_iterator(partition_vector<T> partition,
+        const_local_vector_iterator(partitioned_vector_partition<T> partition,
                 size_type local_index,
                 boost::shared_ptr<server::partitioned_vector<T> > const& data)
           : partition_(partition),
@@ -465,7 +473,10 @@ namespace hpx
         }
 
     public:
-        partition_vector<T> const& get_partition() const { return partition_; }
+        partitioned_vector_partition<T> const& get_partition() const
+        {
+            return partition_;
+        }
         size_type get_local_index() const { return local_index_; }
 
         boost::shared_ptr<server::partitioned_vector<T> >& get_data()
@@ -479,7 +490,7 @@ namespace hpx
 
     protected:
         // refer to a partition of the vector
-        partition_vector<T> partition_;
+        partitioned_vector_partition<T> partition_;
 
         // local position in the referenced partition
         size_type local_index_;
@@ -502,6 +513,10 @@ namespace hpx
             > base_type;
 
     public:
+        segment_vector_iterator()
+          : data_(0)
+        {}
+
         segment_vector_iterator(BaseIter const& it, partitioned_vector<T>* data = 0)
           : base_type(it), data_(data)
         {}
@@ -531,6 +546,10 @@ namespace hpx
             > base_type;
 
     public:
+        const_segment_vector_iterator()
+          : data_(0)
+        {}
+
         const_segment_vector_iterator(BaseIter const& it,
                 partitioned_vector<T> const* data = 0)
           : base_type(it), data_(data)
@@ -588,6 +607,9 @@ namespace hpx
         typedef detail::is_requested_locality<BaseIter> predicate;
 
     public:
+        local_segment_vector_iterator()
+        {}
+
         local_segment_vector_iterator(BaseIter const& end)
           : base_type(end), predicate_(), end_(end)
         {}

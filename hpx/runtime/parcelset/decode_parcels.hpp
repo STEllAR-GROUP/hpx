@@ -9,11 +9,17 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/performance_counters/parcels/data_point.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/shared_ptr.hpp>
 
 #include <vector>
+#include <sstream>
 
 namespace hpx { namespace parcelset
 {
@@ -114,10 +120,22 @@ namespace hpx { namespace parcelset
                         parcel p;
                         archive >> p;
                         // make sure this parcel ended up on the right locality
-#ifdef HPX_DEBUG
-                        if(hpx::get_runtime_ptr() && hpx::get_locality())
-                            HPX_ASSERT(p.destination_locality() == hpx::get_locality());
-#endif
+
+                        naming::gid_type const& here = hpx::get_locality();
+                        if (hpx::get_runtime_ptr() && here &&
+                            (naming::get_locality_id_from_gid(
+                                 p.destination_locality()) !=
+                             naming::get_locality_id_from_gid(here)))
+                        {
+                            std::ostringstream os;
+                            os << "parcel destination does not match "
+                                  "locality which received the parcel ("
+                               << here << "), " << p;
+                            HPX_THROW_EXCEPTION(invalid_status,
+                                "hpx::parcelset::decode_message",
+                                os.str());
+                            return;
+                        }
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();

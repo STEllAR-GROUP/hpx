@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -39,11 +38,13 @@
 #endif
 
 #include <boost/format.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/ref.hpp>
 
 #include <sstream>
 #include <cstdlib>
@@ -873,7 +874,8 @@ namespace detail
 
 void big_boot_barrier::wait_hosted(
     std::string const& locality_name,
-    void* primary_ns_server, void* symbol_ns_server)
+    naming::address::address_type primary_ns_server,
+    naming::address::address_type symbol_ns_server)
 { // {{{
     HPX_ASSERT(service_mode_bootstrap != service_type);
 
@@ -904,8 +906,8 @@ void big_boot_barrier::wait_hosted(
     // contact the bootstrap AGAS node
     registration_header hdr(
           rt.endpoints()
-        , reinterpret_cast<boost::uint64_t>(primary_ns_server)
-        , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
+        , primary_ns_server
+        , symbol_ns_server
         , cores_needed
         , num_threads
         , locality_name
@@ -941,7 +943,18 @@ void big_boot_barrier::trigger()
         util::unique_function_nonser<void()>* p;
 
         while (thunks.pop(p))
-            (*p)();
+        {
+            try
+            {
+                (*p)();
+            }
+            catch(...)
+            {
+                delete p;
+                throw;
+            }
+            delete p;
+        }
     }
 }
 

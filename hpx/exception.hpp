@@ -31,7 +31,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #if !defined(BOOST_SYSTEM_NOEXCEPT)
-#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
+#define BOOST_SYSTEM_NOEXCEPT HPX_NOEXCEPT
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,8 @@ namespace hpx
             {
                 if (value >= success && value < last_error)
                     return std::string("HPX(") + error_names[value] + ")"; //-V108
-
+                if (value & system_error_flag)
+                    return std::string("HPX(system_error)");
                 return "HPX(unknown_error)";
             }
         };
@@ -68,7 +69,7 @@ namespace hpx
                 return "";
             }
 
-            std::string message(int) const BOOST_NOEXCEPT
+            std::string message(int) const HPX_NOEXCEPT
             {
                 return "";
             }
@@ -410,7 +411,7 @@ namespace hpx
         explicit exception(error e = success)
           : boost::system::system_error(make_error_code(e, plain))
         {
-            HPX_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -435,7 +436,7 @@ namespace hpx
         exception(error e, char const* msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
-            HPX_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -453,7 +454,7 @@ namespace hpx
         exception(error e, std::string const& msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
-            HPX_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -617,7 +618,6 @@ namespace hpx
             }
         };
 
-#ifndef BOOST_NO_TYPEID
         struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast
         {
           private:
@@ -653,7 +653,6 @@ namespace hpx
                 return what_.c_str();
             }
         };
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // types needed to add additional information to the thrown exceptions

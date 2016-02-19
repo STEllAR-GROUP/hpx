@@ -13,6 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/coroutine/exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/shared_ptr.hpp>

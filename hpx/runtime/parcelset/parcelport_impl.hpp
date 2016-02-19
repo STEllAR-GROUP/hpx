@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -22,7 +22,10 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <boost/detail/endian.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <limits>
 
@@ -46,6 +49,11 @@ namespace hpx { namespace parcelset
         typedef
             typename connection_handler_traits<ConnectionHandler>::connection_type
             connection;
+
+        typedef hpx::serialization::detail::future_await_container
+            future_await_container_type;
+        typedef hpx::serialization::output_archive archive_type;
+
     public:
         static const char * connection_handler_type()
         {
@@ -183,98 +191,122 @@ namespace hpx { namespace parcelset
 
         }
 
-        void put_parcel(locality const & dest, parcel p, write_handler_type f)
+    protected:
+        void put_parcel_await(
+            locality const & dest, parcel p, write_handler_type f
+          , boost::shared_ptr<archive_type> const & archive
+          , boost::shared_ptr<future_await_container_type> const & future_await)
         {
-            put_parcel(dest, std::move(p), std::move(f), true);
-        }
+            future_await->reset();
 
-        void put_parcel(locality const & dest, parcel p, write_handler_type f,
-            bool trigger)
-        {
-            HPX_ASSERT(dest.type() == type());
-
-            boost::shared_ptr<hpx::serialization::detail::future_await_container>
-                future_await(new hpx::serialization::detail::future_await_container());
-            boost::shared_ptr<hpx::serialization::output_archive>
-                archive(
-                    new hpx::serialization::output_archive(
-                        *future_await, 0, 0, 0, 0, &future_await->new_gids_)
-                );
             (*archive) << p;
 
+            // We are doing a fixed point iteration until we are sure that the
+            // serialization process requires nothing more to wait on ...
+            // Things where we need waiting:
+            //  - (shared_)future<id_type>: when the future wasn't ready yet, we
+            //      need to do another await round for the id splitting
+            //  - id_type: we need to await, if and only if, the credit of the
+            //      needs to split.
             if(future_await->has_futures())
             {
-                void (parcelport_impl::*awaiter)(
-                    locality const &, parcel, write_handler_type, bool
-                  , boost::shared_ptr<hpx::serialization::output_archive> const &
-                  , boost::shared_ptr<
-                        hpx::serialization::detail::future_await_container> const &
-                )
-                    = &parcelport_impl::put_parcel_impl;
                 (*future_await)(
                     util::bind(
-                        util::one_shot(awaiter), this,
-                        dest, std::move(p), std::move(f), true,
+                        util::one_shot(&parcelport_impl::put_parcel_await), this,
+                        dest, std::move(p), std::move(f),
                         archive, future_await)
                 );
                 return;
             }
-            else
-            {
-                put_parcel_impl(
-                    dest, std::move(p), std::move(f), trigger, archive, future_await);
-            }
-        }
 
-        void put_parcel_impl(
-            locality const & dest, parcel p, write_handler_type f, bool trigger
-          , boost::shared_ptr<hpx::serialization::output_archive> const &
-          , boost::shared_ptr<
-                hpx::serialization::detail::future_await_container
-            > const & future_await)
-        {
             // enqueue the outgoing parcel ...
-            enqueue_parcel(
-                dest, std::move(p), std::move(f), std::move(future_await->new_gids_));
+            enqueue_parcel(dest, std::move(p), std::move(f),
+                std::move(future_await->new_gids_));
 
-            if (trigger)
-            {
-                get_connection_and_send_parcels(dest);
-            }
+            get_connection_and_send_parcels(dest);
         }
 
-        void put_parcels(std::vector<locality> dests, std::vector<parcel> parcels,
+    public:
+        void put_parcel(locality const & dest, parcel p, write_handler_type f)
+        {
+            HPX_ASSERT(dest.type() == type());
+
+            boost::shared_ptr<future_await_container_type> future_await =
+                boost::make_shared<future_await_container_type>();
+            boost::shared_ptr<archive_type> archive =
+                boost::make_shared<archive_type>(*future_await);
+
+            put_parcel_await(dest, std::move(p), std::move(f), archive,
+                future_await);
+        }
+
+    protected:
+        void put_parcels_await(
+            locality const& dest, std::vector<parcel> parcels,
+            std::vector<write_handler_type> handlers
+          , boost::shared_ptr<archive_type> const& archive
+          , boost::shared_ptr<future_await_container_type> const& future_await)
+        {
+            future_await->reset();
+
+            for (parcel const& p : parcels)
+                (*archive) << p;
+
+            // We are doing a fixed point iteration until we are sure that the
+            // serialization process requires nothing more to wait on ...
+            // Things where we need waiting:
+            //  - (shared_)future<id_type>: when the future wasn't ready yet, we
+            //      need to do another await round for the id splitting
+            //  - id_type: we need to await, if and only if, the credit of the
+            //      needs to split.
+            if (future_await->has_futures())
+            {
+                (*future_await)(
+                    util::bind(
+                        util::one_shot(&parcelport_impl::put_parcels_await), this,
+                        dest, std::move(parcels), std::move(handlers),
+                        archive, future_await)
+                );
+                return;
+            }
+
+            // enqueue the outgoing parcel ...
+            enqueue_parcels(dest, std::move(parcels), std::move(handlers),
+                std::move(future_await->new_gids_));
+
+            get_connection_and_send_parcels(dest);
+        }
+
+    public:
+        void put_parcels(locality const& dest, std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers)
         {
-            if (dests.size() == parcels.size() && parcels.size() != handlers.size())
+            if (parcels.size() != handlers.size())
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
                     "mismatched number of parcels and handlers");
                 return;
             }
 
-            locality const& locality_id = dests[0];
-
 #if defined(HPX_DEBUG)
             // make sure all parcels go to the same locality
-            for (std::size_t i = 1; i != dests.size(); ++i)
+            HPX_ASSERT(dest.type() == type());
+            for (std::size_t i = 1; i != parcels.size(); ++i)
             {
-                HPX_ASSERT(locality_id == dests[i]);
                 HPX_ASSERT(parcels[0].destination_locality() ==
                     parcels[i].destination_locality());
             }
 #endif
 
-            // enqueue the outgoing parcels ...
-            HPX_ASSERT(parcels.size() == handlers.size());
-            for(std::size_t i = 0; i < parcels.size(); ++i)
-            {
-                put_parcel(
-                    locality_id, std::move(parcels[i]), std::move(handlers[i]),
-                    false);
-            }
+            boost::shared_ptr<future_await_container_type> future_await =
+                boost::make_shared<future_await_container_type>();
+            boost::shared_ptr<archive_type> archive =
+                boost::make_shared<archive_type>(*future_await);
 
-            get_connection_and_send_parcels(locality_id);
+            // enqueue the outgoing parcels ...
+            put_parcels_await(
+                dest, std::move(parcels), std::move(handlers), archive,
+                future_await);
         }
 
         void send_early_parcel(locality const & dest, parcel p)
@@ -506,7 +538,7 @@ namespace hpx { namespace parcelset
                 new_gids_map::iterator it = gids.find(v.first);
                 if(it == gids.end())
                 {
-                    gids.insert(v);
+                    gids.insert(std::move(v));
                 }
                 else
                 {
@@ -779,7 +811,9 @@ namespace hpx { namespace parcelset
             locality const& locality_id,
             boost::shared_ptr<connection> sender_connection)
         {
+            HPX_ASSERT(operations_in_flight_ != 0);
             --operations_in_flight_;
+
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             client_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif

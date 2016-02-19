@@ -9,14 +9,14 @@
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
 #include <map>
-#include <iosfwd>
+#include <iostream>
 
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <boost/lexical_cast.hpp>
 
 // suppress warnings about dependent classes not being exported from the dll
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4091 4251 4231 4275 4660)
 #endif

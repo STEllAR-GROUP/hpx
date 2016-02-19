@@ -8,6 +8,7 @@
 #define HPX_SERIALIZATION_DETAIL_POINTER_HPP
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/access.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
@@ -151,7 +152,7 @@ namespace hpx { namespace serialization
         };
 
         // forwarded serialize pointer functions
-        template <typename Pointer> BOOST_FORCEINLINE
+        template <typename Pointer> HPX_FORCEINLINE
         void serialize_pointer_tracked(output_archive & ar, const Pointer& ptr)
         {
             bool valid = static_cast<bool>(ptr);
@@ -169,7 +170,7 @@ namespace hpx { namespace serialization
             }
         }
 
-        template <class Pointer> BOOST_FORCEINLINE
+        template <class Pointer> HPX_FORCEINLINE
         void serialize_pointer_tracked(input_archive& ar, Pointer& ptr)
         {
             bool valid = false;
@@ -197,7 +198,7 @@ namespace hpx { namespace serialization
             }
         }
 
-        template <typename Pointer> BOOST_FORCEINLINE
+        template <typename Pointer> HPX_FORCEINLINE
         void serialize_pointer_untracked(output_archive & ar, const Pointer& ptr)
         {
             bool valid = static_cast<bool>(ptr);
@@ -208,7 +209,7 @@ namespace hpx { namespace serialization
             }
         }
 
-        template <class Pointer> BOOST_FORCEINLINE
+        template <class Pointer> HPX_FORCEINLINE
         void serialize_pointer_untracked(input_archive& ar, Pointer& ptr)
         {
             bool valid = false;

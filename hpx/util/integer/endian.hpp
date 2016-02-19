@@ -24,7 +24,7 @@
 #include <boost/detail/endian.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/static_assert.hpp>
+
 #include <iosfwd>
 #include <climits>
 
@@ -144,7 +144,7 @@ namespace hpx { namespace util
     class endian< big, T, n_bits, unaligned >
       : cover_operators< endian< big, T, n_bits >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
       public:
         typedef T value_type;
         endian() {}
@@ -159,7 +159,7 @@ namespace hpx { namespace util
     class endian< little, T, n_bits, unaligned >
       : cover_operators< endian< little, T, n_bits >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
       public:
         typedef T value_type;
         endian() {}
@@ -174,7 +174,7 @@ namespace hpx { namespace util
     class endian< native, T, n_bits, unaligned >
       : cover_operators< endian< native, T, n_bits >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
       public:
         typedef T value_type;
         endian() {}
@@ -198,8 +198,8 @@ namespace hpx { namespace util
     class endian< big, T, n_bits, aligned  >
       : cover_operators< endian< big, T, n_bits, aligned >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
-        BOOST_STATIC_ASSERT( sizeof(T) == n_bits/8 );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
+        static_assert(sizeof(T) == n_bits/8, "sizeof(T) == n_bits/8");
       public:
         typedef T value_type;
         endian() {}
@@ -219,8 +219,8 @@ namespace hpx { namespace util
     class endian< little, T, n_bits, aligned  >
       : cover_operators< endian< little, T, n_bits, aligned >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
-        BOOST_STATIC_ASSERT( sizeof(T) == n_bits/8 );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
+        static_assert(sizeof(T) == n_bits/8, "sizeof(T) == n_bits/8");
       public:
         typedef T value_type;
         endian() {}
@@ -299,10 +299,6 @@ namespace hpx { namespace util
     typedef endian< native, uint_least64_t, 56 >     unative56_t;
     typedef endian< native, uint_least64_t, 64 >     unative64_t;
 
-#define BOOST_HAS_INT16_T
-#define BOOST_HAS_INT32_T
-#define BOOST_HAS_INT64_T
-
   //  These types only present if platform has exact size integers:
   //     aligned big endian signed integer types
   //     aligned big endian unsigned integer types
@@ -312,27 +308,20 @@ namespace hpx { namespace util
   //     aligned native endian typedefs are not provided because
   //     <cstdint> types are superior for this use case
 
-# if defined(BOOST_HAS_INT16_T)
     typedef endian< big, int16_t, 16, aligned >      aligned_big16_t;
     typedef endian< big, uint16_t, 16, aligned >     aligned_ubig16_t;
     typedef endian< little, int16_t, 16, aligned >   aligned_little16_t;
     typedef endian< little, uint16_t, 16, aligned >  aligned_ulittle16_t;
-# endif
 
-# if defined(BOOST_HAS_INT32_T)
     typedef endian< big, int32_t, 32, aligned >      aligned_big32_t;
     typedef endian< big, uint32_t, 32, aligned >     aligned_ubig32_t;
     typedef endian< little, int32_t, 32, aligned >   aligned_little32_t;
     typedef endian< little, uint32_t, 32, aligned >  aligned_ulittle32_t;
-# endif
 
-# if defined(BOOST_HAS_INT64_T)
     typedef endian< big, int64_t, 64, aligned >      aligned_big64_t;
     typedef endian< big, uint64_t, 64, aligned >     aligned_ubig64_t;
     typedef endian< little, int64_t, 64, aligned >   aligned_little64_t;
     typedef endian< little, uint64_t, 64, aligned >  aligned_ulittle64_t;
-# endif
-
   } // namespace integer
 }} // namespace hpx::util
 

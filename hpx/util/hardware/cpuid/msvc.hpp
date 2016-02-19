@@ -10,6 +10,9 @@
 #if !defined(HPX_1AB68005_619C_4049_9C2B_DCD5F336B508)
 #define HPX_1AB68005_619C_4049_9C2B_DCD5F336B508
 
+#include <hpx/config.hpp>
+#if defined(HPX_WINDOWS)
+
 #include <intrin.h>
 
 #include <boost/cstdint.hpp>
@@ -36,6 +39,8 @@ void cpuidex(boost::uint32_t (&cpuinfo)[4], boost::uint32_t eax,
 { ::__cpuidex(cpuinfo, eax, ecx); }
 
 }}}
+
+#endif
 
 #endif // HPX_1AB68005_619C_4049_9C2B_DCD5F336B508
 

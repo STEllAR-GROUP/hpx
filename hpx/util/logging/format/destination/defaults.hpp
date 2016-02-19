@@ -17,10 +17,11 @@
 #ifndef JT28092007_destination_defaults_HPP_DEFINED
 #define JT28092007_destination_defaults_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
@@ -113,7 +114,7 @@ template<class convert_dest = do_convert_destination > struct dbg_window_t : is_
 hpx::util::logging::op_equal::always_equal {
 
     template<class msg_type> void operator()(const msg_type & msg) const {
-#ifdef BOOST_WINDOWS
+#ifdef HPX_WINDOWS
 #ifndef HPX_LOG_USE_WCHAR_T
     ::OutputDebugStringA( convert_dest::do_convert(msg, into<const char*>() ) );
 #else

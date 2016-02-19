@@ -30,7 +30,7 @@
 #define HPX_COROUTINE_TUPLE_TRAITS_HPP_20060613
 
 #include <boost/tuple/tuple.hpp>
-#include <boost/type_traits.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/identity.hpp>

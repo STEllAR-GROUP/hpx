@@ -6,6 +6,9 @@
 #if !defined(HPX_PARCELSET_IPC_MESSAGE_NOV_25_2012_0847PM)
 #define HPX_PARCELSET_IPC_MESSAGE_NOV_25_2012_0847PM
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
@@ -23,6 +26,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         char data_[33];
     };
 }}}}
+
+#endif
 
 #endif
 

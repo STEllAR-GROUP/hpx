@@ -200,16 +200,26 @@ namespace hpx { namespace components { namespace stubs
             return hpx::async<action_type>(target_locality, p, to_migrate);
         }
 
-        template <typename Component>
+        template <typename Component, typename DistPolicy>
+        static lcos::future<naming::id_type>
+        migrate_component_async(DistPolicy const& policy,
+            boost::shared_ptr<Component> const& p,
+            naming::id_type const& to_migrate)
+        {
+            typedef typename server::migrate_component_here_action<Component>
+                action_type;
+            return hpx::async<action_type>(policy, p, to_migrate);
+        }
+
+        template <typename Component, typename Target>
         static naming::id_type migrate_component(
-            naming::id_type const& target_locality,
-            naming::id_type const& to_migrate,
+            Target const& target, naming::id_type const& to_migrate,
             boost::shared_ptr<Component> const& p)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future
             return migrate_component_async<Component>(
-                target_locality, p, to_migrate).get();
+                target, p, to_migrate).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

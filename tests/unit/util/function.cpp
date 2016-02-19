@@ -173,7 +173,7 @@ int hpx_main(variables_map& vm)
 {
     {
         {
-            if (sizeof(small_object) <= sizeof(void*))
+            if (sizeof(small_object) <= hpx::util::detail::vtable::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
@@ -194,7 +194,7 @@ int hpx_main(variables_map& vm)
         }
 
         {
-            if (sizeof(big_object) <= sizeof(void*))
+            if (sizeof(big_object) <= hpx::util::detail::vtable::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
@@ -219,18 +219,18 @@ int hpx_main(variables_map& vm)
     // non serializable version
     {
         {
-            if (sizeof(small_object) <= sizeof(void*))
+            if (sizeof(small_object) <= hpx::util::detail::vtable::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
 
             small_object const f(17);
 
-            function<boost::uint64_t(boost::uint64_t const&), void, void> f0(f);
+            function<boost::uint64_t(boost::uint64_t const&), false> f0(f);
 
-            function<boost::uint64_t(boost::uint64_t const&), void, void> f1(f0);
+            function<boost::uint64_t(boost::uint64_t const&), false> f1(f0);
 
-            function<boost::uint64_t(boost::uint64_t const&), void, void> f2;
+            function<boost::uint64_t(boost::uint64_t const&), false> f2;
 
             f2 = f0;
 
@@ -240,7 +240,7 @@ int hpx_main(variables_map& vm)
         }
 
         {
-            if (sizeof(big_object) <= sizeof(void*))
+            if (sizeof(big_object) <= hpx::util::detail::vtable::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
@@ -248,13 +248,13 @@ int hpx_main(variables_map& vm)
             big_object const f(5, 12);
 
             function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
-                void, void> f0(f);
+                false> f0(f);
 
             function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
-                void, void> f1(f0);
+                false> f1(f0);
 
             function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
-                void, void> f2;
+                false> f2;
 
             f2 = f0;
 

@@ -443,7 +443,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                                             phase * block_size;
 
                                         phase_futures.push_back(
-                                            hpx::lcos::local::dataflow(
+                                            hpx::dataflow(
                                                 execs[domain]
                                               , &transpose
                                               , A[from_block].get_sub_block(
@@ -489,7 +489,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         ///////////////////////////////////////////////////////////////////////
         // Analyze and output results
-        double epsilon = 1.e-8;
         if(root)
         {
             double errsq = std::accumulate(errsqs.begin(), errsqs.end(), 0.0);

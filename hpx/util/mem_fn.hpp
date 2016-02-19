@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,63 +8,56 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
-
-#include <boost/static_assert.hpp>
-#include <boost/type_traits/is_member_pointer.hpp>
 
 #include <utility>
 
 namespace hpx { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename MemPtr>
+        template <typename MemberPointer>
         struct mem_fn
         {
-            explicit mem_fn(MemPtr mem_ptr)
-              : f(mem_ptr)
+            explicit mem_fn(MemberPointer pm)
+              : _pm(pm)
             {}
 
             mem_fn(mem_fn const& other)
-              : f(other.f)
+              : _pm(other._pm)
             {}
 
-            mem_fn& operator=(mem_fn const& other)
+            template <typename ...Ts>
+            inline typename util::result_of<MemberPointer(Ts&&...)>::type
+            operator()(Ts&&... vs) const
             {
-                f = other.f;
-                return *this;
+                return util::invoke(_pm, std::forward<Ts>(vs)...);
             }
 
-            template <typename>
-            struct result;
-
-            template <typename This, typename ...Ts>
-            struct result<This(Ts...)>
-              : util::result_of<MemPtr(Ts...)>
-            {};
-
-            template <typename T, typename ...Ts>
-            BOOST_FORCEINLINE
-            typename result<mem_fn const(T, Ts...)>::type
-            operator()(T&& t, Ts&&... vs) const
-            {
-                return util::invoke(
-                    f, std::forward<T>(t), std::forward<Ts>(vs)...);
-            }
-
-            MemPtr f;
+            MemberPointer _pm;
         };
     }
 
-    template <typename MemPtr>
-    detail::mem_fn<MemPtr> mem_fn(MemPtr pm)
+    template <typename M, typename C>
+    inline detail::mem_fn<M C::*>
+    mem_fn(M C::*pm)
     {
-        BOOST_STATIC_ASSERT((boost::is_member_pointer<MemPtr>::value));
+        return detail::mem_fn<M C::*>(pm);
+    }
 
-        return detail::mem_fn<MemPtr>(pm);
+    template <typename R, typename C, typename ...Ps>
+    inline detail::mem_fn<R (C::*)(Ps...)>
+    mem_fn(R (C::*pm)(Ps...))
+    {
+        return detail::mem_fn<R (C::*)(Ps...)>(pm);
+    }
+
+    template <typename R, typename C, typename ...Ps>
+    inline detail::mem_fn<R (C::*)(Ps...) const>
+    mem_fn(R (C::*pm)(Ps...) const)
+    {
+        return detail::mem_fn<R (C::*)(Ps...) const>(pm);
     }
 }}
 

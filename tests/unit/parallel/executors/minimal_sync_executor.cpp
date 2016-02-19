@@ -171,7 +171,7 @@ struct test_sync_executor4 : test_sync_executor2
             results.push_back(
                 async_execute(hpx::util::deferred_call(f, elem))
             );
-        return std::move(results);
+        return results;
     }
 };
 

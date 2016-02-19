@@ -10,7 +10,10 @@
 #if !defined(HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM)
 #define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util_fwd.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
@@ -18,6 +21,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/function.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/locks.hpp>
 
@@ -138,7 +142,7 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<locality> dests,
+        virtual void put_parcels(locality const& dests,
             std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers) = 0;
 
@@ -307,7 +311,7 @@ namespace hpx { namespace parcelset
             applier_ = applier;
         }
 
-        void add_received_parcel(parcel p, std::size_t num_thread = -1);
+        void add_received_parcel(parcel p, std::size_t num_thread = std::size_t(-1));
 
         /// Update performance counter data
         void add_received_data(performance_counters::parcels::data_point const& data)

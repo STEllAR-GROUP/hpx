@@ -9,27 +9,31 @@
 #define HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_VTABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
-    template <typename IArchive, typename OArchive>
     struct serializable_vtable
     {
         template <typename T>
-        static void save_object(void* const* v, OArchive& ar, unsigned version)
+        static void save_object(void* const* v,
+            serialization::output_archive& ar, unsigned version)
         {
             ar << vtable::get<T>(v);
         }
-        typedef void (*save_object_t)(void* const*, OArchive&, unsigned);
+        typedef void (*save_object_t)(void* const*,
+            serialization::output_archive&, unsigned);
 
         template <typename T>
-        static void load_object(void** v, IArchive& ar, unsigned version)
+        static void load_object(void** v,
+            serialization::input_archive& ar, unsigned version)
         {
             vtable::default_construct<T>(v);
             ar >> vtable::get<T>(v);
         }
-        typedef void (*load_object_t)(void**, IArchive&, unsigned);
+        typedef void (*load_object_t)(void**,
+            serialization::input_archive&, unsigned);
     };
 }}}
 

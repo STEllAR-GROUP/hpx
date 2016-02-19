@@ -48,17 +48,23 @@ namespace hpx { namespace util
 #endif
         }
 
-        int get_cfg_entry(command_line_handling& cfg, std::string const& str,
-            int dflt)
+        int get_cfg_entry(runtime_configuration const& cfg,
+            std::string const& str, int dflt)
         {
             try {
                 return boost::lexical_cast<int>(
-                    cfg.rtcfg_.get_entry(str, dflt));
+                    cfg.get_entry(str, dflt));
             }
             catch (boost::bad_lexical_cast const&) {
                 /**/;
             }
             return dflt;
+        }
+
+        int get_cfg_entry(command_line_handling& cfg, std::string const& str,
+            int dflt)
+        {
+            return get_cfg_entry(cfg.rtcfg_, str, dflt);
         }
     }
 }}
@@ -71,6 +77,27 @@ namespace hpx { namespace util
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
     MPI_Comm mpi_environment::communicator_ = MPI_COMM_NULL;
 
+    ///////////////////////////////////////////////////////////////////////////
+    bool mpi_environment::check_mpi_environment(runtime_configuration const& cfg)
+    {
+        if (detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) == 0)
+            return false;
+
+        // We disable the MPI parcelport if the application is not run using
+        // mpirun and the tcp/ip parcelport is not explicitly disabled
+        //
+        // The bottom line is that we use the MPI parcelport either when the
+        // application was executed using mpirun or if the tcp/ip parcelport
+        // was disabled.
+        if (!detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV) &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 1))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
         using namespace boost::assign;
@@ -79,26 +106,10 @@ namespace hpx { namespace util
         has_called_init_ = false;
 
         // We assume to use the MPI parcelport if it is not explicitly disabled
-        enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0;
+        enabled_ = check_mpi_environment(cfg.rtcfg_);
         if (!enabled_)
         {
             cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
-            return;
-        }
-
-        // We disable the MPI parcelport if the application is not run using
-        // mpirun and the tcp/ip parcelport is not explicitly disabled
-        //
-        // The bottom line is that we use the MPI parcelport either when the
-        // application was executed using mpirun or if the tcp/ip parcelport
-        // was disabled.
-        if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_HAVE_PARCELPORT_MPI_ENV) &&
-            detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 1))
-        {
-            cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
-            // explicitly disable mpi if not run by mpirun
-
-            enabled_ = false;
             return;
         }
 

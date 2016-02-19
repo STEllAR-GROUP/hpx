@@ -32,14 +32,14 @@ namespace hpx { namespace lcos
             typedef Future result_type;
 
             template <typename R>
-            BOOST_FORCEINLINE hpx::future<R>
+            HPX_FORCEINLINE hpx::future<R>
             operator()(hpx::future<R>& future) const
             {
                 return std::move(future);
             }
 
             template <typename R>
-            BOOST_FORCEINLINE hpx::shared_future<R>
+            HPX_FORCEINLINE hpx::shared_future<R>
             operator()(hpx::shared_future<R>& future) const
             {
                 return future;
@@ -142,7 +142,7 @@ namespace hpx { namespace lcos
             {
                 if (this != &rhs) {
                     lazy_values_ = std::move(rhs.lazy_values_);
-                    ready_count_ = rhs.ready_count_;
+                    ready_count_.store(rhs.ready_count_.load());
                     rhs.ready_count_ = 0;
                     f_ = std::move(rhs.f_);
                     success_counter_ = rhs.success_counter_;

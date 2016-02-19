@@ -1,6 +1,6 @@
 #include <hpx/hpx_init.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 #pragma warning(disable: 4786)  // identifier truncated in debug info
 #pragma warning(disable: 4710)  // function not inlined
 #pragma warning(disable: 4711)  // function selected for automatic inline expansion
@@ -140,8 +140,6 @@ void fv_9(long a, long b, long c, long d, long e, long f, long g, long h, long i
 
 void function_test()
 {
-    using namespace boost;
-
     int const i = 1;
 
     HPX_TEST( hpx::util::bind(f_0)(i) == 17041L );
@@ -196,7 +194,7 @@ struct Y
 
 void function_object_test()
 {
-    using namespace boost;
+    using boost::ref;
 
     short i(6);
 
@@ -219,7 +217,7 @@ void function_object_test()
 
 void function_object_test2()
 {
-    using namespace boost;
+    using boost::ref;
 
     short i(6);
 
@@ -349,7 +347,7 @@ struct V
 
 void member_function_test()
 {
-    using namespace boost;
+    using boost::ref;
 
     X x;
 
@@ -439,7 +437,7 @@ void member_function_test()
 
 void member_function_void_test()
 {
-    using namespace boost;
+    using boost::ref;
 
     V v;
 
@@ -529,8 +527,6 @@ void member_function_void_test()
 
 void nested_bind_test()
 {
-    using namespace boost;
-
     int const x = 1;
     int const y = 2;
 

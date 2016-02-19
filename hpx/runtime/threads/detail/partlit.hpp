@@ -9,7 +9,7 @@
 #if !defined(HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM)
 #define HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma once
 #endif
 
@@ -32,7 +32,6 @@
 #include <boost/fusion/include/value_at.hpp>
 #include <boost/type_traits/add_reference.hpp>
 #include <boost/type_traits/add_const.hpp>
-#include <boost/mpl/assert.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/utility/enable_if.hpp>

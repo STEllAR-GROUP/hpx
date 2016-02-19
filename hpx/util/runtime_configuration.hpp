@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,7 +45,8 @@ namespace hpx { namespace util
         void reconfigure(std::vector<std::string> const& ini_defs);
 
         std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
-        load_modules();
+            load_modules();
+
         void load_components_static(std::vector<
             components::static_factory_load_data_type> const& static_modules);
 
@@ -67,9 +68,7 @@ namespace hpx { namespace util
 
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size(
-            std::size_t dflt = HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE) const;
-        std::size_t get_agas_local_cache_size_per_thread(
-            std::size_t dflt = HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) const;
+            std::size_t dflt = HPX_AGAS_LOCAL_CACHE_SIZE) const;
 
         bool get_agas_caching_mode() const;
 
@@ -98,6 +97,8 @@ namespace hpx { namespace util
 
         // Enable minimal deadlock detection for HPX threads
         bool enable_minimal_deadlock_detection() const;
+        bool enable_spinlock_deadlock_detection() const;
+        std::size_t get_spinlock_deadlock_detection_limit() const;
 
         // Returns the number of OS threads this locality is running.
         std::size_t get_os_thread_count() const;

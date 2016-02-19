@@ -37,11 +37,11 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread::thread() BOOST_NOEXCEPT
+    thread::thread() HPX_NOEXCEPT
       : id_(threads::invalid_thread_id)
     {}
 
-    thread::thread(thread && rhs) BOOST_NOEXCEPT
+    thread::thread(thread && rhs) HPX_NOEXCEPT
       : id_(threads::invalid_thread_id)   // the rhs needs to end up with an invalid_id
     {
         boost::lock_guard<mutex_type> l(rhs.mtx_);
@@ -49,7 +49,7 @@ namespace hpx
         rhs.id_ = threads::invalid_thread_id;
     }
 
-    thread& thread::operator=(thread && rhs) BOOST_NOEXCEPT
+    thread& thread::operator=(thread && rhs) HPX_NOEXCEPT
     {
         boost::lock_guard<mutex_type> l(mtx_);
         boost::lock_guard<mutex_type> l2(rhs.mtx_);
@@ -77,7 +77,7 @@ namespace hpx
         }
     }
 
-    void thread::swap(thread& rhs) BOOST_NOEXCEPT
+    void thread::swap(thread& rhs) HPX_NOEXCEPT
     {
         boost::lock_guard<mutex_type> l(mtx_);
         boost::lock_guard<mutex_type> l2(rhs.mtx_);
@@ -96,7 +96,7 @@ namespace hpx
     }
 
     threads::thread_state_enum thread::thread_function_nullary(
-        util::function_nonser<void()> const& func)
+        util::unique_function_nonser<void()> const& func)
     {
         try {
             // Now notify our calling thread that we started execution.
@@ -127,17 +127,17 @@ namespace hpx
         return threads::terminated;
     }
 
-    thread::id thread::get_id() const BOOST_NOEXCEPT
+    thread::id thread::get_id() const HPX_NOEXCEPT
     {
         return id(native_handle());
     }
 
-    std::size_t thread::hardware_concurrency() BOOST_NOEXCEPT
+    std::size_t thread::hardware_concurrency() HPX_NOEXCEPT
     {
         return hpx::threads::hardware_concurrency();
     }
 
-    void thread::start_thread(util::function_nonser<void()> && func)
+    void thread::start_thread(util::unique_function_nonser<void()> && func)
     {
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread::thread_function_nullary),
@@ -306,12 +306,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread
     {
-        void yield() BOOST_NOEXCEPT
+        void yield() HPX_NOEXCEPT
         {
             this_thread::suspend(threads::pending, "this_thread::yield");
         }
 
-        thread::id get_id() BOOST_NOEXCEPT
+        thread::id get_id() HPX_NOEXCEPT
         {
             return thread::id(threads::get_self_id());
         }

@@ -29,8 +29,8 @@
 #ifndef HPX_COROUTINE_DETAIL_COROUTINE_TRAITS_HPP_20060613
 #define HPX_COROUTINE_DETAIL_COROUTINE_TRAITS_HPP_20060613
 
-#include <boost/config.hpp>
-#include <boost/type_traits.hpp>
+#include <boost/type_traits/function_traits.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include <hpx/util/coroutine/tuple_traits.hpp>
 #include <hpx/util/coroutine/detail/signature.hpp>

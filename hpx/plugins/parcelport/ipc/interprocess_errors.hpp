@@ -6,15 +6,17 @@
 #if !defined(HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM)
 #define HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 #include <hpx/config.hpp>
 #include <boost/interprocess/errors.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/static_assert.hpp>
 
 #include <string>
 
 #if !defined(BOOST_SYSTEM_NOEXCEPT)
-#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
+#define BOOST_SYSTEM_NOEXCEPT HPX_NOEXCEPT
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,8 +67,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 using namespace boost::interprocess;
 
                 // make sure our assumption about error codes is reasonably correct
-                BOOST_STATIC_ASSERT(sizeof(error_names)/sizeof(error_names[0]) ==
-                    timeout_when_waiting_error+1);
+                static_assert(
+                    sizeof(error_names)/sizeof(error_names[0]) ==
+                    timeout_when_waiting_error+1,
+                    "sizeof(error_names)/sizeof(error_names[0]) == "
+                    "timeout_when_waiting_error+1");
 
                 if (value >= no_error && value <= timeout_when_waiting_error)
                     return std::string("IPC(") + error_names[value] + ")";
@@ -109,5 +114,7 @@ namespace boost { namespace system
 #define HPX_IPC_RESET_EC(ec)                                                  \
         if (&ec != &boost::system::throws) ec = boost::system::error_code();  \
     /**/
+
+#endif
 
 #endif

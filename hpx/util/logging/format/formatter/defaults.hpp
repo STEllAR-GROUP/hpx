@@ -17,11 +17,10 @@
 #ifndef JT28092007_formatter_defaults_HPP_DEFINED
 #define JT28092007_formatter_defaults_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
-#include <boost/cstdint.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
@@ -29,6 +28,7 @@
 #include <hpx/util/logging/format/formatter/time_strf.hpp>
 #include <hpx/util/logging/format/formatter/spacer.hpp>
 #include <hpx/util/logging/format/formatter/thread_id.hpp>
+#include <boost/cstdint.hpp>
 #include <stdio.h>
 #include <time.h>
 #include <sstream>

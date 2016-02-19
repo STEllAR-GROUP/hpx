@@ -21,7 +21,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -154,7 +153,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<FwdIter>::iterator_category
             iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::forward_iterator_tag, iterator_category
             >::value),
@@ -197,14 +196,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     if the elements should be treated as equal. The
     ///                     signature should be equivalent to the following:
     ///                     \code
-    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     bool pred(const Type1 &a, const Type1 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a FwdIter1 and \a FwdIter2
+    ///                     it. The types \a Type1 must be such
+    ///                     that objects of type \a FwdIter
     ///                     can be dereferenced and then implicitly converted
-    ///                     to \a Type1 and \a Type2 respectively.
+    ///                     to \a Type1 .
     ///
     /// The comparison operations in the parallel \a adjacent_find invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -239,7 +238,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<FwdIter>::iterator_category
             iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::forward_iterator_tag, iterator_category
             >::value),

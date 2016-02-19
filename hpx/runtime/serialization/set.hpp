@@ -19,6 +19,8 @@ namespace hpx { namespace serialization
         set.clear();
         boost::uint64_t size;
         ar >> size;
+
+        set.clear();
         for (std::size_t i = 0; i < size; ++i) {
             T t;
             ar >> t;

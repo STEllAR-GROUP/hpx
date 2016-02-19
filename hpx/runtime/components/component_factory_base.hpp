@@ -7,10 +7,13 @@
 #define HPX_COMPONENT_FACTORY_BASE_SEP_26_2008_0446PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/ini.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 
@@ -71,7 +74,7 @@ namespace hpx { namespace components
         /// \return   Returns the GID of the first newly created component
         ///           instance.
         virtual naming::gid_type create_with_args(
-            util::function_nonser<void(void*)> const&) = 0;
+            util::unique_function_nonser<void(void*)> const&) = 0;
 
         /// \brief Create one new component instance and initialize it using
         ///        the using the given constructor function. Assign the give
@@ -85,7 +88,7 @@ namespace hpx { namespace components
         ///           instance (this is the same as assign_gid, if successful).
         virtual naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            util::function_nonser<void(void*)> const& f) = 0;
+            util::unique_function_nonser<void(void*)> const& f) = 0;
 
         /// \brief Destroy one or more component instances
         ///

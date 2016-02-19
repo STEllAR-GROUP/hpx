@@ -8,9 +8,6 @@
 #if !defined(HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM)
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
-#include <boost/noncopyable.hpp>
-#include <boost/bind.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/exception.hpp>
@@ -27,6 +24,9 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/noncopyable.hpp>
+#include <boost/bind.hpp>
 
 #include <map>
 #include <algorithm>
@@ -189,12 +189,52 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        BOOST_FORCEINLINE void put_parcel(parcel p)
+        HPX_FORCEINLINE void put_parcel(parcel p)
         {
             using util::placeholders::_1;
             using util::placeholders::_2;
             put_parcel(std::move(p), util::bind(
                 &parcelhandler::invoke_write_handler, this, _1, _2));
+        }
+
+        /// A parcel is submitted for transport at the source locality site to
+        /// the parcel set of the locality with the put-parcel command
+        //
+        /// \note The function \a put_parcel() is asynchronous, the provided
+        /// function or function object gets invoked on completion of the send
+        /// operation or on any error.
+        ///
+        /// \param p        [in] The parcels to send.
+        /// \param f        [in] The function objects to be invoked on
+        ///                 successful completion or on errors. The signature
+        ///                 of these function object are expected to be:
+        ///
+        /// \code
+        ///     void f (boost::system::error_code const& err, std::size_t );
+        /// \endcode
+        ///
+        ///                 where \a err is the status code of the operation and
+        ///                       \a size is the number of successfully
+        ///                              transferred bytes.
+        void put_parcels(std::vector<parcel> p, std::vector<write_handler_type> f);
+
+        /// This put_parcel() function overload is asynchronous, but no
+        /// callback functor is provided by the user.
+        ///
+        /// \note   The function \a put_parcel() is asynchronous.
+        ///
+        /// \param p        [in, out] A reference to the parcel to send. The
+        ///                 parcel \a p will be modified in place, as it will
+        ///                 get set the resolved destination address and parcel
+        ///                 id (if not already set).
+        void put_parcels(std::vector<parcel> parcels)
+        {
+            using util::placeholders::_1;
+            using util::placeholders::_2;
+            std::vector<write_handler_type> handlers(parcels.size(),
+                util::bind(&parcelhandler::invoke_write_handler, this, _1, _2));
+
+            put_parcels(std::move(parcels), std::move(handlers));
         }
 
         double get_current_time() const

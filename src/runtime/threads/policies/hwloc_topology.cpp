@@ -207,10 +207,15 @@ namespace hpx { namespace threads
         scoped_lock lk(topo_mtx);
 
         int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
-        if(num_cores < 0)
+
+        // If num_cores is smaller 0, we have an error, it should never be zero
+        // either to avoid division by zero, we should always have at least one
+        // core
+        if(num_cores <= 0)
         {
             HPX_THROWS_IF(ec, no_success, "hwloc_topology::hwloc_get_nobjs_by_type",
                 "Failed to get number of cores");
+            return std::size_t(-1);
         }
         num_core %= num_cores; //-V101 //-V104 //-V107
 
@@ -593,7 +598,10 @@ namespace hpx { namespace threads
     std::size_t hwloc_topology::get_number_of_cores() const
     {
         int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
-        if(0 > nobjs)
+        // If num_cores is smaller 0, we have an error, it should never be zero
+        // either to avoid division by zero, we should always have at least one
+        // core
+        if(0 >= nobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::hwloc_topology::get_number_of_cores"
@@ -942,7 +950,10 @@ namespace hpx { namespace threads
         {
             scoped_lock lk(topo_mtx);
             int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
-            if (num_cores < 0) {
+            // If num_cores is smaller 0, we have an error, it should never be zero
+            // either to avoid division by zero, we should always have at least one
+            // core
+            if (num_cores <= 0) {
                 HPX_THROW_EXCEPTION(kernel_error
                   , "hpx::threads::hwloc_topology::init_thread_affinity_mask"
                   , "hwloc_get_nbobjs_by_type failed");

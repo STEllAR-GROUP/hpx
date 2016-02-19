@@ -118,8 +118,6 @@ __exception_list__ object.
 
 __hpx__ provides implementations of the following parallel algorithms:
 
-[template algoref[name] [funcref hpx::parallel::v1::[name] hpx::parallel::[name]]]
-
 [table Non-modifying Parallel Algorithms (In Header: <hpx/include/parallel_algortithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref all_of] ]
@@ -286,7 +284,7 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_minmax.hpp>`]]
 ]
 
-[table Operations checking various sorting criteria (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Sorting Operations (In Header: <hpx/include/parallel_algorithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref is_sorted] ]
      [Returns `true` if each element in a range is sorted]
@@ -297,6 +295,12 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algoref is_partitioned] ]
      [Returns `true` if each true element for a predicate precedes the false elements in a range]
      [`<hpx/include/parallel_is_partitioned.hpp>`]]
+    [[ [algoref sort] ]
+     [Sorts the elements in a range]
+     [`<hpx/include/parallel_sort.hpp>`]]
+    [[ [algoref sort_by_key] ]
+     [Sorts one range of data using keys supplied in another range]
+     [`<hpx/include/parallel_sort.hpp>`]]
 ]
 
 [table Numeric Parallel Algorithms (In Header: <hpx/include/parallel_numeric.hpp>)
@@ -410,7 +414,7 @@ may choose whether or not to report exceptions, and if so, in what manner they
 are communicated back to the caller. However, all executors in __hpx__
 report exceptions in a manner consistent with the behavior of execution policies
 described by the Parallelism TS, where multiple exceptions are collected into
-an __exception_list__. This list is reported through `async_execute()'s`
+an __exception_list__. This list is reported through `async_execute()`'s
 returned future, or thrown directly by execute().
 
 In __hpx__ we have implemented the following executor types:
@@ -594,12 +598,21 @@ function passed to `define_task_block`:
 
     int main()
     {
-        task_block<> tr;      // Error: no public constructor
+        task_block<> tr;    // Error: no public constructor
         tr.run(g);          // No way to call run outside of a define_task_block
         return 0;
     }
 
+[endsect]
+
+[section:task_block Extensions for Task Blocks]
+
 [heading Using Execution Policies with Task Blocks]
+
+In __hpx__ we implemented some extensions for `task_block` beyond the actual
+standards porposal __cpp11_n4088__. The main addition is that a `task_block`
+can be invoked with a execution policy as its first argument, very similar to
+the parallel algorithms.
 
 An execution policy is an object that expresses the requirements on the
 ordering of functions invoked as a consequence of the invocation of a
@@ -625,32 +638,6 @@ created `task_block`. In the following example the use of an explicit
         return compute(n) + left + right;
     }
 
-
-[endsect]
-
-[section:task_block Extensions for Task Blocks]
-
-In __hpx__ we implemented some extensions for `task_block` beyond the actual
-standards porposal __cpp11_n4088__. The main addition is that a `task_block`
-can be invoked with a execution policy as its first argument, very similar to
-the parallel algorithms.
-
-    template <typename Func>
-    int traverse(node& n, Func && compute)
-    {
-        int left = 0, right = 0;
-        define_task_block(
-            par,                        // specify an execution policy
-            [&](task_block<>& tr) {
-                if (n.left)
-                    tr.run([&] { left = traverse(*n.left, compute); });
-                if (n.right)
-                    tr.run([&] { right = traverse(*n.right, compute); });
-            });
-
-        return compute(n) + left + right;
-    }
-
 This also causes the [classref hpx::parallel::v2::task_block `hpx::parallel::task_block`]
 object to be a template in our implementation.
 The template argment is the type of the execution policy used to create the
@@ -664,6 +651,43 @@ the [classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::paral
 
 __hpx__ also adds the ability to access the execution policy which was used to
 create a given `task_block`.
+
+[heading Using Executors to run Tasks]
+
+Often, we want to be able to not only define an execution policy to use by
+default for all spawned tasks inside the task block, but in addition to
+customize the execution context for one of the tasks executed by
+`task_block::run`. Adding an optionally passed executor instance to that
+function enables this use case:
+
+    template <typename Func>
+    int traverse(node *n, Func&& compute)
+    {
+        int left = 0, right = 0;
+
+        define_task_block(
+            par,                // parallel_execution_policy
+            [&](auto& tb) {
+                if (n->left)
+                {
+                    // use explicitly specified executor to run this task
+                    tb.run(my_executor(), [&] { left = traverse(n->left, compute); });
+                }
+                if (n->right)
+                {
+                    // use the executor associated with the par execution policy
+                    tb.run([&] { right = traverse(n->right, compute); });
+                }
+            });
+
+        return compute(n) + left + right;
+    }
+
+__hpx__ still supports calling
+[funcref hpx::parallel::v2::task_block::run `hpx::parallel::task_block::run`]
+without an explicit executor object. In this case the task will be run using
+the executor assiciated with the execution policy which was used to call
+[funcref hpx::parallel::v2::define_task_block `hpx::parallel::define_task_block`].
 
 [endsect]
 

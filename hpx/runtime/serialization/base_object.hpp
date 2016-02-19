@@ -66,28 +66,28 @@ namespace hpx { namespace serialization
     // allow our base_object_type to be serialized as prvalue
     // compiler should support good ADL implementation
     // but it is rather for all hpx serialization library
-    template <typename D, typename B> BOOST_FORCEINLINE
+    template <typename D, typename B> HPX_FORCEINLINE
     output_archive & operator<<(output_archive & ar, base_object_type<D, B> t)
     {
         ar.invoke(t);
         return ar;
     }
 
-    template <typename D, typename B> BOOST_FORCEINLINE
+    template <typename D, typename B> HPX_FORCEINLINE
     input_archive & operator>>(input_archive & ar, base_object_type<D, B> t)
     {
         ar.invoke(t);
         return ar;
     }
 
-    template <typename D, typename B> BOOST_FORCEINLINE
+    template <typename D, typename B> HPX_FORCEINLINE
     output_archive & operator&(output_archive & ar, base_object_type<D, B> t) //-V524
     {
         ar.invoke(t);
         return ar;
     }
 
-    template <typename D, typename B> BOOST_FORCEINLINE
+    template <typename D, typename B> HPX_FORCEINLINE
     input_archive & operator&(input_archive & ar, base_object_type<D, B> t) //-V524
     {
         ar.invoke(t);

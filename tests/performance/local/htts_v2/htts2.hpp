@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
+#include <hpx/config.hpp>
 
 #include <iostream>
 #include <boost/format.hpp>
@@ -38,7 +38,7 @@ struct clocksource
 
     static_assert(base_clock::is_steady == true,
         "base_clock is not steady");
-#if !defined(BOOST_MSVC)
+#if !defined(HPX_MSVC)
     static_assert(boost::mpl::or_<
             std::ratio_equal<period, std::nano>,
             boost::ratio_equal<period, boost::nano>

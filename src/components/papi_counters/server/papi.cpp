@@ -9,6 +9,7 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/thread_mapper.hpp>
@@ -26,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace papi_ns = hpx::performance_counters::papi;
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     papi_ns::server::papi_counter
 > papi_counter_type;
 
@@ -129,10 +130,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         {
             boost::lock_guard<papi_counter_base::mutex_type> lk(cnt->get_global_mtx());
 
-            if (PAPI_read(evset_, &counts_[0]) != PAPI_OK) return false;
+            if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
         }
         timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         cnt->update_state(timestamp_, counts_[cnt->get_counter_index()]);
+        if (reset) counts_[cnt->get_counter_index()] = 0;
         return true;
     }
 
@@ -156,11 +158,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if ((stat & PAPI_RUNNING) != 0)
         {
             std::vector<long long> tmp(counts_.size());
-            {
-                if (PAPI_stop(evset_, &tmp[0]) != PAPI_OK) return false;
-                // accumulate existing counts before modifying event set
-                if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
-            }
+            if (PAPI_stop(evset_, &tmp[0]) != PAPI_OK) return false;
+            // accumulate existing counts before modifying event set
+            if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
             timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         }
         return true;

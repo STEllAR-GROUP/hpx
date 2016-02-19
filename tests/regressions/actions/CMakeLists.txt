@@ -6,6 +6,7 @@
 add_subdirectory(components)
 
 set(tests
+    async_deferred_1523
     make_continuation_1615
     plain_action_1330
     plain_action_1550

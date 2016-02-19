@@ -9,6 +9,9 @@
 #define HPX_THREADMANAGER_SCHEDULING_THROTTLE_QUEUE_MAR_15_2011_0926AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+
 #include <apex_api.hpp>
 
 #include <boost/thread/shared_mutex.hpp>
@@ -132,5 +135,7 @@ namespace hpx { namespace threads { namespace policies
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
+
+#endif
 
 #endif

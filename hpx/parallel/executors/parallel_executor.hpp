@@ -30,11 +30,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// which execute in threads implicitly created by the executor. This
     /// executor prefers continuing with the creating thread first before
     /// executing newly created threads.
-    ///
     struct parallel_executor : executor_tag
     {
-        // Associate the auto_chunk_size executor parameters type as a default
-        // with this executor.
+        /// Associate the auto_chunk_size executor parameters type as a default
+        /// with this executor.
         typedef auto_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor

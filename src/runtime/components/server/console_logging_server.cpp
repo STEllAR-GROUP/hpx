@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,11 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+// This is needed to get rid of an undefined reference to
+// hpx::actions::detail::register_remote_action_invocation_count
+#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>
@@ -20,18 +24,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <vector>
-#include <iostream>
-
 ///////////////////////////////////////////////////////////////////////////////
 // definitions related to console logging
-
-///////////////////////////////////////////////////////////////////////////////
-// This must be in global namespace
-HPX_REGISTER_ACTION_ID(
-    hpx::components::server::console_logging_action<>,
-    console_logging_action,
-    hpx::actions::console_logging_action_id)
 
 namespace hpx { namespace util { namespace detail
 {
@@ -43,6 +37,13 @@ namespace hpx { namespace util { namespace detail
         return lock.get();
     }
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// This must be in global namespace
+HPX_REGISTER_ACTION_ID(
+    hpx::components::server::console_logging_action<>,
+    console_logging_action,
+    hpx::actions::console_logging_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

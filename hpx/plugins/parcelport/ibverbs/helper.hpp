@@ -6,6 +6,9 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+
 #include <boost/cache/entries/lru_entry.hpp>
 #include <boost/cache/local_cache.hpp>
 
@@ -112,5 +115,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
     };
 
 }}}}
+
+#endif
 
 #endif

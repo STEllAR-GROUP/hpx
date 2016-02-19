@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,8 +16,6 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
-
-#include <boost/static_assert.hpp>
 
 #include <memory>
 
@@ -63,7 +61,15 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_function
     {
-        BOOST_STATIC_ASSERT_MSG(
+        // This wrapper is needed to stop infinite recursion when
+        // trying to get the possible additional function decoration
+        // from the component
+        struct action_wrapper
+        {
+            typedef typename Action::component_type component_type;
+        };
+
+        static_assert(
             !Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
 
@@ -88,12 +94,11 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, boost::mpl::false_)
         {
-            typedef typename Action::component_type component_type;
-
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function),
                 util::placeholders::_1,
-                component_type::decorate_action(lva, std::forward<F>(f))
+                traits::action_decorate_function<action_wrapper>::call(
+                    lva, std::forward<F>(f))
             );
         }
 
@@ -112,12 +117,11 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, boost::mpl::true_)
         {
-            typedef typename Action::component_type component_type;
-
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function_future),
                 util::placeholders::_1,
-                component_type::decorate_action(lva, std::forward<F>(f))
+                traits::action_decorate_function<action_wrapper>::call(
+                    lva, std::forward<F>(f))
             );
         }
 
@@ -201,7 +205,7 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_continuation
     {
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
 

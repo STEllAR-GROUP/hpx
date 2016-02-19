@@ -21,7 +21,7 @@ lcos::future<Result> locality_namespace::service_async(
     typedef server_type::service_action action_type;
 
     lcos::packaged_action<action_type, Result> p;
-    p.apply_p(launch::async, gid, priority, req);
+    p.apply_p(gid, priority, req);
     return p.get_future();
 }
 
@@ -79,7 +79,7 @@ lcos::future<std::vector<response> > locality_namespace::bulk_service_async(
     typedef server_type::bulk_service_action action_type;
 
     lcos::packaged_action<action_type> p;
-    p.apply_p(launch::async, gid, priority, reqs);
+    p.apply_p(gid, priority, reqs);
     return p.get_future();
 }
 

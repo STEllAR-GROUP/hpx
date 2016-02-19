@@ -301,7 +301,7 @@ namespace hpx { namespace util
                 >
             {};
 
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             typename result<unwrapped_impl()>::type
             operator()()
             {
@@ -322,7 +322,7 @@ namespace hpx { namespace util
 
             // future
             template <typename T0>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             typename boost::lazy_enable_if_c<
                 traits::is_future<typename decay<T0>::type>::value
               , result<unwrapped_impl(T0)>
@@ -338,7 +338,7 @@ namespace hpx { namespace util
 
             // future-range
             template <typename T0>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             typename boost::lazy_enable_if_c<
                 traits::is_future_range<typename decay<T0>::type>::value
              && !unwrap_impl<typename decay<T0>::type>::is_void::value
@@ -354,7 +354,7 @@ namespace hpx { namespace util
             }
 
             template <typename T0>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             typename boost::lazy_enable_if_c<
                 traits::is_future_range<typename decay<T0>::type>::value
              && unwrap_impl<typename decay<T0>::type>::is_void::value
@@ -372,7 +372,7 @@ namespace hpx { namespace util
 
             // future-tuple
             template <typename T0>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             typename boost::lazy_enable_if_c<
                 traits::is_future_tuple<typename decay<T0>::type>::value
               , result<unwrapped_impl(T0)>
@@ -387,7 +387,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Ts>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             typename result<unwrapped_impl(Ts...)>::type
             operator()(Ts&&... vs)
             {

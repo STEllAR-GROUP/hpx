@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -108,7 +108,7 @@ namespace detail
         typedef Result type;
 
         template <typename U>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         U && set(U && u)
         {
             return std::forward<U>(u);
@@ -120,13 +120,13 @@ namespace detail
     {
         typedef Result* type;
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         Result* set(Result* u)
         {
             return u;
         }
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         Result* set(Result& u)
         {
             return &u;
@@ -138,7 +138,7 @@ namespace detail
     {
         typedef util::unused_type type;
 
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         util::unused_type set(util::unused_type u)
         {
             return u;
@@ -177,7 +177,7 @@ namespace detail
     template <typename F1, typename F2>
     class compose_cb_impl
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl)
 
     public:
         template <typename A1, typename A2>
@@ -204,7 +204,7 @@ namespace detail
     };
 
     template <typename F1, typename F2>
-    static BOOST_FORCEINLINE util::unique_function_nonser<void()>
+    static HPX_FORCEINLINE util::unique_function_nonser<void()>
     compose_cb(F1 && f1, F2 && f2)
     {
         if (!f1)
@@ -243,7 +243,7 @@ namespace detail
     template <typename Result>
     struct future_data : future_data_refcnt_base
     {
-        HPX_NON_COPYABLE(future_data);
+        HPX_NON_COPYABLE(future_data)
 
         typedef typename future_data_result<Result>::type result_type;
         typedef util::unique_function_nonser<void()> completed_callback_type;
@@ -357,9 +357,27 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
-            handle_continuation_recursion_count cnt;
+#if defined(HPX_WINDOWS)
+            bool recurse_asynchronously = false;
+#elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            std::ptrdiff_t remaining_stack =
+                this_thread::get_available_stack_space();
 
-            if (cnt.count_ <= HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+            if(remaining_stack < 0)
+            {
+                HPX_THROW_EXCEPTION(out_of_memory,
+                    "future_data::handle_on_completed",
+                    "Stack overflow");
+            }
+            bool recurse_asynchronously =
+                remaining_stack < 8 * HPX_THREADS_STACK_OVERHEAD;
+#else
+            handle_continuation_recursion_count cnt;
+            bool recurse_asynchronously =
+                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+#endif
+
+            if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
                 on_completed();
@@ -374,7 +392,7 @@ namespace detail
                 if (!run_on_completed_on_new_thread(
                         util::deferred_call(&future_data::run_on_completed,
                             std::move(this_), std::move(on_completed),
-                            std::ref(ptr)),
+                            boost::ref(ptr)),
                         ec))
                 {
                     // thread creation went wrong
@@ -682,31 +700,18 @@ namespace detail
     template <typename Result>
     struct task_base : future_data<Result>
     {
-    private:
+    protected:
         typedef typename future_data<Result>::mutex_type mutex_type;
         typedef boost::intrusive_ptr<task_base> future_base_type;
-
-    protected:
         typedef typename future_data<Result>::result_type result_type;
-
-        threads::thread_id_type get_id() const
-        {
-            boost::lock_guard<mutex_type> l(this->mtx_);
-            return id_;
-        }
-        void set_id(threads::thread_id_type id)
-        {
-            boost::lock_guard<mutex_type> l(this->mtx_);
-            id_ = id;
-        }
 
     public:
         task_base()
-          : started_(false), id_(threads::invalid_thread_id), sched_(0)
+          : started_(false), sched_(0)
         {}
 
         task_base(threads::executor& sched)
-          : started_(false), id_(threads::invalid_thread_id),
+          : started_(false),
             sched_(sched ? &sched : 0)
         {}
 
@@ -729,8 +734,7 @@ namespace detail
         {
             if (!started_test_and_set())
                 this->do_run();
-            else
-                this->future_data<Result>::wait(ec);
+            this->future_data<Result>::wait(ec);
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
@@ -759,6 +763,7 @@ namespace detail
             return false;
         }
 
+    protected:
         void check_started()
         {
             boost::lock_guard<mutex_type> l(this->mtx_);
@@ -780,7 +785,7 @@ namespace detail
         }
 
         // run in a separate thread
-        void apply(BOOST_SCOPED_ENUM(launch) policy,
+        virtual void apply(BOOST_SCOPED_ENUM(launch) policy,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
@@ -811,25 +816,9 @@ namespace detail
             }
         }
 
-    private:
-        struct reset_id
-        {
-            reset_id(task_base& target)
-              : target_(target)
-            {
-                target.set_id(threads::get_self_id());
-            }
-            ~reset_id()
-            {
-                target_.set_id(threads::invalid_thread_id);
-            }
-            task_base& target_;
-        };
-
     protected:
         threads::thread_state_enum run_impl()
         {
-            reset_id r(*this);
             this->do_run();
             return threads::terminated;
         }
@@ -838,18 +827,112 @@ namespace detail
         template <typename T>
         void set_data(T && result)
         {
-            HPX_ASSERT(started_);
-            this->future_data<Result>::set_value(std::forward<T>(result));
+            this->future_data<Result>::set_data(std::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            HPX_ASSERT(started_);
             this->future_data<Result>::set_exception(e);
         }
 
-        virtual void do_run() = 0;
+        virtual void do_run()
+        {
+            HPX_ASSERT(false);      // shouldn't ever be called
+        }
 
+    protected:
+        bool started_;
+        threads::executor* sched_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    struct cancelable_task_base : task_base<Result>
+    {
+    protected:
+        typedef typename task_base<Result>::mutex_type mutex_type;
+        typedef boost::intrusive_ptr<cancelable_task_base> future_base_type;
+        typedef typename future_data<Result>::result_type result_type;
+
+    protected:
+        threads::thread_id_type get_thread_id() const
+        {
+            boost::lock_guard<mutex_type> l(this->mtx_);
+            return id_;
+        }
+        void set_thread_id(threads::thread_id_type id)
+        {
+            boost::lock_guard<mutex_type> l(this->mtx_);
+            id_ = id;
+        }
+
+    public:
+        cancelable_task_base()
+          : task_base<Result>(), id_(threads::invalid_thread_id)
+        {}
+
+        cancelable_task_base(threads::executor& sched)
+          : task_base<Result>(sched), id_(threads::invalid_thread_id)
+        {}
+
+    private:
+        struct reset_id
+        {
+            reset_id(cancelable_task_base& target)
+              : target_(target)
+            {
+                target.set_thread_id(threads::get_self_id());
+            }
+            ~reset_id()
+            {
+                target_.set_thread_id(threads::invalid_thread_id);
+            }
+            cancelable_task_base& target_;
+        };
+
+    protected:
+        // run in a separate thread
+        void apply(BOOST_SCOPED_ENUM(launch) policy,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize, error_code& ec)
+        {
+            this->check_started();
+
+            future_base_type this_(this);
+
+            char const* desc = hpx::threads::get_thread_description(
+                hpx::threads::get_self_id());
+
+            if (this->sched_) {
+                this->sched_->add(
+                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
+                    desc ? desc : "cancelable_task_base::apply",
+                    threads::pending, false, stacksize, ec);
+            }
+            else if (policy == launch::fork) {
+                threads::register_thread_plain(
+                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
+                    desc ? desc : "cancelable_task_base::apply",
+                    threads::pending, false, threads::thread_priority_boost,
+                    get_worker_thread_num(), stacksize, ec);
+            }
+            else {
+                threads::register_thread_plain(
+                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
+                    desc ? desc : "cancelable_task_base::apply",
+                    threads::pending, false, priority, std::size_t(-1),
+                    stacksize, ec);
+            }
+        }
+
+        threads::thread_state_enum run_impl()
+        {
+            reset_id r(*this);
+            this->do_run();
+            return threads::terminated;
+        }
+
+    public:
         // cancellation support
         bool cancelable() const
         {
@@ -891,9 +974,7 @@ namespace detail
         }
 
     protected:
-        bool started_;
         threads::thread_id_type id_;
-        threads::executor* sched_;
     };
 }}}
 

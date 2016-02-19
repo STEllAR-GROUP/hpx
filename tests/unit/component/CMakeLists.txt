@@ -51,6 +51,8 @@ set(get_ptr_PARAMETERS
 set(migrate_component_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
+set(migrate_component_FLAGS
+    DEPENDENCIES iostreams_component)
 
 set(inheritance_2_classes_abstract_FLAGS
     DEPENDENCIES iostreams_component)

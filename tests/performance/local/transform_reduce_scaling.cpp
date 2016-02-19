@@ -42,6 +42,7 @@ void measure_transform_reduce(std::size_t size)
         0.0,
         std::plus<double>()
     );
+    HPX_UNUSED(result);
 }
 
 void measure_transform_reduce_old(std::size_t size)
@@ -61,6 +62,7 @@ void measure_transform_reduce_old(std::size_t size)
                 res.x * res.y + curr.x * curr.y, 1.0};
         }
     );
+    HPX_UNUSED(result);
 }
 
 boost::uint64_t average_out_transform_reduce(std::size_t vector_size)

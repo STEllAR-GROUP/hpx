@@ -47,9 +47,18 @@ namespace hpx { namespace performance_counters
     /// with the counter types. It is suitable to be used for all counters
     /// following the naming scheme:
     ///
-    ///   /<objectname>(locality#<locality_id>/thread#<threadnum>)/<instancename>
+    ///   /<objectname>(locality#<locality_id>/worker-thread#<threadnum>)/<instancename>
     ///
     HPX_API_EXPORT bool locality_thread_counter_discoverer(counter_info const&,
+        discover_counter_func const&, discover_counters_mode, error_code&);
+
+    /// Default discoverer function for performance counters; to be registered
+    /// with the counter types. It is suitable to be used for all counters
+    /// following the naming scheme:
+    ///
+    ///   /<objectname>(locality#<locality_id>/numa-node#<threadnum>)/<instancename>
+    ///
+    HPX_API_EXPORT bool locality_numa_counter_discoverer(counter_info const&,
         discover_counter_func const&, discover_counters_mode, error_code&);
 
     ///////////////////////////////////////////////////////////////////////////

@@ -7,16 +7,18 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_ERRORS_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_ERRORS_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+
 #include <hpx/config.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/asio/detail/throw_error.hpp>
-#include <boost/static_assert.hpp>
 
 #include <string>
 
 #if !defined(BOOST_SYSTEM_NOEXCEPT)
-#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
+#define BOOST_SYSTEM_NOEXCEPT HPX_NOEXCEPT
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,5 +119,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             return ret;                                                         \
         }                                                                       \
     }
+
+#endif
 
 #endif

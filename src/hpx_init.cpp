@@ -25,7 +25,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/apex.hpp>
 
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
 #  include <signal.h>
 #endif
 
@@ -292,7 +292,7 @@ namespace hpx { namespace detail
 namespace hpx
 {
     // Print stack trace and exit.
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
     extern BOOL WINAPI termination_handler(DWORD ctrl_type);
 #else
     extern void termination_handler(int signum);
@@ -1179,7 +1179,7 @@ namespace hpx
 
         if (std::abs(localwait + 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-        else
+
         {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
@@ -1222,7 +1222,7 @@ namespace hpx
 
         if (std::abs(localwait + 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-        else
+
         {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
@@ -1310,7 +1310,7 @@ namespace hpx
             std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
 
             using namespace boost::program_options;
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
             std::vector<std::string> args = split_winmain(cmdline);
 #else
             std::vector<std::string> args = split_unix(cmdline);

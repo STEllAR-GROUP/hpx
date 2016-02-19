@@ -735,6 +735,19 @@ namespace hpx { namespace performance_counters
         }
 
         ///////////////////////////////////////////////////////////////////////
+        inline bool is_node_kind(std::string const& pattern)
+        {
+            std::string::size_type p = pattern.find("-node#*");
+            return p != std::string::npos && p == pattern.size() - 7;
+        }
+
+        inline std::string get_node_kind(std::string const& pattern)
+        {
+            HPX_ASSERT(is_node_kind(pattern));
+            return pattern.substr(0, pattern.find_last_of('-'));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         /// Expand all wild-cards in a counter base name (for aggregate counters)
         bool expand_basecounter(
             counter_info const& info, counter_path_elements& p,
@@ -775,15 +788,37 @@ namespace hpx { namespace performance_counters
             return true;
         }
 
+        bool expand_counter_info_nodes(
+            counter_info& i, counter_path_elements& p,
+            discover_counter_func const& f, error_code& ec)
+        {
+            std::size_t num_nodes
+                = hpx::threads::get_topology().get_number_of_numa_nodes();
+            for (std::size_t l = 0; l != num_nodes; ++l)
+            {
+                p.instanceindex_ = static_cast<boost::int64_t>(l);
+                counter_status status = get_counter_name(p, i.fullname_, ec);
+                if (!status_is_valid(status) || !f(i, ec) || ec)
+                    return false;
+            }
+            return true;
+        }
+
         bool expand_counter_info_localities(
             counter_info& i, counter_path_elements& p,
             discover_counter_func const& f, error_code& ec)
         {
             bool expand_threads = false;
+            bool expand_nodes = false;
             if (is_thread_kind(p.instancename_))
             {
                 p.instancename_ = get_thread_kind(p.instancename_) + "-thread";
                 expand_threads = true;
+            }
+            else if (is_node_kind(p.instancename_))
+            {
+                p.instancename_ = get_node_kind(p.instancename_) + "-node";
+                expand_nodes = true;
             }
 
             boost::uint32_t last_locality = get_num_localities_sync();
@@ -792,6 +827,10 @@ namespace hpx { namespace performance_counters
                 p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
                 if (expand_threads) {
                     if (!detail::expand_counter_info_threads(i, p, f, ec))
+                        return false;
+                }
+                else if(expand_nodes) {
+                    if (!detail::expand_counter_info_nodes(i, p, f, ec))
                         return false;
                 }
                 else {
@@ -830,6 +869,14 @@ namespace hpx { namespace performance_counters
                 counter_info i = info;
                 p.instancename_ = detail::get_thread_kind(p.instancename_) + "-thread";
                 return detail::expand_counter_info_threads(i, p, f, ec);
+            }
+
+            // now expand "<...>-node#*"
+            if (detail::is_node_kind(p.instancename_))
+            {
+                counter_info i = info;
+                p.instancename_ = detail::get_node_kind(p.instancename_) + "-node";
+                return detail::expand_counter_info_nodes(i, p, f, ec);
             }
 
             // handle wild-cards in aggregate counters

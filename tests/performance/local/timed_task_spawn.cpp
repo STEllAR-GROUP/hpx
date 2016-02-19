@@ -373,14 +373,14 @@ int hpx_main(
                     "count\n");
 
             tasks_per_feeder = tasks / os_thread_count;
-            total_tasks      = tasks;
+            //total_tasks      = tasks;
             suspended_tasks_per_feeder = suspended_tasks / os_thread_count;
             total_suspended_tasks      = suspended_tasks;
         }
         else if ("weak" == scaling)
         {
             tasks_per_feeder = tasks;
-            total_tasks      = tasks * os_thread_count;
+            //total_tasks      = tasks * os_thread_count;
             suspended_tasks_per_feeder = suspended_tasks;
             total_suspended_tasks      = suspended_tasks * os_thread_count;
         }

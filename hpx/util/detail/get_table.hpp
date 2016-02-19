@@ -8,14 +8,14 @@
 #define HPX_UTIL_DETAIL_GET_TABLE_HPP
 
 #include <hpx/config.hpp>
-#include <boost/mpl/identity.hpp>
+#include <hpx/util/detail/vtable/vtable.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
     template <typename VTable, typename T>
-    static VTable const* get_table() BOOST_NOEXCEPT
+    static VTable const* get_table() HPX_NOEXCEPT
     {
-        static VTable const vtable = boost::mpl::identity<T>();
+        static VTable const vtable = construct_vtable<T>();
         return &vtable;
     }
 }}}

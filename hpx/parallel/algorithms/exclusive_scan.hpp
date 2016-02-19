@@ -26,7 +26,6 @@
 #include <numeric>
 #include <iterator>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -141,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         util::loop_n(dst, part_size - 1,
                             [=, &val](OutIter it)
                             {
-                                *it = op(*it, val);
+                                *it = op(val, *it);
                             });
                     },
                     // step 4 use this return value
@@ -249,11 +248,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::mpl::or_<
                 boost::is_base_of<
                     std::forward_iterator_tag, output_iterator_category>,
@@ -345,11 +344,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::mpl::or_<
                 boost::is_base_of<
                     std::forward_iterator_tag, output_iterator_category>,

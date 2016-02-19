@@ -35,6 +35,11 @@ namespace hpx
             return container_distribution_policy(num_partitions, localities_);
         }
 
+        container_distribution_policy operator()(hpx::id_type const& locality) const
+        {
+            return container_distribution_policy(locality);
+        }
+
         container_distribution_policy operator()(
             std::vector<id_type> const& localities) const
         {
@@ -43,10 +48,29 @@ namespace hpx
             return container_distribution_policy(localities.size(), localities);
         }
 
+        container_distribution_policy operator()(
+            std::vector<id_type> && localities) const
+        {
+            if (num_partitions_ != std::size_t(-1))
+            {
+                return container_distribution_policy(
+                    num_partitions_, std::move(localities));
+            }
+            return container_distribution_policy(
+                localities.size(), std::move(localities));
+        }
+
         container_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities) const
         {
             return container_distribution_policy(num_partitions, localities);
+        }
+
+        container_distribution_policy operator()(std::size_t num_partitions,
+            std::vector<id_type> && localities) const
+        {
+            return container_distribution_policy(
+                num_partitions, std::move(localities));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -75,6 +99,18 @@ namespace hpx
                 std::vector<id_type> const& localities)
           : components::default_distribution_policy(localities),
             num_partitions_(num_partitions)
+        {}
+
+
+        container_distribution_policy(std::size_t num_partitions,
+                std::vector<id_type> && localities)
+          : components::default_distribution_policy(std::move(localities)),
+            num_partitions_(num_partitions)
+        {}
+
+        container_distribution_policy(hpx::id_type const& locality)
+          : components::default_distribution_policy(locality),
+            num_partitions_(1)
         {}
 
     private:

@@ -1048,6 +1048,11 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       <<
         "HPX Inspection Report\n"
         "Run Date: " << run_date  << "\n"
+        "Commit: " << "<a href = \"https://github.com/STEllAR-GROUP/hpx/commit/"
+                   << HPX_HAVE_GIT_COMMIT
+                   << "\">"
+                   << std::string(HPX_HAVE_GIT_COMMIT, 10)
+                   << "</a>\n"
         "\n"
       ;
 
@@ -1083,8 +1088,14 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       "</td>\n"
       "<td>\n"
       "<h1>HPX Inspection Report</h1>\n"
-      "<b>Run Date:</b> " << run_date  << "\n"
+      "<b>Run Date:</b> " << run_date  << "<br>\n"
       //"&nbsp;&nbsp;/ " << validator_link( "validate me" ) << " /\n"
+      "<b>Commit:</b> "
+            << "<a href = \"https://github.com/STEllAR-GROUP/hpx/commit/"
+            << HPX_HAVE_GIT_COMMIT
+            << "\">"
+            << std::string(HPX_HAVE_GIT_COMMIT, 10)
+            << "</a>\n"
       "</td>\n"
       "</tr>\n"
       "</table>\n"

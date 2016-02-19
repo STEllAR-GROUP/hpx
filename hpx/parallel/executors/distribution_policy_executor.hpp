@@ -22,7 +22,6 @@
 
 #include <type_traits>
 
-#include <boost/static_assert.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -59,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {
     private:
         /// \cond NOINTERNAL
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             hpx::traits::is_distribution_policy<DistPolicy>::value,
             "distribution_policy_executor needs to be instantiated with a "
                 "distribution policy type");

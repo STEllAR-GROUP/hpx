@@ -43,11 +43,8 @@ struct B : A, hpx::components::managed_component_base<B>
         wrapping_type;
     typedef hpx::components::managed_component_base<B>::wrapped_type
         wrapped_type;
-    using hpx::components::managed_component_base<B>::decorate_action;
-    using hpx::components::managed_component_base<B>::schedule_thread;
     using hpx::components::managed_component_base<B>::set_back_ptr;
     using hpx::components::managed_component_base<B>::finalize;
-    using hpx::components::managed_component_base<B>::is_target_valid;
 
     typedef B type_holder;
     typedef A base_type_holder;

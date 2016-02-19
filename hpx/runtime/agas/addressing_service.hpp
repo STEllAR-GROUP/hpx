@@ -1,6 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2015 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Parsa Amini
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,20 +12,20 @@
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
 #include <hpx/config.hpp>
-
 #include <hpx/exception.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/make_shared.hpp>
-#include <boost/cache/entries/lfu_entry.hpp>
-#include <boost/cache/local_cache.hpp>
+#include <boost/cache/lru_cache.hpp>
 #include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -32,10 +34,6 @@
 
 #include <map>
 #include <vector>
-
-// TODO: split into a base class and two implementations (one for bootstrap,
-// one for hosted).
-// TODO: Use \copydoc.
 
 namespace hpx { namespace util
 {
@@ -61,32 +59,26 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         void(std::string const&, components::component_type)
     > iterate_types_function_type;
 
-    typedef hpx::lcos::local::spinlock cache_mutex_type;
     typedef hpx::lcos::local::spinlock mutex_type;
     // }}}
 
     // {{{ gva cache
     struct gva_cache_key;
-    struct gva_erase_policy;
-    typedef boost::cache::entries::lfu_entry<gva> gva_entry_type;
 
-    typedef boost::cache::local_cache<
-        gva_cache_key, gva_entry_type,
-        std::less<gva_entry_type>,
-        boost::cache::policies::always<gva_entry_type>,
-        std::map<gva_cache_key, gva_entry_type>,
-        boost::cache::statistics::local_full_statistics
+    typedef boost::cache::lru_cache<
+        gva_cache_key
+      , gva
+      , boost::cache::statistics::local_full_statistics
     > gva_cache_type;
     // }}}
 
     typedef std::set<naming::gid_type> migrated_objects_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
-    struct bootstrap_data_type;
-    struct hosted_data_type;
-
-    mutable cache_mutex_type gva_cache_mtx_;
+    mutable mutex_type gva_cache_mtx_;
     boost::shared_ptr<gva_cache_type> gva_cache_;
+
+    mutable mutex_type migrated_objects_mtx_;
     migrated_objects_table_type migrated_objects_table_;
 
     mutable mutex_type console_cache_mtx_;
@@ -110,8 +102,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::uint64_t rts_lva_;
     boost::uint64_t mem_lva_;
 
-    boost::shared_ptr<bootstrap_data_type> bootstrap;
-    boost::shared_ptr<hosted_data_type> hosted;
+    boost::shared_ptr<detail::agas_service_client> client_;
 
     boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
@@ -142,11 +133,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void initialize(parcelset::parcelhandler& ph, boost::uint64_t rts_lva,
         boost::uint64_t mem_lva);
 
-    void adjust_local_cache_size();
+    /// \brief Adjust the size of the local AGAS Address resolution cache
+    void adjust_local_cache_size(std::size_t);
 
     state get_status() const
     {
-        if (!hosted && !bootstrap)
+        if (!client_)
             return state_stopping;
         return state_.load();
     }
@@ -202,13 +194,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         error_code& ec = throws
         );
 
-    void* get_hosted_primary_ns_ptr() const;
-    void* get_hosted_symbol_ns_ptr() const;
+    naming::address::address_type get_hosted_primary_ns_ptr() const;
+    naming::address::address_type get_hosted_symbol_ns_ptr() const;
 
-    void* get_bootstrap_locality_ns_ptr() const;
-    void* get_bootstrap_primary_ns_ptr() const;
-    void* get_bootstrap_component_ns_ptr() const;
-    void* get_bootstrap_symbol_ns_ptr() const;
+    naming::address::address_type get_bootstrap_locality_ns_ptr() const;
+    naming::address::address_type get_bootstrap_primary_ns_ptr() const;
+    naming::address::address_type get_bootstrap_component_ns_ptr() const;
+    naming::address::address_type get_bootstrap_symbol_ns_ptr() const;
 
     boost::int64_t synchronize_with_async_incref(
         hpx::future<boost::int64_t> fut
@@ -218,18 +210,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     naming::address::address_type get_primary_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
-            is_bootstrap() ?
-                get_bootstrap_primary_ns_ptr() :
-                get_hosted_primary_ns_ptr());
+        return client_->get_primary_ns_ptr();
     }
 
     naming::address::address_type get_symbol_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
-            is_bootstrap() ?
-                get_bootstrap_symbol_ns_ptr() :
-                get_hosted_symbol_ns_ptr());
+        return client_->get_symbol_ns_ptr();
     }
 
 protected:
@@ -282,18 +268,19 @@ private:
         );
 
     // Helper functions to access the current cache statistics
+    boost::uint64_t get_cache_entries(bool);
     boost::uint64_t get_cache_hits(bool);
     boost::uint64_t get_cache_misses(bool);
     boost::uint64_t get_cache_evictions(bool);
     boost::uint64_t get_cache_insertions(bool);
 
     boost::uint64_t get_cache_get_entry_count(bool reset);
-    boost::uint64_t get_cache_insert_entry_count(bool reset);
+    boost::uint64_t get_cache_insertion_entry_count(bool reset);
     boost::uint64_t get_cache_update_entry_count(bool reset);
     boost::uint64_t get_cache_erase_entry_count(bool reset);
 
     boost::uint64_t get_cache_get_entry_time(bool reset);
-    boost::uint64_t get_cache_insert_entry_time(bool reset);
+    boost::uint64_t get_cache_insertion_entry_time(bool reset);
     boost::uint64_t get_cache_update_entry_time(bool reset);
     boost::uint64_t get_cache_erase_entry_time(bool reset);
 
@@ -875,6 +862,11 @@ public:
       , error_code& ec = throws
         );
 
+    hpx::future<naming::address> unbind_range_async(
+        naming::gid_type const& lower_id
+      , boost::uint64_t count = 1
+        );
+
     /// \brief Test whether the given address refers to a local object.
     ///
     /// This function will test whether the given address refers to an object
@@ -1149,7 +1141,8 @@ public:
         parcelset::parcel p
       , util::function_nonser<void(boost::system::error_code const&,
             parcelset::parcel const&)> &&
-        );
+      , threads::thread_priority local_priority =
+            threads::thread_priority_default);
 
     /// \brief Increment the global reference count for the given id
     ///
@@ -1387,28 +1380,6 @@ public:
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
-    void insert_cache_entry(
-        naming::gid_type const& gid
-      , gva const& gva
-      , error_code& ec = throws
-        );
-
-    /// \warning This function is for internal use only. It is dangerous and
-    ///          may break your code if you use it.
-    void insert_cache_entry(
-        naming::gid_type const& gid
-      , naming::address const& addr
-      , boost::uint64_t count = 0
-      , boost::uint64_t offset = 0
-      , error_code& ec = throws
-        )
-    {
-        const gva g(addr.locality_, addr.type_, count, addr.address_, offset);
-        insert_cache_entry(gid, g, ec);
-    }
-
-    /// \warning This function is for internal use only. It is dangerous and
-    ///          may break your code if you use it.
     void update_cache_entry(
         naming::gid_type const& gid
       , gva const& gva
@@ -1431,15 +1402,24 @@ public:
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
-    void clear_cache(
-        error_code& ec = throws
+    bool get_cache_entry(
+        naming::gid_type const& gid
+      , gva& gva
+      , naming::gid_type& idbase
+      , error_code& ec = throws
         );
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
     void remove_cache_entry(
-        naming::gid_type const& gid
+        naming::gid_type const& id
       , error_code& ec = throws
+        );
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void clear_cache(
+        error_code& ec = throws
         );
 
     // Disable refcnt caching during shutdown
@@ -1458,14 +1438,22 @@ public:
     ///
     /// \returns Current locality and address of the object to migrate
     hpx::future<std::pair<naming::id_type, naming::address> >
-        begin_migration_async(
-            naming::id_type const& id
-          , naming::id_type const& target_locality
-            );
+        begin_migration_async(naming::id_type const& id);
     hpx::future<bool> end_migration_async(naming::id_type const& id);
 
     /// Maintain list of migrated objects
-    bool was_object_migrated(naming::id_type const* ids, std::size_t size);
+    std::pair<bool, components::pinned_ptr>
+        was_object_migrated(naming::gid_type const& gid,
+            util::unique_function_nonser<components::pinned_ptr()> && f);
+
+    /// Mark the given object as being migrated (if the object is unpinned).
+    /// Delay migration until the object is unpinned otherwise.
+    hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
+        util::unique_function_nonser<
+            std::pair<bool, hpx::future<void> >()> && f);
+
+    /// Remove the given object from the table of migrated objects
+    void unmark_as_migrated(naming::gid_type const& gid);
 };
 
 }}

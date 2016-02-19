@@ -35,6 +35,8 @@
 #ifndef HPX_COROUTINE_DETAIL_HAS_SWAP_HPP_20060709
 #define HPX_COROUTINE_DETAIL_HAS_SWAP_HPP_20060709
 
+#include <hpx/config.hpp>
+
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/workaround.hpp>
 
@@ -52,7 +54,7 @@ namespace has_swap_
   };
   no_swap swap(anything,anything);
 
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 # pragma warning(push)
 # pragma warning(disable: 4675)
 // function found through argument dependent lookup -- duh!
@@ -62,20 +64,16 @@ namespace has_swap_
   {
       static T& x;
 
-      BOOST_STATIC_CONSTANT(bool, value = sizeof(swap(x,x),'x') == 1);
+      HPX_STATIC_CONSTEXPR bool value = sizeof(swap(x,x),'x') == 1;
 
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
-      typedef boost::mpl::bool_<has_swap_impl<T>::value> type;
-#else
       typedef boost::mpl::bool_<value> type;
-#endif
   };
 }
 template <class T>
 struct has_swap
   : has_swap_::has_swap_impl<T>::type
 {};
-#if defined(BOOST_MSVC)
+#if defined(HPX_MSVC)
 # pragma warning(pop)
 #endif
 

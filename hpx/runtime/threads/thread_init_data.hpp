@@ -18,8 +18,11 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::ptrdiff_t get_stack_size(thread_stacksize);
 
     ///////////////////////////////////////////////////////////////////////////
-    struct thread_init_data
+    class thread_init_data
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(thread_init_data)
+
+    public:
         thread_init_data()
           : func(),
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
@@ -102,11 +105,6 @@ namespace hpx { namespace threads
         naming::id_type target;
 
         policies::scheduler_base* scheduler_base;
-
-    private:
-        // we don't use the assignment operator
-        thread_init_data(thread_init_data const& rhs);
-        thread_init_data& operator=(thread_init_data const& rhs);
     };
 }}
 

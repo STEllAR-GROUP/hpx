@@ -10,7 +10,6 @@
 #define HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/static_assert.hpp>
 
 #include <type_traits>
 
@@ -19,7 +18,7 @@
     typename std::enable_if<                                                  \
         (BOOST_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__),  \
         int                                                                   \
-    >::type = 0                                                               \
+    >::type BOOST_PP_CAT(_concept_check_, __LINE__) = 0                       \
     /**/
 
 #define HPX_CONCEPT_REQUIRES(...)                                             \
@@ -28,11 +27,11 @@
         typename std::enable_if<                                              \
             (BOOST_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__), \
             int                                                               \
-        >::type = 0>                                                          \
+        >::type BOOST_PP_CAT(_concept_check_, __LINE__) = 0>                  \
     /**/
 
 #define HPX_CONCEPT_ASSERT(...)                                               \
-    BOOST_STATIC_ASSERT_MSG((__VA_ARGS__), "Concept check failed")            \
+    static_assert((__VA_ARGS__), "Concept check failed")                      \
     /**/
 
 #endif

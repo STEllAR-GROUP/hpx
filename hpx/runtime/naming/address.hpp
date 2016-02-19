@@ -6,15 +6,15 @@
 #if !defined(HPX_NAMING_ADDRESS_MAR_24_2008_0949AM)
 #define HPX_NAMING_ADDRESS_MAR_24_2008_0949AM
 
-#include <boost/io/ios_state.hpp>
-#include <boost/cstdint.hpp>
-
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/io/ios_state.hpp>
+#include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  address serialization format version
@@ -39,7 +39,7 @@ namespace hpx { namespace naming
         {}
 
         address(gid_type const& l, component_type t, void* lva,
-            boost::uint64_t offset = 0)
+                boost::uint64_t offset = 0)
           : locality_(l), type_(t),
             address_(reinterpret_cast<address_type>(lva)),
             offset_(offset)
@@ -50,8 +50,9 @@ namespace hpx { namespace naming
         {}
 
         // local only addresses
-        explicit address(void* lva)
-          : type_(components::component_invalid),
+        explicit address(void* lva,
+                component_type t = components::component_invalid)
+          : type_(t),
             address_(reinterpret_cast<address_type>(lva)), offset_(0)
         {}
 
@@ -123,6 +124,8 @@ namespace hpx { namespace naming
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
+
+HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)
 
 #include <hpx/config/warnings_suffix.hpp>
 

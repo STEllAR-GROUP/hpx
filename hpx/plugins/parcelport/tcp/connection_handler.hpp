@@ -10,6 +10,9 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_CONNECTION_HANDLER_HPP
 #define HPX_PARCELSET_POLICIES_TCP_CONNECTION_HANDLER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/config/asio.hpp>
 
@@ -120,5 +123,7 @@ namespace hpx { namespace parcelset
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
+
+#endif
 
 #endif

@@ -52,7 +52,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct processing_units_count_parameter_helper
         {
             template <typename Parameters>
-            static std::size_t call(wrap_int, Parameters& params)
+            static std::size_t call(hpx::traits::detail::wrap_int,
+                Parameters& params)
             {
                 return hpx::get_os_thread_count();
             }
@@ -75,7 +76,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct variable_chunk_size_helper
         {
             template <typename Parameters, typename Executor>
-            static bool call(wrap_int, Parameters&, Executor&)
+            static bool call(hpx::traits::detail::wrap_int, Parameters&,
+                Executor&)
             {
                 return false;       // assume constant chunk sizes
             }
@@ -99,7 +101,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Parameters, typename Executor, typename F>
             static std::size_t
-            call(wrap_int, Parameters&, Executor&, F &&, std::size_t num_tasks)
+            call(hpx::traits::detail::wrap_int, Parameters&, Executor&, F &&,
+                std::size_t num_tasks)
             {
                 return num_tasks;       // assume sequential execution
             }
@@ -127,7 +130,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct reset_thread_distribution_helper
         {
             template <typename Parameters, typename Executor>
-            static void call(wrap_int, Parameters&, Executor& exec)
+            static void call(hpx::traits::detail::wrap_int, Parameters&, Executor&)
             {
             }
 

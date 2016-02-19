@@ -7,6 +7,9 @@
 #ifndef HPX_PARCELSET_POLICIES_IPC_CONNECTION_HANDLER_HPP
 #define HPX_PARCELSET_POLICIES_IPC_CONNECTION_HANDLER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
@@ -103,5 +106,7 @@ namespace hpx { namespace parcelset {
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
+
+#endif
 
 #endif

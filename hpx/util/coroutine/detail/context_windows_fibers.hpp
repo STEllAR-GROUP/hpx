@@ -40,14 +40,13 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/config.hpp>
-#include <boost/version.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
+
 
 #if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
 extern "C" void switch_to_fiber(void* lpFiber) throw();
@@ -174,7 +173,7 @@ namespace hpx { namespace util { namespace coroutines
     };
 
     template <typename T>
-    BOOST_FORCEINLINE VOID CALLBACK
+    HPX_FORCEINLINE VOID CALLBACK
     trampoline(LPVOID pv) {
       T* fun = static_cast<T*>(pv);
       HPX_ASSERT(fun);

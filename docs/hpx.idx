@@ -1,4 +1,4 @@
-#   Copyright (c) 2001-2015 Hartmut Kaiser
+#   Copyright (c) 2001-2016 Hartmut Kaiser
 #
 #   Distributed under the Boost Software License, Version 1.0. (See accompanying
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -250,6 +250,10 @@ parallel::set_symmetric_difference    "set_symmetric_difference" "hpx\.parallel\
 # hpx/parallel/algorithms/set_union.hpp
 parallel::set_union                   "set_union" "hpx\.parallel\.v1\.set_union.*"
 
+# hpx/parallel/algorithms/sort(_by_key].hpp
+parallel::sort                        "sort" "hpx\.parallel\.v1\.sort.*"
+parallel::sort_by_key                 "sort_by_key" "hpx\.parallel\.v1\.sort_by_key.*"
+
 # hpx/parallel/algorithms/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
 
@@ -391,6 +395,8 @@ filesystem_error                      "" "hpx\.error"
 bad_function_call                     "" "hpx\.error"
 task_canceled_exception               "" "hpx\.error"
 task_region_not_active                "" "hpx\.error"
+out_of_range                          "" "hpx\.error"
+length_error                          "" "hpx\.error"
 
 # hpx/runtime/naming/unmanaged.hpp
 unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanaged.*"
@@ -429,7 +435,6 @@ wait_any_n                            "" "header\.hpx\.lcos\.wait_any.*"
 # hpx/lcos/when_any.hpp
 when_any                              "" "header\.hpx\.lcos\.when_any.*"
 when_any_n                            "" "header\.hpx\.lcos\.when_any.*"
-when_any_result                       "" "header\.hpx\.lcos\.when_any_result.*"
 
 # hpx/lcos/wait_some.hpp
 wait_some                             "" "header\.hpx\.lcos\.wait_some.*"
