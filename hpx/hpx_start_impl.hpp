@@ -24,6 +24,10 @@ namespace hpx
             startup_function_type const& startup,
             shutdown_function_type const& shutdown, hpx::runtime_mode mode,
             bool blocking);
+
+#if defined(HPX_WINDOWS)
+        void init_winsocket();
+#endif
     }
     /// \endcond
 
@@ -45,6 +49,9 @@ namespace hpx
         util::function_nonser<void()> const& shutdown,
         hpx::runtime_mode mode)
     {
+#if defined(HPX_WINDOWS)
+        detail::init_winsocket();
+#endif
         util::set_hpx_prefix(HPX_PREFIX);
         return 0 == detail::run_or_start(f, desc_cmdline, argc, argv,
             hpx_startup::user_main_config(cfg),

@@ -11,8 +11,8 @@
 #define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
 #include <hpx/config.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
