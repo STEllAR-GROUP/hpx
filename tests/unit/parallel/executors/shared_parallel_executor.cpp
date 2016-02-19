@@ -101,12 +101,38 @@ void test_bulk_async()
     hpx::when_all(futs).get();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void void_test() {}
+
+void test_sync_void()
+{
+    typedef shared_parallel_executor executor;
+    typedef hpx::parallel::executor_traits<executor> traits;
+
+    executor exec;
+    traits::execute(exec, &void_test);
+}
+
+void test_async_void()
+{
+    typedef shared_parallel_executor executor;
+    typedef hpx::parallel::executor_traits<executor> traits;
+
+    executor exec;
+    hpx::shared_future<void> fut = traits::async_execute(exec, &void_test);
+    fut.get();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
     test_sync();
     test_async();
     test_bulk_sync();
     test_bulk_async();
+
+    test_sync_void();
+    test_async_void();
 
     return hpx::finalize();
 }

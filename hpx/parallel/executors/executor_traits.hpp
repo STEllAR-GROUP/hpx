@@ -157,7 +157,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct execute_helper
         {
             template <typename Executor, typename F>
-            static auto call(hpx::traits::detail::wrap_int, Executor& exec, F && f)
+            static auto call_impl(Executor& exec, F && f, std::false_type)
             ->  decltype(hpx::util::invoke(std::forward<F>(f)))
             {
                 try {
@@ -196,6 +196,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                         exception_list(boost::current_exception())
                     );
                 }
+            }
+
+            template <typename Executor, typename F>
+            static void call_impl(Executor& exec, F && f, std::true_type)
+            {
+                exec.async_execute(std::forward<F>(f)).get();
+            }
+
+            template <typename Executor, typename F>
+            static auto call(hpx::traits::detail::wrap_int, Executor& exec, F && f)
+            ->  decltype(hpx::util::invoke(std::forward<F>(f)))
+            {
+                typedef std::is_void<typename hpx::util::result_of<F()>::type>
+                    is_void;
+                return call_impl(exec, std::forward<F>(f), is_void());
             }
 
             template <typename Executor, typename F>
