@@ -1080,7 +1080,7 @@ else()
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-    hpx_add_compile_flag_if_available(-Wno-deprecated-register CXX C)
+    hpx_add_compile_flag_if_available(-Wno-deprecated-register LANGUAGES CXX C)
   endif()
 
   if(HPX_WITH_HIDDEN_VISIBILITY)
