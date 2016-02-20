@@ -16,7 +16,6 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/auto_chunk_size.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/decay.hpp>
 
 #include <boost/detail/scoped_enum_emulation.hpp>
 
@@ -49,9 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        hpx::future<typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type>
+        hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute(F && f)
         {
             return hpx::async(l_, std::forward<F>(f));
