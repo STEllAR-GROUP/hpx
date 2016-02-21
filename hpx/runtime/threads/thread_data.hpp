@@ -21,6 +21,7 @@
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
@@ -288,42 +289,43 @@ namespace hpx { namespace threads
         }
 
 #ifndef HPX_HAVE_THREAD_DESCRIPTION
-        char const* get_description() const
+        util::thread_description get_description() const
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
-        char const* set_description(char const* /*value*/)
+        util::thread_description set_description(char const* /*value*/)
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
 
-        char const* get_lco_description() const
+        util::thread_description get_lco_description() const
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
-        char const* set_lco_description(char const* /*value*/)
+        util::thread_description set_lco_description(char const* /*value*/)
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
 #else
-        char const* get_description() const
+        util::thread_description get_description() const
         {
             mutex_type::scoped_lock l(this);
-            return description_ ? description_ : "<unknown>";
+            return description_;
         }
-        char const* set_description(char const* value)
+        util::thread_description set_description(util::thread_description value)
         {
             mutex_type::scoped_lock l(this);
             std::swap(description_, value);
             return value;
         }
 
-        char const* get_lco_description() const
+        util::thread_description get_lco_description() const
         {
             mutex_type::scoped_lock l(this);
-            return lco_description_ ? lco_description_ : "<unknown>";
+            return lco_description_;
         }
-        char const* set_lco_description(char const* value)
+        util::thread_description set_lco_description(
+            util::thread_description value)
         {
             mutex_type::scoped_lock l(this);
             std::swap(lco_description_, value);
@@ -591,8 +593,8 @@ namespace hpx { namespace threads
             component_id_(init_data.lva),
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            description_(init_data.description ? init_data.description : ""),
-            lco_description_(""),
+            description_(init_data.description),
+            lco_description_(),
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             parent_locality_id_(init_data.parent_locality_id),
@@ -647,8 +649,8 @@ namespace hpx { namespace threads
             component_id_ = init_data.lva;
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            description_ = (init_data.description ? init_data.description : "");
-            lco_description_ = "";
+            description_ = (init_data.description);
+            lco_description_ = util::thread_description();
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             parent_locality_id_ = init_data.parent_locality_id;
@@ -699,8 +701,8 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        char const* description_;
-        char const* lco_description_;
+        util::thread_description description_;
+        util::thread_description lco_description_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE

@@ -9,6 +9,7 @@
 #define HPX_UTIL_DETAIL_VTABLE_VTABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
+#include <hpx/traits/get_function_address.hpp>
 
 #include <memory>
 #include <typeinfo>
@@ -97,6 +98,13 @@ namespace hpx { namespace util { namespace detail
             }
         }
         typedef void (*delete_t)(void**);
+
+        template <typename T>
+        HPX_FORCEINLINE static std::size_t get_function_address(void** f)
+        {
+            return traits::get_function_address<T>::call(vtable::get<T>(f));
+        }
+        typedef std::size_t (*get_function_address_t)(void**);
     };
 
     template <typename T>

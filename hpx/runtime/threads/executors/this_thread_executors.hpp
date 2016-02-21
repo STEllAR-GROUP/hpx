@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <boost/ptr_container/ptr_vector.hpp>
 
@@ -38,7 +39,8 @@ namespace hpx { namespace threads { namespace executors
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            void add(closure_type && f, char const* description,
+            void add(closure_type && f,
+                util::thread_description const& description,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec);
 
@@ -47,7 +49,7 @@ namespace hpx { namespace threads { namespace executors
             // bounds on the executor's queue size.
             void add_at(
                 boost::chrono::steady_clock::time_point const& abs_time,
-                closure_type && f, char const* description,
+                closure_type && f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Schedule given function for execution in this executor no sooner
@@ -55,7 +57,7 @@ namespace hpx { namespace threads { namespace executors
             // violate bounds on the executor's queue size.
             void add_after(
                 boost::chrono::steady_clock::duration const& rel_time,
-                closure_type && f, char const* description,
+                closure_type && f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.

@@ -31,6 +31,10 @@ namespace hpx { namespace traits
     struct get_remote_result;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename Enable = void>
+    struct get_function_address;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
     struct is_component;
 

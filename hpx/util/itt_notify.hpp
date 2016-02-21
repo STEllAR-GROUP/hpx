@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 #define HPX_UTIL_ITT_NOTIFY_AUG_17_2010_1237PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <cstddef>
 
@@ -248,10 +249,19 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct task
     {
-        task(domain const& domain, char const* name)
+        task(domain const& domain, util::thread_description name)
           : domain_(domain)
         {
-            HPX_ITT_TASK_BEGIN(domain_.domain_, HPX_ITT_TASK_HANDLE_CREATE(name));
+            if (name.kind() == util::thread_description::data_type_description)
+            {
+                HPX_ITT_TASK_BEGIN(domain_.domain_,
+                    HPX_ITT_TASK_HANDLE_CREATE(name));
+            }
+            else
+            {
+                HPX_ITT_TASK_BEGIN(domain_.domain_,
+                    HPX_ITT_TASK_HANDLE_CREATE("address"));
+            }
         }
         ~task()
         {
@@ -432,7 +442,7 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct task
     {
-        task(domain const&, char const*) {}
+        task(domain const&, util::thread_description const&) {}
         ~task() {}
     };
 
