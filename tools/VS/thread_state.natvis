@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <!-- Copyright (c) 2014 Hartmut Kaiser                                      -->
 
 <!-- Use, modification and distribution are subject to the Boost Software   -->
 <!-- License, Version 1.0. (See accompanying file LICENSE_1_0.txt           -->
 <!-- or copy at http://www.boost.org/LICENSE_1_0.txt)                       -->
 
-<?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
     <Type Name="hpx::threads::detail::tagged_thread_state&lt;hpx::threads::thread_state_enum&gt;">
         <AlternativeType Name="hpx::threads::thread_state" />
