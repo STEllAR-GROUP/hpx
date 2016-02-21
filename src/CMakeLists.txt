@@ -65,11 +65,13 @@ if(MSVC)
       CACHE INTERNAL "External object files for HPX." FORCE)
   endif()
 
-  # add natvis files to solution
-  add_hpx_library_sources(hpx_natvis_files
-    GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis")
-  set(hpx_external_OBJECTS ${hpx_external_OBJECTS} ${hpx_natvis_files_SOURCES})
-  source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
+  # add natvis files to solution (supported starting VS2015)
+  if(MSVC14)
+    add_hpx_library_sources(hpx_natvis_files
+      GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis")
+    set(hpx_external_OBJECTS ${hpx_external_OBJECTS} ${hpx_natvis_files_SOURCES})
+    source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
+  endif()
 
 endif()
 
