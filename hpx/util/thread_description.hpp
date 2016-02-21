@@ -7,7 +7,9 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_DESCRIPTION_FEB_19_2016_0200PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_action.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #ifndef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #include <hpx/util/safe_bool.hpp>
@@ -54,7 +56,8 @@ namespace hpx { namespace util
 
         template <typename F, typename =
             typename std::enable_if<
-                !std::is_same<F, thread_description>::value
+                !std::is_same<F, thread_description>::value &&
+                !traits::is_action<F>::value
             >::type>
         explicit thread_description(F const& f) HPX_NOEXCEPT
           : type_(data_type_address)
@@ -62,7 +65,17 @@ namespace hpx { namespace util
             data_.addr_ = traits::get_function_address<F>::call(f);
         }
 
-        HPX_CONSTEXPR data_type kind() const HPX_NOEXCEPT
+        template <typename Action, typename =
+            typename std::enable_if<
+                traits::is_action<Action>::value
+            >::type>
+        explicit thread_description(Action) HPX_NOEXCEPT
+          : type_(data_type_description)
+        {
+            data_.desc_ = hpx::actions::detail::get_action_name<Action>();
+        }
+
+        data_type kind() const HPX_NOEXCEPT
         {
             return type_;
         }

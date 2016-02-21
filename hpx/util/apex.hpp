@@ -31,14 +31,14 @@ namespace hpx { namespace util
         apex_wrapper(thread_description const& name)
           : name_(name), stopped(false)
         {
-            if (name->kind() == thread_description::data_type_description)
+            if (name_.kind() == thread_description::data_type_description)
             {
                 profiler_ = apex::start(name_.get_description());
             }
             else
             {
                 profiler_ = apex::start(
-                    apex::apex_function_address(name_.get_address()));
+                    apex_function_address(name_.get_address()));
             }
         }
         ~apex_wrapper()
@@ -60,7 +60,7 @@ namespace hpx { namespace util
             }
         }
 
-        threads::detail::thread_description name_;
+        thread_description name_;
         bool stopped;
         apex::profiler * profiler_;
     };

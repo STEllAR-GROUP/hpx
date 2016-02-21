@@ -210,7 +210,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<dataflow_frame> this_(this);
             threads::register_thread_nullary(
                 util::deferred_call(f, std::move(this_), is_void())
-              , "hpx::dataflow::execute"
+              , util::thread_description(func_)
               , threads::pending
               , true
               , threads::thread_priority_boost);

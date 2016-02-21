@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -18,6 +18,12 @@ namespace hpx { namespace actions
     /// \tparam Derived           derived action class
     template <typename Component, typename Signature, typename Derived>
     struct basic_action;
+
+    //////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename Action> char const* get_action_name();
+    }
 }}
 
 #endif

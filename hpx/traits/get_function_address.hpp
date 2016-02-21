@@ -34,8 +34,8 @@ namespace hpx { namespace traits
         }
     };
 
-    // For member functions we return the first sizeof(void*) bytes of function
-    // the storage the member function pointer occupies.
+    // For member functions we return the first sizeof(void*) bytes of the
+    // storage the member function pointer occupies.
     //
     // BADBAD: This invokes undefined behavior. What it does is to
     //         access the first sizeof(void*) bytes of the member
@@ -55,8 +55,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(R (Obj::*f)(Ts...)) HPX_NOEXCEPT
         {
-            return reinterpret_cast<std::size_t>(
-                *reinterpret_cast<void**>(std::addressof(f)));
+            return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
         }
     };
 
@@ -65,8 +64,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(R (Obj::*f)(Ts...) const) HPX_NOEXCEPT
         {
-            return reinterpret_cast<std::size_t>(
-                *reinterpret_cast<void**>(std::addressof(f)));
+            return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
         }
     };
 }}
