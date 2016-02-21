@@ -13,118 +13,123 @@
     <Expand/>
   </Type>
 
+  <Type Name="hpx::util::detail::tuple_member&lt;*,*,*&gt;">
+    <DisplayString Optional="true">{_value}</DisplayString>
+    <DisplayString Optional="true">{*($T2*)this}</DisplayString>
+  </Type>
+
   <Type Name="hpx::util::tuple&lt;*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[3]">((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
+      <Item Name="[3]">(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[3]">((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[4]">((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
+      <Item Name="[3]">(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl</Item>
+      <Item Name="[4]">(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*,*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[3]">((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[4]">((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[5]">((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
+      <Item Name="[3]">(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl</Item>
+      <Item Name="[4]">(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl</Item>
+      <Item Name="[5]">(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*,*,*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[3]">((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[4]">((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[5]">((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[6]">((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
+      <Item Name="[3]">(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl</Item>
+      <Item Name="[4]">(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl</Item>
+      <Item Name="[5]">(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl</Item>
+      <Item Name="[6]">(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*,*,*,*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;7,$T8,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;7,$T8,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[3]">((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[4]">((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[5]">((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[6]">((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[7]">((hpx::util::detail::tuple_member&lt;7,$T8,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
+      <Item Name="[3]">(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl</Item>
+      <Item Name="[4]">(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl</Item>
+      <Item Name="[5]">(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl</Item>
+      <Item Name="[6]">(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl</Item>
+      <Item Name="[7]">(hpx::util::detail::tuple_member&lt;7,$T8,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*,*,*,*,*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;7,$T8,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;8,$T9,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;7,$T8,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;8,$T9,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[3]">((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[4]">((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[5]">((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[6]">((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[7]">((hpx::util::detail::tuple_member&lt;7,$T8,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[8]">((hpx::util::detail::tuple_member&lt;8,$T9,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
+      <Item Name="[3]">(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl</Item>
+      <Item Name="[4]">(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl</Item>
+      <Item Name="[5]">(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl</Item>
+      <Item Name="[6]">(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl</Item>
+      <Item Name="[7]">(hpx::util::detail::tuple_member&lt;7,$T8,void&gt;&amp;)_impl</Item>
+      <Item Name="[8]">(hpx::util::detail::tuple_member&lt;8,$T9,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 
   <Type Name="hpx::util::tuple&lt;*,*,*,*,*,*,*,*,*,*&gt;">
-    <DisplayString>({((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;7,$T8,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;8,$T9,void&gt;*)&amp;_impl)->_value}, {((hpx::util::detail::tuple_member&lt;9,$T10,void&gt;*)&amp;_impl)->_value})</DisplayString>
+    <DisplayString>({(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;7,$T8,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;8,$T9,void&gt;&amp;)_impl}, {(hpx::util::detail::tuple_member&lt;9,$T10,void&gt;&amp;)_impl})</DisplayString>
     <Expand>
-      <Item Name="[0]">((hpx::util::detail::tuple_member&lt;0,$T1,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[1]">((hpx::util::detail::tuple_member&lt;1,$T2,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[2]">((hpx::util::detail::tuple_member&lt;2,$T3,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[3]">((hpx::util::detail::tuple_member&lt;3,$T4,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[4]">((hpx::util::detail::tuple_member&lt;4,$T5,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[5]">((hpx::util::detail::tuple_member&lt;5,$T6,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[6]">((hpx::util::detail::tuple_member&lt;6,$T7,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[7]">((hpx::util::detail::tuple_member&lt;7,$T8,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[8]">((hpx::util::detail::tuple_member&lt;8,$T9,void&gt;*)&amp;_impl)->_value</Item>
-      <Item Name="[9]">((hpx::util::detail::tuple_member&lt;9,$T10,void&gt;*)&amp;_impl)->_value</Item>
+      <Item Name="[0]">(hpx::util::detail::tuple_member&lt;0,$T1,void&gt;&amp;)_impl</Item>
+      <Item Name="[1]">(hpx::util::detail::tuple_member&lt;1,$T2,void&gt;&amp;)_impl</Item>
+      <Item Name="[2]">(hpx::util::detail::tuple_member&lt;2,$T3,void&gt;&amp;)_impl</Item>
+      <Item Name="[3]">(hpx::util::detail::tuple_member&lt;3,$T4,void&gt;&amp;)_impl</Item>
+      <Item Name="[4]">(hpx::util::detail::tuple_member&lt;4,$T5,void&gt;&amp;)_impl</Item>
+      <Item Name="[5]">(hpx::util::detail::tuple_member&lt;5,$T6,void&gt;&amp;)_impl</Item>
+      <Item Name="[6]">(hpx::util::detail::tuple_member&lt;6,$T7,void&gt;&amp;)_impl</Item>
+      <Item Name="[7]">(hpx::util::detail::tuple_member&lt;7,$T8,void&gt;&amp;)_impl</Item>
+      <Item Name="[8]">(hpx::util::detail::tuple_member&lt;8,$T9,void&gt;&amp;)_impl</Item>
+      <Item Name="[9]">(hpx::util::detail::tuple_member&lt;9,$T10,void&gt;&amp;)_impl</Item>
     </Expand>
   </Type>
 </AutoVisualizer>
