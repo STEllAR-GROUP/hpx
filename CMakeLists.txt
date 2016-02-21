@@ -854,6 +854,10 @@ hpx_check_for_cxx14_std_integer_sequence(
 hpx_check_for_cxx14_std_result_of_sfinae(
   DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
 
+# check for experimental facilities
+hpx_check_for_cxx_experimental_std_optional(
+  DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+
 ################################################################################
 # Check for misc system headers
 ################################################################################
@@ -1080,7 +1084,7 @@ else()
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-    hpx_add_compile_flag_if_available(-Wno-deprecated-register CXX C)
+    hpx_add_compile_flag_if_available(-Wno-deprecated-register LANGUAGES CXX C)
   endif()
 
   if(HPX_WITH_HIDDEN_VISIBILITY)

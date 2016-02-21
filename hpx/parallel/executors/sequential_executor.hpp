@@ -14,7 +14,7 @@
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unwrapped.hpp>
 
@@ -50,13 +50,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        static typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
+        static typename hpx::util::result_of<F()>::type
         execute(F && f)
         {
             try {
-                return f();
+                return hpx::util::invoke(f);
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
@@ -69,9 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        static hpx::future<typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type>
+        static hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute(F && f)
         {
             return hpx::async(launch::deferred, std::forward<F>(f));

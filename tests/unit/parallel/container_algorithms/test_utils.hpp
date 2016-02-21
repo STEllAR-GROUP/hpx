@@ -10,6 +10,7 @@
 
 #include <boost/iterator/iterator_adaptor.hpp>
 
+#include <numeric>
 #include <random>
 
 namespace test
