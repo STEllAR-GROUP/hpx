@@ -7,8 +7,8 @@
 <!-- or copy at http://www.boost.org/LICENSE_1_0.txt)                       -->
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-    <Type Name="hpx::threads::detail::tagged_thread_state&lt;hpx::threads::thread_state_enum&gt;">
-        <AlternativeType Name="hpx::threads::thread_state" />
+
+    <Type Name="hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_enum&gt;">
         <DisplayString>{{ state={(hpx::threads::thread_state_enum)((state_ &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
         <Expand>
             <Item Name="[state]">(hpx::threads::thread_state_enum)((state_ &gt;&gt; 24) &amp; 0xff)</Item>
@@ -16,12 +16,28 @@
         </Expand>
     </Type>
 
-    <Type Name="hpx::threads::detail::tagged_thread_state&lt;hpx::threads::thread_state_enum_ex&gt;">
-        <AlternativeType Name="hpx::threads::thread_state_ex" />
-        <DisplayString>{{ state={(hpx::threads::thread_state_enum_ex)((state_ &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
+    <Type Name="hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_ex_enum&gt;">
+        <DisplayString>{{ state={(hpx::threads::thread_state_ex_enum)((state_ &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
         <Expand>
-            <Item Name="[state_ex]">(hpx::threads::thread_state_enum_ex)((state_ &gt;&gt; 24) &amp; 0xff)</Item>
+            <Item Name="[state]">(hpx::threads::thread_state_ex_enum)((state_ &gt;&gt; 24) &amp; 0xff)</Item>
             <Item Name="[tag]">state_ &amp; 0xffffff,d</Item>
         </Expand>
     </Type>
+
+    <Type Name="boost::atomics::atomic&lt;hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_enum&gt;&gt;">
+        <DisplayString>{{ state={(hpx::threads::thread_state_enum)((m_storage &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
+        <Expand>
+            <Item Name="[state]">(hpx::threads::thread_state_enum)((m_storage &gt;&gt; 24) &amp; 0xff)</Item>
+            <Item Name="[tag]">m_storage &amp; 0xffffff,d</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="boost::atomics::atomic&lt;hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_ex_enum&gt;&gt;">
+        <DisplayString>{{ state={(hpx::threads::thread_state_ex_enum)((m_storage &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
+        <Expand>
+            <Item Name="[state]">(hpx::threads::thread_state_ex_enum)((m_storage &gt;&gt; 24) &amp; 0xff)</Item>
+            <Item Name="[tag]">m_storage &amp; 0xffffff,d</Item>
+        </Expand>
+    </Type>
+
 </AutoVisualizer>
