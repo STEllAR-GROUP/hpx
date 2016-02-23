@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -1657,18 +1657,33 @@ namespace hpx { namespace components { namespace server
                 boost::program_options::variables_map vm;
 
                 util::commandline_error_mode mode = util::rethrow_on_error;
-                std::string allow_unknown(ini.get_entry("hpx.commandline.allow_unknown",
-                    "0"));
+                std::string allow_unknown(
+                    ini.get_entry("hpx.commandline.allow_unknown", "0"));
                 if (allow_unknown != "0") mode = util::allow_unregistered;
 
+                std::vector<std::string> still_unregistered_options;
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
                     std::size_t(-1), mode,
-                    get_runtime_mode_from_name(runtime_mode));
+                    get_runtime_mode_from_name(runtime_mode), 0,
+                    &still_unregistered_options);
+
+                std::string still_unknown_commandline;
+                for (std::string const& s: still_unregistered_options)
+                    still_unknown_commandline += " " + util::detail::enquote(s);
+
+                if (!still_unknown_commandline.empty())
+                {
+                    util::section* s = ini.get_section("hpx");
+                    HPX_ASSERT(s != 0);
+                    s->add_entry("unknown_cmd_line_option",
+                        still_unknown_commandline);
+                }
             }
 
             std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
             if (!fullhelp.empty()) {
-                std::string help_option(ini.get_entry("hpx.cmd_line_help_option", ""));
+                std::string help_option(
+                    ini.get_entry("hpx.cmd_line_help_option", ""));
                 if (0 == std::string("full").find(help_option)) {
                     std::cout << decode_string(fullhelp);
                     std::cout << options << std::endl;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -60,6 +60,17 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::string reconstruct_command_line(
         boost::program_options::variables_map const &vm);
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        inline std::string enquote(std::string const& arg)
+        {
+            if (arg.find_first_of(" \t") != std::string::npos)
+                return std::string("\"") + arg + "\"";
+            return arg;
+        }
+    }
 }}
 
 #endif
