@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -101,7 +102,8 @@ namespace hpx { namespace threads
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            virtual void add(closure_type && f, char const* desc,
+            virtual void add(closure_type && f,
+                util::thread_description const& desc,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -152,11 +154,11 @@ namespace hpx { namespace threads
             // bounds on the executor's queue size.
             virtual void add_at(
                 boost::chrono::steady_clock::time_point const& abs_time,
-                closure_type && f, char const* desc,
+                closure_type && f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             void add_at(util::steady_time_point const& abs_time,
-                closure_type && f, char const* desc,
+                closure_type && f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
                 return add_at(abs_time.value(), std::move(f), desc,
@@ -168,11 +170,11 @@ namespace hpx { namespace threads
             // violate bounds on the executor's queue size.
             virtual void add_after(
                 boost::chrono::steady_clock::duration const& rel_time,
-                closure_type && f, char const* desc,
+                closure_type && f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             void add_after(util::steady_duration const& rel_time,
-                closure_type && f, char const* desc,
+                closure_type && f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
                 return add_after(rel_time.value(), std::move(f), desc,
@@ -211,7 +213,8 @@ namespace hpx { namespace threads
         /// Schedule the specified function for execution in this executor.
         /// Depending on the subclass implementation, this may block in some
         /// situations.
-        void add(closure_type f, char const* desc = "",
+        void add(closure_type f,
+            util::thread_description const& desc = util::thread_description(),
             threads::thread_state_enum initial_state = threads::pending,
             bool run_now = true,
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,

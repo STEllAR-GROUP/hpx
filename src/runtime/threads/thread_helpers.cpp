@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util/thread_description.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
@@ -253,19 +254,20 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// The get_thread_description function is part of the thread related API and
     /// allows to query the description of one of the thread id
-    char const* get_thread_description(thread_id_type const& id, error_code& ec)
+    util::thread_description get_thread_description(thread_id_type const& id,
+        error_code& ec)
     {
-        return id ? id->get_description() : "<unknown>";
+        return id ? id->get_description() : util::thread_description("<unknown>");
     }
 
-    char const* set_thread_description(thread_id_type const& id,
-        char const* desc, error_code& ec)
+    util::thread_description set_thread_description(thread_id_type const& id,
+        util::thread_description const& desc, error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_description",
                 "NULL thread id encountered");
-            return NULL;
+            return util::thread_description();
         }
         if (&ec != &throws)
             ec = make_success_code();
@@ -273,8 +275,8 @@ namespace hpx { namespace threads
         return id->set_description(desc);
     }
 
-    char const* get_thread_lco_description(thread_id_type const& id,
-        error_code& ec)
+    util::thread_description get_thread_lco_description(
+        thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
@@ -288,8 +290,9 @@ namespace hpx { namespace threads
 
         return id ? id->get_lco_description() : "<unknown>";
     }
-    char const* set_thread_lco_description(thread_id_type const& id,
-        char const* desc, error_code& ec)
+    util::thread_description set_thread_lco_description(
+        thread_id_type const& id, util::thread_description const& desc,
+        error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
@@ -310,7 +313,8 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
 #else
-    util::backtrace const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
+    util::backtrace const* get_thread_backtrace(thread_id_type const& id,
+        error_code& ec)
 #endif
     {
         if (HPX_UNLIKELY(!id)) {
@@ -371,7 +375,8 @@ namespace hpx { namespace this_thread
         struct reset_lco_description
         {
             reset_lco_description(threads::thread_id_type const& id,
-                    char const* description, error_code& ec)
+                    util::thread_description const& description,
+                    error_code& ec)
               : id_(id), ec_(ec)
             {
                 old_desc_ = threads::set_thread_lco_description(id_,
@@ -384,7 +389,7 @@ namespace hpx { namespace this_thread
             }
 
             threads::thread_id_type id_;
-            char const* old_desc_;
+            util::thread_description old_desc_;
             error_code& ec_;
         };
 
@@ -427,7 +432,7 @@ namespace hpx { namespace this_thread
     /// If the suspension was aborted, this function will throw a
     /// \a yield_aborted exception.
     threads::thread_state_ex_enum suspend(threads::thread_state_enum state,
-        char const* description, error_code& ec)
+        util::thread_description const& description, error_code& ec)
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
@@ -465,7 +470,7 @@ namespace hpx { namespace this_thread
             strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, description,
+            HPX_THROWS_IF(ec, yield_aborted, "suspend",
                 strm.str());
         }
 
@@ -477,7 +482,7 @@ namespace hpx { namespace this_thread
 
     threads::thread_state_ex_enum suspend(
         util::steady_time_point const& abs_time,
-        char const* description, error_code& ec)
+        util::thread_description const& description, error_code& ec)
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
@@ -528,7 +533,7 @@ namespace hpx { namespace this_thread
             strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, description,
+            HPX_THROWS_IF(ec, yield_aborted, "suspend_at",
                 strm.str());
         }
 

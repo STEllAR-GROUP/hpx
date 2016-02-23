@@ -256,6 +256,11 @@ namespace hpx { namespace util { namespace detail
             return vptr->invoke(object, std::forward<Ts>(vs)...);
         }
 
+        std::size_t get_function_address() const
+        {
+            return vptr->get_function_address(object);
+        }
+
     private:
         template <typename T>
         static VTablePtr const* get_table_ptr() HPX_NOEXCEPT

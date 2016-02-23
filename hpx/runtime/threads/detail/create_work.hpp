@@ -39,7 +39,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        if (0 == data.description)
+        if (!data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "thread::detail::create_work", "description is NULL");

@@ -62,6 +62,39 @@ namespace hpx { namespace lcos { namespace local
                     this->set_exception(boost::current_exception());
                 }
             }
+
+        protected:
+            // run in a separate thread
+            void apply(BOOST_SCOPED_ENUM(launch) policy,
+                threads::thread_priority priority,
+                threads::thread_stacksize stacksize, error_code& ec)
+            {
+                this->check_started();
+
+                typedef typename Base::future_base_type future_base_type;
+                future_base_type this_(this);
+
+                if (this->sched_) {
+                    this->sched_->add(
+                        util::bind(&base_type::run_impl, std::move(this_)),
+                        util::thread_description(f_),
+                        threads::pending, false, stacksize, ec);
+                }
+                else if (policy == launch::fork) {
+                    threads::register_thread_plain(
+                        util::bind(&base_type::run_impl, std::move(this_)),
+                        util::thread_description(f_),
+                        threads::pending, false, threads::thread_priority_boost,
+                        get_worker_thread_num(), stacksize, ec);
+                }
+                else {
+                    threads::register_thread_plain(
+                        util::bind(&base_type::run_impl, std::move(this_)),
+                        util::thread_description(f_),
+                        threads::pending, false, priority, std::size_t(-1),
+                        stacksize, ec);
+                }
+            }
         };
 
         template <typename F, typename Base>
@@ -96,6 +129,39 @@ namespace hpx { namespace lcos { namespace local
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
+                }
+            }
+
+        protected:
+            // run in a separate thread
+            void apply(BOOST_SCOPED_ENUM(launch) policy,
+                threads::thread_priority priority,
+                threads::thread_stacksize stacksize, error_code& ec)
+            {
+                this->check_started();
+
+                typedef typename Base::future_base_type future_base_type;
+                future_base_type this_(this);
+
+                if (this->sched_) {
+                    this->sched_->add(
+                        util::bind(&base_type::run_impl, std::move(this_)),
+                        util::thread_description(f_),
+                        threads::pending, false, stacksize, ec);
+                }
+                else if (policy == launch::fork) {
+                    threads::register_thread_plain(
+                        util::bind(&base_type::run_impl, std::move(this_)),
+                        util::thread_description(f_),
+                        threads::pending, false, threads::thread_priority_boost,
+                        get_worker_thread_num(), stacksize, ec);
+                }
+                else {
+                    threads::register_thread_plain(
+                        util::bind(&base_type::run_impl, std::move(this_)),
+                        util::thread_description(f_),
+                        threads::pending, false, priority, std::size_t(-1),
+                        stacksize, ec);
                 }
             }
         };
