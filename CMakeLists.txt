@@ -993,6 +993,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # has no meaning; ignored'
     hpx_add_compile_flag(-wd4180)
 
+    # max symbol length exceeded
+    hpx_add_compile_flag(-wd4503)
+
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
     if(MPI_FOUND OR HPX_WITH_APEX)

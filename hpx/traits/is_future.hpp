@@ -20,7 +20,7 @@ namespace hpx { namespace traits
 {
     namespace detail
     {
-        template <typename Future>
+        template <typename Future, typename Enable = void>
         struct is_unique_future
           : boost::mpl::false_
         {};

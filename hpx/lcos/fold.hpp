@@ -198,7 +198,7 @@ namespace hpx { namespace lcos
         template <typename Action>
         struct fold_result
           : traits::promise_local_result<
-                typename traits::extract_action<
+                typename hpx::actions::extract_action<
                     Action
                 >::remote_result_type>
         {};

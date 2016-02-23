@@ -142,7 +142,7 @@ namespace hpx { namespace util
         struct bind_action_async_impl
         {
             typedef lcos::future<typename traits::promise_local_result<
-                typename traits::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type> type;
 
             template <std::size_t ...Is>
@@ -161,7 +161,7 @@ namespace hpx { namespace util
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         HPX_FORCEINLINE
         lcos::future<typename traits::promise_local_result<
-            typename traits::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
         bind_action_async(BoundArgs& bound_args, UnboundArgs&& unbound_args)
         {
@@ -176,7 +176,7 @@ namespace hpx { namespace util
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         HPX_FORCEINLINE
         typename traits::promise_local_result<
-            typename traits::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
         bind_action_invoke(
             BoundArgs& bound_args
@@ -196,7 +196,7 @@ namespace hpx { namespace util
         {
         public:
             typedef typename traits::promise_local_result<
-                typename traits::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type result_type;
 
         public:

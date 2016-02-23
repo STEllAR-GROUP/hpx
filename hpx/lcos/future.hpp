@@ -270,7 +270,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
+    template <typename Future, typename Enable = void>
     struct future_unwrap_result
     {};
 

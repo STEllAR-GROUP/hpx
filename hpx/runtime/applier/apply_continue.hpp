@@ -20,7 +20,7 @@ namespace hpx
     template <typename Action, typename Cont, typename ...Ts>
     bool apply_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
-        typedef typename traits::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply<Action>(
@@ -43,7 +43,7 @@ namespace hpx
     bool apply_continue(naming::id_type const& cont,
         naming::id_type const& gid, Ts&&... vs)
     {
-        typedef typename traits::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply<Action>(

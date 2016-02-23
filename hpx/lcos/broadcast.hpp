@@ -173,7 +173,7 @@ namespace hpx { namespace lcos
         {
             typedef
                 typename traits::promise_local_result<
-                    typename traits::extract_action<
+                    typename hpx::actions::extract_action<
                         Action
                     >::remote_result_type
                 >::type

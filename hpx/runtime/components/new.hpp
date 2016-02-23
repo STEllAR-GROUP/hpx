@@ -342,7 +342,7 @@ namespace hpx { namespace components
                         [](hpx::future<std::vector<hpx::id_type> > && v)
                             -> std::vector<Client>
                         {
-                            return make_client<Client>(v.get());
+                            return make_clients<Client>(v.get());
                         }
                     );
             }

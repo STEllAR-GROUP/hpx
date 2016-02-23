@@ -80,7 +80,7 @@ namespace hpx { namespace detail
     template <typename Action, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename traits::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
     async_colocated(naming::id_type const& gid, Ts&&... vs)
     {
@@ -92,7 +92,7 @@ namespace hpx { namespace detail
           , naming::id_type::unmanaged);
 
         typedef
-            typename traits::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         remote_result_type;
         typedef agas::server::primary_namespace::service_action action_type;
 
@@ -110,7 +110,7 @@ namespace hpx { namespace detail
         typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename traits::extract_action<Derived>::remote_result_type
+            typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
@@ -140,7 +140,7 @@ namespace hpx { namespace detail
           , naming::id_type::unmanaged);
 
         typedef
-            typename traits::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         remote_result_type;
         typedef agas::server::primary_namespace::service_action action_type;
 

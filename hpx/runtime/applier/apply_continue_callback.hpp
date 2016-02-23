@@ -21,7 +21,7 @@ namespace hpx
     bool apply_continue_cb(Cont&& cont, naming::id_type const& gid,
         Callback && cb, Ts&&... vs)
     {
-        typedef typename traits::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(
@@ -44,7 +44,7 @@ namespace hpx
     bool apply_continue_cb(naming::id_type const& cont,
         naming::id_type const& gid, Callback && cb, Ts&&... vs)
     {
-        typedef typename traits::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(

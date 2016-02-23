@@ -201,7 +201,7 @@ namespace hpx { namespace components
         template <typename Action, typename ...Ts>
         hpx::future<
             typename traits::promise_local_result<
-                typename traits::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
         async(launch policy, Ts&&... vs) const
         {
@@ -215,7 +215,7 @@ namespace hpx { namespace components
         template <typename Action, typename Callback, typename ...Ts>
         hpx::future<
             typename traits::promise_local_result<
-                typename traits::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
         async_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {

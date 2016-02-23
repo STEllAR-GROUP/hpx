@@ -103,7 +103,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
     if (begin != end)
     {
         memory_block mb(d);
-        access_memory_block<T> data(mb.get());
+        access_memory_block<T> data(mb.get_data());
 
         std::size_t middle_idx = partition(data.get_ptr(), begin, end);
 
@@ -153,7 +153,7 @@ int hpx_main(variables_map& vm)
     {
         // create a (remote) memory block
         memory_block mb = memory_block::create<int, uint8_t>(prefix, elements);
-        access_memory_block<int> data(mb.get());
+        access_memory_block<int> data(mb.get_data());
 
         // randomly fill the vector
         std::generate(data.get_ptr(), data.get_ptr() + elements, std::rand);

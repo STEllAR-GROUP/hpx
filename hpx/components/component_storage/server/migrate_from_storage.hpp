@@ -145,7 +145,7 @@ namespace hpx { namespace components { namespace server
             .then(
                 [to_resurrect, target_locality](
                     future<std::pair<naming::id_type, naming::address> > && f)
-                        -> future<naming::id_type>
+                ->  future<naming::id_type>
                 {
                     // rethrow errors
                     std::pair<naming::id_type, naming::address> r = f.get();
@@ -153,7 +153,7 @@ namespace hpx { namespace components { namespace server
                     // retrieve the data from the given storage
                     typedef typename server::component_storage::migrate_from_here_action
                         action_type;
-                    return async<action_type>(r.first, to_resurrect.get_id())
+                    return async<action_type>(r.first, to_resurrect.get_gid())
                         .then(util::bind(
                             &detail::migrate_from_storage_here<Component>,
                             util::placeholders::_1, to_resurrect,

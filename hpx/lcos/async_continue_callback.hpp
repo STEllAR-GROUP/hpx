@@ -34,7 +34,7 @@ namespace hpx
             result_type;
 
             typedef
-                typename traits::extract_action<
+                typename hpx::actions::extract_action<
                     Action
                 >::result_type
             continuation_result_type;

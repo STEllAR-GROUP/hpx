@@ -61,6 +61,7 @@ set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_remote_PARAMETERS LOCALITIES 2)
+set(apply_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_colocated_PARAMETERS LOCALITIES 2)
 
 set(async_continue_PARAMETERS LOCALITIES 2)

@@ -38,11 +38,6 @@ namespace hpx
         template <typename Func, typename Enable = void>
         struct async_dispatch;
 
-        // dispatch point used for async implementations where the first
-        // argument is a launch policy
-        template <typename Func, typename Enable = void>
-        struct async_policy_dispatch;
-
         // dispatch point used for async<Action> implementations
         template <typename Action, typename Func, typename Enable = void>
         struct async_action_dispatch;

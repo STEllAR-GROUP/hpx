@@ -20,7 +20,7 @@ namespace hpx { namespace detail
     template <typename Action, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename traits::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
     async_colocated(naming::id_type const& id, Ts&&... vs);
 
@@ -29,7 +29,7 @@ namespace hpx { namespace detail
         typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename traits::extract_action<Derived>::remote_result_type
+            typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/

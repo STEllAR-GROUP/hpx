@@ -484,8 +484,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, launch policy,
-        F && f)
+    make_continuation(Future const& future, launch policy, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
         typedef typename continuation_result<ContResult>::type result_type;
@@ -501,8 +500,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, threads::executor& sched,
-        F && f)
+    make_continuation(Future const& future, threads::executor& sched, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
         typedef typename continuation_result<ContResult>::type result_type;

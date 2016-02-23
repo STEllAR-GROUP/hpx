@@ -38,7 +38,7 @@ namespace hpx { namespace traits
             typedef boost::intrusive_ptr<lcos::detail::future_data<R> > type;
         };
 
-        template <typename Future>
+        template <typename Future, typename Enable = void>
         struct shared_state_ptr_for
           : shared_state_ptr<typename traits::future_traits<Future>::type>
         {};
