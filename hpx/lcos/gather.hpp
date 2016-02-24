@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,15 +11,119 @@
 #if defined(DOXYGEN)
 namespace hpx { namespace lcos
 {
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  result      A future referring to the value to transmit to the
+    ///                     central gather point from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
     template <typename T>
     hpx::future<std::vector<T> >
     gather_here(char const* basename, hpx::future<T> result,
-        std::size_t num_sites = ~0U, std::size_t this_site = ~0U);
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1));
 
+    /// Gather a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central gather
+    /// site (where the corresponding \a gather_here is executed)
+    ///
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  result      A future referring to the value to transmit to the
+    ///                     central gather point from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param root_site    The sequence number of the central gather point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///
+    /// \returns    This function returns a future which will become ready once
+    ///             the gather operation has been completed.
+    ///
     template <typename T>
     hpx::future<void>
     gather_there(char const* basename, hpx::future<T> result,
-        std::size_t root_site = 0, std::size_t this_site = ~0U);
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0,
+        std::size_t this_site = std::size_t(-1));
+
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<typename std::decay<T>::type> >
+    gather_here(char const* basename, T && result,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1));
+
+    /// Gather a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central gather
+    /// site (where the corresponding \a gather_here is executed)
+    ///
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param root_site    The sequence number of the central gather point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///
+    /// \returns    This function returns a future which will become ready once
+    ///             the gather operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<void>
+    gather_there(char const* basename, T && result,
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0,
+        std::size_t this_site = std::size_t(-1));
 }}
 #else
 
