@@ -79,9 +79,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, std::pair<FwdIter, OutIter>
-                    >::type result_type;
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
@@ -260,9 +257,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, std::pair<FwdIter, OutIter>
-                    >::type result_type;
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
