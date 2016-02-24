@@ -32,6 +32,6 @@ int hpx_main(int argc, char** argv_init)
 
 int main()
 {
-    HPX_TEST_EQ(hpx::init(4, (char**)argv), 0);
+    HPX_TEST_EQ(hpx::init(4, const_cast<char**>(argv)), 0);
     return hpx::util::report_errors();
 }

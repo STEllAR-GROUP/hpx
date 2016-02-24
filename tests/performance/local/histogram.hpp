@@ -90,7 +90,7 @@ namespace impl
         template <typename Args>
         void operator ()(Args const &args)
         {
-            std::size_t cnt = count(args);
+            //std::size_t cnt = count(args);
             {
                 if (args[sample] < this->bin_positions[1])
                 {
