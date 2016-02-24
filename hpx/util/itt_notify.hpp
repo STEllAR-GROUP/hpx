@@ -255,7 +255,7 @@ namespace hpx { namespace util { namespace itt
             if (name.kind() == util::thread_description::data_type_description)
             {
                 HPX_ITT_TASK_BEGIN(domain_.domain_,
-                    HPX_ITT_TASK_HANDLE_CREATE(name));
+                    HPX_ITT_TASK_HANDLE_CREATE(name.get_description()));
             }
             else
             {
