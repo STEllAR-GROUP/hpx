@@ -32,7 +32,7 @@ int hpx_main(int argc, char* argv[])
 
             std::vector<boost::uint32_t> sol = overall_result.get();
 
-            for (int j = 0; j < sol.size(); ++j)
+            for (std::size_t j = 0; j < sol.size(); ++j)
             {
                 std::cout << "got residual " << sol[j]  << " from " << j
                     << std::endl;
