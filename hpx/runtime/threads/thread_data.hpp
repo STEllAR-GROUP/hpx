@@ -293,7 +293,7 @@ namespace hpx { namespace threads
         {
             return util::thread_description("<unknown>");
         }
-        util::thread_description set_description(char const* /*value*/)
+        util::thread_description set_description(util::thread_description /*value*/)
         {
             return util::thread_description("<unknown>");
         }
@@ -302,7 +302,7 @@ namespace hpx { namespace threads
         {
             return util::thread_description("<unknown>");
         }
-        util::thread_description set_lco_description(char const* /*value*/)
+        util::thread_description set_lco_description(util::thread_description /*value*/)
         {
             return util::thread_description("<unknown>");
         }
