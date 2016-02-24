@@ -25,6 +25,7 @@ namespace hpx { namespace lcos
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/lcos/future.hpp>
@@ -116,31 +117,31 @@ namespace hpx { namespace lcos
         };
 
         ///////////////////////////////////////////////////////////////////////
-        inline hpx::id_type register_gather_name(hpx::future<hpx::id_type> id,
+        inline hpx::id_type register_gather_name(hpx::future<hpx::id_type> f,
             std::string const& basename, std::size_t site)
         {
-            hpx::id_type target = id.get();
-            hpx::register_with_basename(basename, target, site);
+            hpx::id_type target = f.get();
+            hpx::register_with_basename(basename, hpx::unmanaged(target), site);
             return target;
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         hpx::future<std::vector<T> >
-        gather_data(hpx::future<hpx::id_type> id, std::size_t site,
+        gather_data(hpx::future<hpx::id_type> f, std::size_t site,
             hpx::future<T> result)
         {
             typedef typename gather_server<T>::get_result_action action_type;
-            return async(action_type(), id.get(), site, result.get());
+            return async(action_type(), f.get(), site, result.get());
         }
 
         template <typename T>
         hpx::future<void>
-        set_data(hpx::future<hpx::id_type> id, std::size_t which,
+        set_data(hpx::future<hpx::id_type> f, std::size_t which,
             hpx::future<T> result)
         {
             typedef typename gather_server<T>::set_result_action action_type;
-            return async(action_type(), id.get(), which, result.get());
+            return async(action_type(), f.get(), which, result.get());
         }
     }
 
@@ -178,7 +179,7 @@ namespace hpx { namespace lcos
     // destination site needs to be handled differently
     template <typename T>
     hpx::future<std::vector<T> >
-    gather_here(hpx::future<hpx::id_type> id, hpx::future<T> result,
+    gather_here(hpx::future<hpx::id_type> f, hpx::future<T> result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -189,7 +190,7 @@ namespace hpx { namespace lcos
 
         return dataflow(
                 util::bind(&detail::gather_data<T>, _1, this_site, _2),
-                std::move(id), std::move(result)
+                std::move(f), std::move(result)
             );
     }
 
@@ -214,7 +215,7 @@ namespace hpx { namespace lcos
     // gather plain values
     template <typename T>
     hpx::future<std::vector<typename util::decay<T>::type> >
-    gather_here(hpx::future<hpx::id_type> id, T && result,
+    gather_here(hpx::future<hpx::id_type> f, T && result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -226,7 +227,7 @@ namespace hpx { namespace lcos
         typedef typename util::decay<T>::type result_type;
         return dataflow(
                 util::bind(&detail::gather_data<result_type>, _1, this_site, _2),
-                std::move(id), std::move(result)
+                std::move(f), std::move(result)
             );
     }
 
