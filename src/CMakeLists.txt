@@ -236,6 +236,7 @@ set(hpx_targets ${hpx_targets} hpx)
 # libhpx_init
 
 if(NOT HPX_WITH_STATIC_LINKING)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
   if(HPX_WITH_DEFAULT_TARGETS)
     add_library(hpx_init STATIC
       ${hpx_init_SOURCES} ${hpx_init_HEADERS})
