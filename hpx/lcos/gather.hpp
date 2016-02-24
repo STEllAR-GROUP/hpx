@@ -31,11 +31,13 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/lexical_cast.hpp>
 
+#include <string>
 #include <vector>
 
 namespace hpx { namespace lcos
@@ -52,7 +54,15 @@ namespace hpx { namespace lcos
             std::vector<T> on_ready(future<void> f)
             {
                 f.get();       // propagate any exceptions
-                return std::move(data_);
+
+                std::vector<T> data(num_sites_);
+
+                {
+                    boost::unique_lock<mutex_type> l(mtx_);
+                    std::swap(data, data_);
+                }
+
+                return data;
             }
 
         public:
@@ -62,9 +72,8 @@ namespace hpx { namespace lcos
             }
 
             gather_server(std::size_t num_sites)
-              : generation_(0), data_(num_sites), gate_(num_sites)
-            {
-            }
+              : num_sites_(num_sites), data_(num_sites), gate_(num_sites)
+            {}
 
             hpx::future<std::vector<T> > get_result(std::size_t which, T && t)
             {
@@ -101,14 +110,14 @@ namespace hpx { namespace lcos
 
         private:
             mutex_type mtx_;
-            std::size_t generation_;
+            std::size_t num_sites_;
             std::vector<T> data_;
             lcos::local::and_gate gate_;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::id_type register_name(hpx::future<hpx::id_type> id,
-            char const* basename, std::size_t site)
+        inline hpx::id_type register_gather_name(hpx::future<hpx::id_type> id,
+            std::string const& basename, std::size_t site)
         {
             hpx::id_type target = id.get();
             hpx::register_with_basename(basename, target, site);
@@ -138,22 +147,30 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<hpx::id_type>
-    create_gatherer(char const* basename, std::size_t num_sites = ~0U,
-        std::size_t this_site = ~0U)
+    create_gatherer(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1))
     {
-        if (num_sites == ~0U)
+        if (num_sites == std::size_t(-1))
             num_sites = hpx::get_num_localities_sync();
-        if (this_site == ~0U)
+        if (this_site == std::size_t(-1))
             this_site = hpx::get_locality_id();
 
         // create a new gather_server
-        hpx::future<hpx::id_type> id = hpx::new_<detail::gather_server<T> >(
-            hpx::find_here(), num_sites);
+        typedef typename util::decay<T>::type result_type;
+        hpx::future<hpx::id_type> id =
+            hpx::new_<detail::gather_server<result_type> >(
+                hpx::find_here(), num_sites);
+
+        std::string name(basename);
+        if (generation != std::size_t(-1))
+            name += boost::lexical_cast<std::string>(generation) + "/";
 
         // register the gatherer's id using the given basename
         using util::placeholders::_1;
         return id.then(
-                util::bind(&detail::register_name, _1, basename, this_site)
+                util::bind(&detail::register_gather_name, _1, name, this_site)
             );
     }
 
@@ -162,9 +179,9 @@ namespace hpx { namespace lcos
     template <typename T>
     hpx::future<std::vector<T> >
     gather_here(hpx::future<hpx::id_type> id, hpx::future<T> result,
-        std::size_t this_site = ~0U)
+        std::size_t this_site = std::size_t(-1))
     {
-        if (this_site == ~0U)
+        if (this_site == std::size_t(-1))
             this_site = hpx::get_locality_id();
 
         using util::placeholders::_1;
@@ -179,15 +196,54 @@ namespace hpx { namespace lcos
     template <typename T>
     hpx::future<std::vector<T> >
     gather_here(char const* basename, hpx::future<T> result,
-        std::size_t num_sites = ~0U, std::size_t this_site = ~0U)
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1))
     {
-        if (num_sites == ~0U)
+        if (num_sites == std::size_t(-1))
             num_sites = hpx::get_num_localities_sync();
-        if (this_site == ~0U)
+        if (this_site == std::size_t(-1))
             this_site = hpx::get_locality_id();
 
         return gather_here(
-            create_gatherer<T>(basename, num_sites, this_site),
+            create_gatherer<T>(basename, num_sites, generation, this_site),
+            std::move(result), this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // gather plain values
+    template <typename T>
+    hpx::future<std::vector<typename util::decay<T>::type> >
+    gather_here(hpx::future<hpx::id_type> id, T && result,
+        std::size_t this_site = std::size_t(-1))
+    {
+        if (this_site == std::size_t(-1))
+            this_site = hpx::get_locality_id();
+
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+
+        typedef typename util::decay<T>::type result_type;
+        return dataflow(
+                util::bind(&detail::gather_data<result_type>, _1, this_site, _2),
+                std::move(id), std::move(result)
+            );
+    }
+
+    template <typename T>
+    hpx::future<std::vector<typename util::decay<T>::type> >
+    gather_here(char const* basename, T && result,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1))
+    {
+        if (num_sites == std::size_t(-1))
+            num_sites = hpx::get_num_localities_sync();
+        if (this_site == std::size_t(-1))
+            this_site = hpx::get_locality_id();
+
+        return gather_here(
+            create_gatherer<T>(basename, num_sites, generation, this_site),
             std::move(result), this_site);
     }
 
@@ -195,9 +251,9 @@ namespace hpx { namespace lcos
     template <typename T>
     hpx::future<void>
     gather_there(hpx::future<hpx::id_type> id, hpx::future<T> result,
-        std::size_t this_site = ~0U)
+        std::size_t this_site = std::size_t(-1))
     {
-        if (this_site == ~0U)
+        if (this_site == std::size_t(-1))
             this_site = hpx::get_locality_id();
 
         using util::placeholders::_1;
@@ -212,13 +268,56 @@ namespace hpx { namespace lcos
     template <typename T>
     hpx::future<void>
     gather_there(char const* basename, hpx::future<T> result,
-        std::size_t root_site = 0, std::size_t this_site = ~0U)
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0,
+        std::size_t this_site = std::size_t(-1))
     {
-        if (this_site == ~0U)
+        if (this_site == std::size_t(-1))
             this_site = hpx::get_locality_id();
 
+        std::string name(basename);
+        if (generation != std::size_t(-1))
+            name += boost::lexical_cast<std::string>(generation) + "/";
+
         return gather_there(
-            hpx::find_from_basename(basename, root_site),
+            hpx::find_from_basename(name, root_site),
+            std::move(result), this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // gather plain values
+    template <typename T>
+    hpx::future<void>
+    gather_there(hpx::future<hpx::id_type> id, T && result,
+        std::size_t this_site = std::size_t(-1))
+    {
+        if (this_site == std::size_t(-1))
+            this_site = hpx::get_locality_id();
+
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+
+        typedef typename util::decay<T>::type result_type;
+        return dataflow(
+                util::bind(&detail::set_data<result_type>, _1, this_site, _2),
+                std::move(id), std::move(result)
+            );
+    }
+
+    template <typename T>
+    hpx::future<void>
+    gather_there(char const* basename, T && result,
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0,
+        std::size_t this_site = std::size_t(-1))
+    {
+        if (this_site == std::size_t(-1))
+            this_site = hpx::get_locality_id();
+
+        std::string name(basename);
+        if (generation != std::size_t(-1))
+            name += boost::lexical_cast<std::string>(generation) + "/";
+
+        return gather_there(
+            hpx::find_from_basename(name, root_site),
             std::move(result), this_site);
     }
 }}
