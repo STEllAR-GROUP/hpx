@@ -151,6 +151,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/gather.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/reduce.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_all.hpp"

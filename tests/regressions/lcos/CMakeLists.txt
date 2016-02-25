@@ -24,6 +24,7 @@ set(tests
     ignore_while_locked_1485
     lifetime_588
     lifetime_588_1
+    multiple_gather_ops_2001
     promise_leak_996
     promise_1620
     receive_buffer_1733
@@ -48,6 +49,7 @@ set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
 set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(multiple_gather_ops_2001_PARAMETERS LOCALITIES 2)
 set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)

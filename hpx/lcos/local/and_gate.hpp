@@ -80,13 +80,13 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         /// \brief get a future allowing to wait for the gate to fire
-        future<void> get_future(std::size_t count = std::size_t(~0U),
+        future<void> get_future(std::size_t count = std::size_t(-1),
             std::size_t* generation_value = 0, error_code& ec = hpx::throws)
         {
             boost::lock_guard<mutex_type> l(mtx_);
 
             // by default we use as many segments as specified during construction
-            if (count == std::size_t(~0U))
+            if (count == std::size_t(-1))
                 count = received_segments_.size();
             HPX_ASSERT(count != 0);
 

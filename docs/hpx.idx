@@ -410,6 +410,10 @@ broadcast_with_index                  "" "header\.hpx\.lcos\.broadcast.*"
 broadcast_apply                       "" "header\.hpx\.lcos\.broadcast.*"
 broadcast_apply_with_index            "" "header\.hpx\.lcos\.broadcast.*"
 
+# hpx/lcos/gather.hpp
+gather_here                           "" "header\.hpx\.lcos\.gather.*"
+gather_there                          "" "header\.hpx\.lcos\.gather.*"
+
 # hpx/lcos/reduce.hpp
 reduce                                "" "header\.hpx\.lcos\.reduce.*"
 reduce_with_index                     "" "header\.hpx\.lcos\.reduce.*"

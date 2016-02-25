@@ -45,6 +45,9 @@ to a different compute node).
   (`hpx::dataflow(Action(), target, ...)`). We have also enabled the use of
   distribution policies as the target for dataflow invocations. Please see
   [issue 1265] and [pr 1912] for more information.
+* Adding overloads of `gather_here` and `gather_there` to accept the plain
+  values of the data to gather (in addition to the existing overloads expecting
+  futures).
 
 [heading Breaking Changes]
 
