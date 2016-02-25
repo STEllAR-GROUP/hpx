@@ -22,6 +22,7 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
 #include <hpx/config/noexcept.hpp>
+#include <hpx/config/emulate_deleted.hpp>
 
 #include <boost/version.hpp>
 
