@@ -331,7 +331,7 @@ namespace hpx { namespace lcos
         typedef typename util::decay<T>::type result_type;
         return dataflow(
                 util::bind(&detail::gather_data<result_type>, _1, this_site, _2),
-                std::move(f), std::move(result)
+                std::move(f), std::forward<T>(result)
             );
     }
 
@@ -349,7 +349,7 @@ namespace hpx { namespace lcos
 
         return gather_here(
             create_gatherer<T>(basename, num_sites, generation, this_site),
-            std::move(result), this_site);
+            std::forward<T>(result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -404,7 +404,7 @@ namespace hpx { namespace lcos
         typedef typename util::decay<T>::type result_type;
         return dataflow(
                 util::bind(&detail::set_data<result_type>, _1, this_site, _2),
-                std::move(id), std::move(result)
+                std::move(id), std::forward<T>(result)
             );
     }
 
@@ -423,7 +423,7 @@ namespace hpx { namespace lcos
 
         return gather_there(
             hpx::find_from_basename(name, root_site),
-            std::move(result), this_site);
+            std::forward<T>(result), this_site);
     }
 }}
 
