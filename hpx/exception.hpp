@@ -1553,7 +1553,7 @@ namespace hpx
         return *this;
     }
 
-        // forwarder for HPX_ASSERT handler
+    // forwarder for HPX_ASSERT handler
     HPX_ATTRIBUTE_NORETURN HPX_EXPORT
     void assertion_failed(char const* expr, char const* function,
         char const* file, long line);
