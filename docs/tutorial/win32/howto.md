@@ -6,9 +6,9 @@
 <br/>
 **How to build HPX under Windows 10 x64 with Visual Studio 2015**
 
-* a) Download the *CMake 3.3.0* installer from <a href="http://www.cmake.org/files/v3.3/cmake-3.3.0-win32-x86.exe" target="_blank">here</a> <br/>
+* a) Download the *CMake 3.4.3* installer from <a href="https://blog.kitware.com/cmake-3-4-3-available-for-download/" target="_blank">here</a> <br/>
 * b) Download *Portable Hardware Locality* from <a href="http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip">here</a> and unpack it.<br/>
-* c) Download *Boost libraries* from <a href="http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.zip/download">here</a> and unpack them.<br/>
+* c) Download *Boost libraries* from <a href="https://sourceforge.net/projects/boost/files/boost/1.60.0/">here</a> and unpack them.<br/>
 * d) *Build* the boost DLLs and LIBs by using these commands from Command Line (or PowerShell):<br/>
 
 Open CMD/PowerShell inside the Boost dir and type in:<br/>
