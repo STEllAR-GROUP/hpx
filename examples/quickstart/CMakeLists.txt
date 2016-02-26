@@ -23,7 +23,7 @@ set(example_programs
     fibonacci_futures_distributed
     fractals
     fractals_struct
-    safe_object
+    init_globally
     interest_calculator
     interval_timer
     latch_local
@@ -33,6 +33,7 @@ set(example_programs
     pingpong
     print_to_console
     quicksort
+    safe_object
     shared_mutex
     simple_future_continuation
     simplest_hello_world

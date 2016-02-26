@@ -154,20 +154,10 @@ namespace hpx
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry();
-        /*
-        {
-            return *counters_;
-        }
-        */
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
         performance_counters::registry const& get_counter_registry() const;
-        /*
-        {
-            return *counters_;
-        }
-        */
 
         /// \brief Return a reference to the internal PAPI thread manager
         util::thread_mapper& get_thread_mapper();
