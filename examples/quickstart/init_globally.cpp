@@ -10,9 +10,11 @@
 // - How to register and unregister any (kernel) thread with the HPX runtime
 // - How to launch an HPX thread from any (registered) kernel thread and
 //   how to wait for the HPX thread to run to completion before continuing.
-//   Any value returned from the HPX thread will be marshalled back to the
+//   Any value returned from the HPX thread will be marshaled back to the
 //   calling (kernel) thread.
 //
+// This scheme is generally useful if HPX should be initialized from a shared
+// library and the main executable might not even be aware of this.
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
@@ -23,7 +25,16 @@
 #include <mutex>
 #include <chrono>
 
+#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+#include <experimental/optional>
+#else
+#include <boost/optional.hpp>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
+// Store the command line arguments in global variables to make them available
+// to the startup code.
+
 #if defined(linux) || defined(__linux) || defined(__linux__)
 
 int __argc = 0;
@@ -59,10 +70,17 @@ char** __argv = *_NSGetArgv();
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// This class demonstrates how to initialize a console instance of HPX
+// (locality 0). In order to create an HPX instance which connects to a running
+// HPX application two changes have to be made:
+//
+//  - replace hpx::runtime_mode_console with hpx::runtime_mode_connect
+//  - replace hpx::finalize() with hpx::disconnect()
+//
 struct manage_global_runtime
 {
     manage_global_runtime()
-      : rts_(0), running_(false)
+      : running_(false), rts_(0)
     {
 #if defined(HPX_WINDOWS)
         hpx::detail::init_winsocket();
@@ -81,7 +99,7 @@ struct manage_global_runtime
             std::abort();
         }
 
-        // wait for the main HPX thread to have started running
+        // Wait for the main HPX thread (hpx_main below) to have started running
         std::unique_lock<std::mutex> lk(startup_mtx_);
         while (!running_)
             startup_cond_.wait(lk);
@@ -114,17 +132,19 @@ protected:
     // Main HPX thread, does nothing but wait for the application to exit
     int hpx_main(int argc, char* argv[])
     {
-        // store a pointer to the runtime here
+        // Store a pointer to the runtime here.
         rts_ = hpx::get_runtime_ptr();
 
-        // signal to constructor that thread has started running
+        // Signal to constructor that thread has started running.
         {
             std::lock_guard<std::mutex> lk(startup_mtx_);
             running_ = true;
             startup_cond_.notify_one();
         }
 
-        // now, wait for destructor to be called
+        // Here other HPX specific functionality could be invoked...
+
+        // Now, wait for destructor to be called.
         {
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
             if (rts_ != 0)
@@ -146,6 +166,8 @@ private:
     hpx::runtime* rts_;
 };
 
+// This global object will initialize HPX in its constructor and make sure HPX
+// stops running in its destructor.
 manage_global_runtime init;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -172,97 +194,93 @@ struct thread_registration_wrapper
 // given function and will wait for this HPX thread to exit before returning to
 // the caller.
 
-// overload for running functions which return a value
-template <typename F, typename... Ts,
-    typename Enable = typename std::enable_if<
-        !std::is_void<typename std::result_of<F(Ts&&...)>::type>::value
-    >::type>
-typename std::result_of<F(Ts&&...)>::type
-execute_hpx_thread(F const& f, Ts&&... ts)
+// This is the overload for running functions which return a value.
+template <typename F, typename... Ts>
+typename std::result_of<F(Ts &&...)>::type
+execute_hpx_thread(std::false_type, F const& f, Ts &&... ts)
 {
     std::mutex mtx;
-    std::condition_variable started_cond;
-    bool running = false;
-
     std::condition_variable cond;
+    bool stopping = false;
 
-    typename std::result_of<F(Ts&&...)>::type retval;
+    typedef typename std::result_of<F(Ts &&...)>::type result_type;
 
-    // Create an HPX thread
-    hpx::threads::register_thread_nullary(
-        // this lambda function will be scheduled to run as an HPX thread
+    // Using the optional for storing the returned result value allows to
+    // support non-default-constructible and move-only types.
+
+#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+    std::experimental::optional<result_type> result;
+#else
+    boost::optional<result_type> result;
+#endif
+
+    // This lambda function will be scheduled to run as an HPX thread
+    auto && wrapper =
         [&]()
         {
-            // signal successful initialization
-            {
-                std::lock_guard<std::mutex> lk(mtx);
-                running = true;
-                started_cond.notify_all();
-            }
+            // Execute the given function, forward all parameters, store result.
+            result.emplace(hpx::util::invoke(f, std::forward<Ts>(ts)...));
 
-            // execute the given function, forward all parameters, store result
-            retval = f(std::forward<Ts>(ts)...);
+            // Now signal to the waiting thread that we're done.
+            std::lock_guard<std::mutex> lk(mtx);
+            stopping = true;
+            cond.notify_all();
+        };
 
-            // now signal to the waiting thread that we're done
-            cond.notify_one();
-        });
-
-    {
-        // first wait for the HPX thread to have started running
-        std::unique_lock<std::mutex> lk(mtx);
-        while (!running)
-            started_cond.wait(lk);
-
-        // wait for the HPX thread to exit
-        cond.wait(lk);
-    }
-
-    return retval;
-}
-
-// overload for running functions which return void
-template <typename F, typename... Ts,
-    typename Enable = typename std::enable_if<
-        std::is_void<typename std::result_of<F(Ts&&...)>::type>::value
-    >::type>
-void execute_hpx_thread(F const& f, Ts&&... ts)
-{
-    std::mutex mtx;
-    std::condition_variable started_cond;
-    bool running = false;
-
-    std::condition_variable cond;
-
-    // Create an HPX thread
-    hpx::threads::register_thread_nullary(
-        // this lambda function will be scheduled to run as an HPX thread
-        [&]()
-        {
-            // signal successful initialization
-            {
-                std::lock_guard<std::mutex> lk(mtx);
-                running = true;
-                started_cond.notify_all();
-            }
-
-            // execute the given function, forward all parameters
-            f(std::forward<Ts>(ts)...);
-
-            // now signal to the waiting thread that we're done
-            cond.notify_one();
-        });
-
-    // first wait for the HPX thread to have started running
-    std::unique_lock<std::mutex> lk(mtx);
-    while (!running)
-        started_cond.wait(lk);
+    // Create the HPX thread
+    hpx::threads::register_thread_nullary(std::ref(wrapper));
 
     // wait for the HPX thread to exit
-    cond.wait(lk);
+    std::unique_lock<std::mutex> lk(mtx);
+    while (!stopping)
+        cond.wait(lk);
+
+    return std::move(*result);
+}
+
+// This is the overload for running functions which return void.
+template <typename F, typename... Ts>
+void execute_hpx_thread(std::true_type, F const& f, Ts &&... ts)
+{
+    std::mutex mtx;
+    std::condition_variable cond;
+    bool stopping = false;
+
+    // this lambda function will be scheduled to run as an HPX thread
+    auto && wrapper =
+        [&]()
+        {
+            // Execute the given function, forward all parameters.
+            hpx::util::invoke(f, std::forward<Ts>(ts)...);
+
+            // Now signal to the waiting thread that we're done.
+            std::lock_guard<std::mutex> lk(mtx);
+            stopping = true;
+            cond.notify_all();
+        };
+
+    // Create an HPX thread
+    hpx::threads::register_thread_nullary(std::ref(wrapper));
+
+    // wait for the HPX thread to exit
+    std::unique_lock<std::mutex> lk(mtx);
+    while (!stopping)
+        cond.wait(lk);
+}
+
+template <typename F, typename... Ts>
+typename std::result_of<F(Ts &&...)>::type
+execute_hpx_thread(F const& f, Ts&&... ts)
+{
+    typedef typename std::is_void<
+            typename std::result_of<F(Ts &&...)>::type
+        >::type result_is_void;
+
+    return execute_hpx_thread(result_is_void(), f, std::forward<Ts>(ts)...);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// These functions will be executed as an HPX thread
+// These functions will be executed as HPX threads.
 void hpx_thread_func1()
 {
     // All of the HPX functionality is available here, including hpx::async,
@@ -285,7 +303,7 @@ int hpx_thread_func2(int arg)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// This code will be executed by a system thread
+// This code will be executed by a system thread.
 void thread_func()
 {
     // Register this (kernel) thread with the HPX runtime (unregister at exit).
@@ -308,10 +326,10 @@ void thread_func()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    // start a new (kernel) thread
+    // Start a new (kernel) thread to demonstrate thread registration with HPX.
     std::thread t(&thread_func);
 
-    // The main thread was automatically registered with the HPX runtime
+    // The main thread was automatically registered with the HPX runtime,
     // no explicit registration for this thread is necessary.
     execute_hpx_thread(&hpx_thread_func1);
 
