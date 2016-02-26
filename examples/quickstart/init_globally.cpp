@@ -23,6 +23,7 @@
 #include <type_traits>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <chrono>
 
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
