@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2016 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
@@ -27,6 +28,7 @@ namespace hpx { namespace util { namespace detail
         vtable::get_type_t get_type;
         vtable::destruct_t destruct;
         vtable::delete_t delete_;
+        vtable::get_function_address_t get_function_address;
         bool empty;
 
         template <typename T>
@@ -35,6 +37,7 @@ namespace hpx { namespace util { namespace detail
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)
           , delete_(&vtable::template delete_<T>)
+          , get_function_address(&vtable::template get_function_address<T>)
           , empty(std::is_same<T, empty_function<Sig> >::value)
         {}
 
@@ -187,6 +190,31 @@ namespace hpx { namespace util
     }
 
 #   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
+}}
+
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    template <typename Sig, bool Serializable>
+    struct get_function_address<util::unique_function<Sig, Serializable> >
+    {
+        static std::size_t
+            call(util::unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
+
+    template <typename Sig>
+    struct get_function_address<util::unique_function_nonser<Sig> >
+    {
+        static std::size_t
+            call(util::unique_function_nonser<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
 }}
 
 #endif

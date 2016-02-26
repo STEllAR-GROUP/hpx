@@ -45,6 +45,9 @@ to a different compute node).
   (`hpx::dataflow(Action(), target, ...)`). We have also enabled the use of
   distribution policies as the target for dataflow invocations. Please see
   [issue 1265] and [pr 1912] for more information.
+* Adding overloads of `gather_here` and `gather_there` to accept the plain
+  values of the data to gather (in addition to the existing overloads expecting
+  futures).
 
 [heading Breaking Changes]
 
@@ -66,7 +69,35 @@ to a different compute node).
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2004] - Fixing 2000
+* [pr    2003] - Adding generation parameter to gather to enable using it more
+                 than once
+* [pr    2002] - Turn on position independent code to solve link problem with
+                 hpx_init
+* [issue 2001] - Gathering more than once segfaults
+* [issue 2000] - Undefined reference to hpx::assertion_failed
+* [pr    1998] - Detect unknown command line options
+* [pr    1997] - Extending thread description
+* [pr    1996] - Adding natvis files to solution (MSVC only)
+* [issue 1995] - Command line handling does not produce error
+* [pr    1994] - Possible missing include in test_utils.hpp
+* [pr    1993] - Add missing LANGUAGES tag to a hpx_add_compile_flag_if_available()
+                 call in CMakeLists.txt
+* [pr    1992] - Fixing shared_executor_test
+* [pr    1991] - Making sure the winsock library is properly initialized
+* [pr    1990] - Fixing bind_test placeholder ambiguity coming from boost-1.60
+* [pr    1989] - Performance tuning
+* [pr    1987] - Make configurable size of internal storage in util::function
+* [pr    1986] - AGAS Refactoring+1753 Cache mods
+* [pr    1985] - Adding missing task_block::run() overload taking an executor
+* [pr    1984] - Adding an optimized LRU Cache implementation
+* [pr    1983] - Avoid invoking migration table look up for all objects
+* [pr    1981] - Replacing uintptr_t (which is not defined everywhere) with
+                 std::size_t
+* [pr    1980] - Optimizing LCO continuations
+* [pr    1979] - Fixing Cori
 * [pr    1978] - Fix test check that got broken in hasty fix to memory overflow
+* [pr    1977] - Refactor action traits
 * [pr    1976] - Fixes typo in README.rst
 * [pr    1975] - Reduce size of benchmark timing arrays to fix test failures
 * [pr    1974] - Add action to update data owned by the partitioned_vector
@@ -77,6 +108,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1969] - Fixing continuation recursions to not depend on fixed amount
                  of recursions
 * [pr    1968] - More segmented algorithms
+* [issue 1967] - Simplify component implementations
 * [pr    1966] - Migrate components
 * [issue 1964] - fatal error: 'boost/lockfree/detail/branch_hints.hpp' file
                  not found
@@ -92,6 +124,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1956] - Sort by key example
 * [pr    1955] - Adding regression test for #1946: Hang in wait_all() in
                  distributed run
+* [issue 1954] - HPX releases should not use -Werror
 * [pr    1953] - Adding performance analysis for AGAS cache
 * [pr    1952] - Adapting test for explicit variadics to fail for gcc 4.6
 * [pr    1951] - Fixing memory leak
@@ -209,6 +242,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1815] - seg fault in AGAS
 * [issue 1803] - wait_all documentation
 * [issue 1796] - Outdated documentation to be revised
+* [issue 1753] - HPX performance degrades with time since execution begins
 * [issue 1748] - All public HPX headers need to be self contained
 * [issue 1523] - Remote async with deferred launch policy never executes
 * [issue 1472] - Serialization issues
@@ -216,6 +250,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1265] - Enable dataflow() to be usable with actions
 * [issue 1236] - NUMA aware allocators
 * [issue  559] - Add hpx::migrate facility
+* [issue  279] - Refactor addressing_service into a base class and two derived
+                 classes
 
 [endsect]
 

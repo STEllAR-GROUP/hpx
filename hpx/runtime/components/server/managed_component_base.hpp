@@ -265,9 +265,6 @@ namespace hpx { namespace components
         naming::gid_type get_base_gid() const;
 
     public:
-        // This component type does not support migration.
-        static HPX_CONSTEXPR bool supports_migration() { return false; }
-
         // Pinning functionality
         void pin() {}
         void unpin() {}

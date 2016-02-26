@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Copyright (c) 2014 Hartmut Kaiser                                      -->
+<!-- Copyright (c) 2016 Hartmut Kaiser                                      -->
 
 <!-- Use, modification and distribution are subject to the Boost Software   -->
 <!-- License, Version 1.0. (See accompanying file LICENSE_1_0.txt           -->
 <!-- or copy at http://www.boost.org/LICENSE_1_0.txt)                       -->
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-    <Type Name="hpx::util::backtrace">
-        <DisplayString>{{ size={frames_._Mysize} }}</DisplayString>
-        <Expand>
-            <ExpandedItem>frames_._Myfirst,[frames_._Mysize]stackTrace</ExpandedItem>
-        </Expand>
+    <Type Name="hpx::util::thread_description">
+        <DisplayString Condition="type_ == 0">[desc] {data_.desc_,s}</DisplayString>
+        <DisplayString Condition="type_ == 1">[addr] {(void*)data_.addr_,na}</DisplayString>
     </Type>
 </AutoVisualizer>

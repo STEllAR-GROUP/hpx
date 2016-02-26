@@ -15,6 +15,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 
@@ -277,7 +278,7 @@ namespace hpx { namespace lcos { namespace detail
 
             applier::register_thread_plain(
                 util::bind(async_impl_ptr, std::move(this_), f),
-                "continuation::async");
+                util::thread_description(f_));
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -307,7 +308,7 @@ namespace hpx { namespace lcos { namespace detail
 
             sched.add(
                 util::bind(async_impl_ptr, std::move(this_), f),
-                "continuation::async");
+                util::thread_description(f_));
 
             if (&ec != &throws)
                 ec = make_success_code();

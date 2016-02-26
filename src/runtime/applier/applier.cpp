@@ -17,6 +17,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/include/async.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
@@ -66,7 +67,8 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
-        util::unique_function_nonser<void()> && func, char const* desc,
+        util::unique_function_nonser<void()> && func,
+        util::thread_description const& desc,
         threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -80,10 +82,13 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
+        util::thread_description d = desc;
+        if (!desc)
+            d = util::thread_description(func);
+
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(stacksize));
+            d, 0, priority, os_thread, threads::get_stack_size(stacksize));
 
         threads::thread_id_type id = threads::invalid_thread_id;
         app->get_thread_manager().register_thread(data, id, state, run_now, ec);
@@ -92,8 +97,8 @@ namespace hpx { namespace applier
 
     threads::thread_id_type register_thread(
         util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread,
+        util::thread_description const& desc, threads::thread_state_enum state,
+        bool run_now, threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -105,10 +110,13 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
+        util::thread_description d = desc;
+        if (!desc)
+            d = util::thread_description(func);
+
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(stacksize));
+            d, 0, priority, os_thread, threads::get_stack_size(stacksize));
 
         threads::thread_id_type id = threads::invalid_thread_id;
         app->get_thread_manager().register_thread(data, id, state, run_now, ec);
@@ -117,8 +125,8 @@ namespace hpx { namespace applier
 
     threads::thread_id_type register_thread_plain(
         threads::thread_function_type && func,
-        char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread,
+        util::thread_description const& desc, threads::thread_state_enum state,
+        bool run_now, threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -130,9 +138,12 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        threads::thread_init_data data(
-            std::move(func), desc ? desc : "<unknown>", 0, priority,
-            os_thread, threads::get_stack_size(stacksize));
+        util::thread_description d = desc;
+        if (!desc)
+            d = util::thread_description(func);
+
+        threads::thread_init_data data(std::move(func),
+            d, 0, priority, os_thread, threads::get_stack_size(stacksize));
 
         threads::thread_id_type id = threads::invalid_thread_id;
         app->get_thread_manager().register_thread(data, id, state, run_now, ec);
@@ -159,7 +170,8 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
-        util::unique_function_nonser<void()> && func, char const* desc,
+        util::unique_function_nonser<void()> && func,
+        util::thread_description const& desc,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
         error_code& ec)
@@ -173,16 +185,20 @@ namespace hpx { namespace applier
             return;
         }
 
+        util::thread_description d = desc;
+        if (!desc)
+            d = util::thread_description(func);
+
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(stacksize));
+            d, 0, priority, os_thread, threads::get_stack_size(stacksize));
+
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work(
         util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* desc, threads::thread_state_enum state,
+        util::thread_description const& desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -195,16 +211,20 @@ namespace hpx { namespace applier
             return;
         }
 
+        util::thread_description d = desc;
+        if (!desc)
+            d = util::thread_description(func);
+
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(stacksize));
+            d, 0, priority, os_thread, threads::get_stack_size(stacksize));
+
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work_plain(
         threads::thread_function_type && func,
-        char const* desc, naming::address::address_type lva,
+        util::thread_description const& desc, naming::address::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
         error_code& ec)
@@ -218,16 +238,19 @@ namespace hpx { namespace applier
             return;
         }
 
+        util::thread_description d = desc;
+        if (!desc)
+            d = util::thread_description(func);
+
         threads::thread_init_data data(std::move(func),
-            desc ? desc : "<unknown>", lva, priority, os_thread,
-            threads::get_stack_size(stacksize));
+            d, lva, priority, os_thread, threads::get_stack_size(stacksize));
+
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work_plain(
-        threads::thread_function_type && func,
-        naming::id_type const& target,
-        char const* desc, naming::address::address_type lva,
+        threads::thread_function_type && func, naming::id_type const& target,
+        util::thread_description const& desc, naming::address::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
         error_code& ec)
@@ -241,9 +264,14 @@ namespace hpx { namespace applier
             return;
         }
 
+        util::thread_description d = desc;
+        if (!desc)
+            d = util::thread_description(func);
+
         threads::thread_init_data data(std::move(func),
-            desc ? desc : "<unknown>", lva, priority, os_thread,
-            threads::get_stack_size(stacksize), target);
+            d, lva, priority, os_thread, threads::get_stack_size(stacksize),
+            target);
+
         app->get_thread_manager().register_work(data, state, ec);
     }
 
@@ -276,9 +304,11 @@ namespace hpx { namespace applier
     void applier::initialize(boost::uint64_t rts, boost::uint64_t mem)
     {
         naming::resolver_client & agas_client = get_agas_client();
-        runtime_support_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
-                rts, naming::id_type::unmanaged);
-        memory_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
+        runtime_support_id_ = naming::id_type(
+            agas_client.get_local_locality().get_msb(),
+            rts, naming::id_type::unmanaged);
+        memory_id_ = naming::id_type(
+            agas_client.get_local_locality().get_msb(),
             mem, naming::id_type::unmanaged);
     }
 
@@ -307,7 +337,8 @@ namespace hpx { namespace applier
         return naming::get_locality_id_from_gid(get_raw_locality(ec));
     }
 
-    bool applier::get_raw_remote_localities(std::vector<naming::gid_type>& prefixes,
+    bool applier::get_raw_remote_localities(
+        std::vector<naming::gid_type>& prefixes,
         components::component_type type, error_code& ec) const
     {
         return parcel_handler_.get_raw_remote_localities(prefixes, type, ec);

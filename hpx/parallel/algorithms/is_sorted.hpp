@@ -52,8 +52,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
-                typedef typename std::iterator_traits<FwdIter>::reference
-                    reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
                 typedef typename util::detail::algorithm_result<ExPolicy, bool>

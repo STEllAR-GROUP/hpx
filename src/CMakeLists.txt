@@ -64,6 +64,15 @@ if(MSVC)
     set(hpx_external_OBJECTS "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj"
       CACHE INTERNAL "External object files for HPX." FORCE)
   endif()
+
+  # add natvis files to solution (supported starting VS2015)
+  if(MSVC14)
+    add_hpx_library_sources(hpx_natvis_files
+      GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis")
+    set(hpx_external_OBJECTS ${hpx_external_OBJECTS} ${hpx_natvis_files_SOURCES})
+    source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
+  endif()
+
 endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
@@ -227,6 +236,7 @@ set(hpx_targets ${hpx_targets} hpx)
 # libhpx_init
 
 if(NOT HPX_WITH_STATIC_LINKING)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
   if(HPX_WITH_DEFAULT_TARGETS)
     add_library(hpx_init STATIC
       ${hpx_init_SOURCES} ${hpx_init_HEADERS})

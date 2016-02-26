@@ -17,6 +17,9 @@ if(EXISTS "${HPX_DIR}")
 
   include_directories(${test_SOURCE_DIR})
   include_directories(${HPX_INCLUDE_DIRS})
+  if(MSVC)
+    link_directories(${HPX_LIBRARY_DIR})
+  endif()
 
   add_library(test_component SHARED test_component.cpp)
   hpx_setup_target(

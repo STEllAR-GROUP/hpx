@@ -391,3 +391,10 @@ macro(hpx_check_for_cxx14_std_result_of_sfinae)
     SOURCE cmake/tests/cxx14_std_result_of_sfinae.cpp
     FILE ${ARGN})
 endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx_experimental_std_optional)
+  add_hpx_config_test(HPX_WITH_CXX1Y_EXPERIMENTAL_OPTIONAL
+    SOURCE cmake/tests/cxx1y_experimental_std_optional.cpp
+    FILE ${ARGN})
+endmacro()

@@ -51,7 +51,7 @@ double run_min_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        auto iters = min_element(par, v.begin(), v.end());
+        /*auto iters = */min_element(par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -69,7 +69,7 @@ double run_max_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        auto iters = max_element(par, v.begin(), v.end());
+        /*auto iters = */max_element(par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -87,7 +87,7 @@ double run_minmax_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        auto iters = minmax_element(par, v.begin(), v.end());
+        /*auto iters = */minmax_element(par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -102,7 +102,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     {
         // pull values from cmd
         std::size_t size = vm["vector_size"].as<std::size_t>();
-        bool csvoutput = vm.count("csv_output") != 0;
+        //bool csvoutput = vm.count("csv_output") != 0;
         int test_count = vm["test_count"].as<int>();
 
         // create as many partitions as we have localities

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
@@ -72,6 +73,13 @@ namespace hpx { namespace util
                 ar & _args;
             }
 
+            std::size_t get_function_address() const
+            {
+                return traits::get_function_address<
+                        typename util::decay_unwrap<F>::type
+                    >::call(_f);
+            }
+
         private:
             typename util::decay_unwrap<F>::type _f;
             util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
@@ -101,6 +109,21 @@ namespace hpx { namespace util
 
         return std::forward<F>(f);
     }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct get_function_address<util::detail::deferred<Sig> >
+    {
+        static std::size_t
+            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

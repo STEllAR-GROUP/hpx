@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -249,7 +249,7 @@ namespace hpx { namespace detail
 
         std::size_t shepherd = std::size_t(-1);
         threads::thread_id_type thread_id;
-        std::string thread_name;
+        util::thread_description thread_name;
 
         threads::thread_self* self = threads::get_self_ptr();
         if (NULL != self)
@@ -265,8 +265,10 @@ namespace hpx { namespace detail
         std::string config(configuration_string());
 
         return construct_exception(e, func, file, line, back_trace, node,
-            hostname, pid, shepherd, reinterpret_cast<std::size_t>(thread_id.get()),
-            thread_name, env, config, state_name, auxinfo);
+            hostname, pid, shepherd,
+            reinterpret_cast<std::size_t>(thread_id.get()),
+            util::as_string(thread_name), env, config,
+            state_name, auxinfo);
     }
 
     template <typename Exception>
@@ -1134,6 +1136,18 @@ namespace hpx
     std::string get_error_state(hpx::error_code const& e)
     {
         return get_error_state(detail::access_exception(e));
+    }
+
+    void assertion_failed(char const* expr, char const* function,
+        char const* file, long line)
+    {
+        hpx::detail::assertion_failed(expr, function, file, line);
+    }
+
+    void assertion_failed_msg(char const* msg, char const* expr,
+        char const* function, char const* file, long line)
+    {
+        hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
     }
 }
 

@@ -16,6 +16,7 @@
 #include <hpx/lcos/latch.hpp>
 #include <hpx/lcos/queue.hpp>
 #include <hpx/lcos/reduce.hpp>
+#include <hpx/lcos/gather.hpp>
 
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/async.hpp>

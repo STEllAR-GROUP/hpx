@@ -48,8 +48,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename util::detail::algorithm_result<ExPolicy>::type
-                    result_type;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(

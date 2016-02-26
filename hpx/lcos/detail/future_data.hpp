@@ -199,6 +199,7 @@ namespace detail
             f2_();
         }
 
+    private:
         F1 f1_;
         F2 f2_;
     };
@@ -789,37 +790,13 @@ namespace detail
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
-            check_started();
-
-            future_base_type this_(this);
-
-            char const* desc = hpx::threads::get_thread_description(
-                hpx::threads::get_self_id());
-
-            if (sched_) {
-                sched_->add(util::bind(&task_base::run_impl, std::move(this_)),
-                    desc ? desc : "task_base::apply", threads::pending, false,
-                    stacksize, ec);
-            }
-            else if (policy == launch::fork) {
-                threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, std::move(this_)),
-                    desc ? desc : "task_base::apply", threads::pending, false,
-                    threads::thread_priority_boost, get_worker_thread_num(),
-                    stacksize, ec);
-            }
-            else {
-                threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, std::move(this_)),
-                    desc ? desc : "task_base::apply", threads::pending, false,
-                    priority, std::size_t(-1), stacksize, ec);
-            }
+            HPX_ASSERT(false);      // shouldn't ever be called
         }
 
     protected:
-        threads::thread_state_enum run_impl()
+        static threads::thread_state_enum run_impl(future_base_type this_)
         {
-            this->do_run();
+            this_->do_run();
             return threads::terminated;
         }
 
@@ -891,44 +868,10 @@ namespace detail
         };
 
     protected:
-        // run in a separate thread
-        void apply(BOOST_SCOPED_ENUM(launch) policy,
-            threads::thread_priority priority,
-            threads::thread_stacksize stacksize, error_code& ec)
+        static threads::thread_state_enum run_impl(future_base_type this_)
         {
-            this->check_started();
-
-            future_base_type this_(this);
-
-            char const* desc = hpx::threads::get_thread_description(
-                hpx::threads::get_self_id());
-
-            if (this->sched_) {
-                this->sched_->add(
-                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
-                    desc ? desc : "cancelable_task_base::apply",
-                    threads::pending, false, stacksize, ec);
-            }
-            else if (policy == launch::fork) {
-                threads::register_thread_plain(
-                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
-                    desc ? desc : "cancelable_task_base::apply",
-                    threads::pending, false, threads::thread_priority_boost,
-                    get_worker_thread_num(), stacksize, ec);
-            }
-            else {
-                threads::register_thread_plain(
-                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
-                    desc ? desc : "cancelable_task_base::apply",
-                    threads::pending, false, priority, std::size_t(-1),
-                    stacksize, ec);
-            }
-        }
-
-        threads::thread_state_enum run_impl()
-        {
-            reset_id r(*this);
-            this->do_run();
+            reset_id r(*this_);
+            this_->do_run();
             return threads::terminated;
         }
 
