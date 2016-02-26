@@ -241,11 +241,12 @@ namespace hpx
     /// console mode or worker mode depending on the command line settings).
     inline int
     init(util::function_nonser<int(int, char**)> const& f,
-        int argc, char** argv, hpx::runtime_mode mode)
+        std::string const& app_name, int argc, char** argv,
+        hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
         options_description desc_commandline(
-            std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+            std::string("Usage: ") + app_name +  " [options]");
 
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
@@ -258,9 +259,9 @@ namespace hpx
     // Main entry point for launching the HPX runtime system.
     inline int
     init(util::function_nonser<int(int, char**)> const& f,
-        std::string const& app_name, int argc, char** argv,
-        hpx::runtime_mode mode)
+        int argc, char** argv, hpx::runtime_mode mode)
     {
+        std::string app_name(HPX_APPLICATION_STRING);
         return init(f, app_name, argc, argv, mode);
     }
 }

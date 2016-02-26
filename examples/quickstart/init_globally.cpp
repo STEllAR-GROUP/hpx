@@ -40,7 +40,7 @@
 int __argc = 0;
 char** __argv = 0;
 
-void set_argv_argv(INT argc, char* argv[], char* env[])
+void set_argv_argv(int argc, char* argv[], char* env[])
 {
     __argc = argc;
     __argv = argv;
