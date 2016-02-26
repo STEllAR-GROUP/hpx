@@ -17,7 +17,6 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
 
@@ -87,8 +86,10 @@ namespace hpx { namespace serialization { namespace detail
         }
     };
 
-    class polymorphic_nonintrusive_factory : boost::noncopyable
+    class polymorphic_nonintrusive_factory
     {
+        HPX_NON_COPYABLE(polymorphic_nonintrusive_factory);
+
     public:
         typedef std::unordered_map<std::string,
                   function_bunch_type, hpx::util::jenkins_hash> serializer_map_type;

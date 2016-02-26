@@ -15,7 +15,6 @@
 #include <string>
 
 #include <boost/thread/thread.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/function.hpp>
 #include <boost/bimap.hpp>
@@ -26,8 +25,10 @@ namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     // enumerates active OS threads and maintains their metadata
-    class HPX_EXPORT thread_mapper : boost::noncopyable
+    class HPX_EXPORT thread_mapper
     {
+        HPX_NON_COPYABLE(thread_mapper);
+
     public:
         // type for callback function invoked when thread is unregistered
         typedef boost::function1<bool, boost::uint32_t> callback_type;

@@ -10,7 +10,6 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace hpx { namespace parcelset {
 
@@ -24,8 +23,11 @@ namespace hpx { namespace parcelset {
         typename ChunkType = serialization::serialization_chunk>
     struct parcelport_connection
       : boost::enable_shared_from_this<Connection>
-      , private boost::noncopyable
     {
+    private:
+        HPX_NON_COPYABLE(parcelport_connection);
+
+    public:
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         enum state
         {

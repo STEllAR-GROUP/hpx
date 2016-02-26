@@ -37,6 +37,9 @@ namespace hpx { namespace lcos { namespace local
     struct spinlock_no_backoff
     {
     private:
+        HPX_NON_COPYABLE(spinlock_no_backoff);
+
+    private:
         boost::uint64_t v_;
 
     public:
@@ -44,8 +47,6 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock_no_backoff", "");
         }
-
-        HPX_NON_COPYABLE(spinlock_no_backoff);
 
         ~spinlock_no_backoff()
         {

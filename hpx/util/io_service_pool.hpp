@@ -20,14 +20,15 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/noncopyable.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     /// A pool of io_service objects.
-    class HPX_EXPORT io_service_pool : private boost::noncopyable
+    class HPX_EXPORT io_service_pool
     {
+        HPX_NON_COPYABLE(io_service_pool);
+
     public:
         /// \brief Construct the io_service pool.
         /// \param pool_size

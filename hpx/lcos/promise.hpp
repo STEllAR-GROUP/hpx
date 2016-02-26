@@ -380,8 +380,10 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     // This is a placeholder shim used for the type erased memory management
     // for all promise types
-    struct managed_promise : boost::noncopyable
+    struct managed_promise
     {
+        HPX_NON_COPYABLE(managed_promise);
+
     private:
         struct tag {};
         typedef lcos::local::spinlock_pool<tag> mutex_type;
