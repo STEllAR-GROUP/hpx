@@ -14,6 +14,7 @@
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
+#include <cassert> // boost::unordered_map below needs this
 #include <boost/unordered_map.hpp>
 
 #include <string>
