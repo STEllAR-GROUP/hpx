@@ -112,8 +112,9 @@ struct manage_global_runtime
         {
             std::lock_guard<hpx::lcos::local::spinlock> lk(mtx_);
             rts_ = 0;               // reset pointer
-            cond_.notify_one();     // signal exit
         }
+
+        cond_.notify_one();     // signal exit
 
         // wait for the runtime to exit
         hpx::stop();
@@ -140,8 +141,9 @@ protected:
         {
             std::lock_guard<std::mutex> lk(startup_mtx_);
             running_ = true;
-            startup_cond_.notify_one();
         }
+
+        startup_cond_.notify_one();
 
         // Here other HPX specific functionality could be invoked...
 
@@ -223,8 +225,10 @@ execute_hpx_thread(std::false_type, F const& f, Ts &&... ts)
             result.emplace(hpx::util::invoke(f, std::forward<Ts>(ts)...));
 
             // Now signal to the waiting thread that we're done.
-            std::lock_guard<std::mutex> lk(mtx);
-            stopping = true;
+            {
+                std::lock_guard<std::mutex> lk(mtx);
+                stopping = true;
+            }
             cond.notify_all();
         };
 
@@ -255,8 +259,10 @@ void execute_hpx_thread(std::true_type, F const& f, Ts &&... ts)
             hpx::util::invoke(f, std::forward<Ts>(ts)...);
 
             // Now signal to the waiting thread that we're done.
-            std::lock_guard<std::mutex> lk(mtx);
-            stopping = true;
+            {
+                std::lock_guard<std::mutex> lk(mtx);
+                stopping = true;
+            }
             cond.notify_all();
         };
 
