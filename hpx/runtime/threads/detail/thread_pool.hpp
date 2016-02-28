@@ -89,6 +89,8 @@ namespace hpx { namespace threads { namespace detail
 #endif
 #endif
 
+        boost::int64_t get_cumulative_duration(std::size_t num, bool reset);
+
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
         ///////////////////////////////////////////////////////////////////////
         boost::int64_t avg_idle_rate(bool reset);
@@ -165,6 +167,8 @@ namespace hpx { namespace threads { namespace detail
         std::vector<boost::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
 
+        double timestamp_scale_;    // scale timestamps to nanoseconds
+
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         // timestamps/values of last reset operation for various performance
         // counters
@@ -172,8 +176,6 @@ namespace hpx { namespace threads { namespace detail
         std::vector<boost::int64_t> reset_executed_thread_phases_;
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
-        double timestamp_scale_;    // scale timestamps to nanoseconds
-
         std::vector<boost::int64_t> reset_thread_duration_;
         std::vector<boost::uint64_t> reset_thread_duration_times_;
 
@@ -210,6 +212,7 @@ namespace hpx { namespace threads { namespace detail
 
         // tfunc_impl timers
         std::vector<boost::uint64_t> exec_times_, tfunc_times_;
+        std::vector<boost::uint64_t> reset_tfunc_times_;
 
         // Stores the mask identifying all processing units used by this
         // thread manager.
