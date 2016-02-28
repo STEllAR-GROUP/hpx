@@ -26,34 +26,29 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COROUTINE_DETAIL_FIX_RESULT_HPP_20060709
-#define HPX_COROUTINE_DETAIL_FIX_RESULT_HPP_20060709
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_SIGNATURE_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_SIGNATURE_HPP
 
-#include <boost/utility/enable_if.hpp>
+#include <boost/mpl/vector.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace coroutines { namespace detail
 {
-    template <typename Traits>
-    inline void fix_result(const typename Traits::as_tuple&,
-        typename boost::enable_if_c<Traits::length == 0>::type * = 0)
-    {}
+    /*
+     * Derived from an  mpl::vector describing
+     * 'Function' arguments types.
+     */
+    template <typename Function>
+    struct signature;
 
-    template <typename Traits>
-    inline typename Traits::template at<0>::type
-    fix_result(const typename Traits::as_tuple& x,
-        typename boost::enable_if_c<Traits::length == 1>::type * = 0)
-    {
-      using boost::get;
-      return get<0>(x);
-    }
+    template <typename R>
+    struct signature<R()>
+      : boost::mpl::vector0<>
+    {};
 
-    template <typename Traits>
-    inline typename Traits::as_tuple
-    fix_result(const typename Traits::as_tuple& x,
-        typename boost::enable_if_c<(Traits::length > 1)>::type* =0)
-    {
-      return x;
-    }
-}}}}
+    template <typename R, typename A0>
+    struct signature<R(A0)>
+      : boost::mpl::vector1<A0>
+    {};
+}}}
 
-#endif
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_SIGNATURE_HPP*/

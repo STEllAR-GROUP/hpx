@@ -22,7 +22,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/runtime/coroutine/coroutine.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
 #include <boost/atomic.hpp>

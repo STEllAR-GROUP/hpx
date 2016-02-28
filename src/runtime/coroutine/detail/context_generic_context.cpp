@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-#include <hpx/util/coroutine/detail/config.hpp>
+#include <hpx/runtime/coroutine/detail/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/coroutine/detail/context_generic_context.hpp>
+#include <hpx/runtime/coroutine/detail/context_generic_context.hpp>
 
-namespace hpx { namespace util { namespace coroutines
+namespace hpx { namespace coroutines
 {
     namespace detail { namespace generic_context
     {
@@ -87,6 +87,6 @@ namespace hpx { namespace util { namespace coroutines
         }
 
     }}
-}}}
+}}
 
 #endif

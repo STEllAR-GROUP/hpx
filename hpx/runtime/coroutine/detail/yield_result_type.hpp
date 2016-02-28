@@ -26,12 +26,35 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COROUTINE_DETAIL_INDEX_HPP_20060613
-#define HPX_COROUTINE_DETAIL_INDEX_HPP_20060613
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_YIELD_RESULT_TYPE_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_YIELD_RESULT_TYPE_HPP
 
-namespace hpx { namespace util { namespace coroutines { namespace detail
+#include <hpx/config.hpp>
+#include <hpx/runtime/coroutine/detail/make_tuple_traits.hpp>
+
+#include <boost/mpl/vector.hpp>
+
+namespace hpx { namespace coroutines { namespace detail
 {
-    enum { index_0 };
-}}}}
+    /**
+     * Same as make_tuple_traits, but if
+     * @p TypeList is singular, @p type is the single element, and
+     * if TypeList is empty, @p type is @p void.
+     */
+    template <typename TypeList>
+    struct yield_result_type {
+        typedef typename make_tuple_traits<TypeList>::type type;
+    };
 
-#endif
+    template <typename T>
+    struct yield_result_type<boost::mpl::vector1<T> > {
+        typedef T type;
+    };
+
+    template <>
+    struct yield_result_type<boost::mpl::vector0<> > {
+        typedef void type;
+    };
+}}}
+
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_YIELD_RESULT_TYPE_HPP*/

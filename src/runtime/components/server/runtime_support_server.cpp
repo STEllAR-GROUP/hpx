@@ -44,7 +44,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/runtime/coroutine/coroutine.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>

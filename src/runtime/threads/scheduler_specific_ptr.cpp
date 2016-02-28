@@ -7,7 +7,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/util/coroutine/detail/tss.hpp>
+#include <hpx/runtime/coroutine/detail/tss.hpp>
 #include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
 
 namespace hpx { namespace threads { namespace detail
@@ -18,7 +18,7 @@ namespace hpx { namespace threads { namespace detail
         hpx::threads::thread_id_type self_id = hpx::threads::get_self_id();
         if (!self_id)
         {
-            boost::throw_exception(util::coroutines::null_thread_id_exception());
+            boost::throw_exception(coroutines::null_thread_id_exception());
             return 0;
         }
         return self_id->get_scheduler_base()->get_tss_data(key);
@@ -27,14 +27,14 @@ namespace hpx { namespace threads { namespace detail
     }
 
     void set_tss_data(void const* key,
-        boost::shared_ptr<util::coroutines::detail::tss_cleanup_function> const& func,
+        boost::shared_ptr<coroutines::detail::tss_cleanup_function> const& func,
         void* tss_data, bool cleanup_existing)
     {
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
         hpx::threads::thread_id_type self_id = hpx::threads::get_self_id();
         if (!self_id)
         {
-            boost::throw_exception(util::coroutines::null_thread_id_exception());
+            boost::throw_exception(coroutines::null_thread_id_exception());
             return;
         }
         self_id->get_scheduler_base()->set_tss_data(key, func, tss_data,

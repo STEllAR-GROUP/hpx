@@ -12,10 +12,10 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/coroutine/detail/default_context_impl.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl.hpp>
+#include <hpx/runtime/coroutine/detail/default_context_impl.hpp>
+#include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 
-namespace hpx { namespace util { namespace coroutines
+namespace hpx { namespace coroutines
 {
     /// \cond NOINTERNAL
     namespace detail
@@ -35,7 +35,7 @@ namespace hpx { namespace util { namespace coroutines
         typename ContextImpl = detail::default_context_impl>
     class coroutine;
     /// \endcond
-}}}
+}}
 
 namespace hpx { namespace threads
 {
@@ -58,16 +58,16 @@ namespace hpx { namespace threads
         template <typename CoroutineImpl> struct coroutine_allocator;
     }
 
-    typedef util::coroutines::coroutine<
+    typedef coroutines::coroutine<
         thread_function_sig, detail::coroutine_allocator> coroutine_type;
 
-    typedef util::coroutines::detail::coroutine_self<coroutine_type>
+    typedef coroutines::detail::coroutine_self<coroutine_type>
         thread_self;
     typedef
-        util::coroutines::detail::coroutine_impl<
+        coroutines::detail::coroutine_impl<
             coroutine_type
-            , util::coroutines::detail::default_context_impl
-            , detail::coroutine_allocator
+          , coroutines::detail::default_context_impl
+          , detail::coroutine_allocator
         >
         thread_self_impl_type;
     typedef void * thread_id_repr_type;

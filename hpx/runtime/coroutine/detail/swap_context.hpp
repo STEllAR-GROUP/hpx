@@ -26,22 +26,19 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COROUTINE_SWAP_CONTEXT_HPP_20060611
-#define HPX_COROUTINE_SWAP_CONTEXT_HPP_20060611
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_SWAP_CONTEXT_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_SWAP_CONTEXT_HPP
 
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace coroutines { namespace detail
 {
-  class default_hint {};
-  class yield_hint: public default_hint {};
-  class yield_to_hint: public default_hint {};
-  class invoke_hint: public default_hint {};
+    class default_hint {};
+    class yield_hint : public default_hint {};
+    class yield_to_hint : public default_hint {};
+    class invoke_hint : public default_hint {};
 
-  /////////////////////////////////////////////////////////////////////////////
-  // This is the base class of all context implementations
-  struct context_impl_base
-  {
-  };
+    /////////////////////////////////////////////////////////////////////////////
+    // This is the base class of all context implementations
+    struct context_impl_base {};
+}}}
 
-}}}}
-
-#endif
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_SWAP_CONTEXT_HPP*/

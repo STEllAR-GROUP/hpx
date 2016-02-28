@@ -59,7 +59,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__)\
          || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace coroutines { namespace detail
 {
     namespace posix
     {
@@ -68,7 +68,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         // will be used or not
         HPX_EXPORT bool use_guard_pages = true;
     }
-}}}}
+}}}
 #endif
 
 namespace hpx { namespace threads { namespace policies

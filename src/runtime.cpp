@@ -24,7 +24,7 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/runtime/coroutine/coroutine.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>

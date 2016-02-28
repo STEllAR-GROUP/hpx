@@ -6,19 +6,19 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COROUTINE_CONTEXT_GENERIC_SEP_01_2012_0519PM)
-#define HPX_COROUTINE_CONTEXT_GENERIC_SEP_01_2012_0519PM
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_GENERIC_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_GENERIC_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/coroutine/detail/config.hpp>
-#include <hpx/util/coroutine/detail/get_stack_pointer.hpp>
-#include <hpx/util/coroutine/exception.hpp>
-#include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/runtime/coroutine/detail/config.hpp>
+#include <hpx/runtime/coroutine/detail/get_stack_pointer.hpp>
+#include <hpx/runtime/coroutine/exception.hpp>
+#include <hpx/runtime/coroutine/detail/swap_context.hpp>
 
 #if defined(_POSIX_VERSION)
-#include <hpx/util/coroutine/detail/posix_utility.hpp>
+#include <hpx/runtime/coroutine/detail/posix_utility.hpp>
 #endif
 
 #include <hpx/util/get_and_reset_value.hpp>
@@ -65,7 +65,7 @@ extern "C"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace coroutines
+namespace hpx { namespace coroutines
 {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
@@ -291,6 +291,6 @@ namespace hpx { namespace util { namespace coroutines
 
         typedef fcontext_context_impl context_impl;
     }}
-}}}
+}}
 
-#endif
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_GENERIC_HPP*/

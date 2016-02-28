@@ -6,8 +6,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COROUTINE_B9FD4B38_8972_488B_82BA_BA01C5FDA5FF
-#define HPX_COROUTINE_B9FD4B38_8972_488B_82BA_BA01C5FDA5FF
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONFIG_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_CONFIG_HPP
 
 #if defined(HPX_WINDOWS)
 #  define HPX_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
@@ -31,5 +31,4 @@
 #  define HPX_COROUTINE_NUM_HEAPS    7
 #endif
 
-#endif
-
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONFIG_HPP*/

@@ -16,7 +16,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/runtime/coroutine/coroutine.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>
 

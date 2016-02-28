@@ -4,8 +4,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COROUTINE_GET_STACK_POINTER_HPP
-#define HPX_COROUTINE_GET_STACK_POINTER_HPP
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_GET_STACK_POINTER_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_GET_STACK_POINTER_HPP
 
 #if !defined(HPX_WINDOWS)
 #if defined(__x86_64__) || defined(__amd64)                                    \
@@ -15,10 +15,10 @@
 #define HPX_HAVE_THREADS_GET_STACK_POINTER
 #endif
 
-#include <boost/cstdint.hpp>
+#include <cstddef>
 #include <limits>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace coroutines { namespace detail
 {
     inline std::size_t get_stack_ptr()
     {
@@ -35,7 +35,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #endif
         return stack_ptr;
     }
-}}}}
+}}}
 
 #endif
-#endif
+
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_GET_STACK_POINTER_HPP*/

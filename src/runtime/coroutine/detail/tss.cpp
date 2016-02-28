@@ -10,16 +10,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
-#include <hpx/util/coroutine/detail/tss.hpp>
-#include <hpx/util/coroutine/detail/self.hpp>
+#include <hpx/runtime/coroutine/coroutine.hpp>
+#include <hpx/runtime/coroutine/detail/tss.hpp>
+#include <hpx/runtime/coroutine/detail/self.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/runtime/threads_fwd.hpp>
 
 #include <map>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace coroutines { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     void tss_data_node::cleanup(bool cleanup_existing)
@@ -207,5 +207,5 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
 #endif
     }
-}}}}
+}}}
 

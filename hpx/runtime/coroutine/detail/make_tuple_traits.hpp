@@ -26,24 +26,25 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COROUTINE_DETAIL_MAKE_TUPLE_TRAITS_HPP_20060609
-#define HPX_COROUTINE_DETAIL_MAKE_TUPLE_TRAITS_HPP_20060609
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_MAKE_TUPLE_TRAITS_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_MAKE_TUPLE_TRAITS_HPP
+
+#include <hpx/config.hpp>
+#include <hpx/runtime/coroutine/tuple_traits.hpp>
 
 #include <boost/mpl/vector.hpp>
 
-#include <hpx/util/coroutine/tuple_traits.hpp>
-
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace coroutines { namespace detail
 {
-  /*
-   * Given a mpl::vector, returns a nullary metafunction
-   * describing a tuple of all types in the vector.
-   * NOTE this is just wrong because it should work for all mpl
-   * sequences, not just vectors. But it is in detail, so leave it
-   * as is. Eventually it will be replaced by Boost.Fusion.
-   * @p type is a tuple of all types in TypeList.
-   * TypeList is one of mpl::vector0, mpl::vector1, etc.
-   */
+    /*
+     * Given a mpl::vector, returns a nullary metafunction
+     * describing a tuple of all types in the vector.
+     * NOTE this is just wrong because it should work for all mpl
+     * sequences, not just vectors. But it is in detail, so leave it
+     * as is. Eventually it will be replaced by Boost.Fusion.
+     * @p type is a tuple of all types in TypeList.
+     * TypeList is one of mpl::vector0, mpl::vector1, etc.
+     */
     template <typename TypeList>
     struct make_tuple_traits;
 
@@ -53,12 +54,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         typedef tuple_traits<> type;
     };
 
-    template<typename A0>
+    template <typename A0>
     struct make_tuple_traits<boost::mpl::vector1<A0> >
     {
         typedef tuple_traits<A0> type;
     };
+}}}
 
-}}}}
-
-#endif
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_MAKE_TUPLE_TRAITS_HPP*/
