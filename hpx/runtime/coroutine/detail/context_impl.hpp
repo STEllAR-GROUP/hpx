@@ -26,8 +26,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_DEFAULT_CONTEXT_IMPL_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_DEFAULT_CONTEXT_IMPL_HPP
+#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_IMPL_HPP
+#define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_IMPL_HPP
 
 #include <hpx/config.hpp>
 
@@ -163,4 +163,4 @@ namespace hpx { namespace coroutines
     }
 }}
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_DEFAULT_CONTEXT_IMPL_HPP*/
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_IMPL_HPP*/

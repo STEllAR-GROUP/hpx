@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/coroutine/detail/default_context_impl.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/thread/mutex.hpp>

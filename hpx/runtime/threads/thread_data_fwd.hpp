@@ -12,7 +12,6 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/runtime/coroutine/detail/default_context_impl.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 
 namespace hpx { namespace coroutines
@@ -24,14 +23,12 @@ namespace hpx { namespace coroutines
         class coroutine_self;
 
         template<
-            typename CoroutineType, typename ContextImpl,
+            typename CoroutineType,
             template <typename> class Heap>
         class coroutine_impl;
     }
 
-    template<
-        template <typename> class Heap,
-        typename ContextImpl = detail::default_context_impl>
+    template<template <typename> class Heap>
     class coroutine;
     /// \endcond
 }}
@@ -64,7 +61,6 @@ namespace hpx { namespace threads
     typedef
         coroutines::detail::coroutine_impl<
             coroutine_type
-          , coroutines::detail::default_context_impl
           , detail::coroutine_allocator
         >
         thread_self_impl_type;

@@ -60,29 +60,26 @@ namespace hpx { namespace coroutines { namespace detail
     // the coroutine signature type.
     // This is mostly just a place to put
     // typesafe argument and result type pointers.
-    template <typename CoroutineType, typename ContextImpl,
-        template <typename> class Heap>
+    template <typename CoroutineType, template <typename> class Heap>
     class coroutine_impl
-      : public context_base<ContextImpl>
+      : public context_base
     {
     public:
         template <typename DerivedType, typename ResultType>
         friend class add_result;
 
-        typedef ContextImpl context_impl;
         typedef CoroutineType coroutine_type;
-        typedef coroutine_impl<coroutine_type, context_impl, Heap> type;
-        typedef context_base<context_impl> context_base_;
+        typedef coroutine_impl<coroutine_type, Heap> type;
         typedef typename coroutine_type::result_type result_type;
         typedef typename coroutine_type::arg_type arg_type;
-        typedef typename context_base_::thread_id_repr_type thread_id_repr_type;
+        typedef typename context_base::thread_id_repr_type thread_id_repr_type;
 
         typedef boost::intrusive_ptr<type> pointer;
 
         template <typename DerivedType>
         coroutine_impl(DerivedType *this_, thread_id_repr_type id,
             std::ptrdiff_t stack_size)
-          : context_base_(*this_, stack_size, id),
+          : context_base(*this_, stack_size, id),
             m_arg(0),
             m_result(0)
         {}
@@ -151,12 +148,11 @@ namespace hpx { namespace coroutines { namespace detail
     };
 
     // the TLS holds a pointer to the self instance as stored on the stack
-    template <typename CoroutineType, typename ContextImpl,
-        template <typename> class Heap>
+    template <typename CoroutineType, template <typename> class Heap>
     hpx::util::thread_specific_ptr<
-        typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type*
-        , typename coroutine_impl<CoroutineType, ContextImpl, Heap>::tls_tag
-    > coroutine_impl<CoroutineType, ContextImpl, Heap>::self_;
+        typename coroutine_impl<CoroutineType, Heap>::self_type*
+        , typename coroutine_impl<CoroutineType, Heap>::tls_tag
+    > coroutine_impl<CoroutineType, Heap>::self_;
 
     /////////////////////////////////////////////////////////////////////////////
     template <typename Coroutine, template <typename> class Heap>
@@ -195,17 +191,17 @@ namespace hpx { namespace coroutines { namespace detail
     // functor. The type of this object is erased right after construction
     // when it is assigned to a pointer to coroutine_impl. A deleter is
     // passed down to make sure that the correct derived type is deleted.
-    template <typename FunctorType, typename CoroutineType, typename ContextImpl,
+    template <typename FunctorType, typename CoroutineType,
         template <typename> class Heap>
     class coroutine_impl_wrapper :
-        public coroutine_impl<CoroutineType, ContextImpl, Heap>
+        public coroutine_impl<CoroutineType, Heap>
     {
     public:
         typedef coroutine_impl_wrapper<
-            FunctorType, CoroutineType, ContextImpl, Heap> type;
+            FunctorType, CoroutineType, Heap> type;
         typedef CoroutineType coroutine_type;
         typedef typename CoroutineType::result_type result_type;
-        typedef coroutine_impl<CoroutineType, ContextImpl, Heap> super_type;
+        typedef coroutine_impl<CoroutineType, Heap> super_type;
         typedef typename super_type::thread_id_repr_type thread_id_repr_type;
 
         typedef typename util::decay<FunctorType>::type functor_type;
@@ -402,17 +398,17 @@ namespace hpx { namespace coroutines { namespace detail
         naming::id_type target_;        // keep target alive, if needed
     };
 
-    template <typename CoroutineType, typename ContextImpl, template <typename> class Heap>
+    template <typename CoroutineType, template <typename> class Heap>
     template <typename Functor>
-    inline typename coroutine_impl<CoroutineType, ContextImpl, Heap>::type*
-        coroutine_impl<CoroutineType, ContextImpl, Heap>::
+    inline typename coroutine_impl<CoroutineType, Heap>::type*
+        coroutine_impl<CoroutineType, Heap>::
         create(Functor && f, naming::id_type && target,
             thread_id_repr_type id, std::ptrdiff_t stack_size)
     {
         typedef typename hpx::util::decay<Functor>::type functor_type;
 
         typedef coroutine_impl_wrapper<
-            functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
+            functor_type, CoroutineType, Heap> wrapper_type;
 
         // start looking at the matching heap
         std::size_t const heap_count = wrapper_type::get_heap_count(stack_size);
@@ -431,7 +427,7 @@ namespace hpx { namespace coroutines { namespace detail
         // allocate a new coroutine object, if non is available (or all heaps are locked)
         if (NULL == wrapper)
         {
-            context_base<ContextImpl>::increment_allocation_count(heap_num);
+            context_base::increment_allocation_count(heap_num);
             return new wrapper_type(std::forward<Functor>(f), std::move(target),
                 id, stack_size);
         }
@@ -441,27 +437,27 @@ namespace hpx { namespace coroutines { namespace detail
         return wrapper;
     }
 
-    template <typename CoroutineType, typename ContextImpl, template <typename> class Heap>
+    template <typename CoroutineType, template <typename> class Heap>
     template <typename Functor>
-    inline void coroutine_impl<CoroutineType, ContextImpl, Heap>::
-        rebind(typename coroutine_impl<CoroutineType, ContextImpl, Heap>::type* p,
+    inline void coroutine_impl<CoroutineType, Heap>::
+        rebind(typename coroutine_impl<CoroutineType, Heap>::type* p,
             Functor && f, naming::id_type && target,
             thread_id_repr_type id)
     {
         typedef typename hpx::util::decay<Functor>::type functor_type;
 
         typedef coroutine_impl_wrapper<
-            functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
+            functor_type, CoroutineType, Heap> wrapper_type;
 
         wrapper_type* wrapper = static_cast<wrapper_type*>(p);
 
         wrapper->rebind(std::forward<Functor>(f), std::move(target), id);
     }
 
-    template <typename Functor, typename CoroutineType, typename ContextImpl,
+    template <typename Functor, typename CoroutineType,
         template <typename> class Heap>
     inline void
-        coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
+        coroutine_impl_wrapper<Functor, CoroutineType, Heap>::destroy(type* p)
     {
         // always hand the stack back to the matching heap
         deallocate(p, std::size_t(p->get_thread_id()) / 32); //-V112

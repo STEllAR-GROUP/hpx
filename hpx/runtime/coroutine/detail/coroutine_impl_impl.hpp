@@ -13,33 +13,29 @@
 
 namespace hpx { namespace coroutines { namespace detail
 {
-    template <typename CoroutineType, typename ContextImpl,
-        template <typename> class Heap>
-    void coroutine_impl<CoroutineType, ContextImpl, Heap>::set_self(self_type* self)
+    template <typename CoroutineType, template <typename> class Heap>
+    void coroutine_impl<CoroutineType, Heap>::set_self(self_type* self)
     {
         HPX_ASSERT(NULL != self_.get());
         *self_ = self;
     }
 
-    template <typename CoroutineType, typename ContextImpl,
-        template <typename> class Heap>
-    typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type*
-    coroutine_impl<CoroutineType, ContextImpl, Heap>::get_self()
+    template <typename CoroutineType, template <typename> class Heap>
+    typename coroutine_impl<CoroutineType, Heap>::self_type*
+    coroutine_impl<CoroutineType, Heap>::get_self()
     {
         return (NULL == self_.get()) ? NULL : *self_;
     }
 
-    template <typename CoroutineType, typename ContextImpl,
-        template <typename> class Heap>
-    void coroutine_impl<CoroutineType, ContextImpl, Heap>::init_self()
+    template <typename CoroutineType, template <typename> class Heap>
+    void coroutine_impl<CoroutineType, Heap>::init_self()
     {
         HPX_ASSERT(NULL == self_.get());
         self_.reset(new self_type* (NULL));
     }
 
-    template <typename CoroutineType, typename ContextImpl,
-        template <typename> class Heap>
-    void coroutine_impl<CoroutineType, ContextImpl, Heap>::reset_self()
+    template <typename CoroutineType, template <typename> class Heap>
+    void coroutine_impl<CoroutineType, Heap>::reset_self()
     {
         self_.reset(NULL);
     }

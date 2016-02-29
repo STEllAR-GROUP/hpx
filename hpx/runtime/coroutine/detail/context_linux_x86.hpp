@@ -125,12 +125,12 @@ namespace hpx { namespace coroutines
              * @note This function is found by ADL.
              */
             friend void swap_context(x86_linux_context_impl_base& from,
-                x86_linux_context_impl const& to, default_hint);
+                x86_linux_context_impl_base const& to, default_hint);
 
-            friend void swap_context(x86_linux_context_impl& from,
+            friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_hint);
 
-            friend void swap_context(x86_linux_context_impl& from,
+            friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_to_hint);
 
         protected:
@@ -282,12 +282,12 @@ namespace hpx { namespace coroutines
             }
 
             friend void swap_context(x86_linux_context_impl_base& from,
-                x86_linux_context_impl const& to, default_hint);
+                x86_linux_context_impl_base const& to, default_hint);
 
-            friend void swap_context(x86_linux_context_impl& from,
+            friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_hint);
 
-            friend void swap_context(x86_linux_context_impl& from,
+            friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_to_hint);
 
             // global functions to be called for each OS-thread after it started
@@ -363,14 +363,14 @@ namespace hpx { namespace coroutines
          * @note This function is found by ADL.
          */
         inline void swap_context(x86_linux_context_impl_base& from,
-            x86_linux_context_impl const& to, default_hint)
+            x86_linux_context_impl_base const& to, default_hint)
         {
             //        HPX_ASSERT(*(void**)to.m_stack == (void*)~0);
             to.prefetch();
             swapcontext_stack(&from.m_sp, to.m_sp);
         }
 
-        inline void swap_context(x86_linux_context_impl& from,
+        inline void swap_context(x86_linux_context_impl_base& from,
             x86_linux_context_impl_base const& to, yield_hint)
         {
             //        HPX_ASSERT(*(void**)from.m_stack == (void*)~0);
@@ -382,7 +382,7 @@ namespace hpx { namespace coroutines
 #endif
         }
 
-        inline void swap_context(x86_linux_context_impl& from,
+        inline void swap_context(x86_linux_context_impl_base& from,
             x86_linux_context_impl_base const& to, yield_to_hint)
         {
             //        HPX_ASSERT(*(void**)from.m_stack == (void*)~0);

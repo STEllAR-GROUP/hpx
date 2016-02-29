@@ -39,6 +39,10 @@
  * be big.
  */
 #include <hpx/config.hpp>
+
+// This needs to be first for building on Macs
+#include <hpx/runtime/coroutine/detail/context_impl.hpp>
+
 #include <hpx/util/assert.hpp>
 #include <hpx/runtime/coroutine/detail/swap_context.hpp> //for swap hints
 #include <hpx/runtime/coroutine/detail/tss.hpp>
@@ -85,19 +89,15 @@ namespace hpx { namespace coroutines { namespace detail
     /////////////////////////////////////////////////////////////////////////////
     std::ptrdiff_t const default_stack_size = -1;
 
-    template <typename ContextImpl>
-    class context_base : public ContextImpl
+    class context_base : public default_context_impl
     {
     public:
-        typedef ContextImpl context_impl;
-        typedef context_base<context_impl> type;
-
-        typedef void deleter_type(type const*);
+        typedef void deleter_type(context_base const*);
         typedef void* thread_id_repr_type;
 
         template <typename Derived>
         context_base(Derived& derived, std::ptrdiff_t stack_size, thread_id_repr_type id)
-          : context_impl(derived, stack_size),
+          : default_context_impl(derived, stack_size),
             m_caller(),
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
             m_counter(0),
@@ -121,12 +121,12 @@ namespace hpx { namespace coroutines { namespace detail
             continuation_recursion_count_(0)
         {}
 
-        friend void intrusive_ptr_add_ref(type * ctx)
+        friend void intrusive_ptr_add_ref(context_base* ctx)
         {
             ctx->acquire();
         }
 
-        friend void intrusive_ptr_release(type * ctx)
+        friend void intrusive_ptr_release(context_base* ctx)
         {
             ctx->release();
         }
@@ -603,18 +603,18 @@ namespace hpx { namespace coroutines { namespace detail
         }
 
         template <typename ActualCtx>
-        static void deleter(type const* ctx)
+        static void deleter(context_base const* ctx)
         {
-            ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<type*>(ctx)));
+            ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<context_base*>(ctx)));
         }
 
-        typedef typename context_impl::context_impl_base ctx_type;
+        typedef typename default_context_impl::context_impl_base ctx_type;
         ctx_type m_caller;
 
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
         mutable boost::atomic_uint64_t m_counter;
 #endif
-        static allocation_counters m_allocation_counters;
+        static HPX_EXPORT allocation_counters m_allocation_counters;
         deleter_type* m_deleter;
         context_state m_state;
         context_exit_state m_exit_state;
@@ -636,10 +636,6 @@ namespace hpx { namespace coroutines { namespace detail
 
         std::size_t continuation_recursion_count_;
     };
-
-    // initialize static allocation counter
-    template <typename ContextImpl>
-    allocation_counters context_base<ContextImpl>::m_allocation_counters;
 }}}
 
-#endif /*HPX_RUNTIME_COROUTINE_CONTEXT_BASE_HPP*/
+#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_BASE_HPP*/

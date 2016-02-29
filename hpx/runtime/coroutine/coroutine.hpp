@@ -32,9 +32,6 @@
 
 #include <hpx/config.hpp>
 
-// This needs to be first for building on Macs
-#include <hpx/runtime/coroutine/detail/default_context_impl.hpp>
-
 #include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/coroutine/detail/self.hpp>
@@ -52,7 +49,7 @@
 
 namespace hpx { namespace coroutines
 {
-    template <template <typename> class Heap, typename Context>
+    template <template <typename> class Heap>
     class coroutine;
 
     template <typename T>
@@ -60,30 +57,27 @@ namespace hpx { namespace coroutines
       : boost::mpl::false_
     {};
 
-    template <template <typename> class Heap, typename Context>
-    struct is_coroutine<coroutine<Heap, Context> >
+    template <template <typename> class Heap>
+    struct is_coroutine<coroutine<Heap> >
       : boost::mpl::true_
     {};
 
     /////////////////////////////////////////////////////////////////////////////
-    template <
-        template <typename> class Heap,
-        typename ContextImpl>
+    template <template <typename> class Heap>
     class coroutine
     {
     private:
         HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine)
 
     public:
-        typedef coroutine<Heap, ContextImpl> type;
-        typedef ContextImpl context_impl;
+        typedef coroutine<Heap> type;
 
         friend struct detail::coroutine_accessor;
 
         typedef threads::thread_state_enum result_type;
         typedef threads::thread_state_ex_enum arg_type;
 
-        typedef detail::coroutine_impl<type, context_impl, Heap> impl_type;
+        typedef detail::coroutine_impl<type, Heap> impl_type;
         typedef typename impl_type::pointer impl_ptr;
         typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
 
