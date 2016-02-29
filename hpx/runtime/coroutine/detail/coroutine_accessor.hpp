@@ -29,28 +29,10 @@
 #ifndef HPX_RUNTIME_COROUTINE_DETAIL_COROUTINE_ACCESSOR_HPP
 #define HPX_RUNTIME_COROUTINE_DETAIL_COROUTINE_ACCESSOR_HPP
 
-#include <cstddef>
-
-#include  <boost/utility/in_place_factory.hpp>
-
 namespace hpx { namespace coroutines { namespace detail
 {
-    /*
-     * This is a private interface used for coroutine
-     * implementation.
-     */
-    struct init_from_impl_tag {};
-
     struct coroutine_accessor
     {
-        // Initialize coroutine from implementation type.
-        // used by the in_place_assing in place factory.
-        template <typename Coroutine, typename Ctx>
-        static void construct(Ctx* src, void* address)
-        {
-            new (address) Coroutine(src, init_from_impl_tag());
-        }
-
         template <typename Coroutine>
         static void acquire(Coroutine& x)
         {
@@ -63,42 +45,10 @@ namespace hpx { namespace coroutines { namespace detail
             x.release();
         }
 
-        template <typename Ctx>
-        struct in_place_assign : boost::in_place_factory_base
-        {
-            in_place_assign(Ctx* ctx) : m_ctx(ctx) {}
-
-            template <typename Coroutine>
-            void apply(void* memory) const
-            {
-                construct<Coroutine>(m_ctx, memory);
-            }
-
-            Ctx* m_ctx;
-        };
-
-        template <typename Ctx>
-        static in_place_assign<Ctx> in_place(Ctx* ctx)
-        {
-            return in_place_assign<Ctx>(ctx);
-        }
-
         template <typename Coroutine>
         static typename Coroutine::impl_ptr get_impl(Coroutine& x)
         {
             return x.get_impl();
-        }
-
-        template <typename Coroutine>
-        static typename Coroutine::impl_type* pilfer_impl(Coroutine& x)
-        {
-            return x.pilfer_impl();
-        }
-
-        template <typename Coroutine>
-        static std::size_t count(Coroutine const& x)
-        {
-            return x.count();
         }
     };
 }}}

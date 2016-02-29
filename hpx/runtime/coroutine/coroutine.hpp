@@ -294,12 +294,6 @@ namespace hpx { namespace coroutines
         }
 
     protected:
-        // The second parameter is used to avoid calling this constructor
-        // by mistake from other member functions (specifically operator=).
-        //coroutine(impl_type * pimpl, detail::init_from_impl_tag)
-        //  : m_pimpl(pimpl)
-        //{}
-
         void bool_type_f() {}
 
         bool good() const
