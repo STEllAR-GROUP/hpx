@@ -29,7 +29,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/lockfree/stack.hpp>
 
 #include <stack>
 
@@ -42,41 +41,6 @@ namespace hpx { namespace threads
 
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        // Why do we use std::stack + a lock here?
-        template <typename CoroutineImpl>
-        struct coroutine_allocator
-        {
-            coroutine_allocator()
-              : heap_(128)
-            {}
-
-            CoroutineImpl* get()
-            {
-                return get_locked();
-            }
-
-            CoroutineImpl* try_get() //-V524
-            {
-                return get_locked();
-            }
-
-            void deallocate(CoroutineImpl* c)
-            {
-                heap_.push(c);
-            }
-
-        private:
-            CoroutineImpl* get_locked()
-            {
-                CoroutineImpl* result = 0;
-                heap_.pop(result);
-                return result;
-            }
-
-            boost::lockfree::stack<CoroutineImpl*> heap_;
-        };
-
         ///////////////////////////////////////////////////////////////////////
         struct thread_exit_callback_node
         {

@@ -22,13 +22,10 @@ namespace hpx { namespace coroutines
         template <typename Coroutine>
         class coroutine_self;
 
-        template<
-            typename CoroutineType,
-            template <typename> class Heap>
+        template<typename CoroutineType>
         class coroutine_impl;
     }
 
-    template<template <typename> class Heap>
     class coroutine;
     /// \endcond
 }}
@@ -49,21 +46,16 @@ namespace hpx { namespace threads
     class HPX_EXPORT executor;
 
     ///////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename CoroutineImpl> struct coroutine_allocator;
-    }
+    typedef coroutines::coroutine coroutine_type;
 
-    typedef coroutines::coroutine<detail::coroutine_allocator> coroutine_type;
-
-    typedef coroutines::detail::coroutine_self<coroutine_type>
-        thread_self;
     typedef
-        coroutines::detail::coroutine_impl<
-            coroutine_type
-          , detail::coroutine_allocator
-        >
+        coroutines::detail::coroutine_self<coroutine_type>
+        thread_self;
+
+    typedef
+        coroutines::detail::coroutine_impl<coroutine_type>
         thread_self_impl_type;
+
     typedef void * thread_id_repr_type;
 
     typedef boost::intrusive_ptr<thread_data> thread_id_type;

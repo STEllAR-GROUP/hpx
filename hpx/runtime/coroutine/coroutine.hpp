@@ -49,39 +49,23 @@
 
 namespace hpx { namespace coroutines
 {
-    template <template <typename> class Heap>
-    class coroutine;
-
-    template <typename T>
-    struct is_coroutine
-      : boost::mpl::false_
-    {};
-
-    template <template <typename> class Heap>
-    struct is_coroutine<coroutine<Heap> >
-      : boost::mpl::true_
-    {};
-
     /////////////////////////////////////////////////////////////////////////////
-    template <template <typename> class Heap>
     class coroutine
     {
     private:
         HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine)
 
     public:
-        typedef coroutine<Heap> type;
-
         friend struct detail::coroutine_accessor;
 
         typedef threads::thread_state_enum result_type;
         typedef threads::thread_state_ex_enum arg_type;
 
-        typedef detail::coroutine_impl<type, Heap> impl_type;
+        typedef detail::coroutine_impl<coroutine> impl_type;
         typedef typename impl_type::pointer impl_ptr;
         typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
 
-        typedef detail::coroutine_self<type> self;
+        typedef detail::coroutine_self<coroutine> self;
         coroutine() : m_pimpl(0) {}
 
         template <typename Functor>
@@ -99,14 +83,14 @@ namespace hpx { namespace coroutines
         //{}
 
         coroutine(coroutine && src)
-          : m_pimpl(src->m_pimpl)
+          : m_pimpl(src.m_pimpl)
         {
-            src->m_pimpl = 0;
+            src.m_pimpl = 0;
         }
 
         coroutine& operator=(coroutine && src)
         {
-            coroutine(src).swap(*this);
+            coroutine(std::move(src)).swap(*this);
             return *this;
         }
 
@@ -193,7 +177,7 @@ namespace hpx { namespace coroutines
         bool pending() const
         {
             HPX_ASSERT(m_pimpl);
-            return m_pimpl->pending();
+            return m_pimpl->pending() != 0;
         }
 
         bool exited() const

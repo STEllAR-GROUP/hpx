@@ -13,29 +13,29 @@
 
 namespace hpx { namespace coroutines { namespace detail
 {
-    template <typename CoroutineType, template <typename> class Heap>
-    void coroutine_impl<CoroutineType, Heap>::set_self(self_type* self)
+    template <typename CoroutineType>
+    void coroutine_impl<CoroutineType>::set_self(self_type* self)
     {
         HPX_ASSERT(NULL != self_.get());
         *self_ = self;
     }
 
-    template <typename CoroutineType, template <typename> class Heap>
-    typename coroutine_impl<CoroutineType, Heap>::self_type*
-    coroutine_impl<CoroutineType, Heap>::get_self()
+    template <typename CoroutineType>
+    typename coroutine_impl<CoroutineType>::self_type*
+    coroutine_impl<CoroutineType>::get_self()
     {
         return (NULL == self_.get()) ? NULL : *self_;
     }
 
-    template <typename CoroutineType, template <typename> class Heap>
-    void coroutine_impl<CoroutineType, Heap>::init_self()
+    template <typename CoroutineType>
+    void coroutine_impl<CoroutineType>::init_self()
     {
         HPX_ASSERT(NULL == self_.get());
         self_.reset(new self_type* (NULL));
     }
 
-    template <typename CoroutineType, template <typename> class Heap>
-    void coroutine_impl<CoroutineType, Heap>::reset_self()
+    template <typename CoroutineType>
+    void coroutine_impl<CoroutineType>::reset_self()
     {
         self_.reset(NULL);
     }
