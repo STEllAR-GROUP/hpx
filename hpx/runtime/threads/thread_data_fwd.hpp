@@ -23,8 +23,6 @@ namespace hpx { namespace coroutines
         template <typename Coroutine>
         class coroutine_self;
 
-        template <typename CoroutineImpl>
-        struct coroutine_allocator;
         template<
             typename CoroutineType, typename ContextImpl,
             template <typename> class Heap>

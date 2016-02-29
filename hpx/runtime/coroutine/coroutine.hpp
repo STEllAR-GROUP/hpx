@@ -66,24 +66,6 @@ namespace hpx { namespace coroutines
     {};
 
     /////////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename CoroutineImpl>
-        struct coroutine_allocator
-        {
-            CoroutineImpl* get()
-            {
-                return NULL;
-            }
-
-            void deallocate(CoroutineImpl* c)
-            {
-                delete c;
-            }
-        };
-    }
-
-    /////////////////////////////////////////////////////////////////////////////
     template <
         template <typename> class Heap,
         typename ContextImpl>
