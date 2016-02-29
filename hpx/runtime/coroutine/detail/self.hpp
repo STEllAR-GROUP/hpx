@@ -30,8 +30,8 @@
 #define HPX_RUNTIME_COROUTINE_DETAIL_SELF_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/coroutine/detail/fix_result.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
@@ -75,28 +75,22 @@ namespace hpx { namespace coroutines { namespace detail
         typedef impl_type* impl_ptr;
 
         typedef typename coroutine_type::result_type result_type;
-        typedef typename coroutine_type::result_slot_type result_slot_type;
-        typedef typename coroutine_type::yield_result_type yield_result_type;
-        typedef typename coroutine_type::result_slot_traits result_slot_traits;
-        typedef typename coroutine_type::arg_slot_type arg_slot_type;
-        typedef typename coroutine_type::arg_slot_traits arg_slot_traits;
-        typedef typename coroutine_type::yield_traits yield_traits;
+        typedef typename coroutine_type::arg_type arg_type;
         typedef typename coroutine_type::thread_id_repr_type thread_id_repr_type;
 
-        typedef typename yield_traits::arg0_type arg0_type;
-        typedef util::function_nonser<yield_result_type(arg0_type)>
+        typedef util::function_nonser<arg_type(result_type)>
             yield_decorator_type;
 
-        yield_result_type yield(arg0_type arg0 = arg0_type())
+        arg_type yield(result_type arg = result_type())
         {
-            return !yield_decorator_.empty() ? yield_decorator_(arg0) : yield_impl(arg0);
+            return !yield_decorator_.empty() ? yield_decorator_(arg) : yield_impl(arg);
         }
 
-        yield_result_type yield_impl(arg0_type arg0)
+        arg_type yield_impl(result_type arg)
         {
             HPX_ASSERT(m_pimpl);
 
-            this->m_pimpl->bind_result(&arg0);
+            this->m_pimpl->bind_result(&arg);
 
             {
                 reset_self_on_exit on_exit(this);
@@ -139,9 +133,9 @@ namespace hpx { namespace coroutines { namespace detail
             std::terminate(); // FIXME: replace with hpx::terminate();
         }
 
-        yield_result_type result() {
-            return detail::fix_result<
-                typename coroutine_type::arg_slot_traits>(*m_pimpl->args());
+        arg_type result() {
+            using boost::get;
+            return get<0>(*m_pimpl->args());
         }
 
         bool pending() const

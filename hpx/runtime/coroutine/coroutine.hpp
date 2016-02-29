@@ -36,18 +36,14 @@
 #include <hpx/runtime/coroutine/detail/default_context_impl.hpp>
 
 #include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
-#include <hpx/runtime/coroutine/detail/signature.hpp>
-#include <hpx/runtime/coroutine/detail/index.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_traits.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
-#include <hpx/runtime/coroutine/detail/fix_result.hpp>
 #include <hpx/runtime/coroutine/detail/self.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/optional.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -56,34 +52,7 @@
 
 namespace hpx { namespace coroutines
 {
-    namespace detail
-    {
-        template <typename T>
-        struct optional_result_type
-          : std::conditional<
-                std::is_void<T>::value,
-                void,
-                boost::optional<T>
-            >
-        {};
-
-        template <typename T>
-        typename std::enable_if<
-            std::is_void<T>::value
-        >::type
-        optional_result() {}
-
-        template <typename T>
-        typename std::enable_if<
-            !std::is_void<T>::value,
-            typename optional_result_type<T>::type
-        >::type optional_result()
-        {
-            return typename optional_result_type<T>::type();
-        }
-    }
-
-    template <typename Signature, template <typename> class Heap, typename Context>
+    template <template <typename> class Heap, typename Context>
     class coroutine;
 
     template <typename T>
@@ -91,8 +60,8 @@ namespace hpx { namespace coroutines
       : boost::mpl::false_
     {};
 
-    template <typename Signature, template <typename> class Heap, typename Context>
-    struct is_coroutine<coroutine<Signature, Heap, Context> >
+    template <template <typename> class Heap, typename Context>
+    struct is_coroutine<coroutine<Heap, Context> >
       : boost::mpl::true_
     {};
 
@@ -116,7 +85,6 @@ namespace hpx { namespace coroutines
 
     /////////////////////////////////////////////////////////////////////////////
     template <
-        typename Signature,
         template <typename> class Heap,
         typename ContextImpl>
     class coroutine
@@ -125,19 +93,13 @@ namespace hpx { namespace coroutines
         HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine)
 
     public:
-        typedef coroutine<Signature, Heap, ContextImpl> type;
+        typedef coroutine<Heap, ContextImpl> type;
         typedef ContextImpl context_impl;
-        typedef Signature signature_type;
-        typedef detail::coroutine_traits<signature_type> traits_type;
 
         friend struct detail::coroutine_accessor;
 
-        typedef typename traits_type::result_type result_type;
-        typedef typename traits_type::result_slot_type result_slot_type;
-        typedef typename traits_type::yield_result_type yield_result_type;
-        typedef typename traits_type::result_slot_traits result_slot_traits;
-        typedef typename traits_type::arg_slot_type arg_slot_type;
-        typedef typename traits_type::arg_slot_traits arg_slot_traits;
+        typedef threads::thread_state_enum result_type;
+        typedef threads::thread_state_ex_enum arg_type;
 
         typedef detail::coroutine_impl<type, context_impl, Heap> impl_type;
         typedef typename impl_type::pointer impl_ptr;
@@ -215,22 +177,13 @@ namespace hpx { namespace coroutines
                 std::move(target), id);
         }
 
-        typedef typename arg_slot_traits::template at<0>::type arg0_type;
-        static const int arity = 1;
-
-        struct yield_traits
-        {
-            typedef typename result_slot_traits::template at<0>::type arg0_type;
-            static const int arity = 1;
-        };
-
-        HPX_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
+        HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())
         {
             HPX_ASSERT(m_pimpl);
             HPX_ASSERT(m_pimpl->is_ready());
 
             result_type* ptr = 0;
-            m_pimpl->bind_args(&arg0);
+            m_pimpl->bind_args(&arg);
             m_pimpl->bind_result_pointer(&ptr);
 
             m_pimpl->invoke();

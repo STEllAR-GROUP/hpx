@@ -25,12 +25,13 @@ namespace hpx { namespace coroutines
 
         template <typename CoroutineImpl>
         struct coroutine_allocator;
-        template<typename CoroutineType, typename ContextImpl,
+        template<
+            typename CoroutineType, typename ContextImpl,
             template <typename> class Heap>
         class coroutine_impl;
     }
 
-    template<typename Signature,
+    template<
         template <typename> class Heap,
         typename ContextImpl = detail::default_context_impl>
     class coroutine;
@@ -58,8 +59,7 @@ namespace hpx { namespace threads
         template <typename CoroutineImpl> struct coroutine_allocator;
     }
 
-    typedef coroutines::coroutine<
-        thread_function_sig, detail::coroutine_allocator> coroutine_type;
+    typedef coroutines::coroutine<detail::coroutine_allocator> coroutine_type;
 
     typedef coroutines::detail::coroutine_self<coroutine_type>
         thread_self;

@@ -73,10 +73,8 @@ namespace hpx { namespace coroutines { namespace detail
         typedef CoroutineType coroutine_type;
         typedef coroutine_impl<coroutine_type, context_impl, Heap> type;
         typedef context_base<context_impl> context_base_;
-        typedef typename coroutine_type::arg_slot_type arg_slot_type;
-        typedef typename coroutine_type::arg_slot_traits arg_slot_traits;
         typedef typename coroutine_type::result_type result_type;
-        typedef typename coroutine_type::result_slot_type result_slot_type;
+        typedef typename coroutine_type::arg_type arg_type;
         typedef typename context_base_::thread_id_repr_type thread_id_repr_type;
 
         typedef boost::intrusive_ptr<type> pointer;
@@ -104,14 +102,13 @@ namespace hpx { namespace coroutines { namespace detail
             return *this->m_result;
         }
 
-        typedef typename arg_slot_traits::template at<0>::type arg0_type;
-        arg0_type * args()
+        arg_type * args()
         {
             HPX_ASSERT(m_arg);
             return m_arg;
         };
 
-        void bind_args(arg0_type* arg)
+        void bind_args(arg_type* arg)
         {
             m_arg = arg;
         }
@@ -126,28 +123,6 @@ namespace hpx { namespace coroutines { namespace detail
         void bind_result_pointer(result_type** resp)
         {
             m_result = resp;
-        }
-
-        result_type** result_pointer()
-        {
-            return m_result;
-        }
-
-        // This function must be called only for void
-        // coroutines. It wakes up the coroutine.
-        // Entering the wait state does not cause this
-        // method to throw.
-        void run()
-        {
-            arg_slot_type void_args;
-            result_slot_type * ptr = 0;
-
-            // This dummy binding is required because
-            // do_call expect args() and result()
-            // to return a non NULL result.
-            bind_args(&void_args);
-            bind_result_pointer(&ptr);
-            this->wake_up();
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
@@ -171,7 +146,7 @@ namespace hpx { namespace coroutines { namespace detail
 
     protected:
         result_type m_result_last;
-        arg0_type* m_arg;
+        arg_type* m_arg;
         result_type** m_result;
     };
 
