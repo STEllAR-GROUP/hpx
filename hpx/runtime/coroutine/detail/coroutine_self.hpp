@@ -34,6 +34,7 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -53,12 +54,12 @@ namespace hpx { namespace coroutines { namespace detail
             reset_self_on_exit(coroutine_self* self)
               : self_(self)
             {
-                impl_type::set_self(self->next_self_);
+                set_self(self->next_self_);
             }
 
             ~reset_self_on_exit()
             {
-                impl_type::set_self(self_);
+                set_self(self_);
             }
 
             coroutine_self* self_;
@@ -205,6 +206,16 @@ namespace hpx { namespace coroutines { namespace detail
         }
 
     private:
+        struct tls_tag {};
+        static hpx::util::thread_specific_ptr<type*, tls_tag> self_;
+
+    public:
+        HPX_COROUTINE_EXPORT static void set_self(type* self);
+        HPX_COROUTINE_EXPORT static type* get_self();
+        HPX_COROUTINE_EXPORT static void init_self();
+        HPX_COROUTINE_EXPORT static void reset_self();
+
+    private:
         yield_decorator_type yield_decorator_;
 
         impl_ptr get_impl()
@@ -214,6 +225,13 @@ namespace hpx { namespace coroutines { namespace detail
         impl_ptr m_pimpl;
         coroutine_self* next_self_;
     };
+
+    // the TLS holds a pointer to the self instance as stored on the stack
+    template <typename CoroutineType>
+    hpx::util::thread_specific_ptr<
+        typename coroutine_self<CoroutineType>::type*
+      , typename coroutine_self<CoroutineType>::tls_tag
+    > coroutine_self<CoroutineType>::self_;
 }}}
 
 #endif /*HPX_RUNTIME_COROUTINE_DETAIL_SELF_HPP*/

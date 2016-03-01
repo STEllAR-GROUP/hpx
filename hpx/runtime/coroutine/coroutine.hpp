@@ -34,7 +34,7 @@
 
 #include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
-#include <hpx/runtime/coroutine/detail/self.hpp>
+#include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>

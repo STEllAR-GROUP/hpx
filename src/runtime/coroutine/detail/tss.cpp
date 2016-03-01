@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/coroutine/coroutine.hpp>
+#include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
 #include <hpx/runtime/coroutine/detail/tss.hpp>
-#include <hpx/runtime/coroutine/detail/self.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/runtime/threads_fwd.hpp>

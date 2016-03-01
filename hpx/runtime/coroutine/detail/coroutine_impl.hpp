@@ -38,12 +38,11 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/runtime/coroutine/detail/config.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/coroutine/detail/context_base.hpp>
-#include <hpx/runtime/coroutine/detail/self.hpp>
+#include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
+#include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/reinitializable_static.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
@@ -130,30 +129,11 @@ namespace hpx { namespace coroutines { namespace detail
         }
 #endif
 
-        struct tls_tag {};
-
-    private:
-        typedef detail::coroutine_self<coroutine_type> self_type;
-        static hpx::util::thread_specific_ptr<self_type*, tls_tag> self_;
-
-    public:
-        HPX_COROUTINE_EXPORT static void set_self(self_type* self);
-        HPX_COROUTINE_EXPORT static self_type* get_self();
-        HPX_COROUTINE_EXPORT static void init_self();
-        HPX_COROUTINE_EXPORT static void reset_self();
-
     protected:
         result_type m_result_last;
         arg_type* m_arg;
         result_type** m_result;
     };
-
-    // the TLS holds a pointer to the self instance as stored on the stack
-    template <typename CoroutineType>
-    hpx::util::thread_specific_ptr<
-        typename coroutine_impl<CoroutineType>::self_type*
-      , typename coroutine_impl<CoroutineType>::tls_tag
-    > coroutine_impl<CoroutineType>::self_;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Coroutine>
@@ -245,7 +225,7 @@ namespace hpx { namespace coroutines { namespace detail
 
                     typedef typename coroutine_type::self self_type;
                     {
-                        self_type* old_self = super_type::get_self();
+                        self_type* old_self = self_type::get_self();
                         self_type self(this, old_self);
                         reset_self_on_exit on_exit(&self, old_self);
 
@@ -293,14 +273,14 @@ namespace hpx { namespace coroutines { namespace detail
             typedef typename coroutine_type::self self_type;
 
             reset_self_on_exit(self_type* val, self_type* old_val = 0)
-                : old_self(old_val)
+              : old_self(old_val)
             {
-                super_type::set_self(val);
+                self_type::set_self(val);
             }
 
             ~reset_self_on_exit()
             {
-                super_type::set_self(old_self);
+                self_type::set_self(old_self);
             }
 
             self_type* old_self;
