@@ -8,8 +8,8 @@
 #define HPX_SERIALIZATION_ACCESS_HPP
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
-#include <hpx/traits/has_serialize.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/type_traits/is_empty.hpp>
@@ -24,6 +24,8 @@ namespace hpx { namespace serialization
 {
     namespace detail
     {
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(serialize);
+
         template <class T> HPX_FORCEINLINE
         void serialize_force_adl(output_archive& ar, const T& t, unsigned)
         {
@@ -98,7 +100,7 @@ namespace hpx { namespace serialization
                 hpx::traits::is_intrusive_polymorphic<T>,
                     boost::mpl::identity<intrusive_polymorphic>,
                         boost::mpl::eval_if<
-                            hpx::traits::has_serialize<T>,
+                            detail::has_serialize<T>,
                                 boost::mpl::identity<intrusive_usual>,
                                 boost::mpl::eval_if<
                                     boost::is_empty<T>,

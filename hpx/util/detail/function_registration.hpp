@@ -15,9 +15,8 @@
 #include <hpx/util/demangle_helper.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
 
-#include <utility>
+#include <string>
 
 namespace hpx { namespace util { namespace detail
 {

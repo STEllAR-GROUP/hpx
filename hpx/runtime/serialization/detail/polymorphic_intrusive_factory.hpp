@@ -8,63 +8,47 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-
+#include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/jenkins_hash.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/static.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/noncopyable.hpp>
+#include <cassert> // boost::unordered_map below needs this
 #include <boost/unordered_map.hpp>
-#include <boost/atomic.hpp>
-#include <boost/mpl/bool.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <string>
 
 namespace hpx { namespace serialization { namespace detail
 {
-    class polymorphic_intrusive_factory : boost::noncopyable
+    class polymorphic_intrusive_factory
     {
-    public:
+        HPX_NON_COPYABLE(polymorphic_intrusive_factory);
+
         typedef void* (*ctor_type) ();
         typedef boost::unordered_map<std::string,
-                ctor_type, hpx::util::jenkins_hash> ctor_map_type;
+            ctor_type, hpx::util::jenkins_hash> ctor_map_type;
+
+    public:
+        polymorphic_intrusive_factory() {}
 
         HPX_EXPORT static polymorphic_intrusive_factory& instance();
 
-        void register_class(const std::string& name, ctor_type fun)
+        HPX_EXPORT void register_class(std::string const& name, ctor_type fun);
+
+        HPX_EXPORT void* create(std::string const& name) const;
+
+        template <typename T>
+        T* create(std::string const& name) const
         {
-            if(name.empty())
-            {
-                HPX_THROW_EXCEPTION(serialization_error
-                  , "polymorphic_intrusive_factory::register_class"
-                  , "Cannot register a factory with an empty name");
-            }
-            auto it = map_.find(name);
-            if(it == map_.end())
-            {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-                map_.emplace(name, fun);
-#else
-                map_.insert(ctor_map_type::value_type(name, fun));
-#endif
-            }
+            return static_cast<T*>(create(name));
         }
 
-        template <class T>
-        T* create(const std::string& name) const
-        {
-            return static_cast<T*>(map_.at(name)());
-        }
-
-        friend struct hpx::util::static_<polymorphic_intrusive_factory>;
-
+    private:
         ctor_map_type map_;
     };
 
-    template <class T, typename = void>
+    template <typename T, typename Enable = void>
     struct register_class_name
     {
         register_class_name()
@@ -89,13 +73,13 @@ namespace hpx { namespace serialization { namespace detail
         static register_class_name instance;
     };
 
-    template <class T, class Enable>
+    template <typename T, typename Enable>
     register_class_name<T, Enable> register_class_name<T, Enable>::instance;
 
 }}}
 
 #define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name)        \
-  template <class, class> friend                                              \
+  template <typename, typename> friend                                        \
   struct ::hpx::serialization::detail::register_class_name;                   \
                                                                               \
   static std::string hpx_serialization_get_name_impl()                        \
@@ -106,7 +90,7 @@ namespace hpx { namespace serialization { namespace detail
   }                                                                           \
   virtual std::string hpx_serialization_get_name() const                      \
   {                                                                           \
-      return Class ::hpx_serialization_get_name_impl();                       \
+      return Class::hpx_serialization_get_name_impl();                        \
   }                                                                           \
 /**/
 
@@ -170,8 +154,6 @@ namespace hpx { namespace serialization { namespace detail
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                           \
       Class, BOOST_PP_STRINGIZE(Class))                                       \
 /**/
-
-#include <hpx/config/warnings_suffix.hpp>
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(Class)                         \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(                                    \

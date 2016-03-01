@@ -1137,6 +1137,18 @@ namespace hpx
     {
         return get_error_state(detail::access_exception(e));
     }
+
+    void assertion_failed(char const* expr, char const* function,
+        char const* file, long line)
+    {
+        hpx::detail::assertion_failed(expr, function, file, line);
+    }
+
+    void assertion_failed_msg(char const* msg, char const* expr,
+        char const* function, char const* file, long line)
+    {
+        hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
+    }
 }
 
 

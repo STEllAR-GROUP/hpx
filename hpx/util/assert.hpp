@@ -41,7 +41,7 @@
 
 namespace hpx
 {
-    HPX_EXPORT void assertion_failed(char const * expr,
+    HPX_ATTRIBUTE_NORETURN HPX_EXPORT void assertion_failed(char const * expr,
         char const * function, char const * file, long line);  // user defined
 } // namespace hpx
 
@@ -77,8 +77,9 @@ namespace hpx
 
 namespace hpx
 {
-    HPX_EXPORT void assertion_failed_msg(char const * expr, char const * msg,
-           char const * function, char const * file, long line); // user defined
+    HPX_ATTRIBUTE_NORETURN HPX_EXPORT void assertion_failed_msg(
+        char const * expr, char const * msg,
+        char const * function, char const * file, long line); // user defined
 } // namespace hpx
 
 #define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
@@ -106,9 +107,10 @@ namespace hpx { namespace assertion { namespace detail
 {
     // Note: The template is needed to make the function non-inline and
     // avoid linking errors
-    template< typename CharT >
-    HPX_NOINLINE void assertion_failed_msg(CharT const * expr,
-        char const * msg, char const * function, char const * file, long line)
+    template <typename CharT>
+    HPX_ATTRIBUTE_NORETURN HPX_NOINLINE void assertion_failed_msg(
+        CharT const * expr, char const * msg, char const * function,
+        char const * file, long line)
     {
         HPX_ASSERT_MSG_OSTREAM
             << "***** Internal Program Error - assertion (" << expr

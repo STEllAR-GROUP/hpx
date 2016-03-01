@@ -9,7 +9,7 @@
 #define HPX_UTIL_DETAIL_BASIC_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
@@ -21,10 +21,10 @@
 
 #include <boost/mpl/bool.hpp>
 
+#include <cstring>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
-#include <cstring>
 
 namespace hpx { namespace util { namespace detail
 {
