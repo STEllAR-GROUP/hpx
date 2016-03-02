@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Minh-Khanh Do
+//  Copyright (c) 2016 Minh-Khanh Do
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -33,9 +33,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         // parallel version
         template <
-        //typename ParAlgo, typename SegAlgo,
-        template <typename IterPair> class Algo,
-        typename ExPolicy, typename InIter, typename OutIter>
+            template <typename IterPair> class Algo,
+            typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
@@ -60,24 +59,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare segmented version
         template <
-        //typename ParAlgo, typename SegAlgo,
-        template <typename IterPair> class Algo,
-        typename ExPolicy, typename InIter, typename OutIter>
+            template <typename IterPair> class Algo,
+            typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
-        >::type
+                ExPolicy, std::pair<InIter, OutIter>
+            >::type
         transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
             std::true_type);
 
         /// \endcond
     }
 
-    /// Executes algorithm on the elements in the range [first, last), to another range
-    /// beginning at \a dest. After this operation the elements in the
-    /// moved-from range will still contain valid values of the appropriate
-    /// type, but not necessarily the same values as before the move.
+    /// Executes transfer algorithm on the elements in the range [first, last), to another range
+    /// beginning at \a dest.
     ///
-    /// \note   Complexity: Performs exactly \a last - \a first move assignments.
+    /// \note   Complexity: Performs exactly \a last - \a first transfer assignments.
+    ///
+    ///
+    /// \tparam Algo        The algorithm that is used to transfer the elements.
+    ///                     Should be hpx::parallel::detail::copy or
+    ///                     hpx::parallel::detail::move.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -99,34 +100,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The move assignments in the parallel \a move algorithm invoked
-    /// with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in
-    /// the calling thread.
-    ///
-    /// The move assignments in the parallel \a move algorithm invoked
-    /// with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a move algorithm returns a \a hpx::future<OutIter> if
+    /// \returns  The \a transfer algorithm returns a \a hpx::future<OutIter> if
     ///           the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a move algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
-    ///           copied.
+    ///           transfered.
     ///
     template <
-    template <typename IterPair> class Algo,
-    //typename ParAlgo, typename SegAlgo,
-    typename ExPolicy, typename InIter, typename OutIter,
-    HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        template <typename IterPair> class Algo,
+        typename ExPolicy, typename InIter, typename OutIter,
+        HPX_CONCEPT_REQUIRES_(
+            is_execution_policy<ExPolicy>::value &&
+            traits::is_iterator<InIter>::value &&
+            traits::is_iterator<OutIter>::value)
+    >
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type

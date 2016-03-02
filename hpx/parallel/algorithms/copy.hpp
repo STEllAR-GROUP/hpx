@@ -29,8 +29,6 @@
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/algorithms/transfer.hpp>
 #include <hpx/traits.hpp>
-//#include <tests/unit/parallel/container_algorithms/test_utils.hpp>
-//#include <hpx/include/partitioned_vector.hpp>
 
 #include <algorithm>
 #include <iterator>

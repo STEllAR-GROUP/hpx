@@ -35,12 +35,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
 
         // sequential remote implementation
-        template <typename SegAlgo, typename ExPolicy, typename SegIter,
-                                    typename SegOutIter>
+        template <typename Algo, typename ExPolicy, typename SegIter,
+            typename SegOutIter>
         static typename util::detail::algorithm_result<
             ExPolicy, std::pair<SegIter, SegOutIter>
         >::type
-        segmented_transfer(SegAlgo && algo, ExPolicy const& policy, boost::mpl::true_,
+        segmented_transfer(Algo && algo, ExPolicy const& policy, boost::mpl::true_,
             SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -131,13 +131,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         // parallel remote implementation
-        template <typename SegAlgo, typename ExPolicy, typename SegIter,
-                                    typename SegOutIter>
+        template <typename Algo, typename ExPolicy, typename SegIter,
+            typename SegOutIter>
         static typename util::detail::algorithm_result<
             ExPolicy, std::pair<SegIter, SegOutIter>
         >::type
-        segmented_transfer(SegAlgo && algo, ExPolicy const& policy, boost::mpl::false_,
-                       SegIter first, SegIter last, SegOutIter dest)
+        segmented_transfer(Algo && algo, ExPolicy const& policy, boost::mpl::false_,
+            SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -244,9 +244,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <
-//        typename ParAlgo, typename SegAlgo,
-        template <typename IterPair> class Algo,
-        typename ExPolicy, typename InIter, typename OutIter>
+            template <typename IterPair> class Algo,
+            typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
@@ -263,8 +262,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename parallel::is_sequential_execution_policy<
                     ExPolicy
                 >::type is_seq;
-            typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-            typedef typename iterator_traits::is_segmented_iterator is_segmented;
+
             typedef hpx::traits::segmented_iterator_traits<InIter>
                 input_iterator_traits;
             typedef hpx::traits::segmented_iterator_traits<OutIter>
@@ -281,8 +279,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the non-segmented version of this algorithm
         template <
-        template <typename IterPair> class Algo,
-        typename ExPolicy, typename InIter, typename OutIter>
+            template <typename IterPair> class Algo,
+            typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
