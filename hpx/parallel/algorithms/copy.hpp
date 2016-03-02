@@ -13,6 +13,7 @@
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
@@ -27,6 +28,9 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/algorithms/transfer.hpp>
+#include <hpx/traits.hpp>
+//#include <tests/unit/parallel/container_algorithms/test_utils.hpp>
+//#include <hpx/include/partitioned_vector.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -156,20 +160,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-            typedef hpx::traits::segmented_iterator_traits<InIter>
-                input_iterator_traits;
-            typedef hpx::traits::segmented_iterator_traits<OutIter>
-                output_iterator_traits;
-            typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-            typedef typename iterator_traits::is_segmented_iterator is_segmented;
-
-            typedef std::pair<
-                    typename input_iterator_traits::local_iterator,
-                    typename output_iterator_traits::local_iterator
-                > result_iterator_pair;
-
-            return transfer<detail::copy<std::pair<InIter, OutIter>>, detail::copy<result_iterator_pair>>(
-                std::forward<ExPolicy>(policy), first, last, dest);
+            return transfer<
+                detail::copy
+                >(std::forward<ExPolicy>(policy), first, last, dest);
     }
 
 

@@ -143,19 +143,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     move(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-            typedef hpx::traits::segmented_iterator_traits<InIter>
-                input_iterator_traits;
-            typedef hpx::traits::segmented_iterator_traits<OutIter>
-                output_iterator_traits;
-            typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-            typedef typename iterator_traits::is_segmented_iterator is_segmented;
-
-            typedef std::pair<
-                    typename input_iterator_traits::local_iterator,
-                    typename output_iterator_traits::local_iterator
-                > result_iterator_pair;
-
-            return transfer<detail::move<std::pair<InIter, OutIter>>, detail::move<result_iterator_pair>>(
+            return transfer<detail::move>(
                 std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}

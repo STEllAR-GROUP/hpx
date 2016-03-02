@@ -16,6 +16,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/segmented_algorithms/transfer.hpp>
+#include <hpx/parallel/traits/projected.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -31,7 +32,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         // parallel version
-        template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
+        template <
+        //typename ParAlgo, typename SegAlgo,
+        template <typename IterPair> class Algo,
+        typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
@@ -49,13 +53,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     boost::is_same<std::output_iterator_tag, output_iterator_category>
             >::type is_seq;
 
-            return ParAlgo().call(
+            return Algo<std::pair<InIter, OutIter>>().call(
                     std::forward<ExPolicy>(policy), is_seq(),
                     first, last, dest);
         }
 
         // forward declare segmented version
-        template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter>
+        template <
+        //typename ParAlgo, typename SegAlgo,
+        template <typename IterPair> class Algo,
+        typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
@@ -112,7 +119,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ParAlgo, typename SegAlgo, typename ExPolicy, typename InIter, typename OutIter,
+    template <
+    template <typename IterPair> class Algo,
+    //typename ParAlgo, typename SegAlgo,
+    typename ExPolicy, typename InIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_iterator<InIter>::value &&
@@ -145,7 +155,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::transfer_<ParAlgo, SegAlgo>(
+            detail::transfer_<Algo>(
                 std::forward<ExPolicy>(policy), first, last, dest,
                 is_segmented())
             );
