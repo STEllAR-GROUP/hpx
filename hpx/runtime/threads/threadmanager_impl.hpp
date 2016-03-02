@@ -235,6 +235,9 @@ namespace hpx { namespace threads
 #endif
 #endif
 
+        boost::int64_t get_cumulative_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+
     protected:
         ///
         template <typename C>

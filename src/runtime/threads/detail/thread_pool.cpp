@@ -56,10 +56,7 @@ namespace hpx { namespace threads { namespace detail
         used_processing_units_(),
         mode_(m)
     {
-#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
         timestamp_scale_ = 1.0;
-#endif
     }
 
     template <typename Scheduler>
@@ -287,13 +284,8 @@ namespace hpx { namespace threads { namespace detail
         tfunc_times_.resize(num_threads);
         exec_times_.resize(num_threads);
 
-#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
-        // timestamps/values of last reset operation for various performance
-        // counters
-        reset_executed_threads_.resize(num_threads);
-        reset_executed_thread_phases_.resize(num_threads);
+        reset_tfunc_times_.resize(num_threads);
 
-#if defined(HPX_HAVE_THREAD_IDLE_RATES)
         // scale timestamps to nanoseconds
         boost::uint64_t base_timestamp = util::hardware::timestamp();
         boost::uint64_t base_time = util::high_resolution_clock::now();
@@ -312,10 +304,13 @@ namespace hpx { namespace threads { namespace detail
                 double(curr_timestamp - base_timestamp);
         }
 
-        LTM_(info)
-            << "thread_pool::run: " << pool_name_
-            << " timestamp_scale: " << timestamp_scale_; //-V128
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
+        // timestamps/values of last reset operation for various performance
+        // counters
+        reset_executed_threads_.resize(num_threads);
+        reset_executed_thread_phases_.resize(num_threads);
 
+#if defined(HPX_HAVE_THREAD_IDLE_RATES)
         // timestamps/values of last reset operation for various performance
         // counters
         reset_thread_duration_.resize(num_threads);
@@ -351,6 +346,10 @@ namespace hpx { namespace threads { namespace detail
         reset_cleanup_idle_rate_time_total_.resize(num_threads);
 #endif
 #endif
+
+        LTM_(info)
+            << "thread_pool::run: " << pool_name_
+            << " timestamp_scale: " << timestamp_scale_; //-V128
 
         try {
             HPX_ASSERT(startup_.get() == 0);
@@ -1113,6 +1112,43 @@ namespace hpx { namespace threads { namespace detail
     }
 #endif
 #endif
+
+    template <typename Scheduler>
+    boost::int64_t thread_pool<Scheduler>::
+        get_cumulative_duration(std::size_t num, bool reset)
+    {
+        boost::uint64_t tfunc_total = 0ul;
+        boost::uint64_t reset_tfunc_total = 0ul;
+
+        if (num != std::size_t(-1))
+        {
+            tfunc_total = tfunc_times_[num];
+            reset_tfunc_total = reset_tfunc_times_[num];
+
+            if (reset)
+                reset_tfunc_times_[num] = tfunc_total;
+        }
+        else
+        {
+            tfunc_total = std::accumulate(tfunc_times_.begin(),
+                tfunc_times_.end(), boost::uint64_t(0));
+            reset_tfunc_total = std::accumulate(
+                reset_tfunc_times_.begin(), reset_tfunc_times_.end(),
+                boost::uint64_t(0));
+
+            if (reset)
+            {
+                std::copy(tfunc_times_.begin(), tfunc_times_.end(),
+                    reset_tfunc_times_.begin());
+            }
+        }
+
+        HPX_ASSERT(tfunc_total >= reset_tfunc_total);
+
+        tfunc_total -= reset_tfunc_total;
+
+        return boost::uint64_t(double(tfunc_total) * timestamp_scale_);
+    }
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
     ///////////////////////////////////////////////////////////////////////////

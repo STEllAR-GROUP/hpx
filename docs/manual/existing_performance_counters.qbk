@@ -706,6 +706,32 @@ system and application performance.
         `HPX_WITH_THREAD_CUMULATIVE_COUNTS` (default: ON) and
         `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).]
     ]
+    [   [`/threads/time/overall`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the overall time spent
+          running the scheduler should be queried
+          for. The locality id (given by `*`) is a (zero based) number
+          identifying the locality.
+
+          `worker-thread#*` is defining the worker thread for which the
+          overall time spent running the scheduler should
+          be queried for. The worker thread number (given by the `*`) is a
+          (zero based) number identifying the worker thread. The number of
+          available worker threads is usually specified on the command line
+          for the application using the option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the overall time spent running the scheduler on the
+         given locality since application start. If the
+         instance name is `total` the counter returns the overall time spent
+         running the scheduler for all worker threads
+         (cores) on that locality. If the instance name is `worker-thread#*`
+         the counter will return the overall time spent running the scheduler
+         for all worker threads separately.]
+    ]
     [   [`/threads/time/cumulative`]
         [`locality#*/total` or[br]
          `locality#*/worker-thread#*`
