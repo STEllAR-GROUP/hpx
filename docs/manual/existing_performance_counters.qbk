@@ -730,7 +730,9 @@ system and application performance.
          running the scheduler for all worker threads
          (cores) on that locality. If the instance name is `worker-thread#*`
          the counter will return the overall time spent running the scheduler
-         for all worker threads separately.]
+         for all worker threads separately. This counter is available only
+        if the configuration time constant
+        `HPX_WITH_THREAD_IDLE_RATES` is set to `ON` (default: OFF).]
     ]
     [   [`/threads/time/cumulative`]
         [`locality#*/total` or[br]
