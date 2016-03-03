@@ -222,7 +222,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return util::detail::algorithm_result<
                     ExPolicy, std::pair<SegIter, SegOutIter> >::get(
-                lcos::local::dataflow(
+                dataflow(
                     [=](std::vector<shared_future<local_iterator_pair> > && r)
                         ->  std::pair<SegIter, SegOutIter>
                     {
