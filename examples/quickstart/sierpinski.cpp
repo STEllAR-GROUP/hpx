@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-
 // http://www.wikiwand.com/en/Sierpinski_triangle
 // At each iteration, a white triangle in deleted from the middle
 // of every black triangle,
@@ -31,7 +30,6 @@
 
 // Class representing a Sierpinski triangle
 class sierpinski{
-
     public:
     boost::uint64_t black_triangles, white_triangles;
     double area;
@@ -53,7 +51,6 @@ class sierpinski{
 
 
     private:
-
     //Serialization is necessary to transmit objects from one locality to another
     friend class hpx::serialization::access;
     template <class Archive>
