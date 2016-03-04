@@ -24,6 +24,7 @@ set(example_programs
     fractals
     fractals_struct
     safe_object
+    sierpinski
     interest_calculator
     interval_timer
     latch_local
