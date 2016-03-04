@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
@@ -123,7 +124,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<BidirIter>::value)>
+        hpx::traits::is_iterator<BidirIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
     {
@@ -259,8 +260,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<BidirIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<BidirIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
     >::type

@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/tagged_pair.hpp>
@@ -238,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type>,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             F,
@@ -468,7 +469,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type>,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             F,
@@ -736,7 +737,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type>,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, FwdIter>, traits::projected<Proj, FwdIter>
