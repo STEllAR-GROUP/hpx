@@ -1,6 +1,15 @@
+////////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2016 Satyaki Upadhyay
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 // http://www.wikiwand.com/en/Sierpinski_triangle
-// At each iteration, a white triangle in deleted from the middle of every black triangle,
+// At each iteration, a white triangle in deleted from the middle
+// of every black triangle,
 // thereby splitting it into three equal triangles.
 
 // Takes two program options, the number of iterations (n-value, with default 5)
@@ -19,9 +28,10 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+
 // Class representing a Sierpinski triangle
 class sierpinski{
-    
+
     public:
     boost::uint64_t black_triangles, white_triangles;
     double area;
@@ -34,7 +44,10 @@ class sierpinski{
     }
 
     inline sierpinski operator+(const sierpinski& other) const {
-        sierpinski res = sierpinski (black_triangles+other.black_triangles, white_triangles+other.white_triangles, area+other.area);
+        sierpinski res = sierpinski (
+            black_triangles+other.black_triangles,
+            white_triangles+other.white_triangles,
+            area+other.area);
         return res;
     }
 
@@ -71,9 +84,10 @@ sierpinski get_sierpinski(boost::uint64_t n, double len)
 
     hpx::naming::id_type const locality_id = hpx::find_here();
 
-    // The problem for iteration n is broken down into three sub-problems, 
-    // each of size n-1 (and side length gets halved). It is very inefficient as it does the same calculations
-    // three times but this is the method used for the sake of using parallelization.
+    // The problem for iteration n is broken down into three sub-problems,
+    // each of size n-1 (and side length gets halved). It is very inefficient
+    // as it does the same calculations
+    // three times but this is the method used for the sake of using HPX.
 
     get_sierpinski_action s;
     hpx::future<sierpinski> n1 = hpx::async(s, locality_id, n - 1, len/2);
@@ -125,6 +139,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(desc_commandline, argc, argv);
 }
-
-
-
