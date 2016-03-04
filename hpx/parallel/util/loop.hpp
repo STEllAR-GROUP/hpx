@@ -25,7 +25,7 @@ namespace hpx { namespace parallel { namespace util
         {
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
-            static Iter call(Begin it, End end, F && f)
+            static Begin call(Begin it, End end, F && f)
             {
                 for (/**/; it != end; ++it)
                     f(it);

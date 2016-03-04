@@ -19,6 +19,7 @@
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
@@ -41,12 +42,13 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t count, F1 && f1)
             {
                 typedef typename ExPolicy::executor_type executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
+                typedef hpx::parallel::executor_traits<executor_type>
                     executor_traits;
-                typedef typename hpx::util::tuple<FwdIter, std::size_t> tuple_type;
+                typedef hpx::util::tuple<
+                        std::size_t, FwdIter, std::size_t
+                    > tuple_type;
 
-                FwdIter last = first;
-                std::advance(last, count);
+                FwdIter last = parallel::v1::detail::next(first, count);
 
                 std::vector<hpx::future<Result> > inititems, workitems;
                 std::list<boost::exception_ptr> errors;
@@ -94,12 +96,13 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, F1 && f1)
             {
                 typedef typename ExPolicy::executor_type executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
+                typedef hpx::parallel::executor_traits<executor_type>
                     executor_traits;
-                typedef typename hpx::util::tuple<FwdIter, std::size_t> tuple_type;
+                typedef hpx::util::tuple<
+                        std::size_t, FwdIter, std::size_t
+                    > tuple_type;
 
-                FwdIter last = first;
-                std::advance(last, count);
+                FwdIter last = parallel::v1::detail(first, count);
 
                 std::vector<hpx::future<Result> > inititems, workitems;
                 std::list<boost::exception_ptr> errors;

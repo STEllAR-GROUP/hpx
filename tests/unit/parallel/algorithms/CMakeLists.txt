@@ -50,6 +50,7 @@ set(tests
     foreachn_projection
     foreachn_projection_exception
     foreachn_projection_bad_alloc
+    for_loop
     generate
     generaten
     includes
