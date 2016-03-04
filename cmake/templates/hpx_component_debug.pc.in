@@ -13,5 +13,5 @@ Name: hpx_component
 Description: High Performance ParalleX (application configuration) - debug build
 Version: @HPX_VERSION@
 Libs: @CXX_FLAG@ -L${libdir} -shared @HPX_PKG_DEBUG_LIBRARIES@
-Cflags: @CXX_FLAG@ -DHPX_DEBUG @HPX_CONF_INCLUDE_DIRS@ -DHPX_COMPONENT_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
+Cflags: @CXX_FLAG@ -DHPX_DEBUG @HPX_CONF_INCLUDE_DIRS@ -fPIC -DHPX_COMPONENT_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
 
