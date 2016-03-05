@@ -930,6 +930,10 @@ if(WIN32)
       # disabled for now as this flag crashes debugger
       # hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
       # hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
+
+      # Update 2 requires to set _ENABLE_ATOMIC_ALIGNMENT_FIX for it to compile
+      # atomics
+      hpx_add_config_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
     endif()
 
     # Runtime type information
