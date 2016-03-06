@@ -43,12 +43,10 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/lockfree/stack.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -56,53 +54,14 @@
 namespace hpx { namespace coroutines { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Coroutine>
-    struct coroutine_heap
-    {
-        coroutine_heap()
-          : heap_(128)
-        {}
-
-        ~coroutine_heap()
-        {
-            while (Coroutine* next = get_locked())
-                delete next;
-        }
-
-        Coroutine* allocate()
-        {
-            return get_locked();
-        }
-
-        Coroutine* try_allocate()
-        {
-            return get_locked();
-        }
-
-        void deallocate(Coroutine* p)
-        {
-            //p->reset();          // reset bound function
-            heap_.push(p);
-        }
-
-    private:
-        Coroutine* get_locked()
-        {
-            Coroutine* result = 0;
-            heap_.pop(result);
-            return result;
-        }
-
-        boost::lockfree::stack<Coroutine*> heap_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
     // functor.
     template <typename CoroutineType>
     class coroutine_impl
       : public context_base
     {
+        HPX_NON_COPYABLE(coroutine_impl);
+
     public:
         typedef CoroutineType coroutine_type;
         typedef coroutine_impl<coroutine_type> type;
@@ -137,30 +96,21 @@ namespace hpx { namespace coroutines { namespace detail
             naming::id_type&& target, thread_id_repr_type id = 0,
             std::ptrdiff_t stack_size = default_stack_size)
         {
-            // start looking at the matching heap
-            std::size_t const heap_count = get_heap_count(stack_size);
-            std::size_t const heap_num = std::size_t(id) / 32; //-V112
+            coroutine_impl* p = allocate(id, stack_size);
 
-            // look through all heaps to find an available coroutine object
-            coroutine_impl* p = allocate(heap_num, stack_size);
-            if (0 == p)
+            if (!p)
             {
-                for (std::size_t i = 1; i != heap_count && !p; ++i)
-                {
-                    p = try_allocate(heap_num + i, stack_size);
-                }
-            }
+                std::size_t const heap_num = std::size_t(id) / 32; //-V112
 
-            // allocate a new coroutine object, if non is available (or all heaps are locked)
-            if (NULL == p)
-            {
+                // allocate a new coroutine object, if non is available (or all
+                // heaps are locked)
                 context_base::increment_allocation_count(heap_num);
-                return new coroutine_impl(std::move(f), std::move(target),
+                p = new coroutine_impl(std::move(f), std::move(target),
                     id, stack_size);
+            } else {
+                // we reuse an existing object, we need to rebind its function
+                p->rebind(std::move(f), std::move(target), id);
             }
-
-            // if we reuse an existing  object, we need to rebind its function
-            p->rebind(std::move(f), std::move(target), id);
             return p;
         }
 
@@ -174,7 +124,7 @@ namespace hpx { namespace coroutines { namespace detail
         static inline void destroy(coroutine_impl* p)
         {
             // always hand the stack back to the matching heap
-            deallocate(p, std::size_t(p->get_thread_id()) / 32); //-V112
+            deallocate(p);
         }
 
         void operator()()
@@ -308,77 +258,10 @@ namespace hpx { namespace coroutines { namespace detail
         }
 
     private:
-        // the memory for the threads is managed by a lockfree caching_freelist
-        typedef coroutine_heap<coroutine_impl> heap_type;
+        static HPX_EXPORT coroutine_impl* allocate(
+            thread_id_repr_type id, std::ptrdiff_t stacksize);
 
-        struct heap_tag_small {};
-        struct heap_tag_medium {};
-        struct heap_tag_large {};
-        struct heap_tag_huge {};
-
-        template <std::size_t NumHeaps, typename Tag>
-        static heap_type& get_heap(std::size_t i)
-        {
-            // ensure thread-safe initialization
-            util::reinitializable_static<heap_type, Tag, NumHeaps> heap;
-            return heap.get(i);
-        }
-
-        static heap_type& get_heap(std::size_t i, ptrdiff_t stacksize)
-        {
-            // FIXME: This should check the sizes in runtime_configuration, not the
-            // default macro sizes
-            if (stacksize > HPX_MEDIUM_STACK_SIZE)
-            {
-                if (stacksize > HPX_LARGE_STACK_SIZE)
-                    return get_heap<HPX_COROUTINE_NUM_HEAPS / 4,
-                    heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS / 4)); //-V112
-
-                return get_heap<HPX_COROUTINE_NUM_HEAPS / 4,
-                    heap_tag_large>(i % (HPX_COROUTINE_NUM_HEAPS / 4)); //-V112
-            }
-
-            if (stacksize > HPX_SMALL_STACK_SIZE)
-                return get_heap<HPX_COROUTINE_NUM_HEAPS / 2,
-                heap_tag_medium>(i % (HPX_COROUTINE_NUM_HEAPS / 2));
-
-            return get_heap<HPX_COROUTINE_NUM_HEAPS,
-                heap_tag_small>(i % HPX_COROUTINE_NUM_HEAPS);
-        }
-
-        static std::size_t get_heap_count(ptrdiff_t stacksize)
-        {
-            if (stacksize > HPX_MEDIUM_STACK_SIZE)
-                return HPX_COROUTINE_NUM_HEAPS / 4; //-V112
-
-            if (stacksize > HPX_SMALL_STACK_SIZE)
-                return HPX_COROUTINE_NUM_HEAPS / 2;
-
-            return HPX_COROUTINE_NUM_HEAPS;
-        }
-
-        static coroutine_impl* allocate(std::size_t i, ptrdiff_t stacksize)
-        {
-            return get_heap(i, stacksize).allocate();
-        }
-
-        static coroutine_impl* try_allocate(std::size_t i, ptrdiff_t stacksize)
-        {
-            return get_heap(i, stacksize).try_allocate();
-        }
-
-        static void deallocate(coroutine_impl* wrapper, std::size_t i)
-        {
-            ptrdiff_t stacksize = wrapper->get_stacksize();
-            get_heap(i, stacksize).deallocate(wrapper);
-        }
-
-#if defined(_DEBUG)
-        static heap_type const* get_first_heap_address(ptrdiff_t stacksize)
-        {
-            return &get_heap(0, stacksize);
-        }
-#endif
+        static HPX_EXPORT void deallocate(coroutine_impl* wrapper);
 
     private:
         result_type m_result_last;

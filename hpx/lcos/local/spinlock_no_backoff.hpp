@@ -20,6 +20,9 @@
 
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
+#  if !defined( BOOST_SP_HAS_SYNC )
+#    include <boost/detail/interlocked.hpp>
+#  endif
 #else
 #  include <boost/smart_ptr/detail/spinlock_sync.hpp>
 #  if defined( __ia64__ ) && defined( __INTEL_COMPILER )
