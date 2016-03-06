@@ -65,15 +65,18 @@ namespace hpx { namespace coroutines
         typedef typename impl_type::pointer impl_ptr;
         typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
 
+        typedef util::unique_function_nonser<
+            threads::thread_state_enum(threads::thread_state_ex_enum)
+        > functor_type;
+
         typedef detail::coroutine_self<coroutine> self;
         coroutine() : m_pimpl(0) {}
 
-        template <typename Functor>
-        coroutine(Functor && f, naming::id_type && target,
+        coroutine(functor_type&& f, naming::id_type&& target,
             thread_id_repr_type id = 0, std::ptrdiff_t stack_size =
             detail::default_stack_size)
-          : m_pimpl(impl_type::create(std::forward<Functor>(f),
-                std::move(target), id, stack_size))
+          : m_pimpl(impl_type::create(
+                std::move(f), std::move(target), id, stack_size))
         {
             HPX_ASSERT(m_pimpl->is_ready());
         }
@@ -122,18 +125,18 @@ namespace hpx { namespace coroutines
         {
             return m_pimpl.get() ? m_pimpl->get_thread_data() : 0;
         }
+
         std::size_t set_thread_data(std::size_t data)
         {
             return m_pimpl.get() ? m_pimpl->set_thread_data(data) : 0;
         }
 #endif
 
-        template <typename Functor>
-        void rebind(Functor && f, naming::id_type && target,
+        void rebind(functor_type&& f, naming::id_type&& target,
             thread_id_repr_type id = 0)
         {
             HPX_ASSERT(exited());
-            impl_type::rebind(m_pimpl.get(), std::forward<Functor>(f),
+            impl_type::rebind(m_pimpl.get(), std::move(f),
                 std::move(target), id);
         }
 
