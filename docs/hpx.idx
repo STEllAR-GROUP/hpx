@@ -222,6 +222,16 @@ parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 # hpx/parallel/algorithms/reduce.hpp
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
 
+# hpx/parallel/algorithms/for_loop_reduction.hpp
+parallel::reduction                   "reduction" "hpx\.parallel\.v2\.reduction"
+parallel::reduction_plus              "reduction_plus" "hpx\.parallel\.v2\.reduction_plus"
+parallel::reduction_multiplies        "reduction_multiplies" "hpx\.parallel\.v2\.reduction_multiplies"
+parallel::reduction_bit_and           "reduction_bit_and" "hpx\.parallel\.v2\.reduction_bit_and"
+parallel::reduction_bit_or            "reduction_bit_or" "hpx\.parallel\.v2\.reduction_bit_or"
+parallel::reduction_bit_xor           "reduction_bit_xor" "hpx\.parallel\.v2\.reduction_bit_xor"
+parallel::reduction_min               "reduction_min" "hpx\.parallel\.v2\.reduction_min"
+parallel::reduction_max               "reduction_max" "hpx\.parallel\.v2\.reduction_max"
+
 # hpx/parallel/algorithms/remove_copy.hpp
 parallel::remove_copy                  "remove_copy" "hpx\.parallel\.v1\.remove_copy$"
 parallel::remove_copy_if               "remove_copy_if" "hpx\.parallel\.v1\.remove_copy_if.*"

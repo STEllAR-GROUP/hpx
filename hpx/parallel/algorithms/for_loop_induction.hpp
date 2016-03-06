@@ -36,9 +36,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 curr_ = parallel::v1::detail::next(var_, index);
             }
 
-            T next_iteration() HPX_NOEXCEPT
+            T const& iteration_value() const HPX_NOEXCEPT
             {
-                return curr_++;
+                return curr_;
+            }
+
+            void next_iteration() HPX_NOEXCEPT
+            {
+                ++curr_;
             }
 
             void exit_iteration(std::size_t /*index*/) HPX_NOEXCEPT
@@ -62,9 +67,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 curr_ = parallel::v1::detail::next(var_, index);
             }
 
-            T next_iteration() HPX_NOEXCEPT
+            T const& iteration_value() const HPX_NOEXCEPT
             {
-                return curr_++;
+                return curr_;
+            }
+
+            void next_iteration() HPX_NOEXCEPT
+            {
+                ++curr_;
             }
 
             void exit_iteration(std::size_t index) HPX_NOEXCEPT
@@ -92,11 +102,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 curr_ = parallel::v1::detail::next(var_, stride_*index);
             }
 
-            T next_iteration() HPX_NOEXCEPT
+            T const& iteration_value() const HPX_NOEXCEPT
             {
-                T curr = curr_;
+                return curr_;
+            }
+
+            void next_iteration() HPX_NOEXCEPT
+            {
                 curr_ = parallel::v1::detail::next(curr_, stride_);
-                return curr;
             }
 
             void exit_iteration(std::size_t /*index*/) HPX_NOEXCEPT
@@ -121,11 +134,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 curr_ = parallel::v1::detail::next(var_, stride_*index);
             }
 
-            T next_iteration() HPX_NOEXCEPT
+            T const& iteration_value() const HPX_NOEXCEPT
             {
-                T curr = curr_;
+                return curr_;
+            }
+
+            void next_iteration() HPX_NOEXCEPT
+            {
                 curr_ = parallel::v1::detail::next(curr_, stride_);
-                return curr;
             }
 
             void exit_iteration(std::size_t index) HPX_NOEXCEPT
@@ -140,26 +156,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             T curr_;
             std::size_t stride_;
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Modifier>
-        HPX_FORCEINLINE void init_iteration(Modifier& mod, std::size_t index)
-        {
-            mod.init_iteration(index);
-        }
-
-        template <typename Modifier>
-        HPX_FORCEINLINE void exit_iteration(Modifier& mod, std::size_t index)
-        {
-            mod.exit_iteration(index);
-        }
-
-        template <typename Modifier>
-        HPX_FORCEINLINE auto next_iteration(Modifier& mod)
-        ->  decltype(mod.next_iteration())
-        {
-            return mod.next_iteration();
-        }
 
         /// \endcond
     }

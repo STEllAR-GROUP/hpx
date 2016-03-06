@@ -52,6 +52,7 @@ set(tests
     foreachn_projection_bad_alloc
     for_loop
     for_loop_induction
+    for_loop_reduction
     generate
     generaten
     includes

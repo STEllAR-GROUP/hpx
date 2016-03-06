@@ -20,6 +20,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
+#include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -59,22 +60,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             template <typename ExPolicy, typename B, typename E, typename F,
                 typename... Args>
             static hpx::util::unused_type
-            sequential(ExPolicy, B first, E last, F && f, Args &&... args)
+            sequential(ExPolicy policy, B first, E last, F && f, Args &&... args)
             {
                 int init_sequencer[] = {
-                    ( init_iteration(args, 0), 0 )..., 0
+                    ( args.init_iteration(0), 0 )..., 0
                 };
 
                 std::size_t size = 0;
                 for (/**/; first != last; (void)++first, ++size)
                 {
-                    hpx::util::invoke(f, first, next_iteration(args)...);
+                    hpx::util::invoke(f, first, args.iteration_value()...);
+
+                    int next_sequencer[] = {
+                        ( args.next_iteration(), 0 )..., 0
+                    };
                 }
 
                 //  make sure live-out variables are properly set on
                 // return
                 int exit_sequencer[] = {
-                    ( exit_iteration(args, size), 0 )..., 0
+                    ( args.exit_iteration(size), 0 )..., 0
                 };
 
                 return hpx::util::unused;
@@ -95,12 +100,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                         B part_begin, std::size_t part_size) mutable
                     {
                         int init_sequencer[] = {
-                            ( init_iteration(args, part_index), 0 )..., 0
+                            ( args.init_iteration(part_index), 0 )..., 0
                         };
 
                         for (/**/; part_size != 0; (void)--part_size, ++part_begin)
                         {
-                            hpx::util::invoke(f, part_begin, next_iteration(args)...);
+                            hpx::util::invoke(f, part_begin,
+                                args.iteration_value()...);
+
+                            int next_sequencer[] = {
+                                ( args.next_iteration(), 0 )..., 0
+                            };
                         }
                     },
                     [=](std::vector<hpx::future<void> > &&) mutable -> void
@@ -108,7 +118,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                         //  make sure live-out variables are properly set on
                         // return
                         int exit_sequencer[] = {
-                            ( exit_iteration(args, size), 0 )..., 0
+                            ( args.exit_iteration(size), 0 )..., 0
                         };
                     });
             }
