@@ -32,8 +32,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
+#include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -44,7 +44,6 @@
 
 #include <cstddef>
 #include <limits>
-#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace coroutines
@@ -61,7 +60,7 @@ namespace hpx { namespace coroutines
         typedef threads::thread_state_enum result_type;
         typedef threads::thread_state_ex_enum arg_type;
 
-        typedef detail::coroutine_impl<coroutine> impl_type;
+        typedef detail::coroutine_impl impl_type;
         typedef typename impl_type::pointer impl_ptr;
         typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
 
@@ -69,7 +68,6 @@ namespace hpx { namespace coroutines
             threads::thread_state_enum(threads::thread_state_ex_enum)
         > functor_type;
 
-        typedef detail::coroutine_self<coroutine> self;
         coroutine() : m_pimpl(0) {}
 
         coroutine(functor_type&& f, naming::id_type&& target,

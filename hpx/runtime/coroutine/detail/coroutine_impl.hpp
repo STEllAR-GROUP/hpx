@@ -39,7 +39,6 @@
 #include <hpx/runtime/coroutine/detail/config.hpp>
 #include <hpx/runtime/coroutine/detail/context_base.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
@@ -56,25 +55,22 @@ namespace hpx { namespace coroutines { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
     // functor.
-    template <typename CoroutineType>
     class coroutine_impl
       : public context_base
     {
         HPX_NON_COPYABLE(coroutine_impl);
 
     public:
-        typedef CoroutineType coroutine_type;
-        typedef coroutine_impl<coroutine_type> type;
         typedef context_base super_type;
-        typedef typename coroutine_type::result_type result_type;
-        typedef typename coroutine_type::arg_type arg_type;
+        typedef threads::thread_state_enum result_type;
+        typedef threads::thread_state_ex_enum arg_type;
         typedef typename context_base::thread_id_repr_type thread_id_repr_type;
 
         typedef util::unique_function_nonser<
             threads::thread_state_enum(threads::thread_state_ex_enum)
         > functor_type;
 
-        typedef boost::intrusive_ptr<type> pointer;
+        typedef boost::intrusive_ptr<coroutine_impl> pointer;
 
         coroutine_impl(functor_type&& f, naming::id_type&& target,
             thread_id_repr_type id, std::ptrdiff_t stack_size)
@@ -127,81 +123,7 @@ namespace hpx { namespace coroutines { namespace detail
             deallocate(p);
         }
 
-        void operator()()
-        {
-            typedef typename super_type::context_exit_status
-                context_exit_status;
-            context_exit_status status = super_type::ctx_exited_return;
-
-            // loop as long this coroutine has been rebound
-            do
-            {
-                boost::exception_ptr tinfo;
-                try
-                {
-                    this->check_exit_state();
-
-                    HPX_ASSERT(this->count() > 0);
-
-                    typedef typename coroutine_type::self self_type;
-                    {
-                        self_type* old_self = self_type::get_self();
-                        self_type self(this, old_self);
-                        reset_self_on_exit on_exit(&self, old_self);
-
-                        this->m_result_last = m_fun(*this->args());
-
-                        // if this thread returned 'terminated' we need to reset the functor
-                        // and the bound arguments
-                        if (this->m_result_last == threads::terminated)
-                            this->reset();
-                    }
-
-                    // return value to other side of the fence
-                    this->bind_result(&this->m_result_last);
-                } catch (exit_exception const&) {
-                    status = super_type::ctx_exited_exit;
-                    tinfo = boost::current_exception();
-                    this->reset();            // reset functor
-                } catch (boost::exception const&) {
-                    status = super_type::ctx_exited_abnormally;
-                    tinfo = boost::current_exception();
-                    this->reset();
-                } catch (std::exception const&) {
-                    status = super_type::ctx_exited_abnormally;
-                    tinfo = boost::current_exception();
-                    this->reset();
-                } catch (...) {
-                    status = super_type::ctx_exited_abnormally;
-                    tinfo = boost::current_exception();
-                    this->reset();
-                }
-
-                this->do_return(status, tinfo);
-            } while (this->m_state == super_type::ctx_running);
-
-            // should not get here, never
-            HPX_ASSERT(this->m_state == super_type::ctx_running);
-        }
-
-    protected:
-        struct reset_self_on_exit
-        {
-            typedef typename coroutine_type::self self_type;
-
-            reset_self_on_exit(self_type* val, self_type* old_val = 0)
-              : old_self(old_val)
-            {
-                self_type::set_self(val);
-            }
-
-            ~reset_self_on_exit()
-            {
-                self_type::set_self(old_self);
-            }
-
-            self_type* old_self;
-        };
+        HPX_EXPORT void operator()();
 
     public:
         result_type * result()

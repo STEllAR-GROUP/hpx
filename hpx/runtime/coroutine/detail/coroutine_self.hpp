@@ -31,10 +31,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
+#include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -43,7 +43,6 @@
 
 namespace hpx { namespace coroutines { namespace detail
 {
-    template <typename Coroutine>
     class coroutine_self
     {
         HPX_NON_COPYABLE(coroutine_self);
@@ -66,18 +65,14 @@ namespace hpx { namespace coroutines { namespace detail
         };
 
     public:
-        typedef Coroutine coroutine_type;
-        typedef coroutine_self<coroutine_type> type;
         friend struct detail::coroutine_accessor;
 
-        typedef typename coroutine_type::impl_type impl_type;
+        typedef threads::thread_state_enum result_type;
+        typedef threads::thread_state_ex_enum arg_type;
 
-        // Note, no reference counting here.
-        typedef impl_type* impl_ptr;
-
-        typedef typename coroutine_type::result_type result_type;
-        typedef typename coroutine_type::arg_type arg_type;
-        typedef typename coroutine_type::thread_id_repr_type thread_id_repr_type;
+        typedef coroutine_impl impl_type;
+        typedef impl_type* impl_ptr; // Note, no reference counting here.
+        typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
 
         typedef util::function_nonser<arg_type(result_type)>
             yield_decorator_type;
@@ -134,15 +129,10 @@ namespace hpx { namespace coroutines { namespace detail
             std::terminate(); // FIXME: replace with hpx::terminate();
         }
 
-        arg_type result() {
-            using boost::get;
-            return get<0>(*m_pimpl->args());
-        }
-
         bool pending() const
         {
             HPX_ASSERT(m_pimpl);
-            return m_pimpl->pending();
+            return m_pimpl->pending() != 0;
         }
 
         thread_id_repr_type get_thread_id() const
@@ -205,15 +195,11 @@ namespace hpx { namespace coroutines { namespace detail
             return m_pimpl->get_continuation_recursion_count();
         }
 
-    private:
-        struct tls_tag {};
-        static hpx::util::thread_specific_ptr<type*, tls_tag> self_;
-
     public:
-        HPX_COROUTINE_EXPORT static void set_self(type* self);
-        HPX_COROUTINE_EXPORT static type* get_self();
-        HPX_COROUTINE_EXPORT static void init_self();
-        HPX_COROUTINE_EXPORT static void reset_self();
+        static HPX_EXPORT void set_self(coroutine_self* self);
+        static HPX_EXPORT coroutine_self* get_self();
+        static HPX_EXPORT void init_self();
+        static HPX_EXPORT void reset_self();
 
     private:
         yield_decorator_type yield_decorator_;
@@ -225,13 +211,6 @@ namespace hpx { namespace coroutines { namespace detail
         impl_ptr m_pimpl;
         coroutine_self* next_self_;
     };
-
-    // the TLS holds a pointer to the self instance as stored on the stack
-    template <typename CoroutineType>
-    hpx::util::thread_specific_ptr<
-        typename coroutine_self<CoroutineType>::type*
-      , typename coroutine_self<CoroutineType>::tls_tag
-    > coroutine_self<CoroutineType>::self_;
 }}}
 
 #endif /*HPX_RUNTIME_COROUTINE_DETAIL_SELF_HPP*/

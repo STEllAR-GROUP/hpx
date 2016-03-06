@@ -8,7 +8,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_self_impl.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/assert.hpp>
@@ -215,17 +214,3 @@ namespace hpx { namespace threads
 #endif
     }
 }}
-
-///////////////////////////////////////////////////////////////////////////////
-// explicit instantiation of the thread_self functions
-template HPX_EXPORT void
-hpx::threads::thread_self::set_self(hpx::threads::thread_self*);
-
-template HPX_EXPORT hpx::threads::thread_self*
-hpx::threads::thread_self::get_self();
-
-template HPX_EXPORT void
-hpx::threads::thread_self::init_self();
-
-template HPX_EXPORT void
-hpx::threads::thread_self::reset_self();

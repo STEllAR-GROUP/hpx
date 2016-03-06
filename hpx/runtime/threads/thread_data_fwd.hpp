@@ -19,10 +19,8 @@ namespace hpx { namespace coroutines
     /// \cond NOINTERNAL
     namespace detail
     {
-        template <typename Coroutine>
         class coroutine_self;
 
-        template<typename CoroutineType>
         class coroutine_impl;
     }
 
@@ -48,13 +46,8 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////
     typedef coroutines::coroutine coroutine_type;
 
-    typedef
-        coroutines::detail::coroutine_self<coroutine_type>
-        thread_self;
-
-    typedef
-        coroutines::detail::coroutine_impl<coroutine_type>
-        thread_self_impl_type;
+    typedef coroutines::detail::coroutine_self thread_self;
+    typedef coroutines::detail::coroutine_impl thread_self_impl_type;
 
     typedef void * thread_id_repr_type;
 

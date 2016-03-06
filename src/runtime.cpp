@@ -518,20 +518,20 @@ namespace hpx
         // initialize our TSS
         if (NULL == runtime::runtime_.get())
         {
-            HPX_ASSERT(NULL == threads::coroutine_type::self::get_self());
+            HPX_ASSERT(NULL == threads::thread_self::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
             runtime::uptime_.reset(new boost::uint64_t);
             *runtime::uptime_.get() = util::high_resolution_clock::now();
 
-            threads::coroutine_type::self::init_self();
+            threads::thread_self::init_self();
         }
     }
 
     void runtime::deinit_tss()
     {
         // reset our TSS
-        threads::coroutine_type::self::reset_self();
+        threads::thread_self::reset_self();
         runtime::uptime_.reset();
         runtime::runtime_.reset();
         util::reset_held_lock_data();
