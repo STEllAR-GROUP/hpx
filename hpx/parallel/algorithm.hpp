@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 /// See N4310: 1.3/3
 #include <algorithm>
 
+// Parallelism TS V1
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
@@ -39,5 +40,8 @@
 #include <hpx/parallel/algorithms/set_union.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
+
+// Parallelism TS V2
+#include <hpx/parallel/algorithms/for_loop.hpp>
 
 #endif

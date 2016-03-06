@@ -23,7 +23,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         template <typename T1, typename T2>
         HPX_FORCEINLINE static std::size_t call(T1 t1, T2 t2)
         {
-            return t2 - t1;
+            return std::size_t(t2 - t1);
         }
     };
 
@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         template <typename T>
         HPX_FORCEINLINE static T call(T t1, std::size_t offset)
         {
-            return t1 + offset;
+            return T(t1 + offset);
         }
     };
 
