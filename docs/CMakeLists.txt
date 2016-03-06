@@ -68,6 +68,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_induction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"

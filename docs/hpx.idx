@@ -176,11 +176,17 @@ parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end.*"
 parallel::find_first_of               "find_first_of" "hpx\.parallel\.v1\.find_first_of.*"
 
 # hpx/parallel/algorithms/for_each.hpp
-parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"
+parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each_id.*"
 parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_n.*"
 
+# hpx/parallel/algorithms/for_loop.hpp
+parallel::for_loop                    "for_loop" "hpx\.parallel\.v2\.for_loop"
+
+# hpx/parallel/algorithms/for_loop_induction.hpp
+parallel::induction                   "induction" "hpx\.parallel\.v2\.induction"
+
 # hpx/parallel/algorithms/generate.hpp
-parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
+parallel::generate                    "generate" "hpx\.parallel\.v1\.generate_id.*"
 parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
 
 # hpx/parallel/algorithms/includes.hpp

@@ -9,24 +9,11 @@
 #define HPX_PARALLEL_ALGORITH_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
 
-#include <boost/mpl/bool.hpp>
-
-#include <algorithm>
-#include <iterator>
+#include <cstdlib>
 #include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
@@ -184,13 +171,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// For each element in the input range, a looping algorithm over input
     /// sequence \a S computes an induction value from an induction variable
     /// and ordinal position \a p within \a S by the formula
-    /// \a i + p * stride if a stride was specified or \a i + p otherwise.
+    /// i + p * stride if a stride was specified or i + p otherwise.
     /// This induction value is passed to the element access function.
     ///
     /// If the \a value argument to \a induction is a non-const lvalue, then
     /// that lvalue becomes the live-out object for the returned induction
     /// object. For each induction object that has a live-out object, the
-    /// looping algorithm assigns the value of \a i + n * stride to the live-out
+    /// looping algorithm assigns the value of i + n * stride to the live-out
     /// object upon return, where \a n is the number of elements in the input
     /// range.
     ///
