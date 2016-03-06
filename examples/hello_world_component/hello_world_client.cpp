@@ -12,9 +12,9 @@ int hpx_main(boost::program_options::variables_map&)
     {
         // Create a single instance of the component on this locality.
         examples::hello_world client =
-            examples::hello_world::create(hpx::find_here());
+            hpx::new_<examples::hello_world>(hpx::find_here());
 
-        // Invoke the components action, which will print "Hello World!".
+        // Invoke the component's action, which will print "Hello World!".
         client.invoke();
     }
 
@@ -23,11 +23,7 @@ int hpx_main(boost::program_options::variables_map&)
 
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    boost::program_options::options_description desc_commandline(
-        "usage: " HPX_APPLICATION_STRING " [options]");
-
-    return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
+    return hpx::init(argc, argv); // Initialize and run HPX.
 }
 //]
 
