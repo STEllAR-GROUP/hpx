@@ -71,8 +71,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     return util::foreach_partitioner<ExPolicy>::call(
                         policy, first, count,
-                        [f, proj](Iter part_begin, std::size_t part_size,
-                            std::size_t /*part_index*/)
+                        [f, proj](std::size_t /*part_index*/,
+                            Iter part_begin, std::size_t part_size)
                         {
                             // VS2015 bails out when proj or f are captured by
                             // ref
