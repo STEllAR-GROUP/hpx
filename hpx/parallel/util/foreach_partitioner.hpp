@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { namespace util
                         std::size_t, FwdIter, std::size_t
                     > tuple_type;
 
-                FwdIter last = parallel::v1::detail(first, count);
+                FwdIter last = parallel::v1::detail::next(first, count);
 
                 std::vector<hpx::future<Result> > inititems, workitems;
                 std::list<boost::exception_ptr> errors;

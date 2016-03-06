@@ -174,8 +174,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
-        traits::is_indirect_callable<
+        parallel::traits::is_projected<Proj, InIter>::value &&
+        parallel::traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
@@ -368,8 +368,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
-        traits::is_indirect_callable<
+        parallel::traits::is_projected<Proj, InIter>::value &&
+        parallel::traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
