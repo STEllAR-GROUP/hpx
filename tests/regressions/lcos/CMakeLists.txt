@@ -12,6 +12,7 @@ set(tests
     async_unwrap_1037
     call_promise_get_gid_more_than_once
     dataflow_791
+    dataflow_action_2008
     dataflow_future_swap
     dataflow_launch_775
     future_790
