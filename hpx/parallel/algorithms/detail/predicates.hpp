@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename T>
     struct min_of
     {
-        bool operator()(T const& t1, T const& t2) const
+        T operator()(T const& t1, T const& t2) const
         {
             return (std::min)(t1, t2);
         }
@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename T>
     struct max_of
     {
-        bool operator()(T const& t1, T const& t2) const
+        T operator()(T const& t1, T const& t2) const
         {
             return (std::max)(t1, t2);
         }

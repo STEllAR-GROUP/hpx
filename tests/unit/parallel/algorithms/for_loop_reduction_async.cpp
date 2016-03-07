@@ -28,7 +28,7 @@ void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     std::size_t sum = 0;
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         iterator(boost::begin(c)), iterator(boost::end(c)),
         hpx::parallel::reduction_plus(sum),
@@ -36,6 +36,7 @@ void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
         {
             sum += *it;
         });
+    f.wait();
 
     // verify values
     std::size_t sum2 =
@@ -57,7 +58,7 @@ void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     std::size_t prod = 0;
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         iterator(boost::begin(c)), iterator(boost::end(c)),
         hpx::parallel::reduction_multiplies(prod),
@@ -65,6 +66,7 @@ void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
         {
             prod *= *it;
         });
+    f.wait();
 
     // verify values
     std::size_t prod2 = std::accumulate(boost::begin(c), boost::end(c),
@@ -87,7 +89,7 @@ void test_for_loop_reduction_min(ExPolicy && policy, IteratorTag)
 
     std::size_t minval = c[0];
 
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         iterator(boost::begin(c)), iterator(boost::end(c)),
         hpx::parallel::reduction_min(minval),
@@ -95,6 +97,7 @@ void test_for_loop_reduction_min(ExPolicy && policy, IteratorTag)
         {
             minval = (std::min)(minval, *it);
         });
+    f.wait();
 
     // verify values
     std::size_t minval2 = std::accumulate(boost::begin(c), boost::end(c),
@@ -108,17 +111,14 @@ void test_for_loop_reduction()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_reduction_plus(seq, IteratorTag());
-    test_for_loop_reduction_plus(par, IteratorTag());
-    test_for_loop_reduction_plus(par_vec, IteratorTag());
+    test_for_loop_reduction_plus(seq(task), IteratorTag());
+    test_for_loop_reduction_plus(par(task), IteratorTag());
 
-    test_for_loop_reduction_multiplies(seq, IteratorTag());
-    test_for_loop_reduction_multiplies(par, IteratorTag());
-    test_for_loop_reduction_multiplies(par_vec, IteratorTag());
+    test_for_loop_reduction_multiplies(seq(task), IteratorTag());
+    test_for_loop_reduction_multiplies(par(task), IteratorTag());
 
-    test_for_loop_reduction_min(seq, IteratorTag());
-    test_for_loop_reduction_min(par, IteratorTag());
-    test_for_loop_reduction_min(par_vec, IteratorTag());
+    test_for_loop_reduction_min(seq(task), IteratorTag());
+    test_for_loop_reduction_min(par(task), IteratorTag());
 }
 
 void for_loop_reduction_test()
@@ -140,7 +140,7 @@ void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     std::size_t bits = ~std::size_t(0);
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         0, c.size(),
         hpx::parallel::reduction_bit_and(bits),
@@ -148,6 +148,7 @@ void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
         {
             bits &= c[i];
         });
+    f.wait();
 
     // verify values
     std::size_t bits2 = std::accumulate(boost::begin(c), boost::end(c),
@@ -166,7 +167,7 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy && policy)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     std::size_t bits = 0;
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         0, c.size(),
         hpx::parallel::reduction_bit_or(bits),
@@ -174,6 +175,7 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy && policy)
         {
             bits |= c[i];
         });
+    f.wait();
 
     // verify values
     std::size_t bits2 = std::accumulate(boost::begin(c), boost::end(c),
@@ -185,13 +187,11 @@ void for_loop_reduction_test_idx()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_reduction_bit_and_idx(seq);
-    test_for_loop_reduction_bit_and_idx(par);
-    test_for_loop_reduction_bit_and_idx(par_vec);
+    test_for_loop_reduction_bit_and_idx(seq(task));
+    test_for_loop_reduction_bit_and_idx(par(task));
 
-    test_for_loop_reduction_bit_or_idx(seq);
-    test_for_loop_reduction_bit_or_idx(par);
-    test_for_loop_reduction_bit_or_idx(par_vec);
+    test_for_loop_reduction_bit_or_idx(seq(task));
+    test_for_loop_reduction_bit_or_idx(par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@ void test_for_loop_induction(ExPolicy && policy, IteratorTag)
     std::vector<std::size_t> d(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         iterator(boost::begin(c)), iterator(boost::end(c)),
         hpx::parallel::induction(0),
@@ -37,6 +37,7 @@ void test_for_loop_induction(ExPolicy && policy, IteratorTag)
             *it = 42;
             d[i] = 42;
         });
+    f.wait();
 
     // verify values
     std::size_t count = 0;
@@ -68,7 +69,7 @@ void test_for_loop_induction_stride(ExPolicy && policy, IteratorTag)
     std::vector<std::size_t> d(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         iterator(boost::begin(c)), iterator(boost::end(c)),
         hpx::parallel::induction(0),
@@ -79,6 +80,7 @@ void test_for_loop_induction_stride(ExPolicy && policy, IteratorTag)
             d[i] = 42;
             HPX_TEST_EQ(2*i, j);
         });
+    f.wait();
 
     // verify values
     std::size_t count = 0;
@@ -112,7 +114,7 @@ void test_for_loop_induction_life_out(ExPolicy && policy, IteratorTag)
 
     std::size_t curr = 0;
 
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         iterator(boost::begin(c)), iterator(boost::end(c)),
         hpx::parallel::induction(curr),
@@ -121,6 +123,7 @@ void test_for_loop_induction_life_out(ExPolicy && policy, IteratorTag)
             *it = 42;
             d[i] = 42;
         });
+    f.wait();
     HPX_TEST_EQ(curr, c.size());
 
     // verify values
@@ -156,7 +159,7 @@ void test_for_loop_induction_stride_life_out(ExPolicy && policy, IteratorTag)
     std::size_t curr1 = 0;
     std::size_t curr2 = 0;
 
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         iterator(boost::begin(c)), iterator(boost::end(c)),
         hpx::parallel::induction(curr1),
@@ -167,6 +170,7 @@ void test_for_loop_induction_stride_life_out(ExPolicy && policy, IteratorTag)
             d[i] = 42;
             HPX_TEST_EQ(2*i, j);
         });
+    f.wait();
     HPX_TEST_EQ(curr1, c.size());
     HPX_TEST_EQ(curr2, 2*c.size());
 
@@ -192,21 +196,17 @@ void test_for_loop_induction()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_induction(seq, IteratorTag());
-    test_for_loop_induction(par, IteratorTag());
-    test_for_loop_induction(par_vec, IteratorTag());
+    test_for_loop_induction(seq(task), IteratorTag());
+    test_for_loop_induction(par(task), IteratorTag());
 
-    test_for_loop_induction_stride(seq, IteratorTag());
-    test_for_loop_induction_stride(par, IteratorTag());
-    test_for_loop_induction_stride(par_vec, IteratorTag());
+    test_for_loop_induction_stride(seq(task), IteratorTag());
+    test_for_loop_induction_stride(par(task), IteratorTag());
 
-    test_for_loop_induction_life_out(seq, IteratorTag());
-    test_for_loop_induction_life_out(par, IteratorTag());
-    test_for_loop_induction_life_out(par_vec, IteratorTag());
+    test_for_loop_induction_life_out(seq(task), IteratorTag());
+    test_for_loop_induction_life_out(par(task), IteratorTag());
 
-    test_for_loop_induction_stride_life_out(seq, IteratorTag());
-    test_for_loop_induction_stride_life_out(par, IteratorTag());
-    test_for_loop_induction_stride_life_out(par_vec, IteratorTag());
+    test_for_loop_induction_stride_life_out(seq(task), IteratorTag());
+    test_for_loop_induction_stride_life_out(par(task), IteratorTag());
 }
 
 void for_loop_induction_test()
@@ -227,7 +227,7 @@ void test_for_loop_induction_idx(ExPolicy && policy)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         0, c.size(),
         hpx::parallel::induction(0),
@@ -236,6 +236,7 @@ void test_for_loop_induction_idx(ExPolicy && policy)
             c[i] = 42;
             HPX_TEST_EQ(i, j);
         });
+    f.wait();
 
     // verify values
     std::size_t count = 0;
@@ -258,7 +259,7 @@ void test_for_loop_induction_stride_idx(ExPolicy && policy)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::for_loop(
+    auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
         0, c.size(),
         hpx::parallel::induction(0),
@@ -269,6 +270,7 @@ void test_for_loop_induction_stride_idx(ExPolicy && policy)
             HPX_TEST_EQ(i, j);
             HPX_TEST_EQ(2*i, k);
         });
+    f.wait();
 
     // verify values
     std::size_t count = 0;
@@ -285,13 +287,11 @@ void for_loop_induction_test_idx()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_induction_idx(seq);
-    test_for_loop_induction_idx(par);
-    test_for_loop_induction_idx(par_vec);
+    test_for_loop_induction_idx(seq(task));
+    test_for_loop_induction_idx(par(task));
 
-    test_for_loop_induction_stride_idx(seq);
-    test_for_loop_induction_stride_idx(par);
-    test_for_loop_induction_stride_idx(par_vec);
+    test_for_loop_induction_stride_idx(seq(task));
+    test_for_loop_induction_stride_idx(par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
