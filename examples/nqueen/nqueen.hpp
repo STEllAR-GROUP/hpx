@@ -10,7 +10,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/include/client.hpp>
 
-#include <examples/nqueen/stubs/nqueen.hpp>
+#include "stubs/nqueen.hpp"
 
 namespace nqueen
 {
