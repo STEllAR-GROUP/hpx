@@ -50,8 +50,8 @@ namespace hpx { namespace traits
         template <typename Iter, typename Cat>
         struct has_category<Iter, Cat,
                 typename std::enable_if<is_iterator<Iter>::value>::type>
-          : std::is_same<
-                typename std::iterator_traits<Iter>::iterator_category, Cat>
+          : std::is_base_of<
+                Cat, typename std::iterator_traits<Iter>::iterator_category>
         {};
     }
 

@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/for_loop_reduction.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITH_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM)
-#define HPX_PARALLEL_ALGORITH_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM
+#if !defined(HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM)
+#define HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
@@ -24,7 +24,6 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
-    // for_loop
     namespace detail
     {
         /// \cond NOINTERNAL

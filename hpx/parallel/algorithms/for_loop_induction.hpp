@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/for_loop_induction.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITH_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM)
-#define HPX_PARALLEL_ALGORITH_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
+#if !defined(HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM)
+#define HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
 
 #include <hpx/config.hpp>
 #include <hpx/util/decay.hpp>
@@ -19,7 +19,6 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
-    // for_loop
     namespace detail
     {
         /// \cond NOINTERNAL

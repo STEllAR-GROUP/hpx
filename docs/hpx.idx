@@ -180,7 +180,8 @@ parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each_id
 parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_n.*"
 
 # hpx/parallel/algorithms/for_loop.hpp
-parallel::for_loop                    "for_loop" "hpx\.parallel\.v2\.for_loop"
+parallel::for_loop                    "for_loop" "hpx\.parallel\.v2\.for_loop_id.*"
+parallel::for_loop_strided            "for_loop_strided" "hpx\.parallel\.v2\.for_loop_strided_id.*"
 
 # hpx/parallel/algorithms/for_loop_induction.hpp
 parallel::induction                   "induction" "hpx\.parallel\.v2\.induction"
