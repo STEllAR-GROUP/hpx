@@ -55,6 +55,7 @@ set(tests
     for_loop_induction_async
     for_loop_reduction
     for_loop_reduction_async
+    for_loop_strided
     generate
     generaten
     includes

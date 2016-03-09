@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { namespace util
                 try {
                     // estimates a chunk size based on number of cores used
                     std::vector<tuple_type> shape = get_bulk_iteration_shape_idx(
-                        policy, inititems, f1, first, count);
+                        policy, inititems, f1, first, count, 1);
 
                     workitems.reserve(shape.size());
 
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { namespace util
                 try {
                     // estimates a chunk size based on number of cores used
                     std::vector<tuple_type> shape = get_bulk_iteration_shape_idx(
-                        policy, inititems, f1, first, count);
+                        policy, inititems, f1, first, count, 1);
 
                     workitems.reserve(shape.size());
 

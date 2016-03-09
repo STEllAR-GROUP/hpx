@@ -17,6 +17,7 @@
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -361,7 +362,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         using hpx::util::make_tagged_pair;
 
         // if count is representing a negative value, we do nothing
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<
                     ExPolicy, tagged_pair<tag::in(InIter), tag::out(OutIter)>

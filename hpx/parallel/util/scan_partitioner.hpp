@@ -71,7 +71,7 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     shape = get_bulk_iteration_shape(policy, workitems, f1,
-                        first, count);
+                        first, count, 1);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(shape.size() + 1);
@@ -181,7 +181,7 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     shape = get_bulk_iteration_shape(policy, workitems, f1,
-                        first, count);
+                        first, count, 1);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(shape.size() + 1);

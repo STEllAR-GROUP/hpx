@@ -69,8 +69,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     ( args.init_iteration(0), 0 )..., 0
                 };
 
-                std::size_t size = 0;
-                for (/**/; first != last; ++size)
+                std::size_t size = parallel::v1::detail::distance(first, last);
+
+                std::size_t count = size;
+                for (/* */; first != last; count -= abs(stride))
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
@@ -78,7 +80,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                         ( args.next_iteration(), 0 )..., 0
                     };
 
-                    first = parallel::v1::detail::next(first, stride);
+                    // modifies stride
+                    first = parallel::v1::detail::next(first, count, stride);
                 }
 
                 // make sure live-out variables are properly set on
@@ -99,12 +102,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 if (first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                std::size_t size =
-                    parallel::v1::detail::distance(first, last) /
-                    stride;
-
+                std::size_t size = parallel::v1::detail::distance(first, last);
                 return util::partitioner<ExPolicy>::call_with_index(
-                    policy, first, size,
+                    policy, first, size, stride,
                     [=](std::size_t part_index,
                         B part_begin, std::size_t part_steps) mutable
                     {
@@ -121,9 +121,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                                 ( args.next_iteration(), 0 )..., 0
                             };
 
+                            std::size_t chunk = (std::min)(S(part_steps), stride);
+
+                            // modifies 'chunk'
                             part_begin = parallel::v1::detail::next(
-                                part_begin, stride);
-                            --part_steps;
+                                part_begin, part_steps, chunk);
+                            part_steps -= chunk;
                         }
                     },
                     [=](std::vector<hpx::future<void> > &&) mutable -> void
@@ -463,7 +466,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         typename std::decay<I>::type first, I last, S stride, Args &&... args)
     {
         static_assert(sizeof...(Args) >= 1,
-            "for_loop must be called with at least a function object");
+            "for_loop_strided must be called with at least a function object");
 
         using hpx::util::detail::make_index_pack;
         return detail::for_loop(
@@ -562,7 +565,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         S stride, Args &&... args)
     {
         static_assert(sizeof...(Args) >= 1,
-            "for_loop must be called with at least a function object");
+            "for_loop_strided must be called with at least a function object");
 
         return for_loop_strided(parallel::seq, first, last, stride,
             std::forward<Args>(args)...);
