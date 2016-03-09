@@ -198,7 +198,7 @@ namespace hpx
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
-    inline int init(int (*f)(boost::program_options::variables_map& vm),
+    inline int init(int (*f)(boost::program_options::variables_map&),
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
@@ -217,12 +217,20 @@ namespace hpx
         return init(f, desc_commandline, argc, argv, empty, empty, mode);
     }
 
+    // Main entry point for launching the HPX runtime system.
+    inline int init(int (*f)(boost::program_options::variables_map&),
+        int argc, char** argv, hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        return init(f, app_name, argc, argv, mode);
+    }
+
     /// \cond NOINTERNAL
     namespace detail
     {
         HPX_EXPORT int init_helper(
-            boost::program_options::variables_map& /*vm*/,
-            util::function_nonser<int(int, char**)> const& f);
+            boost::program_options::variables_map&,
+            util::function_nonser<int(int, char**)> const&);
     }
     /// \endcond
 
@@ -233,12 +241,12 @@ namespace hpx
     /// console mode or worker mode depending on the command line settings).
     inline int
     init(util::function_nonser<int(int, char**)> const& f,
-        std::string const& /*app_name*/, int argc, char** argv,
+        std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
         options_description desc_commandline(
-            std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+            std::string("Usage: ") + app_name +  " [options]");
 
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
@@ -246,6 +254,15 @@ namespace hpx
         return init(
             util::bind(detail::init_helper, util::placeholders::_1, f),
             desc_commandline, argc, argv, cfg, empty, empty, mode);
+    }
+
+    // Main entry point for launching the HPX runtime system.
+    inline int
+    init(util::function_nonser<int(int, char**)> const& f,
+        int argc, char** argv, hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        return init(f, app_name, argc, argv, mode);
     }
 }
 
