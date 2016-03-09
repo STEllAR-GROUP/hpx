@@ -13,6 +13,8 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util/function.hpp>
 
+#include <boost/system/error_code.hpp>
+
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \namespace parcelset

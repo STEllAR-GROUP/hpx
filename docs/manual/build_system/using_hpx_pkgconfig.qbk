@@ -31,7 +31,8 @@ used while building __hpx__):
 ``
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
     c++ -o hello_world hello_world.cpp \
-        `pkg-config --cflags --libs hpx_application` -lhpx_iostreams -DHPX_APPLICATION_NAME=hello_world
+        `pkg-config --cflags --libs hpx_application` \
+        -lhpx_iostreams -DHPX_APPLICATION_NAME=hello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
@@ -100,7 +101,7 @@ build the component library. (where [^$HPX_LOCATION] is the build directory or
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
     c++ -o libhpx_hello_world.so hello_world_component.cpp \
         `pkg-config --cflags --libs hpx_component` \
-        -DHPX_COMPONENT_NAME=hpx_hello_world
+        -lhpx_iostreams -DHPX_COMPONENT_NAME=hpx_hello_world
 ``
 
 Now pick a directory in which to install your __hpx__ component libraries. For
@@ -123,28 +124,6 @@ this example, we'll choose a directory named ''my_hpx_libs''.
            linker. You need to add the path $HPX_LOCATION/lib to your linker search
            path (for example LD_LIBRARY_PATH on Linux)]
 
-In the ~/my_hpx_libs directory you need to create an ini file inside that
-directory which matches the name of the component (as supplied by
-`-DHPX_COMPONENT_NAME` above).
-
-[*hello_world.ini]
-``
-    [hpx.components.hello_world]
-    name = hello_world
-    path = ${HOME}/my_hpx_libs
-``
-
-[note For additional details about ini file configuration and __hpx__, see
-      [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
-
-In addition, you'll need this in your home directory:
-
-[*.hpx.ini]
-``
-    [hpx]
-    ini_path = $[hpx.ini_path]:${HOME}/my_hpx_libs
-``
-
 Now, to build the application that uses this component (hello_world_client.cpp),
 we do:
 
@@ -152,12 +131,11 @@ we do:
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
     c++ -o hello_world_client hello_world_client.cpp \
         `pkg-config --cflags --libs hpx_application` \
-        -lhpx_iostreams -L${HOME}/my_hpx_libs -lhello_world
+        -L${HOME}/my_hpx_libs -lhello_world -lhpx_iostreams
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
            the [^-o] flag.]
-
 
 Finally, you'll need to set your LD_LIBRARY_PATH before you can run the program.
 To run the program, type:

@@ -1553,19 +1553,15 @@ namespace hpx
         return *this;
     }
 
-        // forwarder for HPX_ASSERT handler
-    inline void assertion_failed(char const* expr, char const* function,
-        char const* file, long line)
-    {
-        hpx::detail::assertion_failed(expr, function, file, line);
-    }
+    // forwarder for HPX_ASSERT handler
+    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+    void assertion_failed(char const* expr, char const* function,
+        char const* file, long line);
 
     // forwarder for HPX_ASSERT_MSG handler
-    inline void assertion_failed_msg(char const* msg, char const* expr,
-        char const* function, char const* file, long line)
-    {
-        hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
-    }
+    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+    void assertion_failed_msg(char const* msg, char const* expr,
+        char const* function, char const* file, long line);
 
     // For testing purposes we sometime expect to see exceptions, allow those
     // to go through without attaching a debugger.

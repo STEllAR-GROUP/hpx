@@ -7,14 +7,14 @@
 #include "hello_world_component.hpp"
 #include <hpx/include/iostreams.hpp>
 
+#include <iostream>
+
 namespace examples { namespace server
 {
-
-void hello_world::invoke()
-{
-    hpx::cout << "Hello HPX World!\n" << hpx::flush;
-}
-
+    void hello_world::invoke()
+    {
+        hpx::cout << "Hello HPX World!" << std::endl;
+    }
 }}
 
 HPX_REGISTER_COMPONENT_MODULE();

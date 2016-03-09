@@ -9,8 +9,8 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/type_traits/is_class.hpp>
-#include <boost/utility/enable_if.hpp>
+
+#include <type_traits>
 
 // This macro creates a boolean unary metafunction which result is
 // true if and only if its parameter type has member function with
@@ -24,31 +24,30 @@
             void MEMBER (...);                                    \
         };                                                        \
                                                                   \
-        template <class T>                                        \
+        template <typename T>                                     \
         struct helper_composed: T, helper {};                     \
                                                                   \
         template <void (helper::*) (...)>                         \
         struct member_function_holder {};                         \
                                                                   \
-        template <class T, class Ambiguous =                      \
+        template <typename T, typename Ambiguous =                \
             member_function_holder<&helper::MEMBER> >             \
-        struct impl: boost::mpl::true_ {};                        \
+        struct impl : boost::mpl::true_ {};                       \
                                                                   \
-        template <class T>                                        \
+        template <typename T>                                     \
         struct impl<T,                                            \
             member_function_holder<&helper_composed<T>::MEMBER> > \
           : boost::mpl::false_ {};                                \
     }                                                             \
                                                                   \
-    template <class T, class Enable = void>                       \
-    struct BOOST_PP_CAT(has_, MEMBER): boost::mpl::false_ {};     \
+    template <typename T, typename Enable = void>                 \
+    struct BOOST_PP_CAT(has_, MEMBER) : boost::mpl::false_ {};    \
                                                                   \
-    template <class T>                                            \
+    template <typename T>                                         \
     struct BOOST_PP_CAT(has_, MEMBER)<T,                          \
-        typename boost::enable_if<boost::is_class<T> >::type>:    \
-            BOOST_PP_CAT(BOOST_PP_CAT(has_, MEMBER), _detail)     \
+        typename std::enable_if<std::is_class<T>::value >::type>  \
+          : BOOST_PP_CAT(BOOST_PP_CAT(has_, MEMBER), _detail)     \
             ::impl<T> {};                                         \
 /**/
-
 
 #endif

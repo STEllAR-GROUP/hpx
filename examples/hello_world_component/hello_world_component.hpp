@@ -15,49 +15,35 @@
 
 namespace examples { namespace server
 {
-
-struct HPX_COMPONENT_EXPORT hello_world
-  : hpx::components::component_base<hello_world>
-{
-    void invoke();
-    HPX_DEFINE_COMPONENT_ACTION(hello_world, invoke);
-};
-
-}
-
-namespace stubs
-{
-
-struct hello_world : hpx::components::stub_base<server::hello_world>
-{
-    static void invoke(hpx::naming::id_type const& gid)
+    struct HPX_COMPONENT_EXPORT hello_world
+        : hpx::components::component_base<hello_world>
     {
-        hpx::async<server::hello_world::invoke_action>(gid).get();
-    }
-};
-
-}
-
-struct hello_world
-  : hpx::components::client_base<hello_world, stubs::hello_world>
-{
-    typedef hpx::components::client_base<hello_world, stubs::hello_world>
-        base_type;
-
-    hello_world(hpx::future<id_type> gid)
-      : base_type(std::move(gid))
-    {}
-
-    void invoke()
-    {
-        this->base_type::invoke(this->get_id());
-    }
-};
-
-}
+        void invoke();
+        HPX_DEFINE_COMPONENT_ACTION(hello_world, invoke);
+    };
+}}
 
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::hello_world::invoke_action, hello_world_invoke_action);
+
+namespace examples
+{
+    struct hello_world
+      : hpx::components::client_base<hello_world, server::hello_world>
+    {
+        typedef hpx::components::client_base<hello_world, server::hello_world>
+            base_type;
+
+        hello_world(hpx::future<hpx::id_type> f)
+          : base_type(std::move(f))
+        {}
+
+        void invoke()
+        {
+            hpx::async<server::hello_world::invoke_action>(this->get_id()).get();
+        }
+    };
+}
 
 #endif // HELLO_WORLD_COMPONENT_HPP
 //]
