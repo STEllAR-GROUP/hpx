@@ -13,7 +13,6 @@
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
@@ -27,8 +26,8 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/traits/projected.hpp>
-#include <hpx/parallel/algorithms/transfer.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/parallel/algorithms/detail/transfer.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -158,9 +157,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-            return transfer<
+        return detail::transfer<
                 detail::copy
-                >(std::forward<ExPolicy>(policy), first, last, dest);
+            >(std::forward<ExPolicy>(policy), first, last, dest);
     }
 
 

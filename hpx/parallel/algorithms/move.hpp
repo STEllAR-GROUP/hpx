@@ -16,7 +16,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/parallel/algorithms/transfer.hpp>
+#include <hpx/parallel/algorithms/detail/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -124,14 +124,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a move algorithm returns a \a hpx::future<OutIter> if
-    ///           the execution policy is of type
+    /// \returns  The \a move algorithm returns a
+    ///           \a  hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
+    ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a move algorithm returns the output iterator to the
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
+    ///           The \a move algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
-    ///           copied.
+    ///           moved.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
@@ -143,8 +146,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     move(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-            return transfer<detail::move>(
-                std::forward<ExPolicy>(policy), first, last, dest);
+        return detail::transfer<detail::move>(
+            std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}
 
