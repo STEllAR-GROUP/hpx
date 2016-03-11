@@ -24,6 +24,7 @@ set(subdirs
     qt
     random_mem_access
     spell_check
+    sudoku
     startup_shutdown
     thread_aware_timer
     throttle
