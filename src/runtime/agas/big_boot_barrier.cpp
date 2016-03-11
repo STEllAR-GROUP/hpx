@@ -928,8 +928,14 @@ void big_boot_barrier::wait_hosted(
 
 void big_boot_barrier::notify()
 {
-    boost::lock_guard<boost::mutex> lk(mtx, boost::adopt_lock);
-    --connected;
+    runtime& rt = get_runtime();
+    naming::resolver_client& agas_client = rt.get_agas_client();
+
+    if (agas_client.get_status() == state_starting)
+    {
+        boost::lock_guard<boost::mutex> lk(mtx, boost::adopt_lock);
+        --connected;
+    }
     cond.notify_all();
 }
 
