@@ -6,11 +6,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    component_storage
-    containers
-    iostreams
-    performance_counters
-    security
+    io
+    memory
+    papi
    )
 
 add_hpx_pseudo_target(components)

@@ -420,19 +420,32 @@ namespace hpx {
         // stop runtime_impl services (threads)
         thread_manager_->stop(false);    // just initiate shutdown
 
-        // schedule task in timer_pool to execute stopped() below
-        // this is necessary as this function (stop()) might have been called
-        // from a HPX thread, so it would deadlock by waiting for the thread
-        // manager
-        boost::mutex mtx;
-        boost::condition cond;
-        boost::unique_lock<boost::mutex> l(mtx);
+        if (threads::get_self_ptr())
+        {
+            // schedule task on separate thread to execute stopped() below
+            // this is necessary as this function (stop()) might have been called
+            // from a HPX thread, so it would deadlock by waiting for the thread
+            // manager
+            boost::mutex mtx;
+            boost::condition cond;
+            boost::unique_lock<boost::mutex> l(mtx);
 
-        boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
-            boost::ref(cond), boost::ref(mtx)));
-        cond.wait(l);
+            boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
+                boost::ref(cond), boost::ref(mtx)));
+            cond.wait(l);
 
-        t.join();
+            t.join();
+        }
+        else
+        {
+            runtime_support_->stopped();         // re-activate shutdown HPX-thread
+            thread_manager_->stop(blocking);     // wait for thread manager
+
+            // this disables all logging from the main thread
+            deinit_tss();
+
+            LRT_(info) << "runtime_impl: stopped all services";
+        }
 
         // stop the rest of the system
         parcel_handler_.stop(blocking);     // stops parcel pools as well

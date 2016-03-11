@@ -8,7 +8,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <hpx/components/memory/mem_counter.hpp>
+#include <hpx/components/performance_counters/memory/mem_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality, We register the module dynamically

@@ -8,7 +8,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <hpx/components/io_counters/io_counters.hpp>
+#include <hpx/components/performance_counters/io/io_counters.hpp>
 
 #include <boost/format.hpp>
 #include <hpx/exception.hpp>

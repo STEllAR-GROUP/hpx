@@ -17,8 +17,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/thread_mapper.hpp>
-#include <hpx/components/papi/server/papi.hpp>
-#include <hpx/components/papi/util/papi.hpp>
+#include <hpx/components/performance_counters/papi/server/papi.hpp>
+#include <hpx/components/performance_counters/papi/util/papi.hpp>
 #include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

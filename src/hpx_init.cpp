@@ -1280,7 +1280,7 @@ namespace hpx
     int stop(error_code& ec)
     {
         if (threads::get_self_ptr()) {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+            HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "this function cannot be called from an HPX thread");
             return -1;
         }
@@ -1293,7 +1293,12 @@ namespace hpx
             return -1;
         }
 
-        int result = rt->wait();
+        int result = 0;
+
+        // wait only if we have not started up yet
+        if (rt->get_state() <= state_pre_main)
+            result = rt->wait();
+
         rt->stop();
         rt->rethrow_exception();
 
