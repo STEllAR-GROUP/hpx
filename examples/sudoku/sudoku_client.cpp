@@ -4,12 +4,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
-#include <iostream>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/include/util.hpp>
 
+#include <boost/cstdint.hpp>
 #include "sudoku.hpp"
 
 int hpx_main(boost::program_options::variables_map&)
@@ -26,17 +27,17 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     new_board.init_board(default_size);
-    std::cout << "Initial state of the board:" << std::endl;
-    std::vector<std::size_t> list_ = new_board.access_board();
-    for(std::size_t r=0;r<9;r++){
-        for(std::size_t c=0;c<9;c++)
-            if(list_[r*9+c] == 0)
-                std::cout << "_" << " " << std::flush;
+    hpx::cout << "Initial state of the board:" << hpx::endl;
+    std::vector<boost::uint8_t> board_config = new_board.access_board();
+    for(boost::uint8_t r=0;r<9;r++){
+        for(boost::uint8_t c=0;c<9;c++)
+            if(board_config[r*9+c] == 0)
+                hpx::cout << "_" << " " << hpx::flush;
             else
-                std::cout << list_[r*9+c] << " " << std::flush;
-        std::cout << std::endl;
+                hpx::cout << board_config[r*9+c] << " " << hpx::flush;
+        hpx::cout << hpx::endl;
     }
-    std::cout << std::endl;
+    hpx::cout << hpx::endl;
 
     i = 1;
     for(std::list<sudoku::board>::iterator iter = b.begin();
@@ -51,7 +52,7 @@ int hpx_main(boost::program_options::variables_map&)
     b.clear();
 
     if(soln_count_total == 0)
-        std::cout << "The given sudoku puzzle has no solution" << std::endl;
+        hpx::cout << "The given sudoku puzzle has no solution" << hpx::endl;
 
     hpx::finalize();
     return 0;

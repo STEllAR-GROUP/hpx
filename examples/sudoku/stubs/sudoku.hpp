@@ -27,14 +27,14 @@ namespace sudoku { namespace stubs
         }
         //--------------------------------------------------------------
 
-        static hpx::lcos::future<list_type>
+        static hpx::lcos::future<board_type>
         access_board_async(hpx::naming::id_type const& gid)
         {
             typedef server::board::access_action action_type;
             return hpx::async<action_type>(gid);
         }
 
-        static list_type access_board(hpx::naming::id_type const& gid)
+        static board_type access_board(hpx::naming::id_type const& gid)
         {
             return access_board_async(gid).get();
         }
@@ -51,32 +51,32 @@ namespace sudoku { namespace stubs
 
         static hpx::lcos::future<bool>
         check_board_async(hpx::naming::id_type const& gid,
-            list_type const& list, std::size_t level)
+            board_type const& board_config, std::size_t level)
         {
             typedef server::board::check_action action_type;
-            return hpx::async<action_type>(gid, list, level);
+            return hpx::async<action_type>(gid, board_config, level);
         }
 
         static bool check_board(hpx::naming::id_type const& gid,
-            list_type const& list, std::size_t level)
+            board_type const& board_config, std::size_t level)
         {
-            return check_board_async(gid, list, level).get();
+            return check_board_async(gid, board_config, level).get();
         }
         //-----------------------------------------------------------
 
         static std::size_t solve_board(hpx::naming::id_type const& gid,
-            list_type const& list, std::size_t size, std::size_t level)
+            board_type const& board_config, std::size_t size, std::size_t level)
         {
-            return solve_board_async(gid, list, size, level).get();
+            return solve_board_async(gid, board_config, size, level).get();
         }
 
         static hpx::lcos::future<std::size_t> solve_board_async(
-            hpx::naming::id_type const& gid, list_type const& list,
+            hpx::naming::id_type const& gid, board_type const& board_config,
             std::size_t size, std::size_t level)
         {
             typedef server::board::solve_action action_type;
             return hpx::async<action_type>
-                (gid, list, size, level);
+                (gid, board_config, size, level);
         }
         //----------------------------------------------------------
 

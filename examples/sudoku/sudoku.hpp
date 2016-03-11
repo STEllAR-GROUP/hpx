@@ -30,11 +30,11 @@ namespace sudoku
         }
         //-------------------------------------------------------
 
-        list_type access_board(){
+        board_type access_board(){
             return this->base_type::access_board(get_id());
         }
 
-        hpx::lcos::future<list_type> access_board_async(){
+        hpx::lcos::future<board_type> access_board_async(){
             return this->base_type::access_board_async(get_id());
         }
         //------------------------------------------------------
@@ -44,29 +44,29 @@ namespace sudoku
         }
         //-----------------------------------------------------
 
-        bool check_board(list_type const& list, std::size_t level){
-            return this->base_type::check_board(get_id(), list, level);
+        bool check_board(board_type const& board_config, std::size_t level){
+            return this->base_type::check_board(get_id(), board_config, level);
         }
 
-        hpx::lcos::future<bool> check_board_async(list_type const& list,
+        hpx::lcos::future<bool> check_board_async(board_type const& board_config,
             std::size_t level)
         {
-            return this->base_type::check_board_async(get_id(), list, level);
+            return this->base_type::check_board_async(get_id(), board_config, level);
         }
         //---------------------------------------------------------
 
-        std::size_t solve_board(list_type const& list, std::size_t size,
+        std::size_t solve_board(board_type const& board_config, std::size_t size,
             std::size_t level)
         {
-            return this->base_type::solve_board(get_id(), list, size, level);
+            return this->base_type::solve_board(get_id(), board_config, size, level);
         }
 
         hpx::lcos::future<std::size_t>
-        solve_board_async(list_type const& list, std::size_t size,
+        solve_board_async(board_type const& board_config, std::size_t size,
             std::size_t level)
         {
             return this->base_type::solve_board_async
-                (get_id(), list, size, level);
+                (get_id(), board_config, size, level);
         }
         //---------------------------------------------------------
 
