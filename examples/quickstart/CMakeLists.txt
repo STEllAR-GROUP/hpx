@@ -23,7 +23,7 @@ set(example_programs
     fibonacci_futures_distributed
     fractals
     fractals_struct
-#    init_globally
+    init_globally
     sierpinski
     interest_calculator
     interval_timer
