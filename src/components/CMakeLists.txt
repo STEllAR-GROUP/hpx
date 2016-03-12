@@ -10,6 +10,7 @@ set(subdirs
     containers
     iostreams
     performance_counters
+    process
     security
    )
 
