@@ -10,7 +10,10 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_START_IN_DIR_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_START_IN_DIR_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
+
 #include <string>
 #include <unistd.h>
 
@@ -21,6 +24,8 @@ namespace initializers {
 class start_in_dir : public initializer_base
 {
 public:
+    start_in_dir() {}
+
     explicit start_in_dir(const std::string &s) : s_(s) {}
 
     template <class PosixExecutor>
@@ -30,6 +35,14 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned const)
+    {
+        ar & s_;
+    }
+
     std::string s_;
 };
 

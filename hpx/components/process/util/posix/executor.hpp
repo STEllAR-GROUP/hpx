@@ -94,32 +94,31 @@ struct executor
     child operator()(Ts const&... ts)
     {
         int fork_sequencer[] = {
-            call_on_fork_setup(*this)(ts)..., 0
+            (call_on_fork_setup(*this)(ts), 0)..., 0
         };
 
         pid_t pid = ::fork();
         if (pid == -1)
         {
-            int error_sequencer[] = {
-                call_on_fork_error(*this)(ts)..., 0
+            int const error_sequencer[] = {
+                (call_on_fork_error(*this)(ts), 0)..., 0
             };
-            boost::fusion::for_each(seq, call_on_fork_error(*this));
         }
         else if (pid == 0)
         {
-            int setup_sequencer[] = {
-                call_on_fork_setup(*this)(ts)..., 0
+            int const setup_sequencer[] = {
+                (call_on_fork_setup(*this)(ts), 0)..., 0
             };
             ::execve(exe, cmd_line, env);
 
-            int error_sequencer[] = {
-                call_on_exec_error(*this)(ts)..., 0
+            int const error_sequencer[] = {
+                (call_on_exec_error(*this)(ts), 0)..., 0
             };
             _exit(EXIT_FAILURE);
         }
 
-        int success_sequencer[] = {
-            call_on_fork_success(*this)(ts)..., 0
+        int const success_sequencer[] = {
+            (call_on_fork_success(*this)(ts), 0)..., 0
         };
 
         return child(pid);

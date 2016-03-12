@@ -10,7 +10,10 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_RUN_EXE_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_RUN_EXE_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
+
 #include <boost/filesystem.hpp>
 #include <boost/shared_array.hpp>
 #include <string>
@@ -22,6 +25,10 @@ namespace initializers {
 class run_exe_ : public initializer_base
 {
 public:
+    run_exe_()
+    {
+    }
+
     explicit run_exe_(const std::string &s) : s_(s), cmd_line_(new char*[2])
     {
         cmd_line_[0] = const_cast<char*>(s_.c_str());
@@ -37,6 +44,26 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void save(Archive& ar, unsigned const) const
+    {
+        ar & s_;
+    }
+
+    template <typename Archive>
+    void load(Archive& ar, const unsigned int)
+    {
+        ar & s_;
+
+        cmd_line_ = new char*[2];
+        cmd_line_[0] = const_cast<char*>(s_.c_str());
+        cmd_line_[1] = 0;
+    }
+
+    HPX_SERIALIZATION_SPLIT_MEMBER()
+
     std::string s_;
     boost::shared_array<char*> cmd_line_;
 };

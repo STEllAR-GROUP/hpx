@@ -12,13 +12,17 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_SET_ARGS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/shared_array.hpp>
+
 #include <sstream>
+#include <string>
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
@@ -34,6 +38,8 @@ private:
     typedef std::basic_ostringstream<Char> OStringStream;
 
 public:
+    set_args_() {}
+
     explicit set_args_(const Range &args)
     {
         ConstIterator it = boost::const_begin(args);
@@ -56,28 +62,34 @@ public:
                 }
                 os << static_cast<Char>(' ');
             }
-            String s = os.str();
-            cmd_line_.reset(new Char[s.size() + 1]);
-            boost::copy(s, cmd_line_.get());
-            cmd_line_[s.size()] = 0;
+            cmd_line_ = os.str();
         }
         else
         {
-            cmd_line_.reset(new Char[1]());
+            exe_.clear();
+            cmd_line_.clear();
         }
     }
 
     template <class WindowsExecutor>
     void on_CreateProcess_setup(WindowsExecutor &e) const
     {
-        e.cmd_line = cmd_line_.get();
+        e.cmd_line = const_cast<char*>(cmd_line_.c_str());
         if (!e.exe && !exe_.empty())
             e.exe = exe_.c_str();
     }
 
 private:
-    boost::shared_array<Char> cmd_line_;
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar & exe_ & cmd_line_;
+    }
+
     String exe_;
+    String cmd_line_;
 };
 
 template <class Range>

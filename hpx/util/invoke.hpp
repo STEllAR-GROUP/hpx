@@ -153,6 +153,32 @@ namespace hpx { namespace util
         return detail::invoke_guard<R>()(
             std::forward<F>(f), std::forward<Ts>(vs)...);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace functional
+    {
+        struct invoke
+        {
+            template <typename F, typename... Ts>
+            typename util::result_of<F&&(Ts &&...)>::type
+            operator()(F && f, Ts &&... vs)
+            {
+                return util::invoke(std::forward<F>(f),
+                    std::forward<Ts>(vs)...);
+            }
+        };
+
+        template <typename R>
+        struct invoke_r
+        {
+            template <typename F, typename... Ts>
+            R operator()(F && f, Ts &&... vs)
+            {
+                return util::invoke<R>(std::forward<F>(f),
+                    std::forward<Ts>(vs)...);
+            }
+        };
+    }
 }}
 
 #endif

@@ -12,13 +12,14 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_SET_ENV_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+
 #include <boost/range/numeric.hpp>
-#include <boost/range/algorithm/copy.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/shared_array.hpp>
+
 #include <iterator>
 #include <cstddef>
+#include <vector>
 #include <windows.h>
 
 namespace hpx { namespace components { namespace process { namespace windows {
@@ -32,45 +33,62 @@ private:
     typedef typename Range::value_type String;
     typedef typename String::value_type Char;
 
-    static std::size_t add_size(std::size_t size, const String &s)
+    static std::size_t get_size(std::size_t len, String const& s)
     {
-        return size + s.size() + 1u;
+        return len + s.size() + 1;
     }
 
-    struct copy
+    struct copy_env
     {
-        Char *it_;
+        copy_env(Char* curr)
+          : curr_(curr)
+        {}
 
-        copy(Char *it) : it_(it) {}
-
-        void operator()(const String &s)
+        void operator()(String const& s)
         {
-            it_ = boost::copy(s, it_);
-            *it_ = 0;
-            ++it_;
+            std::memcpy(curr_, s.c_str(), s.size());
+            curr_ += s.size();
+            *curr_++ = 0;
         }
+
+        Char* curr_;
     };
 
 public:
-    set_env_(const Range &envs)
-        : size_(boost::accumulate(envs, 0, add_size) + 1),
-        env_(new Char[size_])
+    set_env_()
     {
-        boost::for_each(envs, copy(env_.get()));
-        env_[size_ - 1] = 0;
+        env_.resize(1);
+        env_[0] = 0;
+    }
+
+    set_env_(const Range &envs)
+    {
+        std::size_t s = std::accumulate(envs.begin(), envs.end(),
+            std::size_t(0), &set_env_::get_size);
+
+        env_.resize(s + 1);
+        std::for_each(envs.begin(), envs.end(), copy_env(env_.data()));
+        env_[env_.size() - 1] = 0;
     }
 
     template <class WindowsExecutor>
     void on_CreateProcess_setup(WindowsExecutor &e) const
     {
-        e.env = env_.get();
+        e.env = LPVOID(env_.data());
         if (Unicode)
             e.creation_flags |= CREATE_UNICODE_ENVIRONMENT;
     }
 
 private:
-    std::size_t size_;
-    boost::shared_array<Char> env_;
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned const)
+    {
+        ar & env_;
+    }
+
+    std::vector<Char> env_;
 };
 
 #if defined(_UNICODE) || defined(UNICODE)

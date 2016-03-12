@@ -11,7 +11,10 @@
 #define HPX_PROCESS_POSIX_INITIALIZERS_ON_EXEC_SETUP_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
@@ -21,7 +24,11 @@ template <class Handler>
 class on_exec_setup_ : public initializer_base
 {
 public:
-    explicit on_exec_setup_(Handler handler) : handler_(handler) {}
+    on_exec_setup_() {}
+
+    explicit on_exec_setup_(Handler handler)
+      : handler_(std::move(handler))
+    {}
 
     template <class PosixExecutor>
     void on_exec_setup(PosixExecutor &e) const
@@ -30,13 +37,21 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned const)
+    {
+        ar & handler_;
+    }
+
     Handler handler_;
 };
 
 template <class Handler>
-on_exec_setup_<Handler> on_exec_setup(Handler handler)
+on_exec_setup_<Handler> on_exec_setup(Handler && handler)
 {
-    return on_exec_setup_<Handler>(handler);
+    return on_exec_setup_<Handler>(std::forward<Handler>(handler));
 }
 
 }

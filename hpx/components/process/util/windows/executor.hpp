@@ -84,8 +84,8 @@ struct executor
     template <typename ... Ts>
     child operator()(Ts const&... ts)
     {
-        int setup_sequencer[] = {
-            call_on_CreateProcess_setup(*this)(ts)..., 0
+        int const setup_sequencer[] = {
+            (call_on_CreateProcess_setup(*this)(ts), 0)..., 0
         };
 
         if (!::CreateProcess(
@@ -100,14 +100,14 @@ struct executor
             &startup_info,
             &proc_info))
         {
-            int error_sequencer[] = {
-                call_on_CreateProcess_error(*this)(ts)..., 0
+            int const error_sequencer[] = {
+                (call_on_CreateProcess_error(*this)(ts), 0)..., 0
             };
         }
         else
         {
-            int success_sequencer[] = {
-                call_on_CreateProcess_success(*this)(ts)..., 0
+            int const success_sequencer[] = {
+                (call_on_CreateProcess_success(*this)(ts), 0)..., 0
             };
         }
 

@@ -10,10 +10,12 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_SET_ARGS_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_SET_ARGS_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <boost/range/algorithm/transform.hpp>
-#include <boost/shared_array.hpp>
+
 #include <string>
+#include <vector>
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
@@ -22,30 +24,59 @@ namespace initializers {
 template <class Range>
 class set_args_ : public initializer_base
 {
-private:
-    static char *c_str(const std::string &s)
+public:
+    set_args_()
     {
-        return const_cast<char*>(s.c_str());
+        args_.resize(1);
+        args_[0] = 0;
     }
 
-public:
     explicit set_args_(const Range &args)
     {
-        args_.reset(new char*[args.size() + 1]);
-        boost::transform(args, args_.get(), c_str);
+        string_args_.resize(args.size());
+        args_.resize(args.size() + 1);
+        for (std::size_t i = 0; i != args.size(); ++i)
+        {
+            string_args_[i] = args[i];
+            args_[i] = string_args_[i].c_str();
+        }
         args_[args.size()] = 0;
     }
 
     template <class PosixExecutor>
     void on_exec_setup(PosixExecutor &e) const
     {
-        e.cmd_line = args_.get();
+        e.cmd_line = args_.data();
         if (!e.exe && *args_[0])
             e.exe = args_[0];
     }
 
 private:
-    boost::shared_array<char*> args_;
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void save(Archive& ar, unsigned const) const
+    {
+        ar & string_args_;
+    }
+
+    template <typename Archive>
+    void load(Archive& ar, unsigned const)
+    {
+        ar & string_args_;
+
+        args_.resize(string_args_.size() + 1);
+        for (std::size_t i = 0; i != string_args_.size(); ++i)
+        {
+            args_[i] = string_args_[i].c_str();
+        }
+        args_[string_args_.size()] = 0;
+    }
+
+    HPX_SERIALIZATION_SPLIT_MEMBER()
+
+    std::vector<std::string> string_args_;
+    std::vector<char*> args_;
 };
 
 template <class Range>

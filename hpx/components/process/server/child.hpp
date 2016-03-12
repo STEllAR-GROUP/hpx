@@ -10,6 +10,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/threads/run_as_os_thread.hpp>
 
 #include <hpx/components/process/util/child.hpp>
 #include <hpx/components/process/util/execute.hpp>
@@ -38,7 +39,9 @@ namespace hpx { namespace components { namespace process { namespace server
 
         boost::uint32_t wait_for_exit()
         {
-            return process::util::wait_for_exit(child_);
+            int (*f)(process::util::child const&) =
+                &process::util::wait_for_exit<process::util::child>;
+            return hpx::threads::run_as_os_thread(f, std::ref(child_)).get();
         }
 
         HPX_DEFINE_COMPONENT_ACTION(child, terminate);

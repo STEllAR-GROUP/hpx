@@ -34,10 +34,20 @@ namespace hpx { namespace components { namespace process
             return hpx::async(terminate_action(), this->get_id());
         }
 
+        void terminate_sync()
+        {
+            return terminate().get();
+        }
+
         hpx::future<boost::uint32_t> wait_for_exit()
         {
             typedef server::child::wait_for_exit_action wait_for_exit_action;
             return hpx::async(wait_for_exit_action(), this->get_id());
+        }
+
+        boost::uint32_t wait_for_exit_sync()
+        {
+            return wait_for_exit().get();
         }
     };
 }}}

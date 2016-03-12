@@ -17,7 +17,7 @@
 namespace hpx { namespace components { namespace process { namespace windows {
 
 template <class Process>
-inline DWORD wait_for_exit(const Process &p)
+inline int wait_for_exit(const Process &p)
 {
     if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
     {
@@ -31,12 +31,11 @@ inline DWORD wait_for_exit(const Process &p)
         HPX_THROW_EXCEPTION(invalid_status,
             "process::wait_for_exit", "GetExitCodeProcess() failed");
     }
-
-    return exit_code;
+    return static_cast<int>(exit_code);
 }
 
 template <class Process>
-inline DWORD wait_for_exit(const Process &p, hpx::error_code &ec)
+inline int wait_for_exit(const Process &p, hpx::error_code &ec)
 {
     DWORD exit_code = 1;
 
@@ -54,7 +53,7 @@ inline DWORD wait_for_exit(const Process &p, hpx::error_code &ec)
     {
         ec = hpx::make_success_code();
     }
-    return exit_code;
+    return static_cast<int>(exit_code);
 }
 
 }}}}

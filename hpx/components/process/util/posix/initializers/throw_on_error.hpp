@@ -28,15 +28,18 @@ public:
     void on_fork_setup(PosixExecutor&) const
     {
         if (::pipe(fds_) == -1)
-            HPX_PROCESS_THROW_LAST_SYSTEM_ERROR("pipe(2) failed");
+        {
+            HPX_THROW_EXCEPTION(kernel_error,
+                "throw_on_error::on_fork_setup", "pipe(2) failed");
+        }
         if (::fcntl(fds_[1], F_SETFD, FD_CLOEXEC) == -1)
         {
             int e = errno;
             ::close(fds_[0]);
             ::close(fds_[1]);
-            HPX_PROCESS_THROW(boost::system::system_error(
-                boost::system::error_code(e, boost::system::system_category()),
-                HPX_PROCESS_SOURCE_LOCATION "fcntl(2) failed"));
+
+            HPX_THROW_EXCEPTION(kernel_error,
+                "throw_on_error::on_fork_setup", "fcntl(2) failed");
         }
     }
 
@@ -46,9 +49,9 @@ public:
         int e = errno;
         ::close(fds_[0]);
         ::close(fds_[1]);
-        HPX_PROCESS_THROW(boost::system::system_error(
-            boost::system::error_code(e, boost::system::system_category()),
-            HPX_PROCESS_SOURCE_LOCATION "fork(2) failed"));
+
+        HPX_THROW_EXCEPTION(kernel_error,
+            "throw_on_error::on_fork_error", "fork(2) failed");
     }
 
     template <class PosixExecutor>
@@ -59,10 +62,9 @@ public:
         if (::read(fds_[0], &code, sizeof(int)) > 0)
         {
             ::close(fds_[0]);
-            HPX_PROCESS_THROW(boost::system::system_error(
-                boost::system::error_code(code,
-                boost::system::system_category()),
-                HPX_PROCESS_SOURCE_LOCATION "execve(2) failed"));
+
+            HPX_THROW_EXCEPTION(kernel_error,
+                "throw_on_error::on_fork_success", "execve(2) failed");
         }
         ::close(fds_[0]);
     }
@@ -83,6 +85,11 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive&, unsigned const) {}
+
     mutable int fds_[2];
 };
 

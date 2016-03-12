@@ -12,6 +12,7 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_RUN_EXE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
@@ -24,6 +25,7 @@ template <class String>
 class run_exe_ : public initializer_base
 {
 public:
+    run_exe_() {}
     explicit run_exe_(const String &s) : s_(s) {}
 
     template <class WindowsExecutor>
@@ -33,6 +35,14 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar & s_;
+    }
+
     String s_;
 };
 

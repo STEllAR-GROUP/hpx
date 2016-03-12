@@ -12,6 +12,7 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_START_IN_DIR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <boost/filesystem/path.hpp>
 #include <string>
@@ -24,6 +25,8 @@ template <class String>
 class start_in_dir_ : public initializer_base
 {
 public:
+    start_in_dir_() {}
+
     explicit start_in_dir_(const String &s) : s_(s) {}
 
     template <class WindowsExecutor>
@@ -33,6 +36,14 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned const)
+    {
+        ar & s_;
+    }
+
     String s_;
 };
 

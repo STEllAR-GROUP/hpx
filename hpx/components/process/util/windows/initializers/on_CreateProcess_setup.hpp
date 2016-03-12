@@ -12,7 +12,10 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_ON_CREATEPROCESS_SETUP_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
@@ -22,6 +25,8 @@ template <class Handler>
 class on_CreateProcess_setup_ : public initializer_base
 {
 public:
+    on_CreateProcess_setup_() {}
+
     explicit on_CreateProcess_setup_(Handler handler)
       : handler_(std::move(handler))
     {}
@@ -33,6 +38,14 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned const)
+    {
+        ar & handler_;
+    }
+
     Handler handler_;
 };
 

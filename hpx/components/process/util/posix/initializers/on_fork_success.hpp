@@ -11,7 +11,10 @@
 #define HPX_PROCESS_POSIX_INITIALIZERS_ON_FORK_SUCCESS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
@@ -21,7 +24,11 @@ template <class Handler>
 class on_fork_success_ : public initializer_base
 {
 public:
-    explicit on_fork_success_(Handler handler) : handler_(handler) {}
+    on_fork_success_() {}
+
+    explicit on_fork_success_(Handler handler)
+      : handler_(std::move(handler))
+    {}
 
     template <class PosixExecutor>
     void on_fork_success(PosixExecutor &e) const
@@ -30,13 +37,21 @@ public:
     }
 
 private:
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned const)
+    {
+        ar & handler_;
+    }
+
     Handler handler_;
 };
 
 template <class Handler>
-on_fork_success_<Handler> on_fork_success(Handler handler)
+on_fork_success_<Handler> on_fork_success(Handler && handler)
 {
-    return on_fork_success_<Handler>(handler);
+    return on_fork_success_<Handler>(std::forward<Handler>(handler));
 }
 
 }
