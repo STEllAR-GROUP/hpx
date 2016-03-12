@@ -102,19 +102,22 @@ namespace server
 
             //no equal value in same row
             for(boost::uint8_t col=0;col<9;col++)
-                if((x*9+col) != level && board_config.at(x*9+col) == board_config.at(level))
+                if((x*9+col) != level
+                    && board_config.at(x*9+col) == board_config.at(level))
                     return false;
 
             //no equal value in same column
             for(boost::uint8_t row=0;row<9;row++)
-                if((row*9+y) != level && board_config.at(row*9+y) == board_config.at(level))
+                if((row*9+y) != level
+                    && board_config.at(row*9+y) == board_config.at(level))
                     return false;
 
             //no equal value in same mini-grid
             boost::uint8_t minigrid_row = x/3, minigrid_col = y/3;
             for(boost::uint8_t r=3*minigrid_row;r<3*(minigrid_row+1);r++)
             for(boost::uint8_t c=3*minigrid_col;c<3*(minigrid_col+1);c++)
-                if((r*9+c) != level && board_config.at(r*9+c) == board_config.at(level))
+                if((r*9+c) != level
+                    && board_config.at(r*9+c) == board_config.at(level))
                     return false;
             return true;
         }
@@ -134,8 +137,8 @@ namespace server
             board::board_config.clear();
         }
 
-        std::size_t solve_board(board_type const& board_config, std::size_t size,
-            std::size_t level)
+        std::size_t solve_board(board_type const& board_config,
+            std::size_t size, std::size_t level)
         {
             if(level == size){
                 hpx::cout << "Completed puzzle:" << hpx::endl;
