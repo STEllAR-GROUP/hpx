@@ -14,6 +14,7 @@ if(HPX_WITH_DEFAULT_TARGETS)
     PLUGIN)
 endif()
 
-add_hpx_pseudo_dependencies(components.memory memory_component)
-add_hpx_pseudo_dependencies(core components.memory)
+add_hpx_pseudo_dependencies(components.performance_counters.memory 
+  memory_component)
+add_hpx_pseudo_dependencies(core components.performance_counters.memory)
 

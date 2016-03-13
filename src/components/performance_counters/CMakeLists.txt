@@ -11,10 +11,11 @@ set(subdirs
     papi
    )
 
-add_hpx_pseudo_target(components)
+add_hpx_pseudo_target(components.performance_counters)
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(components.${subdir})
+  add_hpx_pseudo_target(components.performance_counters.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(components components.${subdir})
+  add_hpx_pseudo_dependencies(components.performance_counters 
+    components.performance_counters.${subdir})
 endforeach()
