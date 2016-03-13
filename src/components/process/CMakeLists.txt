@@ -5,6 +5,8 @@
 
 set(root "${PROJECT_SOURCE_DIR}/hpx/components/process")
 
+add_definitions(-DHPX_PROCESS_EXPORTS)
+
 add_hpx_component(process
     FOLDER "Core/Components/Process"
     HEADER_ROOT ${root}

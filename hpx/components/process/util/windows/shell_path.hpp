@@ -13,44 +13,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/components/process/export_definitions.hpp>
+
 #include <boost/filesystem/path.hpp>
 
-namespace hpx { namespace components { namespace process { namespace windows {
-
-inline boost::filesystem::path shell_path()
+namespace hpx { namespace components { namespace process { namespace windows
 {
-    TCHAR sysdir[MAX_PATH];
-    UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
-    if (!size)
-    {
-        HPX_THROW_EXCEPTION(invalid_status,
-            "process::shell_path",
-            "GetSystemDirectory() failed");
-    }
-    boost::filesystem::path p = sysdir;
-    return p / "cmd.exe";
-}
-
-inline boost::filesystem::path shell_path(hpx::error_code &ec)
-{
-    TCHAR sysdir[MAX_PATH];
-    UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
-    boost::filesystem::path p;
-    if (!size)
-    {
-        HPX_THROWS_IF(ec, invalid_status,
-            "process::shell_path",
-            "GetSystemDirectory() failed");
-    }
-    else
-    {
-        ec = hpx::make_success_code();
-        p = sysdir;
-        p /= "cmd.exe";
-    }
-    return p;
-}
-
+    HPX_PROCESS_EXPORT boost::filesystem::path shell_path();
+    HPX_PROCESS_EXPORT boost::filesystem::path shell_path(hpx::error_code &ec);
 }}}}
 
 #endif

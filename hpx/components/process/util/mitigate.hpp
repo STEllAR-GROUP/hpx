@@ -15,7 +15,6 @@
 #include <boost/asio/windows/stream_handle.hpp>
 #else
 #include <boost/asio/posix/stream_handle.hpp>
-#include <sys/wait.h>
 #endif
 
 namespace hpx { namespace components { namespace process  { namespace util {
@@ -43,12 +42,6 @@ inline const char *null_device()
     return "/dev/null";
 #endif
 }
-
-#if defined(HPX_WINDOWS)
-#   define HPX_PROCESS_EXITSTATUS(a) static_cast<int>(a)
-#else
-#   define HPX_PROCESS_EXITSTATUS WEXITSTATUS
-#endif
 
 }}}}
 

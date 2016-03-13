@@ -13,37 +13,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+
+#include <hpx/components/process/export_definitions.hpp>
 #include <hpx/components/process/util/posix/pipe.hpp>
-#include <unistd.h>
 
-namespace hpx { namespace components { namespace process { namespace posix {
-
-inline pipe create_pipe()
+namespace hpx { namespace components { namespace process { namespace posix
 {
-    int fds[2];
-    if (::pipe(fds) == -1)
-    {
-        HPX_THROW_EXCEPTION(invalid_status,
-            "posix::create_pipe", "pipe(2) failed");
-    }
-    return pipe(fds[0], fds[1]);
-}
-
-inline pipe create_pipe(hpx::error_code &ec)
-{
-    int fds[2] = { 0, 0 };
-    if (::pipe(fds) == -1)
-    {
-        HPX_THROWS_IF(ec, invalid_status,
-            "posix::create_pipe", "pipe(2) failed");
-    }
-    else
-    {
-        ec = hpx::make_success_code();
-    }
-    return pipe(fds[0], fds[1]);
-}
-
+    HPX_PROCESS_EXPORT pipe create_pipe();
+    HPX_PROCESS_EXPORT pipe create_pipe(hpx::error_code &ec);
 }}}}
 
 #endif

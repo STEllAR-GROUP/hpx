@@ -10,21 +10,19 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/threads/run_as_os_thread.hpp>
-
-#include <hpx/components/process/util/child.hpp>
-#include <hpx/components/process/util/execute.hpp>
-#include <hpx/components/process/util/terminate.hpp>
-#include <hpx/components/process/util/wait_for_exit.hpp>
 
 #include <type_traits>
 
 #include <boost/cstdint.hpp>
 
+#include <hpx/components/process/util/child.hpp>
+#include <hpx/components/process/util/execute.hpp>
+#include <hpx/components/process/export_definitions.hpp>
+
 namespace hpx { namespace components { namespace process { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    class child : public component_base<child>
+    class HPX_PROCESS_EXPORT child : public component_base<child>
     {
     public:
         template <typename ... Ts>
@@ -32,17 +30,8 @@ namespace hpx { namespace components { namespace process { namespace server
           : child_(process::util::execute(std::forward<Ts>(ts)...))
         {}
 
-        void terminate()
-        {
-            process::util::terminate(child_);
-        }
-
-        boost::uint32_t wait_for_exit()
-        {
-            int (*f)(process::util::child const&) =
-                &process::util::wait_for_exit<process::util::child>;
-            return hpx::threads::run_as_os_thread(f, std::ref(child_)).get();
-        }
+        void terminate();
+        boost::uint32_t wait_for_exit();
 
         HPX_DEFINE_COMPONENT_ACTION(child, terminate);
         HPX_DEFINE_COMPONENT_ACTION(child, wait_for_exit);

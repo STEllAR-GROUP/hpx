@@ -13,21 +13,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/components/process/export_definitions.hpp>
+
 #include <boost/filesystem/path.hpp>
 
-namespace hpx { namespace components { namespace process { namespace posix {
-
-inline boost::filesystem::path shell_path()
+namespace hpx { namespace components { namespace process { namespace posix
 {
-    return "/bin/sh";
-}
-
-inline boost::filesystem::path shell_path(hpx::error_code &ec)
-{
-    ec = hpx::make_success_code();
-    return "/bin/sh";
-}
-
+    HPX_PROCESS_EXPORT boost::filesystem::path shell_path();
+    HPX_PROCESS_EXPORT boost::filesystem::path shell_path(hpx::error_code &ec);
 }}}}
 
 #endif

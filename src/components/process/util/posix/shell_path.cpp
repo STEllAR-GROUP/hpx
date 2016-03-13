@@ -8,19 +8,26 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PROCESS_WINDOWS_CREATE_PIPE_HPP
-#define HPX_PROCESS_WINDOWS_CREATE_PIPE_HPP
-
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/exception.hpp>
+#include <hpx/components/process/util/shell_path.hpp>
 
-#include <hpx/components/process/export_definitions.hpp>
-#include <hpx/components/process/util/windows/pipe.hpp>
+#include <boost/filesystem/path.hpp>
 
-namespace hpx { namespace components { namespace process { namespace windows
+namespace hpx { namespace components { namespace process { namespace posix
 {
-    HPX_PROCESS_EXPORT pipe create_pipe();
-    HPX_PROCESS_EXPORT pipe create_pipe(hpx::error_code &ec);
+    boost::filesystem::path shell_path()
+    {
+        return "/bin/sh";
+    }
+
+    boost::filesystem::path shell_path(hpx::error_code &ec)
+    {
+        ec = hpx::make_success_code();
+        return "/bin/sh";
+    }
 }}}}
 
 #endif
