@@ -12,6 +12,7 @@
 #define HPX_PROCESS_POSIX_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/unused.hpp>
 #include <hpx/components/process/util/child.hpp>
 
 #include <cstdlib>
@@ -96,6 +97,7 @@ struct executor
         int const fork_sequencer[] = {
             (call_on_fork_setup(*this)(ts), 0)..., 0
         };
+        HPX_UNUSED(fork_sequencer);
 
         pid_t pid = ::fork();
         if (pid == -1)
@@ -103,23 +105,27 @@ struct executor
             int const error_sequencer[] = {
                 (call_on_fork_error(*this)(ts), 0)..., 0
             };
+            HPX_UNUSED(error_sequencer);
         }
         else if (pid == 0)
         {
             int const setup_sequencer[] = {
                 (call_on_fork_setup(*this)(ts), 0)..., 0
             };
+            HPX_UNUSED(setup_sequencer);
             ::execve(exe, cmd_line, env);
 
             int const error_sequencer[] = {
                 (call_on_exec_error(*this)(ts), 0)..., 0
             };
+            HPX_UNUSED(error_sequencer);
             _exit(EXIT_FAILURE);
         }
 
         int const success_sequencer[] = {
             (call_on_fork_success(*this)(ts), 0)..., 0
         };
+        HPX_UNUSED(success_sequencer);
 
         return child(pid);
     }

@@ -12,6 +12,7 @@
 #define HPX_PROCESS_WINDOWS_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/unused.hpp>
 #include <hpx/components/process/util/windows/child.hpp>
 
 namespace hpx { namespace components { namespace process { namespace windows {
@@ -87,6 +88,7 @@ struct executor
         int const setup_sequencer[] = {
             (call_on_CreateProcess_setup(*this)(ts), 0)..., 0
         };
+        HPX_UNUSED(setup_sequencer);
 
         if (!::CreateProcess(
             exe,
@@ -103,12 +105,14 @@ struct executor
             int const error_sequencer[] = {
                 (call_on_CreateProcess_error(*this)(ts), 0)..., 0
             };
+            HPX_UNUSED(error_sequencer);
         }
         else
         {
             int const success_sequencer[] = {
                 (call_on_CreateProcess_success(*this)(ts), 0)..., 0
             };
+            HPX_UNUSED(success_sequencer);
         }
 
         return child(proc_info);
