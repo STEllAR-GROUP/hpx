@@ -57,7 +57,7 @@ private:
     {
         ar & s_;
 
-        cmd_line_ = new char*[2];
+        cmd_line_.reset(new char*[2]);
         cmd_line_[0] = const_cast<char*>(s_.c_str());
         cmd_line_[1] = 0;
     }

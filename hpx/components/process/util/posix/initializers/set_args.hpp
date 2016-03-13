@@ -38,7 +38,7 @@ public:
         for (std::size_t i = 0; i != args.size(); ++i)
         {
             string_args_[i] = args[i];
-            args_[i] = string_args_[i].c_str();
+            args_[i] = const_cast<char*>(string_args_[i].c_str());
         }
         args_[args.size()] = 0;
     }
@@ -68,7 +68,7 @@ private:
         args_.resize(string_args_.size() + 1);
         for (std::size_t i = 0; i != string_args_.size(); ++i)
         {
-            args_[i] = string_args_[i].c_str();
+            args_[i] = const_cast<char*>(string_args_[i].c_str());
         }
         args_[string_args_.size()] = 0;
     }

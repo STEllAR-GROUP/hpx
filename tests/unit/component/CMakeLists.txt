@@ -128,7 +128,5 @@ foreach(test ${tests})
 
 endforeach()
 
-add_hpx_pseudo_dependencies(
-  tests.unit.component.launch_process
-  tests.unit.component.launched_process_test_exe)
+add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
 

@@ -12,7 +12,7 @@
 #define HPX_PROCESS_POSIX_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/components/process/util/windows/child.hpp>
+#include <hpx/components/process/util/child.hpp>
 
 #include <cstdlib>
 
@@ -93,7 +93,7 @@ struct executor
     template <typename ... Ts>
     child operator()(Ts const&... ts)
     {
-        int fork_sequencer[] = {
+        int const fork_sequencer[] = {
             (call_on_fork_setup(*this)(ts), 0)..., 0
         };
 

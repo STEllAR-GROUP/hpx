@@ -11,8 +11,6 @@ set(subdirs
     papi
    )
 
-add_hpx_pseudo_target(components.performance_counters)
-
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(components.performance_counters.${subdir})
   add_subdirectory(${subdir})

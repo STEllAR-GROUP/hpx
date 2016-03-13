@@ -13,6 +13,7 @@
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/range/algorithm/transform.hpp>
 #include <string>
 #include <vector>
 

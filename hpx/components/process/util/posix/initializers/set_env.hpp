@@ -46,7 +46,7 @@ public:
     template <class PosixExecutor>
     void on_fork_setup(PosixExecutor &e) const
     {
-        e.env = env_.data();
+        e.env = const_cast<char**>(env_.data());
     }
 
 private:

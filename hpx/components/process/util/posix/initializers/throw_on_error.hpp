@@ -34,7 +34,6 @@ public:
         }
         if (::fcntl(fds_[1], F_SETFD, FD_CLOEXEC) == -1)
         {
-            int e = errno;
             ::close(fds_[0]);
             ::close(fds_[1]);
 
@@ -46,7 +45,6 @@ public:
     template <class PosixExecutor>
     void on_fork_error(PosixExecutor&) const
     {
-        int e = errno;
         ::close(fds_[0]);
         ::close(fds_[1]);
 
