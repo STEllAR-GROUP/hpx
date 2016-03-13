@@ -57,7 +57,15 @@ namespace hpx { namespace threads
                 {
                     // Execute the given function, forward all parameters,
                     // store result.
+
+#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
                     result.emplace(util::invoke_fused(f, std::move(args)));
+#elif BOOST_VERSION < 105600
+                    result = boost::in_place(
+                                util::invoke_fused(f, std::move(args)));
+#else
+                    result.emplace(util::invoke_fused(f, std::move(args)));
+#endif
 
                     // Now signal to the waiting thread that we're done.
                     {
