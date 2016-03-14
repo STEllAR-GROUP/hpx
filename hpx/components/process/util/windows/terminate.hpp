@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_TERMINATE_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/exception.hpp>
 
 #include <cstdlib>
@@ -44,4 +46,5 @@ void terminate(const Process &p, hpx::error_code &ec)
 
 }}}}
 
+#endif
 #endif

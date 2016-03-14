@@ -10,6 +10,9 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_HIDE_CONSOLE_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_HIDE_CONSOLE_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
 namespace hpx { namespace components { namespace process { namespace posix {
@@ -25,4 +28,5 @@ public:
 
 }}}}
 
+#endif
 #endif

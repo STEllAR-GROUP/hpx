@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_SET_CMD_LINE_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/shared_array.hpp>
@@ -71,4 +73,5 @@ inline set_cmd_line_<std::string> set_cmd_line(const std::string &s)
 
 }}}}
 
+#endif
 #endif

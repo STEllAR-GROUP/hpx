@@ -10,6 +10,9 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_SET_CMD_LINE_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_SET_CMD_LINE_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/shared_array.hpp>
@@ -56,4 +59,5 @@ private:
 
 }}}}
 
+#endif
 #endif

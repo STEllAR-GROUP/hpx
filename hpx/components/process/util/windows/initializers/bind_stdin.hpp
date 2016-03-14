@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_BIND_STDIN_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <windows.h>
@@ -42,4 +44,5 @@ private:
 
 }}}}
 
+#endif
 #endif

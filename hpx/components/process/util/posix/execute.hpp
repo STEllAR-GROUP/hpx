@@ -12,6 +12,8 @@
 #define HPX_PROCESS_POSIX_EXECUTE_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/executor.hpp>
 #include <hpx/components/process/util/posix/child.hpp>
 
@@ -25,4 +27,5 @@ child execute(Ts const& ... ts)
 
 }}}}
 
+#endif
 #endif

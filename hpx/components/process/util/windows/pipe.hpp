@@ -11,6 +11,11 @@
 #ifndef HPX_PROCESS_WINDOWS_PIPE_HPP
 #define HPX_PROCESS_WINDOWS_PIPE_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
+#include <windows.h>
+
 namespace hpx { namespace components { namespace process { namespace windows {
 
 struct pipe
@@ -28,4 +33,5 @@ inline pipe make_pipe(HANDLE source, HANDLE sink)
 
 }}}}
 
+#endif
 #endif

@@ -11,6 +11,9 @@
 #ifndef HPX_PROCESS_POSIX_PIPE_HPP
 #define HPX_PROCESS_POSIX_PIPE_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 namespace hpx { namespace components { namespace process { namespace posix {
 
 struct pipe
@@ -28,4 +31,5 @@ inline pipe make_pipe(int source, int sink)
 
 }}}}
 
+#endif
 #endif

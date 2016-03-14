@@ -12,6 +12,8 @@
 #define HPX_PROCESS_POSIX_CREATE_PIPE_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/exception.hpp>
 
 #include <hpx/components/process/export_definitions.hpp>
@@ -23,4 +25,5 @@ namespace hpx { namespace components { namespace process { namespace posix
     HPX_PROCESS_EXPORT pipe create_pipe(hpx::error_code &ec);
 }}}}
 
+#endif
 #endif

@@ -12,6 +12,8 @@
 #define HPX_PROCESS_POSIX_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/util/unused.hpp>
 #include <hpx/components/process/util/child.hpp>
 
@@ -137,4 +139,5 @@ struct executor
 
 }}}}
 
+#endif
 #endif

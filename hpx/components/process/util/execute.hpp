@@ -12,7 +12,6 @@
 #define HPX_PROCESS_EXECUTE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/components/process/child.hpp>
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/execute.hpp>

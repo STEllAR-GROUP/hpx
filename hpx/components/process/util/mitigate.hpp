@@ -14,7 +14,7 @@
 #if defined(HPX_WINDOWS)
 #include <boost/asio/windows/stream_handle.hpp>
 #else
-#include <boost/asio/posix/stream_handle.hpp>
+#include <boost/asio/posix/stream_descriptor.hpp>
 #endif
 
 namespace hpx { namespace components { namespace process  { namespace util {

@@ -10,6 +10,9 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_BIND_FD_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_BIND_FD_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <unistd.h>
 
@@ -44,4 +47,5 @@ bind_fd_<FileDescriptor> bind_fd(int id, const FileDescriptor &fd)
 
 }}}}
 
+#endif
 #endif

@@ -12,6 +12,8 @@
 #define HPX_PROCESS_POSIX_SEARCH_PATH_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/export_definitions.hpp>
 
 #include <string>
@@ -22,4 +24,5 @@ namespace hpx { namespace components { namespace process { namespace posix
         std::string path = "");
 }}}}
 
+#endif
 #endif

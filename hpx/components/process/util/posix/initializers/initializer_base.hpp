@@ -10,6 +10,10 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_INITIALIZER_BASE_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_INITIALIZER_BASE_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
+
 namespace hpx { namespace components { namespace process { namespace posix {
 
 namespace initializers {
@@ -36,4 +40,5 @@ struct initializer_base
 
 }}}}
 
+#endif
 #endif

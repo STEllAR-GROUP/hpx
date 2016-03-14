@@ -11,6 +11,8 @@
 #define HPX_PROCESS_POSIX_INITIALIZERS_START_IN_DIR_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
@@ -50,4 +52,5 @@ private:
 
 }}}}
 
+#endif
 #endif

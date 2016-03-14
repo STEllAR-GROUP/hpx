@@ -10,6 +10,9 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_CLOSE_FDS_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_CLOSE_FDS_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <unistd.h>
@@ -44,4 +47,5 @@ close_fds_<Range> close_fds(const Range &fds)
 
 }}}}
 
+#endif
 #endif

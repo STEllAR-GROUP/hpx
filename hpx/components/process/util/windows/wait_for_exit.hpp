@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_WAIT_FOR_EXIT_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/exception.hpp>
 
 namespace hpx { namespace components { namespace process { namespace windows {
@@ -58,4 +60,5 @@ inline int wait_for_exit(const Process &p, hpx::error_code &ec)
 
 }}}}
 
+#endif
 #endif

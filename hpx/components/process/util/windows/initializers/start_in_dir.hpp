@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_START_IN_DIR_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <boost/filesystem/path.hpp>
@@ -83,4 +85,5 @@ inline start_in_dir_<std::string> start_in_dir(const boost::filesystem::path &p)
 
 }}}}
 
+#endif
 #endif

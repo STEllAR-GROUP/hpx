@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_INHERIT_ENV_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 
 namespace hpx { namespace components { namespace process { namespace windows {
@@ -27,4 +29,5 @@ public:
 
 }}}}
 
+#endif
 #endif

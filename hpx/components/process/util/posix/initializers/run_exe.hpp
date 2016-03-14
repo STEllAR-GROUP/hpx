@@ -11,6 +11,8 @@
 #define HPX_PROCESS_POSIX_INITIALIZERS_RUN_EXE_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
@@ -87,4 +89,5 @@ inline run_exe_ run_exe(const boost::filesystem::path &p)
 
 }}}}
 
+#endif
 #endif

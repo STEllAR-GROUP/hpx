@@ -10,6 +10,9 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_INHERIT_ENV_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_INHERIT_ENV_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
 // From <https://svn.boost.org/trac/boost/changeset/67768>
@@ -38,4 +41,5 @@ public:
 
 }}}}
 
+#endif
 #endif

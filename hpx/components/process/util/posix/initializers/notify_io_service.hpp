@@ -11,6 +11,8 @@
 #define HPX_PROCESS_POSIX_INITIALIZERS_NOTIFY_IO_SERVICE_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
 namespace hpx { namespace components { namespace process { namespace posix {
@@ -56,4 +58,5 @@ notify_io_service_<IOService> notify_io_service(IOService &io_service)
 
 }}}}
 
+#endif
 #endif

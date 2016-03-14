@@ -12,9 +12,14 @@
 #define HPX_PROCESS_WINDOWS_CHILD_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/util/move.hpp>
 
-#include <type_traits>
+#include <utility>
+#include <cstring>
+
+#include <windows.h>
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
@@ -68,4 +73,5 @@ public:
 
 }}}}
 
+#endif
 #endif

@@ -12,10 +12,10 @@
 #define HPX_PROCESS_WINDOWS_EXECUTE_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/executor.hpp>
 #include <hpx/components/process/util/windows/child.hpp>
-
-#include <type_traits>
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
@@ -27,4 +27,5 @@ child execute(Ts const& ...ts)
 
 }}}}
 
+#endif
 #endif

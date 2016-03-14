@@ -10,6 +10,9 @@
 #ifndef HPX_PROCESS_POSIX_INITIALIZERS_CLOSE_FDS_IF_HPP
 #define HPX_PROCESS_POSIX_INITIALIZERS_CLOSE_FDS_IF_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/counting_range.hpp>
@@ -81,4 +84,5 @@ close_fds_if_<Predicate> close_fds_if(const Predicate &pred)
 
 }}}}
 
+#endif
 #endif

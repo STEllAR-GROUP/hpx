@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_CLOSE_STDERR_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <windows.h>
 
@@ -34,4 +36,5 @@ public:
 
 }}}}
 
+#endif
 #endif

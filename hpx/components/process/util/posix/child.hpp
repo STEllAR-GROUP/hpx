@@ -11,6 +11,9 @@
 #ifndef HPX_PROCESS_POSIX_CHILD_HPP
 #define HPX_PROCESS_POSIX_CHILD_HPP
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <sys/types.h>
 
 namespace hpx { namespace components { namespace process { namespace posix {
@@ -25,4 +28,5 @@ struct child
 
 }}}}
 
+#endif
 #endif

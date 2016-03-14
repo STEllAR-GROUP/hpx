@@ -11,10 +11,12 @@
 #define HPX_PROCESS_POSIX_INITIALIZERS_ON_EXEC_ERROR_HPP
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_WINDOWS)
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
-#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
@@ -58,4 +60,5 @@ on_exec_error_<Handler> on_exec_error(Handler && handler)
 
 }}}}
 
+#endif
 #endif

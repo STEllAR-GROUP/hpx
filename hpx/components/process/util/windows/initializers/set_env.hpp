@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_INITIALIZERS_SET_ENV_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 
@@ -109,4 +111,5 @@ set_env_<Range, false> set_env(const Range &envs)
 
 }}}}
 
+#endif
 #endif

@@ -12,6 +12,8 @@
 #define HPX_PROCESS_WINDOWS_SEARCH_PATH_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #include <hpx/exception.hpp>
 #include <hpx/components/process/export_definitions.hpp>
 
@@ -28,4 +30,5 @@ namespace hpx { namespace components { namespace process { namespace windows
 #endif
 }}}}
 
+#endif
 #endif
