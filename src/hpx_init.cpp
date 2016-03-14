@@ -1293,11 +1293,7 @@ namespace hpx
             return -1;
         }
 
-        int result = 0;
-
-        // wait only if we have not started up yet
-        if (rt->get_state() <= state_pre_main)
-            result = rt->wait();
+        int result = rt->wait();
 
         rt->stop();
         rt->rethrow_exception();
