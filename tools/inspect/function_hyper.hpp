@@ -8,6 +8,7 @@
 #ifndef FUNCTION_HYPER_HPP
 #define FUNCTION_HYPER_HPP
 
+#include "inspector.hpp"
 #include "boost/filesystem/path.hpp"
 #include <hpx/config/defines.hpp>
 #include <string>
@@ -18,8 +19,8 @@ using boost::filesystem::path;
 inline std::string linelink(const path & full_path, std::string linenumb)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
-    std::string location = full_path.string();
-    location.erase(0, 4);
+    std::string location = boost::inspect::relative_to(
+        full_path, boost::inspect::search_root_path() );
     //The erase function for location is to get rid of the first /hpx that will always
     //be present in any full path this tool is used for (repeated in wordlink and
     // loclink)
@@ -34,8 +35,8 @@ inline std::string wordlink(const path & full_path,
     std::string linenumb, std::string word)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
-    std::string location = full_path.string();
-    location.erase(0, 4);
+    std::string location = boost::inspect::relative_to(
+        full_path, boost::inspect::search_root_path() );
     std::string total = "<a href = \"https://github.com/STEllAR-GROUP/hpx/blob/"
         + commit + location + "#L" + linenumb + "\">";
     total = total + word;
@@ -46,8 +47,8 @@ inline std::string wordlink(const path & full_path,
 inline std::string loclink(const path & full_path, std::string word)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
-    std::string location = full_path.string();
-    location.erase(0, 4);
+    std::string location = boost::inspect::relative_to(
+        full_path, boost::inspect::search_root_path() );
     std::string total = "<a href = \"https://github.com/STEllAR-GROUP/hpx/blob/"
         + commit + location + "\">";
     total = total + word;
