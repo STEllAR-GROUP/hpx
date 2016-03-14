@@ -11,7 +11,7 @@
 #if !defined(HPX_WINDOWS)
 #include <hpx/lcos/latch.hpp>
 #include <hpx/runtime/serialization/string.hpp>
-#include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+#include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
 #include <string>
 

@@ -10,12 +10,19 @@
 
 #include <boost/program_options.hpp>
 
+#include <vector>
+#include <string>
+#include <chrono>
+
 int hpx_main(boost::program_options::variables_map& vm)
 {
     // extract command line arguments
     int exit_code = 0;
     if (vm.count("exit_code") != 0)
         exit_code = vm["exit_code"].as<int>();
+
+    // pretend to do some work
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     hpx::disconnect();
     return exit_code;
