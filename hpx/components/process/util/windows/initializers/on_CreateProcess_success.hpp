@@ -34,7 +34,7 @@ public:
     {}
 
     template <class WindowsExecutor>
-    void on_CreateProcess_sucess(WindowsExecutor &e) const
+    void on_CreateProcess_success(WindowsExecutor &e) const
     {
         handler_(e);
     }

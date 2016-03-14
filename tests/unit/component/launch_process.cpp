@@ -60,7 +60,6 @@ int main(int argc, char* argv[])
     std::vector<std::string> args;
     args.push_back(exe.string());
     args.push_back("--exit_code=42");
-//     args.push_back("--hpx:connect");
 
     // set up environment for launched executable
     std::vector<std::string> env = get_environment();   // current environment
@@ -85,6 +84,9 @@ int main(int argc, char* argv[])
         hpx::get_config_entry("hpx.agas.port",
             boost::lexical_cast<std::string>(HPX_CONNECTING_IP_PORT - port)));
 
+    // Instruct new locality to connect back on startup using the given name.
+    env.push_back("HPX_ON_STARTUP_WAIT_ON_LATCH=launch_process");
+
     // launch test executable
     process::child c = process::execute(
             hpx::find_here(),
@@ -92,18 +94,29 @@ int main(int argc, char* argv[])
             process::set_args(args),
             process::set_env(env),
             process::start_in_dir(base_dir.string()),
-            process::throw_on_error()
+            process::throw_on_error(),
+            process::wait_on_latch("launch_process")   // same as above!
         );
 
-    // wait for the executable to be up and running
+    // wait for the HPX locality to be up and running
     c.wait();
     HPX_TEST(c);
 
-
+    // now the launched executable should have connected back as a new locality
+    {
+        std::vector<hpx::id_type> localities = hpx::find_all_localities();
+        HPX_TEST_EQ(localities.size(), std::size_t(2));
+    }
 
     // wait for it to exit, we know it returns 42
     boost::uint32_t exit_code = c.wait_for_exit_sync();
     HPX_TEST_EQ(exit_code, boost::uint32_t(42));
+
+    // the new locality should have disconnected now
+    {
+        std::vector<hpx::id_type> localities = hpx::find_all_localities();
+        HPX_TEST_EQ(localities.size(), std::size_t(1));
+    }
 
     return 0;
 }

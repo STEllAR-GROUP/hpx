@@ -17,7 +17,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (vm.count("exit_code") != 0)
         exit_code = vm["exit_code"].as<int>();
 
-    hpx::finalize();
+    hpx::disconnect();
     return exit_code;
 }
 
@@ -32,6 +32,13 @@ int main(int argc, char* argv[])
         ("exit_code,e", value<int>(), "the value to return to the OS")
         ;
 
-    return hpx::init(desc_commandline, argc, argv);
+    // Make sure hpx_main above will be executed even if this is not the
+    // console locality.
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.run_hpx_main!=1");
+
+    // Note: this uses runtime_mode_connect to instruct this locality to
+    // connect to the existing HPX applications
+    return hpx::init(desc_commandline, argc, argv, cfg, hpx::runtime_mode_connect);
 }
 
