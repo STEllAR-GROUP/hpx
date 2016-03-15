@@ -25,12 +25,15 @@ namespace initializers {
 class bind_stdout : public initializer_base
 {
 public:
-    explicit bind_stdout(const boost::iostreams::file_descriptor_sink &sink) : sink_(sink) {}
+    explicit bind_stdout(const boost::iostreams::file_descriptor_sink &sink)
+      : sink_(sink)
+    {}
 
     template <class WindowsExecutor>
     void on_CreateProcess_setup(WindowsExecutor &e) const
     {
-        ::SetHandleInformation(sink_.handle(), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+        ::SetHandleInformation(sink_.handle(), HANDLE_FLAG_INHERIT,
+            HANDLE_FLAG_INHERIT);
         e.startup_info.hStdOutput = sink_.handle();
         e.startup_info.dwFlags |= STARTF_USESTDHANDLES;
         e.inherit_handles = true;

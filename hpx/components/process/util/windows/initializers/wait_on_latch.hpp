@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace process { namespace windows
         public:
             wait_on_latch() {}
 
-            wait_on_latch(char const* connect_to)
+            explicit wait_on_latch(std::string const& connect_to)
               : connect_to_(connect_to)
             {}
 
