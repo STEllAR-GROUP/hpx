@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,9 +7,9 @@
 #if !defined(HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0)
 #define HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
@@ -17,15 +17,13 @@
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/order_output.hpp>
 
-// TODO: Error handling?
-
 namespace hpx { namespace iostreams { namespace server
 {
     struct HPX_IOSTREAMS_EXPORT output_stream
-      : components::managed_component_base<output_stream>
+      : components::component_base<output_stream>
     {
         // {{{ types
-        typedef components::managed_component_base<output_stream> base_type;
+        typedef components::component_base<output_stream> base_type;
         typedef lcos::local::spinlock mutex_type;
         // }}}
 
@@ -57,10 +55,14 @@ namespace hpx { namespace iostreams { namespace server
           : write_f(make_std_ostream_write_function(os))
         {}
 
+        output_stream(std::reference_wrapper<std::ostream> os)
+          : write_f(make_std_ostream_write_function(os.get()))
+        {}
+
         void write_async(boost::uint32_t locality_id,
-            boost::uint64_t count, detail::buffer const& in);
+            boost::uint64_t count, detail::buffer in);
         void write_sync(boost::uint32_t locality_id,
-            boost::uint64_t count, detail::buffer const& in);
+            boost::uint64_t count, detail::buffer in);
 
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_async);
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_sync);

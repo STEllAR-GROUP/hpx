@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,16 +6,18 @@
 #if !defined(HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM)
 #define HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/spinlock.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+
+#include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <vector>
+#include <utility>
 
 namespace hpx { namespace iostreams { namespace detail
 {
@@ -101,9 +103,9 @@ namespace hpx { namespace iostreams { namespace detail
     private:
         friend class hpx::serialization::access;
 
-        HPX_COMPONENT_EXPORT void save(
+        HPX_IOSTREAMS_EXPORT void save(
             serialization::output_archive& ar, unsigned) const;
-        HPX_COMPONENT_EXPORT void load(
+        HPX_IOSTREAMS_EXPORT void load(
             serialization::input_archive& ar, unsigned);
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
