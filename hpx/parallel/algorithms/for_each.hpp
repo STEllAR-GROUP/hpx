@@ -63,13 +63,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename F,
                 typename Proj = util::projection_identity>
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy policy, Iter first, std::size_t count,
+            parallel(ExPolicy && policy, Iter first, std::size_t count,
                 F && f, Proj && proj = Proj())
             {
                 if (count != 0)
                 {
                     return util::foreach_n_partitioner<ExPolicy>::call(
-                        policy, first, count,
+                        std::forward<ExPolicy>(policy), first, count,
                         [f, proj](Iter part_begin, std::size_t part_size)
                         {
                             // VS2015 bails out when proj or f are captured by
@@ -242,11 +242,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
             static typename util::detail::algorithm_result<ExPolicy, InIter>::type
-            parallel(ExPolicy policy, InIter first, InIter last, F && f,
+            parallel(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
                 return detail::for_each_n<Iter>().call(
-                    policy, boost::mpl::false_(),
+                    std::forward<ExPolicy>(policy), boost::mpl::false_(),
                     first, std::distance(first, last), std::forward<F>(f),
                     std::forward<Proj>(proj));
             }

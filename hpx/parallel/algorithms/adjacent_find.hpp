@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 Pred && op)
             {
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter> zip_iterator;
@@ -72,7 +72,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, hpx::util::make_zip_iterator(first, next), count-1,
+                        std::forward<ExPolicy>(policy),
+                        hpx::util::make_zip_iterator(first, next), count-1,
                         [op, tok](std::size_t base_idx, zip_iterator it,
                             std::size_t part_size) mutable
                         {

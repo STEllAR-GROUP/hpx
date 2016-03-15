@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, BidirIter
             >::type
-            parallel(ExPolicy policy, BidirIter first, BidirIter last)
+            parallel(ExPolicy && policy, BidirIter first, BidirIter last)
             {
                 typedef std::reverse_iterator<BidirIter> destination_iterator;
                 typedef hpx::util::zip_iterator<BidirIter, destination_iterator>
@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last)),
                         std::distance(first, last) / 2,
@@ -180,17 +180,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<BidirIter, OutIter>
             >::type
-            parallel(ExPolicy policy, BidirIter first, BidirIter last,
+            parallel(ExPolicy && policy, BidirIter first, BidirIter last,
                 OutIter dest_first)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
 
                 return util::detail::convert_to_result(
-                    detail::copy<std::pair<iterator, OutIter> >()
-                        .call(
-                            policy, boost::mpl::false_(),
-                            iterator(last), iterator(first), dest_first
-                        ),
+                    detail::copy<std::pair<iterator, OutIter> >().call(
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                        iterator(last), iterator(first), dest_first
+                    ),
                     [](std::pair<iterator, OutIter> const& p)
                         -> std::pair<BidirIter, OutIter>
                     {

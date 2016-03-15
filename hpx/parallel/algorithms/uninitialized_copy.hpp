@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_COPY_OCT_02_2014_1145AM)
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_COPY_OCT_02_2014_1145AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename FwdIter>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        parallel_sequential_uninitialized_copy_n(ExPolicy policy,
+        parallel_sequential_uninitialized_copy_n(ExPolicy && policy,
             Iter first, std::size_t count, FwdIter dest)
         {
             if (count == 0)
@@ -73,7 +73,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return util::partitioner_with_cleanup<
                     ExPolicy, FwdIter, partition_result_type
                 >::call(
-                    policy, hpx::util::make_zip_iterator(first, dest), count,
+                    std::forward<ExPolicy>(policy),
+                    hpx::util::make_zip_iterator(first, dest), count,
                     [tok](zip_iterator t, std::size_t part_size)
                         mutable -> partition_result_type
                     {
@@ -124,10 +125,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, Iter first, Iter last,
+            parallel(ExPolicy && policy, Iter first, Iter last,
                 FwdIter dest)
             {
-                return parallel_sequential_uninitialized_copy_n(policy, first,
+                return parallel_sequential_uninitialized_copy_n(
+                    std::forward<ExPolicy>(policy), first,
                     std::distance(first, last), dest);
             }
         };
@@ -237,11 +239,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, Iter first, std::size_t count,
+            parallel(ExPolicy && policy, Iter first, std::size_t count,
                 FwdIter dest)
             {
-                return parallel_sequential_uninitialized_copy_n(policy, first,
-                    count, dest);
+                return parallel_sequential_uninitialized_copy_n(
+                    std::forward<ExPolicy>(policy), first, count, dest);
             }
         };
         /// \endcond

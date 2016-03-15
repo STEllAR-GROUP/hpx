@@ -77,13 +77,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 T1 const& old_value, T2 const& new_value, Proj && proj)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    policy, boost::mpl::false_(),
+                    std::forward<ExPolicy>(policy), boost::mpl::false_(),
                     first, std::distance(first, last),
                     [old_value, new_value, proj](type& t)
                     {
@@ -223,13 +223,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 F && f, T const& new_value, Proj && proj)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    policy, boost::mpl::false_(),
+                    std::forward<ExPolicy>(policy), boost::mpl::false_(),
                     first, std::distance(first, last),
                     [f, new_value, proj](type& t)
                     {
@@ -386,15 +386,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, OutIter dest,
-                T const& old_value, T const& new_value, Proj && proj)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
+                OutIter dest, T const& old_value, T const& new_value,
+                Proj && proj)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [old_value, new_value, proj](reference t)
@@ -571,7 +572,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest, F && f, T const& new_value, Proj && proj)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
@@ -579,7 +580,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [f, new_value, proj](reference t)

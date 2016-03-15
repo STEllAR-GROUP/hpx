@@ -32,7 +32,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
 
-        inline bool sequential_is_partitioned(std::vector<hpx::future<bool > > && res)
+        inline bool
+        sequential_is_partitioned(std::vector<hpx::future<bool > > && res)
         {
             std::vector<hpx::future<bool> >::iterator first = res.begin();
             std::vector<hpx::future<bool> >::iterator last = res.end();
@@ -72,8 +73,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy policy, Iter first, Iter last,
-                Pred && pred)
+            parallel(ExPolicy && policy, Iter first, Iter last, Pred && pred)
             {
                 typedef typename std::iterator_traits<Iter>::reference
                     reference;
@@ -88,7 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, count,
+                    std::forward<ExPolicy>(policy), first, count,
                     [pred, tok](Iter part_begin,
                         std::size_t part_count) mutable -> bool
                     {
@@ -191,7 +191,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<ExPolicy>(policy), is_seq(), first, last,
             std::forward<Pred>(pred));
     }
-
 }}}
 
 #endif

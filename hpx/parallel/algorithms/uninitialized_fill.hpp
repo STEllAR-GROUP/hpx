@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM)
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename T>
         typename util::detail::algorithm_result<ExPolicy>::type
-        parallel_sequential_uninitialized_fill_n(ExPolicy policy,
+        parallel_sequential_uninitialized_fill_n(ExPolicy && policy,
             Iter first, std::size_t count, T const& value)
         {
             if (count == 0)
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return util::partitioner_with_cleanup<
                     ExPolicy, void, partition_result_type
                 >::call(
-                    policy, first, count,
+                    std::forward<ExPolicy>(policy), first, count,
                     [value, tok](Iter it, std::size_t part_size)
                         mutable -> partition_result_type
                     {
@@ -111,13 +111,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, Iter first, Iter last,
+            parallel(ExPolicy && policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                return parallel_sequential_uninitialized_fill_n(policy, first,
+                return parallel_sequential_uninitialized_fill_n(
+                    std::forward<ExPolicy>(policy), first,
                     std::distance(first, last), value);
             }
         };
@@ -213,11 +214,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
                 T const& value)
             {
-                return parallel_sequential_uninitialized_fill_n(policy, first,
-                    count, value);
+                return parallel_sequential_uninitialized_fill_n(
+                    std::forward<ExPolicy>(policy), first, count, value);
             }
         };
         /// \endcond

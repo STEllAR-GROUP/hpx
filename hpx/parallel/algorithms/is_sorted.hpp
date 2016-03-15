@@ -49,8 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                Pred && pred)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
             {
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
@@ -63,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, count,
+                    std::forward<ExPolicy>(policy), first, count,
                     [tok, pred, last](FwdIter part_begin,
                     std::size_t part_size) mutable -> bool
                     {
@@ -223,11 +222,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             iterator_category;
         typedef typename std::iterator_traits<FwdIter>::value_type
             value_type;
+
         static_assert(
-                                (boost::is_base_of<
-                                 std::forward_iterator_tag, iterator_category
-                                 >::value),
-                                "Requires at least forward iterator.");
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category
+            >::value),
+            "Requires at least forward iterator.");
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
@@ -263,8 +263,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                Pred && pred)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
                     reference;
@@ -282,7 +281,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<difference_type> tok(count);
                 return util::partitioner<ExPolicy, FwdIter, void>::
                 call_with_index(
-                    policy, first, count ,
+                    std::forward<ExPolicy>(policy), first, count ,
                     [tok, pred, last](std::size_t base_idx, FwdIter part_begin,
                     std::size_t part_size) mutable
                     {

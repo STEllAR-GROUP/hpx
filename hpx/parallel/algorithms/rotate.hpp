@@ -119,12 +119,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, IterPair
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter new_first,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter new_first,
                 FwdIter last)
             {
                 return util::detail::algorithm_result<
                         ExPolicy, IterPair
-                    >::get(rotate_helper(policy, first, new_first, last));
+                    >::get(rotate_helper(std::forward<ExPolicy>(policy),
+                            first, new_first, last));
             }
         };
         /// \endcond
@@ -272,11 +273,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter new_first,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter new_first,
                 FwdIter last, OutIter dest_first)
             {
                 return util::detail::algorithm_result<ExPolicy, IterPair>::get(
-                    rotate_copy_helper(policy, first, new_first, last, dest_first));
+                    rotate_copy_helper(std::forward<ExPolicy>(policy),
+                        first, new_first, last, dest_first));
             }
         };
         /// \endcond

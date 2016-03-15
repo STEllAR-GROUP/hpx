@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM)
 #define HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -51,8 +51,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename Pred>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-                FwdIter2 last2, Pred && pred)
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, FwdIter2 last2, Pred && pred)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
@@ -80,7 +80,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, bool, void>::
                     call_with_index(
-                        policy, make_zip_iterator(first1, first2), count,
+                        std::forward<ExPolicy>(policy),
+                        make_zip_iterator(first1, first2), count,
                         [pred, tok](std::size_t base_idx, zip_iterator it,
                             std::size_t part_count) mutable
                         {
@@ -212,8 +213,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, detail::less()
-            );
+            first1, last1, first2, last2, detail::less());
     }
 
     /// Checks if the first range [first1, last1) is lexicographically less than
