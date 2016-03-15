@@ -5,13 +5,9 @@
 
 # add inpect executable
 
-if(NOT MSVC)
-  set(inspect NOLIBS DEPENDENCIES ${Boost_LIBRARIES})
-endif()
-
 add_hpx_executable(inspect
   AUTOGLOB
-  NOHPX_INIT
+  NOLIBS
   FOLDER "Tools/Inspect")
 
 if(NOT MSVC)
