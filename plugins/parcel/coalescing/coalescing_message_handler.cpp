@@ -101,8 +101,11 @@ namespace hpx { namespace plugins { namespace parcel
             break;
 
         case detail::message_buffer::normal:
+            if (timer_.is_started())
+                break;
+
             l.unlock();
-            timer_.restart(false);      // restart timer
+            timer_.start(false);        // start deadline timer to flush buffer
             break;
 
         case detail::message_buffer::buffer_now_full:
@@ -110,6 +113,7 @@ namespace hpx { namespace plugins { namespace parcel
             break;
 
         default:
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_message_handler::put_parcel",
                 "unexpected return value from message_buffer::append");
