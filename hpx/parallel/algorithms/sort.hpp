@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \remarks
         //------------------------------------------------------------------------
         template <typename ExPolicy, typename RandomIt, typename Compare>
-        hpx::future<RandomIt> sort_thread(ExPolicy && policy,
+        hpx::future<RandomIt> sort_thread(ExPolicy& policy,
             RandomIt first, RandomIt last, Compare comp)
         {
             typedef typename hpx::util::decay<ExPolicy>::type::executor_type
