@@ -86,7 +86,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     add_ready_future(workitems, f1, first, test_chunk_size);
 
                     // modifies 'test_chunk_size'
-                    first = parallel::v1::detail::next(first, s, test_chunk_size);
+                    first = parallel::v1::detail::next(
+                        first, count, test_chunk_size);
 
                     count -= test_chunk_size;
                     return test_chunk_size;
@@ -113,7 +114,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 shape.push_back(hpx::util::make_tuple(first, chunk));
 
                 // modifies 'chunk'
-                first = parallel::v1::detail::next(first, s, chunk);
+                first = parallel::v1::detail::next(first, count, chunk);
                 count -= chunk;
             }
         }
@@ -139,7 +140,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 shape.push_back(hpx::util::make_tuple(first, chunk));
 
                 // modifies 'chunk'
-                first = parallel::v1::detail::next(first, s, chunk);
+                first = parallel::v1::detail::next(first, count, chunk);
                 count -= chunk;
             }
         }
@@ -215,7 +216,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                         test_chunk_size);
 
                     // modifies 'test_chunk_size'
-                    first = parallel::v1::detail::next(first, s, test_chunk_size);
+                    first = parallel::v1::detail::next(
+                        first, count, test_chunk_size);
 
                     base_idx += test_chunk_size;
                     count -= test_chunk_size;
@@ -244,7 +246,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 shape.push_back(hpx::util::make_tuple(base_idx, first, chunk));
 
                 // modifies 'chunk'
-                first = parallel::v1::detail::next(first, s, chunk);
+                first = parallel::v1::detail::next(first, count, chunk);
 
                 count -= chunk;
                 base_idx += chunk;
@@ -272,7 +274,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 shape.push_back(hpx::util::make_tuple(base_idx, first, chunk));
 
                 // modifies 'chunk'
-                first = parallel::v1::detail::next(first, s, chunk);
+                first = parallel::v1::detail::next(first, count, chunk);
 
                 count -= chunk;
                 base_idx += chunk;
