@@ -1152,6 +1152,22 @@ namespace hpx { namespace components { namespace server
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    inline void decode (std::string &str, char const *s, char const *r)
+    {
+        std::string::size_type pos = 0;
+        while ((pos = str.find(s, pos)) != std::string::npos)
+        {
+            str.replace(pos, 2, r);
+        }
+    }
+
+    inline std::string decode_string(std::string str)
+    {
+        decode(str, "\\n", "\n");
+        return str;
+    }
+
     int runtime_support::load_components()
     {
         // load components now that AGAS is up
@@ -1163,11 +1179,97 @@ namespace hpx { namespace components { namespace server
         // modules loaded dynamically should not register themselves statically
         components::initial_static_loading = false;
 
+        // make sure every component module gets asked for startup/shutdown
+        // functions only once
+        std::set<std::string> startup_handled;
+
+        // collect additional command-line options
+        boost::program_options::options_description options;
+
         // then dynamic ones
         naming::resolver_client& client = get_runtime().get_agas_client();
-        int result = load_components(ini, client.get_local_locality(), client);
-        if (!load_plugins(ini))
+        int result = load_components(ini, client.get_local_locality(), client,
+            options, startup_handled);
+
+        if (!load_plugins(ini, options, startup_handled))
             result = -2;
+
+        // do secondary command line processing, check validity of options only
+        try {
+            std::string unknown_cmd_line(ini.get_entry("hpx.unknown_cmd_line", ""));
+            if (!unknown_cmd_line.empty()) {
+                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
+                boost::program_options::variables_map vm;
+
+                util::commandline_error_mode mode = util::rethrow_on_error;
+                std::string allow_unknown(
+                    ini.get_entry("hpx.commandline.allow_unknown", "0"));
+                if (allow_unknown != "0") mode = util::allow_unregistered;
+
+                std::vector<std::string> still_unregistered_options;
+                util::parse_commandline(ini, options, unknown_cmd_line, vm,
+                    std::size_t(-1), mode,
+                    get_runtime_mode_from_name(runtime_mode), 0,
+                    &still_unregistered_options);
+
+                std::string still_unknown_commandline;
+                for (std::string const& s: still_unregistered_options)
+                    still_unknown_commandline += " " + util::detail::enquote(s);
+
+                if (!still_unknown_commandline.empty())
+                {
+                    util::section* s = ini.get_section("hpx");
+                    HPX_ASSERT(s != 0);
+                    s->add_entry("unknown_cmd_line_option",
+                        still_unknown_commandline);
+                }
+            }
+
+            std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
+            if (!fullhelp.empty()) {
+                std::string help_option(
+                    ini.get_entry("hpx.cmd_line_help_option", ""));
+                if (0 == std::string("full").find(help_option)) {
+                    std::cout << decode_string(fullhelp);
+                    std::cout << options << std::endl;
+                }
+                else {
+                    throw hpx::detail::command_line_error(
+                        "unknown help option: " + help_option);
+                }
+                return 1;
+            }
+
+            // secondary command line handling, looking for --exit and other
+            // options
+            std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
+            if (!cmd_line.empty()) {
+                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
+                boost::program_options::variables_map vm;
+
+                util::parse_commandline(ini, options, cmd_line, vm, std::size_t(-1),
+                    util::allow_unregistered | util::report_missing_config_file,
+                    get_runtime_mode_from_name(runtime_mode));
+
+#if defined(HPX_HAVE_HWLOC)
+                if (vm.count("hpx:print-bind")) {
+                    std::size_t num_threads = boost::lexical_cast<std::size_t>(
+                        ini.get_entry("hpx.os_threads", 1));
+                    util::handle_print_bind(vm, num_threads);
+                }
+#endif
+                if (vm.count("hpx:list-parcel-ports"))
+                    util::handle_list_parcelports();
+
+                if (vm.count("hpx:exit"))
+                    return 1;
+            }
+        }
+        catch (std::exception const& e) {
+            std::cerr << "runtime_support::load_components: "
+                      << "command line processing: " << e.what() << std::endl;
+            return -1;
+        }
 
         return result;
     }
@@ -1394,22 +1496,6 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void decode (std::string &str, char const *s, char const *r)
-    {
-        std::string::size_type pos = 0;
-        while ((pos = str.find(s, pos)) != std::string::npos)
-        {
-            str.replace(pos, 2, r);
-        }
-    }
-
-    inline std::string decode_string(std::string str)
-    {
-        decode(str, "\\n", "\n");
-        return str;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component_static(
         util::section& ini, std::string const& instance,
         std::string const& component, boost::filesystem::path const& lib,
@@ -1522,7 +1608,9 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     int runtime_support::load_components(util::section& ini,
-        naming::gid_type const& prefix, naming::resolver_client& agas_client)
+        naming::gid_type const& prefix, naming::resolver_client& agas_client,
+        boost::program_options::options_description& options,
+        std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components")) {
@@ -1550,13 +1638,6 @@ namespace hpx { namespace components { namespace server
             LRT_(error) << "NULL section found";
             return 0;     // something bad happened
         }
-
-        // make sure every component module gets asked for startup/shutdown
-        // functions only once
-        std::set<std::string> startup_handled;
-
-        // collect additional command-line options
-        boost::program_options::options_description options;
 
         util::section::section_map const& s = (*sec).get_sections();
         typedef util::section::section_map::const_iterator iterator;
@@ -1649,82 +1730,6 @@ namespace hpx { namespace components { namespace server
             }
         } // for
 
-        // do secondary command line processing, check validity of options only
-        try {
-            std::string unknown_cmd_line(ini.get_entry("hpx.unknown_cmd_line", ""));
-            if (!unknown_cmd_line.empty()) {
-                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                boost::program_options::variables_map vm;
-
-                util::commandline_error_mode mode = util::rethrow_on_error;
-                std::string allow_unknown(
-                    ini.get_entry("hpx.commandline.allow_unknown", "0"));
-                if (allow_unknown != "0") mode = util::allow_unregistered;
-
-                std::vector<std::string> still_unregistered_options;
-                util::parse_commandline(ini, options, unknown_cmd_line, vm,
-                    std::size_t(-1), mode,
-                    get_runtime_mode_from_name(runtime_mode), 0,
-                    &still_unregistered_options);
-
-                std::string still_unknown_commandline;
-                for (std::string const& s: still_unregistered_options)
-                    still_unknown_commandline += " " + util::detail::enquote(s);
-
-                if (!still_unknown_commandline.empty())
-                {
-                    util::section* s = ini.get_section("hpx");
-                    HPX_ASSERT(s != 0);
-                    s->add_entry("unknown_cmd_line_option",
-                        still_unknown_commandline);
-                }
-            }
-
-            std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
-            if (!fullhelp.empty()) {
-                std::string help_option(
-                    ini.get_entry("hpx.cmd_line_help_option", ""));
-                if (0 == std::string("full").find(help_option)) {
-                    std::cout << decode_string(fullhelp);
-                    std::cout << options << std::endl;
-                }
-                else {
-                    throw hpx::detail::command_line_error(
-                        "unknown help option: " + help_option);
-                }
-                return 1;
-            }
-
-            // secondary command line handling, looking for --exit and other
-            // options
-            std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
-            if (!cmd_line.empty()) {
-                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                boost::program_options::variables_map vm;
-
-                util::parse_commandline(ini, options, cmd_line, vm, std::size_t(-1),
-                    util::allow_unregistered | util::report_missing_config_file,
-                    get_runtime_mode_from_name(runtime_mode));
-
-#if defined(HPX_HAVE_HWLOC)
-                if (vm.count("hpx:print-bind")) {
-                    std::size_t num_threads = boost::lexical_cast<std::size_t>(
-                        ini.get_entry("hpx.os_threads", 1));
-                    util::handle_print_bind(vm, num_threads);
-                }
-#endif
-                if (vm.count("hpx:list-parcel-ports"))
-                    util::handle_list_parcelports();
-
-                if (vm.count("hpx:exit"))
-                    return 1;
-            }
-        }
-        catch (std::exception const& e) {
-            std::cerr << "runtime_support::load_components: "
-                      << "command line processing: " << e.what() << std::endl;
-            return -1;
-        }
         return 0;
     }
 
@@ -2081,7 +2086,9 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
-    bool runtime_support::load_plugins(util::section& ini)
+    bool runtime_support::load_plugins(util::section& ini,
+        boost::program_options::options_description& options,
+        std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.plugins")) {
@@ -2170,12 +2177,14 @@ namespace hpx { namespace components { namespace server
                         "loading of plugin '" + instance + "'");
 #else
                     // first, try using the path as the full path to the library
-                    if (!load_plugin(ini, instance, component, lib, isenabled))
+                    if (!load_plugin(ini, instance, component, lib, isenabled,
+                            options, startup_handled))
                     {
                         // build path to component to load
                         std::string libname(HPX_MAKE_DLL_STRING(component));
                         lib /= hpx::util::create_path(libname);
-                        if (!load_plugin(ini, instance, component, lib, isenabled))
+                        if (!load_plugin(ini, instance, component, lib, isenabled,
+                                options, startup_handled))
                         {
                             continue;   // next please :-P
                         }
@@ -2195,7 +2204,9 @@ namespace hpx { namespace components { namespace server
 #if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_plugin(util::section& ini,
         std::string const& instance, std::string const& plugin,
-        boost::filesystem::path const& lib, bool isenabled)
+        boost::filesystem::path const& lib, bool isenabled,
+        boost::program_options::options_description& options,
+        std::set<std::string>& startup_handled)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
@@ -2224,37 +2235,44 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(plugin_section))
                 plugin_ini = ini.get_section(plugin_section);
 
-            if (0 != plugin_ini &&
-                "0" != plugin_ini->get_entry("no_factory", "0"))
+            if (0 == plugin_ini ||
+                "0" == plugin_ini->get_entry("no_factory", "0"))
             {
-                return false;
+                // get the factory
+                hpx::util::plugin::plugin_factory<plugins::plugin_factory_base>
+                    pf (d, "factory");
+
+                // create the component factory object, if not disabled
+                boost::shared_ptr<plugins::plugin_factory_base> factory (
+                    pf.create(instance, ec, glob_ini, plugin_ini, isenabled));
+                if (ec) {
+                    LRT_(warning) << "dynamic loading failed: " << lib.string()
+                                  << ": " << instance << ": " << get_error_what(ec);
+                    return false;
+                }
+
+                // store component factory and module for later use
+                plugin_factory_type data(factory, d, isenabled);
+                std::pair<plugin_map_type::iterator, bool> p =
+                    plugins_.insert(plugin_map_type::value_type(instance, data));
+
+                if (!p.second) {
+                    LRT_(fatal) << "duplicate plugin type: " << instance;
+                    return false;   // duplicate component id?
+                }
+
+                LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                            << ": " << instance;
             }
 
-            // get the factory
-            hpx::util::plugin::plugin_factory<plugins::plugin_factory_base>
-                pf (d, "factory");
-
-            // create the component factory object, if not disabled
-            boost::shared_ptr<plugins::plugin_factory_base> factory (
-                pf.create(instance, ec, glob_ini, plugin_ini, isenabled));
-            if (ec) {
-                LRT_(warning) << "dynamic loading failed: " << lib.string()
-                              << ": " << instance << ": " << get_error_what(ec);
-                return false;
+            // make sure startup/shutdown registration is called once for each
+            // module, same for plugins
+            if (startup_handled.find(d.get_name()) == startup_handled.end()) {
+                startup_handled.insert(d.get_name());
+                load_commandline_options(d, options, ec);
+                if (ec) ec = error_code(lightweight);
+                load_startup_shutdown_functions(d, ec);
             }
-
-            // store component factory and module for later use
-            plugin_factory_type data(factory, d, isenabled);
-            std::pair<plugin_map_type::iterator, bool> p =
-                plugins_.insert(plugin_map_type::value_type(instance, data));
-
-            if (!p.second) {
-                LRT_(fatal) << "duplicate plugin type: " << instance;
-                return false;   // duplicate component id?
-            }
-
-            LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                        << ": " << instance;
         }
         catch (hpx::exception const&) {
             throw;

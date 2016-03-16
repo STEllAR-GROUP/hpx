@@ -10,7 +10,9 @@ macro(add_coalescing_module)
     hpx_debug("add_coalescing_module")
     add_hpx_library(parcel_coalescing
         PLUGIN
-        SOURCES "${PROJECT_SOURCE_DIR}/plugins/parcel/coalescing/coalescing_message_handler.cpp"
+        SOURCES
+            "${PROJECT_SOURCE_DIR}/plugins/parcel/coalescing/coalescing_message_handler.cpp"
+            "${PROJECT_SOURCE_DIR}/plugins/parcel/coalescing/performance_counters.cpp"
         HEADERS
               "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/coalescing_message_handler.hpp"
               "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/message_buffer.hpp"
