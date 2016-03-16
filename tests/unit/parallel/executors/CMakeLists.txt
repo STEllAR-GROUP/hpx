@@ -13,6 +13,7 @@ set(tests
     minimal_timed_sync_executor
     parallel_executor
     parallel_fork_executor
+    persistent_executor_parameters
     sequential_executor
     service_executors
     shared_parallel_executor
