@@ -33,9 +33,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
-#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
 #define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
 #endif
 

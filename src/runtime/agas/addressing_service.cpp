@@ -1826,12 +1826,12 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::decref(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ decref implementation
-    naming::gid_type gid(naming::detail::get_stripped_gid(id));
+    naming::gid_type raw(naming::detail::get_stripped_gid(gid));
 
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
@@ -1843,7 +1843,7 @@ void addressing_service::decref(
         ) = &addressing_service::decref;
 
         threads::register_thread_nullary(
-            util::bind(decref_ptr, this, gid, credit, boost::ref(throws)),
+            util::bind(decref_ptr, this, raw, credit, boost::ref(throws)),
             "addressing_service::decref", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default, ec);
@@ -1860,7 +1860,6 @@ void addressing_service::decref(
     }
 
     try {
-        naming::gid_type raw = naming::detail::get_stripped_gid(gid);
         boost::unique_lock<mutex_type> l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
@@ -2036,13 +2035,8 @@ namespace detail
                 "request 'symbol_ns_on_event' failed");
             return hpx::future<hpx::id_type>();
         }
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-        // The move was added to silence an error produced by intel13
-        return std::move(result_f);
-#else
-        // All other compilers do the right thing (tm)
+
         return result_f;
-#endif
     }
 }
 

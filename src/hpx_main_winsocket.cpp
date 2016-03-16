@@ -7,6 +7,8 @@
 
 #if defined(HPX_WINDOWS)
 
+#include <hpx/hpx_init.hpp>
+
 #if !defined(WIN32)
 #  define WIN32
 #endif
@@ -20,16 +22,18 @@ namespace hpx { namespace detail
     // is executed.
     struct winsocket_init_helper
     {
-        static const boost::asio::detail::winsock_init<> init;
+        static boost::asio::detail::winsock_init<> const& init()
+        {
+            static const boost::asio::detail::winsock_init<> init_winsocket =
+                boost::asio::detail::winsock_init<>(false);
+            return init_winsocket;
+        }
     };
-
-    boost::asio::detail::winsock_init<> const winsocket_init_helper::init =
-        boost::asio::detail::winsock_init<>(false);
 
     // This function makes sure this file is actually linked to the executable.
     void init_winsocket()
     {
-        static winsocket_init_helper init;
+        winsocket_init_helper::init();
     }
 }}
 

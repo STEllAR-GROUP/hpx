@@ -221,6 +221,55 @@ namespace hpx
         util::function_nonser<void()> const empty;
         return start(f, desc_commandline, argc, argv, empty, empty, mode);
     }
+
+    // Main non-blocking entry point for launching the HPX runtime system.
+    inline bool start(int (*f)(boost::program_options::variables_map& vm),
+        int argc, char** argv, hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        return start(f, app_name, argc, argv, mode);
+    }
+
+    /// \cond NOINTERNAL
+    namespace detail
+    {
+        HPX_EXPORT int init_helper(
+            boost::program_options::variables_map&,
+            util::function_nonser<int(int, char**)> const&);
+    }
+    /// \endcond
+
+    // Main non-blocking entry point for launching the HPX runtime system.
+    inline bool start(util::function_nonser<int(int, char**)> const& f,
+        std::string const& app_name, int argc, char** argv,
+        hpx::runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            "Usage: " + app_name +  " [options]");
+
+        if (argc == 0 || argv == 0)
+        {
+            char *dummy_argv[2] = { const_cast<char*>(app_name.c_str()), 0 };
+            return start(desc_commandline, 1, dummy_argv, mode);
+        }
+
+        std::vector<std::string> cfg;
+        util::function_nonser<void()> const empty;
+
+        return start(
+            util::bind(detail::init_helper, util::placeholders::_1, f),
+            desc_commandline, argc, argv, cfg, empty, empty, mode);
+    }
+
+    // Main non-blocking entry point for launching the HPX runtime system.
+    inline bool start(util::function_nonser<int(int, char**)> const& f,
+        int argc, char** argv, hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        return start(f, app_name, argc, argv, mode);
+    }
 }
 
 #endif

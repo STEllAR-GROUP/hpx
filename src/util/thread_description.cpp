@@ -29,11 +29,11 @@ namespace hpx { namespace util
     std::string as_string(thread_description const& desc)
     {
         if (desc.kind() == util::thread_description::data_type_description)
-            return desc.get_description();
+            return desc ? desc.get_description() : "<unknown>";
 
         std::stringstream strm;
         strm << "address: 0x" << std::hex
-                << util::safe_lexical_cast<std::string>(
+             << util::safe_lexical_cast<std::string>(
                     desc.get_address());
         return strm.str();
     }

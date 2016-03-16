@@ -23,7 +23,8 @@ set(example_programs
     fibonacci_futures_distributed
     fractals
     fractals_struct
-    safe_object
+    init_globally
+    sierpinski
     interest_calculator
     interval_timer
     latch_local
@@ -33,6 +34,7 @@ set(example_programs
     pingpong
     print_to_console
     quicksort
+    safe_object
     shared_mutex
     simple_future_continuation
     simplest_hello_world
@@ -53,6 +55,7 @@ set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(partitioned_vector_spmd_foreach_FLAGS
     COMPONENT_DEPENDENCIES iostreams partitioned_vector)
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
