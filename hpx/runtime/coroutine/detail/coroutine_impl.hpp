@@ -36,7 +36,6 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/coroutine/detail/config.hpp>
 #include <hpx/runtime/coroutine/detail/context_base.hpp>
 #include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

@@ -13,9 +13,8 @@
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
-#include <hpx/config/forceinline.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/runtime/coroutine/detail/config.hpp>
 #include <hpx/runtime/coroutine/detail/posix_utility.hpp>
 #include <hpx/runtime/coroutine/detail/swap_context.hpp>
 #include <hpx/runtime/coroutine/detail/get_stack_pointer.hpp>

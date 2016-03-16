@@ -32,9 +32,8 @@
 #include <windows.h>
 #include <winnt.h>
 
-#include <hpx/config/forceinline.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/runtime/coroutine/detail/config.hpp>
 #include <hpx/runtime/coroutine/exception.hpp>
 #include <hpx/runtime/coroutine/detail/swap_context.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

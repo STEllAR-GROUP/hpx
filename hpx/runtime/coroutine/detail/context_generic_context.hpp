@@ -10,9 +10,7 @@
 #define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_GENERIC_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/config/forceinline.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/runtime/coroutine/detail/config.hpp>
 #include <hpx/runtime/coroutine/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/coroutine/exception.hpp>
 #include <hpx/runtime/coroutine/detail/swap_context.hpp>
@@ -245,20 +243,20 @@ namespace hpx { namespace coroutines
             static void thread_shutdown() {}
 
             // handle stack operations
-            HPX_COROUTINE_EXPORT void reset_stack();
-            HPX_COROUTINE_EXPORT void rebind_stack();
+            HPX_EXPORT void reset_stack();
+            HPX_EXPORT void rebind_stack();
 
             typedef boost::atomic<boost::int64_t> counter_type;
 
-            HPX_COROUTINE_EXPORT static counter_type& get_stack_unbind_counter();
-            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_unbind_count(bool
+            HPX_EXPORT static counter_type& get_stack_unbind_counter();
+            HPX_EXPORT static boost::uint64_t get_stack_unbind_count(bool
                 reset);
-            HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_unbind_count();
+            HPX_EXPORT static boost::uint64_t increment_stack_unbind_count();
 
-            HPX_COROUTINE_EXPORT static counter_type& get_stack_recycle_counter();
-            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_recycle_count(bool
+            HPX_EXPORT static counter_type& get_stack_recycle_counter();
+            HPX_EXPORT static boost::uint64_t get_stack_recycle_count(bool
                 reset);
-            HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_recycle_count();
+            HPX_EXPORT static boost::uint64_t increment_stack_recycle_count();
 
         private:
             friend void swap_context(fcontext_context_impl& from,

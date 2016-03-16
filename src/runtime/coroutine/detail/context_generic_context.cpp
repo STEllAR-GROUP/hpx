@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-#include <hpx/runtime/coroutine/detail/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/coroutine/detail/context_generic_context.hpp>
 
