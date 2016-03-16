@@ -282,7 +282,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<difference_type> tok(count);
                 return util::partitioner<ExPolicy, FwdIter, void>::
                 call_with_index(
-                    policy, first, count ,
+                    policy, first, count, 1,
                     [tok, pred, last](std::size_t base_idx, FwdIter part_begin,
                     std::size_t part_size) mutable
                     {
@@ -300,7 +300,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter i = trail++;
 
                         //trail now points one past the current grouping
-                        //unless cancelled
+                        //unless canceled
                         if (!tok.was_cancelled(base_idx + part_size)
                             && trail != last)
                         {

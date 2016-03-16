@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        policy, first, count, 1,
                         [val, tok](std::size_t base_idx, InIter it,
                             std::size_t part_size) mutable
                         {
@@ -199,7 +199,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        policy, first, count, 1,
                         [f, tok](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -354,7 +354,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        policy, first, count, 1,
                         [f, tok](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -365,7 +365,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 if (!f(v))
                                     tok.cancel(i);
                             });
-
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                         {
@@ -513,7 +512,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first1, count-(diff-1),
+                        policy, first1, count-(diff-1), 1,
                         [=](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -803,7 +802,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        policy, first, count, 1,
                         [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
                             std::size_t part_size) mutable
                         {

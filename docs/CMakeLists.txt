@@ -68,6 +68,9 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_induction.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_reduction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
@@ -182,10 +185,12 @@ set(doxygen_definition_list
     "HPX_EXPORT="
     "HPX_API_EXPORT="
     "HPX_ALWAYS_EXPORT="
-    "HPX_STD_FUNCTION=std::function"
     "extern="
-    "BOOST_NOEXCEPT="
-    "HPX_INLINE_NAMESPACE(x)=namespace x")
+    "HPX_NOEXCEPT="
+    "HPX_CONSTEXPR="
+    "HPX_FORCEINLINE="
+    "HPX_INLINE_NAMESPACE(x)=namespace x"
+    "HPX_CONCEPT_REQUIRES_(x)=")
 
 #############################################################################
 # Definitions for autodoc.doxy.in
