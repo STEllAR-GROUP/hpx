@@ -203,10 +203,7 @@ namespace hpx { namespace coroutines { namespace detail
 
                         // if this thread returned 'terminated' we need to reset the functor
                         // and the bound arguments
-                        //
-                        // Note: threads::terminated == 5
-                        //
-                        if (this->m_result_last == 5)
+                        if (this->m_result_last == threads::terminated)
                             this->reset();
                     }
 
