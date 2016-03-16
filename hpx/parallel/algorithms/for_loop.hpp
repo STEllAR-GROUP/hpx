@@ -53,6 +53,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename ... Ts, std::size_t ... Is>
+        HPX_FORCEINLINE void init_iteration(hpx::util::tuple<Ts...>& args,
+            hpx::util::detail::pack_c<std::size_t, Is...>,
+            std::size_t part_index)
+        {
+            int _sequencer[] =
+            {
+                (hpx::util::get<Is>(args).init_iteration(part_index), 0)..., 0
+            };
+        }
+
+        template <typename ... Ts, std::size_t ... Is, typename F, typename B>
+        HPX_FORCEINLINE void invoke_iteration(hpx::util::tuple<Ts...>& args,
+            hpx::util::detail::pack_c<std::size_t, Is...>, F && f, B part_begin)
+        {
+            hpx::util::invoke(std::forward<F>(f), part_begin,
+                hpx::util::get<Is>(args).iteration_value()...);
+        }
+
+        template <typename ... Ts, std::size_t ... Is>
+        HPX_FORCEINLINE void next_iteration(hpx::util::tuple<Ts...>& args,
+            hpx::util::detail::pack_c<std::size_t, Is...>)
+        {
+            int _sequencer[] =
+            {
+                (hpx::util::get<Is>(args).next_iteration(), 0)..., 0
+            };
+        }
+
+        template <typename ... Ts, std::size_t ... Is>
+        HPX_FORCEINLINE void exit_iteration(hpx::util::tuple<Ts...>& args,
+            hpx::util::detail::pack_c<std::size_t, Is...>,
+            std::size_t size)
+        {
+            int _sequencer[] =
+            {
+                (hpx::util::get<Is>(args).exit_iteration(size), 0)..., 0
+            };
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         struct for_loop_n : public v1::detail::algorithm<for_loop_n>
         {
             for_loop_n()
@@ -94,13 +135,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             }
 
             template <typename ExPolicy, typename B, typename E, typename S,
-                typename F, typename... Args>
+                typename F, typename... Ts>
             static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy policy, B first, E last, S stride, F && f,
-                Args &&... args)
+                Ts &&... ts)
             {
                 if (first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
+
+                // gcc does not support binding parameter packs as lambda closures
+                auto args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
+                auto pack = typename hpx::util::detail::make_index_pack<
+                    sizeof...(Ts)>::type();
 
                 std::size_t size = parallel::v1::detail::distance(first, last);
                 return util::partitioner<ExPolicy>::call_with_index(
@@ -108,18 +154,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     [=](std::size_t part_index,
                         B part_begin, std::size_t part_steps) mutable
                     {
-                        int init_sequencer[] = {
-                            ( args.init_iteration(part_index), 0 )..., 0
-                        };
+                        detail::init_iteration(args, pack, part_index);
 
                         while (part_steps != 0)
                         {
-                            hpx::util::invoke(f, part_begin,
-                                args.iteration_value()...);
+                            detail::invoke_iteration(args, pack, f, part_begin);
 
-                            int next_sequencer[] = {
-                                ( args.next_iteration(), 0 )..., 0
-                            };
+                            detail::next_iteration(args, pack);
 
                             std::size_t chunk = (std::min)(S(part_steps), stride);
 
@@ -133,9 +174,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     {
                         // make sure live-out variables are properly set on
                         // return
-                        int exit_sequencer[] = {
-                            ( args.exit_iteration(size), 0 )..., 0
-                        };
+                        detail::exit_iteration(args, pack, size);
                     });
             }
         };
