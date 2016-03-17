@@ -284,7 +284,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least a forward iterator.");
 
         // if count is representing a negative value, we do nothing
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
             return util::detail::algorithm_result<ExPolicy>::get();
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;

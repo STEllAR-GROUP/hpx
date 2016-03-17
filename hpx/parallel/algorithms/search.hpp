@@ -16,7 +16,6 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -78,7 +77,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
-                    std::forward<ExPolicy>(policy), first, count-(diff-1),
+                    std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
                     [=](std::size_t base_idx, FwdIter it,
                         std::size_t part_size) mutable
                     {
@@ -355,7 +354,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
-                    std::forward<ExPolicy>(policy), first, count-(diff-1),
+                    std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
                     [=](std::size_t base_idx, FwdIter it,
                         std::size_t part_size) mutable
                     {

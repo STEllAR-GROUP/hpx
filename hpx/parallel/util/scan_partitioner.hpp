@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { namespace util
                 typename F1, typename F2, typename F3, typename F4>
             static R call(ExPolicy && policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
-                F4 && f4, std::size_t chunk_size)
+                F4 && f4)
             {
                 typedef typename hpx::util::decay<ExPolicy>::type::executor_type
                     executor_type;
@@ -72,8 +72,7 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     shape = get_bulk_iteration_shape(policy, workitems, f1,
-                        first, count, chunk_size
-                    );
+                        first, count, 1);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(shape.size() + 1);
@@ -154,7 +153,7 @@ namespace hpx { namespace parallel { namespace util
                 typename F1, typename F2, typename F3, typename F4>
             static hpx::future<R> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, T && init, F1 && f1,
-                F2 && f2, F3 && f3, F4 && f4, std::size_t chunk_size)
+                F2 && f2, F3 && f3, F4 && f4)
             {
                 typedef typename hpx::util::decay<ExPolicy>::type::executor_type
                     executor_type;
@@ -184,8 +183,7 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     shape = get_bulk_iteration_shape(policy, workitems, f1,
-                        first, count, chunk_size
-                    );
+                        first, count, 1);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(shape.size() + 1);
@@ -296,7 +294,7 @@ namespace hpx { namespace parallel { namespace util
                 typename F1, typename F2, typename F3, typename F4>
             static R call(ExPolicy && policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
-                F4 && f4, std::size_t chunk_size = 0)
+                F4 && f4)
             {
                 return static_scan_partitioner<
                         typename hpx::util::decay<ExPolicy>::type,
@@ -305,8 +303,7 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy>(policy),
                         first, count, std::forward<T>(init),
                         std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<F3>(f3), std::forward<F4>(f4),
-                        chunk_size);
+                        std::forward<F3>(f3), std::forward<F4>(f4));
             }
         };
 
@@ -318,7 +315,7 @@ namespace hpx { namespace parallel { namespace util
                 typename F1, typename F2, typename F3, typename F4>
             static hpx::future<R> call(ExPolicy && policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
-                F4 && f4, std::size_t chunk_size = 0)
+                F4 && f4)
             {
                 return static_scan_partitioner<
                         typename hpx::util::decay<ExPolicy>::type,
@@ -327,8 +324,7 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy>(policy),
                         first, count, std::forward<T>(init),
                         std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<F3>(f3), std::forward<F4>(f4),
-                        chunk_size);
+                        std::forward<F3>(f3), std::forward<F4>(f4));
             }
         };
 

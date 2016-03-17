@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
@@ -395,7 +396,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<RandomIt>::value &&
+        hpx::traits::is_iterator<RandomIt>::value &&
         traits::is_projected<Proj, RandomIt>::value &&
         traits::is_indirect_callable<
             Compare,
