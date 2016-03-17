@@ -16,6 +16,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -62,6 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             {
                 (hpx::util::get<Is>(args).init_iteration(part_index), 0)..., 0
             };
+            HPX_UNUSED(_sequencer);
         }
 
         template <typename ... Ts, std::size_t ... Is, typename F, typename B>
@@ -80,6 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             {
                 (hpx::util::get<Is>(args).next_iteration(), 0)..., 0
             };
+            HPX_UNUSED(_sequencer);
         }
 
         template <typename ... Ts, std::size_t ... Is>
@@ -91,6 +94,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             {
                 (hpx::util::get<Is>(args).exit_iteration(size), 0)..., 0
             };
+            HPX_UNUSED(_sequencer);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -109,6 +113,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 int init_sequencer[] = {
                     ( args.init_iteration(0), 0 )..., 0
                 };
+                HPX_UNUSED(init_sequencer);
 
                 std::size_t size = parallel::v1::detail::distance(first, last);
 
@@ -120,6 +125,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     int next_sequencer[] = {
                         ( args.next_iteration(), 0 )..., 0
                     };
+                    HPX_UNUSED(next_sequencer);
 
                     // modifies stride
                     first = parallel::v1::detail::next(first, count, stride);
@@ -130,6 +136,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 int exit_sequencer[] = {
                     ( args.exit_iteration(size), 0 )..., 0
                 };
+                HPX_UNUSED(exit_sequencer);
 
                 return hpx::util::unused;
             }
