@@ -29,9 +29,11 @@ class run_exe_ : public initializer_base
 public:
     run_exe_()
     {
+        cmd_line_[0] = cmd_line_[1] = 0;
     }
 
-    explicit run_exe_(const std::string &s) : s_(s), cmd_line_(new char*[2])
+    explicit run_exe_(const std::string &s)
+      : s_(s)
     {
         cmd_line_[0] = const_cast<char*>(s_.c_str());
         cmd_line_[1] = 0;
@@ -42,7 +44,7 @@ public:
     {
         e.exe = s_.c_str();
         if (!e.cmd_line)
-            e.cmd_line = cmd_line_.get();
+            e.cmd_line = cmd_line_;
     }
 
 private:
@@ -59,7 +61,6 @@ private:
     {
         ar & s_;
 
-        cmd_line_.reset(new char*[2]);
         cmd_line_[0] = const_cast<char*>(s_.c_str());
         cmd_line_[1] = 0;
     }
@@ -67,7 +68,7 @@ private:
     HPX_SERIALIZATION_SPLIT_MEMBER()
 
     std::string s_;
-    boost::shared_array<char*> cmd_line_;
+    char* cmd_line_[2];
 };
 
 inline run_exe_ run_exe(const char *s)

@@ -18,10 +18,10 @@ namespace hpx { namespace components { namespace process
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ... Ts>
-    child execute(hpx::id_type id, Ts && ... ts)
+    child execute(hpx::id_type const& id, Ts && ... ts)
     {
         return hpx::new_<child>(id, std::forward<Ts>(ts)...);
-    };
+    }
 }}}
 
 #endif

@@ -27,7 +27,7 @@ namespace hpx { namespace components { namespace process { namespace server
         process::util::terminate(child_);
     }
 
-    boost::uint32_t child::wait_for_exit()
+    int child::wait_for_exit()
     {
         int (*f)(process::util::child const&) =
             &process::util::wait_for_exit<process::util::child>;

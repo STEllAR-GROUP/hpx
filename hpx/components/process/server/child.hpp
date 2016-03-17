@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace process { namespace server
         {}
 
         void terminate();
-        boost::uint32_t wait_for_exit();
+        int wait_for_exit();
 
         HPX_DEFINE_COMPONENT_ACTION(child, terminate);
         HPX_DEFINE_COMPONENT_ACTION(child, wait_for_exit);

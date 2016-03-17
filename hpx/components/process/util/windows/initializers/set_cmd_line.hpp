@@ -14,9 +14,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
+#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
-#include <boost/range/algorithm/copy.hpp>
+
 #include <boost/shared_array.hpp>
+
 #include <memory>
 
 namespace hpx { namespace components { namespace process { namespace windows {
@@ -26,25 +28,27 @@ namespace initializers {
 template <class String>
 class set_cmd_line_ : public initializer_base
 {
-private:
-    typedef typename String::value_type Char;
-
 public:
     explicit set_cmd_line_(const String &s)
-        : cmd_line_(new Char[s.size() + 1])
-    {
-        boost::copy(s, cmd_line_.get());
-        cmd_line_[s.size()] = 0;
-    }
+      : cmd_line_(s)
+    {}
 
     template <class WindowsExecutor>
     void on_CreateProcess_setup(WindowsExecutor &e) const
     {
-        e.cmd_line = cmd_line_.get();
+        e.cmd_line = cmd_line_.c_str();
     }
 
 private:
-    boost::shared_array<Char> cmd_line_;
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar & cmd_line_;
+    }
+
+    String cmd_line_;
 };
 
 #if defined(_UNICODE) || defined(UNICODE)

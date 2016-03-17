@@ -85,7 +85,7 @@ struct executor
     };
 
     template <typename ... Ts>
-    child operator()(Ts const&... ts)
+    child operator()(Ts &&... ts)
     {
         int const setup_sequencer[] = {
             (call_on_CreateProcess_setup(*this)(ts), 0)..., 0

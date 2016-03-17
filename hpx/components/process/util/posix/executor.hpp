@@ -94,7 +94,7 @@ struct executor
     };
 
     template <typename ... Ts>
-    child operator()(Ts const&... ts)
+    child operator()(Ts &&... ts)
     {
         int const fork_sequencer[] = {
             (call_on_fork_setup(*this)(ts), 0)..., 0

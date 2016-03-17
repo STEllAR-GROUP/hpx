@@ -13,10 +13,13 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
+#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
+
 #include <boost/tokenizer.hpp>
 #include <boost/shared_array.hpp>
-#include <boost/range/algorithm/transform.hpp>
+
 #include <string>
 #include <vector>
 
@@ -26,22 +29,11 @@ namespace initializers {
 
 class set_cmd_line : public initializer_base
 {
-private:
-    static char *c_str(const std::string &s)
-    {
-        return const_cast<char*>(s.c_str());
-    }
-
 public:
     explicit set_cmd_line(const std::string &s)
     {
-        typedef boost::tokenizer<boost::escaped_list_separator<char> > tokenizer;
-        boost::escaped_list_separator<char> sep('\\', ' ', '\"');
-        tokenizer tok(s, sep);
-        args_.assign(tok.begin(), tok.end());
-        cmd_line_.reset(new char*[args_.size() + 1]);
-        boost::transform(args_, cmd_line_.get(), c_str);
-        cmd_line_[args_.size()] = 0;
+        split_command_line(s);
+        init_command_line_arguments();
     }
 
     template <class PosixExecutor>
@@ -51,6 +43,40 @@ public:
     }
 
 private:
+    void split_command_line(std::string const& s)
+    {
+        typedef boost::tokenizer<boost::escaped_list_separator<char> > tokenizer;
+        boost::escaped_list_separator<char> sep('\\', ' ', '\"');
+        tokenizer tok(s, sep);
+        args_.assign(tok.begin(), tok.end());
+    }
+
+    void init_command_line_arguments()
+    {
+        cmd_line_.reset(new char*[args_.size() + 1]);
+        std::size_t i = 0;
+        for (std::string const& s : args_)
+            cmd_line_[i++] = const_cast<char*>(s.c_str());
+        cmd_line_[i] = 0;
+    }
+
+    friend class hpx::serialization::access;
+
+    template <typename Archive>
+    void save(Archive& ar, unsigned const) const
+    {
+        ar & args_;
+    }
+
+    template <typename Archive>
+    void load(Archive& ar, const unsigned int)
+    {
+        ar & args_;
+        init_command_line_arguments();
+    }
+
+    HPX_SERIALIZATION_SPLIT_MEMBER()
+
     std::vector<std::string> args_;
     boost::shared_array<char*> cmd_line_;
 };

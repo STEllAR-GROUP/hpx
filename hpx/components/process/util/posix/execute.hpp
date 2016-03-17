@@ -20,9 +20,9 @@
 namespace hpx { namespace components { namespace process { namespace posix {
 
 template <typename ... Ts>
-child execute(Ts const& ... ts)
+child execute(Ts && ... ts)
 {
-    return executor()(ts...);
+    return executor()(std::forward<Ts>(ts)...);
 }
 
 }}}}
