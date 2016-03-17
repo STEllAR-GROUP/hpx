@@ -51,6 +51,13 @@
 
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // There is no need to protect these global from thread concurrent access
+    // as they are access during early startup only.
+    std::vector<hpx::util::tuple<char const*, char const*> >
+        message_handler_registrations;
+
+    ///////////////////////////////////////////////////////////////////////////
     void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -603,6 +610,13 @@ namespace hpx
     {
         if (active_counters_.get())
             active_counters_->stop_evaluating_counters();
+    }
+
+    void runtime::register_message_handler(char const* message_handler_type,
+        char const* action, error_code& ec)
+    {
+        return runtime_support_->register_message_handler(
+            message_handler_type, action, ec);
     }
 
     parcelset::policies::message_handler* runtime::create_message_handler(
@@ -1446,6 +1460,19 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a message handler plugin
+    void register_message_handler(char const* message_handler_type,
+        char const* action, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            return rt->register_message_handler(message_handler_type, action, ec);
+        }
+
+        // store the request for later
+        message_handler_registrations.push_back(
+            hpx::util::make_tuple(message_handler_type, action));
+    }
+
     parcelset::policies::message_handler* create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,

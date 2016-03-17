@@ -317,6 +317,8 @@ namespace hpx { namespace components { namespace server
         void remove_here_from_connection_cache();
 
         ///////////////////////////////////////////////////////////////////////
+        void register_message_handler(char const* message_handler_type,
+            char const* action, error_code& ec);
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,

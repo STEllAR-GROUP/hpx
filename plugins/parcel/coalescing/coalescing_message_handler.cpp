@@ -15,6 +15,7 @@
 
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
+#include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/locks.hpp>
@@ -84,7 +85,15 @@ namespace hpx { namespace plugins { namespace parcel
         num_messages_(0),
         started_at_(util::high_resolution_clock::now()),
         reset_time_num_parcels_(0)
-    {}
+    {
+        // register performance counter functions
+        using util::placeholders::_1;
+        coalescing_counter_registry::instance().register_action(action_name,
+            util::bind(&coalescing_message_handler::get_parcel_count, this, _1),
+            util::bind(&coalescing_message_handler::get_message_count, this, _1),
+            util::bind(&coalescing_message_handler::
+                get_average_time_between_parcels, this, _1));
+    }
 
     void coalescing_message_handler::put_parcel(
         parcelset::locality const& dest, parcelset::parcel p,
@@ -221,6 +230,16 @@ namespace hpx { namespace plugins { namespace parcel
     {
         boost::unique_lock<mutex_type> l(mtx_);
         return util::get_and_reset_value(num_messages_, reset);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // register the given action (called during startup)
+    void coalescing_message_handler::register_action(char const* action,
+        error_code& ec)
+    {
+        coalescing_counter_registry::instance().register_action(action);
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 }}}
 

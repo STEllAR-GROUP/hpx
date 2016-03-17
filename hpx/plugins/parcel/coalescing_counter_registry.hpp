@@ -21,8 +21,6 @@
 
 #include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel
 {
@@ -34,7 +32,7 @@ namespace hpx { namespace plugins { namespace parcel
     public:
         coalescing_counter_registry() {}
 
-        typedef boost::int64_t (*get_counter_type)(bool);
+        typedef util::function_nonser<boost::int64_t(bool)> get_counter_type;
         typedef util::tuple<
                 get_counter_type, get_counter_type, get_counter_type
             > counter_types;
@@ -44,9 +42,9 @@ namespace hpx { namespace plugins { namespace parcel
 
         static coalescing_counter_registry& instance();
 
-        void register_message_handler(std::string const& name);
+        void register_action(std::string const& name);
 
-        void register_message_handler(std::string const& name,
+        void register_action(std::string const& name,
             get_counter_type num_parcels, get_counter_type num_messages,
             get_counter_type time_between_parcels);
 
@@ -70,37 +68,7 @@ namespace hpx { namespace plugins { namespace parcel
 
         map_type map_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    void register_coalescing_counters(char const* action_name);
-
-    template <typename Action>
-    struct register_coalescing_for_action
-    {
-        register_coalescing_for_action()
-        {
-            register_coalescing_counters(
-                hpx::actions::detail::get_action_name<Action>());
-        }
-        static register_coalescing_for_action instance_;
-    };
-
-    template <typename Action>
-    register_coalescing_for_action<Action>
-        register_coalescing_for_action<Action>::instance_;
 }}}
 
-#include <hpx/config/warnings_suffix.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_COALESCING_COUNTERS(Action)                              \
-    namespace hpx { namespace plugins { namespace parcel                      \
-    {                                                                         \
-        template register_coalescing_for_action<Action>                       \
-            register_coalescing_for_action<Action>::instance_;                \
-    }}}                                                                       \
-/**/
-
 #endif
-
 #endif

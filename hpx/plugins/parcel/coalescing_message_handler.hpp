@@ -10,7 +10,6 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
-#include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -52,6 +51,9 @@ namespace hpx { namespace plugins { namespace parcel
         boost::int64_t get_message_count(bool reset);
         boost::int64_t get_average_time_between_parcels(bool reset);
 
+        // register the given action
+        static void register_action(char const* action, error_code& ec);
+
     protected:
         bool timer_flush();
         bool flush_locked(boost::unique_lock<mutex_type>& l,
@@ -75,74 +77,5 @@ namespace hpx { namespace plugins { namespace parcel
 
 #include <hpx/config/warnings_suffix.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_ACTION_USES_MESSAGE_COALESCING(...)                               \
-    HPX_ACTION_USES_MESSAGE_COALESCING_(__VA_ARGS__)                          \
-/**/
-
-#define HPX_ACTION_USES_MESSAGE_COALESCING_(...)                              \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_ACTION_USES_MESSAGE_COALESCING_, HPX_UTIL_PP_NARG(__VA_ARGS__)    \
-    )(__VA_ARGS__))                                                           \
-/**/
-
-#define HPX_ACTION_USES_MESSAGE_COALESCING_1(action_type)                     \
-    HPX_ACTION_USES_MESSAGE_COALESCING_4(action_type,                         \
-        BOOST_PP_STRINGIZE(action_type), std::size_t(-1), std::size_t(-1))    \
-/**/
-
-#define HPX_ACTION_USES_MESSAGE_COALESCING_2(action_type, num)                \
-    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type,                         \
-        BOOST_PP_STRINGIZE(action_type), num, std::size_t(-1))                \
-/**/
-
-#define HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, num, interval)      \
-    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type,                         \
-        BOOST_PP_STRINGIZE(action_type), num, interval)                       \
-/**/
-
-#define HPX_ACTION_USES_MESSAGE_COALESCING_4(                                 \
-        action_type, action_name, num, interval)                              \
-    namespace hpx { namespace traits                                          \
-    {                                                                         \
-        template <>                                                           \
-        struct action_message_handler<action_type>                            \
-        {                                                                     \
-            static parcelset::policies::message_handler* call(                \
-                parcelset::parcelhandler* ph, parcelset::locality const& loc, \
-                parcelset::parcel const& /*p*/)                               \
-            {                                                                 \
-                return parcelset::get_message_handler(ph, action_name,        \
-                    "coalescing_message_handler", num, interval, loc);        \
-            }                                                                 \
-        };                                                                    \
-    }}                                                                        \
-/**/
-
-#define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(                           \
-        action_type, action_name, num, interval)                              \
-    namespace hpx { namespace traits                                          \
-    {                                                                         \
-        template <>                                                           \
-        struct action_message_handler<action_type>                            \
-        {                                                                     \
-            static parcelset::policies::message_handler* call(                \
-                parcelset::parcelhandler* ph, parcelset::locality const& loc, \
-                parcelset::parcel const& /*p*/)                               \
-            {                                                                 \
-                error_code ec(lightweight);                                   \
-                return parcelset::get_message_handler(ph, action_name,        \
-                    "coalescing_message_handler", num, interval, loc, ec);    \
-            }                                                                 \
-        };                                                                    \
-    }}                                                                        \
-/**/
-
-#else
-
-#define HPX_ACTION_USES_MESSAGE_COALESCING(...)
-#define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(...)
-
 #endif
-
 #endif

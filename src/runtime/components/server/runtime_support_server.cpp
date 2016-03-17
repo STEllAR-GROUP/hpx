@@ -1388,6 +1388,65 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void runtime_support::register_message_handler(
+        char const* message_handler_type, char const* action, error_code& ec)
+    {
+        // locate the factory for the requested plugin type
+        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+
+        plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
+        if (it == plugins_.end() || !(*it).second.first) {
+            if (ec.category() != hpx::get_lightweight_hpx_category())
+            {
+                // we don't know anything about this component
+                std::ostringstream strm;
+                strm << "attempt to create message handler plugin instance of "
+                        "invalid/unknown type: " << message_handler_type;
+                l.unlock();
+                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                    "runtime_support::create_message_handler",
+                    strm.str());
+            }
+            else
+            {
+                // lightweight error handling
+                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                    "runtime_support::create_message_handler",
+                    "attempt to create message handler plugin instance of "
+                    "invalid/unknown type");
+            }
+            return;
+        }
+
+        l.unlock();
+
+        // create new component instance
+        boost::shared_ptr<plugins::message_handler_factory_base> factory(
+            boost::static_pointer_cast<plugins::message_handler_factory_base>(
+                (*it).second.first));
+
+        factory->register_action(action, ec);
+
+        if (ec)
+        {
+            std::ostringstream strm;
+            strm << "couldn't register action '" << action
+                 << "' for message handler plugin of type: "
+                 << message_handler_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::register_message_handler",
+                strm.str());
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // log result if requested
+        LRT_(info) << "successfully registered message handler plugin of type: "
+                    << message_handler_type;
+    }
+
     parcelset::policies::message_handler*
     runtime_support::create_message_handler(
         char const* message_handler_type, char const* action,

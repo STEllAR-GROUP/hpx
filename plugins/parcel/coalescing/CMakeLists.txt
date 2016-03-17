@@ -15,6 +15,7 @@ macro(add_coalescing_module)
             "${PROJECT_SOURCE_DIR}/plugins/parcel/coalescing/coalescing_counter_registry.cpp"
             "${PROJECT_SOURCE_DIR}/plugins/parcel/coalescing/performance_counters.cpp"
         HEADERS
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/coalescing_message_handler_registration.hpp"
               "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/coalescing_message_handler.hpp"
               "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/coalescing_counter_registry.hpp"
               "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/message_buffer.hpp"

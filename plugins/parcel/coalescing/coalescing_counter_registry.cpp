@@ -22,14 +22,8 @@ namespace hpx { namespace plugins { namespace parcel
         return registry.get();
     }
 
-    void register_coalescing_counters(char const* action_name)
-    {
-        coalescing_counter_registry::instance().
-            register_message_handler(action_name);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
-    void coalescing_counter_registry::register_message_handler(
+    void coalescing_counter_registry::register_action(
         std::string const& name,
         get_counter_type num_parcels, get_counter_type num_messages,
         get_counter_type time_between_parcels)
@@ -52,19 +46,19 @@ namespace hpx { namespace plugins { namespace parcel
             map_.insert(map_type::value_type(name, data));
 #endif
         }
-        else
+        else if (util::get<0>((*it).second).empty() &&
+            util::get<1>((*it).second).empty() &&
+            util::get<2>((*it).second).empty())
         {
             // replace the existing functions
             (*it).second = data;
         }
     }
 
-    static boost::int64_t always_zero(bool) { return 0; }
-
-    void coalescing_counter_registry::register_message_handler(
-        std::string const& name)
+    void coalescing_counter_registry::register_action(std::string const& name)
     {
-        register_message_handler(name, always_zero, always_zero, always_zero);
+        register_action(name, get_counter_type(), get_counter_type(),
+            get_counter_type());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -78,7 +72,7 @@ namespace hpx { namespace plugins { namespace parcel
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::get_num_parcels_counter",
                 "unknown action type");
-            return 0;
+            return get_counter_type();
         }
         return hpx::util::get<0>((*it).second);
     }
@@ -93,7 +87,7 @@ namespace hpx { namespace plugins { namespace parcel
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::get_num_messages_counter",
                 "unknown action type");
-            return 0;
+            return get_counter_type();
         }
         return hpx::util::get<1>((*it).second);
     }
@@ -109,7 +103,7 @@ namespace hpx { namespace plugins { namespace parcel
                 "coalescing_counter_registry::"
                     "get_average_time_between_parcels_counter",
                 "unknown action type");
-            return 0;
+            return get_counter_type();
         }
         return hpx::util::get<2>((*it).second);
     }
