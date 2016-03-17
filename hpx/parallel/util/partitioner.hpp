@@ -417,7 +417,7 @@ namespace hpx { namespace parallel { namespace util
                         typename hpx::util::decay<ExPolicy>::type, R, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -442,8 +442,8 @@ namespace hpx { namespace parallel { namespace util
                 return static_partitioner<
                         typename hpx::util::decay<ExPolicy>::type, R, Result
                     >::call_with_index(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                        std::forward<ExPolicy>(policy), first, count, stride,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
         };
 
@@ -460,7 +460,7 @@ namespace hpx { namespace parallel { namespace util
                         typename hpx::util::decay<ExPolicy>::type, R, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -486,8 +486,8 @@ namespace hpx { namespace parallel { namespace util
                 return static_partitioner<
                         typename hpx::util::decay<ExPolicy>::type, R, Result
                     >::call_with_index(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                        std::forward<ExPolicy>(policy), first, count, stride,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
         };
 

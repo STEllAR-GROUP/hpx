@@ -173,7 +173,7 @@ namespace hpx { namespace parallel { namespace util
                         typename hpx::util::decay<ExPolicy>::type, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), chunk_size);
+                        std::forward<F1>(f1));
             }
         };
 
@@ -185,12 +185,11 @@ namespace hpx { namespace parallel { namespace util
             static hpx::future<FwdIter> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1)
             {
-                return foreach_static_partitioner<ExPolicy, Result>::call(
-                return foreach_n_static_partitioner<
+                return foreach_static_partitioner<
                         typename hpx::util::decay<ExPolicy>::type, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), chunk_size);
+                        std::forward<F1>(f1));
             }
         };
 

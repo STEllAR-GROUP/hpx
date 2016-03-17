@@ -190,7 +190,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<std::size_t, FwdIter, std::size_t> tuple_type;
 
-        typedef typename ExPolicy::executor_type executor_type;
+        typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+            executor_type;
         std::size_t const cores = executor_information_traits<executor_type>::
             processing_units_count(policy.executor(), policy.parameters());
 
