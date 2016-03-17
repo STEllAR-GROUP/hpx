@@ -184,7 +184,7 @@ namespace hpx { namespace iostreams
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
                 typedef server::output_stream::write_async_action action_type;
-                hpx::apply<action_type>(get_id(), hpx::get_locality_id(),
+                hpx::apply<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
 
@@ -210,7 +210,7 @@ namespace hpx { namespace iostreams
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
                 typedef server::output_stream::write_sync_action action_type;
-                hpx::async<action_type>(get_id(), hpx::get_locality_id(),
+                hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next).get();
             }
 
@@ -234,7 +234,7 @@ namespace hpx { namespace iostreams
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
                 typedef server::output_stream::write_async_action action_type;
-                hpx::apply<action_type>(get_id(), hpx::get_locality_id(),
+                hpx::apply<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
             return true;
