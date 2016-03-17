@@ -206,6 +206,7 @@ namespace hpx { namespace traits
         }
     };
 
+#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
     template <typename Sig>
     struct get_function_address<util::unique_function_nonser<Sig> >
     {
@@ -215,6 +216,7 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif
