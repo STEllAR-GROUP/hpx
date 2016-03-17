@@ -42,18 +42,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <std::size_t I, typename... Args>
-        HPX_FORCEINLINE typename hpx::util::tuple_element<
-            I, hpx::util::tuple<Args&& ...>
-        >::type
-        nth(Args &&... args)
-        {
-            return hpx::util::get<I>(
-                hpx::util::forward_as_tuple(std::forward<Args>(args)...)
-            );
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename ... Ts, std::size_t ... Is>
         HPX_FORCEINLINE void init_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>,
@@ -209,10 +197,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 hpx::traits::is_input_iterator<B>::value
             >::type is_seq;
 
+            auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
+
             return for_loop_n().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, stride,
-                nth<sizeof...(Args)-1>(std::forward<Args>(args)...),
-                nth<Is>(std::forward<Args>(args)...)...);
+                hpx::util::get<sizeof...(Args)-1>(t), hpx::util::get<Is>(t)...);
         }
 
         /// \endcond
