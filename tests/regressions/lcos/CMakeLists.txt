@@ -127,7 +127,7 @@ foreach(compile_test ${compile_tests})
     FOLDER "Tests/Regressions/LCOs/CompileOnly")
 
     # add a custom target for this example
-    add_hpx_pseudo_target(tests.unit.actions.${compile_test})
+    add_hpx_pseudo_target(tests.regressions.lcos_dir.${compile_test})
 
     # make pseudo-targets depend on master pseudo-target
     add_hpx_pseudo_dependencies(tests.regressions.lcos_dir
