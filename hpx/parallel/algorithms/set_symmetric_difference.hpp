@@ -16,7 +16,6 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
