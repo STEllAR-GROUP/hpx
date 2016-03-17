@@ -13,6 +13,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/concepts.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -68,9 +69,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (count != 0)
                 {
-                    return util::foreach_n_partitioner<ExPolicy>::call(
+                    return util::foreach_partitioner<ExPolicy>::call(
                         policy, first, count,
-                        [f, proj](Iter part_begin, std::size_t part_size)
+                        [f, proj](std::size_t /*part_index*/,
+                            Iter part_begin, std::size_t part_size)
                         {
                             // VS2015 bails out when proj or f are captured by
                             // ref
@@ -171,9 +173,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
-        traits::is_indirect_callable<
+        hpx::traits::is_iterator<InIter>::value &&
+        parallel::traits::is_projected<Proj, InIter>::value &&
+        parallel::traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
@@ -188,7 +190,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         // if count is representing a negative value, we do nothing
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, InIter>::get(
                 std::move(first));
@@ -365,9 +367,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
-        traits::is_indirect_callable<
+        hpx::traits::is_iterator<InIter>::value &&
+        parallel::traits::is_projected<Proj, InIter>::value &&
+        parallel::traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type

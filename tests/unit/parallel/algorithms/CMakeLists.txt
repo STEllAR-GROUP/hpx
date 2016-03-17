@@ -50,6 +50,12 @@ set(tests
     foreachn_projection
     foreachn_projection_exception
     foreachn_projection_bad_alloc
+    for_loop
+    for_loop_induction
+    for_loop_induction_async
+    for_loop_reduction
+    for_loop_reduction_async
+    for_loop_strided
     generate
     generaten
     includes
