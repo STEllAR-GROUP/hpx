@@ -1,11 +1,10 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if \
- !defined(HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM)
-#define HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM
+#if !defined(HPX_RUNTIME_PARCELSET_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM)
+#define HPX_RUNTIME_PARCELSET_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM
 
 #include <hpx/config.hpp>
 
@@ -20,6 +19,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -47,9 +47,15 @@ namespace hpx { namespace plugins { namespace parcel
 
         bool flush(bool stop_buffering = false);
 
+        // access performance counter data
+        boost::int64_t get_parcel_count(bool reset);
+        boost::int64_t get_message_count(bool reset);
+        boost::int64_t get_average_time_between_parcels(bool reset);
+
     protected:
         bool timer_flush();
-        bool flush(boost::unique_lock<mutex_type>& l, bool stop_buffering);
+        bool flush_locked(boost::unique_lock<mutex_type>& l,
+            bool stop_buffering);
 
     private:
         mutable mutex_type mtx_;
@@ -57,6 +63,13 @@ namespace hpx { namespace plugins { namespace parcel
         detail::message_buffer buffer_;
         util::interval_timer timer_;
         bool stopped_;
+
+        // performance counter data
+        boost::int64_t num_parcels_;
+        boost::int64_t reset_num_parcels_;
+        boost::int64_t num_messages_;
+        boost::int64_t started_at_;
+        boost::int64_t reset_time_num_parcels_;
     };
 }}}
 

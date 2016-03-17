@@ -711,7 +711,15 @@ namespace hpx { namespace parcelset
         else if (!(*it).second.get()) {
             l.unlock();
             if (&ec != &throws)
+            {
                 ec = make_error_code(bad_parameter, lightweight);
+            }
+            else
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "parcelhandler::get_message_handler",
+                    "couldn't find an appropriate message handler");
+            }
             return 0;           // no message handler available
         }
 

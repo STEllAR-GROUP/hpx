@@ -1432,7 +1432,7 @@ namespace hpx { namespace components { namespace server
             pp, num_messages, interval);
         if (0 == mh) {
             std::ostringstream strm;
-            strm << "couldn't to create message handler plugin of type: "
+            strm << "couldn't create message handler plugin of type: "
                  << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",

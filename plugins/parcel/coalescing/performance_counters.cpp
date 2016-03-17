@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/hpx.hpp>
 
 namespace hpx { namespace plugins { namespace parcel
@@ -96,3 +99,5 @@ namespace hpx { namespace plugins { namespace parcel
 //
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_MODULE_DYNAMIC(hpx::plugins::parcel::get_startup);
+
+#endif
