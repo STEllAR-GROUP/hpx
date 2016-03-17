@@ -297,7 +297,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Iterator>
     struct future_iterator_traits<Iterator,
         typename hpx::util::always_void<
-            typename Iterator::iterator_category
+            typename std::iterator_traits<Iterator>::value_type
         >::type>
     {
         typedef
