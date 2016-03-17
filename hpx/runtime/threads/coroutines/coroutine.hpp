@@ -27,16 +27,16 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_COROUTINE_HPP
-#define HPX_RUNTIME_COROUTINE_COROUTINE_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_HPP
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 
@@ -46,7 +46,7 @@
 #include <limits>
 #include <utility>
 
-namespace hpx { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     /////////////////////////////////////////////////////////////////////////////
     class coroutine
@@ -57,15 +57,15 @@ namespace hpx { namespace coroutines
     public:
         friend struct detail::coroutine_accessor;
 
-        typedef threads::thread_state_enum result_type;
-        typedef threads::thread_state_ex_enum arg_type;
+        typedef thread_state_enum result_type;
+        typedef thread_state_ex_enum arg_type;
 
         typedef detail::coroutine_impl impl_type;
         typedef typename impl_type::pointer impl_ptr;
         typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
 
         typedef util::unique_function_nonser<
-            threads::thread_state_enum(threads::thread_state_ex_enum)
+            thread_state_enum(thread_state_ex_enum)
         > functor_type;
 
         coroutine() : m_pimpl(0) {}
@@ -227,6 +227,6 @@ namespace hpx { namespace coroutines
             return m_pimpl;
         }
     };
-}}
+}}}
 
-#endif /*HPX_RUNTIME_COROUTINE_COROUTINE_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_HPP*/

@@ -10,9 +10,9 @@
 
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 #include <hpx/exception.hpp>
-#include <hpx/runtime/coroutine/detail/context_generic_context.hpp>
+#include <hpx/runtime/threads/coroutines/detail/context_generic_context.hpp>
 
-namespace hpx { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     namespace detail { namespace generic_context
     {
@@ -86,6 +86,6 @@ namespace hpx { namespace coroutines
         }
 
     }}
-}}
+}}}
 
 #endif

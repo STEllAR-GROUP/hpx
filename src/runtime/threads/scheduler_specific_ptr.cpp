@@ -7,7 +7,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/coroutine/detail/tss.hpp>
+#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
 
 namespace hpx { namespace threads { namespace detail

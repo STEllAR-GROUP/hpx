@@ -26,16 +26,16 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_WINDOWS_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_WINDOWS_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_WINDOWS_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_WINDOWS_HPP
 
 #include <windows.h>
 #include <winnt.h>
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/runtime/coroutine/exception.hpp>
-#include <hpx/runtime/coroutine/detail/swap_context.hpp>
+#include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -51,7 +51,7 @@
 extern "C" void switch_to_fiber(void* lpFiber) throw();
 #endif
 
-namespace hpx { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     // On Windows we need a special preparation for the main coroutines thread
     struct prepare_main_thread
@@ -266,6 +266,6 @@ namespace hpx { namespace coroutines
 
         typedef fibers_context_impl context_impl;
     }}
-}}
+}}}
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_WINDOWS_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_WINDOWS_HPP*/

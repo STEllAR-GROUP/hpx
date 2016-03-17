@@ -26,8 +26,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_POSIX_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_POSIX_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_POSIX_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_POSIX_HPP
 
 // NOTE (per http://lists.apple.com/archives/darwin-dev/2008/Jan/msg00232.html):
 // > Why the bus error? What am I doing wrong?
@@ -61,7 +61,7 @@
 #include <cerrno>
 #include <limits>
 
-namespace hpx { namespace coroutines { namespace detail {
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix { namespace pth
 {
     inline int check(int rc)
@@ -73,21 +73,21 @@ namespace posix { namespace pth
         return rc? 0 : errno;
     }
 }}
-}}}
+}}}}
 
 #define HPX_COROUTINE_POSIX_IMPL "Pth implementation"
 #define HPX_COROUTINE_DECLARE_CONTEXT(name) pth_uctx_t name
 #define HPX_COROUTINE_CREATE_CONTEXT(ctx)                                     \
-    hpx::coroutines::detail::posix::pth::check(pth_uctx_create(&(ctx)))
+    hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_create(&(ctx)))
 #define HPX_COROUTINE_MAKE_CONTEXT(ctx, stack, size, startfunc, startarg, exitto) \
     /* const sigset_t* sigmask = NULL: we don't expect per-context signal masks */ \
-    hpx::coroutines::detail::posix::pth::check(                               \
+    hpx::threads::coroutines::detail::posix::pth::check(                      \
         pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), NULL,        \
         (startfunc), (startarg), (exitto)))
 #define HPX_COROUTINE_SWAP_CONTEXT(from, to)                                  \
-    hpx::coroutines::detail::posix::pth::check(pth_uctx_switch(*(from), *(to)))
+    hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_switch(*(from), *(to)))
 #define HPX_COROUTINE_DESTROY_CONTEXT(ctx)                                    \
-    hpx::coroutines::detail::posix::pth::check(pth_uctx_destroy(ctx))
+    hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_destroy(ctx))
 
 #else // generic Posix platform (e.g. OS X >= 10.5)
 
@@ -104,7 +104,7 @@ namespace posix { namespace pth
 #include <ucontext.h>
 #include <cstddef>                  // ptrdiff_t
 
-namespace hpx { namespace coroutines { namespace detail {
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix { namespace ucontext
 {
     inline int make_context(::ucontext_t* ctx, void* stack, std::ptrdiff_t size,
@@ -128,13 +128,13 @@ namespace posix { namespace ucontext
         return 0;
     }
 }}
-}}}
+}}}}
 
 #define HPX_COROUTINE_POSIX_IMPL "ucontext implementation"
 #define HPX_COROUTINE_DECLARE_CONTEXT(name) ::ucontext_t name
 #define HPX_COROUTINE_CREATE_CONTEXT(ctx) /* nop */
 #define HPX_COROUTINE_MAKE_CONTEXT(ctx, stack, size, startfunc, startarg, exitto) \
-    hpx::coroutines::detail::posix::ucontext::make_context(                   \
+    hpx::threads::coroutines::detail::posix::ucontext::make_context(          \
         ctx, stack, size, startfunc, startarg, exitto)
 #define HPX_COROUTINE_SWAP_CONTEXT(pfrom, pto) ::swapcontext((pfrom), (pto))
 #define HPX_COROUTINE_DESTROY_CONTEXT(ctx) /* nop */
@@ -143,12 +143,12 @@ namespace posix { namespace ucontext
 
 #include <signal.h>                 // SIGSTKSZ
 #include <boost/noncopyable.hpp>
-#include <hpx/runtime/coroutine/exception.hpp>
-#include <hpx/runtime/coroutine/detail/get_stack_pointer.hpp>
-#include <hpx/runtime/coroutine/detail/posix_utility.hpp>
-#include <hpx/runtime/coroutine/detail/swap_context.hpp>
+#include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
 
-namespace hpx { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
@@ -318,7 +318,7 @@ namespace hpx { namespace coroutines
 
         typedef ucontext_context_impl context_impl;
     }}
-}}
+}}}
 
 #else
 
@@ -335,4 +335,4 @@ namespace hpx { namespace coroutines
 
 #endif
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_POSIX_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_POSIX_HPP*/

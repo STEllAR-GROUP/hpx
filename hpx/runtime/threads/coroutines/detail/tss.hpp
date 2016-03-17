@@ -8,8 +8,8 @@
 // (C) Copyright 2008 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_TSS_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_TSS_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
@@ -21,7 +21,7 @@
 #include <map>
 #include <utility>
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     //////////////////////////////////////////////////////////////////////////
     struct tss_cleanup_function
@@ -213,6 +213,6 @@ namespace hpx { namespace coroutines { namespace detail
 
     HPX_EXPORT std::size_t get_tss_thread_data(tss_storage* storage);
     HPX_EXPORT std::size_t set_tss_thread_data(tss_storage* storage, std::size_t);
-}}}
+}}}}
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_TSS_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP*/

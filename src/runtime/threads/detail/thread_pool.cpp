@@ -582,7 +582,7 @@ namespace hpx { namespace threads { namespace detail
                     manage_active_thread_count count(thread_count_);
 
                     // run the work queue
-                    hpx::coroutines::prepare_main_thread main_thread;
+                    hpx::threads::coroutines::prepare_main_thread main_thread;
 
                     // run main Scheduler loop until terminated
                     detail::scheduling_counters counters(

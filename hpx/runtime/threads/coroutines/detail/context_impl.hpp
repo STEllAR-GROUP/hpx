@@ -26,8 +26,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_IMPL_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_IMPL_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP
 
 #include <hpx/config.hpp>
 
@@ -107,11 +107,11 @@
 
 #if BOOST_VERSION >= 105100
 
-#include <hpx/runtime/coroutine/detail/context_generic_context.hpp>
-namespace hpx { namespace coroutines { namespace detail
+#include <hpx/runtime/threads/coroutines/detail/context_generic_context.hpp>
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     typedef generic_context::context_impl default_context_impl;
-}}}
+}}}{}
 
 #else
 #error Boost.Context is available only with Boost V1.51 or later
@@ -120,27 +120,27 @@ namespace hpx { namespace coroutines { namespace detail
 #elif (defined(__linux) || defined(linux) || defined(__linux__)) \
        && !defined(__bgq__) && !defined(__powerpc__)
 
-#include <hpx/runtime/coroutine/detail/context_linux_x86.hpp>
-namespace hpx { namespace coroutines { namespace detail
+#include <hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp>
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     typedef lx::context_impl default_context_impl;
-}}}
+}}}}
 
 #elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__)
 
-#include <hpx/runtime/coroutine/detail/context_posix.hpp>
-namespace hpx { namespace coroutines { namespace detail
+#include <hpx/runtime/threads/coroutines/detail/context_posix.hpp>
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     typedef posix::context_impl default_context_impl;
-}}}
+}}}}
 
 #elif defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 
-#include <hpx/runtime/coroutine/detail/context_windows_fibers.hpp>
-namespace hpx { namespace coroutines { namespace detail
+#include <hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp>
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     typedef windows::context_impl default_context_impl;
-}}}
+}}}}
 
 #else
 
@@ -148,7 +148,7 @@ namespace hpx { namespace coroutines { namespace detail
 
 #endif // HPX_HAVE_GENERIC_CONTEXT_COROUTINES
 
-namespace hpx { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     // functions to be called for each thread after it started running
     // and before it exits
@@ -161,6 +161,6 @@ namespace hpx { namespace coroutines
     {
         detail::default_context_impl::thread_shutdown();
     }
-}}
+}}}
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_IMPL_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP*/

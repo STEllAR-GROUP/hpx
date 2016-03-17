@@ -5,13 +5,13 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     struct tls_tag {};
 
@@ -38,4 +38,4 @@ namespace hpx { namespace coroutines { namespace detail
     {
         self_.reset(NULL);
     }
-}}}
+}}}}

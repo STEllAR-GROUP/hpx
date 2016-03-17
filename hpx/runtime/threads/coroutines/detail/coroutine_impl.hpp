@@ -27,8 +27,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_COROUTINE_IMPL_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_COROUTINE_IMPL_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP
 
 #if defined(HPX_MSVC)
 #pragma warning (push)
@@ -36,10 +36,10 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/coroutine/detail/context_base.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/coroutines/detail/context_base.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -49,7 +49,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
@@ -61,12 +61,12 @@ namespace hpx { namespace coroutines { namespace detail
 
     public:
         typedef context_base super_type;
-        typedef threads::thread_state_enum result_type;
-        typedef threads::thread_state_ex_enum arg_type;
+        typedef thread_state_enum result_type;
+        typedef thread_state_ex_enum arg_type;
         typedef typename context_base::thread_id_repr_type thread_id_repr_type;
 
         typedef util::unique_function_nonser<
-            threads::thread_state_enum(threads::thread_state_ex_enum)
+            thread_state_enum(thread_state_ex_enum)
         > functor_type;
 
         typedef boost::intrusive_ptr<coroutine_impl> pointer;
@@ -192,10 +192,10 @@ namespace hpx { namespace coroutines { namespace detail
         functor_type m_fun;
         naming::id_type target_;        // keep target alive, if needed
     };
-}}}
+}}}}
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_COROUTINE_IMPL_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP*/

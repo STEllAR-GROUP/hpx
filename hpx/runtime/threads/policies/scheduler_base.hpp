@@ -15,7 +15,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/runtime/coroutine/detail/tss.hpp>
+#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #endif

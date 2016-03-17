@@ -26,19 +26,31 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_SWAP_CONTEXT_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_SWAP_CONTEXT_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    class default_hint {};
-    class yield_hint : public default_hint {};
-    class yield_to_hint : public default_hint {};
-    class invoke_hint : public default_hint {};
+    struct coroutine_accessor
+    {
+        template <typename Coroutine>
+        static void acquire(Coroutine& x)
+        {
+            x.acquire();
+        }
 
-    /////////////////////////////////////////////////////////////////////////////
-    // This is the base class of all context implementations
-    struct context_impl_base {};
-}}}
+        template <typename Coroutine>
+        static void release(Coroutine& x)
+        {
+            x.release();
+        }
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_SWAP_CONTEXT_HPP*/
+        template <typename Coroutine>
+        static typename Coroutine::impl_ptr get_impl(Coroutine& x)
+        {
+            return x.get_impl();
+        }
+    };
+}}}}
+
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP*/

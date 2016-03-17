@@ -27,8 +27,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_BASE_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_BASE_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP
 
 /*
  * Currently asio can, in some cases. call copy constructors and
@@ -41,12 +41,12 @@
 #include <hpx/config.hpp>
 
 // This needs to be first for building on Macs
-#include <hpx/runtime/coroutine/detail/context_impl.hpp>
+#include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
 
 #include <hpx/util/assert.hpp>
-#include <hpx/runtime/coroutine/detail/swap_context.hpp> //for swap hints
-#include <hpx/runtime/coroutine/detail/tss.hpp>
-#include <hpx/runtime/coroutine/exception.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp> //for swap hints
+#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/runtime/threads/coroutines/exception.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
@@ -64,7 +64,7 @@
     HPX_COROUTINE_NUM_HEAPS/4)                                                \
 /**/
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     //////////////////////////////////////////////////////////////////////////
     //
@@ -636,6 +636,6 @@ namespace hpx { namespace coroutines { namespace detail
 
         std::size_t continuation_recursion_count_;
     };
-}}}
+}}}}
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_BASE_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP*/

@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/coroutine/detail/context_base.hpp>
+#include <hpx/runtime/threads/coroutines/detail/context_base.hpp>
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     // initialize static allocation counter
     allocation_counters context_base::m_allocation_counters;
-}}}
+}}}}

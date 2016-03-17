@@ -29,9 +29,9 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/coroutine/coroutine.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_self.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
@@ -40,7 +40,7 @@
 
 #include <cstddef>
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace
@@ -87,7 +87,7 @@ namespace hpx { namespace coroutines { namespace detail
 
                     // if this thread returned 'terminated' we need to reset the functor
                     // and the bound arguments
-                    if (this->m_result_last == threads::terminated)
+                    if (this->m_result_last == terminated)
                         this->reset();
                 }
 
@@ -227,4 +227,4 @@ namespace hpx { namespace coroutines { namespace detail
 
         get_heap(heap_num, stacksize).deallocate(p);
     }
-}}}
+}}}}

@@ -26,13 +26,13 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_SELF_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_SELF_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_accessor.hpp>
-#include <hpx/runtime/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
@@ -41,7 +41,7 @@
 #include <limits>
 #include <utility>
 
-namespace hpx { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     class coroutine_self
     {
@@ -67,8 +67,8 @@ namespace hpx { namespace coroutines { namespace detail
     public:
         friend struct detail::coroutine_accessor;
 
-        typedef threads::thread_state_enum result_type;
-        typedef threads::thread_state_ex_enum arg_type;
+        typedef thread_state_enum result_type;
+        typedef thread_state_ex_enum arg_type;
 
         typedef coroutine_impl impl_type;
         typedef impl_type* impl_ptr; // Note, no reference counting here.
@@ -211,6 +211,6 @@ namespace hpx { namespace coroutines { namespace detail
         impl_ptr m_pimpl;
         coroutine_self* next_self_;
     };
-}}}
+}}}}
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_SELF_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP*/

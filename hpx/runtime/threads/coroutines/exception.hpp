@@ -26,15 +26,15 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_EXCEPTION_HPP
-#define HPX_RUNTIME_COROUTINE_EXCEPTION_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_EXCEPTION_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_EXCEPTION_HPP
 
 #include <hpx/config.hpp>
 
 #include <exception>
 #include <typeinfo>
 
-namespace hpx { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     // All coroutine exceptions are derived from this base.
     class exception_base : public std::exception {};
@@ -83,6 +83,6 @@ namespace hpx { namespace coroutines
     };
 
     class null_thread_id_exception : exception_base {};
-}}
+}}}
 
-#endif /*HPX_RUNTIME_COROUTINE_EXCEPTION_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_EXCEPTION_HPP*/

@@ -8,16 +8,16 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_LINUX_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_LINUX_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_LINUX_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_LINUX_HPP
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/runtime/coroutine/detail/posix_utility.hpp>
-#include <hpx/runtime/coroutine/detail/swap_context.hpp>
-#include <hpx/runtime/coroutine/detail/get_stack_pointer.hpp>
+#include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <sys/param.h>
@@ -58,7 +58,7 @@ extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
@@ -393,7 +393,7 @@ namespace hpx { namespace coroutines
 #endif
         }
     }}
-}}
+}}}
 
 #if defined(HPX_HAVE_VALGRIND)
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
@@ -409,4 +409,4 @@ namespace hpx { namespace coroutines
 
 #endif
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_CONTEXT_LINUX_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_LINUX_HPP*/

@@ -27,8 +27,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_COROUTINE_DETAIL_POSIX_UTILITY_HPP
-#define HPX_RUNTIME_COROUTINE_DETAIL_POSIX_UTILITY_HPP
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
@@ -72,7 +72,7 @@
 /**
  * Stack allocation routines and trampolines for setcontext
  */
-namespace hpx { namespace coroutines { namespace detail {
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix
 {
 
@@ -246,10 +246,10 @@ namespace posix
         (*static_cast<T *>(fun))();
     }
 }
-}}}
+}}}}
 
 #else
 #error This header can only be included when compiling for posix systems.
 #endif
 
-#endif /*HPX_RUNTIME_COROUTINE_DETAIL_POSIX_UTILITY_HPP*/
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP*/

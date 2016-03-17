@@ -130,7 +130,8 @@ namespace hpx { namespace threads
 
     thread_self::impl_type* get_ctx_ptr()
     {
-        return hpx::coroutines::detail::coroutine_accessor::get_impl(get_self());
+        using hpx::threads::coroutines::detail::coroutine_accessor;
+        return coroutine_accessor::get_impl(get_self());
     }
 
     thread_self* get_self_ptr_checked(error_code& ec)

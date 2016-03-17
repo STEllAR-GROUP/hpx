@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/runtime/coroutine/coroutine.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
 #include <boost/atomic.hpp>

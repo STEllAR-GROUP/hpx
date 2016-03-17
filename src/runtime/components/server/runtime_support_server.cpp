@@ -17,6 +17,7 @@
 
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -44,7 +45,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/runtime/coroutine/coroutine.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
