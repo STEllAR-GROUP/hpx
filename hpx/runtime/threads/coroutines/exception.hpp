@@ -82,7 +82,7 @@ namespace hpx { namespace threads { namespace coroutines
         std::type_info const& m_e;
     };
 
-    class null_thread_id_exception : exception_base {};
+    class null_thread_id_exception : public exception_base {};
 }}}
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_EXCEPTION_HPP*/
