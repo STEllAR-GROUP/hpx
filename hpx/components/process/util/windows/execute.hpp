@@ -17,6 +17,8 @@
 #include <hpx/components/process/util/windows/executor.hpp>
 #include <hpx/components/process/util/windows/child.hpp>
 
+#include <utility>
+
 namespace hpx { namespace components { namespace process { namespace windows {
 
 template <typename ... Ts>

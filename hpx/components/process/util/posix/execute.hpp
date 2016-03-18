@@ -17,6 +17,8 @@
 #include <hpx/components/process/util/posix/executor.hpp>
 #include <hpx/components/process/util/posix/child.hpp>
 
+#include <utility>
+
 namespace hpx { namespace components { namespace process { namespace posix {
 
 template <typename ... Ts>

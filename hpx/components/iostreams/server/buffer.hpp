@@ -7,7 +7,7 @@
 #define HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
@@ -15,9 +15,11 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/swap.hpp>
 
 #include <vector>
 #include <utility>
+#include <iosfwd>
 
 namespace hpx { namespace iostreams { namespace detail
 {
