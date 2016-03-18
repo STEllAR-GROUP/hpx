@@ -13,6 +13,7 @@
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/parcelset/policies/message_handler.hpp>
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
