@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,16 +7,15 @@
 #if !defined(HPX_97FC0FA2_E773_4F83_8477_806EC68C2253)
 #define HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/state.hpp>
-#include <hpx/include/client.hpp>
-#include <hpx/components/iostreams/manipulators.hpp>
-#include <hpx/components/iostreams/stubs/output_stream.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
+#include <hpx/config.hpp>
 
-#include <boost/swap.hpp>
-#include <boost/noncopyable.hpp>
+#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/components/iostreams/manipulators.hpp>
+#include <hpx/components/iostreams/server/output_stream.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
+#include <hpx/apply.hpp>
+#include <hpx/async.hpp>
+
 #include <boost/iostreams/stream.hpp>
 #include <boost/atomic.hpp>
 #include <boost/thread/locks.hpp>
@@ -24,10 +23,18 @@
 #include <iterator>
 #include <ios>
 #include <iostream>
+#include <utility>
 
 namespace hpx { namespace iostreams
 {
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename Char = char>
+        struct buffer_sink;
+    }
+
+    template <typename Char = char, typename Sink = detail::buffer_sink<char> >
     struct ostream;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -43,7 +50,7 @@ namespace hpx { namespace iostreams
         ///////////////////////////////////////////////////////////////////////
         /// This is a Boost.IoStreams Sink that can be used to create an
         /// [io]stream on top of a detail::buffer.
-        template <typename Char = char>
+        template <typename Char>
         struct buffer_sink
         {
             typedef Char char_type;
@@ -53,7 +60,7 @@ namespace hpx { namespace iostreams
                 boost::iostreams::flushable_tag
             {};
 
-            explicit buffer_sink(ostream& os)
+            explicit buffer_sink(ostream<Char, buffer_sink>& os)
               : os_(os)
             {}
 
@@ -65,15 +72,15 @@ namespace hpx { namespace iostreams
             inline bool flush();
 
         private:
-            ostream& os_;
+            ostream<Char, buffer_sink>& os_;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Char = char>
+        template <typename Char = char, typename Sink = buffer_sink<Char> >
         struct ostream_creator
         {
             typedef std::back_insert_iterator<std::vector<Char> > iterator_type;
-            typedef buffer_sink<Char> device_type;
+            typedef Sink device_type;
             typedef boost::iostreams::stream<device_type> stream_type;
         };
 
@@ -125,17 +132,21 @@ namespace hpx { namespace iostreams
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Char, typename Sink>
     struct ostream
-        : components::client_base<ostream, stubs::output_stream>
+        : components::client_base<ostream<Char, Sink>, server::output_stream>
         , detail::buffer
-        , detail::ostream_creator<char>::stream_type
+        , detail::ostream_creator<Char, Sink>::stream_type
     {
     private:
-        typedef components::client_base<ostream, stubs::output_stream> base_type;
-        typedef detail::ostream_creator<char>::stream_type stream_base_type;
-        typedef stream_base_type::traits_type stream_traits_type;
-        typedef BOOST_IOSTREAMS_BASIC_OSTREAM(char, stream_traits_type) std_stream_type;
-        typedef detail::ostream_creator<char>::iterator_type iterator_type;
+        typedef components::client_base<ostream, server::output_stream> base_type;
+
+        typedef detail::ostream_creator<Char, Sink> ostream_creator;
+        typedef typename ostream_creator::stream_type stream_base_type;
+        typedef typename ostream_creator::iterator_type iterator_type;
+
+        typedef typename stream_base_type::traits_type stream_traits_type;
+        typedef BOOST_IOSTREAMS_BASIC_OSTREAM(Char, stream_traits_type) std_stream_type;
         typedef lcos::local::recursive_mutex mutex_type;
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(ostream);
@@ -172,7 +183,8 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_id(), hpx::get_locality_id(),
+                typedef server::output_stream::write_async_action action_type;
+                hpx::apply<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
 
@@ -197,8 +209,9 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_sync(get_id(), hpx::get_locality_id(),
-                    generational_count_++, next);
+                typedef server::output_stream::write_sync_action action_type;
+                hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
+                    generational_count_++, next).get();
             }
 
             return *this;
@@ -220,7 +233,8 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_id(), hpx::get_locality_id(),
+                typedef server::output_stream::write_async_action action_type;
+                hpx::apply<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
             return true;

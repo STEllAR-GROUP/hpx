@@ -1,4 +1,4 @@
-#  Copyright (c) 2014-2015 Hartmut Kaiser
+#  Copyright (c) 2014-2016 Hartmut Kaiser
 #  Copyright (c) 2011 Thomas Heller
 #
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@ set(tests
     inheritance_3_classes_1_abstract
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
+    launch_process
     migrate_component
     migrate_component_to_storage
     new_
@@ -29,6 +30,12 @@ set(tests
     partitioned_vector_transform_reduce
    )
 
+# add executable needed for launch_process_test
+add_hpx_executable(launched_process_test
+  SOURCES launched_process.cpp
+  EXCLUDE_FROM_ALL
+  HPX_PREFIX ${HPX_BUILD_PREFIX}
+  FOLDER "Tests/Unit/Components")
 
 set(action_invoke_no_more_than_PARAMETERS
     LOCALITIES 2
@@ -47,6 +54,9 @@ set(copy_component_PARAMETERS
 set(get_ptr_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
+
+set(launch_process_FLAGS
+    DEPENDENCIES iostreams_component process_component)
 
 set(migrate_component_PARAMETERS
     LOCALITIES 2
@@ -117,4 +127,6 @@ foreach(test ${tests})
                               ${test}_test_exe)
 
 endforeach()
+
+add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
 

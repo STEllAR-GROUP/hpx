@@ -295,6 +295,7 @@
 #ifdef HPX_WINDOWS  // windows
 #  define HPX_INI_PATH_DELIMITER            ";"
 #  define HPX_SHARED_LIB_EXTENSION          ".dll"
+#  define HPX_EXECUTABLE_EXTENSION          ".exe"
 #  define HPX_PATH_DELIMITERS               "\\/"
 #else                 // unix like
 #  define HPX_INI_PATH_DELIMITER            ":"
@@ -306,6 +307,7 @@
 #  else  // linux & co
 #    define HPX_SHARED_LIB_EXTENSION        ".so"
 #  endif
+#  define HPX_EXECUTABLE_EXTENSION          ""
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
