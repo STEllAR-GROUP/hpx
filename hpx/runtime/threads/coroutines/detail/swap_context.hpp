@@ -33,7 +33,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     class default_hint {};
     class yield_hint : public default_hint {};
-    class yield_to_hint : public default_hint {};
     class invoke_hint : public default_hint {};
 
     /////////////////////////////////////////////////////////////////////////////

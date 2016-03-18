@@ -35,8 +35,9 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <stdexcept>
 #include <limits>
+#include <stdexcept>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS) && BOOST_VERSION >= 105300
