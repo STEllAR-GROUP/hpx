@@ -39,6 +39,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -51,12 +52,6 @@
 
 namespace hpx
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // There is no need to protect these global from thread concurrent access
-    // as they are access during early startup only.
-    std::vector<hpx::util::tuple<char const*, char const*> >
-        message_handler_registrations;
-
     ///////////////////////////////////////////////////////////////////////////
     void handle_termination(char const* reason)
     {
@@ -110,6 +105,7 @@ namespace hpx
 
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void termination_handler(int signum)
     {
         if (signum != SIGINT &&
@@ -135,6 +131,13 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // There is no need to protect these global from thread concurrent access
+    // as they are access during early startup only.
+    std::vector<hpx::util::tuple<char const*, char const*> >
+        message_handler_registrations;
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void new_handler()
     {
         HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
