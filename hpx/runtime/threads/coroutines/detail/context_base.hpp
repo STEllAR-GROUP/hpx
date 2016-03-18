@@ -608,7 +608,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<context_base*>(ctx)));
         }
 
-        typedef typename default_context_impl::context_impl_base ctx_type;
+        typedef default_context_impl::context_impl_base ctx_type;
         ctx_type m_caller;
 
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED

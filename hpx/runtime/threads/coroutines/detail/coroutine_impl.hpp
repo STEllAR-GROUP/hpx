@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         typedef context_base super_type;
         typedef thread_state_enum result_type;
         typedef thread_state_ex_enum arg_type;
-        typedef typename context_base::thread_id_repr_type thread_id_repr_type;
+        typedef context_base::thread_id_repr_type thread_id_repr_type;
 
         typedef util::unique_function_nonser<
             thread_state_enum(thread_state_ex_enum)
