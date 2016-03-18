@@ -733,7 +733,7 @@ namespace hpx
             },
 
             // action invocation counters
-            { "/runtime/count/action_invocation", performance_counters::counter_raw,
+            { "/runtime/count/action-invocation", performance_counters::counter_raw,
               "returns the number of (local) invocations of a specific action "
               "on this locality (the action type has to be specified as the "
               "counter parameter)",
@@ -743,7 +743,7 @@ namespace hpx
               ""
             },
 
-            { "/runtime/count/remote_action_invocation",
+            { "/runtime/count/remote-action-invocation",
               performance_counters::counter_raw,
               "returns the number of (remote) invocations of a specific action "
               "on this locality (the action type has to be specified as the "

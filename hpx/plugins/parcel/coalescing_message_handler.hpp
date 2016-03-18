@@ -48,8 +48,9 @@ namespace hpx { namespace plugins { namespace parcel
         bool flush(bool stop_buffering = false);
 
         // access performance counter data
-        boost::int64_t get_parcel_count(bool reset);
-        boost::int64_t get_message_count(bool reset);
+        boost::int64_t get_parcels_count(bool reset);
+        boost::int64_t get_messages_count(bool reset);
+        boost::int64_t get_parcels_per_message_count(bool reset);
         boost::int64_t get_average_time_between_parcels(bool reset);
 
         // register the given action
@@ -70,7 +71,10 @@ namespace hpx { namespace plugins { namespace parcel
         // performance counter data
         boost::int64_t num_parcels_;
         boost::int64_t reset_num_parcels_;
+        boost::int64_t reset_num_parcels_per_message_parcels_;
         boost::int64_t num_messages_;
+        boost::int64_t reset_num_messages_;
+        boost::int64_t reset_num_parcels_per_message_messages_;
         boost::int64_t started_at_;
         boost::int64_t reset_time_num_parcels_;
     };

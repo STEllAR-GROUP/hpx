@@ -82,15 +82,19 @@ namespace hpx { namespace plugins { namespace parcel
             true),
         stopped_(false),
         num_parcels_(0), reset_num_parcels_(0),
-        num_messages_(0),
+            reset_num_parcels_per_message_parcels_(0),
+        num_messages_(0), reset_num_messages_(0),
+            reset_num_parcels_per_message_messages_(0),
         started_at_(util::high_resolution_clock::now()),
         reset_time_num_parcels_(0)
     {
         // register performance counter functions
         using util::placeholders::_1;
         coalescing_counter_registry::instance().register_action(action_name,
-            util::bind(&coalescing_message_handler::get_parcel_count, this, _1),
-            util::bind(&coalescing_message_handler::get_message_count, this, _1),
+            util::bind(&coalescing_message_handler::get_parcels_count, this, _1),
+            util::bind(&coalescing_message_handler::get_messages_count, this, _1),
+            util::bind(&coalescing_message_handler::
+                get_parcels_per_message_count, this, _1),
             util::bind(&coalescing_message_handler::
                 get_average_time_between_parcels, this, _1));
     }
@@ -217,7 +221,7 @@ namespace hpx { namespace plugins { namespace parcel
         return value;
     }
 
-    boost::int64_t coalescing_message_handler::get_parcel_count(bool reset)
+    boost::int64_t coalescing_message_handler::get_parcels_count(bool reset)
     {
         boost::unique_lock<mutex_type> l(mtx_);
         boost::int64_t num_parcels = num_parcels_ - reset_num_parcels_;
@@ -226,10 +230,45 @@ namespace hpx { namespace plugins { namespace parcel
         return num_parcels;
     }
 
-    boost::int64_t coalescing_message_handler::get_message_count(bool reset)
+    boost::int64_t
+        coalescing_message_handler::get_parcels_per_message_count(bool reset)
     {
         boost::unique_lock<mutex_type> l(mtx_);
-        return util::get_and_reset_value(num_messages_, reset);
+
+        if (num_messages_ == 0)
+        {
+            if (reset)
+            {
+                reset_num_parcels_per_message_parcels_ = num_parcels_;
+                reset_num_parcels_per_message_messages_ = num_messages_;
+            }
+            return 0;
+        }
+
+        boost::int64_t num_parcels =
+            num_parcels_ - reset_num_parcels_per_message_parcels_;
+        boost::int64_t
+            num_messages = num_messages_ - reset_num_parcels_per_message_messages_;
+
+        if (reset)
+        {
+            reset_num_parcels_per_message_parcels_ = num_parcels_;
+            reset_num_parcels_per_message_messages_ = num_messages_;
+        }
+
+        if (num_messages == 0)
+            return 0;
+
+        return num_parcels / num_messages;
+    }
+
+    boost::int64_t coalescing_message_handler::get_messages_count(bool reset)
+    {
+        boost::unique_lock<mutex_type> l(mtx_);
+        boost::int64_t num_messages = num_messages_ - reset_num_messages_;
+        if (reset)
+            reset_num_messages_ = num_messages_;
+        return num_messages;
     }
 
     ///////////////////////////////////////////////////////////////////////////

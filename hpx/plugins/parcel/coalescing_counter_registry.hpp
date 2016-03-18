@@ -12,7 +12,6 @@
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
@@ -33,11 +32,17 @@ namespace hpx { namespace plugins { namespace parcel
         coalescing_counter_registry() {}
 
         typedef util::function_nonser<boost::int64_t(bool)> get_counter_type;
-        typedef util::tuple<
-                get_counter_type, get_counter_type, get_counter_type
-            > counter_types;
+
+        struct counter_functions
+        {
+            get_counter_type num_parcels;
+            get_counter_type num_messages;
+            get_counter_type num_parcels_per_message;
+            get_counter_type average_time_between_parcels;
+        };
+
         typedef boost::unordered_map<
-                std::string, counter_types, hpx::util::jenkins_hash
+                std::string, counter_functions, hpx::util::jenkins_hash
             > map_type;
 
         static coalescing_counter_registry& instance();
@@ -46,10 +51,12 @@ namespace hpx { namespace plugins { namespace parcel
 
         void register_action(std::string const& name,
             get_counter_type num_parcels, get_counter_type num_messages,
-            get_counter_type time_between_parcels);
+            get_counter_type time_between_parcels,
+            get_counter_type average_time_between_parcels);
 
-        get_counter_type get_num_parcels_counter(std::string const& name) const;
-        get_counter_type get_num_messages_counter(std::string const& name) const;
+        get_counter_type get_parcels_counter(std::string const& name) const;
+        get_counter_type get_messages_counter(std::string const& name) const;
+        get_counter_type get_parcels_per_message_counter(std::string const& name) const;
         get_counter_type get_average_time_between_parcels_counter(
             std::string const& name) const;
 

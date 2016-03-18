@@ -59,7 +59,7 @@ namespace hpx { namespace plugins { namespace parcel
             if (counter_.empty())
             {
                 counter_ = coalescing_counter_registry::instance().
-                    get_num_parcels_counter(parameters_);
+                    get_parcels_counter(parameters_);
                 if (counter_.empty())
                     return 0;           // no counter available yet
             }
@@ -102,7 +102,7 @@ namespace hpx { namespace plugins { namespace parcel
                 // ask registry
                 hpx::util::function_nonser<boost::int64_t(bool)> f =
                     coalescing_counter_registry::instance().
-                        get_num_parcels_counter(paths.parameters_);
+                        get_parcels_counter(paths.parameters_);
 
                 if (!f.empty())
                 {
@@ -136,7 +136,7 @@ namespace hpx { namespace plugins { namespace parcel
             if (counter_.empty())
             {
                 counter_ = coalescing_counter_registry::instance().
-                    get_num_messages_counter(parameters_);
+                    get_messages_counter(parameters_);
                 if (counter_.empty())
                     return 0;           // no counter available yet
             }
@@ -179,7 +179,7 @@ namespace hpx { namespace plugins { namespace parcel
                 // ask registry
                 hpx::util::function_nonser<boost::int64_t(bool)> f =
                     coalescing_counter_registry::instance().
-                        get_num_messages_counter(paths.parameters_);
+                        get_messages_counter(paths.parameters_);
 
                 if (!f.empty())
                 {
@@ -196,6 +196,84 @@ namespace hpx { namespace plugins { namespace parcel
         default:
             HPX_THROWS_IF(ec, bad_parameter,
                 "num_parcels_counter_creator",
+                "invalid counter type requested");
+            return naming::invalid_gid;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct num_parcels_per_message_counter_surrogate
+    {
+        num_parcels_per_message_counter_surrogate(std::string const& parameters)
+          : parameters_(parameters)
+        {}
+
+        boost::int64_t operator()(bool reset)
+        {
+            if (counter_.empty())
+            {
+                counter_ = coalescing_counter_registry::instance().
+                    get_parcels_per_message_counter(parameters_);
+                if (counter_.empty())
+                    return 0;           // no counter available yet
+            }
+
+            // dispatch to actual counter
+            return counter_(reset);
+        }
+
+        hpx::util::function_nonser<boost::int64_t(bool)> counter_;
+        std::string parameters_;
+    };
+
+    hpx::naming::gid_type num_parcels_per_message_counter_creator(
+        hpx::performance_counters::counter_info const& info, hpx::error_code& ec)
+    {
+        switch (info.type_) {
+        case performance_counters::counter_raw:
+            {
+                performance_counters::counter_path_elements paths;
+                performance_counters::get_counter_path_elements(
+                    info.fullname_, paths, ec);
+                if (ec) return naming::invalid_gid;
+
+                if (paths.parentinstance_is_basename_) {
+                    HPX_THROWS_IF(ec, bad_parameter,
+                        "num_parcels_per_message_counter_creator",
+                        "invalid counter name for number of parcels (instance "
+                        "name must not be a valid base counter name)");
+                    return naming::invalid_gid;
+                }
+
+                if (paths.parameters_.empty()) {
+                    HPX_THROWS_IF(ec, bad_parameter,
+                        "num_parcels_per_message_counter_creator",
+                        "invalid counter parameter for number of parcels: must "
+                        "specify an action type");
+                    return naming::invalid_gid;
+                }
+
+                // ask registry
+                hpx::util::function_nonser<boost::int64_t(bool)> f =
+                    coalescing_counter_registry::instance().
+                        get_parcels_per_message_counter(paths.parameters_);
+
+                if (!f.empty())
+                {
+                    return performance_counters::detail::create_raw_counter(
+                        info, std::move(f), ec);
+                }
+
+                // the counter is not available yet, create surrogate function
+                return performance_counters::detail::create_raw_counter(
+                    info, num_parcels_per_message_counter_surrogate(
+                        paths.parameters_), ec);
+            }
+            break;
+
+        default:
+            HPX_THROWS_IF(ec, bad_parameter,
+                "num_parcels_per_message_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
@@ -313,8 +391,18 @@ namespace hpx { namespace plugins { namespace parcel
               &counter_discoverer,
               ""
             },
-            // /coalescing(locality#<locality_id>/total)/time/parcel-arrival@action-name
-            { "/coalescing/time/parcel-arrival", counter_raw,
+            // /coalescing(...)/count/average-parcels-per-message@action-name
+            { "/coalescing/count/average-parcels-per-message", counter_raw,
+              "returns the average number of parcels sent in a message "
+              "generated by the message handler associated with the action "
+              "which is given by the counter parameter",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &num_parcels_per_message_counter_creator,
+              &counter_discoverer,
+              ""
+            },
+            // /coalescing(...)/time/average-parcel-arrival@action-name
+            { "/coalescing/time/average-parcel-arrival", counter_raw,
               "returns the average time between arriving parcels for the "
               "action which is given by the counter parameter",
               HPX_PERFORMANCE_COUNTER_V1,

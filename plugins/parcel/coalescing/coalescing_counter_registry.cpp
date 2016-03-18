@@ -26,7 +26,8 @@ namespace hpx { namespace plugins { namespace parcel
     void coalescing_counter_registry::register_action(
         std::string const& name,
         get_counter_type num_parcels, get_counter_type num_messages,
-        get_counter_type time_between_parcels)
+        get_counter_type time_between_parcels,
+        get_counter_type average_time_between_parcels)
     {
         if (name.empty())
         {
@@ -35,20 +36,22 @@ namespace hpx { namespace plugins { namespace parcel
                 "Cannot register an action with an empty name");
         }
 
-        auto data = hpx::util::make_tuple(num_parcels, num_messages,
-            time_between_parcels);
+        counter_functions data =
+        {
+            num_parcels, num_messages,
+            time_between_parcels, average_time_between_parcels
+        };
+
         auto it = map_.find(name);
         if (it == map_.end())
         {
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-            map_.emplace(name, data);
+            map_.emplace(name, std::move(data));
 #else
-            map_.insert(map_type::value_type(name, data));
+            map_.insert(map_type::value_type(name, std::move(data)));
 #endif
         }
-        else if (util::get<0>((*it).second).empty() &&
-            util::get<1>((*it).second).empty() &&
-            util::get<2>((*it).second).empty())
+        else
         {
             // replace the existing functions
             (*it).second = data;
@@ -57,13 +60,27 @@ namespace hpx { namespace plugins { namespace parcel
 
     void coalescing_counter_registry::register_action(std::string const& name)
     {
-        register_action(name, get_counter_type(), get_counter_type(),
-            get_counter_type());
+        if (name.empty())
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "invocation_count_registry::register_class",
+                "Cannot register an action with an empty name");
+        }
+
+        auto it = map_.find(name);
+        if (it == map_.end())
+        {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+            map_.emplace(name, counter_functions());
+#else
+            map_.insert(map_type::value_type(name, counter_functions()));
+#endif
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     coalescing_counter_registry::get_counter_type
-        coalescing_counter_registry::get_num_parcels_counter(
+        coalescing_counter_registry::get_parcels_counter(
             std::string const& name) const
     {
         map_type::const_iterator it = map_.find(name);
@@ -74,11 +91,11 @@ namespace hpx { namespace plugins { namespace parcel
                 "unknown action type");
             return get_counter_type();
         }
-        return hpx::util::get<0>((*it).second);
+        return (*it).second.num_parcels;
     }
 
     coalescing_counter_registry::get_counter_type
-        coalescing_counter_registry::get_num_messages_counter(
+        coalescing_counter_registry::get_messages_counter(
             std::string const& name) const
     {
         map_type::const_iterator it = map_.find(name);
@@ -89,7 +106,22 @@ namespace hpx { namespace plugins { namespace parcel
                 "unknown action type");
             return get_counter_type();
         }
-        return hpx::util::get<1>((*it).second);
+        return (*it).second.num_messages;
+    }
+
+    coalescing_counter_registry::get_counter_type
+        coalescing_counter_registry::get_parcels_per_message_counter(
+            std::string const& name) const
+    {
+        map_type::const_iterator it = map_.find(name);
+        if (it == map_.end())
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "coalescing_counter_registry::get_num_messages_counter",
+                "unknown action type");
+            return get_counter_type();
+        }
+        return (*it).second.num_parcels_per_message;
     }
 
     coalescing_counter_registry::get_counter_type
@@ -105,7 +137,7 @@ namespace hpx { namespace plugins { namespace parcel
                 "unknown action type");
             return get_counter_type();
         }
-        return hpx::util::get<2>((*it).second);
+        return (*it).second.average_time_between_parcels;
     }
 
     ///////////////////////////////////////////////////////////////////////////

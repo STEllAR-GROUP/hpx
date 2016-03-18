@@ -1176,7 +1176,7 @@ system and application performance.
         [Returns the overall number of currently active components of the
          specified type on the given locality.]
     ]
-    [   [`/runtime/count/action_invocation`]
+    [   [`/runtime/count/action-invocation`]
         [`locality#*/total`
 
           where:[br] `*` is the locality id of the locality the number of
@@ -1192,7 +1192,7 @@ system and application performance.
         [Returns the overall (local) invocation count of the specified action
          type on the given locality.]
     ]
-    [   [`/runtime/count/remote_action_invocation`]
+    [   [`/runtime/count/remote-action-invocation`]
         [`locality#*/total`
 
           where:[br] `*` is the locality id of the locality the number of
@@ -1499,7 +1499,23 @@ system and application performance.
          [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`]
         ]
     ]
-    [   [`/coalescing/count/parcel-arrival`]
+    [   [`/coalescing/count/average-parcels-per-message`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          messages for the given action should be queried for. The
+          locality id is a (zero based) number identifying the locality.]
+        [Returns the average number of of parcels sent in a message generated
+         by the message handler associated with the action which is given by
+         the counter parameter.]
+        [The action type. This is the string which has been used
+         while registering the action with __hpx__, e.g. which has been
+         passed as the second parameter to the macro
+         [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
+         [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`]
+        ]
+    ]
+    [   [`/coalescing/time/average-parcel-arrival`]
         [`locality#*/total`
 
           where:[br] `*` is the locality id of the locality the average time
@@ -1518,9 +1534,9 @@ system and application performance.
 
 [note The performance counters related to parcel coalescing are available only
       if the configuration time constant `HPX_WITH_PARCEL_COALESCING` is set to
-      `ON` (default: ON). However, in this case it will be available only for
-      those actions, which are enabled for parcel coalescing (see
-      [macroref HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW `HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW`]
+      `ON` (default: ON). However, even in this case it will be available only
+      for those actions, which are enabled for parcel coalescing (see the macro
+      [macroref HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW `HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW`]).
 ]
 
 [c++]
