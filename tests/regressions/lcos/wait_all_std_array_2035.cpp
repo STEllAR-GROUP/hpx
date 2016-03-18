@@ -16,9 +16,11 @@
 
 int main()
 {
-   std::array<hpx::shared_future<int>, 1> future_array { hpx::make_ready_future(0) };
-   hpx::wait_all(future_array.cbegin(), future_array.cend());
+    std::array<hpx::shared_future<int>, 1> future_array
+        {{ hpx::make_ready_future(0) }};
 
-   return 0;
+    hpx::wait_all(future_array.cbegin(), future_array.cend());
+
+    return 0;
 }
 #endif
