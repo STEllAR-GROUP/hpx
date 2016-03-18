@@ -61,8 +61,8 @@ namespace hpx { namespace threads { namespace coroutines
         typedef thread_state_ex_enum arg_type;
 
         typedef detail::coroutine_impl impl_type;
-        typedef typename impl_type::pointer impl_ptr;
-        typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
+        typedef impl_type::pointer impl_ptr;
+        typedef impl_type::thread_id_repr_type thread_id_repr_type;
 
         typedef util::unique_function_nonser<
             thread_state_enum(thread_state_ex_enum)

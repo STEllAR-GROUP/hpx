@@ -72,7 +72,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         typedef coroutine_impl impl_type;
         typedef impl_type* impl_ptr; // Note, no reference counting here.
-        typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
+        typedef impl_type::thread_id_repr_type thread_id_repr_type;
 
         typedef util::function_nonser<arg_type(result_type)>
             yield_decorator_type;
