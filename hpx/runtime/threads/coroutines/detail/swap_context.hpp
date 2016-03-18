@@ -26,57 +26,19 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SWAP_CONTEXT_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SWAP_CONTEXT_HPP
 
-// Copyright David Abrahams 2004. Distributed under the Boost
-// Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-// Slightly modified for inclusion on coroutines/detail library.
-#ifndef HPX_COROUTINE_DETAIL_HAS_SWAP_HPP_20060709
-#define HPX_COROUTINE_DETAIL_HAS_SWAP_HPP_20060709
-
-#include <hpx/config.hpp>
-
-#include <boost/mpl/bool.hpp>
-#include <boost/detail/workaround.hpp>
-
-namespace hpx { namespace util { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-namespace has_swap_
-{
-  // any soaks up implicit conversions and makes the following
-  // operator++ less-preferred than any other such operator which
-  // might be found via ADL.
-  struct anything { template <class T> anything(T const&); };
-  struct no_swap
-  {
-      char (& operator,(char) )[2];
-  };
-  no_swap swap(anything,anything);
+    class default_hint {};
+    class yield_hint : public default_hint {};
+    class yield_to_hint : public default_hint {};
+    class invoke_hint : public default_hint {};
 
-#if defined(HPX_MSVC)
-# pragma warning(push)
-# pragma warning(disable: 4675)
-// function found through argument dependent lookup -- duh!
-#endif
-  template <class T>
-  struct has_swap_impl
-  {
-      static T& x;
+    /////////////////////////////////////////////////////////////////////////////
+    // This is the base class of all context implementations
+    struct context_impl_base {};
+}}}}
 
-      HPX_STATIC_CONSTEXPR bool value = sizeof(swap(x,x),'x') == 1;
-
-      typedef boost::mpl::bool_<value> type;
-  };
-}
-template <class T>
-struct has_swap
-  : has_swap_::has_swap_impl<T>::type
-{};
-#if defined(HPX_MSVC)
-# pragma warning(pop)
-#endif
-
-}}}
-
-#endif // include guard
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SWAP_CONTEXT_HPP*/

@@ -11,31 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/coroutine/detail/default_context_impl.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl.hpp>
-
-namespace hpx { namespace util { namespace coroutines
-{
-    /// \cond NOINTERNAL
-    namespace detail
-    {
-        template <typename Coroutine>
-        class coroutine_self;
-
-        template <typename CoroutineImpl>
-        struct coroutine_allocator;
-        template<typename CoroutineType, typename ContextImpl,
-            template <typename> class Heap>
-        class coroutine_impl;
-    }
-
-    template<typename Signature,
-        template <typename> class Heap,
-        typename ContextImpl = detail::default_context_impl>
-    class coroutine;
-    /// \endcond
-}}}
 
 namespace hpx { namespace threads
 {
@@ -53,23 +30,25 @@ namespace hpx { namespace threads
     class HPX_EXPORT executor;
 
     ///////////////////////////////////////////////////////////////////////
-    namespace detail
+    namespace coroutines
     {
-        template <typename CoroutineImpl> struct coroutine_allocator;
+        /// \cond NOINTERNAL
+        namespace detail
+        {
+            class coroutine_self;
+
+            class coroutine_impl;
+        }
+
+        class coroutine;
+        /// \endcond
     }
 
-    typedef util::coroutines::coroutine<
-        thread_function_sig, detail::coroutine_allocator> coroutine_type;
+    typedef coroutines::coroutine coroutine_type;
 
-    typedef util::coroutines::detail::coroutine_self<coroutine_type>
-        thread_self;
-    typedef
-        util::coroutines::detail::coroutine_impl<
-            coroutine_type
-            , util::coroutines::detail::default_context_impl
-            , detail::coroutine_allocator
-        >
-        thread_self_impl_type;
+    typedef coroutines::detail::coroutine_self thread_self;
+    typedef coroutines::detail::coroutine_impl thread_self_impl_type;
+
     typedef void * thread_id_repr_type;
 
     typedef boost::intrusive_ptr<thread_data> thread_id_type;

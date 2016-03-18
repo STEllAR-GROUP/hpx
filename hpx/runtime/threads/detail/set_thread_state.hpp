@@ -11,12 +11,12 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>
 
