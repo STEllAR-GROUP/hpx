@@ -111,7 +111,7 @@
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     typedef generic_context::context_impl default_context_impl;
-}}}
+}}}}
 
 #else
 #error Boost.Context is available only with Boost V1.51 or later
