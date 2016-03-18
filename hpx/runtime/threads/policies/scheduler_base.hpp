@@ -15,7 +15,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/util/coroutine/detail/tss.hpp>
+#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #endif
@@ -310,7 +310,7 @@ namespace hpx { namespace threads { namespace policies
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:
-        util::coroutines::detail::tss_data_node* find_tss_data(void const* key)
+        coroutines::detail::tss_data_node* find_tss_data(void const* key)
         {
             if (!thread_data_)
                 return 0;
@@ -318,13 +318,13 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void add_new_tss_node(void const* key,
-            boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>
+            boost::shared_ptr<coroutines::detail::tss_cleanup_function>
                 const& func, void* tss_data)
         {
             if (!thread_data_)
             {
                 thread_data_ =
-                    boost::make_shared<util::coroutines::detail::tss_storage>();
+                    boost::make_shared<coroutines::detail::tss_storage>();
             }
             thread_data_->insert(key, func, tss_data);
         }
@@ -337,7 +337,7 @@ namespace hpx { namespace threads { namespace policies
 
         void* get_tss_data(void const* key)
         {
-            if (util::coroutines::detail::tss_data_node* const current_node =
+            if (coroutines::detail::tss_data_node* const current_node =
                     find_tss_data(key))
             {
                 return current_node->get_value();
@@ -346,10 +346,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void set_tss_data(void const* key,
-            boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>
+            boost::shared_ptr<coroutines::detail::tss_cleanup_function>
                 const& func, void* tss_data, bool cleanup_existing)
         {
-            if (util::coroutines::detail::tss_data_node* const current_node =
+            if (coroutines::detail::tss_data_node* const current_node =
                     find_tss_data(key))
             {
                 if (func || (tss_data != 0))
@@ -364,7 +364,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     protected:
-        boost::shared_ptr<util::coroutines::detail::tss_storage> thread_data_;
+        boost::shared_ptr<coroutines::detail::tss_storage> thread_data_;
 #endif
     };
 }}}

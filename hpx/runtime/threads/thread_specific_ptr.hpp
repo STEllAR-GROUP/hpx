@@ -23,13 +23,13 @@ namespace hpx { namespace threads
     class thread_specific_ptr
     {
     private:
-        typedef util::coroutines::detail::tss_cleanup_function cleanup_function;
+        typedef coroutines::detail::tss_cleanup_function cleanup_function;
 
         thread_specific_ptr(thread_specific_ptr&);
         thread_specific_ptr& operator=(thread_specific_ptr&);
 
         struct delete_data
-          : util::coroutines::detail::tss_cleanup_function
+          : coroutines::detail::tss_cleanup_function
         {
             void operator()(void* data)
             {
@@ -38,7 +38,7 @@ namespace hpx { namespace threads
         };
 
         struct run_custom_cleanup_function
-          : util::coroutines::detail::tss_cleanup_function
+          : coroutines::detail::tss_cleanup_function
         {
             explicit run_custom_cleanup_function(void (*cleanup_function_)(T*)):
                 cleanup_function(cleanup_function_)
@@ -71,12 +71,12 @@ namespace hpx { namespace threads
         {
             // clean up data if this type is used locally for one thread
             if (get_self_ptr())
-                util::coroutines::detail::erase_tss_node(this, true);
+                coroutines::detail::erase_tss_node(this, true);
         }
 
         T* get() const
         {
-            return static_cast<T*>(util::coroutines::detail::get_tss_data(this));
+            return static_cast<T*>(coroutines::detail::get_tss_data(this));
         }
 
         T* operator->() const
@@ -92,7 +92,7 @@ namespace hpx { namespace threads
         T* release()
         {
             T* const temp = get();
-            util::coroutines::detail::set_tss_data(
+            coroutines::detail::set_tss_data(
                 this, boost::shared_ptr<cleanup_function>());
             return temp;
         }
@@ -101,7 +101,7 @@ namespace hpx { namespace threads
             T* const current_value = get();
             if (current_value != new_value)
             {
-                util::coroutines::detail::set_tss_data(
+                coroutines::detail::set_tss_data(
                     this, cleanup_, new_value, true);
             }
         }

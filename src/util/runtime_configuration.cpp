@@ -59,7 +59,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__)\
          || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     namespace posix
     {
@@ -451,7 +451,8 @@ namespace hpx { namespace util
         huge_stacksize = init_huge_stack_size();
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
+        threads::coroutines::detail::posix::use_guard_pages =
+            init_use_stack_guard_pages();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
@@ -511,7 +512,8 @@ namespace hpx { namespace util
         huge_stacksize = init_huge_stack_size();
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
+        threads::coroutines::detail::posix::use_guard_pages =
+            init_use_stack_guard_pages();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())

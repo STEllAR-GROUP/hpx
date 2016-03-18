@@ -26,30 +26,31 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COROUTINE_DETAIL_SIGNATURE_HPP_20060609
-#define HPX_COROUTINE_DETAIL_SIGNATURE_HPP_20060609
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
 
-#include <boost/mpl/vector.hpp>
-
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-  /*
-   * Derived from an  mpl::vector describing
-   * 'Function' arguments types.
-   */
-    template <typename Function>
-    struct signature;
+    struct coroutine_accessor
+    {
+        template <typename Coroutine>
+        static void acquire(Coroutine& x)
+        {
+            x.acquire();
+        }
 
-    template <typename R>
-    struct signature<R()>
-      : boost::mpl::vector0<>
-    {};
+        template <typename Coroutine>
+        static void release(Coroutine& x)
+        {
+            x.release();
+        }
 
-    template <typename R, typename A0>
-    struct signature<R(A0)>
-      : boost::mpl::vector1<A0>
-    {};
-
+        template <typename Coroutine>
+        static typename Coroutine::impl_ptr get_impl(Coroutine& x)
+        {
+            return x.get_impl();
+        }
+    };
 }}}}
 
-#endif
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP*/

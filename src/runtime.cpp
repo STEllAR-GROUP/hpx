@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>
@@ -518,20 +518,20 @@ namespace hpx
         // initialize our TSS
         if (NULL == runtime::runtime_.get())
         {
-            HPX_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
+            HPX_ASSERT(NULL == threads::thread_self::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
             runtime::uptime_.reset(new boost::uint64_t);
             *runtime::uptime_.get() = util::high_resolution_clock::now();
 
-            threads::coroutine_type::impl_type::init_self();
+            threads::thread_self::init_self();
         }
     }
 
     void runtime::deinit_tss()
     {
         // reset our TSS
-        threads::coroutine_type::impl_type::reset_self();
+        threads::thread_self::reset_self();
         runtime::uptime_.reset();
         runtime::runtime_.reset();
         util::reset_held_lock_data();

@@ -6,19 +6,17 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COROUTINE_CONTEXT_GENERIC_SEP_01_2012_0519PM)
-#define HPX_COROUTINE_CONTEXT_GENERIC_SEP_01_2012_0519PM
+#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP
+#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/config/forceinline.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/coroutine/detail/config.hpp>
-#include <hpx/util/coroutine/detail/get_stack_pointer.hpp>
-#include <hpx/util/coroutine/exception.hpp>
-#include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
 
 #if defined(_POSIX_VERSION)
-#include <hpx/util/coroutine/detail/posix_utility.hpp>
+#include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
 #include <hpx/util/get_and_reset_value.hpp>
@@ -65,7 +63,7 @@ extern "C"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace coroutines
+namespace hpx { namespace threads { namespace coroutines
 {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
@@ -245,20 +243,20 @@ namespace hpx { namespace util { namespace coroutines
             static void thread_shutdown() {}
 
             // handle stack operations
-            HPX_COROUTINE_EXPORT void reset_stack();
-            HPX_COROUTINE_EXPORT void rebind_stack();
+            HPX_EXPORT void reset_stack();
+            HPX_EXPORT void rebind_stack();
 
             typedef boost::atomic<boost::int64_t> counter_type;
 
-            HPX_COROUTINE_EXPORT static counter_type& get_stack_unbind_counter();
-            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_unbind_count(bool
+            HPX_EXPORT static counter_type& get_stack_unbind_counter();
+            HPX_EXPORT static boost::uint64_t get_stack_unbind_count(bool
                 reset);
-            HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_unbind_count();
+            HPX_EXPORT static boost::uint64_t increment_stack_unbind_count();
 
-            HPX_COROUTINE_EXPORT static counter_type& get_stack_recycle_counter();
-            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_recycle_count(bool
+            HPX_EXPORT static counter_type& get_stack_recycle_counter();
+            HPX_EXPORT static boost::uint64_t get_stack_recycle_count(bool
                 reset);
-            HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_recycle_count();
+            HPX_EXPORT static boost::uint64_t increment_stack_recycle_count();
 
         private:
             friend void swap_context(fcontext_context_impl& from,
@@ -293,4 +291,4 @@ namespace hpx { namespace util { namespace coroutines
     }}
 }}}
 
-#endif
+#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP*/

@@ -223,6 +223,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the default number of coroutine heaps.
+#if !defined(HPX_COROUTINE_NUM_HEAPS)
+#  define HPX_COROUTINE_NUM_HEAPS 7
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the parent thread information in debug builds
 /// only.
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)

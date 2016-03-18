@@ -11,7 +11,6 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
 // #if HPX_DEBUG
 // #  define HPX_DEBUG_THREAD_POOL 1
@@ -118,25 +117,26 @@ namespace hpx { namespace threads
 
     thread_self* get_self_ptr()
     {
-        return thread_self::impl_type::get_self();
+        return thread_self::get_self();
     }
 
     namespace detail
     {
         void set_self_ptr(thread_self* self)
         {
-            thread_self::impl_type::set_self(self);
+            thread_self::set_self(self);
         }
     }
 
     thread_self::impl_type* get_ctx_ptr()
     {
-        return hpx::util::coroutines::detail::coroutine_accessor::get_impl(get_self());
+        using hpx::threads::coroutines::detail::coroutine_accessor;
+        return coroutine_accessor::get_impl(get_self());
     }
 
     thread_self* get_self_ptr_checked(error_code& ec)
     {
-        thread_self* p = thread_self::impl_type::get_self();
+        thread_self* p = thread_self::get_self();
 
         if (HPX_UNLIKELY(!p))
         {
@@ -215,17 +215,3 @@ namespace hpx { namespace threads
 #endif
     }
 }}
-
-///////////////////////////////////////////////////////////////////////////////
-// explicit instantiation of the thread_self functions
-template HPX_EXPORT void
-hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
-
-template HPX_EXPORT hpx::threads::thread_self*
-hpx::threads::thread_self::impl_type::get_self();
-
-template HPX_EXPORT void
-hpx::threads::thread_self::impl_type::init_self();
-
-template HPX_EXPORT void
-hpx::threads::thread_self::impl_type::reset_self();
