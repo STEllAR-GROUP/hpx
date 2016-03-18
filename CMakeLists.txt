@@ -16,6 +16,7 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 cmake_policy(VERSION 2.8.12)
 if(NOT(CMAKE_VERSION VERSION_LESS 3.1.0))
   cmake_policy(SET CMP0054 OLD)
+  cmake_policy(SET CMP0042 NEW)
 endif()
 
 # Overrides must go before the project() statement, otherwise they are ignored.
