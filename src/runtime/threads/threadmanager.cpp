@@ -281,7 +281,7 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        typedef scheduling_policy_type spt;
+        typedef detail::thread_pool<scheduling_policy_type> spt;
 
         using util::placeholders::_1;
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
@@ -296,7 +296,7 @@ namespace hpx { namespace threads
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < threads_.size())
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
         {
             policies::maintain_queue_wait_times = true;
 
@@ -334,7 +334,7 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        typedef scheduling_policy_type spt;
+        typedef detail::thread_pool<scheduling_policy_type> spt;
 
         using util::placeholders::_1;
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
@@ -349,7 +349,7 @@ namespace hpx { namespace threads
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < threads_.size())
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
         {
             policies::maintain_queue_wait_times = true;
 
