@@ -110,6 +110,7 @@ add_hpx_test(
 
 # compile only tests
 set(compile_tests
+    future_range_ambiguity_2032
     wait_all_std_array_2035
    )
 
