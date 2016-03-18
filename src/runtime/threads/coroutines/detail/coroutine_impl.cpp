@@ -73,8 +73,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
     void coroutine_impl::operator()()
     {
-        typedef typename super_type::context_exit_status
-            context_exit_status;
+        typedef super_type::context_exit_status context_exit_status;
         context_exit_status status = super_type::ctx_exited_return;
 
         // loop as long this coroutine has been rebound
