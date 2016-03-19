@@ -31,9 +31,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
               : var_(var), curr_(var)
             {}
 
-            void init_iteration(std::size_t index) HPX_NOEXCEPT
+            T const& init_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(var_, index);
+                return curr_;
             }
 
             T const& iteration_value() const HPX_NOEXCEPT
@@ -41,13 +42,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 return curr_;
             }
 
-            void next_iteration() HPX_NOEXCEPT
+            T const& next_iteration() HPX_NOEXCEPT
             {
-                ++curr_;
+                return ++curr_;
             }
 
-            void exit_iteration(std::size_t /*index*/) HPX_NOEXCEPT
+            T const& exit_iteration(std::size_t /*index*/) HPX_NOEXCEPT
             {
+                return curr_;
             }
 
         private:
@@ -62,9 +64,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
               : live_out_var_(var), var_(var), curr_(var)
             {}
 
-            void init_iteration(std::size_t index) HPX_NOEXCEPT
+            T const& init_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(var_, index);
+                return curr_;
             }
 
             T const& iteration_value() const HPX_NOEXCEPT
@@ -72,15 +75,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 return curr_;
             }
 
-            void next_iteration() HPX_NOEXCEPT
+            T const& next_iteration() HPX_NOEXCEPT
             {
-                ++curr_;
+                return ++curr_;
             }
 
-            void exit_iteration(std::size_t index) HPX_NOEXCEPT
+            T const& exit_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 live_out_var_ = parallel::v1::detail::next(
                     live_out_var_, index);
+                return live_out_var_;
             }
 
         private:
@@ -97,9 +101,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
               : var_(var), curr_(var), stride_(stride)
             {}
 
-            void init_iteration(std::size_t index) HPX_NOEXCEPT
+            T const& init_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(var_, stride_*index);
+                return curr_;
             }
 
             T const& iteration_value() const HPX_NOEXCEPT
@@ -107,13 +112,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 return curr_;
             }
 
-            void next_iteration() HPX_NOEXCEPT
+            T const& next_iteration() HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(curr_, stride_);
+                return curr_;
             }
 
-            void exit_iteration(std::size_t /*index*/) HPX_NOEXCEPT
+            T const& exit_iteration(std::size_t /*index*/) HPX_NOEXCEPT
             {
+                return curr_;
             }
 
         private:
@@ -129,9 +136,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
               : live_out_var_(var), var_(var), curr_(var), stride_(stride)
             {}
 
-            void init_iteration(std::size_t index) HPX_NOEXCEPT
+            T const& init_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(var_, stride_*index);
+                return curr_;
             }
 
             T const& iteration_value() const HPX_NOEXCEPT
@@ -139,15 +147,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 return curr_;
             }
 
-            void next_iteration() HPX_NOEXCEPT
+            T const& next_iteration() HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(curr_, stride_);
+                return curr_;
             }
 
-            void exit_iteration(std::size_t index) HPX_NOEXCEPT
+            T const& exit_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 live_out_var_ = parallel::v1::detail::next(
                     live_out_var_, stride_*index);
+                return live_out_var_;
             }
 
         private:

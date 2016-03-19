@@ -14,10 +14,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/util/unused.hpp>
 #include <hpx/components/process/util/windows/child.hpp>
+#include <windows.h>
 
 namespace hpx { namespace components { namespace process { namespace windows {
+
+namespace detail
+{
+    template <typename ... Ts>
+    void sequencer(Ts&& ... t) {}
+}
 
 struct executor
 {
@@ -52,9 +58,10 @@ struct executor
         call_on_CreateProcess_setup(executor &e) : e_(e) {}
 
         template <class Arg>
-        void operator()(Arg& arg) const
+        int operator()(Arg& arg) const
         {
             arg.on_CreateProcess_setup(e_);
+            return 0;
         }
     };
 
@@ -65,9 +72,10 @@ struct executor
         call_on_CreateProcess_error(executor &e) : e_(e) {}
 
         template <class Arg>
-        void operator()(Arg& arg) const
+        int operator()(Arg& arg) const
         {
             arg.on_CreateProcess_error(e_);
+            return 0;
         }
     };
 
@@ -78,19 +86,17 @@ struct executor
         call_on_CreateProcess_success(executor &e) : e_(e) {}
 
         template <class Arg>
-        void operator()(Arg& arg) const
+        int operator()(Arg& arg) const
         {
             arg.on_CreateProcess_success(e_);
+            return 0;
         }
     };
 
     template <typename ... Ts>
     child operator()(Ts &&... ts)
     {
-        int const setup_sequencer[] = {
-            (call_on_CreateProcess_setup(*this)(ts), 0)..., 0
-        };
-        HPX_UNUSED(setup_sequencer);
+        detail::sequencer(call_on_CreateProcess_setup(*this)(ts)...);
 
         if (!::CreateProcess(
             exe,
@@ -104,17 +110,11 @@ struct executor
             &startup_info,
             &proc_info))
         {
-            int const error_sequencer[] = {
-                (call_on_CreateProcess_error(*this)(ts), 0)..., 0
-            };
-            HPX_UNUSED(error_sequencer);
+            detail::sequencer(call_on_CreateProcess_error(*this)(ts)...);
         }
         else
         {
-            int const success_sequencer[] = {
-                (call_on_CreateProcess_success(*this)(ts), 0)..., 0
-            };
-            HPX_UNUSED(success_sequencer);
+            detail::sequencer(call_on_CreateProcess_success(*this)(ts)...);
         }
 
         return child(proc_info);
