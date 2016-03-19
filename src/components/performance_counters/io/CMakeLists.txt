@@ -16,7 +16,7 @@ if(HPX_WITH_IO_COUNTERS)
       PLUGIN)
   endif()
 
-  add_hpx_pseudo_dependencies(components.performance_counters.io
+  add_hpx_pseudo_dependencies(components.performance_counters_.io
     io_counters_component)
-  add_hpx_pseudo_dependencies(core components.performance_counters.io)
+  add_hpx_pseudo_dependencies(core components.performance_counters_.io)
 endif()

@@ -12,6 +12,6 @@ add_hpx_component(process
     HEADER_ROOT ${root}
     AUTOGLOB)
 
-add_hpx_pseudo_dependencies(components.process process_component)
-add_hpx_pseudo_dependencies(core components.process)
+add_hpx_pseudo_dependencies(components.process_ process_component)
+add_hpx_pseudo_dependencies(core components.process_)
 

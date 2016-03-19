@@ -28,8 +28,8 @@ if(HPX_WITH_PAPI)
       PLUGIN)
   endif()
 
-  add_hpx_pseudo_dependencies(components.performance_counters.papi
+  add_hpx_pseudo_dependencies(components.performance_counters_.papi
     papi_counters_component)
-  add_hpx_pseudo_dependencies(core components.performance_counters.papi)
+  add_hpx_pseudo_dependencies(core components.performance_counters_.papi)
 
 endif()
