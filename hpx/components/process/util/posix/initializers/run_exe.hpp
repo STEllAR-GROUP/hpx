@@ -44,7 +44,7 @@ public:
     {
         e.exe = s_.c_str();
         if (!e.cmd_line)
-            e.cmd_line = cmd_line_;
+            e.cmd_line = const_cast<char**>(cmd_line_);
     }
 
 private:

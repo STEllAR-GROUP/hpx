@@ -112,7 +112,7 @@ struct executor
         else if (pid == 0)
         {
             int const setup_sequencer[] = {
-                (call_on_fork_setup(*this)(ts), 0)..., 0
+                (call_on_exec_setup(*this)(ts), 0)..., 0
             };
             HPX_UNUSED(setup_sequencer);
             ::execve(exe, cmd_line, env);

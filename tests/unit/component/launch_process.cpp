@@ -68,8 +68,7 @@ int main(int argc, char* argv[])
     env.push_back("HPX_AGAS_SERVER_ADDRESS=" +
         hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS));
     env.push_back("HPX_AGAS_SERVER_PORT=" +
-        hpx::get_config_entry("hpx.agas.port",
-            boost::lexical_cast<std::string>(HPX_INITIAL_IP_PORT)));
+        boost::lexical_cast<std::string>(HPX_INITIAL_IP_PORT));
 
     // Pass along the parcelport address which should be used by the launched
     // executable
@@ -109,8 +108,8 @@ int main(int argc, char* argv[])
     }
 
     // wait for it to exit, we know it returns 42
-    boost::uint32_t exit_code = c.wait_for_exit_sync();
-    HPX_TEST_EQ(exit_code, boost::uint32_t(42));
+    int exit_code = c.wait_for_exit_sync();
+    HPX_TEST_EQ(exit_code, 42);
 
     // the new locality should have disconnected now
     {

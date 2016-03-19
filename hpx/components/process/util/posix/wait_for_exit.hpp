@@ -18,13 +18,15 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include <iostream>
+
 namespace hpx { namespace components { namespace process { namespace posix {
 
 template <class Process>
 inline int wait_for_exit(const Process &p)
 {
     pid_t ret;
-    int status;
+    int status = 0;
     do
     {
         ret = ::waitpid(p.pid, &status, 0);
@@ -35,7 +37,7 @@ inline int wait_for_exit(const Process &p)
         HPX_THROW_EXCEPTION(invalid_status,
             "process::wait_for_exit", "waitpid(2) failed");
     }
-    return status;
+    return WEXITSTATUS(status);
 }
 
 template <class Process>
@@ -56,8 +58,9 @@ inline int wait_for_exit(const Process &p, hpx::error_code &ec)
     else
     {
         ec = hpx::make_success_code();
+        return -1;
     }
-    return status;
+    return WEXITSTATUS(status);
 }
 
 }}}}

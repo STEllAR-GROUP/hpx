@@ -15,7 +15,7 @@ set(tests
     inheritance_3_classes_1_abstract
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
-#    launch_process
+    launch_process
     migrate_component
     migrate_component_to_storage
     new_
@@ -31,11 +31,11 @@ set(tests
    )
 
 # add executable needed for launch_process_test
-#add_hpx_executable(launched_process_test
-#  SOURCES launched_process.cpp
-#  EXCLUDE_FROM_ALL
-#  HPX_PREFIX ${HPX_BUILD_PREFIX}
-#  FOLDER "Tests/Unit/Components")
+add_hpx_executable(launched_process_test
+  SOURCES launched_process.cpp
+  EXCLUDE_FROM_ALL
+  HPX_PREFIX ${HPX_BUILD_PREFIX}
+  FOLDER "Tests/Unit/Components")
 
 set(action_invoke_no_more_than_PARAMETERS
     LOCALITIES 2
@@ -128,5 +128,5 @@ foreach(test ${tests})
 
 endforeach()
 
-#add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
+add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
 

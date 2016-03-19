@@ -48,7 +48,7 @@ public:
     template <class PosixExecutor>
     void on_exec_setup(PosixExecutor &e) const
     {
-        e.cmd_line = args_.data();
+        e.cmd_line = const_cast<char**>(args_.data());
         if (!e.exe && *args_[0])
             e.exe = args_[0];
     }
