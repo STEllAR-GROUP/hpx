@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
     std::vector<std::string> args;
     args.push_back(exe.string());
     args.push_back("--exit_code=42");
+    args.push_back("--hpx:ignore-batch-env");
 
     // set up environment for launched executable
     std::vector<std::string> env = get_environment();   // current environment
