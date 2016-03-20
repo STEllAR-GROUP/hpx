@@ -42,16 +42,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename ... Ts>
+        void sequencer(Ts&& ... t) {}
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename ... Ts, std::size_t ... Is>
         HPX_FORCEINLINE void init_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t part_index)
         {
-            int _sequencer[] =
-            {
-                (hpx::util::get<Is>(args).init_iteration(part_index), 0)..., 0
-            };
-            HPX_UNUSED(_sequencer);
+            sequencer(hpx::util::get<Is>(args).init_iteration(part_index)...);
         }
 
         template <typename ... Ts, std::size_t ... Is, typename F, typename B>
@@ -66,11 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         HPX_FORCEINLINE void next_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
-            int _sequencer[] =
-            {
-                (hpx::util::get<Is>(args).next_iteration(), 0)..., 0
-            };
-            HPX_UNUSED(_sequencer);
+            sequencer(hpx::util::get<Is>(args).next_iteration()...);
         }
 
         template <typename ... Ts, std::size_t ... Is>
@@ -78,11 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t size)
         {
-            int _sequencer[] =
-            {
-                (hpx::util::get<Is>(args).exit_iteration(size), 0)..., 0
-            };
-            HPX_UNUSED(_sequencer);
+            sequencer(hpx::util::get<Is>(args).exit_iteration(size)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -98,10 +90,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             sequential(ExPolicy policy, B first, E last, S stride, F && f,
                 Args &&... args)
             {
-                int init_sequencer[] = {
-                    ( args.init_iteration(0), 0 )..., 0
-                };
-                HPX_UNUSED(init_sequencer);
+                sequencer(args.init_iteration(0)...);
 
                 std::size_t size = parallel::v1::detail::distance(first, last);
 
@@ -110,10 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
-                    int next_sequencer[] = {
-                        ( args.next_iteration(), 0 )..., 0
-                    };
-                    HPX_UNUSED(next_sequencer);
+                    sequencer(args.next_iteration()...);
 
                     // modifies stride
                     first = parallel::v1::detail::next(first, count, stride);
@@ -121,10 +107,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
                 // make sure live-out variables are properly set on
                 // return
-                int exit_sequencer[] = {
-                    ( args.exit_iteration(size), 0 )..., 0
-                };
-                HPX_UNUSED(exit_sequencer);
+                sequencer(args.exit_iteration(size)...);
 
                 return hpx::util::unused;
             }

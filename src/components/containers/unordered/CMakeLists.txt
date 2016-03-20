@@ -12,5 +12,5 @@ add_hpx_component(unordered
   AUTOGLOB
   ESSENTIAL)
 
-add_hpx_pseudo_dependencies(components.containers.unordered unordered_component)
+add_hpx_pseudo_dependencies(components.containers_.unordered unordered_component)
 

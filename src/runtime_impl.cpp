@@ -21,6 +21,7 @@
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/lcos/latch.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
@@ -258,6 +259,17 @@ namespace hpx {
 
             error_code ec(lightweight);     // ignore errors
             evaluate_active_counters(reset, "startup", ec);
+        }
+
+        // Connect back to given latch if specified
+        std::string connect_back_to(
+            get_config_entry("hpx.on_startup.wait_on_latch", ""));
+        if (!connect_back_to.empty())
+        {
+            // inform launching process that this locality is up and running
+            hpx::lcos::latch l;
+            l.connect_to(connect_back_to);
+            l.count_down_and_wait();
         }
 
         // Now, execute the user supplied thread function (hpx_main)

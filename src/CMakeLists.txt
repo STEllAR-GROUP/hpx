@@ -53,7 +53,8 @@ set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
 
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
-    set(switch_to_fiber_source "${PROJECT_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
+    set(switch_to_fiber_source
+      "${PROJECT_SOURCE_DIR}/src/runtime/threads/coroutines/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")
     add_custom_command(

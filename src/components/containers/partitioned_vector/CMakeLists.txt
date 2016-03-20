@@ -13,5 +13,5 @@ add_hpx_component(partitioned_vector
   ESSENTIAL)
 
 add_hpx_pseudo_dependencies(
-    components.containers.partitioned_vector partitioned_vector_component)
+    components.containers_.partitioned_vector partitioned_vector_component)
 

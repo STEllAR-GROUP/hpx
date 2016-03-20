@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2016 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2013 Jeroen Habraken
 #
@@ -9,21 +9,15 @@ set(subdirs
     component_storage
     containers
     iostreams
-    memory
-    papi_counters
+    performance_counters
+    process
     security
    )
-
-if(HPX_WITH_IO_COUNTERS)
-  set(subdirs ${subdirs}
-      io_counters
-     )
-endif()
 
 add_hpx_pseudo_target(components)
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(components.${subdir})
+  add_hpx_pseudo_target(components.${subdir}_)
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(components components.${subdir})
+  add_hpx_pseudo_dependencies(components components.${subdir}_)
 endforeach()

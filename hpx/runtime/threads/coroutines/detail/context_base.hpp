@@ -405,22 +405,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 #endif
 
-        // Throws: exit_exception.
-        void yield_to(context_base& to)
-        {
-            HPX_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loops
-            HPX_ASSERT(m_state == ctx_running);
-            HPX_ASSERT(to.is_ready());
-            HPX_ASSERT(!to.pending());
-
-            std::swap(m_caller, to.m_caller);
-            std::swap(m_state, to.m_state);
-            swap_context(*this, to, detail::yield_to_hint());
-
-            HPX_ASSERT(m_state == ctx_running);
-            check_exit_state();
-        }
-
         // Cause this coroutine to exit.
         // Can only be called on a ready coroutine.
         // Cannot be called if there are pending operations.
