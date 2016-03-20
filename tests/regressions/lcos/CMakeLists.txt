@@ -107,3 +107,34 @@ add_hpx_test(
   EXECUTABLE after_588
   LOCALITIES 2
   THREADS_PER_LOCALITY 4)
+
+# compile only tests
+set(compile_tests
+    wait_all_std_array_2035
+   )
+
+foreach(compile_test ${compile_tests})
+  set(sources
+      ${compile_test}.cpp)
+
+  source_group("Source Files" FILES ${sources})
+
+  add_hpx_unit_compile_test(
+    "lcos_regressions"
+    ${compile_test}
+    SOURCES ${sources}
+    ${${compile_test}_FLAGS}
+    FOLDER "Tests/Regressions/LCOs/CompileOnly")
+
+    # add a custom target for this example
+    add_hpx_pseudo_target(tests.regressions.lcos_dir.${compile_test})
+
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(tests.regressions.lcos_dir
+      tests.regressions.lcos_dir.${compile_test})
+
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(tests.regressions.lcos_dir.${compile_test}
+      "tests.regressions.lcos_dir.${compile_test}")
+
+endforeach()
