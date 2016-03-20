@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
 namespace detail
 {
     template <typename ... Ts>
-    void sequencer(Ts&& ... t) {}
+    void swallow(Ts&& ... t) {}
 }
 
 struct executor
@@ -96,7 +96,7 @@ struct executor
     template <typename ... Ts>
     child operator()(Ts &&... ts)
     {
-        detail::sequencer(call_on_CreateProcess_setup(*this)(ts)...);
+        detail::swallow(call_on_CreateProcess_setup(*this)(ts)...);
 
         if (!::CreateProcess(
             exe,
@@ -110,11 +110,11 @@ struct executor
             &startup_info,
             &proc_info))
         {
-            detail::sequencer(call_on_CreateProcess_error(*this)(ts)...);
+            detail::swallow(call_on_CreateProcess_error(*this)(ts)...);
         }
         else
         {
-            detail::sequencer(call_on_CreateProcess_success(*this)(ts)...);
+            detail::swallow(call_on_CreateProcess_success(*this)(ts)...);
         }
 
         return child(proc_info);

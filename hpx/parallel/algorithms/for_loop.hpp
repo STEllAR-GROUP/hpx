@@ -43,7 +43,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ... Ts>
-        void sequencer(Ts&& ... t) {}
+        void swallow(Ts&& ... t) {}
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ... Ts, std::size_t ... Is>
@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t part_index)
         {
-            sequencer(hpx::util::get<Is>(args).init_iteration(part_index)...);
+            swallow(hpx::util::get<Is>(args).init_iteration(part_index)...);
         }
 
         template <typename ... Ts, std::size_t ... Is, typename F, typename B>
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         HPX_FORCEINLINE void next_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
-            sequencer(hpx::util::get<Is>(args).next_iteration()...);
+            swallow(hpx::util::get<Is>(args).next_iteration()...);
         }
 
         template <typename ... Ts, std::size_t ... Is>
@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t size)
         {
-            sequencer(hpx::util::get<Is>(args).exit_iteration(size)...);
+            swallow(hpx::util::get<Is>(args).exit_iteration(size)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             sequential(ExPolicy policy, B first, E last, S stride, F && f,
                 Args &&... args)
             {
-                sequencer(args.init_iteration(0)...);
+                swallow(args.init_iteration(0)...);
 
                 std::size_t size = parallel::v1::detail::distance(first, last);
 
@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
-                    sequencer(args.next_iteration()...);
+                    swallow(args.next_iteration()...);
 
                     // modifies stride
                     first = parallel::v1::detail::next(first, count, stride);
@@ -107,7 +107,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
                 // make sure live-out variables are properly set on
                 // return
-                sequencer(args.exit_iteration(size)...);
+                swallow(args.exit_iteration(size)...);
 
                 return hpx::util::unused;
             }
