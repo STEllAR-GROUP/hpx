@@ -114,7 +114,6 @@ namespace hpx { namespace util { namespace plugin {
             {
                 if (NULL != h_)
                 {
-                    dll::initialize_mutex();
                     boost::lock_guard<boost::mutex> lock(dll::mutex_instance());
 
                     dll::deinit_library(h_);
@@ -208,7 +207,6 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            initialize_mutex();
             boost::lock_guard<boost::mutex> lock(mutex_instance());
 
             static_assert(
@@ -273,7 +271,6 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                initialize_mutex();
                 boost::lock_guard<boost::mutex> lock(mutex_instance());
 
                 ::dlerror();                // Clear the error state.
@@ -356,7 +353,6 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (NULL != dll_handle)
             {
-                initialize_mutex();
                 boost::lock_guard<boost::mutex> lock(mutex_instance());
 
                 deinit_library(dll_handle);
@@ -365,20 +361,11 @@ namespace hpx { namespace util { namespace plugin {
             }
         }
 
-    // protect access to dl... functions
+        // protect access to dl... functions
         static boost::mutex &mutex_instance()
         {
             static boost::mutex mutex;
             return mutex;
-        }
-        static void mutex_init()
-        {
-            mutex_instance();
-        }
-        static void initialize_mutex()
-        {
-            static boost::once_flag been_here = BOOST_ONCE_INIT;
-            boost::call_once(mutex_init, been_here);
         }
 
     private:
