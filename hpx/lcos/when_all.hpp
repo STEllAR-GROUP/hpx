@@ -382,7 +382,12 @@ namespace hpx { namespace lcos
 
     template <typename Iterator, typename Container =
         std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 needs special help
+    typename boost::enable_if<traits::is_future_range<Container>,
+        lcos::future<Container> >::type
+#else
     lcos::future<Container>
+#endif
     when_all(Iterator begin, Iterator end)
     {
         Container values;
