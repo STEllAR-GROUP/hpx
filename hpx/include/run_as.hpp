@@ -7,5 +7,6 @@
 #define HPX_RUN_AS_MAR_12_2016_0227PM
 
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
+#include <hpx/runtime/threads/run_as_os_thread.hpp>
 
 #endif

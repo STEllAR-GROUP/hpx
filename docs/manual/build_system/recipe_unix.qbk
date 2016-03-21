@@ -43,7 +43,7 @@
 ``
 
 [caution Compiling and linking __hpx__ needs a considerable amount of memory. It is advisable that
-    approximately 2 GB of memory per parallel process is available.]
+    at least 2 GB of memory per parallel process is available.]
 
 [note Many Linux distributions use `make` as an alias for `gmake`]
 

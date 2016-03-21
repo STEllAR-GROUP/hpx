@@ -41,7 +41,7 @@
 
 /*
  * Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
- * invoke, yield and yield_to swap_context functions. Separate calls sites
+ * invoke, and yield swap_context functions. Separate calls sites
  * increase performance by 25% at least on P4 for invoke+yield back loops
  * at the cost of a slightly higher instruction cache use and is thus enabled by
  * default.
@@ -128,9 +128,6 @@ namespace hpx { namespace threads { namespace coroutines
 
             friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_hint);
-
-            friend void swap_context(x86_linux_context_impl_base& from,
-                x86_linux_context_impl_base const& to, yield_to_hint);
 
         protected:
             void ** m_sp;
@@ -286,9 +283,6 @@ namespace hpx { namespace threads { namespace coroutines
             friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_hint);
 
-            friend void swap_context(x86_linux_context_impl_base& from,
-                x86_linux_context_impl_base const& to, yield_to_hint);
-
             // global functions to be called for each OS-thread after it started
             // running and before it exits
             static void thread_startup(char const* /*thread_type*/)
@@ -376,18 +370,6 @@ namespace hpx { namespace threads { namespace coroutines
             to.prefetch();
 #ifndef HPX_COROUTINE_NO_SEPARATE_CALL_SITES
             swapcontext_stack2(&from.m_sp, to.m_sp);
-#else
-            swapcontext_stack(&from.m_sp, to.m_sp);
-#endif
-        }
-
-        inline void swap_context(x86_linux_context_impl_base& from,
-            x86_linux_context_impl_base const& to, yield_to_hint)
-        {
-            //        HPX_ASSERT(*(void**)from.m_stack == (void*)~0);
-            to.prefetch();
-#ifndef HPX_COROUTINE_NO_SEPARATE_CALL_SITES
-            swapcontext_stack3(&from.m_sp, to.m_sp);
 #else
             swapcontext_stack(&from.m_sp, to.m_sp);
 #endif

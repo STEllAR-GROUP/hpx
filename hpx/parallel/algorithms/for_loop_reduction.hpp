@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 std::size_t cores = hpx::get_os_thread_count();
                 data_.reset(new T[cores]);
                 for (std::size_t i = 0; i != cores; ++i)
-                    data_.get()[i] = identity;
+                    data_[i] = identity;
             }
 
             void init_iteration(std::size_t)
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             T& iteration_value()
             {
-                return data_.get()[curr_];
+                return data_[curr_];
             }
 
             void next_iteration() HPX_NOEXCEPT {}
@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             {
                 std::size_t cores = hpx::get_os_thread_count();
                 for (std::size_t i = 0; i != cores; ++i)
-                    var_ = op_(var_, data_.get()[i]);
+                    var_ = op_(var_, data_[i]);
             }
 
         private:

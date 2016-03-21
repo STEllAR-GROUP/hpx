@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,14 +6,16 @@
 #if !defined(HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM)
 #define HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/components/iostreams/server/buffer.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/unlock_guard.hpp>
+
+#include <hpx/components/iostreams/server/buffer.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <map>
+#include <utility>
 
 namespace hpx { namespace iostreams { namespace detail
 {

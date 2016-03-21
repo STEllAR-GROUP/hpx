@@ -11,7 +11,8 @@ set(subdirs
    )
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(components.containers.${subdir})
+  add_hpx_pseudo_target(components.containers_.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(components.containers components.containers.${subdir})
+  add_hpx_pseudo_dependencies(components.containers_
+    components.containers_.${subdir})
 endforeach()

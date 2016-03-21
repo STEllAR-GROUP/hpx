@@ -10,16 +10,21 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+
+// include unist.d conditionally to check for POSIX version. Not all OSs have the
+// unistd header...
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
 
 #if defined(_POSIX_VERSION)
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
-
-#include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/version.hpp>
 #include <boost/cstdint.hpp>
@@ -35,8 +40,9 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <stdexcept>
 #include <limits>
+#include <stdexcept>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS) && BOOST_VERSION >= 105300

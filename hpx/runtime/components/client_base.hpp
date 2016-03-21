@@ -241,7 +241,7 @@ namespace hpx { namespace components
 
         bool valid() const
         {
-            return gid_.valid();
+            return gid_.valid() && !gid_.has_exception();
         }
 
         // check whether the embedded future is valid

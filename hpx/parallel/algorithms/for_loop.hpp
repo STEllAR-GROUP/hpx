@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         {
             int _sequencer[] =
             {
-                (hpx::util::get<Is>(args).init_iteration(part_index), 0)..., 0
+                0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...
             };
             HPX_UNUSED(_sequencer);
         }
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         {
             int _sequencer[] =
             {
-                (hpx::util::get<Is>(args).next_iteration(), 0)..., 0
+                0, (hpx::util::get<Is>(args).next_iteration(), 0)...
             };
             HPX_UNUSED(_sequencer);
         }
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         {
             int _sequencer[] =
             {
-                (hpx::util::get<Is>(args).exit_iteration(size), 0)..., 0
+                0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...
             };
             HPX_UNUSED(_sequencer);
         }
@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 Args &&... args)
             {
                 int init_sequencer[] = {
-                    ( args.init_iteration(0), 0 )..., 0
+                    0, (args.init_iteration(0), 0)...
                 };
                 HPX_UNUSED(init_sequencer);
 
@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
                     int next_sequencer[] = {
-                        ( args.next_iteration(), 0 )..., 0
+                        0, (args.next_iteration(), 0)...
                     };
                     HPX_UNUSED(next_sequencer);
 
@@ -122,7 +122,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 // make sure live-out variables are properly set on
                 // return
                 int exit_sequencer[] = {
-                    ( args.exit_iteration(size), 0 )..., 0
+                    0, (args.exit_iteration(size), 0)...
                 };
                 HPX_UNUSED(exit_sequencer);
 

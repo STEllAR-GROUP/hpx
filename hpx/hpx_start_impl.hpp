@@ -153,6 +153,22 @@ namespace hpx
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
+    start(boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        util::function_nonser<void()> const empty;
+        return start(desc_cmdline, argc, argv, cfg, empty, empty, mode);
+    }
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
+    inline bool
     start(std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {

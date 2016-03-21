@@ -181,6 +181,10 @@ namespace hpx { namespace util
             "numa_sensitive = 0",
             "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
+            // connect back to the given latch if specified
+            "[hpx.on_startup]",
+            "wait_on_latch = ${HPX_ON_STARTUP_WAIT_ON_LATCH}",
+
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",
