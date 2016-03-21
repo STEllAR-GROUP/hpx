@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
@@ -51,14 +52,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         // requires traits::is_future<Future>
     std::vector<hpx::util::tuple<FwdIter, std::size_t> >
     get_bulk_iteration_shape(
-        ExPolicy policy, std::vector<Future>& workitems, F1 && f1,
+        ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
         FwdIter& first, std::size_t& count, Stride s)
     {
-        typedef typename ExPolicy::executor_parameters_type parameters_type;
+        typedef typename hpx::util::decay<ExPolicy>::type::executor_parameters_type
+            parameters_type;
         typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<FwdIter, std::size_t> tuple_type;
 
-        typedef typename ExPolicy::executor_type executor_type;
+        typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+            executor_type;
         std::size_t const cores = executor_information_traits<executor_type>::
             processing_units_count(policy.executor(), policy.parameters());
 
@@ -179,14 +182,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         // requires traits::is_future<Future>
     std::vector<hpx::util::tuple<std::size_t, FwdIter, std::size_t > >
     get_bulk_iteration_shape_idx(
-        ExPolicy policy, std::vector<Future>& workitems, F1 && f1,
+        ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
         FwdIter& first, std::size_t& count, Stride s)
     {
-        typedef typename ExPolicy::executor_parameters_type parameters_type;
+        typedef typename hpx::util::decay<ExPolicy>::type::executor_parameters_type
+            parameters_type;
         typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<std::size_t, FwdIter, std::size_t> tuple_type;
 
-        typedef typename ExPolicy::executor_type executor_type;
+        typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+            executor_type;
         std::size_t const cores = executor_information_traits<executor_type>::
             processing_units_count(policy.executor(), policy.parameters());
 

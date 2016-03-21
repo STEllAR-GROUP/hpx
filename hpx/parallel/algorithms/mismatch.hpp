@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM)
 #define HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -62,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 if (first1 == last1 || first2 == last2)
@@ -98,8 +98,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, T, void>::
                     call_with_index(
-                        policy, hpx::util::make_zip_iterator(first1, first2),
-                        count1, 1,
+                        std::forward<ExPolicy>(policy),
+                        hpx::util::make_zip_iterator(first1, first2), count1, 1,
                         [f, tok](std::size_t base_idx, zip_iterator it,
                             std::size_t part_count) mutable
                         {
@@ -355,7 +355,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)
@@ -375,8 +375,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, T, void>::
                     call_with_index(
-                        policy, hpx::util::make_zip_iterator(first1, first2),
-                        count, 1,
+                        std::forward<ExPolicy>(policy),
+                        hpx::util::make_zip_iterator(first1, first2), count, 1,
                         [f, tok](std::size_t base_idx, zip_iterator it,
                             std::size_t part_count) mutable
                         {

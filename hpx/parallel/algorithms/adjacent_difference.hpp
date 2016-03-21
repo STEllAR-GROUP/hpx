@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15)
 #define HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, Iter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 Iter dest, Op && op)
             {
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter, Iter>
@@ -77,7 +77,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, Iter, void>::call(
-                    policy, make_zip_iterator(first, prev, dest), count,
+                    std::forward<ExPolicy>(policy),
+                    make_zip_iterator(first, prev, dest), count,
                     [op](zip_iterator part_begin, std::size_t part_size)
                     {
                         // VS2015RC bails out when op is captured by ref
@@ -254,7 +255,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           last element in the output range.
     ///
     ///
-
     template <typename ExPolicy, typename InIter, typename OutIter,
         typename Op>
     inline typename boost::enable_if<

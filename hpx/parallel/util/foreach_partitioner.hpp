@@ -6,8 +6,7 @@
 #if !defined(HPX_PARALLEL_UTIL_FOREACH_PARTITIONER_OCT_03_2014_0112PM)
 #define HPX_PARALLEL_UTIL_FOREACH_PARTITIONER_OCT_03_2014_0112PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/async.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/dataflow.hpp>
@@ -34,14 +33,15 @@ namespace hpx { namespace parallel { namespace util
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
-        template <typename ExPolicy, typename Result = void>
+        template <typename ExPolicy_, typename Result = void>
         struct foreach_static_partitioner
         {
-            template <typename FwdIter, typename F1>
-            static FwdIter call(ExPolicy policy, FwdIter first,
+            template <typename ExPolicy, typename FwdIter, typename F1>
+            static FwdIter call(ExPolicy && policy, FwdIter first,
                 std::size_t count, F1 && f1)
             {
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef hpx::util::tuple<
@@ -92,10 +92,11 @@ namespace hpx { namespace parallel { namespace util
         struct foreach_static_partitioner<parallel_task_execution_policy, Result>
         {
             template <typename ExPolicy, typename FwdIter, typename F1>
-            static hpx::future<FwdIter> call(ExPolicy policy,
+            static hpx::future<FwdIter> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1)
             {
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef hpx::util::tuple<
@@ -160,16 +161,19 @@ namespace hpx { namespace parallel { namespace util
         struct foreach_partitioner;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Result>
-        struct foreach_partitioner<ExPolicy, Result,
+        template <typename ExPolicy_, typename Result>
+        struct foreach_partitioner<ExPolicy_, Result,
             parallel::traits::static_partitioner_tag>
         {
-            template <typename FwdIter, typename F1>
-            static FwdIter call(ExPolicy policy, FwdIter first,
+            template <typename ExPolicy, typename FwdIter, typename F1>
+            static FwdIter call(ExPolicy && policy, FwdIter first,
                 std::size_t count, F1 && f1)
             {
-                return foreach_static_partitioner<ExPolicy, Result>::call(
-                    policy, first, count, std::forward<F1>(f1));
+                return foreach_static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, Result
+                    >::call(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1));
             }
         };
 
@@ -178,11 +182,14 @@ namespace hpx { namespace parallel { namespace util
                 parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename F1>
-            static hpx::future<FwdIter> call(ExPolicy policy,
+            static hpx::future<FwdIter> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1)
             {
-                return foreach_static_partitioner<ExPolicy, Result>::call(
-                    policy, first, count, std::forward<F1>(f1));
+                return foreach_static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, Result
+                    >::call(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1));
             }
         };
 

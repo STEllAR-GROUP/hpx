@@ -75,11 +75,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest, T const& val, Proj && proj)
             {
                 return copy_if<IterPair>().call(
-                    policy, boost::mpl::false_(), first, last, dest,
+                    std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                    first, last, dest,
                     [val, proj](T const& a)
                     {
                         return !(a == val);
@@ -250,14 +251,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest, F && f, Proj && proj)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
                 return copy_if<IterPair>().call(
-                    policy, boost::mpl::false_(), first, last, dest,
+                    std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                    first, last, dest,
                     [f](value_type const& a)
                     {
                         return !hpx::util::invoke(f, a);

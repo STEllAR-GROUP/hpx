@@ -48,12 +48,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename F>
             static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         first, std::distance(first, last),
                         [f](type& v)
                         {
@@ -184,14 +184,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy policy, OutIter first, std::size_t count,
+            parallel(ExPolicy && policy, OutIter first, std::size_t count,
                 F && f)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;
 
                 return
                     for_each_n<OutIter>().call(
-                        policy, boost::mpl::false_(), first, count,
+                        std::forward<ExPolicy>(policy),
+                        boost::mpl::false_(), first, count,
                         [f](type& v)
                         {
                             v = f();

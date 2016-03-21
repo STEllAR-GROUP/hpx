@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM)
 #define HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -54,7 +54,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
@@ -77,7 +77,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
-                    policy, first, count-(diff-1), 1,
+                    std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
                     [=](std::size_t base_idx, FwdIter it,
                         std::size_t part_size) mutable
                     {
@@ -332,7 +332,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
@@ -354,7 +354,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
-                    policy, first, count-(diff-1), 1,
+                    std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
                     [=](std::size_t base_idx, FwdIter it,
                         std::size_t part_size) mutable
                     {

@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_TRANSFORM_INCLUSIVE_SCAN_JAN_04_2015_0556PM)
 #define HPX_PARALLEL_ALGORITHM_TRANSFORM_INCLUSIVE_SCAN_JAN_04_2015_0556PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -88,7 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                  OutIter dest, Conv && conv, T && init, Op && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
@@ -112,7 +112,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
                 return util::scan_partitioner<ExPolicy, OutIter, T>::call(
-                    policy, make_zip_iterator(first, dest), count, init,
+                    std::forward<ExPolicy>(policy),
+                    make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
                     [op, conv](zip_iterator part_begin, std::size_t part_size)
                         -> T

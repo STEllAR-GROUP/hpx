@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
                 Proj && proj)
             {
                 if (first == last)
@@ -121,9 +121,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         get(std::move(first));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter>::
-                    call(
-                        policy, first, std::distance(first, last),
+                return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
+                        std::forward<ExPolicy>(policy),
+                        first, std::distance(first, last),
                         [f, proj](FwdIter it, std::size_t part_count)
                         {
                             return sequential_min_element(
@@ -341,7 +341,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
                 Proj && proj)
             {
                 if (first == last)
@@ -350,9 +350,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         get(std::move(first));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter>::
-                    call(
-                        policy, first, std::distance(first, last),
+                return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
+                        std::forward<ExPolicy>(policy),
+                        first, std::distance(first, last),
                         [f, proj](FwdIter it, std::size_t part_count)
                         {
                             return sequential_max_element(
@@ -589,7 +589,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, FwdIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 F && f, Proj && proj)
             {
                 typedef std::pair<FwdIter, FwdIter> result_type;
@@ -604,7 +604,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, result_type, result_type>::
                     call(
-                        policy, result.first, std::distance(result.first, last),
+                        std::forward<ExPolicy>(policy),
+                        result.first, std::distance(result.first, last),
                         [f, proj](FwdIter it, std::size_t part_count)
                         {
                             return sequential_minmax_element(

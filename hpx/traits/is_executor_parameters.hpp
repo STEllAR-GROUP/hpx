@@ -12,7 +12,11 @@
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
+#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
+#include <functional>
+#endif
 
+#include <boost/ref.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
@@ -32,6 +36,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct is_executor_parameters<executor_parameters_tag>
           : std::false_type
         {};
+
+        template <typename T>
+        struct is_executor_parameters< ::boost::reference_wrapper<T> >
+          : is_executor_parameters<typename hpx::util::decay<T>::type>
+        {};
+
+#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
+        template <typename T>
+        struct is_executor_parameters< ::std::reference_wrapper<T> >
+          : is_executor_parameters<typename hpx::util::decay<T>::type>
+        {};
+#endif
         /// \endcond
     }
 

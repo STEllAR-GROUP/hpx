@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM)
 #define HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)
@@ -62,8 +62,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    [op, tok](FwdIter part_begin, std::size_t part_count)
+                        mutable -> bool
                     {
                         util::loop_n(
                             part_begin, part_count, tok,
@@ -192,7 +194,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)
@@ -204,8 +206,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    [op, tok](FwdIter part_begin, std::size_t part_count)
+                        mutable -> bool
                     {
                         util::loop_n(
                             part_begin, part_count, tok,
@@ -334,8 +338,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                F && op)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && op)
             {
                 if (first == last)
                 {
@@ -346,8 +349,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    [op, tok](FwdIter part_begin, std::size_t part_count)
+                        mutable -> bool
                     {
                         util::loop_n(
                             part_begin, part_count, tok,

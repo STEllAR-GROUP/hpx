@@ -14,6 +14,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/dataflow.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
@@ -114,10 +115,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \remarks
         //------------------------------------------------------------------------
         template <typename ExPolicy, typename RandomIt, typename Compare>
-        hpx::future<RandomIt> sort_thread(ExPolicy policy,
+        hpx::future<RandomIt> sort_thread(ExPolicy& policy,
             RandomIt first, RandomIt last, Compare comp)
         {
-            typedef typename ExPolicy::executor_type executor_type;
+            typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                executor_type;
             typedef typename hpx::parallel::executor_traits<executor_type>
                 executor_traits;
 
@@ -189,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     policy.executor(),
                     hpx::util::bind(
                         &sort_thread<ExPolicy, RandomIt, Compare>,
-                        policy, first, c_last, comp
+                        std::ref(policy), first, c_last, comp
                     ));
 
             hpx::future<RandomIt> right =
@@ -197,7 +199,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     policy.executor(),
                     hpx::util::bind(
                         &sort_thread<ExPolicy, RandomIt, Compare>,
-                        policy, c_first, last, comp
+                        std::ref(policy), c_first, last, comp
                     ));
 
             return hpx::dataflow(
@@ -231,7 +233,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// @remarks
         template <typename ExPolicy, typename RandomIt, typename Compare>
         hpx::future<RandomIt>
-        parallel_sort_async(ExPolicy policy, RandomIt first, RandomIt last,
+        parallel_sort_async(ExPolicy && policy, RandomIt first, RandomIt last,
             Compare comp)
         {
             hpx::future<RandomIt> result;
@@ -249,7 +251,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (detail::is_sorted_sequential(first, last, comp))
                     return hpx::make_ready_future(last);
 
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
 
@@ -257,7 +260,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     policy.executor(),
                     hpx::util::bind(
                         &sort_thread<ExPolicy, RandomIt, Compare>,
-                        policy, first, last, comp
+                        std::ref(policy), first, last, comp
                     ));
             }
             catch (...) {
@@ -300,13 +303,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, RandomIt
             >::type
-            parallel(ExPolicy policy, RandomIt first, RandomIt last,
+            parallel(ExPolicy && policy, RandomIt first, RandomIt last,
                 Compare && comp, Proj && proj)
             {
                 // call the sort routine and return the right type,
                 // depending on execution policy
                 return util::detail::algorithm_result<ExPolicy, RandomIt>::get(
-                    parallel_sort_async(policy, first, last,
+                    parallel_sort_async(std::forward<ExPolicy>(policy),
+                        first, last,
                         util::compare_projected<Compare, Proj>(
                             std::forward<Compare>(comp),
                             std::forward<Proj>(proj)

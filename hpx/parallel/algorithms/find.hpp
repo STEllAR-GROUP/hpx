@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM)
 #define HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
-            parallel(ExPolicy policy, InIter first, InIter last,
+            parallel(ExPolicy && policy, InIter first, InIter last,
                 T const& val)
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
-                        policy, first, count, 1,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [val, tok](std::size_t base_idx, InIter it,
                             std::size_t part_size) mutable
                         {
@@ -184,7 +184,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -199,7 +199,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first, count, 1,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [f, tok](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -339,7 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -354,7 +354,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first, count, 1,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [f, tok](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -490,7 +490,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first1, FwdIter last1,
+            parallel(ExPolicy && policy, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
@@ -512,7 +512,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first1, count-(diff-1), 1,
+                        std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
                         [=](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -780,7 +780,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
-            parallel(ExPolicy policy, InIter first, InIter last,
+            parallel(ExPolicy && policy, InIter first, InIter last,
                 FwdIter s_first, FwdIter s_last, Pred && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;
@@ -802,7 +802,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
-                        policy, first, count, 1,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
                             std::size_t part_size) mutable
                         {
@@ -811,7 +811,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 [&tok, &s_first, &s_last, &op]
                                 (reference v, std::size_t i)
                                 {
-                                    for(FwdIter iter = s_first; iter != s_last; ++iter) {
+                                    for(FwdIter iter = s_first; iter != s_last; ++iter)
+                                    {
                                         if(op(v,*iter))
                                             tok.cancel(i);
                                     }
