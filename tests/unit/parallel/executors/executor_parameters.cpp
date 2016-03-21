@@ -93,6 +93,19 @@ void test_auto_chunk_size()
     }
 }
 
+void test_persistent_auto_chunk_size()
+{
+    {
+        hpx::parallel::persistent_auto_chunk_size pacs;
+        chunk_size_test(pacs);
+    }
+
+    {
+        hpx::parallel::persistent_auto_chunk_size pacs(boost::chrono::milliseconds(0));
+        chunk_size_test(pacs);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -107,6 +120,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     test_static_chunk_size();
     test_guided_chunk_size();
     test_auto_chunk_size();
+    test_persistent_auto_chunk_size();
 
     return hpx::finalize();
 }
