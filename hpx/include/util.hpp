@@ -21,6 +21,7 @@
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/zip_iterator.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/interval_timer.hpp>
 
 #endif
 

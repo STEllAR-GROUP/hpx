@@ -340,6 +340,14 @@
 #  define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
 #endif
 
+#if !defined(HPX_PLUGIN_COMPONENT_PREFIX)
+#  if defined(HPX_PLUGIN_NAME)
+#    define HPX_PLUGIN_COMPONENT_PREFIX HPX_MANGLE_NAME(HPX_PLUGIN_NAME)
+#  elif defined(HPX_COMPONENT_NAME)
+#    define HPX_PLUGIN_COMPONENT_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
+#  endif
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NAME)
 #  define HPX_PLUGIN_NAME hpx
@@ -354,12 +362,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_PLUGIN_COMPONENT_PREFIX)
-#  define HPX_PLUGIN_COMPONENT_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-
 #if !defined(HPX_APPLICATION_STRING)
 #  if defined(HPX_APPLICATION_NAME)
 #    define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)

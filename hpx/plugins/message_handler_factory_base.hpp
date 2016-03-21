@@ -23,6 +23,10 @@ namespace hpx { namespace plugins
     {
         virtual ~message_handler_factory_base() {}
 
+        /// Register a action for this message handler type
+        virtual void register_action(
+            char const* action, error_code& ec) = 0;
+
         /// Create a new instance of a message handler
         ///
         /// return Returns the newly created instance of the message handler

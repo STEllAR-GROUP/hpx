@@ -317,6 +317,8 @@ namespace hpx { namespace components { namespace server
         void remove_here_from_connection_cache();
 
         ///////////////////////////////////////////////////////////////////////
+        void register_message_handler(char const* message_handler_type,
+            char const* action, error_code& ec);
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
@@ -340,7 +342,9 @@ namespace hpx { namespace components { namespace server
     protected:
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client);
+            naming::resolver_client& agas_client,
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_component(hpx::util::plugin::dll& d,
@@ -380,12 +384,16 @@ namespace hpx { namespace components { namespace server
             error_code& ec);
 
         // Load all plugins from the ini files found in the configuration
-        bool load_plugins(util::section& ini);
+        bool load_plugins(util::section& ini,
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_plugin(util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path const& lib,
-            bool isenabled);
+            bool isenabled,
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
 #endif
 
         // the name says it all

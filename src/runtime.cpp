@@ -39,6 +39,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -51,6 +52,7 @@
 
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
     void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -103,6 +105,7 @@ namespace hpx
 
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void termination_handler(int signum)
     {
         if (signum != SIGINT &&
@@ -128,6 +131,13 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // There is no need to protect these global from thread concurrent access
+    // as they are access during early startup only.
+    std::vector<hpx::util::tuple<char const*, char const*> >
+        message_handler_registrations;
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void new_handler()
     {
         HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
@@ -605,6 +615,13 @@ namespace hpx
             active_counters_->stop_evaluating_counters();
     }
 
+    void runtime::register_message_handler(char const* message_handler_type,
+        char const* action, error_code& ec)
+    {
+        return runtime_support_->register_message_handler(
+            message_handler_type, action, ec);
+    }
+
     parcelset::policies::message_handler* runtime::create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
@@ -716,7 +733,7 @@ namespace hpx
             },
 
             // action invocation counters
-            { "/runtime/count/action_invocation", performance_counters::counter_raw,
+            { "/runtime/count/action-invocation", performance_counters::counter_raw,
               "returns the number of (local) invocations of a specific action "
               "on this locality (the action type has to be specified as the "
               "counter parameter)",
@@ -726,7 +743,7 @@ namespace hpx
               ""
             },
 
-            { "/runtime/count/remote_action_invocation",
+            { "/runtime/count/remote-action-invocation",
               performance_counters::counter_raw,
               "returns the number of (remote) invocations of a specific action "
               "on this locality (the action type has to be specified as the "
@@ -1446,6 +1463,19 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a message handler plugin
+    void register_message_handler(char const* message_handler_type,
+        char const* action, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            return rt->register_message_handler(message_handler_type, action, ec);
+        }
+
+        // store the request for later
+        message_handler_registrations.push_back(
+            hpx::util::make_tuple(message_handler_type, action));
+    }
+
     parcelset::policies::message_handler* create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
