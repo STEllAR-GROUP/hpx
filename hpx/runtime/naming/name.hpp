@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -181,7 +181,8 @@ namespace hpx { namespace naming
         }
 
         // GID + GID
-        friend inline gid_type operator+ (gid_type const& lhs, gid_type const& rhs);
+        friend HPX_EXPORT gid_type operator+ (
+            gid_type const& lhs, gid_type const& rhs);
         gid_type operator+= (gid_type const& rhs)
         { return (*this = *this + rhs); }
 
@@ -192,7 +193,8 @@ namespace hpx { namespace naming
         { return (*this = *this + rhs); }
 
         // GID - GID
-        friend inline gid_type operator- (gid_type const& lhs, gid_type const& rhs);
+        friend HPX_EXPORT gid_type operator- (gid_type const& lhs,
+            gid_type const& rhs);
         gid_type operator-= (gid_type const& rhs)
         { return (*this = *this - rhs); }
 
@@ -328,7 +330,7 @@ namespace hpx { namespace naming
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-            reliquish_lock();
+            relinquish_lock();
             util::unregister_lock(this);
 
             HPX_ITT_SYNC_RELEASED(this);
@@ -340,7 +342,8 @@ namespace hpx { namespace naming
         mutex_type& get_mutex() const { return const_cast<mutex_type&>(*this); }
 
     private:
-        friend std::ostream& operator<< (std::ostream& os, gid_type const& id);
+        friend HPX_EXPORT std::ostream& operator<< (std::ostream& os,
+            gid_type const& id);
 
         friend class hpx::serialization::access;
 
@@ -368,7 +371,7 @@ namespace hpx { namespace naming
             return false;
         }
 
-        void reliquish_lock()
+        void relinquish_lock()
         {
             util::ignore_lock(this);
             internal_mutex_type::scoped_lock l(this);
@@ -650,146 +653,38 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         // has side effects, can't be pure
-        inline boost::int64_t add_credit_to_gid(gid_type& id, boost::int64_t credits)
-        {
-            boost::int64_t c = get_credit_from_gid(id);
+        HPX_EXPORT boost::int64_t add_credit_to_gid(gid_type& id,
+            boost::int64_t credits);
 
-            c += credits;
-            set_credit_for_gid(id, c);
+        HPX_EXPORT boost::int64_t remove_credit_from_gid(gid_type& id,
+            boost::int64_t debit);
 
-            return c;
-        }
-
-        inline boost::int64_t remove_credit_from_gid(gid_type& id, boost::int64_t debit)
-        {
-            boost::int64_t c = get_credit_from_gid(id);
-            HPX_ASSERT(c > debit);
-
-            c -= debit;
-            set_credit_for_gid(id, c);
-
-            return c;
-        }
-
-        inline boost::int64_t fill_credit_for_gid(gid_type& id,
-            boost::int64_t credits = HPX_GLOBALCREDIT_INITIAL)
-        {
-            boost::int64_t c = get_credit_from_gid(id);
-            HPX_ASSERT(c <= credits);
-
-            boost::int64_t added = credits - c;
-            set_credit_for_gid(id, credits);
-
-            return added;
-        }
+        HPX_EXPORT boost::int64_t fill_credit_for_gid(gid_type& id,
+            boost::int64_t credits = HPX_GLOBALCREDIT_INITIAL);
 
         ///////////////////////////////////////////////////////////////////////
-
         HPX_EXPORT gid_type move_gid(gid_type& id);
-        HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
+        HPX_EXPORT gid_type move_gid_locked(gid_type::mutex_type::scoped_lock l,
+            gid_type& gid);
 
         HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
         // splits the current credit of the given id and assigns half of it to
         // the returned copy
-        inline gid_type split_credits_for_gid(gid_type& id)
-        {
-            boost::uint16_t log2credits = get_log2credit_from_gid(id);
-            HPX_ASSERT(log2credits > 0);
-
-            gid_type newid = id;            // strips lock-bit
-
-            set_log2credit_for_gid(id, log2credits-1);
-            set_credit_split_mask_for_gid(id);
-
-            set_log2credit_for_gid(newid, log2credits-1);
-            set_credit_split_mask_for_gid(newid);
-
-            return newid;
-        }
+        HPX_EXPORT gid_type split_credits_for_gid(gid_type& id);
+        HPX_EXPORT gid_type split_credits_for_gid_locked(
+            gid_type::mutex_type::scoped_lock& l, gid_type& id);
     }
 
-    inline gid_type operator+ (gid_type const& lhs, gid_type const& rhs)
-    {
-        boost::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
-        boost::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
-
-#if defined(HPX_DEBUG)
-        // make sure we're using the operator+ in proper contexts only
-        boost::uint64_t lhs_internal_bits =
-            detail::get_internal_bits(lhs.id_msb_);
-
-        boost::uint64_t msb_test =
-            detail::strip_internal_bits_from_gid(lhs.id_msb_) +
-            detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
-
-        HPX_ASSERT(msb == (msb_test | lhs_internal_bits));
-#endif
-
-        if (lsb < lhs.id_lsb_ || lsb < rhs.id_lsb_)
-            ++msb;
-
-        return gid_type(msb, lsb);
-    }
-
-    inline gid_type operator- (gid_type const& lhs, gid_type const& rhs)
-    {
-        boost::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
-        boost::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
-
-// #if defined(HPX_DEBUG)
-//         // make sure we're using the operator- in proper contexts only
-//         boost::uint64_t lhs_internal_bits = detail::get_internal_bits(lhs.id_msb_);
-//
-//         boost::uint64_t msb_test =
-//             detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
-//             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
-//
-//         boost::uint32_t lhs_locality_id =
-//             naming::get_locality_id_from_gid(lhs.id_msb_);
-//         boost::uint32_t rhs_locality_id =
-//             naming::get_locality_id_from_gid(rhs.id_msb_);
-//         if (rhs_locality_id != naming::invalid_locality_id)
-//         {
-//             HPX_ASSERT(lhs_locality_id == rhs_locality_id);
-//             HPX_ASSERT(msb == naming::replace_locality_id(
-//                 msb_test | lhs_internal_bits, naming::invalid_locality_id));
-//         }
-//         else
-//         {
-//             HPX_ASSERT(msb == naming::replace_locality_id(
-//                 msb_test | lhs_internal_bits, lhs_locality_id));
-//         }
-// #endif
-
-        if (lsb > lhs.id_lsb_)
-            --msb;
-
-        return gid_type(msb, lsb);
-    }
+    HPX_EXPORT gid_type operator+ (gid_type const& lhs, gid_type const& rhs);
+    HPX_EXPORT gid_type operator- (gid_type const& lhs, gid_type const& rhs);
 
     ///////////////////////////////////////////////////////////////////////////
     gid_type const invalid_gid = gid_type();
 
     ///////////////////////////////////////////////////////////////////////////
-    inline std::ostream& operator<< (std::ostream& os, gid_type const& id)
-    {
-        boost::io::ios_flags_saver ifs(os);
-        if (id != naming::invalid_gid)
-        {
-            os << std::hex
-               << "{" << std::right << std::setfill('0') << std::setw(16)
-                      << id.id_msb_ << ", "
-                      << std::right << std::setfill('0') << std::setw(16)
-                      << id.id_lsb_ << "}";
-        }
-        else
-        {
-            os << "{invalid}";
-        }
-        return os;
-    }
+    HPX_EXPORT std::ostream& operator<< (std::ostream& os, gid_type const& id);
 
     namespace detail
     {
