@@ -39,6 +39,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <iterator>
 
 namespace hpx { namespace lcos { namespace detail
 {
@@ -297,7 +298,11 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Iterator>
     struct future_iterator_traits<Iterator,
         typename hpx::util::always_void<
+#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 needs special help
+            typename Iterator::iterator_category
+#else
             typename std::iterator_traits<Iterator>::value_type
+#endif
         >::type>
     {
         typedef
