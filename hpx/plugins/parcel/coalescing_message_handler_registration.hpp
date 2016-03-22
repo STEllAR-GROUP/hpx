@@ -8,7 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCEL_COALESCING)
+// the module itself should not register any actions which coalesce parcels
+#if defined(HPX_HAVE_PARCEL_COALESCING) && !defined(HPX_PARCEL_COALESCING_MODULE_EXPORTS)
 
 #include <hpx/exception.hpp>
 #include <hpx/traits/action_message_handler.hpp>

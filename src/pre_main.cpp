@@ -161,6 +161,11 @@ int pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_code ? ", application exit has been requested" : "");
 
+        // Work on registration requests for message handler plugins
+        register_message_handlers();
+
+        // Register all counter types before the startup functions are being
+        // executed.
         register_counter_types();
 
         rt.set_state(state_pre_startup);
