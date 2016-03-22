@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2016 Zahra Khatami
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -42,6 +42,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       any of the scheduled chunks should run.
         ///
 
+        persistent_auto_chunk_size()
+          : chunk_size_time_(0) , min_time_(80000)
+        {}
 
         /// Construct an \a persistent_auto_chunk_size executor parameters object
         ///
@@ -50,8 +53,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                     combined.
         ///
 
-        explicit persistent_auto_chunk_size(hpx::util::steady_duration time_cs = boost::chrono::nanoseconds(0))
-          : chunk_size_time_(time_cs.value().count())
+        explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs, hpx::util::steady_duration const& rel_time)
+          : chunk_size_time_(time_cs.value().count()), min_time_(rel_time.value().count())
         {}
 
         /// \cond NOINTERNAL
@@ -64,45 +67,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             if (count > 100*cores)
             {
-                boost::uint64_t t;
-                if(chunk_size_time_ == 0)
-                {
-                    using hpx::util::high_resolution_clock;
-                    t = high_resolution_clock::now();
+                using hpx::util::high_resolution_clock;
+                boost::uint64_t t = high_resolution_clock::now();
 
-                    std::size_t test_chunk_size = f();
-                    if (test_chunk_size != 0)
+                std::size_t test_chunk_size = f();
+                if (test_chunk_size != 0)
+                {
+
+                    if(chunk_size_time_ == 0)
                     {
-                        
                         t = (high_resolution_clock::now() - t) / test_chunk_size;
                         chunk_size_time_ = t;
-                    
-                        if (t != 0)
-                        {
-                            // return chunk size which will create the required
-                            // amount of work
-                            return (std::min)(count, (std::size_t)(min_time_ / t));
-                        }
                     }
-                }
 
-                else
-                {
-                    t = chunk_size_time_;
-                    return (std::min)(count, (std::size_t)(min_time_ / t));
+                    else
+                        t = chunk_size_time_;
+
+                    if (t != 0)
+                    {
+                        // return chunk size which will create the required
+                        // amount of work
+                        return (std::min)(count, (std::size_t)(min_time_ / t));
+                    }
                 }
             }
 
-            
             return (count + cores - 1) / cores;
-            
         }
         /// \endcond
-
-        std::size_t get_chunk_size_value() const
-        {
-        return chunk_size_time_;
-        }
 
     private:
         /// \cond NOINTERNAL
@@ -118,7 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     private:
         /// \cond NOINTERNAL
         boost::uint64_t chunk_size_time_;
-        static constexpr boost::uint64_t min_time_ = 80000;      // nanoseconds
+        boost::uint64_t min_time_;      // nanoseconds
         /// \endcond
     };
 }}}
