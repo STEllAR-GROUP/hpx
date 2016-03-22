@@ -17,7 +17,7 @@
     ///////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
-    // BOOST_SCOPED_ENUM(launch)
+    // launch
     template <typename Action, typename Policy>
     struct async_action_dispatch<Action, Policy,
         typename boost::enable_if_c<
@@ -31,7 +31,7 @@ namespace hpx { namespace detail
                     Action
                 >::remote_result_type
             >::type>
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+        call(launch launch_policy,
             naming::id_type const& id, Ts&&... ts)
         {
             return hpx::detail::async_impl<Action>(launch_policy, id,
@@ -50,7 +50,7 @@ namespace hpx { namespace detail
                 >::type
             >
         >::type
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+        call(launch launch_policy,
             DistPolicy const& policy, Ts&&... ts)
         {
             return policy.template async<Action>(launch_policy,
@@ -73,7 +73,7 @@ namespace hpx { namespace detail
         call(naming::id_type const& id, Ts&&... ts)
         {
             return async_action_dispatch<
-                    Action, BOOST_SCOPED_ENUM(launch)
+                    Action, launch
                 >::call(launch::all, id, std::forward<Ts>(ts)...);
         }
     };
@@ -96,7 +96,7 @@ namespace hpx { namespace detail
         call(DistPolicy const& policy, Ts&&... ts)
         {
             return async_action_dispatch<
-                    Action, BOOST_SCOPED_ENUM(launch)
+                    Action, launch
                 >::call(launch::all, policy, std::forward<Ts>(ts)...);
         }
     };
@@ -117,7 +117,7 @@ namespace hpx { namespace detail
         template <typename ...Ts>
         HPX_FORCEINLINE static
         lcos::future<result_type>
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+        call(launch launch_policy,
             Action const&, naming::id_type const& id, Ts&&... ts)
         {
             return async<Action>(launch_policy, id, std::forward<Ts>(ts)...);
@@ -129,7 +129,7 @@ namespace hpx { namespace detail
             traits::is_distribution_policy<DistPolicy>::value,
             lcos::future<result_type>
         >::type
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+        call(launch launch_policy,
             Action const&, DistPolicy const& policy, Ts&&... ts)
         {
             return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);
@@ -194,7 +194,7 @@ namespace hpx { namespace detail
         }
     };
 
-    // BOOST_SCOPED_ENUM(launch)
+    // launch
     template <typename Policy>
     struct async_dispatch<Policy,
         typename boost::enable_if_c<
@@ -203,7 +203,7 @@ namespace hpx { namespace detail
     {
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
+        call(launch const& launch_policy, F&& f, Ts&&... ts)
         ->  decltype(detail::async_launch_policy_dispatch<
                 typename util::decay<F>::type
             >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...))

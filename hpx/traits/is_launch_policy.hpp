@@ -22,7 +22,7 @@ namespace hpx { namespace traits
     {
         template <typename Policy>
         struct is_launch_policy
-          : boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
+          : boost::is_same<launch, Policy>
         {};
 
         template <typename Policy>

@@ -10,15 +10,13 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/detail/scoped_enum_emulation.hpp>
-
 #include <type_traits>
 
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Launch policy for \a hpx::async
-    BOOST_SCOPED_ENUM_START(launch)
+    enum class launch
     {
         async = 0x01,
         deferred = 0x02,
@@ -30,19 +28,18 @@ namespace hpx
         async_policies = 0x15,      // async | task | fork
         all = 0x1f                  // async | deferred | task | sync | fork
     };
-    BOOST_SCOPED_ENUM_END
 
     /// \cond NOINTERNAL
     inline bool
-    operator&(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
+    operator&(launch lhs, launch rhs)
     {
         return (static_cast<int>(lhs) & static_cast<int>(rhs)) != 0;
     }
 
-    inline BOOST_SCOPED_ENUM(launch)
-    operator|(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
+    inline launch
+    operator|(launch lhs, launch rhs)
     {
-        return static_cast<BOOST_SCOPED_ENUM(launch)>(
+        return static_cast<launch>(
             static_cast<int>(lhs) | static_cast<int>(rhs));
     }
     /// \endcond

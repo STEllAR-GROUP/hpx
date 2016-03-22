@@ -65,7 +65,7 @@ namespace hpx { namespace lcos { namespace local
 
         protected:
             // run in a separate thread
-            void apply(BOOST_SCOPED_ENUM(launch) policy,
+            void apply(launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
@@ -134,7 +134,7 @@ namespace hpx { namespace lcos { namespace local
 
         protected:
             // run in a separate thread
-            void apply(BOOST_SCOPED_ENUM(launch) policy,
+            void apply(launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
@@ -345,7 +345,7 @@ namespace hpx { namespace lcos { namespace local
 
         // asynchronous execution
         void apply(
-            BOOST_SCOPED_ENUM(launch) policy = launch::async,
+            launch policy = launch::async,
             threads::thread_priority priority = threads::thread_priority_default,
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws) const

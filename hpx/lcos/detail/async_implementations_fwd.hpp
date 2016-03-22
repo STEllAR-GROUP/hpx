@@ -13,8 +13,6 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
-#include <boost/detail/scoped_enum_emulation.hpp>
-
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -23,7 +21,7 @@ namespace hpx { namespace detail
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_impl(BOOST_SCOPED_ENUM(launch) policy, hpx::id_type const& id,
+    async_impl(launch policy, hpx::id_type const& id,
         Ts&&... vs);
 
     template <typename Action, typename Callback, typename ...Ts>
@@ -31,7 +29,7 @@ namespace hpx { namespace detail
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_cb_impl(BOOST_SCOPED_ENUM(launch) policy, hpx::id_type const& id,
+    async_cb_impl(launch policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs);
 }}
 

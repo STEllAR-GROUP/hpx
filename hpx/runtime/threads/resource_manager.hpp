@@ -12,7 +12,6 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
@@ -23,13 +22,12 @@ namespace hpx { namespace  threads
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Status of a given processing unit
-    BOOST_SCOPED_ENUM_START(punit_status)
+    enum class punit_status
     {
         unassigned = 0,
         reserved = 1,
         assigned = 2
     };
-    BOOST_SCOPED_ENUM_END
 
     /// In short, there are two main responsibilities of the Resource Manager:
     ///
@@ -73,12 +71,12 @@ namespace hpx { namespace  threads
         // reserve virtual cores for scheduler
         std::size_t reserve_processing_units(
                 std::size_t use_count, std::size_t desired,
-                std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+                std::vector<punit_status>& available_punits);
 
         // reserve virtual cores for scheduler at higher use count
         std::size_t reserve_at_higher_use_count(
                 std::size_t desired,
-                std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+                std::vector<punit_status>& available_punits);
 
     private:
         mutable mutex_type mtx_;
@@ -208,19 +206,19 @@ namespace hpx { namespace  threads
         bool release_scheduler_resources(
             allocation_data_map_type::iterator it,
             std::size_t number_to_free,
-            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+            std::vector<punit_status>& available_punits);
 
         // release cores from all schedulers
         // calls release_scheduler_resources
         std::size_t release_cores_on_existing_schedulers(
             std::size_t number_to_free,
-            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+            std::vector<punit_status>& available_punits);
 
         // distribute cores to schedulers proportional to max_punits of
         // the schedulers
         std::size_t redistribute_cores_among_all(std::size_t reserved,
             std::size_t min_punits, std::size_t max_punits,
-            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+            std::vector<punit_status>& available_punits);
 
         void roundup_scaled_allocations(
             allocation_data_map_type &scaled_static_allocation_data,

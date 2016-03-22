@@ -22,7 +22,6 @@
 #include <hpx/util/deferred_call.hpp>
 
 #include <boost/detail/atomic_count.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/math/common_factor_ct.hpp>
@@ -37,11 +36,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    BOOST_SCOPED_ENUM_START(future_status)
+    enum class future_status
     {
         ready, timeout, deferred, uninitialized
     };
-    BOOST_SCOPED_ENUM_END
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -590,7 +588,7 @@ namespace detail
                 ec = make_success_code();
         }
 
-        virtual BOOST_SCOPED_ENUM(future_status)
+        virtual future_status
         wait_until(boost::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
@@ -738,7 +736,7 @@ namespace detail
             this->future_data<Result>::wait(ec);
         }
 
-        virtual BOOST_SCOPED_ENUM(future_status)
+        virtual future_status
         wait_until(boost::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
@@ -786,7 +784,7 @@ namespace detail
         }
 
         // run in a separate thread
-        virtual void apply(BOOST_SCOPED_ENUM(launch) policy,
+        virtual void apply(launch policy,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {

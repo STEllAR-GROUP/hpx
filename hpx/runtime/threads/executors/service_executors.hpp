@@ -13,7 +13,6 @@
 #include <hpx/lcos/local/counting_semaphore.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -77,7 +76,7 @@ namespace hpx { namespace threads { namespace executors
     ///
     /// This enum type allows to specify the kind of the HPX thread pool to use
     /// for a given \a service_executor.
-    BOOST_SCOPED_ENUM_START(service_executor_type)
+    enum class service_executor_type
     {
         io_thread_pool,        ///< Selects creating a service executor using
                                ///< the I/O pool of threads
@@ -88,13 +87,12 @@ namespace hpx { namespace threads { namespace executors
         main_thread            ///< Selects creating a service executor using
                                ///< the main thread
     };
-    BOOST_SCOPED_ENUM_END
 
     namespace detail
     {
         /// \cond NOINTERNAL
         inline threads::detail::scheduled_executor_base*
-        get_service_executor(BOOST_SCOPED_ENUM(service_executor_type) t,
+        get_service_executor(service_executor_type t,
             char const* name_suffix = "")
         {
             switch(t)
@@ -129,7 +127,7 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     struct service_executor : public scheduled_executor
     {
-        service_executor(BOOST_SCOPED_ENUM(service_executor_type) t,
+        service_executor(service_executor_type t,
                 char const* name_suffix = "")
           : scheduled_executor(detail::get_service_executor(t, name_suffix))
         {}

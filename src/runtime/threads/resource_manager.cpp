@@ -75,7 +75,7 @@ namespace hpx { namespace threads
     // the resource manager is locked while executing this function
     std::size_t resource_manager::reserve_processing_units(
         std::size_t use_count, std::size_t desired,
-        std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
+        std::vector<punit_status>& available_punits)
     {
         std::size_t available = 0;
         for (std::size_t i = 0; i != punits_.size(); ++i)
@@ -95,7 +95,7 @@ namespace hpx { namespace threads
     // calls reserve_processing_units
     std::size_t resource_manager::reserve_at_higher_use_count(
             std::size_t desired,
-            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
+            std::vector<punit_status>& available_punits)
     {
         std::size_t use_count = 1;
         std::size_t available = 0;
@@ -117,7 +117,7 @@ namespace hpx { namespace threads
     // release_borrowed_cores - scheduler should release all its borrowed cores
     bool resource_manager::release_scheduler_resources(
         allocation_data_map_type::iterator it, std::size_t number_to_free,
-        std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
+        std::vector<punit_status>& available_punits)
     {
         static_allocation_data st;
         std::size_t borrowed_cores;
@@ -186,7 +186,7 @@ namespace hpx { namespace threads
     // available cores for the new scheduler
     std::size_t resource_manager::release_cores_on_existing_schedulers(
         std::size_t number_to_free,
-        std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
+        std::vector<punit_status>& available_punits)
     {
         // Ask previously allocated schedulers to release surplus cores,
         // until either the request is satisfied, or we're out of
@@ -222,7 +222,7 @@ namespace hpx { namespace threads
     // and reserve any freed cores for the new scheduler.
     std::size_t resource_manager::redistribute_cores_among_all(
         std::size_t reserved, std::size_t min_punits, std::size_t max_punits,
-        std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
+        std::vector<punit_status>& available_punits)
     {
         std::size_t available = 0;
 
@@ -505,7 +505,7 @@ namespace hpx { namespace threads
         std::vector<coreids_type> core_ids;
 
         // array of available processing units
-        std::vector<BOOST_SCOPED_ENUM(punit_status)> available_punits(
+        std::vector<punit_status> available_punits(
             get_os_thread_count(), punit_status::unassigned);
 
         // find all available processing units with zero use count

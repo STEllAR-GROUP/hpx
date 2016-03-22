@@ -202,7 +202,7 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async(BOOST_SCOPED_ENUM(launch) policy, Ts&&... vs) const
+        async(launch policy, Ts&&... vs) const
         {
             return hpx::detail::async_impl<Action>(policy,
                 get_next_target(), std::forward<Ts>(vs)...);
@@ -216,7 +216,7 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async_cb(BOOST_SCOPED_ENUM(launch) policy, Callback&& cb, Ts&&... vs) const
+        async_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::async_cb_impl<Action>(policy,
                 get_next_target(), std::forward<Callback>(cb),
