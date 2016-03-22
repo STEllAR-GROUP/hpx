@@ -15,7 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/once.hpp>
 #include <boost/filesystem/path.hpp>
@@ -114,7 +114,8 @@ namespace hpx { namespace util { namespace plugin {
             {
                 if (NULL != h_)
                 {
-                    boost::lock_guard<boost::mutex> lock(dll::mutex_instance());
+                    boost::lock_guard<boost::recursive_mutex> lock(
+                        dll::mutex_instance());
 
                     dll::deinit_library(h_);
                     dlerror();
@@ -207,7 +208,7 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            boost::lock_guard<boost::mutex> lock(mutex_instance());
+            boost::lock_guard<boost::recursive_mutex> lock(mutex_instance());
 
             static_assert(
                 boost::is_pointer<SymbolType>::value,
@@ -271,7 +272,7 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                boost::lock_guard<boost::mutex> lock(mutex_instance());
+                boost::lock_guard<boost::recursive_mutex> lock(mutex_instance());
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
@@ -353,7 +354,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (NULL != dll_handle)
             {
-                boost::lock_guard<boost::mutex> lock(mutex_instance());
+                boost::lock_guard<boost::recursive_mutex> lock(mutex_instance());
 
                 deinit_library(dll_handle);
                 dlerror();
@@ -362,9 +363,9 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         // protect access to dl... functions
-        static boost::mutex &mutex_instance()
+        static boost::recursive_mutex &mutex_instance()
         {
-            static boost::mutex mutex;
+            static boost::recursive_mutex mutex;
             return mutex;
         }
 
