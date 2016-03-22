@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
+#include <hpx/exception.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
@@ -25,9 +26,12 @@ namespace hpx { namespace parcelset
     {
         register_coalescing_for_action()
         {
+            // ignore all errors as the module might not be available
+            hpx::error_code ec (hpx::lightweight);
             hpx::register_message_handler(
                 "coalescing_message_handler",
-                get_action_coalescing_name<Action>()
+                get_action_coalescing_name<Action>(),
+                ec
             );
         }
         static register_coalescing_for_action instance_;
