@@ -146,7 +146,7 @@ namespace hpx
 }
 #else
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
@@ -420,7 +420,8 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    Iterator wait_some_n(std::size_t n, Iterator begin,
+    Iterator
+    wait_some_n(std::size_t n, Iterator begin,
         std::size_t count, error_code& ec = throws)
     {
         typedef

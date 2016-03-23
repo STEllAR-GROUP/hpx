@@ -95,7 +95,7 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/when_each.hpp>
 #include <hpx/util/detail/pack.hpp>
 
@@ -115,13 +115,15 @@ namespace hpx { namespace lcos
     }
 
     template <typename F, typename Iterator>
-    void wait_each(F&& f, Iterator begin, Iterator end)
+    void
+    wait_each(F&& f, Iterator begin, Iterator end)
     {
         lcos::when_each(std::forward<F>(f), begin, end).wait();
     }
 
     template <typename F, typename Iterator>
-    void wait_each_n(F&& f, Iterator begin, std::size_t count)
+    void
+    wait_each_n(F&& f, Iterator begin, std::size_t count)
     {
         when_each_n(std::forward<F>(f), begin, count).wait();
     }

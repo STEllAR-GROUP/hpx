@@ -137,7 +137,7 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
@@ -196,7 +196,8 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
-    Iterator wait_any_n(Iterator begin, std::size_t count,
+    Iterator
+    wait_any_n(Iterator begin, std::size_t count,
         error_code& ec = throws)
     {
         return wait_some_n(1, begin, count, ec);

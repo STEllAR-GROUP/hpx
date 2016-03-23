@@ -84,7 +84,7 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_some.hpp>
@@ -101,6 +101,7 @@ namespace hpx
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -363,7 +364,8 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    Iterator wait_all_n(Iterator begin, std::size_t count)
+    Iterator
+    wait_all_n(Iterator begin, std::size_t count)
     {
         typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
