@@ -31,14 +31,12 @@ void test_persistent_executitor_parameters()
         persistent_auto_chunk_size p;
         auto policy = par.with(p);
         test_for_each(policy, iterator_tag());
-        HPX_TEST_NEQ(policy.parameters().get_chunk_size_value(), std::size_t(0));
     }
 
     {
         persistent_auto_chunk_size p;
         auto policy = par(task).with(p);
         test_for_each_async(policy, iterator_tag());
-        HPX_TEST_NEQ(policy.parameters().get_chunk_size_value(), std::size_t(0));
     }
 
     parallel_executor par_exec;
@@ -46,14 +44,12 @@ void test_persistent_executitor_parameters()
         persistent_auto_chunk_size p;
         auto policy = par.on(par_exec).with(p);
         test_for_each(policy, iterator_tag());
-        HPX_TEST_NEQ(policy.parameters().get_chunk_size_value(), std::size_t(0));
     }
 
     {
         persistent_auto_chunk_size p;
         auto policy = par(task).on(par_exec).with(p);
         test_for_each_async(policy, iterator_tag());
-        HPX_TEST_NEQ(policy.parameters().get_chunk_size_value(), std::size_t(0));
     }
 }
 
@@ -66,27 +62,23 @@ void test_persistent_executitor_parameters_ref()
     {
         persistent_auto_chunk_size p;
         test_for_each(par.with(boost::ref(p)), iterator_tag());
-        HPX_TEST_NEQ(boost::unwrap_ref(par.with(boost::ref(p)).parameters()).get_chunk_size_value(), std::size_t(0));
     }
 
     {
         persistent_auto_chunk_size p;
         test_for_each_async(par(task).with(boost::ref(p)), iterator_tag());
-        HPX_TEST_NEQ(boost::unwrap_ref(par(task).with(boost::ref(p)).parameters()).get_chunk_size_value(), std::size_t(0));
     }
 
     parallel_executor par_exec;
     {
         persistent_auto_chunk_size p;
         test_for_each(par.on(par_exec).with(boost::ref(p)), iterator_tag());
-        HPX_TEST_NEQ(boost::unwrap_ref(par.on(par_exec).with(boost::ref(p)).parameters()).get_chunk_size_value(), std::size_t(0));
     }
 
     {
         persistent_auto_chunk_size p;
         test_for_each_async(par(task).on(par_exec).with(boost::ref(p)),
             iterator_tag());
-        HPX_TEST_NEQ(boost::unwrap_ref(par(task).on(par_exec).with(boost::ref(p)).parameters()).get_chunk_size_value(), std::size_t(0));
     }
 
 }
