@@ -69,6 +69,50 @@ to a different compute node).
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2048] - Fixing gcc startup hangs
+* [pr    2047] - Fixing when_xxx and wait_xxx for MSVC12
+* [pr    2042] - Clarify that HPX builds can use (much) more than 2GB per process
+* [pr    2041] - Changing future_iterator_traits to support pointers
+* [issue 2040] - Improve documentation memory usage warning?
+* [pr    2039] - Coroutine cleanup
+* [pr    2038] - Fix cmake policy CMP0042 warning MACOSX_RPATH
+* [pr    2037] - Avoid redundant specialization of [unique_]function_nonser
+* [pr    2036] - nvcc dies with an internal error upon pushing/popping warnings
+                 inside templates
+* [issue 2035] - Use a less restrictive iterator definition in
+                 hpx::lcos::detail::future_iterator_traits
+* [pr    2034] - Fixing compilation error with thread queue wait time
+                 performance counter
+* [issue 2033] - Compilation error when compiling with thread queue waittime
+                 performance counter
+* [pr    2031] - Don't restart timer on every incoming parcel
+* [pr    2030] - Unify handling of execution policies in parallel algorithms
+* [pr    2029] - Make pkg-config .pc files use .dylib on OSX
+* [pr    2028] - Adding process component
+* [pr    2027] - Making check for compiler compatibility independent on compiler
+                 path
+* [pr    2025] - Fixing inspect tool
+* [pr    2024] - Intel13 removal
+* [pr    2023] - Fix errors related to older boost versions and parameter pack
+                 expansions in lambdas
+* [issue 2022] - gmake fail: "No rule to make target
+                 /usr/lib46/libboost_context-mt.so"
+* [issue 2020] - Make errors related to init_globally.cpp example while building
+                 HPX out of the box
+* [pr    2019] - Fixed some compilation and cmake errors encountered in nqueen
+                 example
+* [pr    2018] - For loop algorithms
+* [pr    2017] - Non-recursive at_index implementation
+* [pr    2014] - Fixed dataflow if invoked action returns a future
+* [pr    2013] - Fixing compilation issues with external example
+* [pr    2012] - Added Sierpinski Triangle example
+* [issue 2011] - Compilation error while running sample hello_world_component code
+* [issue 2009] - pkg-config order incorrect on 14.04 / GCC 4.8
+* [issue 2008] - Compilation error in dataflow of action returning a future
+* [pr    2007] - Adding new performance counter exposing overall scheduler time
+* [pr    2006] - Function includes
+* [pr    2005] - Adding an example demonstrating how to initialize HPX from a
+                 global object
 * [pr    2004] - Fixing 2000
 * [pr    2003] - Adding generation parameter to gather to enable using it more
                  than once
@@ -244,6 +288,10 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1796] - Outdated documentation to be revised
 * [issue 1753] - HPX performance degrades with time since execution begins
 * [issue 1748] - All public HPX headers need to be self contained
+* [pr    1719] - How to build HPX with Visual Studio
+* [issue 1684] - Race condition when using --hpx:connect?
+* [pr    1658] - Add serialization for std::set (as there is for std::vector
+                 and std::map)
 * [issue 1523] - Remote async with deferred launch policy never executes
 * [issue 1472] - Serialization issues
 * [issue 1457] - Implement N4392: C++ Latches and Barriers
