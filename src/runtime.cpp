@@ -1198,7 +1198,7 @@ namespace hpx
         if (NULL != rt)
         {
             state st = rt->get_state();
-            return st == state_stopped || st == state_shutdown;
+            return st >= state_shutdown;
         }
         return true;        // assume stopped
     }

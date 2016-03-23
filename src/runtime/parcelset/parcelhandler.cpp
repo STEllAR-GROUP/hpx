@@ -440,7 +440,7 @@ namespace hpx { namespace parcelset
             typedef std::pair<boost::shared_ptr<parcelport>, locality> destination_pair;
             destination_pair dest = find_appropriate_destination(addrs[0].locality_);
 
-            if (load_message_handlers_)
+            if (load_message_handlers_ && !hpx::is_stopped_or_shutting_down())
             {
                 policies::message_handler* mh =
                     p.get_message_handler(this, dest.second);
