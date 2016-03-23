@@ -316,7 +316,7 @@ namespace hpx { namespace naming
                 // The splitting is happening in two parts:
                 // First get the current credit and split it:
                 // Case 1: credit == 1 ==> we need to request new credit from
-                //                         AGAS. This is happening synchronously.
+                //                         AGAS. This is happening asynchronously.
                 // Case 2: credit != 1 ==> Just fill with new credit
                 //
                 // Scenario that might happen:
