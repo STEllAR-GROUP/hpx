@@ -14,7 +14,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/util/unused.hpp>
 #include <hpx/components/process/util/windows/child.hpp>
 #include <windows.h>
 
@@ -91,7 +90,7 @@ struct executor
         int const setup_sequencer[] = {
             0, (call_on_CreateProcess_setup(*this)(ts), 0)...
         };
-        HPX_UNUSED(setup_sequencer);
+        (void)setup_sequencer;
 
         if (!::CreateProcess(
             exe,
@@ -108,14 +107,14 @@ struct executor
             int const error_sequencer[] = {
                 0, (call_on_CreateProcess_error(*this)(ts), 0)...
             };
-            HPX_UNUSED(error_sequencer);
+            (void)error_sequencer;
         }
         else
         {
             int const success_sequencer[] = {
                 0, (call_on_CreateProcess_success(*this)(ts), 0)...
             };
-            HPX_UNUSED(success_sequencer);
+            (void)success_sequencer;
         }
 
         return child(proc_info);
