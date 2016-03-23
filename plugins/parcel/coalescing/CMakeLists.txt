@@ -22,6 +22,8 @@ macro(add_coalescing_module)
         FOLDER "Core/Plugins/MessageHandler"
         )
 
+    add_definitions(-DHPX_PARCEL_COALESCING_MODULE_EXPORTS)
+
     add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
     add_hpx_pseudo_dependencies(core plugins.parcel.coalescing)
   endif()

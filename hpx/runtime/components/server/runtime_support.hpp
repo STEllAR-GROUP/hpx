@@ -389,8 +389,15 @@ namespace hpx { namespace components { namespace server
             std::set<std::string>& startup_handled);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
-        bool load_plugin(util::section& ini, std::string const& instance,
+        bool load_plugin(hpx::util::plugin::dll& d,
+            util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path const& lib,
+            bool isenabled,
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
+        bool load_plugin_dynamic(
+            util::section& ini, std::string const& instance,
+            std::string const& component, boost::filesystem::path lib,
             bool isenabled,
             boost::program_options::options_description& options,
             std::set<std::string>& startup_handled);

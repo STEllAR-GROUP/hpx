@@ -1914,40 +1914,36 @@ namespace hpx { namespace components { namespace server
         if (it != modules_.cend())
         {
             // use loaded module, instantiate the requested factory
-            if (!load_component((*it).second, ini, instance, component, lib,
-                    prefix, agas_client, isdefault, isenabled, options,
-                    startup_handled))
-            {
-                return false;   // next please :-P
-            }
+            return load_component((*it).second, ini, instance, component, lib,
+                prefix, agas_client, isdefault, isenabled, options,
+                startup_handled);
         }
-        else {
-            // first, try using the path as the full path to the library
-            error_code ec(lightweight);
-            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
+
+        // first, try using the path as the full path to the library
+        error_code ec(lightweight);
+        hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
+        d.load_library(ec);
+        if (ec) {
+            // build path to component to load
+            std::string libname(HPX_MAKE_DLL_STRING(component));
+            lib /= hpx::util::create_path(libname);
             d.load_library(ec);
             if (ec) {
-                // build path to component to load
-                std::string libname(HPX_MAKE_DLL_STRING(component));
-                lib /= hpx::util::create_path(libname);
-                d.load_library(ec);
-                if (ec) {
-                    LRT_(warning) << "dynamic loading failed: " << lib.string()
-                                    << ": " << instance << ": " << get_error_what(ec);
-                    return false;   // next please :-P
-                }
-            }
-
-            // now, instantiate the requested factory
-            if (!load_component(d, ini, instance, component, lib, prefix,
-                    agas_client, isdefault, isenabled, options,
-                    startup_handled))
-            {
+                LRT_(warning) << "dynamic loading failed: " << lib.string()
+                                << ": " << instance << ": " << get_error_what(ec);
                 return false;   // next please :-P
             }
-
-            modules_.insert(std::make_pair(HPX_MANGLE_STRING(component), d));
         }
+
+        // now, instantiate the requested factory
+        if (!load_component(d, ini, instance, component, lib, prefix,
+                agas_client, isdefault, isenabled, options,
+                startup_handled))
+        {
+            return false;   // next please :-P
+        }
+
+        modules_.insert(std::make_pair(HPX_MANGLE_STRING(component), d));
         return true;
     }
 
@@ -2048,7 +2044,6 @@ namespace hpx { namespace components { namespace server
         boost::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
-        namespace fs = boost::filesystem;
         try {
             // initialize the factory instance using the preferences from the
             // ini files
@@ -2227,6 +2222,10 @@ namespace hpx { namespace components { namespace server
 
                 if (sect.get_entry("static", "0") == "1") {
                     // FIXME: implement statically linked plugins
+                    HPX_THROW_EXCEPTION(service_unavailable,
+                        "runtime_support::load_plugins",
+                        "static linking configuration does not support static "
+                        "loading of plugin '" + instance + "'");
                 }
                 else {
 #if defined(HPX_HAVE_STATIC_LINKING)
@@ -2236,18 +2235,8 @@ namespace hpx { namespace components { namespace server
                         "loading of plugin '" + instance + "'");
 #else
                     // first, try using the path as the full path to the library
-                    if (!load_plugin(ini, instance, component, lib, isenabled,
-                            options, startup_handled))
-                    {
-                        // build path to component to load
-                        std::string libname(HPX_MAKE_DLL_STRING(component));
-                        lib /= hpx::util::create_path(libname);
-                        if (!load_plugin(ini, instance, component, lib, isenabled,
-                                options, startup_handled))
-                        {
-                            continue;   // next please :-P
-                        }
-                    }
+                    load_plugin_dynamic(ini, instance, component, lib,
+                        isenabled, options, startup_handled);
 #endif
                 }
             }
@@ -2255,34 +2244,27 @@ namespace hpx { namespace components { namespace server
                 LRT_(warning) << "caught exception while loading " << instance
                               << ", " << e.get_error_code().get_message()
                               << ": " << e.what();
+                if (e.get_error_code().value() == hpx::commandline_option_error)
+                {
+                    std::cerr << "runtime_support::load_pluginss: "
+                              << "invalid command line option(s) to "
+                              << instance << " component: " << e.what()
+                              << std::endl;
+                }
             }
         } // for
         return true;
     }
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
-    bool runtime_support::load_plugin(util::section& ini,
+    bool runtime_support::load_plugin(hpx::util::plugin::dll& d,
+        util::section& ini,
         std::string const& instance, std::string const& plugin,
         boost::filesystem::path const& lib, bool isenabled,
         boost::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
-        namespace fs = boost::filesystem;
-        if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
-            return false;
-
         try {
-            // get the handle of the library
-            error_code ec(lightweight);
-            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
-
-            d.load_library(ec);
-            if (ec) {
-                LRT_(warning) << "dynamic loading failed: " << lib.string()
-                              << ": " << instance << ": " << get_error_what(ec);
-                return false;
-            }
-
             // initialize the factory instance using the preferences from the
             // ini files
             util::section const* glob_ini = NULL;
@@ -2294,6 +2276,7 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(plugin_section))
                 plugin_ini = ini.get_section(plugin_section);
 
+            error_code ec(lightweight);
             if (0 == plugin_ini ||
                 "0" == plugin_ini->get_entry("no_factory", "0"))
             {
@@ -2304,24 +2287,27 @@ namespace hpx { namespace components { namespace server
                 // create the component factory object, if not disabled
                 boost::shared_ptr<plugins::plugin_factory_base> factory (
                     pf.create(instance, ec, glob_ini, plugin_ini, isenabled));
-                if (ec) {
-                    LRT_(warning) << "dynamic loading failed: " << lib.string()
-                                  << ": " << instance << ": " << get_error_what(ec);
-                    return false;
+                if (!ec)
+                {
+                    // store component factory and module for later use
+                    plugin_factory_type data(factory, d, isenabled);
+                    std::pair<plugin_map_type::iterator, bool> p =
+                        plugins_.insert(plugin_map_type::value_type(instance, data));
+
+                    if (!p.second) {
+                        LRT_(fatal) << "duplicate plugin type: " << instance;
+                        return false;
+                    }
+
+                    LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                               << ": " << instance;
                 }
-
-                // store component factory and module for later use
-                plugin_factory_type data(factory, d, isenabled);
-                std::pair<plugin_map_type::iterator, bool> p =
-                    plugins_.insert(plugin_map_type::value_type(instance, data));
-
-                if (!p.second) {
-                    LRT_(fatal) << "duplicate plugin type: " << instance;
-                    return false;   // duplicate component id?
+                else
+                {
+                    LRT_(warning) << "dynamic loading of plugin factory failed: "
+                        << lib.string() << ": " << instance << ": "
+                        << get_error_what(ec);
                 }
-
-                LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                            << ": " << instance;
             }
 
             // make sure startup/shutdown registration is called once for each
@@ -2346,7 +2332,48 @@ namespace hpx { namespace components { namespace server
                           << ": " << instance << ": " << e.what();
             return false;
         }
-        return true;    // component got loaded
+        return true;
+    }
+
+    bool runtime_support::load_plugin_dynamic(util::section& ini,
+        std::string const& instance, std::string const& plugin,
+        boost::filesystem::path lib, bool isenabled,
+        boost::program_options::options_description& options,
+        std::set<std::string>& startup_handled)
+    {
+        modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(plugin));
+        if (it != modules_.cend())
+        {
+            // use loaded module, instantiate the requested factory
+            return load_plugin((*it).second, ini, instance, plugin, lib,
+                isenabled, options, startup_handled);
+        }
+
+        // get the handle of the library
+        error_code ec(lightweight);
+        hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
+        d.load_library(ec);
+        if (ec) {
+            // build path to component to load
+            std::string libname(HPX_MAKE_DLL_STRING(plugin));
+            lib /= hpx::util::create_path(libname);
+            d.load_library(ec);
+            if (ec) {
+                LRT_(warning) << "dynamic loading failed: " << lib.string()
+                                << ": " << instance << ": " << get_error_what(ec);
+                return false;   // next please :-P
+            }
+        }
+
+        // now, instantiate the requested factory
+        if (!load_plugin(d, ini, instance, plugin, lib, isenabled, options,
+                startup_handled))
+        {
+            return false;   // next please :-P
+        }
+
+        modules_.insert(std::make_pair(HPX_MANGLE_STRING(plugin), d));
+        return true;    // plugin got loaded
     }
 #endif
 
