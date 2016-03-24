@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/util/thread_description.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
