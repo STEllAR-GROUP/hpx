@@ -15,10 +15,10 @@
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/unordered_map.hpp>
 #include <boost/cstdint.hpp>
 
 #include <string>
+#include <unordered_map>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel
@@ -41,7 +41,7 @@ namespace hpx { namespace plugins { namespace parcel
             get_counter_type average_time_between_parcels;
         };
 
-        typedef boost::unordered_map<
+        typedef std::unordered_map<
                 std::string, counter_functions, hpx::util::jenkins_hash
             > map_type;
 
