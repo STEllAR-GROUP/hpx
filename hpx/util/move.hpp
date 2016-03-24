@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/util/decay.hpp>
-
 #include <utility>
 
 #if !defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
@@ -29,14 +27,6 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    HPX_FORCEINLINE typename decay<T>::type
-    decay_copy(T&& v)
-    {
-        return std::forward<T>(v);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct make_temporary_impl
