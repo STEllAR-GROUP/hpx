@@ -53,7 +53,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                     combined.
         ///
 
-        explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs, hpx::util::steady_duration const& rel_time)
+        explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs,
+         hpx::util::steady_duration const& rel_time)
           : chunk_size_time_(time_cs.value().count()), min_time_(rel_time.value().count())
         {}
 

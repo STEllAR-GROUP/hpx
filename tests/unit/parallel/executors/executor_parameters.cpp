@@ -101,7 +101,8 @@ void test_persistent_auto_chunk_size()
     }
 
     {
-        hpx::parallel::persistent_auto_chunk_size pacs(boost::chrono::milliseconds(0),boost::chrono::milliseconds(1));
+        hpx::parallel::persistent_auto_chunk_size pacs(
+            boost::chrono::milliseconds(0),boost::chrono::milliseconds(1));
         chunk_size_test(pacs);
     }
 }
