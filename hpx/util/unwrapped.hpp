@@ -105,123 +105,65 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Tuple, typename U>
-        struct unwrap_tuple_push_back;
-
-        template <typename U>
-        struct unwrap_tuple_push_back<util::tuple<>, U>
-        {
-            typedef util::tuple<U> type;
-
-            template <typename U_>
-            static type call(util::tuple<>, U_&& value)
-            {
-                return type(std::forward<U_>(value));
-            }
-        };
-
-        template <typename ...Ts, typename U>
-        struct unwrap_tuple_push_back<util::tuple<Ts...>, U>
-        {
-            typedef util::tuple<Ts..., U> type;
-
-            template <std::size_t ...Is, typename State_, typename U_>
-            static type call(util::detail::pack_c<std::size_t, Is...>,
-                State_&& tuple, U_&& value)
-            {
-                return type(
-                    util::get<Is>(std::forward<State_>(tuple))...,
-                    std::forward<U_>(value));
-            }
-
-            template <typename State_, typename U_>
-            static type call(State_&& tuple, U_&& value)
-            {
-                return call(
-                    typename util::detail::make_index_pack<sizeof...(Ts)>::type(),
-                    std::forward<State_>(tuple), std::forward<U_>(value));
-            }
-        };
-
-        template <
-            typename State, typename Future,
-            bool IsVoid =
-                unwrap_impl<typename std::decay<Future>::type>::is_void::value
-        >
-        struct unwrap_tuple_impl
-        {
-            typedef typename unwrap_tuple_push_back<
-                typename std::decay<State>::type
-              , typename unwrap_impl<
-                    typename std::decay<Future>::type
-                >::type
-            >::type type;
-
-            static type call(State&& tuple, Future&& f)
-            {
-                typedef
-                    unwrap_impl<typename std::decay<Future>::type>
-                    unwrap_impl_t;
-
-                typedef
-                    unwrap_tuple_push_back<
-                        typename std::decay<State>::type
-                      , typename unwrap_impl_t::type
-                    >
-                    unwrap_tuple_push_back_t;
-
-                return unwrap_tuple_push_back_t::call(
-                    std::forward<State>(tuple), unwrap_impl_t::call(f));
-            }
-        };
-
-        template <typename State, typename Future>
-        struct unwrap_tuple_impl<State, Future, /*IsVoid=*/true>
-        {
-            typedef typename std::decay<State>::type type;
-
-            static type call(State&& tuple, Future&& f)
-            {
-                typedef
-                    unwrap_impl<typename std::decay<Future>::type>
-                    unwrap_impl_t;
-
-                unwrap_impl_t::call(f);
-                return std::forward<State>(tuple);
-            }
-        };
-
         template <
             typename Tuple,
-            typename State = util::tuple<>, std::size_t I = 0,
+            typename State = detail::pack<>, std::size_t I = 0,
             bool End =
                 (I == util::tuple_size<typename std::decay<Tuple>::type>::value)
-        >
-        struct unwrap_tuple_fold
+        > struct unwrap_tuple_fold;
+
+        template <
+            typename Tuple, typename State, std::size_t I,
+            typename Future = decltype(util::get<I>(std::declval<Tuple&>())),
+            bool IsVoid =
+                unwrap_impl<typename std::decay<Future>::type>::is_void::value
+        > struct unwrap_tuple_impl;
+
+        template <typename Tuple, typename ...Vs, std::size_t I, typename Future>
+        struct unwrap_tuple_impl<Tuple, detail::pack<Vs...>, I, Future, /*IsVoid=*/false>
         {
-            typedef decltype(util::get<I>(std::declval<Tuple&>())) element_type;
-            typedef unwrap_tuple_impl<State, element_type> unwrap_impl_t;
-            typedef typename unwrap_impl_t::type next_state;
+            typedef unwrap_impl<typename std::decay<Future>::type> unwrap_impl_t;
+            typedef detail::pack<Vs..., typename unwrap_impl_t::type> next_state;
 
             typedef typename unwrap_tuple_fold<Tuple, next_state, I + 1>::type type;
 
-            static type call(Tuple& tuple, State&& state)
+            static type call(Tuple& tuple, Vs&&... vs)
             {
                 return unwrap_tuple_fold<Tuple, next_state, I + 1>::call(
-                    tuple,
-                    unwrap_impl_t::call(
-                        std::forward<State>(state), util::get<I>(tuple)));
+                    tuple, std::forward<Vs>(vs)...,
+                    unwrap_impl_t::call(util::get<I>(tuple)));
             }
         };
 
-        template <typename Tuple, typename State, std::size_t I>
-        struct unwrap_tuple_fold<Tuple, State, I, /*End=*/true>
+        template <typename Tuple, typename ...Vs, std::size_t I, typename Future>
+        struct unwrap_tuple_impl<Tuple, detail::pack<Vs...>, I, Future, /*IsVoid=*/true>
         {
-            typedef State type;
+            typedef unwrap_impl<typename std::decay<Future>::type> unwrap_impl_t;
+            typedef detail::pack<Vs...> next_state;
 
-            static type call(Tuple& /*tuple*/, State&& state)
+            typedef typename unwrap_tuple_fold<Tuple, next_state, I + 1>::type type;
+
+            static type call(Tuple& tuple, Vs&&... vs)
             {
-                return std::forward<State>(state);
+                unwrap_impl_t::call(util::get<I>(tuple));
+                return unwrap_tuple_fold<Tuple, next_state, I + 1>::call(
+                    tuple, std::forward<Vs>(vs)...);
+            }
+        };
+
+        template <typename Tuple, typename ...Vs, std::size_t I>
+        struct unwrap_tuple_fold<Tuple, detail::pack<Vs...>, I, /*End=*/false>
+          : unwrap_tuple_impl<Tuple, detail::pack<Vs...>, I>
+        {};
+
+        template <typename Tuple, typename ...Vs, std::size_t I>
+        struct unwrap_tuple_fold<Tuple, detail::pack<Vs...>, I, /*End=*/true>
+        {
+            typedef util::tuple<Vs...> type;
+
+            static type call(Tuple& /*tuple*/, Vs&&... vs)
+            {
+                return util::forward_as_tuple(std::forward<Vs>(vs)...);
             }
         };
 
@@ -236,8 +178,7 @@ namespace hpx { namespace util
             template <typename Tuple>
             static type call(Tuple&& tuple)
             {
-                return unwrap_tuple_fold<Tuple&>::call(
-                    tuple, util::tuple<>());
+                return unwrap_tuple_fold<Tuple&>::call(tuple);
             }
         };
 
