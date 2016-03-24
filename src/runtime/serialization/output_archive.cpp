@@ -10,10 +10,10 @@ namespace hpx { namespace serialization
 {
     void output_archive::add_gid(
         naming::gid_type const & gid,
-        naming::gid_type const & splitted_gid)
+        naming::gid_type const & split_gid)
     {
         HPX_ASSERT(is_future_awaiting());
-        buffer_->add_gid(gid, splitted_gid);
+        buffer_->add_gid(gid, split_gid);
     }
 
     naming::gid_type output_archive::get_new_gid(naming::gid_type const & gid)
@@ -26,6 +26,7 @@ namespace hpx { namespace serialization
 
         naming::gid_type new_gid = it->second.front();
         it->second.pop_front();
+
         return new_gid;
     }
 
