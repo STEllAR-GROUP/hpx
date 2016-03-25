@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             thread pool
         ///
         service_executor(
-                BOOST_SCOPED_ENUM(threads::executors::service_executor_type) t,
+                threads::executors::service_executor_type t,
                 char const* name_suffix = "")
           : threads::executors::service_executor(t, name_suffix)
         {}

@@ -794,7 +794,7 @@ hpx_check_for_cxx11_rvalue_references(
   REQUIRED "HPX needs support for C++11 rvalue references")
 
 hpx_check_for_cxx11_scoped_enums(
-  DEFINITIONS HPX_HAVE_CXX11_SCOPED_ENUMS)
+  REQUIRED "HPX needs support for C++11 scoped enums")
 
 hpx_check_for_cxx11_static_assert(
   REQUIRED "HPX needs support for C++11 static_assert")

@@ -1277,7 +1277,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             virtual execution_policy make_async(
                 task_execution_policy_tag tag) const = 0;
-            virtual BOOST_SCOPED_ENUM(launch) launch_policy() const = 0;
+            virtual launch launch_policy() const = 0;
 
             virtual void* get() HPX_NOEXCEPT = 0;
             virtual void const* get() const HPX_NOEXCEPT = 0;
@@ -1300,7 +1300,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             // defined below
             execution_policy make_async(task_execution_policy_tag tag) const;
-            BOOST_SCOPED_ENUM(launch) launch_policy() const;
+            launch launch_policy() const;
 
             void* get() HPX_NOEXCEPT
             {
@@ -1608,7 +1608,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The associated default launch policy
         ///
-        BOOST_SCOPED_ENUM(launch) launch_policy() const
+        launch launch_policy() const
         {
             return inner_->launch_policy();
         }
@@ -1704,7 +1704,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename Enable = void>
         struct extract_launch_policy
         {
-            static BOOST_SCOPED_ENUM(launch) call() { return launch::async; }
+            static launch call() { return launch::async; }
         };
 
         template <typename ExPolicy>
@@ -1713,11 +1713,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 is_sequential_execution_policy<ExPolicy>::value
             >::type>
         {
-            static BOOST_SCOPED_ENUM(launch) call() { return launch::deferred; }
+            static launch call() { return launch::deferred; }
         };
 
         template <typename ExPolicy>
-        BOOST_SCOPED_ENUM(launch)
+        launch
         execution_policy_shim<ExPolicy>::launch_policy() const
         {
             return extract_launch_policy<ExPolicy>::call();

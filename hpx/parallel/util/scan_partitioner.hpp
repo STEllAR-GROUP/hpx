@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        BOOST_SCOPED_ENUM(hpx::launch) p = (parts & 0x7) ?
+                        hpx::launch p = (parts & 0x7) ?
                             hpx::launch::sync : hpx::launch::async;
 
                         workitems.push_back(
@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        BOOST_SCOPED_ENUM(hpx::launch) p = (parts & 0x7) ?
+                        hpx::launch p = (parts & 0x7) ?
                             hpx::launch::sync : hpx::launch::async;
 
                         workitems.push_back(

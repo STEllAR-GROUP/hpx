@@ -13,7 +13,6 @@
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 
-#include <boost/detail/scoped_enum_emulation.hpp>
 #ifndef HPX_MSVC
 #include <boost/utility/enable_if.hpp>
 #endif
@@ -27,7 +26,7 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_cb(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    async_cb(launch policy, naming::id_type const& gid,
         Callback&& cb, Ts&&... vs);
 
     template <typename Action, typename Callback, typename ...Ts>
@@ -55,7 +54,7 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
-    async_cb(BOOST_SCOPED_ENUM(launch) policy,
+    async_cb(launch policy,
         hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 
@@ -71,7 +70,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
-    async_cb(BOOST_SCOPED_ENUM(launch) launch_policy, DistPolicy const& policy,
+    async_cb(launch launch_policy, DistPolicy const& policy,
         Callback&& cb, Ts&&... vs);
 
     template <typename Action, typename DistPolicy, typename Callback,
@@ -95,7 +94,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
     >::type
-    async_cb(BOOST_SCOPED_ENUM(launch) launch_policy,
+    async_cb(launch launch_policy,
         hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
         DistPolicy const& policy, Callback&& cb, Ts&&... vs);
 

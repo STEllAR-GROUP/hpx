@@ -34,17 +34,17 @@ namespace hpx { namespace lcos { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename dataflow_frame<
-            BOOST_SCOPED_ENUM(launch)
+            launch
           , typename hpx::util::decay<F>::type
           , hpx::util::tuple<
                 typename hpx::traits::acquire_future<Ts>::type...
             >
         >::type
-        call(BOOST_SCOPED_ENUM(launch) policy, F && f, Ts &&... ts)
+        call(launch policy, F && f, Ts &&... ts)
         {
             typedef
                 dataflow_frame<
-                    BOOST_SCOPED_ENUM(launch)
+                    launch
                   , typename hpx::util::decay<F>::type
                   , hpx::util::tuple<
                         typename hpx::traits::acquire_future<Ts>::type...
@@ -69,7 +69,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // BOOST_SCOPED_ENUM(launch)
+    // launch
     template <typename Policy>
     struct dataflow_dispatch<Policy,
         typename boost::enable_if_c<
@@ -78,7 +78,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(BOOST_SCOPED_ENUM(launch) const& policy, F && f, Ts &&... ts)
+        call(launch const& policy, F && f, Ts &&... ts)
         ->  decltype(dataflow_launch_policy_dispatch<
                     typename util::decay<F>::type
                 >::call(policy, std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -96,7 +96,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename detail::dataflow_frame<
-            BOOST_SCOPED_ENUM(launch)
+            launch
           , typename hpx::util::decay<F>::type
           , hpx::util::tuple<
                 typename hpx::traits::acquire_future<Ts>::type...
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace detail
         >::type
         call(F && f, Ts &&... ts)
         {
-            return dataflow_dispatch<BOOST_SCOPED_ENUM(launch)>::call(
+            return dataflow_dispatch<launch>::call(
                 launch::all, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
