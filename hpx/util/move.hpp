@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <utility>
-
 #if !defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
 #define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
     private:                                                                  \
@@ -24,57 +22,5 @@
     private:                                                                  \
 /**/
 #endif
-
-namespace hpx { namespace util { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct make_temporary_impl
-    {
-        typedef T && type;
-
-        template <typename U>
-        HPX_FORCEINLINE static T && call(U& u)
-        {
-            return std::move(u);
-        }
-    };
-
-    template <typename T>
-    struct make_temporary_impl<T&>
-    {
-        typedef T type;
-
-        HPX_FORCEINLINE static T call(T& u)
-        {
-            return u;
-        }
-    };
-
-    template <typename T>
-    struct make_temporary_impl<T const&>
-    {
-        typedef T type;
-
-        HPX_FORCEINLINE static T call(T const& u)
-        {
-            return u;
-        }
-    };
-
-    template <typename T>
-    HPX_FORCEINLINE typename detail::make_temporary_impl<T>::type
-    make_temporary(typename std::remove_reference<T>::type& v)
-    {
-        return detail::make_temporary_impl<T>::call(v);
-    }
-
-    template <typename T>
-    HPX_FORCEINLINE typename detail::make_temporary_impl<T>::type
-    make_temporary(typename std::remove_reference<T>::type&& v)
-    {
-        return detail::make_temporary_impl<T>::call(v);
-    }
-}}}
 
 #endif
