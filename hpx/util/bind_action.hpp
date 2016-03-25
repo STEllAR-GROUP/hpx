@@ -16,7 +16,6 @@
 #include <hpx/traits/is_placeholder.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/mpl/eval_if.hpp>

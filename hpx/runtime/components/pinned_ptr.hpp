@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <memory>

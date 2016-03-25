@@ -24,7 +24,6 @@
 #include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/identity.hpp>

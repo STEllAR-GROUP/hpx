@@ -16,7 +16,6 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/deferred_call.hpp>

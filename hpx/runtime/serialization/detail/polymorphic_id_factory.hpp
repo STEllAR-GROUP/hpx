@@ -13,7 +13,6 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
 
 #include <boost/preprocessor/stringize.hpp>

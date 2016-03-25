@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>

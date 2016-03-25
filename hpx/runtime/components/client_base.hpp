@@ -16,7 +16,6 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>

@@ -16,7 +16,6 @@
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>

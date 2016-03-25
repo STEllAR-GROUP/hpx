@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_FOR_EACH_JUL_18_2015_0959AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/concepts.hpp>
 
 #include <hpx/parallel/algorithms/for_each.hpp>

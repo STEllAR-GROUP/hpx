@@ -14,8 +14,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/util/move.hpp>
-
 #include <utility>
 #include <cstring>
 

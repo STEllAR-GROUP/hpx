@@ -10,7 +10,6 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>

@@ -11,7 +11,6 @@
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 

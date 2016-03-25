@@ -8,7 +8,6 @@
 
 #include <hpx/traits.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>

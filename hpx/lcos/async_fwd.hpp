@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -17,7 +17,6 @@
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #include <hpx/exception.hpp>
 #endif
-#include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

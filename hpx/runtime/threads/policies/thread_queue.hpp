@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
