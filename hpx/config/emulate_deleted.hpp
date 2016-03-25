@@ -18,6 +18,14 @@
     cls& operator=(cls const&) = delete;                                      \
 /**/
 
+#define HPX_DELETE_MOVE_CTOR(cls)                                             \
+    cls(cls&&) = delete;                                                      \
+/**/
+
+#define HPX_DELETE_MOVE_ASSIGN(cls)                                           \
+    cls& operator=(cls&&) = delete;                                           \
+/**/
+
 #else
 
 #define HPX_DELETE_COPY_CTOR(cls)                                             \
@@ -32,11 +40,25 @@
     public:                                                                   \
 /**/
 
+#define HPX_DELETE_MOVE_CTOR(cls)                                             \
+    private:                                                                  \
+        cls(cls&&);                                                           \
+    public:                                                                   \
+/**/
+
+#define HPX_DELETE_MOVE_ASSIGN(cls)                                           \
+    private:                                                                  \
+        cls& operator=(cls&&);                                                \
+    public:                                                                   \
+/**/
+
 #endif // HPX_HAVE_CXX11_DELETED_FUNCTIONS
 
 #define HPX_NON_COPYABLE(cls)                                                 \
     HPX_DELETE_COPY_CTOR(cls)                                                 \
     HPX_DELETE_COPY_ASSIGN(cls)                                               \
+    HPX_DELETE_MOVE_CTOR(cls)                                                 \
+    HPX_DELETE_MOVE_ASSIGN(cls)                                               \
 /**/
 
 #endif
