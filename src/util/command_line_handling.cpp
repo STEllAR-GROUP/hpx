@@ -407,10 +407,13 @@ namespace hpx { namespace util
         // The AGAS host name and port number are pre-initialized from
         //the command line
         std::string agas_host =
-            cfgmap.get_value<std::string>("hpx.agas.address", "");
+            cfgmap.get_value<std::string>("hpx.agas.address",
+                rtcfg_.get_entry("hpx.agas.address", ""));
         boost::uint16_t agas_port =
             cfgmap.get_value<boost::uint16_t>("hpx.agas.port",
-                HPX_INITIAL_IP_PORT);
+                boost::lexical_cast<boost::uint16_t>(
+                    rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)
+                ));
 
         if (vm.count("hpx:agas")) {
             if (!util::split_ip_address(
@@ -506,7 +509,9 @@ namespace hpx { namespace util
         // locality.
         std::string hpx_host =
             cfgmap.get_value<std::string>("hpx.parcel.address",
-                env.host_name(HPX_INITIAL_IP_ADDRESS));
+                env.host_name(
+                    rtcfg_.get_entry("hpx.parcel.address", HPX_INITIAL_IP_ADDRESS)
+                ));
 
         // we expect dynamic connections if:
         //  - --hpx:expect-connecting-localities or
@@ -522,10 +527,16 @@ namespace hpx { namespace util
         ini_config += std::string("hpx.expect_connecting_localities=") +
             (expect_connections ? "1" : "0");
 
+        boost::uint16_t initial_hpx_port = 0;
+        if (num_localities_ != 1 || expect_connections)
+        {
+            initial_hpx_port =
+                boost::lexical_cast<boost::uint16_t>(
+                    rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
+        }
+
         boost::uint16_t hpx_port =
-            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
-                (num_localities_ == 1 && !expect_connections) ?
-                    0 : HPX_INITIAL_IP_PORT);
+            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port", initial_hpx_port);
 
         bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
@@ -570,7 +581,10 @@ namespace hpx { namespace util
         // has been retrieved from the environment)
         if (mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
-            hpx_port = HPX_CONNECTING_IP_PORT;
+            hpx_port = cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
+                boost::lexical_cast<boost::uint16_t>(
+                    rtcfg_.get_entry("hpx.parcel.port", HPX_CONNECTING_IP_PORT)
+                ));
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
