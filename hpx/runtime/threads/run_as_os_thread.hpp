@@ -11,7 +11,7 @@
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <type_traits>
@@ -20,7 +20,7 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    hpx::future<typename std::result_of<F(Ts &&...)>::type>
+    hpx::future<typename util::result_of<F(Ts &&...)>::type>
     run_as_os_thread(F && f, Ts &&... vs)
     {
         HPX_ASSERT(get_self_ptr() != 0);
@@ -30,8 +30,7 @@ namespace hpx { namespace threads
 
         executor_type scheduler;
         return traits::async_execute(scheduler, util::deferred_call(
-                util::functional::invoke(),
-                    std::forward<F>(f), std::forward<Ts>(vs)...
+                std::forward<F>(f), std::forward<Ts>(vs)...
             ));
     }
 }}
