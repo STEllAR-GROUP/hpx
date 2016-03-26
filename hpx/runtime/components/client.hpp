@@ -7,9 +7,10 @@
 #define HPX_COMPONENTS_CLIENT_JUN_25_2015_0145PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/client.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/move.hpp>
+
+#include <utility>
 
 namespace hpx { namespace components
 {
