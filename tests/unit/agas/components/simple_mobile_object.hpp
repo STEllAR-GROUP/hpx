@@ -32,8 +32,8 @@ struct simple_mobile_object
     explicit simple_mobile_object(
         naming::id_type const& locality
         )
+      : base_type(stub_type::create_async(locality))
     {
-        gid_ = stub_type::create_async(locality);
     }
 
     boost::uint64_t get_lva()

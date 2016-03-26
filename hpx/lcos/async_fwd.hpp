@@ -52,14 +52,16 @@ namespace hpx
     auto async(F && f, Ts &&... ts)
     ->  decltype(detail::async_action_dispatch<
                 Action, typename util::decay<F>::type
-            >::call(std::forward<F>(f), std::forward<Ts>(ts)...
-        ));
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...)
+        );
 
     template <typename F, typename ...Ts>
-    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
-    ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...
-        ));
+    HPX_FORCEINLINE
+    auto async(F&& f, Ts&&... ts)
+    ->  decltype(detail::async_dispatch<
+                typename util::decay<F>::type
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...)
+        );
 }
 
 #endif

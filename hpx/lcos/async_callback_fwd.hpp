@@ -35,20 +35,6 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
-#ifndef HPX_MSVC
-    template <typename Action, typename DistPolicy, typename Callback,
-        typename ...Ts>
-    typename boost::enable_if_c<
-        traits::is_distribution_policy<DistPolicy>::value,
-        lcos::future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
-    >::type
-    async_cb(launch launch_policy, DistPolicy const& policy, Callback&& cb,
-        Ts&&... vs);
-#endif
-
     template <typename Action, typename F, typename ...Ts>
     HPX_FORCEINLINE
     auto async_cb(F && f, Ts &&... ts)
