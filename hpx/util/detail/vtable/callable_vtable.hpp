@@ -9,6 +9,7 @@
 #define HPX_UTIL_DETAIL_VTABLE_CALLABLE_VTABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/invoke.hpp>
 
@@ -17,11 +18,21 @@
 
 namespace hpx { namespace util { namespace detail
 {
+    struct callable_vtable_base
+    {
+        template <typename T>
+        HPX_FORCEINLINE static std::size_t get_function_address(void** f)
+        {
+            return traits::get_function_address<T>::call(vtable::get<T>(f));
+        }
+        typedef std::size_t (*get_function_address_t)(void**);
+    };
+
     template <typename Sig>
     struct callable_vtable;
 
     template <typename R, typename ...Ts>
-    struct callable_vtable<R(Ts...)>
+    struct callable_vtable<R(Ts...)> : callable_vtable_base
     {
         template <typename T>
         HPX_FORCEINLINE static R invoke(void** f, Ts&&... vs)

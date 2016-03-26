@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/traits/is_callable.hpp>

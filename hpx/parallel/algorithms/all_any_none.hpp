@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/void_guard.hpp>
-#include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>

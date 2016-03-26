@@ -17,7 +17,6 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 
 #include <type_traits>

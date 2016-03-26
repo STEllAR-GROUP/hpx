@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>

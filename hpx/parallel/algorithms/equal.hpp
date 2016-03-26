@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>

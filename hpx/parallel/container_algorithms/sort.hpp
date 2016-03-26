@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_SORT_DEC_06_2015_1133AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/concepts.hpp>
 
 #include <hpx/parallel/algorithms/sort.hpp>

@@ -16,7 +16,6 @@
 #include <hpx/util/detail/get_table.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/mpl/bool.hpp>

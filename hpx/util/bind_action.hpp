@@ -17,7 +17,6 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/mpl/eval_if.hpp>

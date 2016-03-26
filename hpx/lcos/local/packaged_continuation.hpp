@@ -14,7 +14,6 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>

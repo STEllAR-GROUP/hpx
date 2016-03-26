@@ -9,7 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
 #include <vector>

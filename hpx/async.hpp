@@ -14,7 +14,6 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/runtime/launch_policy.hpp>

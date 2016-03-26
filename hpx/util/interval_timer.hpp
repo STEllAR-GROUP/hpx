@@ -10,7 +10,6 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/thread/locks.hpp>

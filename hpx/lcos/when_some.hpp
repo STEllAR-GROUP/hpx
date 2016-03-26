@@ -236,7 +236,6 @@ namespace hpx
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/atomic.hpp>

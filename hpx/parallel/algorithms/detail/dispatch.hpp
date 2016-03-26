@@ -9,7 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>

@@ -17,7 +17,6 @@
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/move.hpp>
 
 #include <type_traits>
 #include <vector>

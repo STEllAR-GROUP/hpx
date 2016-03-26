@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>

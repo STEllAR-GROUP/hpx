@@ -45,7 +45,6 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/function.hpp>
 // ^ this has to come before the naming/id_type.hpp below
-#include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/runtime/agas_fwd.hpp>

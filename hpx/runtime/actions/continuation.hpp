@@ -7,7 +7,6 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
@@ -38,16 +37,19 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <memory>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    namespace actions {
+    namespace actions
+    {
         template <typename Result>
         struct typed_continuation;
     }
+
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Action, typename ...Ts>
@@ -69,6 +71,58 @@ namespace hpx
 
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename T>
+        struct make_rvalue_impl
+        {
+            typedef T && type;
+
+            template <typename U>
+            HPX_FORCEINLINE static T && call(U& u)
+            {
+                return std::move(u);
+            }
+        };
+
+        template <typename T>
+        struct make_rvalue_impl<T&>
+        {
+            typedef T type;
+
+            HPX_FORCEINLINE static T call(T& u)
+            {
+                return u;
+            }
+        };
+
+        template <typename T>
+        struct make_rvalue_impl<T const&>
+        {
+            typedef T type;
+
+            HPX_FORCEINLINE static T call(T const& u)
+            {
+                return u;
+            }
+        };
+
+        template <typename T>
+        HPX_FORCEINLINE typename detail::make_rvalue_impl<T>::type
+        make_rvalue(typename std::remove_reference<T>::type& v)
+        {
+            return detail::make_rvalue_impl<T>::call(v);
+        }
+
+        template <typename T>
+        HPX_FORCEINLINE typename detail::make_rvalue_impl<T>::type
+        make_rvalue(typename std::remove_reference<T>::type&& v)
+        {
+            return detail::make_rvalue_impl<T>::call(v);
+        }
+    }
+
     template <typename T>
     void set_lco_value(naming::id_type const& id, naming::address && addr, T && t,
         bool move_credits)
@@ -83,13 +137,13 @@ namespace hpx
 
             detail::apply_impl<set_value_action>(
                 target, std::move(addr), actions::action_priority<set_value_action>(),
-                util::detail::make_temporary<T>(t));
+                detail::make_rvalue<T>(t));
         }
         else
         {
             detail::apply_impl<set_value_action>(
                 id, std::move(addr), actions::action_priority<set_value_action>(),
-                util::detail::make_temporary<T>(t));
+                detail::make_rvalue<T>(t));
         }
     }
 
@@ -110,13 +164,13 @@ namespace hpx
 
             detail::apply_impl<set_value_action>(
                 actions::typed_continuation<result_type>(cont), target, std::move(addr),
-                util::detail::make_temporary<T>(t));
+                detail::make_rvalue<T>(t));
         }
         else
         {
             detail::apply_impl<set_value_action>(
                 actions::typed_continuation<result_type>(cont), id, std::move(addr),
-                util::detail::make_temporary<T>(t));
+                detail::make_rvalue<T>(t));
         }
     }
 }

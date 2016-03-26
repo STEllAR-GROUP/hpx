@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>

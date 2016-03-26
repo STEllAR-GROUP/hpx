@@ -15,7 +15,6 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/packaged_action.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/mpl/bool.hpp>
 

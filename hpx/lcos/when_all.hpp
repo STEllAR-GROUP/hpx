@@ -139,7 +139,6 @@ namespace hpx
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>

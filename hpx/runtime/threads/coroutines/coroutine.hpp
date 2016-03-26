@@ -38,7 +38,6 @@
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/mpl/bool.hpp>
 

@@ -15,7 +15,6 @@
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/atomic.hpp>
 

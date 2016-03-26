@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_ALGORITHM_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>

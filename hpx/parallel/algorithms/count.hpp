@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
