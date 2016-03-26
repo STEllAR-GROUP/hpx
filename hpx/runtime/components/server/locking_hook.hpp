@@ -10,7 +10,6 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 

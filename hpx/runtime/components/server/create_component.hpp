@@ -13,7 +13,6 @@
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/functional/new.hpp>

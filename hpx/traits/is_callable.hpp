@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
 
 #include <boost/type_traits/integral_constant.hpp>
@@ -52,21 +51,6 @@ namespace hpx { namespace traits
     struct is_callable<F(Ts...), R>
       : detail::is_callable_impl<F(Ts...), R>
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename T>
-        struct is_deferred_callable;
-
-        template <typename F, typename ...Ts>
-        struct is_deferred_callable<F(Ts...)>
-          : is_callable<
-                typename util::decay_unwrap<F>::type(
-                    typename util::decay_unwrap<Ts>::type...)
-            >
-        {};
-    }
 }}
 
 #endif

@@ -12,7 +12,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>

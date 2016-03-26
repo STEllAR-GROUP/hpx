@@ -12,7 +12,6 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/move.hpp>
 
 #include <utility>
 

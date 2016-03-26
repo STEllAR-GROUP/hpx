@@ -17,7 +17,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>

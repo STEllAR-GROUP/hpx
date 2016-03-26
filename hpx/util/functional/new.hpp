@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_FUNCTIONAL_NEW_JAN_11_2015_0535PM)
 #define HPX_UTIL_FUNCTIONAL_NEW_JAN_11_2015_0535PM
 
-#include <hpx/util/move.hpp>
+#include <utility>
 
 namespace hpx { namespace util { namespace functional
 {

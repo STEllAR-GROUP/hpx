@@ -24,7 +24,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
-#include <hpx/util/move.hpp>
 
 #include <algorithm>
 #include <vector>

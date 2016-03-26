@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_ALGORITHM_INNER_PRODUCT_JUL_15_2015_0730AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>

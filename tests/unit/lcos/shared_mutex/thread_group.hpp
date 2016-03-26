@@ -13,7 +13,6 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/thread/locks.hpp>
 

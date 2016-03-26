@@ -16,6 +16,21 @@
 #include <type_traits>
 #include <utility>
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits { namespace detail
+{
+    template <typename T>
+    struct is_deferred_callable;
+
+    template <typename F, typename ...Ts>
+    struct is_deferred_callable<F(Ts...)>
+      : is_callable<
+            typename util::decay_unwrap<F>::type(
+                typename util::decay_unwrap<Ts>::type...)
+        >
+    {};
+}}}
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>

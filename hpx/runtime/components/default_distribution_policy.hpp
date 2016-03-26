@@ -22,7 +22,6 @@
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/util/move.hpp>
 
 #include <algorithm>
 #include <vector>

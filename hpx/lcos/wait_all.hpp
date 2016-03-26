@@ -90,7 +90,6 @@ namespace hpx
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/mpl/bool.hpp>

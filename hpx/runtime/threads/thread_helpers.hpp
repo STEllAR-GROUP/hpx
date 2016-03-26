@@ -14,7 +14,6 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/exception.hpp>
 

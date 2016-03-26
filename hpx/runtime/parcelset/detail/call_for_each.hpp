@@ -8,7 +8,6 @@
 #define HPX_RUNTIME_PARCELSET_DETAIL_CALL_FOR_EACH_HPP
 
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/util/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset

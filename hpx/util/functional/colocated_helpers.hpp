@@ -14,7 +14,6 @@
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 
 #include <memory>
 

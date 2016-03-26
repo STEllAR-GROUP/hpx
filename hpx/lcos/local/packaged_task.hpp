@@ -15,7 +15,6 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>

@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
