@@ -10,6 +10,7 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/traits/acquire_future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
@@ -18,10 +19,6 @@
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/acquire_future.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
 #include <vector>
