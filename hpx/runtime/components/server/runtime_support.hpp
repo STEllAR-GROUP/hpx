@@ -528,9 +528,13 @@ namespace hpx { namespace components { namespace server
             util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
+
+            // Note, T and Ts can't be (non-const) references, and parameters
+            // should be moved to allow for move-only constructor argument
+            // types.
             id = factory->create_with_args(
                     detail::construct_function<wrapping_type>(
-                        std::forward<T>(v), std::forward<Ts>(vs)...));
+                        std::move(v), std::move(vs)...));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -634,9 +638,12 @@ namespace hpx { namespace components { namespace server
             {
                 typedef typename Component::wrapping_type wrapping_type;
 
+                // Note, T and Ts can't be (non-const) references, and parameters
+                // should be moved to allow for move-only constructor argument
+                // types.
                 ids.push_back(factory->create_with_args(
                     detail::construct_function<wrapping_type>(
-                        std::forward<T>(v), std::forward<Ts>(vs)...)));
+                        std::move(v), std::move(vs)...)));
             }
         }
         LRT_(info) << "successfully created " << count //-V128
