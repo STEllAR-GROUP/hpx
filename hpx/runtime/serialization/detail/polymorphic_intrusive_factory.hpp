@@ -14,10 +14,9 @@
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
-#include <cassert> // boost::unordered_map below needs this
-#include <boost/unordered_map.hpp>
 
 #include <string>
+#include <unordered_map>
 
 namespace hpx { namespace serialization { namespace detail
 {
@@ -26,7 +25,7 @@ namespace hpx { namespace serialization { namespace detail
         HPX_NON_COPYABLE(polymorphic_intrusive_factory);
 
         typedef void* (*ctor_type) ();
-        typedef boost::unordered_map<std::string,
+        typedef std::unordered_map<std::string,
             ctor_type, hpx::util::jenkins_hash> ctor_map_type;
 
     public:
