@@ -7,8 +7,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/lexical_cast.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 void test_make_future()
 {
@@ -46,7 +44,7 @@ void test_make_future()
                 std::move(f1),
                 [](int value) -> std::string
                 {
-                    return boost::lexical_cast<std::string>(value);
+                    return std::to_string(value);
                 });
 
         HPX_TEST_EQ(std::string("42"), f2.get());
@@ -92,7 +90,7 @@ void test_make_shared_future()
                 f1,
                 [](int value) -> std::string
                 {
-                    return boost::lexical_cast<std::string>(value);
+                    return std::to_string(value);
                 });
 
         HPX_TEST_EQ(42, f1.get());

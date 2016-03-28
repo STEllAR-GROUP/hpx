@@ -22,7 +22,6 @@
 
 //Boost includes
 #include <boost/program_options.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <boost/thread/locks.hpp>
 #include <boost/ref.hpp>

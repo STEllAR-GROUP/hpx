@@ -21,6 +21,8 @@
 
 #include <boost/asio/placeholders.hpp>
 
+#include <string>
+
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
     class sender
@@ -37,8 +39,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             cache_(cache)
         {
             std::string fullname(here.get<locality>().address() + "." +
-                boost::lexical_cast<std::string>(here.get<locality>().port()) + "." +
-                boost::lexical_cast<std::string>(connection_count));
+                std::to_string(here.get<locality>().port()) + "." +
+                std::to_string(connection_count));
 
             window_.set_option(data_window::bound_to(fullname));
         }

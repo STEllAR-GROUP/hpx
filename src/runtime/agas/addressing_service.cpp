@@ -40,8 +40,9 @@
 
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/thread/locks.hpp>
+
+#include <string>
 
 namespace hpx { namespace agas
 {
@@ -2972,7 +2973,7 @@ void addressing_service::send_refcnt_requests_sync(
                     "could not decrement reference count (reported error" +
                     hpx::get_error_what(ec) + ", " +
                     hpx::get_error_file_name(ec) + "(" +
-                    boost::lexical_cast<std::string>(
+                    std::to_string(
                         hpx::get_error_line_number(ec)) + "))");
                 return;
             }
@@ -3184,7 +3185,7 @@ namespace hpx
             name += basename;
             if (name[name.size()-1] != '/')
                 name += '/';
-            name += boost::lexical_cast<std::string>(idx);
+            name += std::to_string(idx);
 
             return name;
         }

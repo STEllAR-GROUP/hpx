@@ -108,7 +108,7 @@ namespace throttle { namespace server
     void throttle::register_thread(std::size_t shepherd)
     {
         std::string description("throttle controller for shepherd thread (" +
-            boost::lexical_cast<std::string>(shepherd) + ")");
+            std::to_string(shepherd) + ")");
 
         hpx::applier::register_thread(
             boost::bind(&throttle::throttle_controller, this, shepherd),
@@ -122,7 +122,7 @@ namespace throttle { namespace server
     void throttle::register_suspend_thread(std::size_t shepherd)
     {
         std::string description("suspend shepherd thread (" +
-            boost::lexical_cast<std::string>(shepherd) + ")");
+            std::to_string(shepherd) + ")");
 
         hpx::applier::register_thread(
             boost::bind(&throttle::suspend, this, shepherd),

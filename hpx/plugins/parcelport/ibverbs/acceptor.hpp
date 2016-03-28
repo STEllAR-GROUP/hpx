@@ -26,6 +26,8 @@
 #include <boost/scope_exit.hpp>
 #include <boost/atomic.hpp>
 
+#include <string>
+
 #include <netdb.h>
 #include <rdma/rdma_cma.h>
 
@@ -98,7 +100,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 }
 
                 std::string host = ep.address().to_string();
-                std::string port = boost::lexical_cast<std::string>(ep.port());
+                std::string port = std::to_string(ep.port());
 
                 addrinfo *addr;
 

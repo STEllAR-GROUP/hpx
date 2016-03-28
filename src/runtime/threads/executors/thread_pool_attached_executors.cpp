@@ -18,7 +18,6 @@
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/thread/locks.hpp>
 

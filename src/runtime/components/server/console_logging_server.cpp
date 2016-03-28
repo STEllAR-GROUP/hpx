@@ -21,7 +21,6 @@
 #include <hpx/util/logging/format_fwd.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

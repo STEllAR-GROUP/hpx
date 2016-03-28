@@ -9,7 +9,6 @@
 #include "htts2.hpp"
 
 #include <boost/atomic.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <qthread/qthread.h>
 #include <qthread/qloop.h>
@@ -35,7 +34,7 @@ struct qthreads_driver : htts2::driver
     void run()
     {
         setenv("QT_NUM_SHEPHERDS",
-            boost::lexical_cast<std::string>(this->osthreads_).c_str(), 1);
+            std::to_string(this->osthreads_).c_str(), 1);
         setenv("QT_NUM_WORKERS_PER_SHEPHERD", "1", 1);
 
         qthread_initialize();

@@ -14,7 +14,7 @@ static const char* const latch_name = "latch_remote_test";
 hpx::lcos::latch create_latch(std::size_t num_threads, std::size_t generation)
 {
     std::string name(latch_name);
-    name += boost::lexical_cast<std::string>(generation);
+    name += std::to_string(generation);
 
     hpx::lcos::latch l;
     if (hpx::get_locality_id() == 0)
