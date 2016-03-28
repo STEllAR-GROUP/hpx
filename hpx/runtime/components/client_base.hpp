@@ -45,73 +45,75 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
-    struct is_future<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
-      : boost::mpl::true_
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
-    struct future_traits<Derived,
-        typename std::enable_if<is_client<Derived>::value>::type>
-    {
-        typedef id_type type;
-        typedef id_type result_type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
-    struct future_access<Derived,
-        typename std::enable_if<is_client<Derived>::value>::type>
-    {
-        template <typename SharedState>
-        HPX_FORCEINLINE static Derived
-        create(boost::intrusive_ptr<SharedState> const& shared_state)
-        {
-            return Derived(future<id_type>(shared_state));
-        }
-
-        template <typename SharedState>
-        HPX_FORCEINLINE static Derived
-        create(boost::intrusive_ptr<SharedState> && shared_state)
-        {
-            return Derived(future<id_type>(std::move(shared_state)));
-        }
-
-        template <typename SharedState>
-        HPX_FORCEINLINE static Derived
-        create(SharedState* shared_state)
-        {
-            return Derived(future<id_type>(
-                boost::intrusive_ptr<SharedState>(shared_state)));
-        }
-
-        HPX_FORCEINLINE static
-        typename traits::detail::shared_state_ptr<id_type>::type const&
-        get_shared_state(Derived const& client)
-        {
-            return client.shared_state_;
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
-    struct acquire_future_impl<Derived,
-        typename std::enable_if<is_client<Derived>::value>::type>
-    {
-        typedef Derived type;
-
-        template <typename T_>
-        HPX_FORCEINLINE
-        Derived operator()(T_ && value) const
-        {
-            return std::forward<T_>(value);
-        }
-    };
-
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Derived>
+        struct is_future_customization_point<Derived,
+                typename std::enable_if<is_client<Derived>::value>::type>
+          : boost::mpl::true_
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Derived>
+        struct future_traits_customization_point<Derived,
+            typename std::enable_if<is_client<Derived>::value>::type>
+        {
+            typedef id_type type;
+            typedef id_type result_type;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Derived>
+        struct future_access_customization_point<Derived,
+            typename std::enable_if<is_client<Derived>::value>::type>
+        {
+            template <typename SharedState>
+            HPX_FORCEINLINE static Derived
+            create(boost::intrusive_ptr<SharedState> const& shared_state)
+            {
+                return Derived(future<id_type>(shared_state));
+            }
+
+            template <typename SharedState>
+            HPX_FORCEINLINE static Derived
+            create(boost::intrusive_ptr<SharedState> && shared_state)
+            {
+                return Derived(future<id_type>(std::move(shared_state)));
+            }
+
+            template <typename SharedState>
+            HPX_FORCEINLINE static Derived
+            create(SharedState* shared_state)
+            {
+                return Derived(future<id_type>(
+                    boost::intrusive_ptr<SharedState>(shared_state)));
+            }
+
+            HPX_FORCEINLINE static
+            typename traits::detail::shared_state_ptr<id_type>::type const&
+            get_shared_state(Derived const& client)
+            {
+                return client.shared_state_;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Derived>
+        struct acquire_future_impl<Derived,
+            typename std::enable_if<is_client<Derived>::value>::type>
+        {
+            typedef Derived type;
+
+            template <typename T_>
+            HPX_FORCEINLINE
+            Derived operator()(T_ && value) const
+            {
+                return std::forward<T_>(value);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct shared_state_ptr_for<Derived,
                 typename std::enable_if<is_client<Derived>::value>::type>
@@ -174,8 +176,8 @@ namespace hpx { namespace components
     class client_base : public detail::make_stub<Stub>::type
     {
     private:
-        template <typename Future, typename Enable>
-        friend struct hpx::traits::future_access;
+        template <typename T, typename Enable>
+        friend struct hpx::traits::detail::future_access_customization_point;
 
     protected:
         typedef typename detail::make_stub<Stub>::type stub_type;

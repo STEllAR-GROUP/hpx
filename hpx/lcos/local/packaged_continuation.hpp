@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/runtime/launch_policy.hpp>

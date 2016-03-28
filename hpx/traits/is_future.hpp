@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,11 +29,16 @@ namespace hpx { namespace traits
         struct is_unique_future<lcos::future<R> >
           : boost::mpl::true_
         {};
+
+        template <typename Future, typename Enable = void>
+        struct is_future_customization_point
+          : boost::mpl::false_
+        {};
     }
 
-    template <typename Future, typename Enable>
+    template <typename Future>
     struct is_future
-      : boost::mpl::false_
+      : detail::is_future_customization_point<Future>
     {};
 
     template <typename R>

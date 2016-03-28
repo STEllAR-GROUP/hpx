@@ -160,13 +160,13 @@ namespace hpx { namespace traits
     struct is_range;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename Enable = void>
+    template <typename Future>
     struct is_future;
 
-    template <typename Future, typename Enable = void>
+    template <typename Future>
     struct future_traits;
 
-    template <typename Future, typename Enable = void>
+    template <typename Future>
     struct future_access;
 
     template <typename Range, typename Enable = void>
