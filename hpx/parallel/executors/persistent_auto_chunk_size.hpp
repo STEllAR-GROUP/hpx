@@ -38,7 +38,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// Construct an \a persistent_auto_chunk_size executor parameters object
         ///
         /// \note Default constructed \a persistent_auto_chunk_size executor parameter
-        ///       types will use 80 microseconds as the minimal time for which
+        ///       types will use 0 microseconds as the execution time for each chunk
+        ///       and 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
 
@@ -47,10 +48,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {}
 
         /// Construct an \a persistent_auto_chunk_size executor parameters object
+
+        /// \param time_cs      The execution time for each chunk.
+        ///
+        /// \param rel_time     Constructed \a persistent_auto_chunk_size executor parameter
+        ///                     types will use 80 microseconds as the minimal time for which
+        ///                     any of the scheduled chunks should run.
+        ///
+
+        explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs)
+          : chunk_size_time_(time_cs.value().count()), min_time_(80000)
+        {}
+
+        /// Construct an \a persistent_auto_chunk_size executor parameters object
         ///
         /// \param rel_time     [in] The time duration to use as the minimum
         ///                     to decide how many loop iterations should be
         ///                     combined.
+        ///
+
+        /// \param time_cs       The execution time for each chunk.
         ///
 
         explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs,
@@ -110,8 +127,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
     private:
         /// \cond NOINTERNAL
-        boost::uint64_t chunk_size_time_;
-        boost::uint64_t min_time_;      // nanoseconds
+        boost::uint64_t chunk_size_time_; // nanoseconds
+        boost::uint64_t min_time_;        // nanoseconds
         /// \endcond
     };
 }}}
