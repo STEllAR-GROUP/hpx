@@ -16,7 +16,6 @@
 #include <hpx/exception.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
