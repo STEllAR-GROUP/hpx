@@ -69,7 +69,8 @@ int main(int argc, char* argv[])
     env.push_back("HPX_AGAS_SERVER_ADDRESS=" +
         hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS));
     env.push_back("HPX_AGAS_SERVER_PORT=" +
-        boost::lexical_cast<std::string>(HPX_INITIAL_IP_PORT));
+        hpx::get_config_entry("hpx.agas.port",
+            boost::lexical_cast<std::string>(HPX_INITIAL_IP_PORT)));
 
     // Pass along the parcelport address which should be used by the launched
     // executable
@@ -81,8 +82,7 @@ int main(int argc, char* argv[])
     env.push_back("HPX_PARCEL_SERVER_ADDRESS=" +
         hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS));
     env.push_back("HPX_PARCEL_SERVER_PORT=" +
-        hpx::get_config_entry("hpx.agas.port",
-            boost::lexical_cast<std::string>(HPX_CONNECTING_IP_PORT - port)));
+        boost::lexical_cast<std::string>(HPX_CONNECTING_IP_PORT - port));
 
     // Instruct new locality to connect back on startup using the given name.
     env.push_back("HPX_ON_STARTUP_WAIT_ON_LATCH=launch_process");
