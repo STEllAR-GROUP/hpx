@@ -123,12 +123,14 @@ void test_exclusive_scan1()
     test_exclusive_scan1_async(seq(task), IteratorTag());
     test_exclusive_scan1_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_exclusive_scan1(execution_policy(seq), IteratorTag());
     test_exclusive_scan1(execution_policy(par), IteratorTag());
     test_exclusive_scan1(execution_policy(par_vec), IteratorTag());
 
     test_exclusive_scan1(execution_policy(seq(task)), IteratorTag());
     test_exclusive_scan1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void exclusive_scan_test1()

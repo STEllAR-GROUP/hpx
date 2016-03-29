@@ -1262,6 +1262,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
       : detail::is_rebound_execution_policy<typename hpx::util::decay<T>::type>
     {};
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     ///////////////////////////////////////////////////////////////////////////
     class execution_policy;
 
@@ -1316,6 +1317,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
         /// \endcond
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -1376,10 +1378,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : boost::mpl::true_
         {};
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
         template <>
         struct is_execution_policy<execution_policy>
           : boost::mpl::true_
         {};
+#endif
         /// \endcond
     }
 
@@ -1539,6 +1543,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
       : detail::is_async_execution_policy<typename hpx::util::decay<T>::type>
     {};
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     ///////////////////////////////////////////////////////////////////////////
     ///
     /// An execution policy is an object that expresses the requirements on the
@@ -1723,6 +1728,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
         /// \endcond
     }
+#endif
 }}}
 
 #endif

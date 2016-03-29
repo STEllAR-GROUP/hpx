@@ -79,6 +79,10 @@ to a different compute node).
 * The facility `hpx::lcos::make_future_void()` has been replaced by
   `hpx::make_future<void>()`.
 * We have removed support for Intel V13 and gcc 4.4.x.
+* We have removed the generic `parallel::execution_policy` by default. This
+  feature was removed by the C++ committee from the Parallelism TS V1 when it
+  was moved to C++17. This can still be enabled by specifying
+  `-DHPX_WITH_GENERIC_EXECUTION_POLICY=On` at the configure step.
 
 [heading Bug Fixes (Closed Tickets)]
 

@@ -101,12 +101,14 @@ void test_transform_reduce()
     test_transform_reduce_async(seq(task), IteratorTag());
     test_transform_reduce_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform_reduce(execution_policy(seq), IteratorTag());
     test_transform_reduce(execution_policy(par), IteratorTag());
     test_transform_reduce(execution_policy(par_vec), IteratorTag());
 
     test_transform_reduce(execution_policy(seq(task)), IteratorTag());
     test_transform_reduce(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void transform_reduce_test()
@@ -208,11 +210,13 @@ void test_transform_reduce_exception()
     test_transform_reduce_exception_async(seq(task), IteratorTag());
     test_transform_reduce_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform_reduce_exception(execution_policy(seq), IteratorTag());
     test_transform_reduce_exception(execution_policy(par), IteratorTag());
 
     test_transform_reduce_exception(execution_policy(seq(task)), IteratorTag());
     test_transform_reduce_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void transform_reduce_exception_test()
@@ -312,11 +316,13 @@ void test_transform_reduce_bad_alloc()
     test_transform_reduce_bad_alloc_async(seq(task), IteratorTag());
     test_transform_reduce_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform_reduce_bad_alloc(execution_policy(seq), IteratorTag());
     test_transform_reduce_bad_alloc(execution_policy(par), IteratorTag());
 
     test_transform_reduce_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_transform_reduce_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void transform_reduce_bad_alloc_test()

@@ -235,6 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 std::forward<Args>(args)...);
         }
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
         ///////////////////////////////////////////////////////////////////////////
         template <typename... Args>
         local_result_type
@@ -290,6 +291,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         {
             return call(seq, boost::mpl::true_(), std::forward<Args>(args)...);
         }
+#endif
 
     private:
         char const* const name_;

@@ -21,12 +21,14 @@ void test_inclusive_scan1()
     test_inclusive_scan1_async(seq(task), IteratorTag());
     test_inclusive_scan1_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_inclusive_scan1(execution_policy(seq), IteratorTag());
     test_inclusive_scan1(execution_policy(par), IteratorTag());
     test_inclusive_scan1(execution_policy(par_vec), IteratorTag());
 
     test_inclusive_scan1(execution_policy(seq(task)), IteratorTag());
     test_inclusive_scan1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void inclusive_scan_test1()
@@ -49,12 +51,14 @@ void test_inclusive_scan2()
     test_inclusive_scan2_async(seq(task), IteratorTag());
     test_inclusive_scan2_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_inclusive_scan2(execution_policy(seq), IteratorTag());
     test_inclusive_scan2(execution_policy(par), IteratorTag());
     test_inclusive_scan2(execution_policy(par_vec), IteratorTag());
 
     test_inclusive_scan2(execution_policy(seq(task)), IteratorTag());
     test_inclusive_scan2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void inclusive_scan_test2()
@@ -77,12 +81,14 @@ void test_inclusive_scan3()
     test_inclusive_scan3_async(seq(task), IteratorTag());
     test_inclusive_scan3_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_inclusive_scan3(execution_policy(seq), IteratorTag());
     test_inclusive_scan3(execution_policy(par), IteratorTag());
     test_inclusive_scan3(execution_policy(par_vec), IteratorTag());
 
     test_inclusive_scan3(execution_policy(seq(task)), IteratorTag());
     test_inclusive_scan3(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void inclusive_scan_test3()
@@ -107,11 +113,13 @@ void test_inclusive_scan_exception()
     test_inclusive_scan_exception_async(seq(task), IteratorTag());
     test_inclusive_scan_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_inclusive_scan_exception(execution_policy(seq), IteratorTag());
     test_inclusive_scan_exception(execution_policy(par), IteratorTag());
 
     test_inclusive_scan_exception(execution_policy(seq(task)), IteratorTag());
     test_inclusive_scan_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void inclusive_scan_exception_test()
@@ -136,11 +144,13 @@ void test_inclusive_scan_bad_alloc()
     test_inclusive_scan_bad_alloc_async(seq(task), IteratorTag());
     test_inclusive_scan_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_inclusive_scan_bad_alloc(execution_policy(seq), IteratorTag());
     test_inclusive_scan_bad_alloc(execution_policy(par), IteratorTag());
 
     test_inclusive_scan_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_inclusive_scan_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void inclusive_scan_bad_alloc_test()

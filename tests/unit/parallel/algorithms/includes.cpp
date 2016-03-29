@@ -137,12 +137,14 @@ void test_includes1()
     test_includes1_async(seq(task), IteratorTag());
     test_includes1_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_includes1(execution_policy(seq), IteratorTag());
     test_includes1(execution_policy(par), IteratorTag());
     test_includes1(execution_policy(par_vec), IteratorTag());
 
     test_includes1(execution_policy(seq(task)), IteratorTag());
     test_includes1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void includes_test1()
@@ -277,12 +279,14 @@ void test_includes2()
     test_includes2_async(seq(task), IteratorTag());
     test_includes2_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_includes2(execution_policy(seq), IteratorTag());
     test_includes2(execution_policy(par), IteratorTag());
     test_includes2(execution_policy(par_vec), IteratorTag());
 
     test_includes2(execution_policy(seq(task)), IteratorTag());
     test_includes2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void includes_test2()
@@ -406,11 +410,13 @@ void test_includes_exception()
     test_includes_exception_async(seq(task), IteratorTag());
     test_includes_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_includes_exception(execution_policy(seq), IteratorTag());
     test_includes_exception(execution_policy(par), IteratorTag());
 
     test_includes_exception(execution_policy(seq(task)), IteratorTag());
     test_includes_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void includes_exception_test()
@@ -532,11 +538,13 @@ void test_includes_bad_alloc()
     test_includes_bad_alloc_async(seq(task), IteratorTag());
     test_includes_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_includes_bad_alloc(execution_policy(seq), IteratorTag());
     test_includes_bad_alloc(execution_policy(par), IteratorTag());
 
     test_includes_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_includes_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void includes_bad_alloc_test()

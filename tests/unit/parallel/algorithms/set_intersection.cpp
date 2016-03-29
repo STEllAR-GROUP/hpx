@@ -81,12 +81,14 @@ void test_set_intersection1()
     test_set_intersection1_async(seq(task), IteratorTag());
     test_set_intersection1_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_intersection1(execution_policy(seq), IteratorTag());
     test_set_intersection1(execution_policy(par), IteratorTag());
     test_set_intersection1(execution_policy(par_vec), IteratorTag());
 
     test_set_intersection1(execution_policy(seq(task)), IteratorTag());
     test_set_intersection1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_intersection_test1()
@@ -173,12 +175,14 @@ void test_set_intersection2()
     test_set_intersection2_async(seq(task), IteratorTag());
     test_set_intersection2_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_intersection2(execution_policy(seq), IteratorTag());
     test_set_intersection2(execution_policy(par), IteratorTag());
     test_set_intersection2(execution_policy(par_vec), IteratorTag());
 
     test_set_intersection2(execution_policy(seq(task)), IteratorTag());
     test_set_intersection2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_intersection_test2()
@@ -293,11 +297,13 @@ void test_set_intersection_exception()
     test_set_intersection_exception_async(seq(task), IteratorTag());
     test_set_intersection_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_intersection_exception(execution_policy(seq), IteratorTag());
     test_set_intersection_exception(execution_policy(par), IteratorTag());
 
     test_set_intersection_exception(execution_policy(seq(task)), IteratorTag());
     test_set_intersection_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_intersection_exception_test()
@@ -410,11 +416,13 @@ void test_set_intersection_bad_alloc()
     test_set_intersection_bad_alloc_async(seq(task), IteratorTag());
     test_set_intersection_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_intersection_bad_alloc(execution_policy(seq), IteratorTag());
     test_set_intersection_bad_alloc(execution_policy(par), IteratorTag());
 
     test_set_intersection_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_set_intersection_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_intersection_bad_alloc_test()

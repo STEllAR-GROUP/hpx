@@ -123,12 +123,14 @@ void test_mismatch_binary1()
     test_mismatch_binary1_async(seq(task), IteratorTag());
     test_mismatch_binary1_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_mismatch_binary1(execution_policy(seq), IteratorTag());
     test_mismatch_binary1(execution_policy(par), IteratorTag());
     test_mismatch_binary1(execution_policy(par_vec), IteratorTag());
 
     test_mismatch_binary1(execution_policy(seq(task)), IteratorTag());
     test_mismatch_binary1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void mismatch_binary_test1()
@@ -252,12 +254,14 @@ void test_mismatch_binary2()
     test_mismatch_binary2_async(seq(task), IteratorTag());
     test_mismatch_binary2_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_mismatch_binary2(execution_policy(seq), IteratorTag());
     test_mismatch_binary2(execution_policy(par), IteratorTag());
     test_mismatch_binary2(execution_policy(par_vec), IteratorTag());
 
     test_mismatch_binary2(execution_policy(seq(task)), IteratorTag());
     test_mismatch_binary2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void mismatch_binary_test2()
@@ -367,11 +371,13 @@ void test_mismatch_binary_exception()
     test_mismatch_binary_exception_async(seq(task), IteratorTag());
     test_mismatch_binary_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_mismatch_binary_exception(execution_policy(seq), IteratorTag());
     test_mismatch_binary_exception(execution_policy(par), IteratorTag());
 
     test_mismatch_binary_exception(execution_policy(seq(task)), IteratorTag());
     test_mismatch_binary_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void mismatch_binary_exception_test()
@@ -479,11 +485,13 @@ void test_mismatch_binary_bad_alloc()
     test_mismatch_binary_bad_alloc_async(seq(task), IteratorTag());
     test_mismatch_binary_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_mismatch_binary_bad_alloc(execution_policy(seq), IteratorTag());
     test_mismatch_binary_bad_alloc(execution_policy(par), IteratorTag());
 
     test_mismatch_binary_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_mismatch_binary_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void mismatch_binary_bad_alloc_test()

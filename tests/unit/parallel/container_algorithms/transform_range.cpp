@@ -97,12 +97,14 @@ void test_transform()
     test_transform_async(seq(task), IteratorTag());
     test_transform_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform(execution_policy(seq), IteratorTag());
     test_transform(execution_policy(par), IteratorTag());
     test_transform(execution_policy(par_vec), IteratorTag());
 
     test_transform(execution_policy(seq(task)), IteratorTag());
     test_transform(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void transform_test()
@@ -202,11 +204,13 @@ void test_transform_exception()
     test_transform_exception_async(seq(task), IteratorTag());
     test_transform_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform_exception(execution_policy(seq), IteratorTag());
     test_transform_exception(execution_policy(par), IteratorTag());
 
     test_transform_exception(execution_policy(seq(task)), IteratorTag());
     test_transform_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void transform_exception_test()
@@ -304,11 +308,13 @@ void test_transform_bad_alloc()
     test_transform_bad_alloc_async(seq(task), IteratorTag());
     test_transform_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform_bad_alloc(execution_policy(seq), IteratorTag());
     test_transform_bad_alloc(execution_policy(par), IteratorTag());
 
     test_transform_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_transform_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void transform_bad_alloc_test()

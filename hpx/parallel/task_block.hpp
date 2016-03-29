@@ -452,6 +452,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 
     /// \cond NOINTERNAL
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
 #if defined(HPX_HAVE_CXX14_LAMBDAS)
     template <typename F>
     inline void define_task_block(parallel::execution_policy && policy, F && f)
@@ -499,6 +500,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             "define_task_block",
             "The given execution policy is not supported");
     }
+#endif
 #endif
     /// \endcond
 

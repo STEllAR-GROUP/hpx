@@ -93,6 +93,7 @@ void test_sort1()
     test_sort1_async_str(seq(task), std::greater<std::string>());
     test_sort1_async_str(par(task), std::greater<std::string>());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sort1(execution_policy(seq),       int());
     test_sort1(execution_policy(par),       int());
     test_sort1(execution_policy(par_vec),   int());
@@ -100,6 +101,7 @@ void test_sort1()
     test_sort1(execution_policy(par(task)), int());
     test_sort1(execution_policy(seq(task)), std::string());
     test_sort1(execution_policy(par(task)), std::string());
+#endif
 }
 
 void test_sort2()
@@ -138,11 +140,13 @@ void test_sort2()
     test_sort2_async(seq(task), double(), std::greater<double>());
     test_sort2_async(par(task), float(),  std::greater<float>());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sort2(execution_policy(seq),       int());
     test_sort2(execution_policy(par),       int());
     test_sort2(execution_policy(par_vec),   int());
     test_sort2(execution_policy(seq(task)), int());
     test_sort2(execution_policy(par(task)), int());
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

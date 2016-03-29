@@ -92,11 +92,13 @@ void test_for_each_n_exception()
     test_for_each_n_exception_async(seq(task), IteratorTag());
     test_for_each_n_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_n_exception(execution_policy(seq), IteratorTag());
     test_for_each_n_exception(execution_policy(par), IteratorTag());
 
     test_for_each_n_exception(execution_policy(seq(task)), IteratorTag());
     test_for_each_n_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void for_each_n_exception_test()

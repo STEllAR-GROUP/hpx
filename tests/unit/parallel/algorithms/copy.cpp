@@ -128,12 +128,14 @@ void test_copy()
     test_copy_async(seq(task), IteratorTag());
     test_copy_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy(execution_policy(seq), IteratorTag());
     test_copy(execution_policy(par), IteratorTag());
     test_copy(execution_policy(par_vec), IteratorTag());
 
     test_copy(execution_policy(seq(task)), IteratorTag());
     test_copy(execution_policy(par(task)), IteratorTag());
+#endif
 
     //assure output iterator will work
     test_copy_outiter(seq, IteratorTag());
@@ -143,12 +145,14 @@ void test_copy()
     test_copy_outiter_async(seq(task), IteratorTag());
     test_copy_outiter_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_outiter(execution_policy(seq), IteratorTag());
     test_copy_outiter(execution_policy(par), IteratorTag());
     test_copy_outiter(execution_policy(par_vec), IteratorTag());
 
     test_copy_outiter(execution_policy(seq(task)), IteratorTag());
     test_copy_outiter(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void copy_test()
@@ -247,11 +251,13 @@ void test_copy_exception()
     test_copy_exception_async(seq(task), IteratorTag());
     test_copy_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_exception(execution_policy(seq), IteratorTag());
     test_copy_exception(execution_policy(par), IteratorTag());
 
     test_copy_exception(execution_policy(seq(task)), IteratorTag());
     test_copy_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void copy_exception_test()
@@ -348,11 +354,13 @@ void test_copy_bad_alloc()
     test_copy_bad_alloc_async(seq(task), IteratorTag());
     test_copy_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_bad_alloc(execution_policy(seq), IteratorTag());
     test_copy_bad_alloc(execution_policy(par), IteratorTag());
 
     test_copy_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_copy_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void copy_bad_alloc_test()

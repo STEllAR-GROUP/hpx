@@ -10,7 +10,6 @@
 
 void search_zero_dist_test()
 {
-    using hpx::parallel::execution_policy;
     using hpx::parallel::seq;
     using hpx::parallel::par;
     using hpx::parallel::search;

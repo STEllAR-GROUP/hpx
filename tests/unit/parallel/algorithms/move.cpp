@@ -154,12 +154,14 @@ void test_move()
     test_move_async(seq(task), IteratorTag());
     test_move_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_move(execution_policy(seq), IteratorTag());
     test_move(execution_policy(par), IteratorTag());
     test_move(execution_policy(par_vec), IteratorTag());
 
     test_move(execution_policy(seq(task)), IteratorTag());
     test_move(execution_policy(par(task)), IteratorTag());
+#endif
 
     // output iterator test
     test_outiter_move(seq, IteratorTag());
@@ -169,12 +171,14 @@ void test_move()
     test_outiter_move_async(seq(task), IteratorTag());
     test_outiter_move_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_outiter_move(execution_policy(seq), IteratorTag());
     test_outiter_move(execution_policy(par), IteratorTag());
     test_outiter_move(execution_policy(par_vec), IteratorTag());
 
     test_outiter_move(execution_policy(seq(task)), IteratorTag());
     test_outiter_move(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void move_test()
@@ -275,11 +279,13 @@ void test_move_exception()
     test_move_exception_async(seq(task), IteratorTag());
     test_move_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_move_exception(execution_policy(seq), IteratorTag());
     test_move_exception(execution_policy(par), IteratorTag());
 
     test_move_exception(execution_policy(seq(task)), IteratorTag());
     test_move_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void move_exception_test()
@@ -378,11 +384,13 @@ void test_move_bad_alloc()
     test_move_bad_alloc_async(seq(task), IteratorTag());
     test_move_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_move_bad_alloc(execution_policy(seq), IteratorTag());
     test_move_bad_alloc(execution_policy(par), IteratorTag());
 
     test_move_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_move_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void move_bad_alloc_test()
