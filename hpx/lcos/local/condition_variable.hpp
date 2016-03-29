@@ -13,8 +13,8 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/thread/locks.hpp>
 
@@ -54,9 +54,7 @@ namespace hpx { namespace lcos { namespace local
             boost::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<boost::unique_lock<mutex> > unlock(lock);
 
-            cond_.wait(l, ec);
-
-            l.unlock();
+            cond_.wait(std::move(l), ec);
         }
 
         template <class Predicate>
@@ -82,9 +80,8 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<boost::unique_lock<mutex> > unlock(lock);
 
             threads::thread_state_ex_enum const reason =
-                cond_.wait_until(l, abs_time, ec);
+                cond_.wait_until(std::move(l), abs_time, ec);
 
-            l.unlock();
             if (ec) return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
@@ -155,9 +152,7 @@ namespace hpx { namespace lcos { namespace local
             boost::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
-            cond_.wait(l, ec);
-
-            l.unlock();
+            cond_.wait(std::move(l), ec);
         }
 
         template <class Lock, class Predicate>
@@ -183,9 +178,8 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
-                cond_.wait_until(l, abs_time, ec);
+                cond_.wait_until(std::move(l), abs_time, ec);
 
-            l.unlock();
             if (ec) return cv_status::error;
 
             // if the timer has hit, the waiting period timed out

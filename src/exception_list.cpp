@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_list.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>
 #include <boost/exception_ptr.hpp>

@@ -8,8 +8,6 @@
 #define HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
-#include <hpx/config/export_definitions.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
@@ -27,6 +25,24 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     private:
         typedef lcos::local::spinlock mutex_type;
+
+        class relock_guard
+        {
+            HPX_NON_COPYABLE(relock_guard)
+
+        public:
+            explicit relock_guard(boost::unique_lock<mutex_type>& l)
+              : l_(l)
+            {}
+
+            ~relock_guard()
+            {
+                l_.lock();
+            }
+
+        private:
+            boost::unique_lock<mutex_type>& l_;
+        };
 
     private:
         // define data structures needed for intrusive slist container used for
@@ -99,8 +115,23 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             boost::unique_lock<mutex_type> lock);
 
         HPX_EXPORT threads::thread_state_ex_enum wait(
-            boost::unique_lock<mutex_type>& lock,
+            boost::unique_lock<mutex_type>&& lock,
             char const* description, error_code& ec = throws);
+
+        threads::thread_state_ex_enum wait(
+            boost::unique_lock<mutex_type>& lock,
+            char const* description, error_code& ec = throws)
+        {
+            relock_guard rl(lock);
+            return wait(std::move(lock), description, ec);
+        }
+
+        threads::thread_state_ex_enum wait(
+            boost::unique_lock<mutex_type>&& lock,
+            error_code& ec = throws)
+        {
+            return wait(std::move(lock), "condition_variable::wait", ec);
+        }
 
         threads::thread_state_ex_enum wait(
             boost::unique_lock<mutex_type>& lock,
@@ -110,9 +141,27 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         HPX_EXPORT threads::thread_state_ex_enum wait_until(
-            boost::unique_lock<mutex_type>& lock,
+            boost::unique_lock<mutex_type>&& lock,
             util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws);
+
+        threads::thread_state_ex_enum wait_until(
+            boost::unique_lock<mutex_type>& lock,
+            util::steady_time_point const& abs_time,
+            char const* description, error_code& ec = throws)
+        {
+            relock_guard rl(lock);
+            return wait_until(std::move(lock), abs_time, description, ec);
+        }
+
+        threads::thread_state_ex_enum wait_until(
+            boost::unique_lock<mutex_type>&& lock,
+            util::steady_time_point const& abs_time,
+            error_code& ec = throws)
+        {
+            return wait_until(std::move(lock), abs_time,
+                "condition_variable::wait_until", ec);
+        }
 
         threads::thread_state_ex_enum wait_until(
             boost::unique_lock<mutex_type>& lock,
@@ -124,11 +173,28 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_for(
+            boost::unique_lock<mutex_type>&& lock,
+            util::steady_duration const& rel_time,
+            char const* description, error_code& ec = throws)
+        {
+            return wait_until(std::move(lock), rel_time.from_now(), description, ec);
+        }
+
+        threads::thread_state_ex_enum wait_for(
             boost::unique_lock<mutex_type>& lock,
             util::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), description, ec);
+        }
+
+        threads::thread_state_ex_enum wait_for(
+            boost::unique_lock<mutex_type>&& lock,
+            util::steady_duration const& rel_time,
+            error_code& ec = throws)
+        {
+            return wait_until(std::move(lock), rel_time.from_now(),
+                "condition_variable::wait_for", ec);
         }
 
         threads::thread_state_ex_enum wait_for(

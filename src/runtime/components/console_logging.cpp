@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/thread/locks.hpp>

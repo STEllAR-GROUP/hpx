@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/thread/locks.hpp>
 
