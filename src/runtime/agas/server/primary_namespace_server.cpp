@@ -960,7 +960,9 @@ void primary_namespace::increment(
         refcnt_table_type::iterator it = refcnts_.find(raw);
         if (it == refcnts_.end())
         {
-            boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
+            boost::int64_t count =
+                boost::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
+
             std::pair<refcnt_table_type::iterator, bool> p =
                 refcnts_.insert(refcnt_table_type::value_type(raw, count));
             if (!p.second)
@@ -968,7 +970,7 @@ void primary_namespace::increment(
                 l.unlock();
 
                 HPX_THROWS_IF(ec, invalid_data
-                    , "primary_namespace::decrement_sweep"
+                    , "primary_namespace::increment"
                     , boost::str(boost::format(
                         "couldn't create entry in reference count table, "
                         "raw(%1%), ref-count(%3%)")
@@ -1139,8 +1141,23 @@ void primary_namespace::decrement_sweep(
             refcnt_table_type::iterator it = refcnts_.find(raw);
             if (it == refcnts_.end())
             {
-                boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL)
-                    - credits;
+                if (credits > boost::int64_t(HPX_GLOBALCREDIT_INITIAL))
+                {
+                    l.unlock();
+
+                    HPX_THROWS_IF(ec, invalid_data
+                      , "primary_namespace::decrement_sweep"
+                      , boost::str(boost::format(
+                            "negative entry in reference count table, raw(%1%), "
+                            "refcount(%2%)")
+                            % raw
+                            % boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits));
+                    return;
+                }
+
+                boost::int64_t count =
+                    boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
+
                 std::pair<refcnt_table_type::iterator, bool> p =
                     refcnts_.insert(refcnt_table_type::value_type(raw, count));
                 if (!p.second)
