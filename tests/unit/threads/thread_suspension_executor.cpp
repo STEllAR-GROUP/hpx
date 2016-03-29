@@ -12,10 +12,19 @@
 
 #include <boost/assign/std/vector.hpp>
 
+#include <iostream>
 #include <vector>
 
 #define NUM_SUSPEND_TESTS 1000
 #define NUM_YIELD_TESTS 1000
+
+namespace hpx { namespace threads
+{
+    std::ostream& operator<<(std::ostream& os, executor const&)
+    {
+        return os;
+    }
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_executor_association_yield()

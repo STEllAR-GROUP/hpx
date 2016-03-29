@@ -12,9 +12,6 @@
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/assert.hpp>
-#ifndef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#include <hpx/util/safe_bool.hpp>
-#endif
 
 #include <iosfwd>
 #include <string>
@@ -104,18 +101,10 @@ namespace hpx { namespace util
             return data_.addr_;
         }
 
-#ifdef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
         explicit operator bool() const HPX_NOEXCEPT
         {
             return valid();
         }
-#else
-        operator typename util::safe_bool<thread_description>
-            ::result_type() const HPX_NOEXCEPT
-        {
-            return util::safe_bool<thread_description>()(valid());
-        }
-#endif
 
         bool valid() const HPX_NOEXCEPT
         {
@@ -184,18 +173,10 @@ namespace hpx { namespace util
             return 0;
         }
 
-#ifdef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
         explicit operator bool() const HPX_NOEXCEPT
         {
             return valid();
         }
-#else
-        operator typename util::safe_bool<thread_description>
-            ::result_type() const HPX_NOEXCEPT
-        {
-            return util::safe_bool<thread_description>()(valid());
-        }
-#endif
 
         bool valid() const HPX_NOEXCEPT
         {

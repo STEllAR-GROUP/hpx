@@ -14,7 +14,6 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 namespace hpx { namespace parcelset
 {
@@ -41,9 +40,9 @@ namespace hpx { namespace parcelset
                 return "mpi";
             }
 
-            operator util::safe_bool<locality>::result_type() const
+            explicit operator bool() const HPX_NOEXCEPT
             {
-                return util::safe_bool<locality>()(rank_ != -1);
+                return rank_ != -1;
             }
 
             void save(serialization::output_archive & ar) const

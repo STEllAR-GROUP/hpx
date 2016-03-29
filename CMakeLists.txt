@@ -785,7 +785,7 @@ hpx_check_for_cxx11_deleted_functions(
   REQUIRED "HPX needs support for C++11 deleted functions")
 
 hpx_check_for_cxx11_explicit_cvt_ops(
-  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
+  REQUIRED "HPX needs support for C++11 explicit conversion operators")
 
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")

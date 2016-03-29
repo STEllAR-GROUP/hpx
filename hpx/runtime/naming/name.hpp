@@ -9,7 +9,6 @@
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
@@ -152,9 +151,9 @@ namespace hpx { namespace naming
             return *this;
         }
 
-        operator util::safe_bool<gid_type>::result_type() const
+        explicit operator bool() const HPX_NOEXCEPT
         {
-            return util::safe_bool<gid_type>()(0 != id_lsb_ || 0 != id_msb_);
+            return 0 != id_lsb_ || 0 != id_msb_;
         }
 
         // We support increment, decrement, addition and subtraction
