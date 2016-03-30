@@ -7,6 +7,8 @@
 #define HPX_PARALLEL_ALGORITHMS_SET_OPERATION_MAR_06_2015_0704PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
+
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>

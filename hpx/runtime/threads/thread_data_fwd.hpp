@@ -11,8 +11,10 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/util/unique_function.hpp>
+
+#include <boost/intrusive_ptr.hpp>
 
 namespace hpx { namespace threads
 {
@@ -28,21 +30,6 @@ namespace hpx { namespace threads
         thread_function_type;
 
     class HPX_EXPORT executor;
-
-    ///////////////////////////////////////////////////////////////////////
-    namespace coroutines
-    {
-        /// \cond NOINTERNAL
-        namespace detail
-        {
-            class coroutine_self;
-
-            class coroutine_impl;
-        }
-
-        class coroutine;
-        /// \endcond
-    }
 
     typedef coroutines::coroutine coroutine_type;
 
