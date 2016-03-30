@@ -1151,7 +1151,7 @@ void primary_namespace::decrement_sweep(
                             "negative entry in reference count table, raw(%1%), "
                             "refcount(%2%)")
                             % raw
-                            % boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits));
+                            % (boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits)));
                     return;
                 }
 
