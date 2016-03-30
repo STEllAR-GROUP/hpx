@@ -25,19 +25,20 @@
   </Type>
 
   <Type Name="hpx::naming::id_type">
-    <DisplayString>{{ msb={gid_.px->id_msb_,x} lsb={gid_.px->id_lsb_,x} }}</DisplayString>
+    <DisplayString  Condition="gid_.px == 0">empty</DisplayString>
+    <DisplayString  Condition="gid_.px != 0">{{ msb={gid_.px->id_msb_,x} lsb={gid_.px->id_lsb_,x} }}</DisplayString>
     <Expand>
-      <Item Name="[msb]">gid_.px->id_msb_ &amp; 0x7fffffull,x</Item>
-      <Item Name="[lsb]">gid_.px->id_lsb_,x</Item>
-      <Item Name="[type]">gid_.px->type_</Item>
-      <Item Condition="(gid_.px->type_ != unmanaged) != 0" Name="[has_credit]">(gid_.px->id_msb_ &amp; 0x40000000ull) ? true : false</Item>
-      <Item Condition="(gid_.px->type_ != unmanaged) != 0" Name="[log2credits]">(gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full</Item>
-      <Item Condition="(gid_.px->type_ != unmanaged) != 0" Name="[credits]">1ull &lt;&lt; ((gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full),x</Item>
-      <Item Condition="(gid_.px->type_ != unmanaged) != 0" Name="[was_split]">(gid_.px->id_msb_ &amp; 0x80000000ull) ? true : false</Item>
-      <Item Name="[is_locked]">(gid_.px->id_msb_ &amp; 0x20000000ull) ? true : false</Item>
-      <Item Name="[dont_cache]">(gid_.px->id_msb_ &amp; 0x00800000ull) ? true : false</Item>
-      <Item Condition="((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) != 0" Name="[locality_id]">((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1</Item>
-      <Item Name="[count]">gid_.px->count_.value_</Item>
+      <Item Condition="gid_.px != 0" Name="[msb]">gid_.px->id_msb_ &amp; 0x7fffffull,x</Item>
+      <Item Condition="gid_.px != 0" Name="[lsb]">gid_.px->id_lsb_,x</Item>
+      <Item Condition="gid_.px != 0" Name="[type]">gid_.px->type_</Item>
+      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[has_credit]">(gid_.px->id_msb_ &amp; 0x40000000ull) ? true : false</Item>
+      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[log2credits]">(gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full</Item>
+      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[credits]">1ull &lt;&lt; ((gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full),x</Item>
+      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[was_split]">(gid_.px->id_msb_ &amp; 0x80000000ull) ? true : false</Item>
+      <Item Condition="gid_.px != 0" Name="[is_locked]">(gid_.px->id_msb_ &amp; 0x20000000ull) ? true : false</Item>
+      <Item Condition="gid_.px != 0" Name="[dont_cache]">(gid_.px->id_msb_ &amp; 0x00800000ull) ? true : false</Item>
+      <Item Condition="gid_.px != 0 &lt;&lt; ((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) != 0" Name="[locality_id]">((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1</Item>
+      <Item Condition="gid_.px != 0" Name="[count]">gid_.px->count_.value_</Item>
     </Expand>
   </Type>
 </AutoVisualizer>
