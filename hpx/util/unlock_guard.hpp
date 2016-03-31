@@ -8,7 +8,6 @@
 #define HPX_UTIL_UNLOCK_GUARD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
