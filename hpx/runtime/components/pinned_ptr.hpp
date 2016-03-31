@@ -18,8 +18,11 @@ namespace hpx { namespace components
 {
     namespace detail
     {
-        struct pinned_ptr_base
+        class pinned_ptr_base
         {
+            HPX_NON_COPYABLE(pinned_ptr_base);
+
+        public:
             pinned_ptr_base() HPX_NOEXCEPT
               : lva_(0)
             {}
@@ -30,21 +33,6 @@ namespace hpx { namespace components
 
             virtual ~pinned_ptr_base() {}
 
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            pinned_ptr_base(pinned_ptr_base const&) = delete;
-            pinned_ptr_base(pinned_ptr_base &&) = delete;
-
-            pinned_ptr_base& operator= (pinned_ptr_base const&) = delete;
-            pinned_ptr_base& operator= (pinned_ptr_base &&) = delete;
-#else
-        private:
-            pinned_ptr_base(pinned_ptr_base const&);
-            pinned_ptr_base(pinned_ptr_base &&);
-
-            pinned_ptr_base& operator= (pinned_ptr_base const&);
-            pinned_ptr_base& operator= (pinned_ptr_base &&);
-#endif
-
         protected:
             naming::address::address_type lva_;
         };
@@ -52,6 +40,8 @@ namespace hpx { namespace components
         template <typename Component>
         class pinned_ptr : public pinned_ptr_base
         {
+            HPX_NON_COPYABLE(pinned_ptr);
+
         public:
             pinned_ptr() HPX_NOEXCEPT {}
 
@@ -66,21 +56,6 @@ namespace hpx { namespace components
             {
                 unpin();
             }
-
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            pinned_ptr(pinned_ptr const&) = delete;
-            pinned_ptr(pinned_ptr &&) = delete;
-
-            pinned_ptr& operator= (pinned_ptr const&) = delete;
-            pinned_ptr& operator= (pinned_ptr &&) = delete;
-#else
-        private:
-            pinned_ptr(pinned_ptr const&);
-            pinned_ptr(pinned_ptr &&);
-
-            pinned_ptr& operator= (pinned_ptr const&);
-            pinned_ptr& operator= (pinned_ptr &&);
-#endif
 
         protected:
             void pin()
@@ -124,14 +99,8 @@ namespace hpx { namespace components
         }
 
 #if !defined(HPX_INTEL_VERSION) || (HPX_INTEL_VERSION > 1400)
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-        pinned_ptr(pinned_ptr const&) = delete;
-        pinned_ptr& operator= (pinned_ptr const&) = delete;
-#else
-    private:
-        pinned_ptr(pinned_ptr const&);
-        pinned_ptr& operator= (pinned_ptr const&);
-#endif
+        HPX_DELETE_COPY_CTOR(pinned_ptr);
+        HPX_DELETE_COPY_ASSIGN(pinned_ptr);
 #endif
 
     private:

@@ -174,7 +174,7 @@ namespace detail
     template <typename F1, typename F2>
     class compose_cb_impl
     {
-        HPX_MOVABLE_ONLY(compose_cb_impl)
+        HPX_MOVABLE_ONLY(compose_cb_impl);
 
     public:
         template <typename A1, typename A2>

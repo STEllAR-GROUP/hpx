@@ -8,61 +8,31 @@
 
 #include <hpx/config.hpp>
 
-#ifdef HPX_HAVE_CXX11_DELETED_FUNCTIONS
-
 #define HPX_DELETE_COPY_CTOR(cls)                                             \
-    cls(cls const&) = delete;                                                 \
+    cls(cls const&) = delete                                                  \
 /**/
 
 #define HPX_DELETE_COPY_ASSIGN(cls)                                           \
-    cls& operator=(cls const&) = delete;                                      \
+    cls& operator=(cls const&) = delete                                       \
 /**/
 
 #define HPX_DELETE_MOVE_CTOR(cls)                                             \
-    cls(cls&&) = delete;                                                      \
+    cls(cls&&) = delete                                                       \
 /**/
 
 #define HPX_DELETE_MOVE_ASSIGN(cls)                                           \
-    cls& operator=(cls&&) = delete;                                           \
+    cls& operator=(cls&&) = delete                                            \
 /**/
-
-#else
-
-#define HPX_DELETE_COPY_CTOR(cls)                                             \
-    private:                                                                  \
-        cls(cls const&);                                                      \
-    public:                                                                   \
-/**/
-
-#define HPX_DELETE_COPY_ASSIGN(cls)                                           \
-    private:                                                                  \
-        cls& operator=(cls const&);                                           \
-    public:                                                                   \
-/**/
-
-#define HPX_DELETE_MOVE_CTOR(cls)                                             \
-    private:                                                                  \
-        cls(cls&&);                                                           \
-    public:                                                                   \
-/**/
-
-#define HPX_DELETE_MOVE_ASSIGN(cls)                                           \
-    private:                                                                  \
-        cls& operator=(cls&&);                                                \
-    public:                                                                   \
-/**/
-
-#endif // HPX_HAVE_CXX11_DELETED_FUNCTIONS
 
 #define HPX_NON_COPYABLE(cls)                                                 \
-    HPX_DELETE_COPY_CTOR(cls)                                                 \
-    HPX_DELETE_COPY_ASSIGN(cls)                                               \
-    HPX_DELETE_MOVE_CTOR(cls)                                                 \
+    HPX_DELETE_COPY_CTOR(cls);                                                \
+    HPX_DELETE_COPY_ASSIGN(cls);                                              \
+    HPX_DELETE_MOVE_CTOR(cls);                                                \
     HPX_DELETE_MOVE_ASSIGN(cls)                                               \
 /**/
 
 #define HPX_MOVABLE_ONLY(cls)                                                 \
-    HPX_DELETE_COPY_CTOR(cls)                                                 \
+    HPX_DELETE_COPY_CTOR(cls);                                                \
     HPX_DELETE_COPY_ASSIGN(cls)                                               \
 /**/
 

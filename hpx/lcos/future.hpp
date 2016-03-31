@@ -705,7 +705,7 @@ namespace hpx { namespace lcos
     template <typename R>
     class future : public detail::future_base<future<R>, R>
     {
-        HPX_MOVABLE_ONLY(future)
+        HPX_MOVABLE_ONLY(future);
 
         typedef detail::future_base<future<R>, R> base_type;
 

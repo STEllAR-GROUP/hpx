@@ -772,7 +772,7 @@ hpx_check_for_cxx11_defaulted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
 
 hpx_check_for_cxx11_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+  REQUIRED "HPX needs support for C++11 deleted functions")
 
 hpx_check_for_cxx11_explicit_cvt_ops(
   DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)

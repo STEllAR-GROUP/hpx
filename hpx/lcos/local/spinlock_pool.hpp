@@ -50,10 +50,10 @@ namespace hpx { namespace lcos { namespace local
 
         class scoped_lock
         {
-            HPX_NON_COPYABLE(scoped_lock);
-
         private:
             hpx::lcos::local::spinlock & sp_;
+
+            HPX_NON_COPYABLE(scoped_lock);
 
         public:
             explicit scoped_lock(void const * pv)

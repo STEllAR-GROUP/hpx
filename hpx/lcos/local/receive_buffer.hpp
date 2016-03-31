@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace local
         struct entry_data
         {
         private:
-            HPX_MOVABLE_ONLY(entry_data)
+            HPX_MOVABLE_ONLY(entry_data);
 
         public:
             entry_data()
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace local
         };
 
     private:
-        HPX_MOVABLE_ONLY(receive_buffer)
+        HPX_MOVABLE_ONLY(receive_buffer);
 
     public:
         receive_buffer() {}
@@ -184,7 +184,7 @@ namespace hpx { namespace lcos { namespace local
         struct entry_data
         {
         private:
-            HPX_MOVABLE_ONLY(entry_data)
+            HPX_MOVABLE_ONLY(entry_data);
 
         public:
             entry_data()
@@ -230,7 +230,7 @@ namespace hpx { namespace lcos { namespace local
         };
 
     private:
-        HPX_MOVABLE_ONLY(receive_buffer)
+        HPX_MOVABLE_ONLY(receive_buffer);
 
     public:
         receive_buffer() {}

@@ -119,7 +119,7 @@ namespace hpx { namespace util { namespace detail
     template <typename VTablePtr, typename R, typename ...Ts>
     class function_base<VTablePtr, R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(function_base)
+        HPX_MOVABLE_ONLY(function_base);
 
         // make sure the empty table instance is initialized in time, even
         // during early startup
@@ -296,7 +296,7 @@ namespace hpx { namespace util { namespace detail
           , R(Ts...)
         >
     {
-        HPX_MOVABLE_ONLY(basic_function)
+        HPX_MOVABLE_ONLY(basic_function);
 
         typedef serializable_function_vtable_ptr<VTablePtr> vtable_ptr;
         typedef function_base<vtable_ptr, R(Ts...)> base_type;
@@ -357,7 +357,7 @@ namespace hpx { namespace util { namespace detail
     class basic_function<VTablePtr, R(Ts...), false>
       : public function_base<VTablePtr, R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(basic_function)
+        HPX_MOVABLE_ONLY(basic_function);
 
         typedef function_base<VTablePtr, R(Ts...)> base_type;
 
