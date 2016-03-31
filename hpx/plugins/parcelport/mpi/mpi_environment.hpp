@@ -43,7 +43,7 @@ namespace hpx { namespace util
             scoped_lock();
             ~scoped_lock();
             void unlock();
-            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
+            HPX_MOVABLE_ONLY(scoped_lock);
         };
 
         struct scoped_try_lock
@@ -52,7 +52,7 @@ namespace hpx { namespace util
             ~scoped_try_lock();
             void unlock();
             bool locked;
-            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_try_lock);
+            HPX_MOVABLE_ONLY(scoped_try_lock);
         };
 
         typedef hpx::lcos::local::spinlock mutex_type;

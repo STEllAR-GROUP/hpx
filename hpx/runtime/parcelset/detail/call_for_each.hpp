@@ -17,7 +17,7 @@ namespace hpx { namespace parcelset
     {
         struct call_for_each
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(call_for_each);
+            HPX_MOVABLE_ONLY(call_for_each);
         public:
             typedef void result_type;
 

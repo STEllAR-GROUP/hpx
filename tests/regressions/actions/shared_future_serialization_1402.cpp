@@ -13,7 +13,7 @@ struct movable_only
     movable_only(movable_only&&) {}
 
 private:
-    HPX_MOVABLE_BUT_NOT_COPYABLE(movable_only);
+    HPX_MOVABLE_ONLY(movable_only);
 };
 
 void pass_shared_future_movable(hpx::shared_future<movable_only> const& obj) {}

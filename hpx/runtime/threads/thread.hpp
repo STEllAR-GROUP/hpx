@@ -50,7 +50,7 @@ namespace hpx
 
         ~thread();
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(thread)
+        HPX_MOVABLE_ONLY(thread)
 
     public:
         thread(thread &&) HPX_NOEXCEPT;

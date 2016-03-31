@@ -464,7 +464,7 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class promise
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise)
 
     public:
         typedef detail::promise<Result, RemoteResult> wrapped_type;
@@ -620,7 +620,7 @@ namespace hpx { namespace lcos
     template <>
     class promise<void, util::unused_type>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise)
 
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;

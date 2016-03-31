@@ -53,7 +53,7 @@ namespace hpx { namespace lcos
         struct wait_each
         {
         private:
-            HPX_MOVABLE_BUT_NOT_COPYABLE(wait_each)
+            HPX_MOVABLE_ONLY(wait_each)
 
         protected:
             void on_future_ready_(threads::thread_id_type const& id)
