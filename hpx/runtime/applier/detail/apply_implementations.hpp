@@ -16,7 +16,8 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/util/move.hpp>
+
+#include <boost/format.hpp>
 
 #include <utility>
 

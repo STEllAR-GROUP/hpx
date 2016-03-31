@@ -12,6 +12,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
@@ -20,6 +21,8 @@
 #if defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
 #include <hpx/lcos/broadcast.hpp>
 #endif
+
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -120,6 +123,17 @@ inline void register_counter_types()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+extern std::vector<util::tuple<char const*, char const*> >
+    message_handler_registrations;
+
+inline void register_message_handlers()
+{
+    runtime& rt = get_runtime();
+    for (auto const& t : message_handler_registrations)
+        rt.register_message_handler(util::get<0>(t), util::get<1>(t));
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
 int pre_main(runtime_mode mode);
 int pre_main(runtime_mode mode)
@@ -147,6 +161,11 @@ int pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_code ? ", application exit has been requested" : "");
 
+        // Work on registration requests for message handler plugins
+        register_message_handlers();
+
+        // Register all counter types before the startup functions are being
+        // executed.
         register_counter_types();
 
         rt.set_state(state_pre_startup);
@@ -198,6 +217,9 @@ int pre_main(runtime_mode mode)
             LBT_(info) << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
         }
         // }}}
+
+        // Work on registration requests for message handler plugins
+        register_message_handlers();
 
         // Register all counter types before the startup functions are being
         // executed.

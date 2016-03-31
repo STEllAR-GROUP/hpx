@@ -19,20 +19,15 @@
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Range, typename>
+    template <typename Range, typename Enable>
     struct is_future_range
       : boost::mpl::false_
     {};
 
     template <typename Range>
     struct is_future_range<Range,
-        typename boost::enable_if<is_range<Range> >::type>
+            typename boost::enable_if<is_range<Range> >::type>
       : is_future<typename util::decay<Range>::type::value_type>
-    {};
-
-    template <typename Iterator>
-    struct is_future_range<boost::iterator_range<Iterator> >
-      : is_future<typename std::iterator_traits<Iterator>::value_type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -45,17 +40,6 @@ namespace hpx { namespace traits
         >
     {
         typedef typename Range::value_type future_type;
-    };
-
-    template <typename Iterator>
-    struct future_range_traits<
-            boost::iterator_range<Iterator>,
-            typename boost::enable_if<
-                is_future<typename std::iterator_traits<Iterator>::value_type>
-            >::type
-        >
-    {
-        typedef typename std::iterator_traits<Iterator>::value_type future_type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

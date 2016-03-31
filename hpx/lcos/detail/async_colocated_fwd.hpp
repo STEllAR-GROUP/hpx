@@ -12,7 +12,6 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/async_fwd.hpp>
-#include <hpx/util/move.hpp>
 
 namespace hpx { namespace detail
 {

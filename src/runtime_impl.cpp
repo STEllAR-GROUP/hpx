@@ -21,6 +21,7 @@
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/lcos/latch.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
@@ -260,6 +261,17 @@ namespace hpx {
             evaluate_active_counters(reset, "startup", ec);
         }
 
+        // Connect back to given latch if specified
+        std::string connect_back_to(
+            get_config_entry("hpx.on_startup.wait_on_latch", ""));
+        if (!connect_back_to.empty())
+        {
+            // inform launching process that this locality is up and running
+            hpx::lcos::latch l;
+            l.connect_to(connect_back_to);
+            l.count_down_and_wait();
+        }
+
         // Now, execute the user supplied thread function (hpx_main)
         if (!!func) {
             // Change our thread description, as we're about to call hpx_main
@@ -420,19 +432,32 @@ namespace hpx {
         // stop runtime_impl services (threads)
         thread_manager_->stop(false);    // just initiate shutdown
 
-        // schedule task in timer_pool to execute stopped() below
-        // this is necessary as this function (stop()) might have been called
-        // from a HPX thread, so it would deadlock by waiting for the thread
-        // manager
-        boost::mutex mtx;
-        boost::condition cond;
-        boost::unique_lock<boost::mutex> l(mtx);
+        if (threads::get_self_ptr())
+        {
+            // schedule task on separate thread to execute stopped() below
+            // this is necessary as this function (stop()) might have been called
+            // from a HPX thread, so it would deadlock by waiting for the thread
+            // manager
+            boost::mutex mtx;
+            boost::condition cond;
+            boost::unique_lock<boost::mutex> l(mtx);
 
-        boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
-            boost::ref(cond), boost::ref(mtx)));
-        cond.wait(l);
+            boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
+                boost::ref(cond), boost::ref(mtx)));
+            cond.wait(l);
 
-        t.join();
+            t.join();
+        }
+        else
+        {
+            runtime_support_->stopped();         // re-activate shutdown HPX-thread
+            thread_manager_->stop(blocking);     // wait for thread manager
+
+            // this disables all logging from the main thread
+            deinit_tss();
+
+            LRT_(info) << "runtime_impl: stopped all services";
+        }
 
         // stop the rest of the system
         parcel_handler_.stop(blocking);     // stops parcel pools as well
@@ -611,7 +636,7 @@ namespace hpx {
             thread_support_->register_thread(name);
 
             // initialize coroutines context switcher
-            hpx::util::coroutines::thread_startup(name);
+            hpx::threads::coroutines::thread_startup(name);
 
             // register this thread with any possibly active Intel tool
             HPX_ITT_THREAD_SET_NAME(name);
@@ -648,7 +673,7 @@ namespace hpx {
     void runtime_impl<SchedulingPolicy>::deinit_tss()
     {
         // initialize coroutines context switcher
-        hpx::util::coroutines::thread_shutdown();
+        hpx::threads::coroutines::thread_shutdown();
 
         // reset applier TSS
         applier_.deinit_tss();

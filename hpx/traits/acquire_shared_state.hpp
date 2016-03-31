@@ -14,7 +14,6 @@
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 
 #include <vector>
 #include <iterator>

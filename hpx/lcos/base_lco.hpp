@@ -14,7 +14,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/ini.hpp>
 
-#include <hpx/plugins/parcel/coalescing_message_handler.hpp>
+#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 
 #include <boost/mpl/bool.hpp>
 

@@ -146,7 +146,7 @@ namespace hpx
 }
 #else
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
@@ -156,7 +156,6 @@ namespace hpx
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
@@ -420,7 +419,8 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    Iterator wait_some_n(std::size_t n, Iterator begin,
+    Iterator
+    wait_some_n(std::size_t n, Iterator begin,
         std::size_t count, error_code& ec = throws)
     {
         typedef

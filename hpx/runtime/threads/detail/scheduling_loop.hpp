@@ -15,7 +15,6 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 

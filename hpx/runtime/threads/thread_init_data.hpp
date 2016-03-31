@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/thread_description.hpp>
 
 namespace hpx { namespace threads

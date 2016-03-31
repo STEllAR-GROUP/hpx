@@ -59,7 +59,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__)\
          || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace util { namespace coroutines { namespace detail
+namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     namespace posix
     {
@@ -181,6 +181,10 @@ namespace hpx { namespace util
             "numa_sensitive = 0",
             "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
+            // connect back to the given latch if specified
+            "[hpx.on_startup]",
+            "wait_on_latch = ${HPX_ON_STARTUP_WAIT_ON_LATCH}",
+
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",
@@ -235,7 +239,9 @@ namespace hpx { namespace util
             "-9 = --hpx:node=9",
 
             "[hpx.agas]",
-            "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
+            // 'address' has deliberately no default, see
+            // command_line_handling.cpp
+            "address = ${HPX_AGAS_SERVER_ADDRESS}",
             "port = ${HPX_AGAS_SERVER_PORT:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
             "max_pending_refcnt_requests = "
@@ -451,7 +457,8 @@ namespace hpx { namespace util
         huge_stacksize = init_huge_stack_size();
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
+        threads::coroutines::detail::posix::use_guard_pages =
+            init_use_stack_guard_pages();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
@@ -511,7 +518,8 @@ namespace hpx { namespace util
         huge_stacksize = init_huge_stack_size();
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
+        threads::coroutines::detail::posix::use_guard_pages =
+            init_use_stack_guard_pages();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())

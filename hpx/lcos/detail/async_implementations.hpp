@@ -15,14 +15,13 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/packaged_action.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace detail
 {
     /// \cond NOINTERNAL
-    HPX_FORCEINLINE bool has_async_policy(BOOST_SCOPED_ENUM(launch) policy)
+    HPX_FORCEINLINE bool has_async_policy(launch policy)
     {
         return (static_cast<int>(policy) &
             static_cast<int>(launch::async_policies)) ? true : false;
@@ -165,7 +164,7 @@ namespace hpx { namespace detail
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_impl(BOOST_SCOPED_ENUM(launch) policy, hpx::id_type const& id,
+    async_impl(launch policy, hpx::id_type const& id,
         Ts&&... vs)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -250,7 +249,7 @@ namespace hpx { namespace detail
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_cb_impl(BOOST_SCOPED_ENUM(launch) policy, hpx::id_type const& id,
+    async_cb_impl(launch policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;

@@ -7,6 +7,8 @@
 #define HPX_PARALLEL_ALGORITHMS_SET_OPERATION_MAR_06_2015_0704PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
+
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
@@ -167,10 +169,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 }
 
                 // finally, copy data to destination
-                parallel::util::foreach_n_partitioner<
+                parallel::util::foreach_partitioner<
                         hpx::parallel::parallel_execution_policy
                     >::call(par, chunks.get(), cores,
-                        [buffer, dest](set_chunk_data* chunk, std::size_t)
+                        [buffer, dest](
+                            std::size_t, set_chunk_data* chunk, std::size_t)
                         {
                             std::copy(buffer.get() + chunk->start,
                                 buffer.get() + chunk->start + chunk->len,
@@ -178,8 +181,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         });
 
                 return dest;
-            },
-            1);
+            });
     }
 
     /// \endcond

@@ -12,7 +12,6 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/move.hpp>
 
 #include <string>
 

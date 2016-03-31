@@ -21,7 +21,7 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_cb(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    async_cb(launch policy, naming::id_type const& gid,
         Callback&& cb, Ts&&... vs)
     {
         return hpx::detail::async_cb_impl<Action>(policy, gid,
@@ -46,7 +46,7 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
-    async_cb(BOOST_SCOPED_ENUM(launch) policy,
+    async_cb(launch policy,
         hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
@@ -79,7 +79,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
-    async_cb(BOOST_SCOPED_ENUM(launch) launch_policy, DistPolicy const& policy,
+    async_cb(launch launch_policy, DistPolicy const& policy,
         Callback&& cb, Ts&&... vs)
     {
         return policy.template async_cb<Action>(launch_policy,
@@ -111,7 +111,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
     >::type
-    async_cb(BOOST_SCOPED_ENUM(launch) launch_policy,
+    async_cb(launch launch_policy,
         hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
         DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {

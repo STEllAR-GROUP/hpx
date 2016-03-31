@@ -8,8 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM)
 #define HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -54,7 +53,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r)
             {
                 if (first == last)
@@ -64,7 +63,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 return util::partitioner<ExPolicy, T>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [r](FwdIter part_begin, std::size_t part_size) -> T
                     {
                         T val = *part_begin;

@@ -14,7 +14,6 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -104,7 +103,7 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
-        call(BOOST_SCOPED_ENUM(launch) launch_policy, F&& f, Ts&&... ts)
+        call(launch launch_policy, F&& f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
                 F(Ts&&...)
@@ -143,7 +142,7 @@ namespace hpx { namespace detail
         >::type
         call(F&& f, Ts&&... ts)
         {
-            return async_dispatch<BOOST_SCOPED_ENUM(launch)>::call(
+            return async_dispatch<launch>::call(
                 launch::all, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };

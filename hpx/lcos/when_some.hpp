@@ -224,7 +224,7 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -236,7 +236,6 @@ namespace hpx
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/atomic.hpp>

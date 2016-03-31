@@ -8,8 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM)
 #define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -49,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
@@ -60,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter<1, result_type>(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [](reference t) {

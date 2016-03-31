@@ -13,7 +13,6 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tagged.hpp>
 #include <hpx/lcos/future.hpp>

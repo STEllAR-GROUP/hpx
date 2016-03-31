@@ -1008,6 +1008,7 @@ int cpp_main( int argc_param, char * argv_param[] )
   //// perform the actual inspection, using the requested type of iteration
     for(auto const& search_root: search_roots)
     {
+        ::search_root = search_root;
         visit_all<fs::directory_iterator>( search_root.leaf().string(),
             search_root, inspectors );
     }

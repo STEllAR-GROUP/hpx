@@ -10,14 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, BidirIter
             >::type
-            parallel(ExPolicy policy, BidirIter first, BidirIter last)
+            parallel(ExPolicy && policy, BidirIter first, BidirIter last)
             {
                 typedef std::reverse_iterator<BidirIter> destination_iterator;
                 typedef hpx::util::zip_iterator<BidirIter, destination_iterator>
@@ -64,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last)),
                         std::distance(first, last) / 2,
@@ -123,7 +122,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<BidirIter>::value)>
+        hpx::traits::is_iterator<BidirIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
     {
@@ -180,17 +179,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<BidirIter, OutIter>
             >::type
-            parallel(ExPolicy policy, BidirIter first, BidirIter last,
+            parallel(ExPolicy && policy, BidirIter first, BidirIter last,
                 OutIter dest_first)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
 
                 return util::detail::convert_to_result(
-                    detail::copy<std::pair<iterator, OutIter> >()
-                        .call(
-                            policy, boost::mpl::false_(),
-                            iterator(last), iterator(first), dest_first
-                        ),
+                    detail::copy<std::pair<iterator, OutIter> >().call(
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                        iterator(last), iterator(first), dest_first
+                    ),
                     [](std::pair<iterator, OutIter> const& p)
                         -> std::pair<BidirIter, OutIter>
                     {
@@ -259,8 +257,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<BidirIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<BidirIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
     >::type

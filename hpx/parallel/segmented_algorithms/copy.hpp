@@ -7,13 +7,11 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

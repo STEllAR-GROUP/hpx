@@ -14,7 +14,6 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
@@ -412,7 +411,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
-        void attach(Future const& future, BOOST_SCOPED_ENUM(launch) policy)
+        void attach(Future const& future, launch policy)
         {
             typedef
                 typename traits::detail::shared_state_ptr_for<Future>::type
@@ -484,7 +483,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, BOOST_SCOPED_ENUM(launch) policy,
+    make_continuation(Future const& future, launch policy,
         F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;

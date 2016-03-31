@@ -32,7 +32,7 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>

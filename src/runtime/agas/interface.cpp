@@ -19,6 +19,13 @@
 namespace hpx { namespace agas
 {
 ///////////////////////////////////////////////////////////////////////////////
+bool is_console()
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.is_console();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 bool register_name_sync(
     std::string const& name
   , naming::gid_type const& gid

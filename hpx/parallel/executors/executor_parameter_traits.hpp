@@ -13,6 +13,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -49,6 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Parameters_>
         struct processing_units_count_parameter_helper
         {
             template <typename Parameters>
@@ -64,15 +66,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 return params.processing_units_count();
             }
+
+            static std::size_t call(Parameters_& params)
+            {
+                return call(0, params);
+            }
         };
 
         template <typename Parameters>
         std::size_t call_processing_units_parameter_count(Parameters& params)
         {
-            return processing_units_count_parameter_helper::call(0, params);
+            return processing_units_count_parameter_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type
+                >::call(params);
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Parameters_>
         struct variable_chunk_size_helper
         {
             template <typename Parameters, typename Executor>
@@ -88,15 +98,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 return params.variable_chunk_size(exec);
             }
+
+            template <typename Executor>
+            static bool call(Parameters_& params, Executor& exec)
+            {
+                return call(0, params, exec);
+            }
         };
 
         template <typename Parameters, typename Executor>
         bool call_variable_chunk_size(Parameters& params, Executor& exec)
         {
-            return variable_chunk_size_helper::call(0, params, exec);
+            return variable_chunk_size_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type
+                >::call(params, exec);
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Parameters_>
         struct get_chunk_size_helper
         {
             template <typename Parameters, typename Executor, typename F>
@@ -116,17 +135,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 return params.get_chunk_size(exec, std::forward<F>(f), num_tasks);
             }
+
+            template <typename Executor, typename F>
+            static std::size_t
+            call(Parameters_& params, Executor& exec, F && f,
+                std::size_t num_tasks)
+            {
+                return call(0, params, exec, std::forward<F>(f), num_tasks);
+            }
         };
 
         template <typename Parameters, typename Executor, typename F>
         std::size_t call_get_chunk_size(Parameters& params, Executor& exec,
             F && f, std::size_t num_tasks)
         {
-            return get_chunk_size_helper::call(0, params, exec,
-                std::forward<F>(f), num_tasks);
+            return get_chunk_size_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type
+                >::call(params, exec, std::forward<F>(f), num_tasks);
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Parameters_>
         struct reset_thread_distribution_helper
         {
             template <typename Parameters, typename Executor>
@@ -140,12 +169,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 params.reset_thread_distribution(exec);
             }
+
+            template <typename Executor>
+            static void call(Parameters_& params, Executor& exec)
+            {
+                call(0, params, exec);
+            }
         };
 
         template <typename Parameters, typename Executor>
         void call_reset_thread_distribution(Parameters& params, Executor& exec)
         {
-            reset_thread_distribution_helper::call(0, params, exec);
+            reset_thread_distribution_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type
+                >::call(params, exec);
         }
     }
     /// \endcond

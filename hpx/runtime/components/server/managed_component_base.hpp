@@ -8,6 +8,12 @@
 #define HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
+// this needs to go first to workaround a weird GCC4.6 ICE
+#include <hpx/util/reinitializable_static.hpp>
+#endif
+
 #include <hpx/exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components_fwd.hpp>

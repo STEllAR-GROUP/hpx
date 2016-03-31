@@ -8,8 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM)
 #define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -68,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 typedef typename std::iterator_traits<FwdIter1>::difference_type
@@ -108,9 +107,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
                     hpx::util::make_zip_iterator(first1, first2), count1,
-                    [f, tok](zip_iterator it, std::size_t part_count) mutable -> bool
+                    [f, tok](zip_iterator it, std::size_t part_count)
+                        mutable -> bool
                     {
                         util::loop_n(
                             it, part_count, tok,
@@ -349,7 +350,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)
@@ -366,9 +367,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
                     hpx::util::make_zip_iterator(first1, first2), count,
-                    [f, tok](zip_iterator it, std::size_t part_count) mutable -> bool
+                    [f, tok](zip_iterator it, std::size_t part_count)
+                        mutable -> bool
                     {
                         util::loop_n(
                             it, part_count, tok,

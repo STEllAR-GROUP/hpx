@@ -13,17 +13,15 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
-#include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
-    BOOST_SCOPED_ENUM_START(cv_status)
+    enum class cv_status
     {
         no_timeout, timeout, error
     };
-    BOOST_SCOPED_ENUM_END
 
     class condition_variable
     {
@@ -67,7 +65,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock>
-        BOOST_SCOPED_ENUM(cv_status)
+        cv_status
         wait_until(Lock& lock, util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
@@ -99,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock>
-        BOOST_SCOPED_ENUM(cv_status)
+        cv_status
         wait_for(Lock& lock, util::steady_duration const& rel_time,
             error_code& ec = throws)
         {

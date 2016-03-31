@@ -10,7 +10,6 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_GENERATE_JAN_25_2016_0622PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/concepts.hpp>
 
 #include <hpx/parallel/algorithms/generate.hpp>

@@ -46,7 +46,7 @@ void plain_actions(hpx::id_type const& there)
         HPX_TEST(there == f2.get());
     }
 
-    BOOST_SCOPED_ENUM(hpx::launch) policies[] =
+    hpx::launch policies[] =
     {
         hpx::launch::async,
 //        hpx::launch::deferred,    // FIXME: enable once #1523 has been fixed

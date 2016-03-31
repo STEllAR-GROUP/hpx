@@ -104,7 +104,7 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
@@ -114,7 +114,6 @@ namespace hpx
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/utility/enable_if.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos

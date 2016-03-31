@@ -194,7 +194,7 @@ namespace hpx { namespace lcos { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         HPX_FORCEINLINE
-        void finalize(BOOST_SCOPED_ENUM(launch) policy)
+        void finalize(launch policy)
         {
             typedef
                 boost::mpl::bool_<boost::is_void<result_type>::value>
@@ -488,20 +488,20 @@ namespace hpx { namespace lcos { namespace detail
             typename ...Ts>
         HPX_FORCEINLINE static
         typename dataflow_frame<
-            BOOST_SCOPED_ENUM(launch)
+            launch
           , Derived
           , hpx::util::tuple<
                 hpx::id_type
               , typename hpx::traits::acquire_future<Ts>::type...
             >
         >::type
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+        call(launch launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         {
             typedef
                 dataflow_frame<
-                    BOOST_SCOPED_ENUM(launch)
+                    launch
                   , Derived
                   , hpx::util::tuple<
                         hpx::id_type
@@ -531,7 +531,7 @@ namespace hpx { namespace lcos { namespace detail
             typename ...Ts>
         HPX_FORCEINLINE static
         typename dataflow_frame<
-            BOOST_SCOPED_ENUM(launch)
+            launch
           , Derived
           , hpx::util::tuple<
                 hpx::id_type
@@ -545,7 +545,7 @@ namespace hpx { namespace lcos { namespace detail
         }
     };
 
-    // BOOST_SCOPED_ENUM(launch)
+    // launch
     template <typename Action, typename Policy>
     struct dataflow_action_dispatch<Action, Policy,
         typename boost::enable_if_c<
@@ -559,7 +559,7 @@ namespace hpx { namespace lcos { namespace detail
                     Action
                 >::remote_result_type
             >::type>
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+        call(launch launch_policy,
             naming::id_type const& id, Ts &&... ts)
         {
             return dataflow_dispatch<Action>::call(launch_policy, Action(), id,
@@ -578,7 +578,7 @@ namespace hpx { namespace lcos { namespace detail
 //                 >::type
 //             >
 //         >::type
-//         call(BOOST_SCOPED_ENUM(launch) launch_policy,
+//         call(launch launch_policy,
 //             DistPolicy const& policy, Ts&&... ts)
 //         {
 //             return policy.template async<Action>(launch_policy,
@@ -601,7 +601,7 @@ namespace hpx { namespace lcos { namespace detail
         call(naming::id_type const& id, Ts&&... ts)
         {
             return dataflow_action_dispatch<
-                    Action, BOOST_SCOPED_ENUM(launch)
+                    Action, launch
                 >::call(launch::all, id, std::forward<Ts>(ts)...);
         }
     };
@@ -624,7 +624,7 @@ namespace hpx { namespace lcos { namespace detail
 //         call(DistPolicy const& policy, Ts&&... ts)
 //         {
 //             return dataflow_action_dispatch<
-//                     Action, BOOST_SCOPED_ENUM(launch)
+//                     Action, launch
 //                 >::call(launch::all, policy, std::forward<Ts>(ts)...);
 //         }
 //     };
@@ -645,11 +645,11 @@ namespace hpx { namespace lcos { namespace detail
         template <typename ...Ts>
         HPX_FORCEINLINE static
         lcos::future<result_type>
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+        call(launch launch_policy,
             Action const&, naming::id_type const& id, Ts &&... ts)
         {
             return dataflow_action_dispatch<
-                    Action, BOOST_SCOPED_ENUM(launch)
+                    Action, launch
                 >::call(launch_policy, id, std::forward<Ts>(ts)...);
         }
 
@@ -659,7 +659,7 @@ namespace hpx { namespace lcos { namespace detail
 //             traits::is_distribution_policy<DistPolicy>::value,
 //             lcos::future<result_type>
 //         >::type
-//         call(BOOST_SCOPED_ENUM(launch) launch_policy,
+//         call(launch launch_policy,
 //             Action const&, DistPolicy const& policy, Ts&&... ts)
 //         {
 //             return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);

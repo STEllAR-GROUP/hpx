@@ -10,7 +10,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/lcos/future.hpp>

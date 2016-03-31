@@ -8,8 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM)
 #define HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -135,7 +134,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 if (first1 == last1)
@@ -151,7 +150,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
                     first2, std::distance(first2, last2),
                     [first1, last1, first2, last2, f, tok](
                             FwdIter2 part_begin, std::size_t part_count

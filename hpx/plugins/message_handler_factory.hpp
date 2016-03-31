@@ -63,6 +63,12 @@ namespace hpx { namespace plugins
         ///
         ~message_handler_factory() {}
 
+        /// Register a action for this message handler type
+        void register_action(char const* action, error_code& ec)
+        {
+            MessageHandler::register_action(action, ec);
+        }
+
         /// Create a new instance of a message handler
         ///
         /// return Returns the newly created instance of the message handler

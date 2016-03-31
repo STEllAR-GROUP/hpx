@@ -132,9 +132,28 @@ namespace hpx { namespace traits
     struct default_chunk_size;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator, typename Enable = void>
+    struct is_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_input_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_output_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_forward_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_bidirectional_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_random_access_iterator;
+
     template <typename Range, typename Enable = void>
     struct is_range;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct is_future;
 

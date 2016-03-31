@@ -26,21 +26,21 @@ namespace hpx { namespace util { namespace detail
     struct function_vtable_ptr
     {
         typename callable_vtable<Sig>::invoke_t invoke;
+        typename callable_vtable<Sig>::get_function_address_t get_function_address;
         copyable_vtable::copy_t copy;
         vtable::get_type_t get_type;
         vtable::destruct_t destruct;
         vtable::delete_t delete_;
-        vtable::get_function_address_t get_function_address;
         bool empty;
 
         template <typename T>
         function_vtable_ptr(construct_vtable<T>) HPX_NOEXCEPT
           : invoke(&callable_vtable<Sig>::template invoke<T>)
+          , get_function_address(&callable_vtable<Sig>::template get_function_address<T>)
           , copy(&copyable_vtable::template copy<T>)
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)
           , delete_(&vtable::template delete_<T>)
-          , get_function_address(&vtable::template get_function_address<T>)
           , empty(std::is_same<T, empty_function<Sig> >::value)
         {}
 
@@ -252,6 +252,7 @@ namespace hpx { namespace traits
         }
     };
 
+#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
     template <typename Sig>
     struct get_function_address<util::function_nonser<Sig> >
     {
@@ -261,6 +262,7 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

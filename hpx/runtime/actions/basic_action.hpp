@@ -25,7 +25,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
@@ -274,7 +273,7 @@ namespace hpx { namespace actions
         {
             template <typename IdOrPolicy, typename ...Ts>
             HPX_FORCEINLINE static LocalResult call(
-                boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
+                boost::mpl::false_, launch policy,
                 IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
@@ -283,7 +282,7 @@ namespace hpx { namespace actions
 
             template <typename IdOrPolicy, typename ...Ts>
             HPX_FORCEINLINE static LocalResult call(
-                boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
+                boost::mpl::true_, launch policy,
                 IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
@@ -294,7 +293,7 @@ namespace hpx { namespace actions
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
         HPX_FORCEINLINE local_result_type operator()(
-            BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+            launch policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
             return util::void_guard<local_result_type>(),
@@ -311,7 +310,7 @@ namespace hpx { namespace actions
 
         template <typename ...Ts>
         HPX_FORCEINLINE local_result_type operator()(
-            BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+            launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
             return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
@@ -331,7 +330,7 @@ namespace hpx { namespace actions
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
         >::type
-        operator()(BOOST_SCOPED_ENUM(launch) policy,
+        operator()(launch policy,
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
             return util::void_guard<local_result_type>(),
@@ -360,7 +359,7 @@ namespace hpx { namespace actions
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
         >::type
-        operator()(BOOST_SCOPED_ENUM(launch) policy,
+        operator()(launch policy,
             DistPolicy const& dist_policy, Ts&&... vs) const
         {
             return (*this)(launch::all, dist_policy, throws,

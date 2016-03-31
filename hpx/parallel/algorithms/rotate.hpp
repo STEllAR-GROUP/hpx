@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/dataflow.hpp>
@@ -119,12 +119,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, IterPair
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter new_first,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter new_first,
                 FwdIter last)
             {
                 return util::detail::algorithm_result<
                         ExPolicy, IterPair
-                    >::get(rotate_helper(policy, first, new_first, last));
+                    >::get(rotate_helper(std::forward<ExPolicy>(policy),
+                            first, new_first, last));
             }
         };
         /// \endcond
@@ -179,7 +180,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value)>
+        hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
@@ -272,11 +273,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter new_first,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter new_first,
                 FwdIter last, OutIter dest_first)
             {
                 return util::detail::algorithm_result<ExPolicy, IterPair>::get(
-                    rotate_copy_helper(policy, first, new_first, last, dest_first));
+                    rotate_copy_helper(std::forward<ExPolicy>(policy),
+                        first, new_first, last, dest_first));
             }
         };
         /// \endcond
@@ -333,8 +335,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<FwdIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>

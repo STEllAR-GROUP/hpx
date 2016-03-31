@@ -8,9 +8,8 @@
 #if !defined(HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM)
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/void_guard.hpp>
-#include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -49,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                  T const& val)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
@@ -61,7 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         first, std::distance(first, last),
                         [val](type& v) {
                             v = val;
@@ -154,15 +153,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy policy, OutIter first, std::size_t count,
+            parallel(ExPolicy && policy, OutIter first, std::size_t count,
                 T const& val)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;
 
                 return
                     for_each_n<OutIter>().call(
-                        policy, boost::mpl::false_(), first, count,
-                        [val](type& v) {
+                        std::forward<ExPolicy>(policy),
+                        boost::mpl::false_(), first, count,
+                        [val](type& v) -> void
+                        {
                             v = val;
                         });
             }
@@ -232,7 +233,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least bidirectional iterator.");
 
         // if count is representing a negative value, we do nothing
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                 std::move(first));

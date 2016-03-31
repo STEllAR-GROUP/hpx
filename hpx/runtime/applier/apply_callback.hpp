@@ -13,6 +13,10 @@
 
 #include <hpx/runtime/applier/apply.hpp>
 
+#include <boost/format.hpp>
+
+#include <utility>
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////

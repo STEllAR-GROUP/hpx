@@ -44,12 +44,6 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
 
-    /// \ cond NODETAIL
-    ///   Please note that if you change the value of threads::terminated
-    ///   above, you will need to adjust do_call(dummy<1> = 1) in
-    ///   util/coroutine/detail/coroutine_impl.hpp as well.
-    /// \ endcond
-
     ///////////////////////////////////////////////////////////////////////
     /// \enum thread_priority
     enum thread_priority

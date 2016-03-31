@@ -24,7 +24,6 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -39,6 +38,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <iterator>
 
 namespace hpx { namespace lcos { namespace detail
 {
@@ -297,7 +297,11 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Iterator>
     struct future_iterator_traits<Iterator,
         typename hpx::util::always_void<
+#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 needs special help
             typename Iterator::iterator_category
+#else
+            typename std::iterator_traits<Iterator>::value_type
+#endif
         >::type>
     {
         typedef
@@ -365,7 +369,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename hpx::traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, BOOST_SCOPED_ENUM(launch) policy,
+    make_continuation(Future const& future, launch policy,
         F && f);
 
     template <typename ContResult, typename Future, typename F>
@@ -542,7 +546,7 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, F && f, error_code& ec = throws) const
+        then(launch policy, F && f, error_code& ec = throws) const
         {
             typedef
                 typename future_then_result<Derived, F>::result_type
@@ -658,7 +662,7 @@ namespace hpx { namespace lcos { namespace detail
         //   - future_status::timeout if the function is returning because the
         //     absolute timeout (30.2.4) specified by abs_time has expired.
         // Throws: timeout-related exceptions (30.2.4).
-        BOOST_SCOPED_ENUM(future_status)
+        future_status
         wait_until(hpx::util::steady_time_point const& abs_time,
             error_code& ec = throws) const
         {
@@ -683,7 +687,7 @@ namespace hpx { namespace lcos { namespace detail
         //   - future_status::timeout if the function is returning because the
         //     relative timeout (30.2.4) specified by rel_time has expired.
         // Throws: timeout-related exceptions (30.2.4).
-        BOOST_SCOPED_ENUM(future_status)
+        future_status
         wait_for(hpx::util::steady_duration const& rel_time,
             error_code& ec = throws) const
         {
@@ -894,7 +898,7 @@ namespace hpx { namespace lcos
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, F && f, error_code& ec = throws)
+        then(launch policy, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
             return base_type::then(policy, std::forward<F>(f), ec);

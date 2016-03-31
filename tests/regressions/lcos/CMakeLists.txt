@@ -88,7 +88,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/LCOs")
 
-  add_hpx_regression_test("lcos" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("lcos_dir" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.regressions.lcos_dir.${test})
@@ -103,7 +103,39 @@ foreach(test ${tests})
 endforeach()
 
 add_hpx_test(
-  "tests.regressions.lcos" after_588_4
+  "tests.regressions.lcos_dir" after_588_4
   EXECUTABLE after_588
   LOCALITIES 2
   THREADS_PER_LOCALITY 4)
+
+# compile only tests
+set(compile_tests
+    future_range_ambiguity_2032
+    wait_all_std_array_2035
+   )
+
+foreach(compile_test ${compile_tests})
+  set(sources
+      ${compile_test}.cpp)
+
+  source_group("Source Files" FILES ${sources})
+
+  add_hpx_regression_compile_test(
+    "lcos_dir"
+    ${compile_test}
+    SOURCES ${sources}
+    ${${compile_test}_FLAGS}
+    FOLDER "Tests/Regressions/LCOs/CompileOnly")
+
+    # add a custom target for this example
+    add_hpx_pseudo_target(tests.regressions.lcos_dir.${compile_test})
+
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(tests.regressions.lcos_dir
+      tests.regressions.lcos_dir.${compile_test})
+
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(tests.regressions.lcos_dir.${compile_test}
+      "tests.regressions.lcos_dir.${compile_test}")
+
+endforeach()

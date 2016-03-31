@@ -8,7 +8,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 

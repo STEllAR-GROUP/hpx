@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 
@@ -101,7 +101,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
-        traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             F, traits::projected_range<Proj, Rng>
@@ -216,8 +216,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
-        traits::is_iterator<InIter2>::value &&
-        traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_iterator<InIter2>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj1, Rng>::value &&
         traits::is_projected<Proj2, InIter2>::value &&
         traits::is_indirect_callable<
@@ -345,7 +345,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng1>::value &&
         traits::is_range<Rng2>::value &&
-        traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj1, Rng1>::value &&
         traits::is_projected_range<Proj2, Rng2>::value &&
         traits::is_indirect_callable<

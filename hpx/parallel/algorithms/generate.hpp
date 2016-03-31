@@ -10,9 +10,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
@@ -46,12 +48,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename F>
             static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         first, std::distance(first, last),
                         [f](type& v)
                         {
@@ -139,7 +141,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename F,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value)>
+        hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     generate(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
@@ -182,14 +184,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy policy, OutIter first, std::size_t count,
+            parallel(ExPolicy && policy, OutIter first, std::size_t count,
                 F && f)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;
 
                 return
                     for_each_n<OutIter>().call(
-                        policy, boost::mpl::false_(), first, count,
+                        std::forward<ExPolicy>(policy),
+                        boost::mpl::false_(), first, count,
                         [f](type& v)
                         {
                             v = f();
@@ -253,7 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename OutIter, typename Size, typename F,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     generate_n(ExPolicy && policy, OutIter first, Size count, F && f)
     {
@@ -269,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires at least output iterator.");
 
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                 std::move(first));

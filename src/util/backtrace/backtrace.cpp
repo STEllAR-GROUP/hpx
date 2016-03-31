@@ -64,10 +64,9 @@
 
 namespace hpx { namespace util {
 
-    namespace stack_trace {
-#if defined(BOOST_HAVE_EXECINFO) && defined(BOOST_HAVE_UNWIND) && \
-        defined(BOOST_HAVE_EXECINFO)
-
+    namespace stack_trace
+    {
+#if defined(BOOST_HAVE_EXECINFO) && defined(BOOST_HAVE_UNWIND)
         struct trace_data
         {
             trace_data(void **array,std::size_t size)

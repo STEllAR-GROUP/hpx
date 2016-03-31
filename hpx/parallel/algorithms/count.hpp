@@ -8,8 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM)
 #define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy policy, Iter first, Iter last,
+            parallel(ExPolicy && policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
@@ -66,7 +65,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 return util::partitioner<ExPolicy, difference_type>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [value](Iter part_begin, std::size_t part_size) -> difference_type
                     {
                         difference_type ret = 0;
@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy policy, Iter first, Iter last, Pred && op)
+            parallel(ExPolicy && policy, Iter first, Iter last, Pred && op)
             {
                 if (first == last)
                 {
@@ -224,7 +224,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 return util::partitioner<ExPolicy, difference_type>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [op](Iter part_begin, std::size_t part_size) -> difference_type
                     {
                         difference_type ret = 0;

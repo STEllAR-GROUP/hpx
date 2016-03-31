@@ -9,15 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <type_traits>
-#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
-#include <boost/shared_ptr.hpp>
-#else
 #include <memory>
-#endif
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -145,11 +140,7 @@ namespace hpx { namespace components
           : data_(new detail::pinned_ptr<Component>(lva))
         {}
 
-#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
-        boost::shared_ptr<detail::pinned_ptr_base> data_;
-#else
         std::unique_ptr<detail::pinned_ptr_base> data_;
-#endif
     };
 }}
 

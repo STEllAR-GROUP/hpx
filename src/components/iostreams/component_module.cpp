@@ -1,11 +1,16 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/component_startup_shutdown.hpp>
+#include <hpx/runtime/components/server/component.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/util/function.hpp>
 
 #include <hpx/components/iostreams/server/output_stream.hpp>
 #include <hpx/components/iostreams/ostream.hpp>
@@ -17,7 +22,7 @@ HPX_REGISTER_COMPONENT_MODULE()
 typedef hpx::iostreams::server::output_stream ostream_type;
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::managed_component<ostream_type>,
+    hpx::components::component<ostream_type>,
     output_stream_factory, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(ostream_type)
 

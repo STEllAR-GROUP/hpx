@@ -12,7 +12,7 @@ function(hpx_check_compiler_compatibility)
     return()
   endif()
 
-  if(NOT CMAKE_CXX_COMPILER STREQUAL HPX_CXX_COMPILER)
+  if(NOT (CMAKE_CXX_COMPILER_ID STREQUAL HPX_CXX_COMPILER_ID AND CMAKE_CXX_COMPILER_VERSION STREQUAL HPX_CXX_COMPILER_VERSION))
     set(MESSAGE "Compilers do not match. In order to compile HPX application it is"
         " recommended to use the same compiler as you did for HPX. "
         "HPX_CXX_COMPILER=${HPX_CXX_COMPILER}, "

@@ -223,6 +223,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the default number of coroutine heaps.
+#if !defined(HPX_COROUTINE_NUM_HEAPS)
+#  define HPX_COROUTINE_NUM_HEAPS 7
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the parent thread information in debug builds
 /// only.
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -266,8 +272,8 @@
 #endif
 
 /// By default we capture only 5 levels of stack back trace on suspension
-#if !defined(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)
-#  define HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH 5
+#if !defined(HPX_HAVE_THREAD_BACKTRACE_DEPTH)
+#  define HPX_HAVE_THREAD_BACKTRACE_DEPTH 5
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -289,6 +295,7 @@
 #ifdef HPX_WINDOWS  // windows
 #  define HPX_INI_PATH_DELIMITER            ";"
 #  define HPX_SHARED_LIB_EXTENSION          ".dll"
+#  define HPX_EXECUTABLE_EXTENSION          ".exe"
 #  define HPX_PATH_DELIMITERS               "\\/"
 #else                 // unix like
 #  define HPX_INI_PATH_DELIMITER            ":"
@@ -300,6 +307,7 @@
 #  else  // linux & co
 #    define HPX_SHARED_LIB_EXTENSION        ".so"
 #  endif
+#  define HPX_EXECUTABLE_EXTENSION          ""
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -332,6 +340,14 @@
 #  define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
 #endif
 
+#if !defined(HPX_PLUGIN_COMPONENT_PREFIX)
+#  if defined(HPX_PLUGIN_NAME)
+#    define HPX_PLUGIN_COMPONENT_PREFIX HPX_MANGLE_NAME(HPX_PLUGIN_NAME)
+#  elif defined(HPX_COMPONENT_NAME)
+#    define HPX_PLUGIN_COMPONENT_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
+#  endif
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NAME)
 #  define HPX_PLUGIN_NAME hpx
@@ -346,12 +362,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_PLUGIN_COMPONENT_PREFIX)
-#  define HPX_PLUGIN_COMPONENT_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-
 #if !defined(HPX_APPLICATION_STRING)
 #  if defined(HPX_APPLICATION_NAME)
 #    define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)

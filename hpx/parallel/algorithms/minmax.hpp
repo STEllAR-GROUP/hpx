@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/util/invoke.hpp>
@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
                 Proj && proj)
             {
                 if (first == last)
@@ -120,9 +120,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         get(std::move(first));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter>::
-                    call(
-                        policy, first, std::distance(first, last),
+                return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
+                        std::forward<ExPolicy>(policy),
+                        first, std::distance(first, last),
                         [f, proj](FwdIter it, std::size_t part_count)
                         {
                             return sequential_min_element(
@@ -238,7 +238,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type>,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             F,
@@ -340,7 +340,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
                 Proj && proj)
             {
                 if (first == last)
@@ -349,9 +349,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         get(std::move(first));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter>::
-                    call(
-                        policy, first, std::distance(first, last),
+                return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
+                        std::forward<ExPolicy>(policy),
+                        first, std::distance(first, last),
                         [f, proj](FwdIter it, std::size_t part_count)
                         {
                             return sequential_max_element(
@@ -468,7 +468,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type>,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             F,
@@ -588,7 +588,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, FwdIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 F && f, Proj && proj)
             {
                 typedef std::pair<FwdIter, FwdIter> result_type;
@@ -603,7 +603,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, result_type, result_type>::
                     call(
-                        policy, result.first, std::distance(result.first, last),
+                        std::forward<ExPolicy>(policy),
+                        result.first, std::distance(result.first, last),
                         [f, proj](FwdIter it, std::size_t part_count)
                         {
                             return sequential_minmax_element(
@@ -736,7 +737,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type>,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, FwdIter>, traits::projected<Proj, FwdIter>

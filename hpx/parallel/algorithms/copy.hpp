@@ -11,11 +11,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -74,7 +76,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
@@ -82,7 +84,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [](reference t)
@@ -177,8 +179,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
@@ -252,7 +254,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
@@ -260,7 +262,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         count,
                         [](reference t)
@@ -330,8 +332,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
@@ -360,7 +362,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         using hpx::util::make_tagged_pair;
 
         // if count is representing a negative value, we do nothing
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<
                     ExPolicy, tagged_pair<tag::in(InIter), tag::out(OutIter)>
@@ -422,7 +424,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest, Pred && pred, Proj && proj = Proj())
             {
                 typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
@@ -446,8 +448,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ExPolicy, std::pair<FwdIter, OutIter>, std::size_t
                     > scan_partitioner_type;
                 return scan_partitioner_type::call(
-                    policy, make_zip_iterator(first, flags.get()),
-                    count, init,
+                    std::forward<ExPolicy>(policy),
+                    make_zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
                     [pred, proj](zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
@@ -577,8 +579,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>

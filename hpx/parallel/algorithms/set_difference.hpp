@@ -8,15 +8,12 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_SET_DIFFERENCE_MAR_10_2015_0158PM)
 #define HPX_PARALLEL_ALGORITHM_SET_DIFFERENCE_MAR_10_2015_0158PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -62,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy policy, RanIter1 first1, RanIter1 last1,
+            parallel(ExPolicy && policy, RanIter1 first1, RanIter1 last1,
                 RanIter2 first2, RanIter2 last2, OutIter dest, F && f)
             {
                 typedef typename std::iterator_traits<RanIter1>::difference_type
@@ -83,8 +80,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return util::detail::convert_to_result(
                         detail::copy<std::pair<RanIter1, OutIter> >()
                             .call(
-                                policy, boost::mpl::false_(), first1, last1,
-                                dest
+                                std::forward<ExPolicy>(policy),
+                                boost::mpl::false_(), first1, last1, dest
                             ),
                             [](std::pair<RanIter1, OutIter> const& p) -> OutIter
                             {
@@ -95,7 +92,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename set_operations_buffer<OutIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
-                return set_operation(policy,
+                return set_operation(std::forward<ExPolicy>(policy),
                     first1, last1, first2, last2, dest, std::forward<F>(f),
                     // calculate approximate destination index
                     [](difference_type1 idx1, difference_type2 idx2)

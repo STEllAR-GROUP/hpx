@@ -10,7 +10,6 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/detail/pack.hpp>
 

@@ -146,6 +146,23 @@ namespace hpx
             argc, argv, empty, empty, mode);
     }
 
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main entry point, which can be used to set up the
+    /// runtime for an HPX application (the runtime system will be set up in
+    /// console mode or worker mode depending on the command line settings).
+    ///
+    /// In console mode it will execute the user supplied function `hpx_main`,
+    /// in worker mode it will execute an empty `hpx_main`.
+    inline int
+    init(boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        util::function_nonser<void()> const empty;
+        return init(desc_cmdline, argc, argv, cfg, empty, empty, mode);
+    }
+
     /// \fn int init(std::string const& app_name, int argc = 0, char** argv = 0)
     ///
     /// \brief Main entry point for launching the HPX runtime system.

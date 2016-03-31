@@ -8,8 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM)
 #define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -63,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce, typename Convert>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 if (first == last)
@@ -77,7 +76,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     reference;
 
                 return util::partitioner<ExPolicy, T>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [r, conv](FwdIter part_begin, std::size_t part_size) -> T
                     {
                         T val = conv(*part_begin);
@@ -103,7 +103,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         inline typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
+        transform_reduce_(ExPolicy && policy, InIter first, InIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::false_type)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
@@ -132,7 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
+        transform_reduce_(ExPolicy && policy, InIter first, InIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::true_type);
 
         /// \endcond
