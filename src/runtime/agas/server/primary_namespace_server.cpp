@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
@@ -747,18 +747,22 @@ response primary_namespace::increment_credit(
     request const& req
   , error_code& ec
     )
-{ // change_credit_non_blocking implementation
+{ // increment_credit implementation
     // parameters
     boost::int64_t credits = req.get_credit();
-    naming::gid_type lower = req.get_gid();
+    naming::gid_type lower = req.get_lower_bound();
+    naming::gid_type upper = req.get_upper_bound();
 
     naming::detail::strip_internal_bits_from_gid(lower);
+    naming::detail::strip_internal_bits_from_gid(upper);
+
+    if (lower == upper)
+        ++upper;
 
     // Increment.
-    naming::gid_type upper = lower;
     if (credits > 0)
     {
-        increment(lower, ++upper, credits, ec);
+        increment(lower, upper, credits, ec);
         if (ec) return response();
     }
     else
@@ -861,8 +865,8 @@ response primary_namespace::allocate(
     next_id_ = upper;
 
     // Set the initial credit count.
-    naming::detail::set_credit_for_gid(lower, HPX_GLOBALCREDIT_INITIAL);
-    naming::detail::set_credit_for_gid(upper, HPX_GLOBALCREDIT_INITIAL);
+    naming::detail::set_credit_for_gid(lower, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
+    naming::detail::set_credit_for_gid(upper, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::allocate, count(%1%), "
@@ -1215,7 +1219,7 @@ void primary_namespace::free_components_sync(
   , naming::gid_type const& upper
   , error_code& ec
     )
-{ // {{{ kill_sync implementation
+{ // {{{ free_components_sync implementation
     using boost::fusion::at_c;
 
     std::vector<lcos::future<void> > futures;
@@ -1274,7 +1278,7 @@ primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
   , naming::gid_type const& gid
   , error_code& ec
     )
-{ // {{{ resolve_gid implementation
+{ // {{{ resolve_gid_locked implementation
     HPX_ASSERT_OWNS_LOCK(l);
 
     // parameters
