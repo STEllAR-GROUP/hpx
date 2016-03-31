@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM)
 #define HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/dataflow.hpp>

@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_INNER_PRODUCT_JUL_15_2015_0730AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -21,9 +22,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -155,32 +154,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
 
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category_1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category_2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag,
-                iterator_category_1>::value),
+            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag,
-                iterator_category_2>::value),
+            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category_1>,
-            boost::is_same<std::input_iterator_tag, iterator_category_2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<InIter1>::value ||
+                hpx::traits::is_input_iterator<InIter2>::value
+            > is_seq;
 
         return detail::inner_product<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -272,38 +264,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
         typename Op1, typename Op2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init, Op1 && op1, Op2 && op2)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category_1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category_2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag,
-                iterator_category_1>::value),
+            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag,
-                iterator_category_2>::value),
+            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category_1>,
-            boost::is_same<std::input_iterator_tag, iterator_category_2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<InIter1>::value ||
+                hpx::traits::is_input_iterator<InIter2>::value
+            > is_seq;
 
         return detail::inner_product<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
             std::move(init), std::forward<Op1>(op1), std::forward<Op2>(op2));
     }
-
 }}}
 
 #endif

@@ -139,17 +139,30 @@ namespace hpx { namespace traits
     struct is_input_iterator;
 
     template <typename Iterator, typename Enable = void>
+    struct is_at_least_input_iterator;
+
+    template <typename Iterator, typename Enable = void>
     struct is_output_iterator;
 
     template <typename Iterator, typename Enable = void>
     struct is_forward_iterator;
 
     template <typename Iterator, typename Enable = void>
+    struct is_at_least_forward_iterator;
+
+    template <typename Iterator, typename Enable = void>
     struct is_bidirectional_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_at_least_bidirectional_iterator;
 
     template <typename Iterator, typename Enable = void>
     struct is_random_access_iterator;
 
+    template <typename Iterator, typename Enable = void>
+    struct is_at_least_random_access_iterator;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Range, typename Enable = void>
     struct is_range;
 
@@ -203,6 +216,9 @@ namespace hpx { namespace traits
 
     template <typename Iterator, typename Enable = void>
     struct segmented_local_iterator_traits;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_local_iterator;
 
     template <typename T, typename Enable = void>
     struct projected_iterator;

@@ -42,20 +42,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       and 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-
         persistent_auto_chunk_size()
           : chunk_size_time_(0) , min_time_(80000)
         {}
 
         /// Construct an \a persistent_auto_chunk_size executor parameters object
-
+        ///
         /// \param time_cs      The execution time for each chunk.
         ///
-        /// \param rel_time     Constructed \a persistent_auto_chunk_size executor parameter
-        ///                     types will use 80 microseconds as the minimal time for which
-        ///                     any of the scheduled chunks should run.
-        ///
-
         explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs)
           : chunk_size_time_(time_cs.value().count()), min_time_(80000)
         {}
@@ -65,14 +59,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param rel_time     [in] The time duration to use as the minimum
         ///                     to decide how many loop iterations should be
         ///                     combined.
-        ///
-
         /// \param time_cs       The execution time for each chunk.
         ///
-
-        explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs,
-         hpx::util::steady_duration const& rel_time)
-          : chunk_size_time_(time_cs.value().count()), min_time_(rel_time.value().count())
+        persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs,
+                hpx::util::steady_duration const& rel_time)
+          : chunk_size_time_(time_cs.value().count()),
+            min_time_(rel_time.value().count())
         {}
 
         /// \cond NOINTERNAL
@@ -91,15 +83,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 std::size_t test_chunk_size = f();
                 if (test_chunk_size != 0)
                 {
-
-                    if(chunk_size_time_ == 0)
+                    if (chunk_size_time_ == 0)
                     {
                         t = (high_resolution_clock::now() - t) / test_chunk_size;
                         chunk_size_time_ = t;
                     }
-
                     else
+                    {
                         t = chunk_size_time_;
+                    }
 
                     if (t != 0)
                     {

@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct calculate_next<Iterable,
         typename std::enable_if<
             hpx::traits::is_iterator<Iterable>::value &&
-           !hpx::traits::is_bidirectional_iterator<Iterable>::value
+           !hpx::traits::is_at_least_bidirectional_iterator<Iterable>::value
         >::type>
     {
         template <typename Iter, typename Stride>
@@ -130,7 +130,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Iterable>
     struct calculate_next<Iterable,
         typename std::enable_if<
-            hpx::traits::is_bidirectional_iterator<Iterable>::value
+            hpx::traits::is_at_least_bidirectional_iterator<Iterable>::value
         >::type>
     {
         template <typename Iter, typename Stride>

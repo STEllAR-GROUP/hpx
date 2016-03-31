@@ -9,6 +9,8 @@
 #define HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -21,9 +23,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             : public detail::algorithm<lexicographical_compare, bool>
         {
             lexicographical_compare()
-                : lexicographical_compare::algorithm("lexicographical_compare")
+              : lexicographical_compare::algorithm("lexicographical_compare")
             {}
 
            template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -181,35 +181,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           it returns false.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category1
-            >::value),
+            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category2
-            >::value),
-            "Requires at least input iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<InIter1>::value ||
+                hpx::traits::is_input_iterator<InIter2>::value
+            > is_seq;
 
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -289,35 +279,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// range [first2, last2), it returns false.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename Pred>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, Pred && pred)
     {
-       typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category1
-            >::value),
+            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category2
-            >::value),
-            "Requires at least input iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<InIter1>::value ||
+                hpx::traits::is_input_iterator<InIter2>::value
+            > is_seq;
 
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), is_seq(),

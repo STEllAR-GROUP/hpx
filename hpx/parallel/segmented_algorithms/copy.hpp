@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM)
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -20,8 +20,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
-
-#include <boost/type_traits/is_same.hpp>
+#include <list>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -38,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static typename util::detail::algorithm_result<
             ExPolicy, std::pair<SegIter, SegOutIter>
         >::type
-        segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::true_,
+        segmented_copy(Algo && algo, ExPolicy const& policy, std::true_type,
             SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -61,8 +60,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             segment_output_iterator sdest = traits::segment(dest);
 
-            using boost::mpl::true_;
-
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -73,7 +70,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     local_iterator_pair p = dispatch(
                         traits::get_id(sit),
-                        algo, policy, true_(),
+                        algo, policy, std::true_type(),
                         beg, end, traits::local(dest));
 
                     dest = output_traits::compose(sdest, p.second);
@@ -89,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     local_iterator_pair p = dispatch(
                         traits::get_id(sit),
-                        algo, policy, true_(), beg, end, out);
+                        algo, policy, std::true_type(), beg, end, out);
                     out = p.second;
                 }
 
@@ -104,7 +101,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         local_iterator_pair p = dispatch(
                             traits::get_id(sit),
-                            algo, policy, true_(), beg, end, out);
+                            algo, policy, std::true_type(), beg, end, out);
                         out = p.second;
                     }
                 }
@@ -116,7 +113,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     local_iterator_pair p = dispatch(
                         traits::get_id(sit),
-                        algo, policy, true_(), beg, end, traits::begin(sdest));
+                        algo, policy, std::true_type(), beg, end,
+                        traits::begin(sdest));
                     out = p.second;
                 }
 
@@ -134,7 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static typename util::detail::algorithm_result<
             ExPolicy, std::pair<SegIter, SegOutIter>
         >::type
-        segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::false_,
+        segmented_copy(Algo && algo, ExPolicy const& policy, std::false_type,
             SegIter first, SegIter last, SegOutIter dest)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -152,11 +150,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     local_iterator_type, local_output_iterator_type
                 > local_iterator_pair;
 
-            typedef typename std::iterator_traits<SegIter>::iterator_category
-                iterator_category;
-            typedef typename boost::mpl::bool_<boost::is_same<
-                    iterator_category, std::input_iterator_tag
-                >::value> forced_seq;
+            typedef hpx::traits::is_input_iterator<SegIter> forced_seq;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -255,9 +249,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     >::get(std::make_pair(last, dest));
             }
 
-            typedef typename parallel::is_sequential_execution_policy<
-                    ExPolicy
-                >::type is_seq;
+            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
 
             typedef hpx::traits::segmented_iterator_traits<InIter>
                 input_iterator_traits;

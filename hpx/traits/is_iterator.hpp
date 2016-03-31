@@ -43,6 +43,19 @@ namespace hpx { namespace traits
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter, typename Cat, typename Enable = void>
+        struct belongs_to_category
+          : std::false_type
+        {};
+
+        template <typename Iter, typename Cat>
+        struct belongs_to_category<Iter, Cat,
+                typename std::enable_if<is_iterator<Iter>::value>::type>
+          : std::is_base_of<
+                Cat, typename std::iterator_traits<Iter>::iterator_category>
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Iter, typename Cat, typename Enable = void>
         struct has_category
           : std::false_type
         {};
@@ -50,14 +63,26 @@ namespace hpx { namespace traits
         template <typename Iter, typename Cat>
         struct has_category<Iter, Cat,
                 typename std::enable_if<is_iterator<Iter>::value>::type>
-          : std::is_base_of<
+          : std::is_same<
                 Cat, typename std::iterator_traits<Iter>::iterator_category>
         {};
     }
 
     template <typename Iter, typename Enable>
+    struct is_output_iterator
+      : detail::has_category<
+            typename std::decay<Iter>::type, std::output_iterator_tag>
+    {};
+
+    template <typename Iter, typename Enable>
     struct is_input_iterator
       : detail::has_category<
+            typename std::decay<Iter>::type, std::input_iterator_tag>
+    {};
+
+    template <typename Iter, typename Enable>
+    struct is_at_least_input_iterator
+      : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::input_iterator_tag>
     {};
 
@@ -68,14 +93,32 @@ namespace hpx { namespace traits
     {};
 
     template <typename Iter, typename Enable>
+    struct is_at_least_forward_iterator
+      : detail::belongs_to_category<
+            typename std::decay<Iter>::type, std::forward_iterator_tag>
+    {};
+
+    template <typename Iter, typename Enable>
     struct is_bidirectional_iterator
       : detail::has_category<
             typename std::decay<Iter>::type, std::bidirectional_iterator_tag>
     {};
 
     template <typename Iter, typename Enable>
+    struct is_at_least_bidirectional_iterator
+      : detail::belongs_to_category<
+            typename std::decay<Iter>::type, std::bidirectional_iterator_tag>
+    {};
+
+    template <typename Iter, typename Enable>
     struct is_random_access_iterator
       : detail::has_category<
+            typename std::decay<Iter>::type, std::random_access_iterator_tag>
+    {};
+
+    template <typename Iter, typename Enable>
+    struct is_at_least_random_access_iterator
+      : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::random_access_iterator_tag>
     {};
 }}

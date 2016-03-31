@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -20,8 +21,6 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <boost/range/functions.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -106,17 +105,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         transform_reduce_(ExPolicy && policy, InIter first, InIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::false_type)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                iterator_category;
-
             static_assert(
-                (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+                (hpx::traits::is_at_least_input_iterator<InIter>::value),
                 "Requires at least input iterator.");
 
-            typedef typename boost::mpl::or_<
-                parallel::is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, iterator_category>
-            >::type is_seq;
+            typedef std::integral_constant<bool,
+                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    hpx::traits::is_input_iterator<InIter>::value
+                > is_seq;
 
             typedef typename hpx::util::decay<T>::type init_type;
 

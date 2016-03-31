@@ -21,14 +21,6 @@ int partition_size = 10000;
 namespace hpx { namespace experimental { namespace detail
 {
     template <typename Iterator>
-    struct is_random_access_iterator
-        : boost::is_same<
-            std::random_access_iterator_tag,
-            typename std::iterator_traits<Iterator>::iterator_category
-            >
-    {};
-
-    template <typename Iterator>
     HPX_FORCEINLINE
     Iterator previous(Iterator it, boost::mpl::false_)
     {
@@ -46,7 +38,7 @@ namespace hpx { namespace experimental { namespace detail
     HPX_FORCEINLINE
     Iterator previous(Iterator const& it)
     {
-        return previous(it, is_random_access_iterator<Iterator>());
+        return previous(it, hpx::traits::is_random_access_iterator<Iterator>());
     }
 
     template <typename Iterator>
@@ -67,7 +59,7 @@ namespace hpx { namespace experimental { namespace detail
     HPX_FORCEINLINE
     Iterator next(Iterator const& it)
     {
-        return next(it, is_random_access_iterator<Iterator>());
+        return next(it, hpx::traits::is_random_access_iterator<Iterator>());
     }
 }}}
 

@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -20,9 +21,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -145,19 +144,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a last is returned
     ///
     template <typename ExPolicy, typename FwdIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category
-            >::value),
+            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
             "Requires at least a forward iterator");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -230,19 +224,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           predicate \a op.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last, Pred && op)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category
-            >::value),
+            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
             "Requires at least a forward iterator");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;

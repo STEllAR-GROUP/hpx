@@ -8,7 +8,7 @@
 #if !defined(HPX_FINALIZE_OCT_04_2012_0809PM)
 #define HPX_FINALIZE_OCT_04_2012_0809PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 /// \namespace hpx
 namespace hpx

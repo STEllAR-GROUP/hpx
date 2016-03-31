@@ -19,7 +19,7 @@ void exclusive_scan_benchmark()
     try {
       std::vector<double> c(100000000);
       std::vector<double> d(c.size());
-      std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+      std::fill(boost::begin(c), boost::end(c), 1.0);
 
       double const val(0);
       auto op =

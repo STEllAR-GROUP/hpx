@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -21,9 +22,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -152,37 +151,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
 
     template <typename ExPolicy, typename InIter, typename OutIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     adjacent_difference(ExPolicy&& policy, InIter first, InIter last,
         OutIter dest)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag,
-                iterator_category>::value),
+            (hpx::traits::is_at_least_input_iterator<InIter>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_at_least_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<InIter>::value
+            > is_seq;
 
         return detail::adjacent_difference<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
@@ -256,36 +246,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename OutIter,
         typename Op>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     adjacent_difference(ExPolicy&& policy, InIter first, InIter last,
         OutIter dest, Op && op)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag,
-                iterator_category>::value),
+            (hpx::traits::is_at_least_input_iterator<InIter>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_at_least_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<InIter>::value
+            > is_seq;
 
         return detail::adjacent_difference<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, dest,

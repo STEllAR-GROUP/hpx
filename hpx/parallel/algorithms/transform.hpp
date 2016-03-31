@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,9 +29,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -86,7 +84,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [f, proj](reference t)
@@ -187,17 +185,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     transform(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         F && f, Proj && proj = Proj())
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
-            "Required at least input iterator.");
+            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_at_least_input_iterator<OutIter>::value),
+            "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<InIter>::value ||
+                hpx::traits::is_output_iterator<OutIter>::value
+            > is_seq;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::transform<std::pair<InIter, OutIter> >().call(
@@ -264,7 +264,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter_tuple(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first1, first2, dest),
                         std::distance(first1, last1),
                         [f, proj1, proj2](reference t)
@@ -397,21 +397,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F && f,
         Proj1 && proj1 = Proj1{}, Proj2 && proj2 = Proj2{})
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, category1>::value),
-            "Required at least input iterator.");
+            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, category2>::value),
-            "Required at least input iterator.");
+            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_at_least_input_iterator<OutIter>::value),
+            "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, category1>,
-            boost::is_same<std::input_iterator_tag, category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<InIter1>::value ||
+                hpx::traits::is_input_iterator<InIter2>::value ||
+                hpx::traits::is_output_iterator<OutIter>::value
+            > is_seq;
 
         typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
 
@@ -481,7 +483,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter_tuple(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first1, first2, dest),
                         (std::min)(
                             std::distance(first1, last1),
@@ -621,23 +623,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     transform(ExPolicy && policy,
         InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
         OutIter dest, F && f,
-        Proj1 && proj1 = Proj1{}, Proj2 && proj2 = Proj2{})
+        Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, category1>::value),
-            "Required at least input iterator.");
+            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, category2>::value),
-            "Required at least input iterator.");
+            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_at_least_input_iterator<OutIter>::value),
+            "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, category1>,
-            boost::is_same<std::input_iterator_tag, category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<InIter1>::value ||
+                hpx::traits::is_input_iterator<InIter2>::value ||
+                hpx::traits::is_output_iterator<OutIter>::value
+            > is_seq;
 
         typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
 
