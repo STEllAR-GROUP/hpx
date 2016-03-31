@@ -62,38 +62,22 @@ namespace server
             //initialize the starting state of the puzzle
             //0 denotes empty positions
             //non-zero values denote already-filled cells
+
             boost::uint8_t i = 0;
             while(i < size){
                 board_config.push_back(0);
                 i++;
             }
 
-            board_config.at(1) = 2;
-            board_config.at(5) = 4;
-            board_config.at(6) = 3;
-            board_config.at(9) = 9;
-            board_config.at(13) = 2;
-            board_config.at(17) = 8;
-            board_config.at(21) = 6;
-            board_config.at(23) = 9;
-            board_config.at(25) = 5;
-            board_config.at(35) = 1;
-            board_config.at(37) = 7;
-            board_config.at(38) = 2;
-            board_config.at(39) = 5;
-            board_config.at(41) = 3;
-            board_config.at(42) = 6;
-            board_config.at(43) = 8;
-            board_config.at(45) = 6;
-            board_config.at(55) = 8;
-            board_config.at(57) = 2;
-            board_config.at(59) = 5;
-            board_config.at(63) = 1;
-            board_config.at(67) = 9;
-            board_config.at(71) = 3;
-            board_config.at(74) = 9;
-            board_config.at(75) = 8;
-            board_config.at(79) = 6;
+            hpx::cout << "Please enter the initial state of the board as a "
+                      << "9X9 matrix using 0 to denote empty cells." << hpx::endl;
+            for(boost::uint8_t r=0;r<9;r++){
+                for(boost::uint8_t c=0;c<9;c++){
+                    int a;
+                    std::cin >> a;
+                    board_config[9*r+c] = a;
+                }
+            }
         }
 
         bool check_board(board_type const& board_config, std::size_t level)

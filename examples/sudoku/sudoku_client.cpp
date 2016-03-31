@@ -27,17 +27,17 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     new_board.init_board(default_size);
-    hpx::cout << "Initial state of the board:" << hpx::endl;
-    std::vector<boost::uint8_t> board_config = new_board.access_board();
-    for(boost::uint8_t r=0;r<9;r++){
-        for(boost::uint8_t c=0;c<9;c++)
-            if(board_config[r*9+c] == 0)
-                hpx::cout << "_" << " " << hpx::flush;
-            else
-                hpx::cout << board_config[r*9+c] << " " << hpx::flush;
-        hpx::cout << hpx::endl;
-    }
-    hpx::cout << hpx::endl;
+    // hpx::cout << "Initial state of the board:" << hpx::endl;
+    // std::vector<boost::uint8_t> board_config = new_board.access_board();
+    // for(boost::uint8_t r=0;r<9;r++){
+    //     for(boost::uint8_t c=0;c<9;c++)
+    //         if(board_config[r*9+c] == 0)
+    //             hpx::cout << "_" << " " << hpx::flush;
+    //         else
+    //             hpx::cout << board_config[r*9+c] << " " << hpx::flush;
+    //     hpx::cout << hpx::endl;
+    // }
+    // hpx::cout << hpx::endl;
 
     i = 1;
     for(std::list<sudoku::board>::iterator iter = b.begin();
