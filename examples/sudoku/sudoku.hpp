@@ -90,7 +90,7 @@ namespace sudoku
         }
 
         //---------------------------------------------------------
-        
+
         hpx::lcos::future<std::size_t> solve_board_async(
             hpx::naming::id_type const& gid, board_type const& board_config,
             std::size_t size, std::size_t level)
@@ -107,14 +107,14 @@ namespace sudoku
         {
             HPX_ASSERT(this->get_id());
 
-            return solve_board_async(this->get_id(), 
+            return solve_board_async(this->get_id(),
                 board_config, size, level).get();
         }
 
         //---------------------------------------------------------
 
         void clear_board(){
-            
+
             HPX_ASSERT(this->get_id());
 
             hpx::apply<server::board::clear_action>(this->get_id());
