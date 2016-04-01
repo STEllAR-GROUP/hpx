@@ -20,7 +20,7 @@ int hpx_main(boost::program_options::variables_map&)
     hpx::naming::id_type locality_ = hpx::find_here();
 
     std::list<sudoku::board> b;
-    sudoku::board new_board;
+    sudoku::board new_board = hpx::new_<sudoku::board>(locality_);
     while(i != 9){
         b.push_back(new_board);
         ++i;

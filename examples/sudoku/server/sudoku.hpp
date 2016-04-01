@@ -69,38 +69,76 @@ namespace server
                 i++;
             }
 
-            hpx::cout << "Please enter the initial state of the board as a "
-                      << "9X9 matrix using 0 to denote empty cells." << hpx::endl;
-            for(boost::uint8_t r=0;r<9;r++){
-                for(boost::uint8_t c=0;c<9;c++){
-                    int a;
-                    std::cin >> a;
-                    board_config[9*r+c] = a;
+            hpx::cout << "Press 1 to enter the starting state of the board, "
+                      << "or 2 to use the default" << hpx::endl;
+
+            int choice;
+            std::cin >> choice;
+
+            if(choice == 1){
+
+                hpx::cout << "Please enter the initial state of the board as a "
+                << "9X9 matrix using 0 to denote empty cells." << hpx::endl;
+                for(boost::uint8_t r=0;r<9;r++){
+                    for(boost::uint8_t c=0;c<9;c++){
+                        int a;
+                        std::cin >> a;
+                        board_config[9*r+c] = a;
+                    }
                 }
+            }
+            else{
+
+                board_config.at(1) = 2;
+                board_config.at(5) = 4;
+                board_config.at(6) = 3;
+                board_config.at(9) = 9;
+                board_config.at(13) = 2;
+                board_config.at(17) = 8;
+                board_config.at(21) = 6;
+                board_config.at(23) = 9;
+                board_config.at(25) = 5;
+                board_config.at(35) = 1;
+                board_config.at(37) = 7;
+                board_config.at(38) = 2;
+                board_config.at(39) = 5;
+                board_config.at(41) = 3;
+                board_config.at(42) = 6;
+                board_config.at(43) = 8;
+                board_config.at(45) = 6;
+                board_config.at(55) = 8;
+                board_config.at(57) = 2;
+                board_config.at(59) = 5;
+                board_config.at(63) = 1;
+                board_config.at(67) = 9;
+                board_config.at(71) = 3;
+                board_config.at(74) = 9;
+                board_config.at(75) = 8;
+                board_config.at(79) = 6;
             }
         }
 
         bool check_board(board_type const& board_config, std::size_t level)
         {
-            boost::uint8_t x = level/9, y = level%9;
+            std::size_t x = level/9, y = level%9;
 
             //no equal value in same row
-            for(boost::uint8_t col=0;col<9;col++)
-                if((x*9+col) != level
+            for(std::size_t col=0;col<9;col++)
+                if((x*9+col) != unsigned(level)
                     && board_config.at(x*9+col) == board_config.at(level))
                     return false;
 
             //no equal value in same column
-            for(boost::uint8_t row=0;row<9;row++)
-                if((row*9+y) != level
+            for(std::size_t row=0;row<9;row++)
+                if((row*9+y) != unsigned(level)
                     && board_config.at(row*9+y) == board_config.at(level))
                     return false;
 
             //no equal value in same mini-grid
-            boost::uint8_t minigrid_row = x/3, minigrid_col = y/3;
-            for(boost::uint8_t r=3*minigrid_row;r<3*(minigrid_row+1);r++)
-            for(boost::uint8_t c=3*minigrid_col;c<3*(minigrid_col+1);c++)
-                if((r*9+c) != level
+            std::size_t minigrid_row = x/3, minigrid_col = y/3;
+            for(std::size_t r=3*minigrid_row;r<3*(minigrid_row+1);r++)
+            for(std::size_t c=3*minigrid_col;c<3*(minigrid_col+1);c++)
+                if((r*9+c) != unsigned(level)
                     && board_config.at(r*9+c) == board_config.at(level))
                     return false;
             return true;
@@ -126,8 +164,8 @@ namespace server
         {
             if(level == size){
                 hpx::cout << "Completed puzzle:" << hpx::endl;
-                for(boost::uint8_t r=0;r<9;r++){
-                    for(boost::uint8_t c=0;c<9;c++)
+                for(std::size_t r=0;r<9;r++){
+                    for(std::size_t c=0;c<9;c++)
                         hpx::cout << board_config[r*9+c] << " " << hpx::flush;
                     hpx::cout << hpx::endl;
                 }
