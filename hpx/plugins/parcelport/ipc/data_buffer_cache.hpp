@@ -22,7 +22,6 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/tuple/tuple.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <map>
@@ -35,8 +34,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
     ///////////////////////////////////////////////////////////////////////////
     // This class implements an LRU cache to hold connections.
-    class data_buffer_cache : boost::noncopyable
+    class data_buffer_cache
     {
+        HPX_NON_COPYABLE(data_buffer_cache);
+
     public:
         typedef boost::recursive_mutex mutex_type;
 

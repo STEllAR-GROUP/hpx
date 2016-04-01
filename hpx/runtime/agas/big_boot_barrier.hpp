@@ -23,15 +23,17 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 namespace hpx { namespace agas
 {
 
-struct HPX_EXPORT big_boot_barrier : boost::noncopyable
+struct HPX_EXPORT big_boot_barrier
 {
+  private:
+    HPX_NON_COPYABLE(big_boot_barrier);
+
   private:
     parcelset::parcelport* pp;
     parcelset::endpoints_type const& endpoints;

@@ -12,8 +12,6 @@
 
 #include "test_utils.hpp"
 
-#include <boost/noncopyable.hpp>
-
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_move(ExPolicy policy, IteratorTag)

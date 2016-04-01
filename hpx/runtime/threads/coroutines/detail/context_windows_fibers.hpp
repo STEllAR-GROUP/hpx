@@ -40,7 +40,6 @@
 #include <hpx/util/unused.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/system/error_code.hpp>
@@ -183,9 +182,10 @@ namespace hpx { namespace threads { namespace coroutines
         static const std::size_t stack_size = sizeof(void*) >= 8 ? 2048 : 1024;
 
         class fibers_context_impl
-          : public fibers_context_impl_base,
-            private boost::noncopyable
+          : public fibers_context_impl_base
         {
+            HPX_NON_COPYABLE(fibers_context_impl);
+
         public:
             typedef fibers_context_impl_base context_impl_base;
 

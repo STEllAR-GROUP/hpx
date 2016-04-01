@@ -20,7 +20,6 @@
 #include <boost/make_shared.hpp>
 #endif
 
-#include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -59,8 +58,12 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
-    struct scheduler_base : boost::noncopyable
+    struct scheduler_base
     {
+    private:
+        HPX_NON_COPYABLE(scheduler_base);
+
+    public:
         scheduler_base(std::size_t num_threads,
                 char const* description = "",
                 scheduler_mode mode = nothing_special)

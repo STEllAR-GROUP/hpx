@@ -124,8 +124,10 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    class papi_counter_base: boost::noncopyable
+    class papi_counter_base
     {
+        HPX_NON_COPYABLE(papi_counter_base);
+
     public:
         typedef hpx::lcos::local::spinlock mutex_type;
 

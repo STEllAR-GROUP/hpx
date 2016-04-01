@@ -45,8 +45,12 @@ namespace hpx { namespace traits
 namespace hpx { namespace util
 {
     template <typename Mutex = hpx::lcos::local::spinlock>
-    struct memory_chunk_pool : boost::noncopyable
+    struct memory_chunk_pool
     {
+    private:
+        HPX_NON_COPYABLE(memory_chunk_pool);
+
+    public:
         typedef Mutex mutex_type;
         typedef memory_chunk<mutex_type> memory_chunk_type;
 
