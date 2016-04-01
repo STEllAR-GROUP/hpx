@@ -23,10 +23,10 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <memory>
 #include <string>

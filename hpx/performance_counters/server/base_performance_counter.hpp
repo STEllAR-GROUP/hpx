@@ -9,13 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/performance_counter_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/performance_counter_base.hpp>
-
-#include <boost/detail/atomic_count.hpp>
+#include <hpx/util/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
@@ -142,7 +141,7 @@ namespace hpx { namespace performance_counters { namespace server
 
     protected:
         hpx::performance_counters::counter_info info_;
-        boost::detail::atomic_count invocation_count_;
+        util::atomic_count invocation_count_;
     };
 }}}
 

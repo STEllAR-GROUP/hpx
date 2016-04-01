@@ -11,8 +11,6 @@
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/detail/atomic_count.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {

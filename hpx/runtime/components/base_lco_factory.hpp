@@ -18,7 +18,6 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
-#include <boost/detail/atomic_count.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 

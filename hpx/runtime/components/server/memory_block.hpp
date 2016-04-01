@@ -17,10 +17,10 @@
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <sstream>
 
@@ -143,7 +143,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         friend void intrusive_ptr_add_ref(memory_block_header* p);
         friend void intrusive_ptr_release(memory_block_header* p);
 
-        boost::detail::atomic_count count_;
+        util::atomic_count count_;
         std::size_t size_;
         server::memory_block* wrapper_;
         actions::manage_object_action_base const& managing_object_;

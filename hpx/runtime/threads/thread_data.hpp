@@ -712,7 +712,7 @@ namespace hpx { namespace threads
         policies::scheduler_base* scheduler_base_;
 
         //reference count
-        boost::detail::atomic_count count_;
+        util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;
 
