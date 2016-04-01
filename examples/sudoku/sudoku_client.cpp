@@ -21,12 +21,12 @@ int hpx_main(boost::program_options::variables_map&)
 
     std::list<sudoku::board> b;
     sudoku::board new_board = hpx::new_<sudoku::board>(locality_);
+    new_board.init_board(default_size);
     while(i != 9){
         b.push_back(new_board);
         ++i;
     }
 
-    new_board.init_board(default_size);
     // hpx::cout << "Initial state of the board:" << hpx::endl;
     // std::vector<boost::uint8_t> board_config = new_board.access_board();
     // for(boost::uint8_t r=0;r<9;r++){
