@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40703
 // this needs to go first to workaround a weird GCC4.6 ICE
 #include <hpx/util/reinitializable_static.hpp>
 #endif
