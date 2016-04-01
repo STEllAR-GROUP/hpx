@@ -10,7 +10,7 @@
 
 [heading Installation of the Boost Libraries]
 
-* Download __boost_downloads__ for Linux and unpack the retreived tarball.
+* Download __boost_downloads__ for Linux and unpack the retrieved tarball.
 
 * Adapt your ~/user-config.jam to contain the following lines:
 ```
@@ -40,7 +40,7 @@
 
 [heading Installation of the hwloc Library]
 
-* Download __hwloc_downloads__, unpack the retreived tarball and change to the
+* Download __hwloc_downloads__, unpack the retrieved tarball and change to the
   newly created directory
 * Run the configure-make-install procedure as follows
 
@@ -57,7 +57,7 @@ You now have a working hwloc installation in $HWLOC_ROOT.
 
 [heading Building __hpx__]
 
-After all the prerequistes have been successfully installed, we can now start building and
+After all the prerequisites have been successfully installed, we can now start building and
 installing __hpx__. The build procedure is almost the same as for __unix_installation__
 with the sole difference that you have to enable the Xeon Phi in the CMake Build system.
 This is achieved by invoking CMake in the following way:
