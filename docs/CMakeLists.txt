@@ -177,9 +177,6 @@ set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
 
 set(doxygen_definition_list
     "DOXYGEN:=1"
-    "BOOST_SCOPED_ENUM_START(x):=enum x"
-    "BOOST_SCOPED_ENUM_END="
-    "BOOST_SCOPED_ENUM(x):=x"
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
     "HPX_EXPORT="

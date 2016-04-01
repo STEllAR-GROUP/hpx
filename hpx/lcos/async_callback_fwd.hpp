@@ -13,7 +13,6 @@
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 
-#include <boost/detail/scoped_enum_emulation.hpp>
 #ifndef HPX_MSVC
 #include <boost/utility/enable_if.hpp>
 #endif
