@@ -85,7 +85,7 @@ namespace examples { namespace server
     };
 }}
 
-#define REGISTER_TEMPLATE_ACCUMULATOR_DECLARATON(type)                        \
+#define REGISTER_TEMPLATE_ACCUMULATOR_DECLARATION(type)                       \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         examples::server::template_accumulator<type>::reset_action,           \
         BOOST_PP_CAT(__template_accumulator_reset_action_, type));            \
