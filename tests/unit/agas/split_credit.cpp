@@ -44,7 +44,7 @@ using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper functions
-inline boost::uint64_t get_credit(id_type const& id)
+inline boost::int64_t get_credit(id_type const& id)
 {
     return hpx::naming::detail::get_credit_from_gid(id.get_gid());
 }
