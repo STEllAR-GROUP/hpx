@@ -68,13 +68,10 @@ namespace hpx { namespace util { namespace detail
             is_stopped_ = false;
 
             if (evaluate_) {
-                //l.unlock();
-                //evaluate(threads::wait_signaled);
                 //Nothing to do here
-                std::cout<<"I should not be here!!";
+                //std::cout<<"I should not be here!!";
             }
             else {
-                //schedule_thread(l);
                 mytimer_.expires_from_now(microsecs_);
                 boost::system::error_code e;
                 mytimer_.async_wait( util::bind(&pool_timer::dummy,this,e));
