@@ -104,7 +104,8 @@ void test_copy_if_bad_alloc()
 
     test_copy_if_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_copy_if_bad_alloc(execution_policy(par(task)), IteratorTag());
-#endif}
+#endif
+}
 
 void copy_if_bad_alloc_test()
 {

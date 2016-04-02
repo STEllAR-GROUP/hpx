@@ -228,22 +228,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename T, typename Reduce,
         typename Convert>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     transform_reduce(ExPolicy&& policy, InIter first, InIter last,
         Convert && conv_op, T init, Reduce && red_op)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
-        static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
-            "Requires at least input iterator.");
-
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::transform_reduce_(
             std::forward<ExPolicy>(policy), first, last, std::move(init),

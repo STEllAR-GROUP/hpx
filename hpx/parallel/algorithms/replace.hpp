@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         T1 const& old_value, T2 const& new_value, Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<InIter>::value),
+            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -320,7 +320,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         F && f, T const& new_value, Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<InIter>::value),
+            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;

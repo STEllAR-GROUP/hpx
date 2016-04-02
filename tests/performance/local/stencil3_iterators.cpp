@@ -5,9 +5,12 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/include/iostreams.hpp>
+
+#include <type_traits>
 
 #include <boost/cstdint.hpp>
 #include <boost/range/irange.hpp>
@@ -22,14 +25,14 @@ namespace hpx { namespace experimental { namespace detail
 {
     template <typename Iterator>
     HPX_FORCEINLINE
-    Iterator previous(Iterator it, boost::mpl::false_)
+    Iterator previous(Iterator it, std::false_type)
     {
         return --it;
     }
 
     template <typename Iterator>
     HPX_FORCEINLINE
-    Iterator previous(Iterator const& it, boost::mpl::true_)
+    Iterator previous(Iterator const& it, std::true_type)
     {
         return it - 1;
     }
@@ -43,14 +46,14 @@ namespace hpx { namespace experimental { namespace detail
 
     template <typename Iterator>
     HPX_FORCEINLINE
-    Iterator next(Iterator it, boost::mpl::false_)
+    Iterator next(Iterator it, std::false_type)
     {
         return ++it;
     }
 
     template <typename Iterator>
     HPX_FORCEINLINE
-    Iterator next(Iterator const& it, boost::mpl::true_)
+    Iterator next(Iterator const& it, std::true_type)
     {
         return it + 1;
     }

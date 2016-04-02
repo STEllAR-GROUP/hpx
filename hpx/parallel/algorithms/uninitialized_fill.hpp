@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         T const& value)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<InIter>::value),
+            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         // if count is representing a negative value, we do nothing

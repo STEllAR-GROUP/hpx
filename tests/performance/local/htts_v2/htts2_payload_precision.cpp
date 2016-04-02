@@ -9,6 +9,7 @@
 
 #include "htts2.hpp"
 
+#if !defined(HPX_MOVABLE_BUT_NOT_COPYABLE)
 #if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
 #define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
     public:                                                                   \
@@ -22,6 +23,7 @@
         TYPE(TYPE const &);                                                   \
         TYPE& operator=(TYPE const &);                                        \
 /**/
+#endif
 #endif
 
 template <typename BaseClock = boost::chrono::steady_clock>

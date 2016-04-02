@@ -160,7 +160,7 @@ void test_remove_copy()
     test_remove_copy(execution_policy(par(task)), IteratorTag());
 #endif
 
-    //assure output iterator will work
+    // assure output iterator will work
     test_remove_copy_outiter(seq, IteratorTag());
     test_remove_copy_outiter(par, IteratorTag());
     test_remove_copy_outiter(par_vec, IteratorTag());

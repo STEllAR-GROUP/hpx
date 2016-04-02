@@ -313,8 +313,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_at_least_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef typename typename std::iterator_traits<InIter>::value_type
-            value_type
+        typedef typename std::iterator_traits<InIter>::value_type value_type;
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||

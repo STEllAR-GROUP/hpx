@@ -261,7 +261,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             >::type result_type;
 
         algorithm_invoker_action<
-            algo_type, ExPolicy, IsSeq,
+            algo_type, ExPolicy, typename IsSeq::type,
             result_type(typename hpx::util::decay<Args>::type const&...)
         > act;
 
