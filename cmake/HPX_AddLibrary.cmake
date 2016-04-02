@@ -104,7 +104,7 @@ macro(add_hpx_library name)
     if(${name}_INSTALL_SUFFIX)
       set(install_destination ${${name}_INSTALL_SUFFIX})
     endif()
-    set(_target_flags ${_target_flags}
+    set(_target_flags # ${_target_flags}
       INSTALL
       INSTALL_FLAGS
         DESTINATION ${install_destination}
