@@ -13,6 +13,10 @@ namespace hpx { namespace components
       : base_type(hpx::new_<server::component_storage>(target_locality))
     {}
 
+    component_storage::component_storage(hpx::future<naming::id_type> && f)
+      : base_type(hpx::new_<server::component_storage>(f.get()))
+    {}
+
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<naming::id_type> component_storage::migrate_to_here(
         std::vector<char> const& data, naming::id_type id,

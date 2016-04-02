@@ -25,11 +25,7 @@ namespace hpx { namespace components
 
     public:
         component_storage(hpx::id_type target_locality);
-
-        template <typename ... Ts>
-        component_storage(Ts && ... ts)
-          : base_type(std::forward<Ts>(ts)...)
-        {}
+        component_storage(hpx::future<naming::id_type> && f);
 
         hpx::future<naming::id_type> migrate_to_here(std::vector<char> const&,
             naming::id_type, naming::address const&);
