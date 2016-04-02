@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/util/pool_timer.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
@@ -65,7 +65,7 @@ namespace hpx { namespace plugins { namespace parcel
         mutable mutex_type mtx_;
         parcelset::parcelport* pp_;
         detail::message_buffer buffer_;
-        util::interval_timer timer_;
+        util::pool_timer timer_;
         bool stopped_;
 
         // performance counter data
