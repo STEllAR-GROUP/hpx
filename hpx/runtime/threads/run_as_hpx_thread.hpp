@@ -10,6 +10,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <cstdlib>
 #include <type_traits>
@@ -31,14 +32,14 @@ namespace hpx { namespace threads
     {
         // This is the overload for running functions which return a value.
         template <typename F, typename... Ts>
-        typename std::result_of<F(Ts &&...)>::type
+        typename util::result_of<F(Ts &&...)>::type
         run_as_hpx_thread(std::false_type, F const& f, Ts &&... ts)
         {
             std::mutex mtx;
             std::condition_variable cond;
             bool stopping = false;
 
-            typedef typename std::result_of<F(Ts &&...)>::type result_type;
+            typedef typename util::result_of<F(Ts &&...)>::type result_type;
 
             // Using the optional for storing the returned result value
             // allows to support non-default-constructible and move-only
@@ -123,11 +124,11 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    typename std::result_of<F(Ts &&...)>::type
+    typename util::result_of<F(Ts &&...)>::type
     run_as_hpx_thread(F const& f, Ts &&... vs)
     {
         typedef typename std::is_void<
-                typename std::result_of<F(Ts &&...)>::type
+                typename util::result_of<F(Ts &&...)>::type
             >::type result_is_void;
 
         return detail::run_as_hpx_thread(result_is_void(),

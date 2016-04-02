@@ -25,6 +25,12 @@ to a different compute node).
   Extensions for Ranges (__cpp17_n4560__) proposal. This also includes the
   addition of projections to the existing algorithms. Please see [issue 1668]
   for a list of algorithms which have been adapted to __cpp17_n4560__.
+* We have started to implement index-based parallel for-loops based on a
+  corresponding standardization proposal (__cpp20_p0075r1__). Please see
+  [issue 2016] for a list of available algorithms.
+* We have pervasively added (optional) executor arguments to all API functions
+  which schedule new work. Executors are now used throughout the code base as
+  the main means of executing tasks.
 * Added `hpx::make_future<R>(future<T> &&)` allowing to convert a future of
   any type `T` into a future of any other type `R`, either based on default
   conversion rules of the embedded types or using a given explicit conversion
@@ -48,6 +54,14 @@ to a different compute node).
 * Adding overloads of `gather_here` and `gather_there` to accept the plain
   values of the data to gather (in addition to the existing overloads expecting
   futures).
+* We have cleaned up and refactored large parts of the code base. This helped
+  reducing compile and link times of __hpx__ itself and also of applications
+  depending on it. We have further decreased the dependency of __hpx__ on the
+  Boost libraries by replacing part of those with facilities available from the
+  standard libraries.
+* We have added new performance counters for parcel coalescing, file-IO, the
+  AGAS cache, and overall scheduler time. Resetting performance counters has
+  been overhauled and fixed.
 
 [heading Breaking Changes]
 
@@ -64,13 +78,25 @@ to a different compute node).
   have already been adapted.
 * The facility `hpx::lcos::make_future_void()` has been replaced by
   `hpx::make_future<void>()`.
+* We have removed support for Intel V13 and gcc 4.4.x.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2058] - Move several definitions to more appropriate headers
+* [pr    2057] - Simplify assert_owns_lock and ignore_while_checking
+* [pr    2056] - Replacing std::result_of with util::result_of
+* [pr    2053] - Replace uses of boost::unordered_map with std::unordered_map
+* [pr    2052] - Rewrite tuple unwrap
+* [pr    2050] - Replace uses of BOOST_SCOPED_ENUM with C++11 scoped enums
+* [pr    2049] - Attempt to narrow down split_credit problem
 * [pr    2048] - Fixing gcc startup hangs
 * [pr    2047] - Fixing when_xxx and wait_xxx for MSVC12
+* [pr    2045] - Fixing HPX_HAVE_THREAD_BACKTRACE_DEPTH build time configuration
+* [pr    2044] - Adding missing service executor types
+* [pr    2043] - Removing ambiguous definitions for is_future_range and
+                 future_range_traits
 * [pr    2042] - Clarify that HPX builds can use (much) more than 2GB per process
 * [pr    2041] - Changing future_iterator_traits to support pointers
 * [issue 2040] - Improve documentation memory usage warning?
@@ -85,6 +111,8 @@ Here is a list of the important tickets we closed for this release.
                  performance counter
 * [issue 2033] - Compilation error when compiling with thread queue waittime
                  performance counter
+* [issue 2032] - Ambiguous template instantiation for is_future_range and
+                 future_range_traits.
 * [pr    2031] - Don't restart timer on every incoming parcel
 * [pr    2030] - Unify handling of execution policies in parallel algorithms
 * [pr    2029] - Make pkg-config .pc files use .dylib on OSX
@@ -134,7 +162,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1987] - Make configurable size of internal storage in util::function
 * [pr    1986] - AGAS Refactoring+1753 Cache mods
 * [pr    1985] - Adding missing task_block::run() overload taking an executor
-* [pr    1984] - Adding an optimized LRU Cache implementation
+* [pr    1984] - Adding an optimized LRU Cache implementation (for AGAS)
 * [pr    1983] - Avoid invoking migration table look up for all objects
 * [pr    1981] - Replacing uintptr_t (which is not defined everywhere) with
                  std::size_t
@@ -292,6 +320,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1684] - Race condition when using --hpx:connect?
 * [pr    1658] - Add serialization for std::set (as there is for std::vector
                  and std::map)
+* [pr    1603] - Adds preferred namespace check to inspect tool
 * [issue 1523] - Remote async with deferred launch policy never executes
 * [issue 1472] - Serialization issues
 * [issue 1457] - Implement N4392: C++ Latches and Barriers

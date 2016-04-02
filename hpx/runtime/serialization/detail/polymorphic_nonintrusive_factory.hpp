@@ -17,12 +17,11 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 
-#include <boost/noncopyable.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
 
 #include <typeinfo>
+#include <unordered_map>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -87,12 +86,14 @@ namespace hpx { namespace serialization { namespace detail
         }
     };
 
-    class polymorphic_nonintrusive_factory : boost::noncopyable
+    class polymorphic_nonintrusive_factory
     {
+        HPX_NON_COPYABLE(polymorphic_nonintrusive_factory);
+
     public:
-        typedef boost::unordered_map<std::string,
+        typedef std::unordered_map<std::string,
                   function_bunch_type, hpx::util::jenkins_hash> serializer_map_type;
-        typedef boost::unordered_map<std::string,
+        typedef std::unordered_map<std::string,
                   std::string, hpx::util::jenkins_hash> serializer_typeinfo_map_type;
 
         HPX_EXPORT static polymorphic_nonintrusive_factory& instance();

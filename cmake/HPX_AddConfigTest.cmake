@@ -358,6 +358,13 @@ macro(hpx_check_for_cxx11_std_unique_ptr)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_unordered_map)
+  add_hpx_config_test(HPX_WITH_CXX11_UNORDERED_MAP
+    SOURCE cmake/tests/cxx11_std_unordered_map.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_extended_friend_declarations)
   add_hpx_config_test(HPX_WITH_CXX11_EXTENDED_FRIEND_DECLARATIONS
     SOURCE cmake/tests/cxx11_extended_friend_declarations.cpp

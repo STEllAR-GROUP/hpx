@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
 #include <boost/aligned_storage.hpp>
 
@@ -44,8 +43,11 @@ namespace hpx { namespace util
     // For conforming compilers, we utilize this feature.
     //
     template <typename T, typename Tag = T>
-    struct HPX_EXPORT_STATIC_ static_ : boost::noncopyable
+    struct HPX_EXPORT_STATIC_ static_
     {
+    private:
+        HPX_NON_COPYABLE(static_);
+
     public:
         typedef T value_type;
 
@@ -99,8 +101,11 @@ namespace hpx { namespace util
     //          this is a requirement of boost::call_once.
     //
     template <typename T, typename Tag = T>
-    struct HPX_EXPORT_STATIC_ static_ : boost::noncopyable
+    struct HPX_EXPORT_STATIC_ static_
     {
+    private:
+        HPX_NON_COPYABLE(static_);
+
     public:
         typedef T value_type;
 

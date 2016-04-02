@@ -14,14 +14,15 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local { namespace detail
 {
-    class condition_variable : boost::noncopyable
+    class condition_variable
     {
+        HPX_NON_COPYABLE(condition_variable);
+
     private:
         // define data structures needed for intrusive slist container used for
         // the queues

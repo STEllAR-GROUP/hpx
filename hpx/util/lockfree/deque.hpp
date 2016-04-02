@@ -24,7 +24,6 @@
 #include <boost/thread/thread.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/noncopyable.hpp>
 
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 
@@ -142,8 +141,12 @@ template <typename T,
           typename freelist_t = caching_freelist_t,
           typename Alloc = std::allocator<T>
           >
-struct deque: private boost::noncopyable
+struct deque
 {
+  private:
+    HPX_NON_COPYABLE(deque);
+
+  public:
     typedef deque_node<T> node;
     typedef typename node::pointer node_pointer;
     typedef typename node::atomic_pointer atomic_node_pointer;

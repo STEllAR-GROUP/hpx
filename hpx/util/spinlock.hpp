@@ -22,6 +22,9 @@ namespace hpx { namespace util
 struct spinlock
 {
   private:
+    HPX_NON_COPYABLE(spinlock);
+
+  private:
     boost::detail::spinlock m;
 
   public:
@@ -32,8 +35,6 @@ struct spinlock
         boost::detail::spinlock l = BOOST_DETAIL_SPINLOCK_INIT;
         m = l;
     }
-
-    HPX_NON_COPYABLE(spinlock)
 
     ~spinlock()
     {

@@ -85,16 +85,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         }
 
         ///////////////////////////////////////////////////////////////////////
-        struct for_loop_n : public v1::detail::algorithm<for_loop_n>
+        struct for_loop_algo : public v1::detail::algorithm<for_loop_algo>
         {
-            for_loop_n()
-              : for_loop_n::algorithm("for_loop_n")
+            for_loop_algo()
+              : for_loop_algo::algorithm("for_loop_algo")
             {}
 
-            template <typename ExPolicy, typename B, typename E, typename S,
+            template <typename ExPolicy, typename B, typename Size, typename S,
                 typename F, typename... Args>
             static hpx::util::unused_type
-            sequential(ExPolicy policy, B first, E last, S stride, F && f,
+            sequential(ExPolicy policy, B first, Size size, S stride, F && f,
                 Args &&... args)
             {
                 int init_sequencer[] = {
@@ -102,10 +102,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 };
                 (void)init_sequencer;
 
-                std::size_t size = parallel::v1::detail::distance(first, last);
-
                 std::size_t count = size;
-                for (/* */; first != last; count -= abs(stride))
+                while (count != 0)
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
@@ -114,8 +112,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     };
                     (void)next_sequencer;
 
+                    std::size_t chunk = (std::min)(S(count), stride);
+
                     // modifies stride
-                    first = parallel::v1::detail::next(first, count, stride);
+                    first = parallel::v1::detail::next(first, count, chunk);
+                    count -= chunk;
                 }
 
                 // make sure live-out variables are properly set on
@@ -128,13 +129,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 return hpx::util::unused;
             }
 
-            template <typename ExPolicy, typename B, typename E, typename S,
+            template <typename ExPolicy, typename B, typename Size, typename S,
                 typename F, typename... Ts>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, B first, E last, S stride, F && f,
+            parallel(ExPolicy policy, B first, Size size, S stride, F && f,
                 Ts &&... ts)
             {
-                if (first == last)
+                if (size == 0)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
                 // gcc does not support binding parameter packs as lambda closures
@@ -142,7 +143,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 auto pack = typename hpx::util::detail::make_index_pack<
                     sizeof...(Ts)>::type();
 
-                std::size_t size = parallel::v1::detail::distance(first, last);
                 return util::partitioner<ExPolicy>::call_with_index(
                     policy, first, size, stride,
                     [=](std::size_t part_index,
@@ -196,13 +196,46 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 hpx::traits::is_input_iterator<B>::value
             >::type is_seq;
 
+            std::size_t size = parallel::v1::detail::distance(first, last);
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
 
-            return for_loop_n().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, stride,
+            return for_loop_algo().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, size, stride,
                 hpx::util::get<sizeof...(Args)-1>(t), hpx::util::get<Is>(t)...);
         }
 
+        // reshuffle arguments, last argument is function object, will go first
+        template <typename ExPolicy, typename B, typename Size, typename S,
+            std::size_t... Is, typename... Args>
+        typename util::detail::algorithm_result<ExPolicy>::type
+        for_loop_n(ExPolicy && policy, B first, Size size, S stride,
+            hpx::util::detail::pack_c<std::size_t, Is...>, Args &&... args)
+        {
+            // Size should be non-negative
+            HPX_ASSERT(size >= 0);
+
+            // stride shall not be zero
+            HPX_ASSERT(stride != 0);
+
+            // stride should be negative only if E is an integral type or at
+            // least a bidirectional iterator
+            if (stride < 0)
+            {
+                HPX_ASSERT(std::is_integral<B>::value ||
+                    hpx::traits::is_bidirectional_iterator<B>::value);
+            }
+
+            typedef typename boost::mpl::bool_<
+                is_sequential_execution_policy<ExPolicy>::value ||
+                hpx::traits::is_input_iterator<B>::value
+            >::type is_seq;
+
+            auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
+
+            return for_loop_algo().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, size, stride,
+                hpx::util::get<sizeof...(Args)-1>(t), hpx::util::get<Is>(t)...);
+        }
         /// \endcond
     }
 
@@ -602,6 +635,415 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             "for_loop_strided must be called with at least a function object");
 
         return for_loop_strided(parallel::seq, first, last, stride,
+            std::forward<Args>(args)...);
+    }
+
+    /// The for_loop_n implements loop functionality over a range specified by
+    /// integral or iterator bounds. For the iterator case, these algorithms
+    /// resemble for_each from the Parallelism TS, but leave to the programmer
+    /// when and if to dereference the iterator.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it applies user-provided function objects.
+    /// \tparam I           The type of the iteration variable. This could be
+    ///                     an (input) iterator type or an integral type.
+    /// \tparam Size        The type of a non-negative integral value specifying
+    ///                     the number of items to iterate over.
+    /// \tparam Args        A parameter pack, it's last element is a function
+    ///                     object to be invoked for each iteration, the others
+    ///                     have to be either conforming to the induction or
+    ///                     reduction concept.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param size         Refers to the number of items the algorithm will be
+    ///                     applied to.
+    /// \param args         The last element of this parameter pack is the
+    ///                     function (object) to invoke, while the remaining
+    ///                     elements of the parameter pack are instances of
+    ///                     either induction or reduction objects.
+    ///                     The function (or function object) which will be
+    ///                     invoked for each of the elements in the sequence
+    ///                     specified by [first, last) should expose a signature
+    ///                     equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(I const& a, ...);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. It will
+    ///                     receive the current value of the iteration variable
+    ///                     and one argument for each of the induction or
+    ///                     reduction objects passed to the algorithms,
+    ///                     representing their current values.
+    ///
+    /// Requires: \a I shall be an integral type or meet the requirements
+    ///           of an input iterator type. The \a args parameter pack shall
+    ///           have at least one element, comprising objects returned by
+    ///           invocations of \a reduction and/or \a induction function
+    ///           templates followed by exactly one element invocable
+    ///           element-access function, \a f. \a f shall meet the
+    ///           requirements of MoveConstructible.
+    ///
+    /// Effects:  Applies \a f to each element in the input sequence, with
+    ///           additional arguments corresponding to the reductions and
+    ///           inductions in the \a args parameter pack. The length of the
+    ///           input sequence is last - first.
+    ///
+    /// The first element in the input sequence is specified by \a first. Each
+    /// subsequent element is generated by incrementing the previous element.
+    ///
+    /// \note As described in the C++ standard, arithmetic on non-random-access
+    ///       iterators is performed using advance and distance.
+    ///
+    /// \note The order of the elements of the input sequence is important for
+    ///       determining ordinal position of an application of \a f, even
+    ///       though the applications themselves may be unordered.
+    ///
+    /// Along with an element from the input sequence, for each member of the
+    /// \a args parameter pack excluding \a f, an additional argument is passed
+    /// to each application of \a f as follows:
+    ///
+    /// If the pack member is an object returned by a call to a reduction
+    /// function listed in section, then the
+    /// additional argument is a reference to a view of that reduction object.
+    /// If the pack member is an object returned by a call to induction, then
+    /// the additional argument is the induction value for that induction object
+    /// corresponding to the position of the application of \a f in the input
+    /// sequence.
+    ///
+    /// Complexity: Applies \a f exactly once for each element of the input
+    ///             sequence.
+    ///
+    /// Remarks: If \a f returns a result, the result is ignored.
+    ///
+    /// \returns  The \a for_loop_n algorithm returns a
+    ///           \a hpx::future<void> if the execution policy is of
+    ///           type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and returns \a void
+    ///           otherwise.
+    ///
+    template <typename ExPolicy, typename I, typename Size, typename... Args,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
+        std::is_integral<Size>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type
+    for_loop_n(ExPolicy && policy, I first, Size size, Args &&... args)
+    {
+        static_assert(sizeof...(Args) >= 1,
+            "for_loop_n must be called with at least a function object");
+
+        using hpx::util::detail::make_index_pack;
+        return detail::for_loop_n(
+            std::forward<ExPolicy>(policy), first, size, 1,
+            typename make_index_pack<sizeof...(Args)-1>::type(),
+            std::forward<Args>(args)...);
+    }
+
+    /// The for_loop implements loop functionality over a range specified by
+    /// integral or iterator bounds. For the iterator case, these algorithms
+    /// resemble for_each from the Parallelism TS, but leave to the programmer
+    /// when and if to dereference the iterator.
+    ///
+    /// The execution of for_loop without specifying an execution policy is
+    /// equivalent to specifying \a parallel::seq as the execution policy.
+    ///
+    /// \tparam I           The type of the iteration variable. This could be
+    ///                     an (input) iterator type or an integral type.
+    /// \tparam Size        The type of a non-negative integral value specifying
+    ///                     the number of items to iterate over.
+    /// \tparam Args        A parameter pack, it's last element is a function
+    ///                     object to be invoked for each iteration, the others
+    ///                     have to be either conforming to the induction or
+    ///                     reduction concept.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param size         Refers to the number of items the algorithm will be
+    ///                     applied to.
+    /// \param args         The last element of this parameter pack is the
+    ///                     function (object) to invoke, while the remaining
+    ///                     elements of the parameter pack are instances of
+    ///                     either induction or reduction objects.
+    ///                     The function (or function object) which will be
+    ///                     invoked for each of the elements in the sequence
+    ///                     specified by [first, last) should expose a signature
+    ///                     equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(I const& a, ...);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. It will
+    ///                     receive the current value of the iteration variable
+    ///                     and one argument for each of the induction or
+    ///                     reduction objects passed to the algorithms,
+    ///                     representing their current values.
+    ///
+    /// Requires: \a I shall be an integral type or meet the requirements
+    ///           of an input iterator type. The \a args parameter pack shall
+    ///           have at least one element, comprising objects returned by
+    ///           invocations of \a reduction and/or \a induction function
+    ///           templates followed by exactly one element invocable
+    ///           element-access function, \a f. \a f shall meet the
+    ///           requirements of MoveConstructible.
+    ///
+    /// Effects:  Applies \a f to each element in the input sequence, with
+    ///           additional arguments corresponding to the reductions and
+    ///           inductions in the \a args parameter pack. The length of the
+    ///           input sequence is last - first.
+    ///
+    /// The first element in the input sequence is specified by \a first. Each
+    /// subsequent element is generated by incrementing the previous element.
+    ///
+    /// \note As described in the C++ standard, arithmetic on non-random-access
+    ///       iterators is performed using advance and distance.
+    ///
+    /// \note The order of the elements of the input sequence is important for
+    ///       determining ordinal position of an application of \a f, even
+    ///       though the applications themselves may be unordered.
+    ///
+    /// Along with an element from the input sequence, for each member of the
+    /// \a args parameter pack excluding \a f, an additional argument is passed
+    /// to each application of \a f as follows:
+    ///
+    /// If the pack member is an object returned by a call to a reduction
+    /// function listed in section, then the
+    /// additional argument is a reference to a view of that reduction object.
+    /// If the pack member is an object returned by a call to induction, then
+    /// the additional argument is the induction value for that induction object
+    /// corresponding to the position of the application of \a f in the input
+    /// sequence.
+    ///
+    /// Complexity: Applies \a f exactly once for each element of the input
+    ///             sequence.
+    ///
+    /// Remarks: If \a f returns a result, the result is ignored.
+    ///
+    template <typename I, typename Size, typename... Args,
+    HPX_CONCEPT_REQUIRES_(
+        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
+        std::is_integral<Size>::value)>
+    void for_loop_n(I first, Size size, Args &&... args)
+    {
+        static_assert(sizeof...(Args) >= 1,
+            "for_loop_n must be called with at least a function object");
+
+        return for_loop_n(parallel::seq, first, size, std::forward<Args>(args)...);
+    }
+
+    /// The for_loop_n_strided implements loop functionality over a range
+    /// specified by integral or iterator bounds. For the iterator case, these
+    /// algorithms resemble for_each from the Parallelism TS, but leave to the
+    /// programmer when and if to dereference the iterator.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it applies user-provided function objects.
+    /// \tparam I           The type of the iteration variable. This could be
+    ///                     an (input) iterator type or an integral type.
+    /// \tparam Size        The type of a non-negative integral value specifying
+    ///                     the number of items to iterate over.
+    /// \tparam S           The type of the stride variable. This should be
+    ///                     an integral type.
+    /// \tparam Args        A parameter pack, it's last element is a function
+    ///                     object to be invoked for each iteration, the others
+    ///                     have to be either conforming to the induction or
+    ///                     reduction concept.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param size         Refers to the number of items the algorithm will be
+    ///                     applied to.
+    /// \param stride       Refers to the stride of the iteration steps. This
+    ///                     shall have non-zero value and shall be negative
+    ///                     only if I has integral type or meets the requirements
+    ///                     of a bidirectional iterator.
+    /// \param args         The last element of this parameter pack is the
+    ///                     function (object) to invoke, while the remaining
+    ///                     elements of the parameter pack are instances of
+    ///                     either induction or reduction objects.
+    ///                     The function (or function object) which will be
+    ///                     invoked for each of the elements in the sequence
+    ///                     specified by [first, last) should expose a signature
+    ///                     equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(I const& a, ...);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. It will
+    ///                     receive the current value of the iteration variable
+    ///                     and one argument for each of the induction or
+    ///                     reduction objects passed to the algorithms,
+    ///                     representing their current values.
+    ///
+    /// Requires: \a I shall be an integral type or meet the requirements
+    ///           of an input iterator type. The \a args parameter pack shall
+    ///           have at least one element, comprising objects returned by
+    ///           invocations of \a reduction and/or \a induction function
+    ///           templates followed by exactly one element invocable
+    ///           element-access function, \a f. \a f shall meet the
+    ///           requirements of MoveConstructible.
+    ///
+    /// Effects:  Applies \a f to each element in the input sequence, with
+    ///           additional arguments corresponding to the reductions and
+    ///           inductions in the \a args parameter pack. The length of the
+    ///           input sequence is last - first.
+    ///
+    /// The first element in the input sequence is specified by \a first. Each
+    /// subsequent element is generated by incrementing the previous element.
+    ///
+    /// \note As described in the C++ standard, arithmetic on non-random-access
+    ///       iterators is performed using advance and distance.
+    ///
+    /// \note The order of the elements of the input sequence is important for
+    ///       determining ordinal position of an application of \a f, even
+    ///       though the applications themselves may be unordered.
+    ///
+    /// Along with an element from the input sequence, for each member of the
+    /// \a args parameter pack excluding \a f, an additional argument is passed
+    /// to each application of \a f as follows:
+    ///
+    /// If the pack member is an object returned by a call to a reduction
+    /// function listed in section, then the
+    /// additional argument is a reference to a view of that reduction object.
+    /// If the pack member is an object returned by a call to induction, then
+    /// the additional argument is the induction value for that induction object
+    /// corresponding to the position of the application of \a f in the input
+    /// sequence.
+    ///
+    /// Complexity: Applies \a f exactly once for each element of the input
+    ///             sequence.
+    ///
+    /// Remarks: If \a f returns a result, the result is ignored.
+    ///
+    /// \returns  The \a for_loop_n_strided algorithm returns a
+    ///           \a hpx::future<void> if the execution policy is of
+    ///           type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and returns \a void
+    ///           otherwise.
+    ///
+    template <typename ExPolicy, typename I, typename Size, typename S,
+        typename... Args,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
+        std::is_integral<Size>::value &&
+        std::is_integral<S>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type
+    for_loop_n_strided(ExPolicy && policy, I first, Size size, S stride,
+        Args &&... args)
+    {
+        static_assert(sizeof...(Args) >= 1,
+            "for_loop_n_strided must be called with at least a function object");
+
+        using hpx::util::detail::make_index_pack;
+        return detail::for_loop_n(
+            std::forward<ExPolicy>(policy), first, size, stride,
+            typename make_index_pack<sizeof...(Args)-1>::type(),
+            std::forward<Args>(args)...);
+    }
+
+    /// The for_loop_n_strided implements loop functionality over a range
+    /// specified by integral or iterator bounds. For the iterator case, these
+    /// algorithms resemble for_each from the Parallelism TS, but leave to the
+    /// programmer when and if to dereference the iterator.
+    ///
+    /// The execution of for_loop without specifying an execution policy is
+    /// equivalent to specifying \a parallel::seq as the execution policy.
+    ///
+    /// \tparam I           The type of the iteration variable. This could be
+    ///                     an (input) iterator type or an integral type.
+    /// \tparam Size        The type of a non-negative integral value specifying
+    ///                     the number of items to iterate over.
+    /// \tparam S           The type of the stride variable. This should be
+    ///                     an integral type.
+    /// \tparam Args        A parameter pack, it's last element is a function
+    ///                     object to be invoked for each iteration, the others
+    ///                     have to be either conforming to the induction or
+    ///                     reduction concept.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param size         Refers to the number of items the algorithm will be
+    ///                     applied to.
+    /// \param stride       Refers to the stride of the iteration steps. This
+    ///                     shall have non-zero value and shall be negative
+    ///                     only if I has integral type or meets the requirements
+    ///                     of a bidirectional iterator.
+    /// \param args         The last element of this parameter pack is the
+    ///                     function (object) to invoke, while the remaining
+    ///                     elements of the parameter pack are instances of
+    ///                     either induction or reduction objects.
+    ///                     The function (or function object) which will be
+    ///                     invoked for each of the elements in the sequence
+    ///                     specified by [first, last) should expose a signature
+    ///                     equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(I const& a, ...);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. It will
+    ///                     receive the current value of the iteration variable
+    ///                     and one argument for each of the induction or
+    ///                     reduction objects passed to the algorithms,
+    ///                     representing their current values.
+    ///
+    /// Requires: \a I shall be an integral type or meet the requirements
+    ///           of an input iterator type. The \a args parameter pack shall
+    ///           have at least one element, comprising objects returned by
+    ///           invocations of \a reduction and/or \a induction function
+    ///           templates followed by exactly one element invocable
+    ///           element-access function, \a f. \a f shall meet the
+    ///           requirements of MoveConstructible.
+    ///
+    /// Effects:  Applies \a f to each element in the input sequence, with
+    ///           additional arguments corresponding to the reductions and
+    ///           inductions in the \a args parameter pack. The length of the
+    ///           input sequence is last - first.
+    ///
+    /// The first element in the input sequence is specified by \a first. Each
+    /// subsequent element is generated by incrementing the previous element.
+    ///
+    /// \note As described in the C++ standard, arithmetic on non-random-access
+    ///       iterators is performed using advance and distance.
+    ///
+    /// \note The order of the elements of the input sequence is important for
+    ///       determining ordinal position of an application of \a f, even
+    ///       though the applications themselves may be unordered.
+    ///
+    /// Along with an element from the input sequence, for each member of the
+    /// \a args parameter pack excluding \a f, an additional argument is passed
+    /// to each application of \a f as follows:
+    ///
+    /// If the pack member is an object returned by a call to a reduction
+    /// function listed in section, then the
+    /// additional argument is a reference to a view of that reduction object.
+    /// If the pack member is an object returned by a call to induction, then
+    /// the additional argument is the induction value for that induction object
+    /// corresponding to the position of the application of \a f in the input
+    /// sequence.
+    ///
+    /// Complexity: Applies \a f exactly once for each element of the input
+    ///             sequence.
+    ///
+    /// Remarks: If \a f returns a result, the result is ignored.
+    ///
+    template <typename I, typename Size, typename S, typename... Args,
+    HPX_CONCEPT_REQUIRES_(
+        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
+        std::is_integral<Size>::value &&
+        std::is_integral<S>::value)>
+    void for_loop_n_strided(I first, Size size, S stride, Args &&... args)
+    {
+        static_assert(sizeof...(Args) >= 1,
+            "for_loop_n_strided must be called with at least a function object");
+
+        return for_loop_strided_n(parallel::seq, first, size, stride,
             std::forward<Args>(args)...);
     }
 }}}

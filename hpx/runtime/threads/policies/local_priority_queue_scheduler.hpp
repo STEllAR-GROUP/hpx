@@ -19,7 +19,6 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 

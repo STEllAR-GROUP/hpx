@@ -19,7 +19,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
@@ -63,8 +62,10 @@ namespace hpx { namespace components { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////////
     template<typename T, typename Allocator, typename Mutex = hpx::lcos::local::spinlock>
-    class wrapper_heap : private boost::noncopyable
+    class wrapper_heap
     {
+        HPX_NON_COPYABLE(wrapper_heap);
+
     public:
         typedef T value_type;
         typedef Allocator allocator_type;

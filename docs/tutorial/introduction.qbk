@@ -281,7 +281,7 @@ a couple of specialized languages and programming environments based on __pgas__
 (Partitioned Global Address Space) designed to overcome this limitation, such
 as __chapel__, __x10__, __upc__, or __fortress__. However all systems based on __pgas__ rely on
 static data distribution. This works fine as long as such a static data
-distribution does not result in inhomogeneous workload distributions or other
+distribution does not result in in homogeneous workload distributions or other
 resource utilization imbalances. In a distributed system these imbalances can
 be mitigated by migrating part of the application data to different localities
 (nodes). The only framework supporting (limited) migration today is

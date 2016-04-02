@@ -142,7 +142,6 @@ namespace posix { namespace ucontext
 #endif // generic Posix platform
 
 #include <signal.h>                 // SIGSTKSZ
-#include <boost/noncopyable.hpp>
 #include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
@@ -196,9 +195,10 @@ namespace hpx { namespace threads { namespace coroutines
         };
 
         class ucontext_context_impl
-          : public ucontext_context_impl_base,
-            private boost::noncopyable
+          : public ucontext_context_impl_base
         {
+            HPX_NON_COPYABLE(ucontext_context_impl);
+
         public:
             typedef ucontext_context_impl_base context_impl_base;
 

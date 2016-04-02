@@ -13,6 +13,7 @@
 #include <hpx/util/memory_chunk.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/thread/locks.hpp>
 //
 #include <cstdlib>
@@ -44,8 +45,12 @@ namespace hpx { namespace traits
 namespace hpx { namespace util
 {
     template <typename Mutex = hpx::lcos::local::spinlock>
-    struct memory_chunk_pool : boost::noncopyable
+    struct memory_chunk_pool
     {
+    private:
+        HPX_NON_COPYABLE(memory_chunk_pool);
+
+    public:
         typedef Mutex mutex_type;
         typedef memory_chunk<mutex_type> memory_chunk_type;
 
@@ -69,7 +74,7 @@ namespace hpx { namespace util
             for (typename backup_chunks_type::value_type& v : backup_chunks_)
             {
                 char *ptr = v.second - offset_;
-#if _POSIX_SOURCE
+#ifdef _POSIX_SOURCE
                 free(ptr);
 #else
                 delete[] ptr;
@@ -139,7 +144,7 @@ namespace hpx { namespace util
                 }
             }
 
-#if _POSIX_SOURCE
+#ifdef _POSIX_SOURCE
             int ret = posix_memalign(
                 reinterpret_cast<void **>(&result),
                 EXEC_PAGESIZE, size + offset_);
@@ -188,7 +193,7 @@ namespace hpx { namespace util
                 else
                 {
                     char *ptr = p - offset_;
-#if _POSIX_SOURCE
+#ifdef _POSIX_SOURCE
                     free(ptr);
 #else
                     delete[] ptr;

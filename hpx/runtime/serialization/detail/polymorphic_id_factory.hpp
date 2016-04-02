@@ -16,7 +16,6 @@
 #include <hpx/exception.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
@@ -28,8 +27,10 @@ namespace hpx { namespace serialization {
 
     namespace detail
     {
-        class id_registry : boost::noncopyable
+        class id_registry
         {
+            HPX_NON_COPYABLE(id_registry);
+
         public:
             typedef void* (*ctor_t) ();
             typedef std::map<std::string, ctor_t> typename_to_ctor_t;
@@ -124,8 +125,10 @@ namespace hpx { namespace serialization {
             cache_t cache;
         };
 
-        class polymorphic_id_factory : boost::noncopyable
+        class polymorphic_id_factory
         {
+            HPX_NON_COPYABLE(polymorphic_id_factory);
+
             typedef id_registry::ctor_t ctor_t;
             typedef id_registry::typename_to_ctor_t typename_to_ctor_t;
             typedef id_registry::typename_to_id_t typename_to_id_t;

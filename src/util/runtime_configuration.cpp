@@ -239,7 +239,9 @@ namespace hpx { namespace util
             "-9 = --hpx:node=9",
 
             "[hpx.agas]",
-            "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
+            // 'address' has deliberately no default, see
+            // command_line_handling.cpp
+            "address = ${HPX_AGAS_SERVER_ADDRESS}",
             "port = ${HPX_AGAS_SERVER_PORT:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
             "max_pending_refcnt_requests = "

@@ -22,11 +22,13 @@ namespace hpx { namespace lcos { namespace local
 {
     struct once_flag
     {
+    private:
+        HPX_NON_COPYABLE(once_flag);
+
+    public:
         once_flag() HPX_NOEXCEPT
           : status_(0)
         {}
-
-        HPX_NON_COPYABLE(once_flag)
 
     private:
         boost::atomic<long> status_;

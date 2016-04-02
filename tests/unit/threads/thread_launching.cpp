@@ -71,12 +71,16 @@ void test_thread_callable_object_no_arguments()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct callable_noncopyable_no_args
-  : boost::noncopyable
+class callable_noncopyable_no_args
 {
+    HPX_NON_COPYABLE(callable_noncopyable_no_args);
+
+public:
     typedef void result_type;
 
     static bool called;
+
+    callable_noncopyable_no_args() {}
 
     void operator()() const
     {
