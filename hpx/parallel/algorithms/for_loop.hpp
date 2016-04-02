@@ -102,7 +102,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 };
                 (void)init_sequencer;
 
-                while (size != 0)
+                std::size_t count = size;
+                while (count != 0)
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
@@ -111,11 +112,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     };
                     (void)next_sequencer;
 
-                    std::size_t chunk = (std::min)(S(size), stride);
+                    std::size_t chunk = (std::min)(S(count), stride);
 
                     // modifies stride
-                    first = parallel::v1::detail::next(first, size, chunk);
-                    size -= chunk;
+                    first = parallel::v1::detail::next(first, count, chunk);
+                    count -= chunk;
                 }
 
                 // make sure live-out variables are properly set on
