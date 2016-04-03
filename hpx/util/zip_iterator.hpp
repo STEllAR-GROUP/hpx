@@ -7,18 +7,20 @@
 #if !defined(HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM)
 #define HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM
 
-#include <hpx/util/tuple.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 
-#include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util
 {
@@ -333,25 +335,41 @@ namespace hpx { namespace util
 
             void increment()
             {
-                return boost::fusion::for_each(iterators_,
-                    increment_iterator());
+                this->apply(increment_iterator());
             }
 
             void decrement()
             {
-                return boost::fusion::for_each(iterators_,
-                    decrement_iterator());
+                this->apply(decrement_iterator());
             }
 
             void advance(std::ptrdiff_t n)
             {
-                return boost::fusion::for_each(iterators_,
-                    advance_iterator(n));
+                this->apply(advance_iterator(n));
             }
 
             std::ptrdiff_t distance_to(zip_iterator_base const& other) const
             {
                 return util::get<0>(other.iterators_) - util::get<0>(iterators_);
+            }
+
+        private:
+            template <typename F, std::size_t ...Is>
+            void apply(F&& f, detail::pack_c<std::size_t, Is...>)
+            {
+                int const _sequencer[]= {
+                    ((f(util::get<Is>(iterators_))), 0)...
+                };
+                (void)_sequencer;
+            }
+
+            template <typename F>
+            void apply(F&& f)
+            {
+                return apply(std::forward<F>(f),
+                    detail::make_index_pack<
+                        util::tuple_size<IteratorTuple>::value
+                    >());
             }
 
         private:
