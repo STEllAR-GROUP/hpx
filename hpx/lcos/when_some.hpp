@@ -240,13 +240,13 @@ namespace hpx
 
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/is_sequence.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <vector>
 
@@ -366,22 +366,27 @@ namespace hpx { namespace lcos
                 apply(sequence);
             }
 
-            template <typename Sequence_>
+            template <typename Tuple, std::size_t ...Is>
             HPX_FORCEINLINE
-            void apply(Sequence_& sequence,
-                typename boost::enable_if_c<
-                    boost::fusion::traits::is_sequence<Sequence_>::value
-                >::type* = 0) const
+            void apply(Tuple& tuple, util::detail::pack_c<std::size_t, Is...>) const
             {
-                boost::fusion::for_each(sequence, *this);
+                int const _sequencer[]= {
+                    (((*this)(util::get<Is>(tuple))), 0)...
+                };
+                (void)_sequencer;
+            }
+
+            template <typename ...Ts>
+            HPX_FORCEINLINE
+            void apply(util::tuple<Ts...>& sequence) const
+            {
+                apply(sequence,
+                    typename util::detail::make_index_pack<sizeof...(Ts)>::type());
             }
 
             template <typename Sequence_>
             HPX_FORCEINLINE
-            void apply(Sequence_& sequence,
-                typename boost::disable_if_c<
-                    boost::fusion::traits::is_sequence<Sequence_>::value
-                >::type* = 0) const
+            void apply(Sequence_& sequence) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }

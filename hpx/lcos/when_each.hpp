@@ -108,12 +108,15 @@ namespace hpx
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/range/functions.hpp>
+
+#include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -131,8 +134,12 @@ namespace hpx { namespace lcos
             when_each_frame();
             when_each_frame(when_each_frame const&);
 
-            typedef typename boost::fusion::result_of::end<Tuple>::type
-                end_type;
+            template <std::size_t I>
+            struct is_end
+              : boost::mpl::bool_<
+                    util::tuple_size<Tuple>::value == I
+                >
+            {};
 
         public:
             template <typename Tuple_, typename F_>
@@ -144,24 +151,24 @@ namespace hpx { namespace lcos
             {}
 
         protected:
-            template <typename TupleIter>
+            template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(TupleIter&&, boost::mpl::true_)
+            void do_await(boost::mpl::true_)
             {
                 this->set_value(util::unused);
             }
 
             // Current element is a range (vector) of futures
-            template <typename TupleIter, typename Iter>
-            void await_range(TupleIter iter, Iter next, Iter end)
+            template <std::size_t I, typename Iter>
+            void await_range(Iter next, Iter end)
             {
                 typedef typename std::iterator_traits<Iter>::value_type
                     future_type;
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                void (when_each_frame::*f)(TupleIter, Iter, Iter) =
-                    &when_each_frame::await_range;
+                void (when_each_frame::*f)(Iter, Iter) =
+                    &when_each_frame::await_range<I>;
 
                 for(/**/; next != end; ++next)
                 {
@@ -183,7 +190,7 @@ namespace hpx { namespace lcos
                             boost::intrusive_ptr<when_each_frame> this_(this);
                             next_future_data->set_on_completed(
                                 util::bind(
-                                    f, std::move(this_), std::move(iter),
+                                    f, std::move(this_),
                                     std::move(next), std::move(end)));
                             return;
                         }
@@ -193,43 +200,39 @@ namespace hpx { namespace lcos
                     ++count_;
                     if(count_ == needed_count_)
                     {
-                        do_await(std::move(iter), boost::mpl::true_());
+                        do_await<I + 1>(boost::mpl::true_());
                         return;
                     }
                 }
 
-                typedef typename boost::fusion::result_of::next<TupleIter>::type
-                    next_type;
-
-                typedef boost::is_same<next_type, end_type> pred;
-
-                do_await(boost::fusion::next(iter), pred());
+                do_await<I + 1>(is_end<I + 1>());
             }
 
-            template <typename TupleIter>
+            template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(TupleIter iter, boost::mpl::false_, boost::mpl::true_)
+            void await_next(boost::mpl::false_, boost::mpl::true_)
             {
-                await_range(iter,
-                    boost::begin(boost::unwrap_ref(boost::fusion::deref(iter))),
-                    boost::end(boost::unwrap_ref(boost::fusion::deref(iter))));
+                await_range<I>(
+                    boost::begin(boost::unwrap_ref(util::get<I>(t_))),
+                    boost::end(boost::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future
-            template <typename TupleIter>
+            template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
+            void await_next(boost::mpl::true_, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
-                    typename boost::fusion::result_of::deref<TupleIter>::type
+                    typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
+
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
                 using boost::mpl::false_;
                 using boost::mpl::true_;
 
-                future_type& fut = boost::fusion::deref(iter);
+                future_type& fut = util::get<I>(t_);
 
                 boost::intrusive_ptr<
                     lcos::detail::future_data<future_result_type>
@@ -247,12 +250,13 @@ namespace hpx { namespace lcos
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
-                        void (when_each_frame::*f)(TupleIter, true_, false_) =
-                            &when_each_frame::await_next;
+                        void (when_each_frame::*f)(true_, false_) =
+                            &when_each_frame::await_next<I>;
+
                         boost::intrusive_ptr<when_each_frame> this_(this);
                         next_future_data->set_on_completed(
                             hpx::util::bind(
-                                f, std::move(this_), std::move(iter),
+                                f, std::move(this_),
                                 true_(), false_()));
                         return;
                     }
@@ -262,39 +266,31 @@ namespace hpx { namespace lcos
                 ++count_;
                 if(count_ == needed_count_)
                 {
-                    do_await(std::move(iter), boost::mpl::true_());
+                    do_await<I + 1>(boost::mpl::true_());
                     return;
                 }
 
-                typedef typename boost::fusion::result_of::next<TupleIter>::type
-                    next_type;
-                typedef boost::is_same<next_type, end_type> pred;
-
-                do_await(boost::fusion::next(iter), pred());
+                do_await<I + 1>(is_end<I + 1>());
             }
 
-            template <typename TupleIter>
+            template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(TupleIter&& iter, boost::mpl::false_)
+            void do_await(boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
-                    typename boost::fusion::result_of::deref<TupleIter>::type
+                    typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
                 typedef typename traits::is_future<future_type>::type is_future;
                 typedef typename traits::is_future_range<future_type>::type is_range;
 
-                await_next(std::move(iter), is_future(), is_range());
+                await_next<I>(is_future(), is_range());
             }
 
         public:
             HPX_FORCEINLINE void do_await()
             {
-                typedef typename boost::fusion::result_of::begin<Tuple>::type
-                    begin_type;
-                typedef boost::is_same<begin_type, end_type> pred;
-
-                do_await(boost::fusion::begin(t_), pred());
+                do_await<0>(is_end<0>());
             }
 
         private:
