@@ -12,7 +12,6 @@
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -20,6 +19,7 @@
 #include <boost/mpl/bool.hpp>
 
 #include <map>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -143,8 +143,7 @@ namespace hpx { namespace serialization {
                 if (id > vec.size()) //-V104
                     HPX_THROW_EXCEPTION(serialization_error
                       , "polymorphic_id_factory::create"
-                      , "Unknown type descriptor " +
-                            util::safe_lexical_cast<std::string>(id));
+                      , "Unknown type descriptor " + std::to_string(id));
 
                 ctor_t ctor = vec[id]; //-V108
                 HPX_ASSERT(ctor != NULL);

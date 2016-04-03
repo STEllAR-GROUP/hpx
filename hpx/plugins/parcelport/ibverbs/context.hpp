@@ -28,7 +28,8 @@
 #include <boost/thread/thread_time.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/atomic.hpp>
-#include <boost/lexical_cast.hpp>
+
+#include <string>
 
 #include <netdb.h>
 #include <rdma/rdma_cma.h>
@@ -358,7 +359,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 addrinfo *addr;
                 ret = getaddrinfo(
                     there.address().to_string().c_str()
-                  , boost::lexical_cast<std::string>(there.port()).c_str()
+                  , std::to_string(there.port()).c_str()
                   , NULL
                   , &addr
                 );

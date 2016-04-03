@@ -11,7 +11,6 @@
 
 #include <boost/version.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <process.h>
@@ -19,6 +18,7 @@
 #  include <unistd.h>
 #endif
 #include <fstream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INITIAL_TIMES_SIZE 64000
@@ -72,8 +72,8 @@ namespace hpx { namespace util
                 return;     // generate output only if logging is enabled
 
             std::string name(description_);
-            name += "." + boost::lexical_cast<std::string>(getpid());
-            name += "." + boost::lexical_cast<std::string>(thread_num_);
+            name += "." + std::to_string(getpid());
+            name += "." + std::to_string(thread_num_);
             name += ".csv";
 
             std::ofstream out(name.c_str());

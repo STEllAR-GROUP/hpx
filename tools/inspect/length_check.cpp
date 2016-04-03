@@ -14,7 +14,6 @@
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
 #include "boost/regex.hpp"
-#include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
 
 using namespace std;

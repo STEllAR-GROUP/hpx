@@ -11,6 +11,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 #include "nqueen.hpp"
 
 int hpx_main(boost::program_options::variables_map&)

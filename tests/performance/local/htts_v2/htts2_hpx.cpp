@@ -14,7 +14,6 @@
 #include "htts2.hpp"
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/lexical_cast.hpp>
 
 template <typename BaseClock = boost::chrono::steady_clock>
 struct hpx_driver : htts2::driver
@@ -28,7 +27,7 @@ struct hpx_driver : htts2::driver
     {
         using namespace boost::assign;
         std::vector<std::string> cfg;
-        cfg += "hpx.os_threads=" + boost::lexical_cast<std::string>(osthreads_);
+        cfg += "hpx.os_threads=" + std::to_string(osthreads_);
         cfg += "hpx.run_hpx_main!=0";
         cfg += "hpx.commandline.allow_unknown!=1";
 

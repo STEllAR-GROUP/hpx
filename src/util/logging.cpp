@@ -23,12 +23,14 @@
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 
 #include <boost/assign/std/vector.hpp>
 
 #include <cstddef>
 #include <cstdlib>
+#include <string>
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #include <android/log.h>
@@ -125,7 +127,7 @@ namespace hpx { namespace util
             return "  <always>";
         }
 
-        std::string unknown = boost::lexical_cast<std::string>(level);
+        std::string unknown = std::to_string(level);
         return std::string((std::max)(7-unknown.size(), std::size_t(0)), ' ') +
             "<" + unknown + ">";
     }

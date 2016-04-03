@@ -839,6 +839,9 @@ hpx_check_for_cxx11_std_is_placeholder(
 hpx_check_for_cxx11_std_reference_wrapper(
   DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 
+hpx_check_for_cxx11_std_to_string(
+  REQUIRED "HPX needs support for C++11 std::to_string")
+
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")
 

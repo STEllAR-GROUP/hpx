@@ -39,12 +39,12 @@
 #include <new>
 #include <memory>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/format.hpp>
-#include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/assign/std/vector.hpp>
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

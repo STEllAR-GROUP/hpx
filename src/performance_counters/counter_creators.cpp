@@ -14,6 +14,8 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/util/function.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
@@ -350,7 +352,7 @@ namespace hpx { namespace performance_counters
                 return naming::invalid_gid;
             }
             service += "#";
-            service += boost::lexical_cast<std::string>(paths.parentinstanceindex_);
+            service += std::to_string(paths.parentinstanceindex_);
 
             service += "/";
             service += service_name;

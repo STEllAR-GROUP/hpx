@@ -11,7 +11,6 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/lexical_cast.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

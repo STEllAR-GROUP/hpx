@@ -31,7 +31,6 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <string>
 
 #include "boost/shared_ptr.hpp"
-#include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
 #include "boost/program_options.hpp"

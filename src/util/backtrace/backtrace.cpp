@@ -16,7 +16,6 @@
 #include <hpx/async.hpp>
 
 #include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <hpx/util/backtrace/backtrace.hpp>
 
@@ -53,6 +52,7 @@
 #include <ostream>
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 #if defined(HPX_MSVC)
 #include <windows.h>
@@ -197,7 +197,7 @@ namespace hpx { namespace util {
         HPX_API_EXPORT std::string get_symbols(void *const *addresses,
             std::size_t size)
         {
-            std::string res = boost::lexical_cast<std::string>(size)
+            std::string res = std::to_string(size)
                 + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
@@ -247,7 +247,7 @@ namespace hpx { namespace util {
             try {
                 if(ptr==0)
                     return std::string();
-                std::string res = boost::lexical_cast<std::string>(size)
+                std::string res = std::to_string(size)
                     + ((1==size)?" frame:":" frames:");
                 for(std::size_t i=0;i<size;i++) {
                     res+='\n';
@@ -335,7 +335,7 @@ namespace hpx { namespace util {
         HPX_API_EXPORT std::string get_symbols(void *const *addresses,
             std::size_t size)
         {
-            std::string res = boost::lexical_cast<std::string>(size)
+            std::string res = std::to_string(size)
                 + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
