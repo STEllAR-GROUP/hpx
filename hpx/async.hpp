@@ -103,7 +103,7 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
-        call(launch launch_policy, F&& f, Ts&&... ts)
+        call(launch launch_policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
                 F(Ts&&...)

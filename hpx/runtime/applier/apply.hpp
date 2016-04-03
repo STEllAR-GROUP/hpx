@@ -23,6 +23,7 @@
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/extract_action.hpp>
@@ -45,10 +46,10 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    // zero parameter version of apply()
     // Invoked by a running HPX-thread to apply an action to any resource
     namespace applier { namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         template <typename Action>
         inline naming::address& complement_addr(naming::address& addr)
         {
@@ -327,12 +328,20 @@ namespace hpx
             std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Client, typename Stub,
-        typename ...Ts>
+    template <typename Action, typename Client, typename Stub, typename ...Ts>
     inline bool
     apply_p(components::client_base<Client, Stub> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
+        // make sure the action is compatible with the component type
+        typedef typename components::client_base<
+                Client, Stub
+            >::server_component_type component_type;
+
+        typedef traits::is_valid_action<Action, component_type> is_valid;
+        static_assert(is_valid::value,
+            "The action to invoke is not supported by the target");
+
         return hpx::detail::apply_impl<Action>(
             c.get_id(), priority, std::forward<Ts>(vs)...);
     }
@@ -376,6 +385,15 @@ namespace hpx
             call(hpx::actions::basic_action<Component, Signature, Derived>,
                 components::client_base<Client, Stub> const& c, Ts&&... ts)
             {
+                // make sure the action is compatible with the component type
+                typedef typename components::client_base<
+                        Client, Stub
+                    >::server_component_type component_type;
+
+                typedef traits::is_valid_action<Derived, component_type> is_valid;
+                static_assert(is_valid::value,
+                    "The action to invoke is not supported by the target");
+
                 return apply_p<Derived>(c.get_id(),
                     actions::action_priority<Derived>(),
                     std::forward<Ts>(ts)...);
@@ -409,6 +427,15 @@ namespace hpx
     inline bool
     apply(components::client_base<Client, Stub> const& c, Ts&&... vs)
     {
+        // make sure the action is compatible with the component type
+        typedef typename components::client_base<
+                Client, Stub
+            >::server_component_type component_type;
+
+        typedef traits::is_valid_action<Action, component_type> is_valid;
+        static_assert(is_valid::value,
+            "The action to invoke is not supported by the target");
+
         return apply_p<Action>(c.get_id(),
             actions::action_priority<Action>(), std::forward<Ts>(vs)...);
     }
@@ -594,6 +621,15 @@ namespace hpx
         components::client_base<Client, Stub> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
+        // make sure the action is compatible with the component type
+        typedef typename components::client_base<
+                Client, Stub
+            >::server_component_type component_type;
+
+        typedef traits::is_valid_action<Action, component_type> is_valid;
+        static_assert(is_valid::value,
+            "The action to invoke is not supported by the target");
+
         return hpx::detail::apply_impl<Action>(
             std::forward<Continuation>(cont), c.get_id(), priority,
             std::forward<Ts>(vs)...);
@@ -641,6 +677,15 @@ namespace hpx
                 hpx::actions::basic_action<Component, Signature, Derived>,
                 components::client_base<Client, Stub> const& c, Ts&&... ts)
             {
+                // make sure the action is compatible with the component type
+                typedef typename components::client_base<
+                        Client, Stub
+                    >::server_component_type component_type;
+
+                typedef traits::is_valid_action<Derived, component_type> is_valid;
+                static_assert(is_valid::value,
+                    "The action to invoke is not supported by the target");
+
                 return apply_p<Derived>(std::forward<Continuation>(cont),
                     c.get_id(), actions::action_priority<Derived>(),
                     std::forward<Ts>(ts)...);
@@ -666,8 +711,7 @@ namespace hpx
     inline typename boost::enable_if_c<
         traits::is_continuation<Continuation>::value, bool
     >::type
-    apply(Continuation && c, naming::id_type const& gid,
-        Ts&&... vs)
+    apply(Continuation && c, naming::id_type const& gid, Ts&&... vs)
     {
         return apply_p<Action>(std::forward<Continuation>(c), gid,
             actions::action_priority<Action>(),
@@ -682,6 +726,15 @@ namespace hpx
     apply(Continuation && cont, components::client_base<Client, Stub> const& c,
         Ts&&... vs)
     {
+        // make sure the action is compatible with the component type
+        typedef typename components::client_base<
+                Client, Stub
+            >::server_component_type component_type;
+
+        typedef traits::is_valid_action<Action, component_type> is_valid;
+        static_assert(is_valid::value,
+            "The action to invoke is not supported by the target");
+
         return apply_p<Action>(std::forward<Continuation>(cont), c.get_id(),
             actions::action_priority<Action>(), std::forward<Ts>(vs)...);
     }

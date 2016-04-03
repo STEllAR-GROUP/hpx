@@ -17,6 +17,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>
@@ -26,6 +27,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    struct async_action_client_dispatch
+    {
+        template <typename Client, typename Stub, typename ...Ts>
+        HPX_FORCEINLINE lcos::future<
+            typename traits::promise_local_result<
+                typename traits::extract_action<
+                    Action
+                >::remote_result_type
+            >::type>
+        operator()(launch launch_policy,
+            components::client_base<Client, Stub> const& c, Ts &&... ts) const
+        {
+            HPX_ASSERT(c.is_ready());
+            return hpx::detail::async_impl<Action>(launch_policy, c.get_id(),
+                std::forward<Ts>(ts)...);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // launch
     template <typename Action, typename Policy>
     struct async_action_dispatch<Action, Policy,
@@ -35,7 +57,8 @@ namespace hpx { namespace detail
     {
         // id_type
         template <typename ...Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static
+        lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
@@ -48,15 +71,17 @@ namespace hpx { namespace detail
         }
 
         template <typename Client, typename Stub, typename ...Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static
+        lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
         call(launch launch_policy,
-            components::client_base<Client, Stub> const& c, Ts&&... ts)
+            components::client_base<Client, Stub> c, Ts&&... ts)
         {
+            // make sure the action is compatible with the component type
             typedef typename components::client_base<
                     Client, Stub
                 >::server_component_type component_type;
@@ -65,8 +90,18 @@ namespace hpx { namespace detail
             static_assert(is_valid::value,
                 "The action to invoke is not supported by the target");
 
-            return hpx::detail::async_impl<Action>(launch_policy, c.get_id(),
-                std::forward<Ts>(ts)...);
+            // invoke directly if client is ready
+            if (c.is_ready())
+            {
+                return hpx::detail::async_impl<Action>(
+                    launch_policy, c.get_id(), std::forward<Ts>(ts)...);
+            }
+
+            // defer invocation otherwise
+            return c.then(util::bind(
+                util::one_shot(async_action_client_dispatch<Action>()),
+                launch_policy, c, std::forward<Ts>(ts)...
+            ));
         }
 
         // distribution policy
@@ -127,17 +162,9 @@ namespace hpx { namespace detail
             >::type>
         call(components::client_base<Client_, Stub> const& c, Ts&&... ts)
         {
-            typedef typename components::client_base<
-                    Client_, Stub
-                >::server_component_type component_type;
-
-            typedef traits::is_valid_action<Action, component_type> is_valid;
-            static_assert(is_valid::value,
-                "The action to invoke is not supported by the target");
-
             return async_action_dispatch<
                     Action, launch
-                >::call(launch::all, c.get_id(), std::forward<Ts>(ts)...);
+                >::call(launch::all, c, std::forward<Ts>(ts)...);
         }
     };
 
@@ -180,22 +207,9 @@ namespace hpx { namespace detail
         template <typename ...Ts>
         HPX_FORCEINLINE static
         lcos::future<result_type>
-        call(launch launch_policy,
-            Action const&, naming::id_type const& id, Ts&&... ts)
+        call(launch launch_policy, Action const&, Ts &&... ts)
         {
-            return async<Action>(launch_policy, id, std::forward<Ts>(ts)...);
-        }
-
-        template <typename DistPolicy, typename ...Ts>
-        HPX_FORCEINLINE static
-        typename boost::enable_if_c<
-            traits::is_distribution_policy<DistPolicy>::value,
-            lcos::future<result_type>
-        >::type
-        call(launch launch_policy,
-            Action const&, DistPolicy const& policy, Ts&&... ts)
-        {
-            return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);
+            return async<Action>(launch_policy, std::forward<Ts>(ts)...);
         }
     };
 }}
@@ -290,7 +304,7 @@ namespace hpx { namespace detail
     {
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(launch const& launch_policy, F&& f, Ts&&... ts)
+        call(launch const& launch_policy, F && f, Ts &&... ts)
         ->  decltype(detail::async_launch_policy_dispatch<
                 typename util::decay<F>::type
             >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...))

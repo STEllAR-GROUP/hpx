@@ -362,20 +362,6 @@ namespace hpx { namespace components
         }
 #endif
 
-        id_type const& get() const
-        {
-            if (!shared_state_)
-            {
-                HPX_THROW_EXCEPTION(no_state,
-                    "client_base::get_gid",
-                    "this client_base has no valid shared state");
-            }
-
-            // no error has been reported, return the result
-            return lcos::detail::future_value<id_type>::
-                get(*shared_state_->get_result());
-        }
-
         id_type const& get_id() const
         {
             return get();
@@ -415,8 +401,23 @@ namespace hpx { namespace components
             *this = std::move(rhs);
         }
 
+    public:
         ///////////////////////////////////////////////////////////////////////
-        // Interface mimicking future
+        // Exposition only: interface mimicking future
+
+        id_type const& get() const
+        {
+            if (!shared_state_)
+            {
+                HPX_THROW_EXCEPTION(no_state,
+                    "client_base::get_gid",
+                    "this client_base has no valid shared state");
+            }
+
+            // no error has been reported, return the result
+            return lcos::detail::future_value<id_type>::
+                get(*shared_state_->get_result());
+        }
 
         // Returns: true if the shared state is ready, false if it isn't.
         bool is_ready() const HPX_NOEXCEPT
@@ -469,8 +470,48 @@ namespace hpx { namespace components
             return hpx::detail::access_exception(ec);
         }
 
+    private:
+        template <typename F>
+        static typename lcos::detail::future_then_result<Derived, F>::cont_result
+        on_ready(shared_future<id_type> && fut, F f)
+        {
+            return f(Derived(std::move(fut)));
+        }
+
+    public:
+        template <typename F>
+        typename lcos::detail::future_then_result<Derived, F>::type
+        then(F && f)
+        {
+            typedef
+                typename lcos::detail::future_then_result<Derived, F>::result_type
+                result_type;
+
+            if (!shared_state_)
+            {
+                HPX_THROW_EXCEPTION(no_state,
+                    "client_base::then",
+                    "this client_base has no valid shared state");
+                return future<result_type>();
+            }
+
+            typedef
+                typename hpx::util::result_of<F(Derived)>::type
+                continuation_result_type;
+            typedef
+                typename hpx::traits::detail::shared_state_ptr<result_type>::type
+                shared_state_ptr;
+
+            shared_state_ptr p =
+                lcos::detail::make_continuation<continuation_result_type>(
+                    *static_cast<Derived const*>(this), launch::all,
+                    std::forward<F>(f));
+            return hpx::traits::future_access<future<result_type> >::create(
+                std::move(p));
+        }
+
+    private:
         ///////////////////////////////////////////////////////////////////////
-    protected:
         static void register_as_helper(Derived && f,
             std::string const& symbolic_name)
         {
@@ -517,46 +558,6 @@ namespace hpx { namespace components
         {
             HPX_ASSERT(!registered_name_.empty());   // call only once
             registered_name_.clear();
-        }
-
-    protected:
-        template <typename F>
-        static typename lcos::detail::future_then_result<Derived, F>::cont_result
-        on_ready(shared_future<id_type> && fut, F f)
-        {
-            return f(Derived(std::move(fut)));
-        }
-
-    public:
-        template <typename F>
-        typename lcos::detail::future_then_result<Derived, F>::type
-        then(F && f)
-        {
-            typedef
-                typename lcos::detail::future_then_result<Derived, F>::result_type
-                result_type;
-
-            if (!shared_state_)
-            {
-                HPX_THROW_EXCEPTION(no_state,
-                    "client_base::then",
-                    "this client_base has no valid shared state");
-                return future<result_type>();
-            }
-
-            typedef
-                typename hpx::util::result_of<F(Derived)>::type
-                continuation_result_type;
-            typedef
-                typename hpx::traits::detail::shared_state_ptr<result_type>::type
-                shared_state_ptr;
-
-            shared_state_ptr p =
-                lcos::detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived const*>(this), launch::all,
-                    std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(
-                std::move(p));
         }
 
     protected:
