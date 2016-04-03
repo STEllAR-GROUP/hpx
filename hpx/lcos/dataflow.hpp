@@ -3,18 +3,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_DATAFLOW_DEC_07_2015_1133AM)
-#define HPX_DATAFLOW_DEC_07_2015_1133AM
+#ifndef HPX_LCOS_DATAFLOW_HPP
+#define HPX_LCOS_DATAFLOW_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -22,14 +25,16 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/utility/enable_if.hpp>
 
+#include <cstddef>
 #include <iterator>
+#include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -53,32 +58,28 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename Future>
         HPX_FORCEINLINE
-        typename boost::enable_if<
-            hpx::traits::is_future_or_future_range<Future>
-        >::type
-        operator()(Future& future) const
+        typename std::enable_if<
+            traits::is_future_or_future_range<Future>::value
+        >::type operator()(Future& future) const
         {
             future = Future();
         }
 
         template <typename Future>
         HPX_FORCEINLINE
-        typename boost::enable_if<
-            traits::is_future_or_future_range<Future>
-        >::type
-        operator()(boost::reference_wrapper<Future>& future) const
+        typename std::enable_if<
+            traits::is_future_or_future_range<Future>::value
+        >::type operator()(boost::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
         }
 
         template <typename Future>
         HPX_FORCEINLINE
-        typename boost::disable_if<
-            traits::is_future_or_future_range<Future>
-        >::type
-        operator()(Future& future) const
-        {
-        }
+        typename std::enable_if<
+            !traits::is_future_or_future_range<Future>::value
+        >::type operator()(Future& future) const
+        {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,27 +88,17 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename F, typename Args>
     struct dataflow_return<F, Args,
-        typename boost::enable_if_c<
-            !traits::is_action<F>::value
-        >::type>
-    {
-        typedef typename util::detail::fused_result_of<
-                F(Args &&)
-            >::type type;
-    };
+        typename std::enable_if<!traits::is_action<F>::value>::type
+    > : util::detail::fused_result_of<F(Args &&)>
+    {};
 
     template <typename Action, typename Args>
     struct dataflow_return<Action, Args,
-        typename boost::enable_if_c<
-            traits::is_action<Action>::value
-        >::type>
-    {
-        typedef typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type type;
-    };
+        typename std::enable_if<traits::is_action<Action>::value>::type
+    > : traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
@@ -125,17 +116,21 @@ namespace hpx { namespace lcos { namespace detail
                 util::tuple_size<Futures>::value
             >::type indices_type;
 
-        typedef
-            boost::mpl::bool_<boost::is_void<result_type>::value>
-            is_void;
+        typedef std::is_void<result_type> is_void;
 
-        typedef
-            typename boost::mpl::if_<
-                is_void
-              , void(dataflow_frame::*)(indices_type, boost::mpl::true_)
-              , void(dataflow_frame::*)(indices_type, boost::mpl::false_)
-            >::type
-            execute_function_type;
+        template <std::size_t I>
+        struct is_end
+          : std::integral_constant<
+                bool,
+                util::tuple_size<Futures>::value == I
+            >
+        {};
+
+        typedef typename std::conditional<
+                is_void::value
+              , void(dataflow_frame::*)(indices_type, std::true_type)
+              , void(dataflow_frame::*)(indices_type, std::false_type)
+            >::type execute_function_type;
 
     private:
         // workaround gcc regression wrongly instantiating constructors
@@ -158,7 +153,7 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t ...Is>
         HPX_FORCEINLINE
-        void execute(util::detail::pack_c<std::size_t, Is...>, boost::mpl::false_)
+        void execute(util::detail::pack_c<std::size_t, Is...>, std::false_type)
         {
             try {
                 result_type res =
@@ -180,7 +175,7 @@ namespace hpx { namespace lcos { namespace detail
 
         template <std::size_t ...Is>
         HPX_FORCEINLINE
-        void execute(util::detail::pack_c<std::size_t, Is...>, boost::mpl::true_)
+        void execute(util::detail::pack_c<std::size_t, Is...>, std::true_type)
         {
             try {
                 util::invoke_fused(func_, std::move(futures_));
@@ -245,7 +240,7 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t I>
         HPX_FORCEINLINE
-        void do_await(boost::mpl::true_)
+        void do_await(std::true_type)
         {
             done_ = true;
         }
@@ -268,8 +263,7 @@ namespace hpx { namespace lcos { namespace detail
         HPX_FORCEINLINE
         void await_next(boost::mpl::false_, boost::mpl::false_)
         {
-            do_await<I + 1>(
-                boost::mpl::bool_<util::tuple_size<Futures>::value == I + 1>());
+            do_await<I + 1>(is_end<I + 1>());
         }
 
         template <std::size_t I, typename Iter>
@@ -292,14 +286,10 @@ namespace hpx { namespace lcos { namespace detail
             for (/**/; next != end; ++next)
             {
                 typedef
-                    typename std::iterator_traits<
-                        Iter
-                    >::value_type
+                    typename std::iterator_traits<Iter>::value_type
                     future_type;
                 typedef
-                    typename traits::future_traits<
-                        future_type
-                    >::type
+                    typename traits::future_traits<future_type>::type
                     future_result_type;
 
                 boost::intrusive_ptr<
@@ -328,8 +318,7 @@ namespace hpx { namespace lcos { namespace detail
                 }
             }
 
-            do_await<I + 1>(
-                boost::mpl::bool_<util::tuple_size<Futures>::value == I + 1>());
+            do_await<I + 1>(is_end<I + 1>());
         }
 
         // Current element is a range (vector) of futures
@@ -391,14 +380,13 @@ namespace hpx { namespace lcos { namespace detail
                 }
             }
 
-            do_await<I + 1>(
-                boost::mpl::bool_<util::tuple_size<Futures>::value == I + 1>());
+            do_await<I + 1>(is_end<I + 1>());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t I>
         HPX_FORCEINLINE
-        void do_await(boost::mpl::false_)
+        void do_await(std::false_type)
         {
             typedef
                 typename util::tuple_element<I, Futures>::type
@@ -418,8 +406,7 @@ namespace hpx { namespace lcos { namespace detail
     public:
         HPX_FORCEINLINE void do_await()
         {
-            do_await<0>(
-                boost::mpl::bool_<util::tuple_size<Futures>::value == 0>());
+            do_await<0>(is_end<0>());
 
             // avoid finalizing more than once
             bool expected = true;
@@ -438,9 +425,7 @@ namespace hpx { namespace lcos { namespace detail
     // any action
     template <typename Action>
     struct dataflow_dispatch<Action,
-        typename boost::enable_if_c<
-            traits::is_action<Action>::value
-        >::type>
+        typename std::enable_if<traits::is_action<Action>::value>::type>
     {
         template <
             typename Component, typename Signature, typename Derived,
@@ -451,7 +436,7 @@ namespace hpx { namespace lcos { namespace detail
           , Derived
           , util::tuple<
                 hpx::id_type
-              , typename hpx::traits::acquire_future<Ts>::type...
+              , typename traits::acquire_future<Ts>::type...
             >
         >::type
         call(launch launch_policy,
@@ -464,7 +449,7 @@ namespace hpx { namespace lcos { namespace detail
                   , Derived
                   , util::tuple<
                         hpx::id_type
-                      , typename hpx::traits::acquire_future<Ts>::type...
+                      , typename traits::acquire_future<Ts>::type...
                     >
                 >
                 frame_type;
@@ -474,9 +459,7 @@ namespace hpx { namespace lcos { namespace detail
                   , Derived()
                   , util::forward_as_tuple(
                         id
-                      , hpx::traits::acquire_future_disp()(
-                            std::forward<Ts>(ts)
-                        )...
+                      , traits::acquire_future_disp()(std::forward<Ts>(ts))...
                     )
                 ));
             p->do_await();
@@ -494,7 +477,7 @@ namespace hpx { namespace lcos { namespace detail
           , Derived
           , util::tuple<
                 hpx::id_type
-              , typename hpx::traits::acquire_future<Ts>::type...
+              , typename traits::acquire_future<Ts>::type...
             >
         >::type
         call(hpx::actions::basic_action<Component, Signature, Derived> const& act,
@@ -507,9 +490,7 @@ namespace hpx { namespace lcos { namespace detail
     // launch
     template <typename Action, typename Policy>
     struct dataflow_action_dispatch<Action, Policy,
-        typename boost::enable_if_c<
-            traits::is_launch_policy<Policy>::value
-        >::type>
+        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
     {
         template <typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
@@ -527,7 +508,7 @@ namespace hpx { namespace lcos { namespace detail
 
 //         template <typename DistPolicy, typename ...Ts>
 //         HPX_FORCEINLINE static
-//         typename boost::enable_if_c<
+//         typename std::enable_if<
 //             traits::is_distribution_policy<DistPolicy>::value,
 //             lcos::future<
 //                 typename traits::promise_local_result<
@@ -568,7 +549,7 @@ namespace hpx { namespace lcos { namespace detail
     // distribution policy
 //     template <typename Action, typename Policy>
 //     struct dataflow_action_dispatch<Action, Policy,
-//         typename boost::enable_if_c<
+//         typename std::enable_if<
 //             traits::is_distribution_policy<Policy>::value
 //         >::type>
 //     {
@@ -591,9 +572,7 @@ namespace hpx { namespace lcos { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct dataflow_launch_policy_dispatch<Action,
-        typename boost::enable_if_c<
-            traits::is_action<Action>::value
-        >::type>
+        typename std::enable_if<traits::is_action<Action>::value>::type>
     {
         typedef typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
@@ -614,7 +593,7 @@ namespace hpx { namespace lcos { namespace detail
 
 //         template <typename DistPolicy, typename ...Ts>
 //         HPX_FORCEINLINE static
-//         typename boost::enable_if_c<
+//         typename std::enable_if<
 //             traits::is_distribution_policy<DistPolicy>::value,
 //             lcos::future<result_type>
 //         >::type
@@ -634,13 +613,13 @@ namespace hpx
     HPX_FORCEINLINE
     auto dataflow(F && f, Ts &&... ts)
     ->  decltype(lcos::detail::dataflow_action_dispatch<
-                    Action, typename util::decay<F>::type
+                    Action, typename std::decay<F>::type
             >::call(std::forward<F>(f), std::forward<Ts>(ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<
-                Action, typename util::decay<F>::type
+                Action, typename std::decay<F>::type
             >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }
 
-#endif
+#endif /*HPX_LCOS_DATAFLOW_HPP*/
