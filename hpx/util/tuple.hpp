@@ -988,8 +988,6 @@ namespace hpx { namespace util
 #endif
 }}
 
-#include <hpx/util/detail/fusion_adapt_tuple.hpp>
-
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
