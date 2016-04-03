@@ -18,7 +18,6 @@
 
 #include <list>
 
-#include <boost/fusion/include/at_c.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace agas
@@ -308,7 +307,7 @@ response locality_namespace::allocate(
   , error_code& ec
     )
 { // {{{ allocate implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     // parameters
     parcelset::endpoints_type endpoints = req.get_endpoints();
@@ -321,7 +320,7 @@ response locality_namespace::allocate(
 #if defined(HPX_DEBUG)
     for (partition_table_type::value_type const& partition : partitions_)
     {
-        HPX_ASSERT(at_c<0>(partition.second) != endpoints);
+        HPX_ASSERT(get<0>(partition.second) != endpoints);
     }
 #endif
     // Check for address space exhaustion.
@@ -415,7 +414,7 @@ response locality_namespace::resolve_locality(
     )
 { // {{{ resolve_locality implementation
 
-    using boost::fusion::at_c;
+    using hpx::util::get;
     boost::uint32_t prefix = naming::get_locality_id_from_gid(req.get_gid());
 
     boost::lock_guard<mutex_type> l(mutex_);
@@ -423,7 +422,7 @@ response locality_namespace::resolve_locality(
 
     if(it != partitions_.end())
     {
-        return response(locality_ns_resolve_locality, at_c<0>(it->second));
+        return response(locality_ns_resolve_locality, get<0>(it->second));
     }
 
     return response(locality_ns_resolve_locality, parcelset::endpoints_type(),
@@ -435,7 +434,7 @@ response locality_namespace::free(
   , error_code& ec
     )
 { // {{{ free implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     // parameters
     naming::gid_type locality = req.get_gid();
@@ -451,10 +450,10 @@ response locality_namespace::free(
         /*
         // Wipe the locality from the tables.
         naming::gid_type locality =
-            naming::get_gid_from_locality_id(at_c<0>(pit->second));
+            naming::get_gid_from_locality_id(get<0>(pit->second));
 
         // first remove entry from reverse partition table
-        prefixes_.erase(at_c<0>(pit->second));
+        prefixes_.erase(get<0>(pit->second));
         */
 
         // now remove it from the main partition table
@@ -526,7 +525,7 @@ response locality_namespace::localities(
   , error_code& ec
     )
 { // {{{ localities implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     boost::lock_guard<mutex_type> l(mutex_);
 
@@ -553,7 +552,7 @@ response locality_namespace::resolved_localities(
   , error_code& ec
     )
 { // {{{ localities implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     boost::lock_guard<mutex_type> l(mutex_);
 
@@ -567,7 +566,7 @@ response locality_namespace::resolved_localities(
         localities.insert(
             std::make_pair(
                 naming::get_gid_from_locality_id(it->first)
-              , at_c<0>(it->second)
+              , get<0>(it->second)
             )
         );
     }
@@ -615,8 +614,8 @@ response locality_namespace::get_num_threads(
     for (partition_table_type::iterator it = partitions_.begin();
          it != end; ++it)
     {
-        using boost::fusion::at_c;
-        num_threads.push_back(at_c<1>(it->second));
+        using hpx::util::get;
+        num_threads.push_back(get<1>(it->second));
     }
 
     LAGAS_(info) << (boost::format(
