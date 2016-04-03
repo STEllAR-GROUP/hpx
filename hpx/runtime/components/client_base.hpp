@@ -25,7 +25,6 @@
 #include <type_traits>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/has_xxx.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Client objects are equivalent to futures
@@ -146,8 +145,6 @@ namespace hpx { namespace components
 {
     namespace detail
     {
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(server_component_type)
-
         // Wrap a give type such that it is usable as a stub_base.
         // The main template is chosen whenever the argument Stub is not a (or
         // not derived from) a stub_base. In this case Stub should be a server
