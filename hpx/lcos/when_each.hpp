@@ -105,18 +105,26 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/when_some.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 
+#include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/mpl/and.hpp>
 #include <boost/range/functions.hpp>
+#include <boost/ref.hpp>
 
+#include <algorithm>
 #include <cstddef>
+#include <iterator>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -136,7 +144,8 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             struct is_end
-              : boost::mpl::bool_<
+              : std::integral_constant<
+                    bool,
                     util::tuple_size<Tuple>::value == I
                 >
             {};
@@ -153,7 +162,7 @@ namespace hpx { namespace lcos
         protected:
             template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(boost::mpl::true_)
+            void do_await(std::true_type)
             {
                 this->set_value(util::unused);
             }
@@ -189,7 +198,7 @@ namespace hpx { namespace lcos
                             // (if any).
                             boost::intrusive_ptr<when_each_frame> this_(this);
                             next_future_data->set_on_completed(
-                                util::bind(
+                                util::deferred_call(
                                     f, std::move(this_),
                                     std::move(next), std::move(end)));
                             return;
@@ -200,7 +209,7 @@ namespace hpx { namespace lcos
                     ++count_;
                     if(count_ == needed_count_)
                     {
-                        do_await<I + 1>(boost::mpl::true_());
+                        do_await<I + 1>(std::true_type());
                         return;
                     }
                 }
@@ -254,10 +263,8 @@ namespace hpx { namespace lcos
                             &when_each_frame::await_next<I>;
 
                         boost::intrusive_ptr<when_each_frame> this_(this);
-                        next_future_data->set_on_completed(
-                            hpx::util::bind(
-                                f, std::move(this_),
-                                true_(), false_()));
+                        next_future_data->set_on_completed(util::deferred_call(
+                            f, std::move(this_), true_(), false_()));
                         return;
                     }
                 }
@@ -266,7 +273,7 @@ namespace hpx { namespace lcos
                 ++count_;
                 if(count_ == needed_count_)
                 {
-                    do_await<I + 1>(boost::mpl::true_());
+                    do_await<I + 1>(std::true_type());
                     return;
                 }
 
@@ -275,7 +282,7 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(boost::mpl::false_)
+            void do_await(std::false_type)
             {
                 typedef typename util::decay_unwrap<
                     typename util::tuple_element<I, Tuple>::type
@@ -309,8 +316,8 @@ namespace hpx { namespace lcos
         static_assert(
             traits::is_future<Future>::value, "invalid use of when_each");
 
-        typedef hpx::util::tuple<std::vector<Future> > argument_type;
-        typedef typename util::decay<F>::type func_type;
+        typedef util::tuple<std::vector<Future> > argument_type;
+        typedef typename std::decay<F>::type func_type;
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
 
         std::vector<Future> lazy_values_;
@@ -393,20 +400,18 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    typename boost::disable_if<
-        boost::mpl::or_<
-            traits::is_future<typename util::decay<F>::type>,
-            util::detail::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
-        >,
+    typename std::enable_if<
+        !traits::is_future<typename std::decay<F>::type>::value &&
+        util::detail::all_of<traits::is_future<Ts>...>::value,
         lcos::future<void>
     >::type
     when_each(F&& f, Ts&&... ts)
     {
-        typedef hpx::util::tuple<
+        typedef util::tuple<
                 typename traits::acquire_future<Ts>::type...
             > argument_type;
 
-        typedef typename util::decay<F>::type func_type;
+        typedef typename std::decay<F>::type func_type;
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
 
         traits::acquire_future_disp func;

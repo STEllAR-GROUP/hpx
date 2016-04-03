@@ -85,22 +85,25 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_some.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,7 +140,7 @@ namespace hpx { namespace lcos
 
         template <typename Future>
         struct future_or_shared_state_result<Future,
-                typename boost::enable_if<traits::is_future<Future> >::type>
+                typename std::enable_if<traits::is_future<Future>::value>::type>
           : traits::future_traits<Future>
         {};
 
@@ -160,7 +163,8 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             struct is_end
-              : boost::mpl::bool_<
+              : std::integral_constant<
+                    bool,
                     util::tuple_size<Tuple>::value == I
                 >
             {};
@@ -174,7 +178,7 @@ namespace hpx { namespace lcos
             // End of the tuple is reached
             template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(boost::mpl::true_)
+            void do_await(std::true_type)
             {
                 this->set_value(util::unused);     // simply make ourself ready
             }
@@ -210,7 +214,7 @@ namespace hpx { namespace lcos
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
                             next_future_data->set_on_completed(
-                                util::bind(
+                                util::deferred_call(
                                     f, this, std::move(next), std::move(end)));
                             return;
                         }
@@ -265,7 +269,7 @@ namespace hpx { namespace lcos
                         void (wait_all_frame::*f)(true_, false_) =
                             &wait_all_frame::await_next<I>;
 
-                        next_future_data->set_on_completed(hpx::util::bind(
+                        next_future_data->set_on_completed(util::deferred_call(
                             f, this, true_(), false_()));
                         return;
                     }
@@ -276,7 +280,7 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(boost::mpl::false_)
+            void do_await(std::false_type)
             {
                 typedef typename util::decay_unwrap<
                     typename util::tuple_element<I, Tuple>::type
@@ -311,7 +315,7 @@ namespace hpx { namespace lcos
     template <typename Future>
     void wait_all(std::vector<Future> const& values)
     {
-        typedef hpx::util::tuple<std::vector<Future> const&> result_type;
+        typedef util::tuple<std::vector<Future> const&> result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
 
         result_type data(values);
@@ -380,7 +384,7 @@ namespace hpx { namespace lcos
     template <typename... Ts>
     void wait_all(Ts&&... ts)
     {
-        typedef hpx::util::tuple<
+        typedef util::tuple<
                 typename traits::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;

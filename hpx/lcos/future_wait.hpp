@@ -10,6 +10,7 @@
 
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include <boost/atomic.hpp>

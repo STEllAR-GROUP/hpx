@@ -137,20 +137,23 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_some.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/tuple.hpp>
 
+#include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -199,7 +202,8 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             struct is_end
-              : boost::mpl::bool_<
+              : std::integral_constant<
+                    bool,
                     util::tuple_size<Tuple>::value == I
                 >
             {};
@@ -214,7 +218,7 @@ namespace hpx { namespace lcos
             // End of the tuple is reached
             template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(boost::mpl::true_)
+            void do_await(std::true_type)
             {
                 this->set_value(when_all_result<Tuple>::call(std::move(t_)));
             }
@@ -249,7 +253,7 @@ namespace hpx { namespace lcos
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
                             boost::intrusive_ptr<when_all_frame> this_(this);
-                            next_future_data->set_on_completed(util::bind(
+                            next_future_data->set_on_completed(util::deferred_call(
                                 f, std::move(this_),
                                 std::move(next), std::move(end)));
                             return;
@@ -278,18 +282,18 @@ namespace hpx { namespace lcos
                     typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
-                using boost::mpl::false_;
-                using boost::mpl::true_;
-
                 future_type& f_ = util::get<I>(t_);
 
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data =
-                        traits::detail::get_shared_state(f_);
+                using boost::mpl::false_;
+                using boost::mpl::true_;
+
+                boost::intrusive_ptr<
+                    lcos::detail::future_data<future_result_type>
+                > next_future_data =
+                    traits::detail::get_shared_state(f_);
 
                 if (!next_future_data->is_ready())
                 {
@@ -305,10 +309,8 @@ namespace hpx { namespace lcos
                             &when_all_frame::await_next<I>;
 
                         boost::intrusive_ptr<when_all_frame> this_(this);
-                        next_future_data->set_on_completed(
-                            hpx::util::bind(
-                                f, std::move(this_),
-                                true_(), false_()));
+                        next_future_data->set_on_completed(util::deferred_call(
+                            f, std::move(this_), true_(), false_()));
                         return;
                     }
                 }
@@ -318,7 +320,7 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             HPX_FORCEINLINE
-            void do_await(boost::mpl::false_)
+            void do_await(std::false_type)
             {
                 typedef typename util::decay_unwrap<
                     typename util::tuple_element<I, Tuple>::type
@@ -343,16 +345,16 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range>
-    typename boost::enable_if<traits::is_future_range<Range>,
-        lcos::future<typename util::decay<Range>::type> >::type //-V659
+    typename std::enable_if<traits::is_future_range<Range>::value,
+        lcos::future<typename std::decay<Range>::type> >::type //-V659
     when_all(Range&& values)
     {
         typedef detail::when_all_frame<
-                hpx::util::tuple<Range>
+                util::tuple<Range>
             > frame_type;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
-            hpx::util::forward_as_tuple(std::move(values))));
+            util::forward_as_tuple(std::move(values))));
         p->do_await();
 
         using traits::future_access;
@@ -360,8 +362,8 @@ namespace hpx { namespace lcos
     }
 
     template <typename Range>
-    typename boost::enable_if<traits::is_future_range<Range>,
-        lcos::future<typename util::decay<Range>::type> >::type
+    typename std::enable_if<traits::is_future_range<Range>::value,
+        lcos::future<typename std::decay<Range>::type> >::type
     when_all(Range& values)
     {
         Range values_ = traits::acquire_future<Range>()(values);
@@ -387,10 +389,10 @@ namespace hpx { namespace lcos
         return lcos::when_all(std::move(values));
     }
 
-    inline lcos::future<hpx::util::tuple<> > //-V524
+    inline lcos::future<util::tuple<> > //-V524
     when_all()
     {
-        typedef hpx::util::tuple<> result_type;
+        typedef util::tuple<> result_type;
         return lcos::make_ready_future(result_type());
     }
 
@@ -413,11 +415,11 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
     typename detail::when_all_frame<
-        hpx::util::tuple<typename traits::acquire_future<Ts>::type...>
+        util::tuple<typename traits::acquire_future<Ts>::type...>
     >::type
     when_all(Ts&&... ts)
     {
-        typedef hpx::util::tuple<
+        typedef util::tuple<
                 typename traits::acquire_future<Ts>::type...
             > result_type;
         typedef detail::when_all_frame<result_type> frame_type;
