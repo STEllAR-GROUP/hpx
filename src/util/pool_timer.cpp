@@ -66,6 +66,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             is_stopped_ = false;
+            is_started_ = true;
 
             if (evaluate_) {
                 //Nothing to do here
