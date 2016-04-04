@@ -53,7 +53,7 @@ line number, the sequence number of the OS-thread and the __hpx__-thread id, the
 locality id and the stack backtrace of the point where the original exception
 was thrown.
 
-Under certain circumstances it is desireable to output only some of the
+Under certain circumstances it is desirable to output only some of the
 diagnostics, or to output those using different formatting. For this case, __hpx__
 exposes a set of lower level functions as demonstrated in the following code
 snippet:
@@ -64,7 +64,7 @@ snippet:
 
 Most of the API functions exposed by __hpx__ can be invoked in two different
 modes. By default those will throw an exception on error as described above.
-However, sometimes it is desireable not to throw an exception in case of an
+However, sometimes it is desirable not to throw an exception in case of an
 error condition. In this case an object instance of the [classref hpx::error_code `hpx::error_code`] type
 can be passed as the last argument to the API function. In case of an error
 the error condition will be returned in that [classref hpx::error_code `hpx::error_code`] instance. The
@@ -85,7 +85,7 @@ retrieves all available diagnostic information from the error code instance as
 a formatted string.
 
 As for handling exceptions, when working with error codes, under certain
-circumstances it is desireable to output only some of the
+circumstances it is desirable to output only some of the
 diagnostics, or to output those using different formatting. For this case, __hpx__
 exposes a set of lower level functions usable with error codes as demonstrated
 in the following code snippet:
@@ -109,7 +109,7 @@ For more information please refer to the documentation of
 
 [heading:lightweight_error_code Lightweight error Codes]
 
-Sometimes it is not desireable to collect all the ambient information about the
+Sometimes it is not desirable to collect all the ambient information about the
 error at the point where it happened as this might impose too much overhead for
 simple scenarious. In this case, __hpx__ provides a lightweight error code
 facility which will hold the error code only. The following snippet demonstrates
