@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     // After hpx::init returns, all actions should have been executed
     // The final result is only accumulated on the root locality
     if(root_locality)
-        HPX_TEST_EQ(final_result, 13);
+        HPX_TEST_EQ(final_result, 7);
 
     return hpx::util::report_errors();
 }
