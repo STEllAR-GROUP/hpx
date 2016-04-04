@@ -368,7 +368,7 @@ steps that explain how to use a docker image::
     # NOTICE: Docker images are read-only and will be reset after execution.
     docker run stellargroup/hpx:dev hello_world
 
-    # Mount a host directory to make changes persistant.
+    # Mount a host directory to make changes persistent.
     # In this case, mount the current host directory $PWD to /hpx in the
     # dockerfile via '-v'.
     # Also, make /hpx the current working directory with '-w'.
