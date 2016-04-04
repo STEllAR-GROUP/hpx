@@ -131,7 +131,7 @@ namespace hpx
     ///
     template <typename T>
     class partitioned_vector
-      : hpx::components::client_base<partitioned_vector<T>,
+      : public hpx::components::client_base<partitioned_vector<T>,
             hpx::components::server::distributed_metadata_base<
                 server::partitioned_vector_config_data> >
     {
@@ -335,6 +335,15 @@ namespace hpx
         void register_as_sync(std::string const& symbolic_name)
         {
             register_as(symbolic_name).get();
+        }
+
+        // construct from id
+        partitioned_vector(future<id_type> && f)
+        {
+            using util::placeholders::_1;
+            f.share().then(
+                util::bind(&partitioned_vector::connect_to_helper, this, _1)
+            );
         }
 
     public:

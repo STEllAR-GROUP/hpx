@@ -145,7 +145,7 @@ namespace hpx { namespace components { namespace server
             .then(
                 [to_resurrect, target_locality](
                     future<std::pair<naming::id_type, naming::address> > && f)
-                        -> future<naming::id_type>
+                ->  future<naming::id_type>
                 {
                     // rethrow errors
                     std::pair<naming::id_type, naming::address> r = f.get();

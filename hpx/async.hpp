@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -103,7 +103,7 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
-        call(launch launch_policy, F&& f, Ts&&... ts)
+        call(launch launch_policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
                 F(Ts&&...)
@@ -221,8 +221,9 @@ namespace hpx
             std::forward<F>(f), std::forward<Ts>(ts)...
         ))
     {
-        return detail::async_dispatch<typename util::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+        return detail::async_dispatch<
+                typename util::decay<F>::type
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }
 

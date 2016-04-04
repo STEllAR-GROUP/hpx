@@ -269,7 +269,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
+    template <typename Future, typename Enable = void>
     struct future_unwrap_result
     {};
 
@@ -729,8 +729,11 @@ namespace hpx { namespace lcos
         };
 
     private:
-        template <typename Future, typename Enable>
+        template <typename Future>
         friend struct hpx::traits::future_access;
+
+        template <typename Future, typename Enable>
+        friend struct hpx::traits::detail::future_access_customization_point;
 
         // Effects: constructs a future object from an shared state
         explicit future(
@@ -1004,8 +1007,11 @@ namespace hpx { namespace lcos
         typedef typename base_type::shared_state_type shared_state_type;
 
     private:
-        template <typename Future, typename Enable>
+        template <typename Future>
         friend struct hpx::traits::future_access;
+
+        template <typename Future, typename Enable>
+        friend struct hpx::traits::detail::future_access_customization_point;
 
         // Effects: constructs a future object from an shared state
         explicit shared_future(

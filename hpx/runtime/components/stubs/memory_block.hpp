@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -58,29 +58,29 @@ namespace hpx { namespace components { namespace stubs
         /// or a copy of the remote data.
 
         HPX_EXPORT static
-        lcos::future<components::memory_block_data> get_async(
+        lcos::future<components::memory_block_data> get_data_async(
             naming::id_type const& targetgid);
 
-        static components::memory_block_data get(
+        static components::memory_block_data get_data(
             naming::id_type const& targetgid)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future
-            return get_async(targetgid).get();
+            return get_data_async(targetgid).get();
         }
 
         HPX_EXPORT static
-        lcos::future<components::memory_block_data> get_async(
+        lcos::future<components::memory_block_data> get_data_async(
             naming::id_type const& targetgid,
             components::memory_block_data const& cfg);
 
-        static components::memory_block_data get(
+        static components::memory_block_data get_data(
             naming::id_type const& targetgid,
             components::memory_block_data const& cfg)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future
-            return get_async(targetgid, cfg).get();
+            return get_data_async(targetgid, cfg).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

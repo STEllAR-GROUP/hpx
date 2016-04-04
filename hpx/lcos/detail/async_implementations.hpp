@@ -332,5 +332,4 @@ namespace hpx { namespace detail
     /// \endcond
 }}
 
-
 #endif

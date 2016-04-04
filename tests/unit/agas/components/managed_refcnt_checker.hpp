@@ -43,19 +43,23 @@ struct managed_refcnt_monitor
     explicit managed_refcnt_monitor(
         naming::gid_type const& locality
         )
-      : locality_(naming::get_locality_from_gid(locality)
+      : base_type(), flag_(),
+        locality_(naming::get_locality_from_gid(locality)
                 , naming::id_type::unmanaged)
     {
-        gid_ = stub_type::create_async(locality_, flag_.get_id());
+        static_cast<base_type&>(*this) =
+            stub_type::create_async(locality_, flag_.get_id());
     }
 
     /// Create a new component on the target locality.
     explicit managed_refcnt_monitor(
         naming::id_type const& locality
         )
-      : locality_(naming::get_locality_from_id(locality))
+      : base_type(), flag_(),
+        locality_(naming::get_locality_from_id(locality))
     {
-        gid_ = stub_type::create_async(locality_, flag_.get_id());
+        static_cast<base_type&>(*this) =
+            stub_type::create_async(locality_, flag_.get_id());
     }
 
     lcos::future<void> take_reference_async(
@@ -121,18 +125,18 @@ struct managed_object
     explicit managed_object(
         naming::gid_type const& locality
         )
-    {
-        gid_ = stub_type::create_async(
+      : base_type(stub_type::create_async(
             naming::id_type(locality, naming::id_type::unmanaged),
-            naming::invalid_id);
+            naming::invalid_id))
+    {
     }
 
     /// Create a new component on the target locality.
     explicit managed_object(
         naming::id_type const& locality
         )
+      : base_type(stub_type::create_async(locality, naming::invalid_id))
     {
-        gid_ = stub_type::create_async(locality, naming::invalid_id);
     }
 };
 

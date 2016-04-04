@@ -7,6 +7,7 @@
 #define HPX_APPLIER_APPLY_CALLBACK_DEC_16_2012_1228PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>

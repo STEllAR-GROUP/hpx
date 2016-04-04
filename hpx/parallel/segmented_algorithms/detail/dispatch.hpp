@@ -27,7 +27,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct algorithm_result_helper
     {
         template <typename T_>
-        static BOOST_FORCEINLINE T_ call(T_&& val)
+        static HPX_FORCEINLINE T_ call(T_&& val)
         {
             return std::forward<T_>(val);
         }
@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <>
     struct algorithm_result_helper<future<void> >
     {
-        static BOOST_FORCEINLINE future<void> call(future<void>&& f)
+        static HPX_FORCEINLINE future<void> call(future<void>&& f)
         {
             return std::move(f);
         }
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typedef hpx::traits::segmented_local_iterator_traits<Iterator>
             traits;
 
-        static BOOST_FORCEINLINE Iterator
+        static HPX_FORCEINLINE Iterator
         call(typename traits::local_raw_iterator&& it)
         {
             return traits::remote(std::move(it));
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typedef hpx::traits::segmented_local_iterator_traits<Iterator2>
             traits2;
 
-        static BOOST_FORCEINLINE
+        static HPX_FORCEINLINE
         std::pair<
             typename traits1::local_iterator, typename traits2::local_iterator
         >
@@ -106,7 +106,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     {
         typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
 
-        static BOOST_FORCEINLINE future<Iterator>
+        static HPX_FORCEINLINE future<Iterator>
         call(future<typename traits::local_raw_iterator>&& f)
         {
             typedef future<typename traits::local_raw_iterator> argtype;
@@ -142,7 +142,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 typename traits2::local_raw_iterator
             > arg_type;
 
-        static BOOST_FORCEINLINE
+        static HPX_FORCEINLINE
         future<std::pair<
             typename traits1::local_iterator, typename traits2::local_iterator
         > >
@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename R, typename Algo, typename ExPolicy, typename... Args>
     struct dispatcher_helper
     {
-        static BOOST_FORCEINLINE R sequential(Algo const& algo,
+        static HPX_FORCEINLINE R sequential(Algo const& algo,
             ExPolicy const& policy, Args const&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 );
         }
 
-        static BOOST_FORCEINLINE R parallel(Algo const& algo,
+        static HPX_FORCEINLINE R parallel(Algo const& algo,
             ExPolicy const& policy, Args const&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
@@ -195,7 +195,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Algo, typename ExPolicy, typename... Args>
     struct dispatcher_helper<void, Algo, ExPolicy, Args...>
     {
-        static BOOST_FORCEINLINE
+        static HPX_FORCEINLINE
         typename parallel::util::detail::algorithm_result<ExPolicy>::type
         sequential(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
@@ -205,7 +205,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 );
         }
 
-        static BOOST_FORCEINLINE
+        static HPX_FORCEINLINE
         typename parallel::util::detail::algorithm_result<ExPolicy>::type
         parallel(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
@@ -228,13 +228,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 result_type, Algo, ExPolicy, Args...
             > base_dispatcher;
 
-        static BOOST_FORCEINLINE result_type sequential(Algo const& algo,
+        static HPX_FORCEINLINE result_type sequential(Algo const& algo,
             ExPolicy const& policy, Args const&... args)
         {
             return base_dispatcher::sequential(algo, policy, args...);
         }
 
-        static BOOST_FORCEINLINE result_type parallel(Algo const& algo,
+        static HPX_FORCEINLINE result_type parallel(Algo const& algo,
             ExPolicy const& policy, Args const&... args)
         {
             return base_dispatcher::sequential(algo, policy, args...);
@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Algo, typename ExPolicy, typename IsSeq, typename... Args>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     future<typename hpx::util::decay<Algo>::type::result_type>
     dispatch_async(id_type const& id, Algo && algo, ExPolicy const& policy,
         IsSeq, Args&&... args)
@@ -291,7 +291,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     }
 
     template <typename Algo, typename ExPolicy, typename IsSeq, typename... Args>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     typename hpx::util::decay<Algo>::type::result_type
     dispatch(id_type const& id, Algo && algo, ExPolicy const& policy,
         IsSeq is_seq, Args&&... args)

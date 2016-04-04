@@ -121,7 +121,7 @@ int hpx_main(po::variables_map &vm)
 
         for (int i=0;i<array_length;i++) {
           components::access_memory_block<data>
-                  result( components::stubs::memory_block::get(n[i].get()) );
+                  result( components::stubs::memory_block::get_data(n[i].get()) );
           std::cout << " Result index: " << i << " value : "
                   << result->val_ << std::endl;
         }
