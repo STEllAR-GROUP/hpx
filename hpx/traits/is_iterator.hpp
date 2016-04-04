@@ -75,33 +75,15 @@ namespace hpx { namespace traits
     {};
 
     template <typename Iter, typename Enable>
-    struct is_just_input_iterator
-      : detail::has_category<
-            typename std::decay<Iter>::type, std::input_iterator_tag>
-    {};
-
-    template <typename Iter, typename Enable>
     struct is_input_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::input_iterator_tag>
     {};
 
     template <typename Iter, typename Enable>
-    struct is_just_forward_iterator
-      : detail::has_category<
-            typename std::decay<Iter>::type, std::forward_iterator_tag>
-    {};
-
-    template <typename Iter, typename Enable>
     struct is_forward_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::forward_iterator_tag>
-    {};
-
-    template <typename Iter, typename Enable>
-    struct is_just_bidirectional_iterator
-      : detail::has_category<
-            typename std::decay<Iter>::type, std::bidirectional_iterator_tag>
     {};
 
     template <typename Iter, typename Enable>

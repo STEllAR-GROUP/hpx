@@ -145,8 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::generate_(
             std::forward<ExPolicy>(policy), first, last,
@@ -265,7 +264,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_output_iterator<OutIter>::value
+               !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 
         return detail::generate_n<OutIter>().call(

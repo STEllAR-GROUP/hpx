@@ -136,22 +136,13 @@ namespace hpx { namespace traits
     struct is_iterator;
 
     template <typename Iterator, typename Enable = void>
-    struct is_just_input_iterator;
-
-    template <typename Iterator, typename Enable = void>
     struct is_input_iterator;
 
     template <typename Iterator, typename Enable = void>
     struct is_output_iterator;
 
     template <typename Iterator, typename Enable = void>
-    struct is_just_forward_iterator;
-
-    template <typename Iterator, typename Enable = void>
     struct is_forward_iterator;
-
-    template <typename Iterator, typename Enable = void>
-    struct is_just_bidirectional_iterator;
 
     template <typename Iterator, typename Enable = void>
     struct is_bidirectional_iterator;

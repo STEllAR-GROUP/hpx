@@ -246,8 +246,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::min_element_(
                 std::forward<ExPolicy>(policy), first, last,
@@ -470,8 +469,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::max_element_(
                 std::forward<ExPolicy>(policy), first, last,
@@ -733,8 +731,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return hpx::util::make_tagged_pair<tag::min, tag::max>(
             detail::minmax_element_(

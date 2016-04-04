@@ -111,7 +111,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
-            typedef hpx::traits::is_just_input_iterator<SegIter> forced_seq;
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
 
             typedef typename std::iterator_traits<SegIter>::difference_type
                 value_type;
@@ -302,7 +304,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
-            typedef hpx::traits::is_just_input_iterator<SegIter> forced_seq;
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
 
             typedef typename std::iterator_traits<SegIter>::difference_type
                 value_type;

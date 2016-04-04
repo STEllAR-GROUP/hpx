@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_just_input_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
         return detail::uninitialized_copy<FwdIter>().call(
@@ -312,7 +312,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::move(dest));
         }
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::uninitialized_copy_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

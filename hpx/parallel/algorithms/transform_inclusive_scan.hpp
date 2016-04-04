@@ -270,8 +270,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_just_input_iterator<InIter>::value ||
-                hpx::traits::is_output_iterator<OutIter>::value
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 
         return detail::transform_inclusive_scan<OutIter>().call(
@@ -397,8 +397,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_just_input_iterator<InIter>::value ||
-                hpx::traits::is_output_iterator<OutIter>::value
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 
         typedef typename std::iterator_traits<InIter>::value_type value_type;

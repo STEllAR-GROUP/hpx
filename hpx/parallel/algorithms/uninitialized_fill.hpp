@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_just_input_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
         return detail::uninitialized_fill().call(

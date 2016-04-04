@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                    hpx::traits::is_just_input_iterator<InIter>::value
+                   !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
@@ -173,8 +173,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::count_(
             std::forward<ExPolicy>(policy), first, last, value,
@@ -249,7 +248,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                    hpx::traits::is_just_input_iterator<InIter>::value
+                   !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
@@ -343,8 +342,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::count_if_(
             std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),

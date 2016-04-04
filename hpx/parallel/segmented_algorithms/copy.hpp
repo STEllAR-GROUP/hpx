@@ -150,7 +150,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     local_iterator_type, local_output_iterator_type
                 > local_iterator_pair;
 
-            typedef hpx::traits::is_just_input_iterator<SegIter> forced_seq;
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);

@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_just_forward_iterator<FwdIter>::value
+               !hpx::traits::is_bidirectional_iterator<FwdIter>::value
             > is_seq;
 
         return hpx::util::make_tagged_pair<tag::begin, tag::end>(
@@ -348,7 +348,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_output_iterator<OutIter>::value
+               !hpx::traits::is_bidirectional_iterator<FwdIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
