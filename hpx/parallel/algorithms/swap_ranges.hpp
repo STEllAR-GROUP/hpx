@@ -128,10 +128,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ForwardIter2 first2)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<ForwardIter1>::value),
+            (hpx::traits::is_forward_iterator<ForwardIter1>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<ForwardIter2>::value),
+            (hpx::traits::is_forward_iterator<ForwardIter2>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;

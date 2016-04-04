@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                    hpx::traits::is_input_iterator<InIter>::value
+                    hpx::traits::is_just_input_iterator<InIter>::value
                 > is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
@@ -170,7 +170,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     count(ExPolicy && policy, InIter first, InIter last, T const& value)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
 
         typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
@@ -249,7 +249,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                    hpx::traits::is_input_iterator<InIter>::value
+                    hpx::traits::is_just_input_iterator<InIter>::value
                 > is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
@@ -340,7 +340,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     count_if(ExPolicy && policy, InIter first, InIter last, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
 
         typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;

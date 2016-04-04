@@ -151,7 +151,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least a forward iterator");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -231,7 +231,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last, Pred && op)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least a forward iterator");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;

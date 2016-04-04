@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename traits::local_iterator local_iterator_type;
             typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
 
-            typedef hpx::traits::is_input_iterator<SegIter> forced_seq;
+            typedef hpx::traits::is_just_input_iterator<SegIter> forced_seq;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);

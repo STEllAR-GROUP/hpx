@@ -186,12 +186,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     rotate(ExPolicy && policy, FwdIter first, FwdIter new_first, FwdIter last)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_forward_iterator<FwdIter>::value
+                hpx::traits::is_just_forward_iterator<FwdIter>::value
             > is_seq;
 
         return hpx::util::make_tagged_pair<tag::begin, tag::end>(
@@ -339,11 +339,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter last, OutIter dest_first)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_at_least_input_iterator<OutIter>::value),
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,

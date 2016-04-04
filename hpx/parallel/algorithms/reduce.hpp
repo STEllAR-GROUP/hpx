@@ -159,12 +159,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     reduce(ExPolicy&& policy, InIter first, InIter last, T init, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::reduce<T>().call(
@@ -233,12 +233,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     reduce(ExPolicy&& policy, InIter first, InIter last, T init)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::reduce<T>().call(
@@ -310,14 +310,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     reduce(ExPolicy&& policy, InIter first, InIter last)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::reduce<value_type>().call(

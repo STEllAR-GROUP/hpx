@@ -160,7 +160,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     is_sorted(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -218,7 +218,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     is_sorted(ExPolicy && policy, FwdIter first, FwdIter last)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -372,7 +372,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -428,7 +428,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;

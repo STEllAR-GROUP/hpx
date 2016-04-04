@@ -186,12 +186,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             if (stride < 0)
             {
                 HPX_ASSERT(std::is_integral<E>::value ||
-                    hpx::traits::is_at_least_bidirectional_iterator<E>::value);
+                    hpx::traits::is_bidirectional_iterator<E>::value);
             }
 
             typedef std::integral_constant<bool,
                     is_sequential_execution_policy<ExPolicy>::value ||
-                    hpx::traits::is_at_least_input_iterator<B>::value
+                    hpx::traits::is_input_iterator<B>::value
                 > is_seq;
 
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);

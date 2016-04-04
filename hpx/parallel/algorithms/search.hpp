@@ -180,10 +180,10 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter2 s_first, FwdIter2 s_last)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -266,10 +266,10 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -432,10 +432,10 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter2 s_first, FwdIter2 s_last)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -518,10 +518,10 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;

@@ -142,7 +142,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     generate(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_at_least_forward_iterator<OutIter>::value),
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "Required at least output iterator.");
 
         if (detail::is_negative(count))

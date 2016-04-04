@@ -143,12 +143,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     find(ExPolicy && policy, InIter first, InIter last, T const& val)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::find<InIter>().call(
@@ -288,12 +288,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     find_if(ExPolicy && policy, InIter first, InIter last, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::find_if<InIter>().call(
@@ -438,12 +438,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     find_if_not(ExPolicy && policy, InIter first, InIter last, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::find_if_not<InIter>().call(
@@ -604,10 +604,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter2 first2, FwdIter2 last2)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter1>::value),
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -698,10 +698,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter2 first2, FwdIter2 last2, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter1>::value),
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -860,15 +860,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter s_first, FwdIter s_last)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::find_first_of<InIter>().call(
@@ -959,15 +959,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter s_first, FwdIter s_last, Pred && op)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::find_first_of<InIter>().call(

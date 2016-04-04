@@ -75,37 +75,37 @@ namespace hpx { namespace traits
     {};
 
     template <typename Iter, typename Enable>
-    struct is_input_iterator
+    struct is_just_input_iterator
       : detail::has_category<
             typename std::decay<Iter>::type, std::input_iterator_tag>
     {};
 
     template <typename Iter, typename Enable>
-    struct is_at_least_input_iterator
+    struct is_input_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::input_iterator_tag>
+    {};
+
+    template <typename Iter, typename Enable>
+    struct is_just_forward_iterator
+      : detail::has_category<
+            typename std::decay<Iter>::type, std::forward_iterator_tag>
     {};
 
     template <typename Iter, typename Enable>
     struct is_forward_iterator
-      : detail::has_category<
-            typename std::decay<Iter>::type, std::forward_iterator_tag>
-    {};
-
-    template <typename Iter, typename Enable>
-    struct is_at_least_forward_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::forward_iterator_tag>
     {};
 
     template <typename Iter, typename Enable>
-    struct is_bidirectional_iterator
+    struct is_just_bidirectional_iterator
       : detail::has_category<
             typename std::decay<Iter>::type, std::bidirectional_iterator_tag>
     {};
 
     template <typename Iter, typename Enable>
-    struct is_at_least_bidirectional_iterator
+    struct is_bidirectional_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::bidirectional_iterator_tag>
     {};
@@ -113,12 +113,6 @@ namespace hpx { namespace traits
     template <typename Iter, typename Enable>
     struct is_random_access_iterator
       : detail::has_category<
-            typename std::decay<Iter>::type, std::random_access_iterator_tag>
-    {};
-
-    template <typename Iter, typename Enable>
-    struct is_at_least_random_access_iterator
-      : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::random_access_iterator_tag>
     {};
 }}

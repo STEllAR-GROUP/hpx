@@ -125,7 +125,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
     {
         static_assert(
-            (hpx::traits::is_at_least_bidirectional_iterator<BidirIter>::value),
+            (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
             "Requires at least bidirectional iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -260,11 +260,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter dest_first)
     {
         static_assert(
-            (hpx::traits::is_at_least_bidirectional_iterator<BidirIter>::value),
+            (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
             "Requires at least bidirectional iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_at_least_input_iterator<OutIter>::value),
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,

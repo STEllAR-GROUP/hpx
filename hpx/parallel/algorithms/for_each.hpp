@@ -178,7 +178,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         // if count is representing a negative value, we do nothing
@@ -190,7 +190,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::for_each_n<InIter>().call(
@@ -255,7 +255,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                    hpx::traits::is_input_iterator<InIter>::value
+                    hpx::traits::is_just_input_iterator<InIter>::value
                 > is_seq;
 
             if (first == last)
@@ -364,7 +364,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;

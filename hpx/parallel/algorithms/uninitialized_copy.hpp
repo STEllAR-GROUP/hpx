@@ -188,15 +188,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter dest)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::uninitialized_copy<FwdIter>().call(
@@ -299,10 +299,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         FwdIter dest)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         // if count is representing a negative value, we do nothing

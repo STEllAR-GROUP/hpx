@@ -120,7 +120,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
-            typedef hpx::traits::is_input_iterator<SegIter> forced_seq;
+            typedef hpx::traits::is_just_input_iterator<SegIter> forced_seq;
             typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
 
             segment_iterator sit = traits::segment(first);
@@ -395,7 +395,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
-            typedef hpx::traits::is_input_iterator<SegIter> forced_seq;
+            typedef hpx::traits::is_just_input_iterator<SegIter> forced_seq;
             typedef std::pair<SegIter, SegIter> result_type;
             typedef util::detail::algorithm_result<ExPolicy, result_type> result;
 

@@ -106,12 +106,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             T && init, Reduce && red_op, Convert && conv_op, std::false_type)
         {
             static_assert(
-                (hpx::traits::is_at_least_input_iterator<InIter>::value),
+                (hpx::traits::is_input_iterator<InIter>::value),
                 "Requires at least input iterator.");
 
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                    hpx::traits::is_input_iterator<InIter>::value
+                    hpx::traits::is_just_input_iterator<InIter>::value
                 > is_seq;
 
             typedef typename hpx::util::decay<T>::type init_type;

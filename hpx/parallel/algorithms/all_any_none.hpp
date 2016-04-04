@@ -155,12 +155,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     none_of(ExPolicy && policy, InIter first, InIter last, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::none_of().call(
@@ -296,12 +296,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     any_of(ExPolicy && policy, InIter first, InIter last, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::any_of().call(
@@ -436,12 +436,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     all_of(ExPolicy && policy, InIter first, InIter last, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_just_input_iterator<InIter>::value
             > is_seq;
 
         return detail::all_of().call(

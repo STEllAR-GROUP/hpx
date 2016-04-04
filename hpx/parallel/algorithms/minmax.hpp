@@ -243,7 +243,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
@@ -467,7 +467,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;
@@ -730,7 +730,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         F && f = F(), Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_at_least_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef hpx::traits::segmented_iterator_traits<FwdIter> iterator_traits;

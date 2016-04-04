@@ -211,14 +211,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         InIter2 first2, InIter2 last2, OutIter dest, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_at_least_input_iterator<OutIter>::value),
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
@@ -308,14 +308,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         InIter2 first2, InIter2 last2, OutIter dest)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_at_least_input_iterator<OutIter>::value),
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,

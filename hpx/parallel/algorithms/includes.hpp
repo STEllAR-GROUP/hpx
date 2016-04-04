@@ -269,16 +269,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         InIter2 first2, InIter2 last2)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter1>::value ||
-                hpx::traits::is_input_iterator<InIter2>::value
+                hpx::traits::is_just_input_iterator<InIter1>::value ||
+                hpx::traits::is_just_input_iterator<InIter2>::value
             > is_seq;
 
         return detail::includes().call(
@@ -365,16 +365,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         InIter2 first2, InIter2 last2, F && f)
     {
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_at_least_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<InIter1>::value ||
-                hpx::traits::is_input_iterator<InIter2>::value
+                hpx::traits::is_just_input_iterator<InIter1>::value ||
+                hpx::traits::is_just_input_iterator<InIter2>::value
             > is_seq;
 
         return detail::includes().call(
