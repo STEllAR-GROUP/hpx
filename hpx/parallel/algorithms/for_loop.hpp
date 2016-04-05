@@ -223,7 +223,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<B>::value);
             }
 
-            typedef typename boost::mpl::bool_<
+            typedef typename std::integral_constant<bool,
                 is_sequential_execution_policy<ExPolicy>::value ||
                 hpx::traits::is_input_iterator<B>::value
             >::type is_seq;
