@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,7 +37,7 @@ namespace hpx { namespace traits
             typedef boost::intrusive_ptr<lcos::detail::future_data<R> > type;
         };
 
-        template <typename Future>
+        template <typename Future, typename Enable = void>
         struct shared_state_ptr_for
           : shared_state_ptr<typename traits::future_traits<Future>::type>
         {};
@@ -79,6 +79,17 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename T, typename Enable = void>
+        struct future_access_customization_point;
+    }
+
+    template <typename T>
+    struct future_access
+      : detail::future_access_customization_point<T>
+    {};
+
     template <typename R>
     struct future_access<lcos::future<R> >
     {

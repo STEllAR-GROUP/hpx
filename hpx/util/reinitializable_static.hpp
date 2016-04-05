@@ -11,7 +11,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/static_reinit.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
 #include <boost/aligned_storage.hpp>
 
@@ -54,8 +53,10 @@ namespace hpx { namespace util
     //////////////////////////////////////////////////////////////////////////
     template <typename T, typename Tag, std::size_t N>
     struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
-      : private boost::noncopyable
     {
+    private:
+        HPX_NON_COPYABLE(reinitializable_static);
+
     public:
         typedef T value_type;
 

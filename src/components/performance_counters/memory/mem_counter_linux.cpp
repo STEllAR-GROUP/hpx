@@ -20,7 +20,6 @@
 #include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
 #include <fstream>

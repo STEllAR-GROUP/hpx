@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,9 +25,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -71,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         rotate_helper(ExPolicy policy, FwdIter first, FwdIter new_first,
             FwdIter last)
         {
-            typedef boost::mpl::false_ non_seq;
+            typedef std::false_type non_seq;
 
             parallel_task_execution_policy p =
                 parallel_task_execution_policy()
@@ -187,18 +185,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     rotate(ExPolicy && policy, FwdIter first, FwdIter new_first, FwdIter last)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category>::value),
-            "Required at least forward iterator.");
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::forward_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_bidirectional_iterator<FwdIter>::value
+            > is_seq;
 
         return hpx::util::make_tagged_pair<tag::begin, tag::end>(
             detail::rotate<std::pair<FwdIter, FwdIter> >().call(
@@ -230,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         rotate_copy_helper(ExPolicy policy, FwdIter first,
             FwdIter new_first, FwdIter last, OutIter dest_first)
         {
-            typedef boost::mpl::false_ non_seq;
+            typedef std::false_type non_seq;
 
             parallel_task_execution_policy p =
                 parallel_task_execution_policy()
@@ -344,29 +338,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     rotate_copy(ExPolicy && policy, FwdIter first, FwdIter new_first,
         FwdIter last, OutIter dest_first)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            forward_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, forward_iterator_category>::value),
-            "Required at least forward iterator.");
-
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_bidirectional_iterator<FwdIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::rotate_copy<std::pair<FwdIter, OutIter> >().call(

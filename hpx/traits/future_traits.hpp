@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,8 +22,16 @@ namespace hpx { namespace lcos
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable>
+    namespace detail
+    {
+        template <typename Future, typename Enable = void>
+        struct future_traits_customization_point
+        {};
+    }
+
+    template <typename T>
     struct future_traits
+      : detail::future_traits_customization_point<T>
     {};
 
     template <typename Future>

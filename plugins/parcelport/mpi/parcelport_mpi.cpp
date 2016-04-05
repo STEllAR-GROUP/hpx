@@ -224,7 +224,7 @@ namespace hpx { namespace parcelset
                             "mpi::early_write_handler", __FILE__, __LINE__,
                             "error while handling early parcel: " +
                                 ec.message() + "(" +
-                                boost::lexical_cast<std::string>(ec.value()) +
+                                std::to_string(ec.value()) +
                                 ")" + parcelset::dump_parcel(p));
 
                     hpx::report_error(exception);

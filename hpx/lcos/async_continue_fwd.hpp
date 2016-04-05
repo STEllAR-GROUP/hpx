@@ -8,8 +8,8 @@
 #if !defined(HPX_LCOS_ASYNC_CONTINUE_FWD_JAN_25_2013_0828AM)
 #define HPX_LCOS_ASYNC_CONTINUE_FWD_JAN_25_2013_0828AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/lcos/future.hpp>

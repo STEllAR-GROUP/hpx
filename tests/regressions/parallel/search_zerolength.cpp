@@ -10,7 +10,6 @@
 
 void search_zero_dist_test()
 {
-    using hpx::parallel::execution_policy;
     using hpx::parallel::seq;
     using hpx::parallel::par;
     using hpx::parallel::search;
@@ -40,7 +39,7 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" + boost::lexical_cast<std::string>
+    cfg.push_back("hpx.os_threads=" + std::to_string
                   (hpx::threads::hardware_concurrency()));
 
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

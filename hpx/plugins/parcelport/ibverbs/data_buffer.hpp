@@ -12,9 +12,11 @@
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     struct data_buffer
-        : boost::noncopyable
     {
+    private:
+        HPX_NON_COPYABLE(data_buffer);
 
+    public:
         static const std::size_t mr_buffer_offset = 2 * sizeof(boost::uint64_t);
 
         data_buffer()

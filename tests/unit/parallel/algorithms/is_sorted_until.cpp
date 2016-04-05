@@ -69,6 +69,7 @@ void test_sorted_until1()
     test_sorted_until1_async(seq(task), IteratorTag());//calls sequential and gets future
     test_sorted_until1_async(par(task), IteratorTag());//calls parallel and gets future
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_until1(execution_policy(seq), IteratorTag());
     //calls sequential and gets iter
     test_sorted_until1(execution_policy(par), IteratorTag());
@@ -79,6 +80,7 @@ void test_sorted_until1()
     //calls sequential and gets iter
     test_sorted_until1(execution_policy(par(task)), IteratorTag());
     //calls parallel and gets iter
+#endif
 }
 
 void sorted_until_test1()
@@ -161,12 +163,13 @@ void test_sorted_until2()
     test_sorted_until2_async(seq(task), IteratorTag());
     test_sorted_until2_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_until2(execution_policy(seq), IteratorTag());
     test_sorted_until2(execution_policy(par), IteratorTag());
     test_sorted_until2(execution_policy(par_vec), IteratorTag());
     test_sorted_until2(execution_policy(seq(task)), IteratorTag());
     test_sorted_until2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void sorted_until_test2()
@@ -258,12 +261,13 @@ void test_sorted_until3()
     test_sorted_until3_async(seq(task), IteratorTag());
     test_sorted_until3_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_until3(execution_policy(seq), IteratorTag());
     test_sorted_until3(execution_policy(par), IteratorTag());
     test_sorted_until3(execution_policy(par_vec), IteratorTag());
     test_sorted_until3(execution_policy(seq(task)), IteratorTag());
     test_sorted_until3(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void sorted_until_test3()
@@ -360,10 +364,13 @@ void test_sorted_until_exception()
     test_sorted_until_async_exception(seq(task), IteratorTag());
     test_sorted_until_async_exception(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_until_exception(execution_policy(par), IteratorTag());
     test_sorted_until_exception(execution_policy(seq(task)), IteratorTag());
     test_sorted_until_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
+
 void sorted_until_exception_test()
 {
     test_sorted_until_exception<std::random_access_iterator_tag>();
@@ -464,10 +471,12 @@ void test_sorted_until_bad_alloc()
     test_sorted_until_async_bad_alloc(seq(task), IteratorTag());
     test_sorted_until_async_bad_alloc(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_until_bad_alloc(execution_policy(par), IteratorTag());
     test_sorted_until_bad_alloc(execution_policy(seq), IteratorTag());
     test_sorted_until_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_sorted_until_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void sorted_until_bad_alloc_test()
@@ -495,7 +504,7 @@ int main(int argc, char* argv[])
 
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

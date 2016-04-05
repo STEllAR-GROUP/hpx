@@ -132,15 +132,14 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/new.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/dataflow.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/thread/locks.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <string>
 #include <vector>
@@ -270,7 +269,7 @@ namespace hpx { namespace lcos
 
         std::string name(basename);
         if (generation != std::size_t(-1))
-            name += boost::lexical_cast<std::string>(generation) + "/";
+            name += std::to_string(generation) + "/";
 
         // register the gatherer's id using the given basename
         using util::placeholders::_1;
@@ -381,7 +380,7 @@ namespace hpx { namespace lcos
 
         std::string name(basename);
         if (generation != std::size_t(-1))
-            name += boost::lexical_cast<std::string>(generation) + "/";
+            name += std::to_string(generation) + "/";
 
         return gather_there(
             hpx::find_from_basename(name, root_site),
@@ -419,7 +418,7 @@ namespace hpx { namespace lcos
 
         std::string name(basename);
         if (generation != std::size_t(-1))
-            name += boost::lexical_cast<std::string>(generation) + "/";
+            name += std::to_string(generation) + "/";
 
         return gather_there(
             hpx::find_from_basename(name, root_site),

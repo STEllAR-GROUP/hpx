@@ -13,7 +13,6 @@
 #include <hpx/hpx_user_main_config.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/lexical_cast.hpp>
 
 #ifndef DOXYGEN
 ///////////////////////////////////////////////////////////////////////////////

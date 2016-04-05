@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>

@@ -351,6 +351,12 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algorefv2 for_loop_strided] ]
      [Implements loop functionality over a range specified by integral or iterator bounds.]
      [`<hpx/include/parallel_for_loop.hpp>`]]
+    [[ [algorefv2 for_loop_n] ]
+     [Implements loop functionality over a range specified by integral or iterator bounds.]
+     [`<hpx/include/parallel_for_loop.hpp>`]]
+    [[ [algorefv2 for_loop_n_strided] ]
+     [Implements loop functionality over a range specified by integral or iterator bounds.]
+     [`<hpx/include/parallel_for_loop.hpp>`]]
 ]
 
 [endsect]

@@ -73,12 +73,14 @@ void adjacent_difference_test()
     test_adjacent_difference_async(seq(task));
     test_adjacent_difference_async(par(task));
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_adjacent_difference(execution_policy(seq));
     test_adjacent_difference(execution_policy(par));
     test_adjacent_difference(execution_policy(par_vec));
 
     test_adjacent_difference(execution_policy(seq(task)));
     test_adjacent_difference(execution_policy(par(task)));
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -109,7 +111,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

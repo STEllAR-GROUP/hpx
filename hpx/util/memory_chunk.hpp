@@ -9,6 +9,16 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+// include unist.d conditionally to check for POSIX version. Not all OSs have the
+// unistd header...
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
+#if defined(_POSIX_VERSION)
+#include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
+#endif
+
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace util

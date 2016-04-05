@@ -9,14 +9,17 @@ set(tests
     apply_local
     apply_local_executor
     apply_remote
+    apply_remote_client
     async_cb_colocated
     async_cb_remote
+    async_cb_remote_client
     async_continue
     async_continue_cb
     async_continue_cb_colocated
     async_local
     async_local_executor
     async_remote
+    async_remote_client
     broadcast
     broadcast_apply
     client_then
@@ -58,6 +61,7 @@ set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_remote_PARAMETERS LOCALITIES 2)
+set(apply_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_colocated_PARAMETERS LOCALITIES 2)
 
 set(async_continue_PARAMETERS LOCALITIES 2)
@@ -66,7 +70,9 @@ set(async_continue_cb_colocated_PARAMETERS LOCALITIES 2)
 set(async_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_remote_PARAMETERS LOCALITIES 2)
+set(async_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_PARAMETERS LOCALITIES 2)
+set(async_cb_remote_client_PARAMETERS LOCALITIES 2)
 
 set(broadcast_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)

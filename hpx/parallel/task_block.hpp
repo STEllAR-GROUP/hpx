@@ -8,9 +8,8 @@
 #if !defined(HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM)
 #define HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
@@ -452,6 +451,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 
     /// \cond NOINTERNAL
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
 #if defined(HPX_HAVE_CXX14_LAMBDAS)
     template <typename F>
     inline void define_task_block(parallel::execution_policy && policy, F && f)
@@ -499,6 +499,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             "define_task_block",
             "The given execution policy is not supported");
     }
+#endif
 #endif
     /// \endcond
 

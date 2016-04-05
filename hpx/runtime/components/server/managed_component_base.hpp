@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40703
 // this needs to go first to workaround a weird GCC4.6 ICE
 #include <hpx/util/reinitializable_static.hpp>
 #endif
@@ -25,7 +25,6 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/throw_exception.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -186,8 +185,10 @@ namespace hpx { namespace components
     template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     class managed_component_base
-      : public traits::detail::managed_component_tag, boost::noncopyable
+      : public traits::detail::managed_component_tag
     {
+        HPX_NON_COPYABLE(managed_component_base);
+
     private:
         Component& derived()
         {
@@ -374,8 +375,10 @@ namespace hpx { namespace components
     /// \tparam Derived
     ///
     template <typename Component, typename Derived>
-    class managed_component : boost::noncopyable
+    class managed_component
     {
+        HPX_NON_COPYABLE(managed_component);
+
     public:
         typedef typename boost::mpl::if_<
                 boost::is_same<Derived, detail::this_type>,

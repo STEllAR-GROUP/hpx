@@ -33,6 +33,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -627,7 +628,7 @@ namespace hpx {
             std::string* fullname = new std::string(context);
             if (postfix && *postfix)
                 *fullname += postfix;
-            *fullname += "#" + boost::lexical_cast<std::string>(num);
+            *fullname += "#" + std::to_string(num);
             runtime::thread_name_.reset(fullname);
 
             char const* name = runtime::thread_name_.get()->c_str();

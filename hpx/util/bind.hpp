@@ -261,10 +261,8 @@ namespace hpx { namespace util
             {}
 #endif
 
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            bound& operator=(bound const&) = delete;
-            bound& operator=(bound&&) = delete;
-#endif
+            HPX_DELETE_COPY_ASSIGN(bound);
+            HPX_DELETE_MOVE_ASSIGN(bound);
 
             template <typename ...Us>
             inline typename bound_result_of<

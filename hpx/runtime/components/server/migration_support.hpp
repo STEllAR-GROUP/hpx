@@ -76,10 +76,10 @@ namespace hpx { namespace components
                 [this]() mutable -> std::pair<bool, hpx::future<void> >
                 {
                     boost::unique_lock<mutex_type> l(mtx_);
-                    HPX_ASSERT(pin_count_ != 0);
-                    if (pin_count_ != ~0x0u)
+                    HPX_ASSERT(this->pin_count_ != 0);
+                    if (this->pin_count_ != ~0x0u)
                     {
-                        if (--pin_count_ == 0)
+                        if (--this->pin_count_ == 0)
                         {
                             // trigger pending migration if this was the last
                             // unpin and a migration operation is pending

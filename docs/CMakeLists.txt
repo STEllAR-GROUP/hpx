@@ -116,6 +116,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_parameter_traits.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/persistent_auto_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/sequential_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/service_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
@@ -177,9 +178,6 @@ set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
 
 set(doxygen_definition_list
     "DOXYGEN:=1"
-    "BOOST_SCOPED_ENUM_START(x):=enum x"
-    "BOOST_SCOPED_ENUM_END="
-    "BOOST_SCOPED_ENUM(x):=x"
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
     "HPX_EXPORT="

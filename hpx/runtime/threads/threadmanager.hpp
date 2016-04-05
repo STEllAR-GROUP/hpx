@@ -37,9 +37,14 @@ namespace hpx { namespace threads
     class thread_init_data;
 
     ///////////////////////////////////////////////////////////////////////////
-    struct threadmanager_base : private boost::noncopyable
+    struct threadmanager_base
     {
+    private:
+        HPX_NON_COPYABLE(threadmanager_base);
+
     public:
+        threadmanager_base() {}
+
         virtual ~threadmanager_base() {}
 
         virtual std::size_t init(policies::init_affinity_data const& data) = 0;

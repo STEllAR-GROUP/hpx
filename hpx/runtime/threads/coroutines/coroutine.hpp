@@ -33,6 +33,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
@@ -51,7 +52,7 @@ namespace hpx { namespace threads { namespace coroutines
     class coroutine
     {
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine)
+        HPX_MOVABLE_ONLY(coroutine);
 
     public:
         friend struct detail::coroutine_accessor;

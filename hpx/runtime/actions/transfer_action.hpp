@@ -32,6 +32,7 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -53,7 +54,7 @@ namespace hpx { namespace actions
     template <typename Action>
     struct transfer_action : base_action
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(transfer_action)
+        HPX_MOVABLE_ONLY(transfer_action);
 
     public:
         typedef typename Action::component_type component_type;

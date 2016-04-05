@@ -174,7 +174,7 @@ namespace detail
     template <typename F1, typename F2>
     class compose_cb_impl
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl)
+        HPX_MOVABLE_ONLY(compose_cb_impl);
 
     public:
         template <typename A1, typename A2>
@@ -241,7 +241,7 @@ namespace detail
     template <typename Result>
     struct future_data : future_data_refcnt_base
     {
-        HPX_NON_COPYABLE(future_data)
+        HPX_NON_COPYABLE(future_data);
 
         typedef typename future_data_result<Result>::type result_type;
         typedef util::unique_function_nonser<void()> completed_callback_type;

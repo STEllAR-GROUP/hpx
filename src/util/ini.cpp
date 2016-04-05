@@ -18,6 +18,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
@@ -30,7 +31,6 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/assign/std/vector.hpp>
 
 #ifdef __APPLE__
@@ -616,7 +616,7 @@ void section::line_msg(std::string msg, std::string const& file,
 {
     msg += " " + file;
     if (lnum > 0)
-        msg += ": line " + boost::lexical_cast<std::string>(lnum);
+        msg += ": line " + std::to_string(lnum);
     if (!line.empty())
         msg += " (offending entry: " + line + ")";
 

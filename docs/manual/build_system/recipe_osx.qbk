@@ -38,7 +38,7 @@ This section describes how to build__hpx__ for OS X (Mac).
 ``
         b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang install -j4
 ``
-    we verifed this using Boost V1.53. If you use a different
+    We verified this using Boost V1.53. If you use a different
     version, just remember to replace `/usr/local/include/boost-1_53` with
     whatever include prefix you had in your installation.
 

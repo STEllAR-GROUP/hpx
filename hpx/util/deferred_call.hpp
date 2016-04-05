@@ -71,9 +71,8 @@ namespace hpx { namespace util
             {}
 #endif
 
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            deferred& operator=(deferred&&) = delete;
-#endif
+            HPX_DELETE_COPY_ASSIGN(deferred);
+            HPX_DELETE_MOVE_ASSIGN(deferred);
 
             inline typename deferred_result_of<F(Ts...)>::type
             operator()()

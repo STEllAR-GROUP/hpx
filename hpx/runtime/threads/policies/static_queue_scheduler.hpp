@@ -20,7 +20,6 @@
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 

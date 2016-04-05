@@ -11,7 +11,7 @@
 #define HPX_LCOS_LOCAL_ONCE_JAN_03_2013_0810PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/assert.hpp>
@@ -22,11 +22,13 @@ namespace hpx { namespace lcos { namespace local
 {
     struct once_flag
     {
+    private:
+        HPX_NON_COPYABLE(once_flag);
+
+    public:
         once_flag() HPX_NOEXCEPT
           : status_(0)
         {}
-
-        HPX_NON_COPYABLE(once_flag)
 
     private:
         boost::atomic<long> status_;

@@ -22,10 +22,11 @@
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio/placeholders.hpp>
 #include <boost/tuple/tuple.hpp>
+
+#include <string>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
@@ -42,7 +43,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
           : window_(io_service), parcelport_(parcelport)
         {
             std::string fullname(here.get<locality>().address() + "." +
-                boost::lexical_cast<std::string>(here.get<locality>().port()));
+                std::to_string(here.get<locality>().port()));
             window_.set_option(data_window::bound_to(fullname));
         }
 

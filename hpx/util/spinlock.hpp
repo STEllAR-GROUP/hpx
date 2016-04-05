@@ -8,7 +8,7 @@
 #if !defined(HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770)
 #define HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770
 
-#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 
@@ -22,6 +22,9 @@ namespace hpx { namespace util
 struct spinlock
 {
   private:
+    HPX_NON_COPYABLE(spinlock);
+
+  private:
     boost::detail::spinlock m;
 
   public:
@@ -32,8 +35,6 @@ struct spinlock
         boost::detail::spinlock l = BOOST_DETAIL_SPINLOCK_INIT;
         m = l;
     }
-
-    HPX_NON_COPYABLE(spinlock)
 
     ~spinlock()
     {

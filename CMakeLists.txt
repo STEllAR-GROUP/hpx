@@ -625,6 +625,14 @@ if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
 endif()
 
+# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.12
+hpx_option(HPX_WITH_GENERIC_EXECUTION_POLICY BOOL
+    "Enable the generic execution policy (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_GENERIC_EXECUTION_POLICY)
+  hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
+endif()
+
 # BADBAD: This enables an overload of swap is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -764,7 +772,7 @@ hpx_check_for_cxx11_defaulted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
 
 hpx_check_for_cxx11_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+  REQUIRED "HPX needs support for C++11 deleted functions")
 
 hpx_check_for_cxx11_explicit_cvt_ops(
   DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
@@ -838,6 +846,9 @@ hpx_check_for_cxx11_std_is_placeholder(
 
 hpx_check_for_cxx11_std_reference_wrapper(
   DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
+
+hpx_check_for_cxx11_std_to_string(
+  REQUIRED "HPX needs support for C++11 std::to_string")
 
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")
@@ -995,6 +1006,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # MSVC2012/2013 are overeager to report 'qualifier applied to function type
     # has no meaning; ignored'
     hpx_add_compile_flag(-wd4180)
+
+    # max symbol length exceeded
+    hpx_add_compile_flag(-wd4503)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
