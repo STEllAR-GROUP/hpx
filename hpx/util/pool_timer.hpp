@@ -7,19 +7,12 @@
 #define HPX_UTIL_POOL_TIMER
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-
-#include <string>
-#include <vector>
-#include <algorithm>
 
 #include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
