@@ -104,11 +104,13 @@ void test_exclusive_scan_exception()
     test_exclusive_scan_exception_async(seq(task), IteratorTag());
     test_exclusive_scan_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_exclusive_scan_exception(execution_policy(seq), IteratorTag());
     test_exclusive_scan_exception(execution_policy(par), IteratorTag());
 
     test_exclusive_scan_exception(execution_policy(seq(task)), IteratorTag());
     test_exclusive_scan_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void exclusive_scan_exception_test()

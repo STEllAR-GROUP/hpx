@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,8 @@
 #define HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -19,9 +21,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -190,8 +190,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           If the length of the range [first1, last1) does not mismatch
     ///           the length of the range [first2, last2), it returns false.
     template <typename ExPolicy, typename InIter1, typename InIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
@@ -199,23 +199,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter1>::value ||
+               !hpx::traits::is_forward_iterator<InIter2>::value
+            > is_seq;
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch_binary<result_type>().call(
@@ -298,8 +293,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           If the length of the range [first1, last1) does not mismatch
     ///           the length of the range [first2, last2), it returns false.
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
@@ -307,23 +302,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, F && f)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter1>::value ||
+               !hpx::traits::is_forward_iterator<InIter2>::value
+            > is_seq;
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch_binary<result_type>().call(
@@ -456,32 +446,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           and another defined by [first2, last2).
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
     >::type
-    mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-        InIter2 first2)
+    mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1, InIter2 first2)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter1>::value ||
+               !hpx::traits::is_forward_iterator<InIter2>::value
+            > is_seq;
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch<result_type>().call(
@@ -555,8 +539,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           and another defined by [first2, last2).
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
@@ -564,23 +548,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1, InIter2 first2,
         F && f)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter1>::value ||
+               !hpx::traits::is_forward_iterator<InIter2>::value
+            > is_seq;
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch<result_type>().call(

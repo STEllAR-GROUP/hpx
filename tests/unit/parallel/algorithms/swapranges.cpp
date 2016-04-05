@@ -98,12 +98,14 @@ void test_swap_ranges()
     test_swap_ranges_async(seq(task), IteratorTag());
     test_swap_ranges_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_swap_ranges(execution_policy(seq), IteratorTag());
     test_swap_ranges(execution_policy(par), IteratorTag());
     test_swap_ranges(execution_policy(par_vec), IteratorTag());
 
     test_swap_ranges(execution_policy(seq(task)), IteratorTag());
     test_swap_ranges(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void swap_ranges_test()
@@ -203,11 +205,13 @@ void test_swap_ranges_exception()
     test_swap_ranges_exception_async(seq(task), IteratorTag());
     test_swap_ranges_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_swap_ranges_exception(execution_policy(seq), IteratorTag());
     test_swap_ranges_exception(execution_policy(par), IteratorTag());
 
     test_swap_ranges_exception(execution_policy(seq(task)), IteratorTag());
     test_swap_ranges_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void swap_ranges_exception_test()
@@ -305,11 +309,13 @@ void test_swap_ranges_bad_alloc()
     test_swap_ranges_bad_alloc_async(seq(task), IteratorTag());
     test_swap_ranges_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_swap_ranges_bad_alloc(execution_policy(seq), IteratorTag());
     test_swap_ranges_bad_alloc(execution_policy(par), IteratorTag());
 
     test_swap_ranges_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_swap_ranges_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void swap_ranges_bad_alloc_test()

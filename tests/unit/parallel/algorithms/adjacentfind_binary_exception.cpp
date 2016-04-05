@@ -100,11 +100,13 @@ void test_adjacent_find_exception()
     test_adjacent_find_exception_async(seq(task), IteratorTag());
     test_adjacent_find_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_adjacent_find_exception(execution_policy(seq), IteratorTag());
     test_adjacent_find_exception(execution_policy(par), IteratorTag());
 
     test_adjacent_find_exception(execution_policy(seq(task)), IteratorTag());
     test_adjacent_find_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void adjacent_find_exception_test()

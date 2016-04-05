@@ -95,11 +95,13 @@ void test_for_each_n_exception()
     test_for_each_n_exception_async(seq(task), IteratorTag(), Proj());
     test_for_each_n_exception_async(par(task), IteratorTag(), Proj());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_n_exception(execution_policy(seq), IteratorTag(), Proj());
     test_for_each_n_exception(execution_policy(par), IteratorTag(), Proj());
 
     test_for_each_n_exception(execution_policy(seq(task)), IteratorTag(), Proj());
     test_for_each_n_exception(execution_policy(par(task)), IteratorTag(), Proj());
+#endif
 }
 
 template <typename Proj>

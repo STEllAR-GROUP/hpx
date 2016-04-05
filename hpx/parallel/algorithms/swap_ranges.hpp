@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -19,9 +20,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -62,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter<1, result_type>(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first1, first2),
                         std::distance(first1, last1),
                         [](reference t) {
@@ -128,21 +127,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     swap_ranges(ExPolicy && policy, ForwardIter1 first1, ForwardIter1 last1,
         ForwardIter2 first2)
     {
-        typedef typename std::iterator_traits<ForwardIter1>::iterator_category
-            iter1_category;
-        typedef typename std::iterator_traits<ForwardIter2>::iterator_category
-            iter2_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iter1_category>::value),
-            "Required at least forward iterator tag.");
+            (hpx::traits::is_forward_iterator<ForwardIter1>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iter2_category>::value),
-            "Required at least forward iterator tag.");
+            (hpx::traits::is_forward_iterator<ForwardIter2>::value),
+            "Requires at least forward iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
         return detail::swap_ranges<ForwardIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2);

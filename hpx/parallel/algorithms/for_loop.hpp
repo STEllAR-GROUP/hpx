@@ -27,8 +27,6 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
-#include <boost/mpl/bool.hpp>
-
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
@@ -191,10 +189,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<E>::value);
             }
 
-            typedef typename boost::mpl::bool_<
-                is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<B>::value
-            >::type is_seq;
+            typedef std::integral_constant<bool,
+                    is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<B>::value
+                > is_seq;
 
             std::size_t size = parallel::v1::detail::distance(first, last);
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);

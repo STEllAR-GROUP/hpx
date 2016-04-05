@@ -137,6 +137,9 @@ parallel::guided_chunk_size                 "guided_chunk_size"             "hpx
 # hpx/parallel/executors/auto_chunk_size.hpp
 parallel::auto_chunk_size                   "auto_chunk_size"               "hpx\.parallel\.v3\.auto_chunk_size.*"
 
+# hpx/parallel/executors/persistent_auto_chunk_size.hpp
+parallel::persistent_auto_chunk_size        "persistent_auto_chunk_size"    "hpx\.parallel\.v3\.persistent_auto_chunk_size.*"
+
 
 # hpx/parallel/algorithms/adjacent_difference.hpp
 parallel::adjacent_difference         "adjacent_difference" "hpx\.parallel\.v1\.adjacent_difference.*"

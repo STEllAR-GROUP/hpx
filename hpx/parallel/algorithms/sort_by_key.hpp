@@ -10,15 +10,15 @@
 #include <hpx/config.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/tagged_pair.hpp>
+
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/tagspec.hpp>
-//
+
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-//
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -135,22 +135,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP "
             "is defined");
 #else
-        typedef typename std::iterator_traits<KeyIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<ValueIter>::iterator_category
-            iterator_category2;
-        typedef typename util::detail::algorithm_result<
-                ExPolicy,
-                hpx::util::tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>
-            >::type result_type;
-
         static_assert(
-            (boost::is_base_of<
-                std::random_access_iterator_tag, iterator_category
-            >::value) ||
-            (boost::is_base_of<
-                std::random_access_iterator_tag, iterator_category2
-            >::value),
+            (hpx::traits::is_random_access_iterator<KeyIter>::value),
+            "Requires a random access iterator.");
+        static_assert(
+            (hpx::traits::is_random_access_iterator<ValueIter>::value),
             "Requires a random access iterator.");
 
         ValueIter value_last = value_first;

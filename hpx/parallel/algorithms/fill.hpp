@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -20,9 +21,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -60,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
-                        std::forward<ExPolicy>(policy), boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         first, std::distance(first, last),
                         [val](type& v) {
                             v = val;
@@ -109,21 +108,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           is defined by \a void.
     ///
     template <typename ExPolicy, typename InIter, typename T>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
     fill(ExPolicy && policy, InIter first, InIter last, T value)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-             iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category>::value),
-            "Required at least forward iterator.");
+            (hpx::traits::is_forward_iterator<InIter>::value),
+            "Requires at least forward iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::fill().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -161,7 +156,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return
                     for_each_n<OutIter>().call(
                         std::forward<ExPolicy>(policy),
-                        boost::mpl::false_(), first, count,
+                        std::false_type(), first, count,
                         [val](type& v) -> void
                         {
                             v = val;
@@ -214,23 +209,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           is defined by \a void.
     ///
     template <typename ExPolicy, typename OutIter, typename Size, typename T>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     fill_n(ExPolicy && policy, OutIter first, Size count, T value)
     {
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, iterator_category>
-            >::value),
-            "Requires at least bidirectional iterator.");
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least output iterator.");
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
@@ -239,10 +227,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::move(first));
         }
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::output_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return detail::fill_n<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

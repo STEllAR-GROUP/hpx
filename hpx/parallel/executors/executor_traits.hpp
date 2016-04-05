@@ -309,8 +309,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename F, typename Shape>
         struct bulk_execute_result<F, Shape,
-            typename boost::enable_if_c<
-                boost::is_void<
+            typename std::enable_if<
+                std::is_void<
                     typename detail::bulk_async_execute_result<F, Shape>::type
                 >::value
             >::type>

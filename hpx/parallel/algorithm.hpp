@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_MAY_28_2014_0522PM)
 #define HPX_PARALLEL_ALGORITHM_MAY_28_2014_0522PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 /// See N4310: 1.3/3
 #include <algorithm>

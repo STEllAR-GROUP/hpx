@@ -32,6 +32,7 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <list>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -407,13 +408,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     sort(ExPolicy && policy, RandomIt first, RandomIt last,
         Compare && comp = Compare(), Proj && proj = Proj())
     {
-        typedef typename std::iterator_traits<RandomIt>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::random_access_iterator_tag, iterator_category
-            >::value),
+            (hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;

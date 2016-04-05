@@ -83,12 +83,14 @@ void test_generate()
     test_generate_async(seq(task), IteratorTag());
     test_generate_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_generate(execution_policy(seq), IteratorTag());
     test_generate(execution_policy(par), IteratorTag());
     test_generate(execution_policy(par_vec), IteratorTag());
 
     test_generate(execution_policy(seq(task)), IteratorTag());
     test_generate(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void generate_test()
@@ -187,11 +189,13 @@ void test_generate_exception()
     test_generate_exception_async(seq(task), IteratorTag());
     test_generate_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_generate_exception(execution_policy(seq), IteratorTag());
     test_generate_exception(execution_policy(par), IteratorTag());
 
     test_generate_exception(execution_policy(seq(task)), IteratorTag());
     test_generate_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void generate_exception_test()
@@ -289,11 +293,13 @@ void test_generate_bad_alloc()
     test_generate_bad_alloc_async(seq(task), IteratorTag());
     test_generate_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_generate_bad_alloc(execution_policy(seq), IteratorTag());
     test_generate_bad_alloc(execution_policy(par), IteratorTag());
 
     test_generate_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_generate_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void generate_bad_alloc_test()

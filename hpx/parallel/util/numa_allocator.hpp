@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
@@ -17,6 +19,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cstddef>
+#include <limits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -156,6 +156,7 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable = void>
     struct is_random_access_iterator;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Range, typename Enable = void>
     struct is_range;
 
@@ -209,6 +210,9 @@ namespace hpx { namespace traits
 
     template <typename Iterator, typename Enable = void>
     struct segmented_local_iterator_traits;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_local_iterator;
 
     template <typename T, typename Enable = void>
     struct projected_iterator;

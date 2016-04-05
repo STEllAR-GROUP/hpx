@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_FOR_EACH_OCT_15_2014_0839PM)
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_FOR_EACH_OCT_15_2014_0839PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -20,9 +20,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
-
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <list>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -38,15 +36,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         segmented_for_each(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj,
-            boost::mpl::true_)
+            SegIter first, SegIter last, F && f, Proj && proj, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
             typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
-
-            using boost::mpl::true_;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -59,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(traits::get_id(sit),
-                        algo, policy, true_(), beg, end, f, proj
+                        algo, policy, std::true_type(), beg, end, f, proj
                     );
                     last = traits::compose(send, out);
                 }
@@ -73,7 +68,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, true_(), beg, end, f, proj
+                        algo, policy, std::true_type(), beg, end, f, proj
                     );
                 }
 
@@ -87,7 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
-                            algo, policy, true_(), beg, end, f, proj
+                            algo, policy, std::true_type(), beg, end, f, proj
                         );
                     }
                 }
@@ -98,7 +93,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, true_(), beg, end, f, proj
+                        algo, policy, std::true_type(), beg, end, f, proj
                     );
                 }
 
@@ -113,19 +108,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         segmented_for_each(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj,
-            boost::mpl::false_)
+            SegIter first, SegIter last, F && f, Proj && proj, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
             typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
 
-            typedef typename std::iterator_traits<SegIter>::iterator_category
-                iterator_category;
-            typedef typename boost::mpl::bool_<boost::is_same<
-                    iterator_category, std::input_iterator_tag
-                >::value> forced_seq;
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -203,9 +195,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef typename parallel::is_sequential_execution_policy<
-                    ExPolicy
-                >::type is_seq;
+            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
 
             if (first == last)
             {

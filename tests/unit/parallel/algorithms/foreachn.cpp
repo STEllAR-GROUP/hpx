@@ -83,12 +83,14 @@ void test_for_each_n()
     test_for_each_n_async(seq(task), IteratorTag());
     test_for_each_n_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_n(execution_policy(seq), IteratorTag());
     test_for_each_n(execution_policy(par), IteratorTag());
     test_for_each_n(execution_policy(par_vec), IteratorTag());
 
     test_for_each_n(execution_policy(seq(task)), IteratorTag());
     test_for_each_n(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void for_each_n_test()

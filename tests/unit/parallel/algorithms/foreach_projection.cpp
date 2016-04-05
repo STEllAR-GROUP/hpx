@@ -21,12 +21,14 @@ void test_for_each()
     test_for_each_async(seq(task), IteratorTag(), Proj());
     test_for_each_async(par(task), IteratorTag(), Proj());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each(execution_policy(seq), IteratorTag(), Proj());
     test_for_each(execution_policy(par), IteratorTag(), Proj());
     test_for_each(execution_policy(par_vec), IteratorTag(), Proj());
 
     test_for_each(execution_policy(seq(task)), IteratorTag(), Proj());
     test_for_each(execution_policy(par(task)), IteratorTag(), Proj());
+#endif
 }
 
 template <typename Proj>
@@ -52,10 +54,12 @@ void test_for_each_exception()
     test_for_each_exception_async(seq(task), IteratorTag(), Proj());
     test_for_each_exception_async(par(task), IteratorTag(), Proj());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_exception(execution_policy(seq), IteratorTag(), Proj());
     test_for_each_exception(execution_policy(par), IteratorTag(), Proj());
     test_for_each_exception(execution_policy(seq(task)), IteratorTag(), Proj());
     test_for_each_exception(execution_policy(par(task)), IteratorTag(), Proj());
+#endif
 }
 
 template <typename Proj>
@@ -81,10 +85,12 @@ void test_for_each_bad_alloc()
     test_for_each_bad_alloc_async(seq(task), IteratorTag(), Proj());
     test_for_each_bad_alloc_async(par(task), IteratorTag(), Proj());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_bad_alloc(execution_policy(seq), IteratorTag(), Proj());
     test_for_each_bad_alloc(execution_policy(par), IteratorTag(), Proj());
     test_for_each_bad_alloc(execution_policy(seq(task)), IteratorTag(), Proj());
     test_for_each_bad_alloc(execution_policy(par(task)), IteratorTag(), Proj());
+#endif
 }
 
 template <typename Proj>
