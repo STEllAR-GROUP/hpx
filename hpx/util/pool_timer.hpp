@@ -36,10 +36,10 @@ namespace hpx { namespace util { namespace detail
 
     public:
         pool_timer();
-        
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::posix_time::time_duration microsecs, std::string const& description,
+            boost::posix_time::time_duration microsecs,
+            std::string const& description,
             bool pre_shutdown);
 
         ~pool_timer();
@@ -75,14 +75,15 @@ namespace hpx { namespace util
 {
     class HPX_EXPORT pool_timer
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(pool_timer)
+        HPX_MOVABLE_ONLY(pool_timer);
 
     public:
         pool_timer();
 
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::posix_time::time_duration microsecs, std::string const& description = "",
+            boost::posix_time::time_duration microsecs,
+            std::string const& description = "",
             bool pre_shutdown = false);
 
         ~pool_timer();

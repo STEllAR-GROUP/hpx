@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/pool_timer.hpp>
@@ -66,24 +65,16 @@ namespace hpx { namespace util { namespace detail
 
             is_stopped_ = false;
             is_started_ = true;
-
-            if (evaluate_) {
-                //Nothing to do here
-                //std::cout<<"I should not be here!!";
-            }
-            else {
-                mytimer_.expires_from_now(microsecs_);
-                boost::system::error_code e;
-                mytimer_.async_wait( util::bind(&pool_timer::dummy,this,e));
-                l.unlock();
-            }
-
+            mytimer_.expires_from_now(microsecs_);
+            boost::system::error_code e;
+            mytimer_.async_wait( util::bind(&pool_timer::dummy,
+                this->shared_from_this(),e));
+            l.unlock();
             return true;
         }
         return false;
     }
 
-   
     bool pool_timer::stop()
     {
         boost::lock_guard<mutex_type> l(mtx_);
@@ -126,7 +117,6 @@ namespace hpx { namespace util { namespace detail
     }
 
 }}}
-    
 
 namespace hpx { namespace util
 {
@@ -140,7 +130,6 @@ namespace hpx { namespace util
             f, on_term, microsecs, description, pre_shutdown))
     {}
 
-    
     pool_timer::~pool_timer()
     {
         timer_->terminate();
