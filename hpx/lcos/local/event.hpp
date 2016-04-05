@@ -4,22 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_EVENT_SEP_29_2012_1918AM)
-#define HPX_LCOS_EVENT_SEP_29_2012_1918AM
+#ifndef HPX_LCOS_LOCAL_EVENT_HPP
+#define HPX_LCOS_LOCAL_EVENT_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/thread/locks.hpp>
-
-#if defined(HPX_MSVC)
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -95,9 +89,4 @@ namespace hpx { namespace lcos { namespace local
     };
 }}}
 
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
-
-#endif
-
+#endif /*HPX_LCOS_LOCAL_EVENT_HPP*/

@@ -3,19 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_ONCE_FWD_JAN_05_2013_0427PM)
-#define HPX_LCOS_LOCAL_ONCE_FWD_JAN_05_2013_0427PM
+#ifndef HPX_LCOS_LOCAL_ONCE_FWD_HPP
+#define HPX_LCOS_LOCAL_ONCE_FWD_HPP
 
 namespace hpx { namespace lcos { namespace local
 {
     // call_once support
     struct once_flag;
 
-    template <typename Function>
-    void call_once(once_flag& flag, Function f);
+    template <typename F, typename ...Args>
+    void call_once(once_flag& flag, F&& f, Args&&... args);
 }}}
 
 #define HPX_ONCE_INIT hpx::lcos::local::once_flag()
 
-#endif
-
+#endif /*HPX_LCOS_LOCAL_ONCE_FWD_HPP*/
