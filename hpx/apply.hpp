@@ -15,6 +15,7 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 
@@ -41,7 +42,7 @@ namespace hpx { namespace detail
         >::type
         call(F&& f, Ts&&... ts)
         {
-            util::thread_description desc(f);
+            util::thread_description desc(f, "apply_disptach::call");
             threads::register_thread_nullary(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
                 desc);

@@ -17,6 +17,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/dataflow.hpp>
 
@@ -205,12 +206,17 @@ namespace hpx { namespace lcos { namespace detail
                 return;
             }
 
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            util::thread_description desc(func_);
+#else
+            util::thread_description desc("dataflow_frame::finalize");
+#endif
             // schedule the final function invocation with high priority
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
             threads::register_thread_nullary(
                 util::deferred_call(f, std::move(this_), is_void())
-              , util::thread_description(func_)
+              , desc
               , threads::pending
               , true
               , threads::thread_priority_boost);

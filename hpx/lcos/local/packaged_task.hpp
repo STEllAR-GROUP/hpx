@@ -15,6 +15,7 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
@@ -73,24 +74,23 @@ namespace hpx { namespace lcos { namespace local
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
+                util::thread_description desc(f_);   // inherit description
                 if (this->sched_) {
                     this->sched_->add(
                         util::bind(&base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_),
-                        threads::pending, false, stacksize, ec);
+                        desc, threads::pending, false, stacksize, ec);
                 }
                 else if (policy == launch::fork) {
                     threads::register_thread_plain(
                         util::bind(&base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_),
-                        threads::pending, false, threads::thread_priority_boost,
+                        desc, threads::pending, false,
+                        threads::thread_priority_boost,
                         get_worker_thread_num(), stacksize, ec);
                 }
                 else {
                     threads::register_thread_plain(
                         util::bind(&base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_),
-                        threads::pending, false, priority, std::size_t(-1),
+                        desc, threads::pending, false, priority, std::size_t(-1),
                         stacksize, ec);
                 }
             }
@@ -142,24 +142,23 @@ namespace hpx { namespace lcos { namespace local
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
+                util::thread_description desc(f_);   // inherit description
                 if (this->sched_) {
                     this->sched_->add(
                         util::bind(&base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_),
-                        threads::pending, false, stacksize, ec);
+                        desc, threads::pending, false, stacksize, ec);
                 }
                 else if (policy == launch::fork) {
                     threads::register_thread_plain(
                         util::bind(&base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_),
-                        threads::pending, false, threads::thread_priority_boost,
-                        get_worker_thread_num(), stacksize, ec);
+                        desc, threads::pending, false,
+                        threads::thread_priority_boost, get_worker_thread_num(),
+                        stacksize, ec);
                 }
                 else {
                     threads::register_thread_plain(
                         util::bind(&base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_),
-                        threads::pending, false, priority, std::size_t(-1),
+                        desc, threads::pending, false, priority, std::size_t(-1),
                         stacksize, ec);
                 }
             }
