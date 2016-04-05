@@ -25,7 +25,7 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     class coalescing_counter_registry
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(coalescing_counter_registry);
+        HPX_MOVABLE_ONLY(coalescing_counter_registry);
 
     public:
         coalescing_counter_registry() {}

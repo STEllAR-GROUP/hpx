@@ -22,7 +22,7 @@
 struct X
 {
 private:
-    HPX_MOVABLE_BUT_NOT_COPYABLE(X);
+    HPX_MOVABLE_ONLY(X);
 
 public:
     int i;

@@ -36,21 +36,7 @@ namespace hpx { namespace lcos { namespace local
     ///         synchronize a given number of \a threads.
     class latch
     {
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-    public:
-        latch (latch const&) = delete;
-        latch (latch&&) = delete;
-
-        latch& operator= (latch const&) = delete;
-        latch& operator= (latch&&) = delete;
-#else
-    private:
-        latch (latch const&);
-        latch (latch&&);
-
-        latch& operator= (latch const&);
-        latch& operator= (latch&&);
-#endif
+        HPX_NON_COPYABLE(latch);
 
     private:
         typedef lcos::local::spinlock mutex_type;

@@ -149,7 +149,7 @@ namespace hpx { namespace iostreams
         typedef BOOST_IOSTREAMS_BASIC_OSTREAM(Char, stream_traits_type) std_stream_type;
         typedef lcos::local::recursive_mutex mutex_type;
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(ostream);
+        HPX_MOVABLE_ONLY(ostream);
 
     private:
         mutex_type mtx_;

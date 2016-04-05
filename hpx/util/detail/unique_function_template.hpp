@@ -71,7 +71,7 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable_ptr<R(Ts...)> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, R(Ts...), Serializable> base_type;
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function)
+        HPX_MOVABLE_ONLY(unique_function);
 
     public:
         typedef typename base_type::result_type result_type;
@@ -144,7 +144,7 @@ namespace hpx { namespace util
     {
         typedef unique_function<R(Ts...), false> base_type;
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function_nonser);
+        HPX_MOVABLE_ONLY(unique_function_nonser);
 
     public:
         unique_function_nonser() HPX_NOEXCEPT

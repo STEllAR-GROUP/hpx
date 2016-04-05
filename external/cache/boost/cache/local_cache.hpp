@@ -86,7 +86,7 @@ namespace boost { namespace cache
             Func f_;    // user supplied UpdatePolicy
         };
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(local_cache)
+        HPX_MOVABLE_ONLY(local_cache);
 
     public:
         typedef Key key_type;

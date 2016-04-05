@@ -13,7 +13,7 @@
 #ifndef HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
 #define HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
 
-#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
@@ -50,10 +50,10 @@ namespace hpx { namespace lcos { namespace local
 
         class scoped_lock
         {
-            HPX_NON_COPYABLE(scoped_lock);
-
         private:
             hpx::lcos::local::spinlock & sp_;
+
+            HPX_NON_COPYABLE(scoped_lock);
 
         public:
             explicit scoped_lock(void const * pv)
