@@ -190,8 +190,11 @@ namespace hpx { namespace plugins { namespace parcel
         HPX_ASSERT(l.owns_lock());
 
         // proceed with background work only if explicitly allowed
-        if (!allow_background_flush_)
+        if (!allow_background_flush_ &&
+            mode == parcelset::policies::message_handler::flush_mode_background_work)
+        {
             return false;
+        }
 
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
