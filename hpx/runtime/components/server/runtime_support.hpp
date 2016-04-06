@@ -28,6 +28,7 @@
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
@@ -425,7 +426,7 @@ namespace hpx { namespace components { namespace server
 
         typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
-        lcos::local::condition_variable dijkstra_cond_;
+        lcos::local::condition_variable_any dijkstra_cond_;
 
         component_map_mutex_type cm_mtx_;
         plugin_map_mutex_type p_mtx_;

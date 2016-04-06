@@ -139,14 +139,14 @@ struct HPX_EXPORT primary_namespace
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     typedef std::map<
             naming::gid_type,
-            hpx::util::tuple<bool, std::size_t, lcos::local::condition_variable>
+            hpx::util::tuple<bool, std::size_t, lcos::local::condition_variable_any>
         > migration_table_type;
 #else
     typedef std::map<
             naming::gid_type,
             hpx::util::tuple<
                 bool, std::size_t,
-                boost::shared_ptr<lcos::local::condition_variable>
+                boost::shared_ptr<lcos::local::condition_variable_any>
             >
         > migration_table_type;
 #endif

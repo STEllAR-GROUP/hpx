@@ -98,7 +98,7 @@ struct manage_global_runtime
     {
         // notify hpx_main above to tear down the runtime
         {
-            std::lock_guard<hpx::lcos::local::spinlock> lk(mtx_);
+            std::lock_guard<hpx::lcos::local::mutex> lk(mtx_);
             rts_ = 0;               // reset pointer
         }
 
@@ -137,7 +137,7 @@ protected:
 
         // Now, wait for destructor to be called.
         {
-            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
+            boost::unique_lock<hpx::lcos::local::mutex> lk(mtx_);
             if (rts_ != 0)
                 cond_.wait(lk);
         }
@@ -147,7 +147,7 @@ protected:
     }
 
 private:
-    hpx::lcos::local::spinlock mtx_;
+    hpx::lcos::local::mutex mtx_;
     hpx::lcos::local::condition_variable cond_;
 
     std::mutex startup_mtx_;

@@ -395,7 +395,7 @@ response primary_namespace::begin_migration(
                 id,
                 hpx::util::make_tuple(
                     false, 0,
-                    boost::make_shared<lcos::local::condition_variable>()
+                    boost::make_shared<lcos::local::condition_variable_any>()
                 )
             ));
 #endif

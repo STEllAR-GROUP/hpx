@@ -12,7 +12,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<boost::int32_t> accumulator;
-hpx::lcos::local::condition_variable result_cv;
+hpx::lcos::local::condition_variable_any result_cv;
 
 void increment(boost::int32_t i)
 {
