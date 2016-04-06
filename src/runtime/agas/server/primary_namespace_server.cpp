@@ -20,7 +20,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/fusion/include/at_c.hpp>
 #include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
@@ -365,14 +364,14 @@ response primary_namespace::begin_migration(
     request const& req
   , error_code& ec)
 {
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     naming::gid_type id = req.get_gid();
 
     boost::unique_lock<mutex_type> l(mutex_);
 
     resolved_type r = resolve_gid_locked(l, id, ec);
-    if (at_c<0>(r) == naming::invalid_gid)
+    if (get<0>(r) == naming::invalid_gid)
     {
         l.unlock();
 
@@ -407,7 +406,7 @@ response primary_namespace::begin_migration(
     // flag this id as being migrated
     hpx::util::get<0>(it->second) = true;
 
-    return response(primary_ns_begin_migration, at_c<0>(r), at_c<1>(r), at_c<2>(r));
+    return response(primary_ns_begin_migration, get<0>(r), get<1>(r), get<2>(r));
 }
 
 // migration of the given object is complete
@@ -468,7 +467,7 @@ response primary_namespace::bind_gid(
   , error_code& ec
     )
 { // {{{ bind_gid implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     // parameters
     gva g = req.get_gva();
@@ -645,7 +644,7 @@ response primary_namespace::resolve_gid(
   , error_code& ec
     )
 { // {{{ resolve_gid implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     // parameters
     naming::gid_type id = req.get_gid();
@@ -662,7 +661,7 @@ response primary_namespace::resolve_gid(
         r = resolve_gid_locked(l, id, ec);
     }
 
-    if (at_c<0>(r) == naming::invalid_gid)
+    if (get<0>(r) == naming::invalid_gid)
     {
         LAGAS_(info) << (boost::format(
             "primary_namespace::resolve_gid, gid(%1%), response(no_success)")
@@ -678,9 +677,9 @@ response primary_namespace::resolve_gid(
     LAGAS_(info) << (boost::format(
         "primary_namespace::resolve_gid, gid(%1%), base(%2%), "
         "gva(%3%), locality_id(%4%)")
-        % id % at_c<0>(r) % at_c<1>(r) % at_c<2>(r));
+        % id % get<0>(r) % get<1>(r) % get<2>(r));
 
-    return response(primary_ns_resolve_gid, at_c<0>(r), at_c<1>(r), at_c<2>(r));
+    return response(primary_ns_resolve_gid, get<0>(r), get<1>(r), get<2>(r));
 } // }}}
 
 response primary_namespace::unbind_gid(
@@ -1006,7 +1005,7 @@ void primary_namespace::resolve_free_list(
 {
     HPX_ASSERT_OWNS_LOCK(l);
 
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     typedef refcnt_table_type::iterator iterator;
 
@@ -1024,7 +1023,7 @@ void primary_namespace::resolve_free_list(
         resolved_type r = resolve_gid_locked(l, gid, ec);
         if (ec) return;
 
-        naming::gid_type& raw = at_c<0>(r);
+        naming::gid_type& raw = get<0>(r);
         if (raw == naming::invalid_gid)
         {
             l.unlock();
@@ -1039,7 +1038,7 @@ void primary_namespace::resolve_free_list(
         }
 
         // Make sure the GVA is valid.
-        gva& g = at_c<1>(r);
+        gva& g = get<1>(r);
 
         // REVIEW: Should we do more to make sure the GVA is valid?
         if (HPX_UNLIKELY(components::component_invalid == g.type))
@@ -1077,7 +1076,7 @@ void primary_namespace::resolve_free_list(
 
         // Add the information needed to destroy these components to the
         // free list.
-        free_entry_list.push_back(free_entry(resolved, gid, at_c<2>(r)));
+        free_entry_list.push_back(free_entry(resolved, gid, get<2>(r)));
 
         // remove this entry from the refcnt table
         refcnts_.erase(it);
@@ -1216,7 +1215,7 @@ void primary_namespace::free_components_sync(
   , error_code& ec
     )
 { // {{{ kill_sync implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     std::vector<lcos::future<void> > futures;
 

@@ -26,8 +26,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/fusion/include/vector.hpp>
 #include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
@@ -127,7 +125,7 @@ struct HPX_EXPORT primary_namespace
     typedef std::map<naming::gid_type, gva_table_data_type> gva_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_table_type;
 
-    typedef boost::fusion::vector3<naming::gid_type, gva, naming::gid_type>
+    typedef hpx::util::tuple<naming::gid_type, gva, naming::gid_type>
         resolved_type;
     // }}}
 

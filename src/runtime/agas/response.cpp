@@ -20,9 +20,6 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/fusion/include/value_at.hpp>
-
 // The number of types that response's variant can represent.
 #define HPX_AGAS_RESPONSE_SUBTYPES 12
 
@@ -158,10 +155,10 @@ namespace hpx { namespace agas
             subtype Type
           , int N
         >
-        typename boost::fusion::result_of::value_at_c<
-            typename boost::mpl::at_c<
+        typename hpx::util::tuple_element<
+            N, typename boost::mpl::at_c<
                 typename data_type::types, Type
-            >::type, N
+            >::type
         >::type
         get_data(
             error_code& ec = throws
@@ -171,8 +168,8 @@ namespace hpx { namespace agas
                 typename data_type::types, Type
             >::type vector_type;
 
-            typedef typename boost::fusion::result_of::value_at_c<
-                vector_type, N
+            typedef typename hpx::util::tuple_element<
+                N, vector_type
             >::type return_type;
 
             switch (data.which())
@@ -192,7 +189,7 @@ namespace hpx { namespace agas
                     if (&ec != &throws)
                         ec = make_success_code();
 
-                    return boost::fusion::at_c<N>(*v);
+                    return hpx::util::get<N>(*v);
                 }
 
                 default: {
