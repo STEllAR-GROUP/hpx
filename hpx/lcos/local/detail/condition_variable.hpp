@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         class relock_guard
         {
-            HPX_NON_COPYABLE(relock_guard)
+            HPX_NON_COPYABLE(relock_guard);
 
         public:
             explicit relock_guard(boost::unique_lock<mutex_type>& l)
