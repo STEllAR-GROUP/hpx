@@ -74,20 +74,10 @@ namespace hpx
     // library, forcing to resolve the variable HPX_CHECK_VERSION.
     namespace
     {
-
-#if defined(__clang__)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wunused-function"
-#endif
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#    pragma GCC diagnostic push
-#  endif
-#  pragma GCC diagnostic ignored "-Wunused-function"
-#endif
-
         // Note: this function is never executed.
+#if defined(__GNUG__)
+        __attribute__ ((unused))
+#endif
         char const* check_hpx_version()
         {
             char const* versions[] = {
@@ -95,17 +85,6 @@ namespace hpx
             };
             return versions[0];
         }
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
-
-#if defined(__clang__)
-#  pragma clang diagnostic pop
-#endif
-
     }
 #endif
 

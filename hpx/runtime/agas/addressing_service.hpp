@@ -28,7 +28,6 @@
 #include <boost/cache/lru_cache.hpp>
 #include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/thread/locks.hpp>
 
@@ -46,8 +45,12 @@ struct request;
 struct response;
 HPX_EXPORT void destroy_big_boot_barrier();
 
-struct HPX_EXPORT addressing_service : boost::noncopyable
+struct HPX_EXPORT addressing_service
 {
+private:
+    HPX_NON_COPYABLE(addressing_service);
+
+public:
     // {{{ types
     typedef components::component_type component_id_type;
 

@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -483,8 +482,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, launch policy,
-        F && f)
+    make_continuation(Future const& future, launch policy, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
         typedef typename continuation_result<ContResult>::type result_type;
@@ -500,8 +498,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, threads::executor& sched,
-        F && f)
+    make_continuation(Future const& future, threads::executor& sched, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
         typedef typename continuation_result<ContResult>::type result_type;

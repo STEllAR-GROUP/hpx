@@ -65,7 +65,7 @@ namespace hpx
     std::vector<Client>
     find_all_from_basename(std::string base_name, std::size_t num_ids)
     {
-        return components::make_client<Client>(
+        return components::make_clients<Client>(
             find_all_from_basename(std::move(base_name), num_ids));
     }
 
@@ -117,7 +117,7 @@ namespace hpx
         find_from_basename(std::string base_name,
             std::vector<std::size_t> const& ids)
     {
-        return components::make_client<Client>(
+        return components::make_clients<Client>(
             find_from_basename(std::move(base_name), ids));
     }
 

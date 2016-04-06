@@ -15,6 +15,7 @@
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
 #include <boost/assign/std/vector.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <cstdlib>
@@ -190,7 +191,7 @@ namespace hpx { namespace util
         }
 
         cfg.ini_config_ += std::string("hpx.parcel.mpi.rank!=") +
-            boost::lexical_cast<std::string>(this_rank);
+            std::to_string(this_rank);
         cfg.ini_config_ += std::string("hpx.parcel.mpi.processorname!=") +
             get_processor_name();
 

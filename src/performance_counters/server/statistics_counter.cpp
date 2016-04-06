@@ -8,6 +8,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>

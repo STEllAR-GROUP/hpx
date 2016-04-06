@@ -51,9 +51,10 @@ namespace hpx { namespace parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
     class HPX_EXPORT parcelport
-      : public boost::enable_shared_from_this<parcelport>,
-        boost::noncopyable
+      : public boost::enable_shared_from_this<parcelport>
     {
+        HPX_NON_COPYABLE(parcelport);
+
     private:
         // avoid warnings about using \a this in member initializer list
         parcelport& This() { return *this; }

@@ -18,9 +18,10 @@
 #include <hpx/runtime/threads/executors/thread_pool_os_executors.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/thread/locks.hpp>
+
+#include <string>
 
 namespace hpx
 {
@@ -36,7 +37,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         std::string name = Scheduler::get_scheduler_name();
         name += "#";
-        name += hpx::util::safe_lexical_cast<std::string>(++os_executor_count_);
+        name += std::to_string(++os_executor_count_);
         return name;
     }
 

@@ -12,7 +12,6 @@
 #define HPX_RUNTIME_THREADS_SCHEDULER_TSS_AUG_08_2015_0733PM
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 

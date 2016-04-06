@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -21,13 +22,9 @@
 
 #include <algorithm>
 #include <iterator>
+#include <type_traits>
 
 #include <boost/shared_array.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/mpl/not.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -72,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         detail::copy<std::pair<RanIter2, OutIter> >()
                             .call(
                                 std::forward<ExPolicy>(policy),
-                                boost::mpl::false_(), first2, last2, dest
+                                std::false_type(), first2, last2, dest
                             ),
                             [](std::pair<RanIter2, OutIter> const& p) -> OutIter
                             {
@@ -86,7 +83,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         detail::copy<std::pair<RanIter1, OutIter> >()
                             .call(
                                 std::forward<ExPolicy>(policy),
-                                boost::mpl::false_(), first1, last1, dest
+                                std::false_type(), first1, last1, dest
                             ),
                             [](std::pair<RanIter1, OutIter> const& p) -> OutIter
                             {
@@ -198,50 +195,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     set_union(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, OutIter dest, F && f)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            input_iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            input_iterator_category2;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
-
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            parallel::is_sequential_execution_policy<ExPolicy>,
-            boost::mpl::not_<boost::is_same<
-                std::random_access_iterator_tag, input_iterator_category1
-            > >,
-            boost::mpl::not_<boost::is_same<
-                std::random_access_iterator_tag, input_iterator_category2
-            > >,
-            boost::mpl::not_<boost::is_same<
-                std::random_access_iterator_tag, output_iterator_category
-            > >
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_random_access_iterator<InIter1>::value ||
+               !hpx::traits::is_random_access_iterator<InIter2>::value ||
+               !hpx::traits::is_random_access_iterator<OutIter>::value
+            > is_seq;
 
         return detail::set_union<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -310,52 +287,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    template <typename ExPolicy, typename InIter1, typename InIter2, typename OutIter>
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     set_union(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, OutIter dest)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            input_iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            input_iterator_category2;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
-
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            parallel::is_sequential_execution_policy<ExPolicy>,
-            boost::mpl::not_<boost::is_same<
-                std::random_access_iterator_tag, input_iterator_category1
-            > >,
-            boost::mpl::not_<boost::is_same<
-                std::random_access_iterator_tag, input_iterator_category2
-            > >,
-            boost::mpl::not_<boost::is_same<
-                std::random_access_iterator_tag, output_iterator_category
-            > >
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_random_access_iterator<InIter1>::value ||
+               !hpx::traits::is_random_access_iterator<InIter2>::value ||
+               !hpx::traits::is_random_access_iterator<OutIter>::value
+            > is_seq;
 
         return detail::set_union<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

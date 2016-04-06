@@ -10,11 +10,11 @@
 
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/dynamic_bitset.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -53,7 +53,7 @@ namespace hpx { namespace lcos
         struct wait_each
         {
         private:
-            HPX_MOVABLE_BUT_NOT_COPYABLE(wait_each)
+            HPX_MOVABLE_ONLY(wait_each);
 
         protected:
             void on_future_ready_(threads::thread_id_type const& id)

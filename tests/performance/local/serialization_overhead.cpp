@@ -9,11 +9,12 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <algorithm>
 #include <iterator>
 #include <fstream>
-
-#include <boost/format.hpp>
 
 // This function will never be called
 int test_function(hpx::serialization::serialize_buffer<double> const& b)

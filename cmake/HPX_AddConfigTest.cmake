@@ -330,6 +330,13 @@ macro(hpx_check_for_cxx11_std_reference_wrapper)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_to_string)
+  add_hpx_config_test(HPX_WITH_CXX11_TO_STRING
+    SOURCE cmake/tests/cxx11_std_to_string.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_initializer_list)
   add_hpx_config_test(HPX_WITH_CXX11_STD_INITIALIZER_LIST
     SOURCE cmake/tests/cxx11_std_initializer_list.cpp

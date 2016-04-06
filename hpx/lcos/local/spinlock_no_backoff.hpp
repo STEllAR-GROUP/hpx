@@ -11,7 +11,6 @@
 #define HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -37,6 +36,9 @@ namespace hpx { namespace lcos { namespace local
     struct spinlock_no_backoff
     {
     private:
+        HPX_NON_COPYABLE(spinlock_no_backoff);
+
+    private:
         boost::uint64_t v_;
 
     public:
@@ -44,8 +46,6 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock_no_backoff", "");
         }
-
-        HPX_NON_COPYABLE(spinlock_no_backoff);
 
         ~spinlock_no_backoff()
         {

@@ -31,7 +31,7 @@
 
 * Open CMake-GUI.exe and set up your source directory (input field 'Where is the
   source code') to the _base directory_ of the source code you downloaded from
-  HPX' GitHub pages. Here's an example of my CMake path settings which point to
+  HPX's GitHub pages. Here's an example of my CMake path settings which point to
   my `Documents/GitHub/hpx` folder:
 
   [fig cmake_settings1.png..Example CMake path settings..win32_cmake_settings1]

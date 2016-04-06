@@ -51,7 +51,7 @@ namespace hpx { namespace agas { namespace detail
             boost::uint32_t locality_id)
     {
         std::string str("locality#" +
-            boost::lexical_cast<std::string>(locality_id) + "/");
+            std::to_string(locality_id) + "/");
         return data_.register_server_instance(str.c_str(), locality_id);
     }
 

@@ -118,7 +118,7 @@ struct sub_block
     double * data_;
     mode mode_;
 
-    HPX_MOVABLE_BUT_NOT_COPYABLE(sub_block);
+    HPX_MOVABLE_ONLY(sub_block);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

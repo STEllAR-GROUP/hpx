@@ -481,6 +481,7 @@ namespace hpx
         typedef hpx::components::client_base<
                 partitioned_vector_partition<T>, server::partitioned_vector<T>
             > base_type;
+
     public:
         partitioned_vector_partition() {}
 

@@ -25,7 +25,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/bind.hpp>
 
 #include <map>
@@ -40,8 +39,10 @@ namespace hpx { namespace parcelset
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
-    class HPX_EXPORT parcelhandler : boost::noncopyable
+    class HPX_EXPORT parcelhandler
     {
+        HPX_NON_COPYABLE(parcelhandler);
+
     private:
         void parcel_sink(parcel const& p);
 

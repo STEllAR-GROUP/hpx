@@ -16,7 +16,6 @@
 #include <hpx/components/security/capability.hpp>
 #endif
 
-#include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

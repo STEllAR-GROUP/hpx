@@ -15,6 +15,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/thread/locks.hpp>

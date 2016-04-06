@@ -99,6 +99,10 @@ namespace hpx
 #include <hpx/lcos/when_each.hpp>
 #include <hpx/util/detail/pack.hpp>
 
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -136,11 +140,9 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    typename boost::disable_if<
-        boost::mpl::or_<
-            traits::is_future<typename util::decay<F>::type>,
-            util::detail::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
-        >
+    typename std::enable_if<
+        !traits::is_future<typename std::decay<F>::type>::value &&
+        util::detail::all_of<traits::is_future<Ts>...>::value
     >::type
     wait_each(F&& f, Ts&&... ts)
     {

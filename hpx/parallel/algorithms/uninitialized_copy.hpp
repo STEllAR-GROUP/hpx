@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_COPY_OCT_02_2014_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -21,9 +22,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -181,32 +180,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           the last element copied.
     ///
     template <typename ExPolicy, typename InIter, typename FwdIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     uninitialized_copy(ExPolicy && policy, InIter first, InIter last,
         FwdIter dest)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            forward_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Requires at least an input iterator.");
-
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Required at least input iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, forward_iterator_category>::value),
-            "Requires at least a forward iterator.");
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::uninitialized_copy<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -300,27 +291,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           the last element copied.
     ///
     template <typename ExPolicy, typename InIter, typename Size, typename FwdIter>
-    typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     uninitialized_copy_n(ExPolicy && policy, InIter first, Size count,
         FwdIter dest)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            forward_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Requires at least an input iterator.");
-
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Required at least input iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, forward_iterator_category>::value),
-            "Requires at least a forward iterator.");
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
@@ -329,10 +312,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::move(dest));
         }
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::uninitialized_copy_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

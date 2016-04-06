@@ -14,8 +14,6 @@
 #include <functional>
 #include <string>
 
-#include <boost/lexical_cast.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_UNORDERED_MAP(std::string, double);
@@ -37,7 +35,7 @@ void test_global_iteration(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
 
     for(std::size_t i = 0; i != size; ++i)
     {
-        std::string idx = boost::lexical_cast<std::string>(i);
+        std::string idx = std::to_string(i);
         HPX_TEST_EQ(m[idx], val);
         m[idx] = Value(i+1);
         HPX_TEST_EQ(m[idx], Value(i+1));
@@ -69,7 +67,7 @@ void fill_unordered_map(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
 {
     for (std::size_t i = 0; i != count; ++i)
     {
-        std::string idx = boost::lexical_cast<std::string>(i);
+        std::string idx = std::to_string(i);
         m[idx] = val;
     }
     HPX_TEST(m.size() == count);

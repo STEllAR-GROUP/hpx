@@ -11,8 +11,6 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/lexical_cast.hpp>
-
 boost::int32_t times2(boost::int32_t i)
 {
     return i * 2;
@@ -21,7 +19,7 @@ HPX_PLAIN_ACTION(times2);           // defines times2_action
 
 std::string to_string(boost::int32_t i)
 {
-    return boost::lexical_cast<std::string>(i);
+    return std::to_string(i);
 }
 HPX_PLAIN_ACTION(to_string);    // defines to_string_action
 

@@ -55,8 +55,10 @@ namespace hpx { namespace lcos { namespace local
         /// An exclusive-ownership recursive mutex which implements Boost.Thread's
         /// TimedLockable concept.
         template <typename Mutex = local::spinlock>
-        struct recursive_mutex_impl : boost::noncopyable
+        struct recursive_mutex_impl
         {
+            HPX_NON_COPYABLE(recursive_mutex_impl);
+
         private:
             typedef typename thread_id_from_mutex<Mutex>::thread_id_type
                 thread_id_type;

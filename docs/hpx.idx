@@ -137,6 +137,9 @@ parallel::guided_chunk_size                 "guided_chunk_size"             "hpx
 # hpx/parallel/executors/auto_chunk_size.hpp
 parallel::auto_chunk_size                   "auto_chunk_size"               "hpx\.parallel\.v3\.auto_chunk_size.*"
 
+# hpx/parallel/executors/persistent_auto_chunk_size.hpp
+parallel::persistent_auto_chunk_size        "persistent_auto_chunk_size"    "hpx\.parallel\.v3\.persistent_auto_chunk_size.*"
+
 
 # hpx/parallel/algorithms/adjacent_difference.hpp
 parallel::adjacent_difference         "adjacent_difference" "hpx\.parallel\.v1\.adjacent_difference.*"
@@ -182,6 +185,8 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 # hpx/parallel/algorithms/for_loop.hpp
 parallel::for_loop                    "for_loop" "hpx\.parallel\.v2\.for_loop_id.*"
 parallel::for_loop_strided            "for_loop_strided" "hpx\.parallel\.v2\.for_loop_strided_id.*"
+parallel::for_loop_n                  "for_loop_n" "hpx\.parallel\.v2\.for_loop_n_id.*"
+parallel::for_loop_n_strided          "for_loop_n_strided" "hpx\.parallel\.v2\.for_loop_n_stride_id.*"
 
 # hpx/parallel/algorithms/for_loop_induction.hpp
 parallel::induction                   "induction" "hpx\.parallel\.v2\.induction"

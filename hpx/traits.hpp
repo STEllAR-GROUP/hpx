@@ -83,6 +83,12 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct is_action;
 
+    template <typename Action, typename Component, typename Enable = void>
+    struct is_valid_action;
+
+    template <typename Action, typename Enable = void>
+    struct extract_action;
+
     template <typename Action, typename Enable = void>
     struct is_continuation;
 
@@ -150,17 +156,18 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable = void>
     struct is_random_access_iterator;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Range, typename Enable = void>
     struct is_range;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename Enable = void>
+    template <typename Future>
     struct is_future;
 
-    template <typename Future, typename Enable = void>
+    template <typename Future>
     struct future_traits;
 
-    template <typename Future, typename Enable = void>
+    template <typename Future>
     struct future_access;
 
     template <typename Range, typename Enable = void>
@@ -203,6 +210,9 @@ namespace hpx { namespace traits
 
     template <typename Iterator, typename Enable = void>
     struct segmented_local_iterator_traits;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_local_iterator;
 
     template <typename T, typename Enable = void>
     struct projected_iterator;

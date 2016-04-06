@@ -11,7 +11,6 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/thread/locks.hpp>
 
 using boost::program_options::variables_map;
@@ -212,9 +211,11 @@ void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct non_copyable_functor:
-    boost::noncopyable
+class non_copyable_functor
 {
+    HPX_NON_COPYABLE(non_copyable_functor);
+
+public:
     unsigned value;
 
     non_copyable_functor()

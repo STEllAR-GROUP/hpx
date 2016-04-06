@@ -27,7 +27,6 @@
 #include <map>
 
 #include <boost/format.hpp>
-#include <boost/fusion/include/vector.hpp>
 #include <boost/atomic.hpp>
 
 namespace hpx { namespace agas
@@ -52,7 +51,7 @@ struct HPX_EXPORT locality_namespace
     typedef boost::int32_t component_type;
 
     // stores the locality endpoints, and number of OS-threads running on this locality
-    typedef boost::fusion::vector2<
+    typedef hpx::util::tuple<
         parcelset::endpoints_type, boost::uint32_t>
     partition_type;
 
@@ -72,8 +71,12 @@ struct HPX_EXPORT locality_namespace
     struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
-    struct counter_data :  boost::noncopyable
+    struct counter_data
     {
+    private:
+        HPX_NON_COPYABLE(counter_data);
+
+    public:
         typedef lcos::local::spinlock mutex_type;
 
         struct api_counter_data

@@ -6,9 +6,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_IS_NEGATIVE_JUL_2014_01_0148PM)
 #define HPX_PARALLEL_DETAIL_IS_NEGATIVE_JUL_2014_01_0148PM
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_signed.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
@@ -19,7 +17,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     // signed integral values may be negative
     template <typename T>
     struct is_negative_helper<T,
-        typename boost::enable_if<boost::is_signed<T> >::type>
+        typename std::enable_if<std::is_signed<T>::value>::type>
     {
         static bool call(T const& size) { return size < 0; }
 
@@ -34,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     // unsigned integral values are never negative
     template <typename T>
     struct is_negative_helper<T,
-        typename boost::enable_if<boost::is_unsigned<T> >::type>
+        typename std::enable_if<std::is_unsigned<T>::value>::type>
     {
         static bool call(T const&) { return false; }
 

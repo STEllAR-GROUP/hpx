@@ -380,8 +380,10 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     // This is a placeholder shim used for the type erased memory management
     // for all promise types
-    struct managed_promise : boost::noncopyable
+    struct managed_promise
     {
+        HPX_NON_COPYABLE(managed_promise);
+
     private:
         struct tag {};
         typedef lcos::local::spinlock_pool<tag> mutex_type;
@@ -462,7 +464,7 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class promise
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise);
 
     public:
         typedef detail::promise<Result, RemoteResult> wrapped_type;
@@ -618,7 +620,7 @@ namespace hpx { namespace lcos
     template <>
     class promise<void, util::unused_type>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise);
 
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;

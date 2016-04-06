@@ -20,8 +20,6 @@
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
 
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,13 +52,13 @@ namespace hpx { namespace components { namespace server
     {
         boost::lock_guard<util::spinlock> l(util::detail::get_log_lock());
 
-        using boost::fusion::at_c;
+        using hpx::util::get;
 
         for (message_type const& msg : msgs)
         {
-            const logging_destination dest = at_c<0>(msg);
-            const std::size_t level = at_c<1>(msg);
-            std::string const& s = at_c<2>(msg);
+            const logging_destination dest = get<0>(msg);
+            const std::size_t level = get<1>(msg);
+            std::string const& s = get<2>(msg);
 
             switch (dest) {
             case destination_hpx:

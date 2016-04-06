@@ -20,7 +20,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     class thread_init_data
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(thread_init_data)
+        HPX_MOVABLE_ONLY(thread_init_data);
 
     public:
         thread_init_data()

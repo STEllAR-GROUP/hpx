@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -23,9 +24,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -173,34 +172,21 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           is found, \a last is also returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
         FwdIter2 s_first, FwdIter2 s_last)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<FwdIter2>::iterator_category
-            s_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
-            "Requires at least input iterator.");
-
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, s_iterator_category
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::search<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -272,34 +258,21 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Pred>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<FwdIter2>::iterator_category
-            s_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
-            "Requires at least input iterator.");
-
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, s_iterator_category
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::search<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -451,34 +424,21 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           is found, \a first is also returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search_n(ExPolicy && policy, FwdIter first, std::size_t count,
         FwdIter2 s_first, FwdIter2 s_last)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<FwdIter2>::iterator_category
-            s_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
-            "Requires at least input iterator.");
-
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, s_iterator_category
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::search_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -549,36 +509,22 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
     ///
-    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Pred>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    template <typename ExPolicy, typename FwdIter, typename FwdIter2, typename Pred>
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search_n(ExPolicy && policy, FwdIter first, std::size_t count,
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<FwdIter2>::iterator_category
-            s_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
-            "Requires at least input iterator.");
-
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, s_iterator_category
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::search_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

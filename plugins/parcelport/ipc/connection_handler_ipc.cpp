@@ -113,7 +113,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 boost::asio::ip::tcp::endpoint ep = *it;
 
                 std::string fullname(ep.address().to_string() + "." +
-                    boost::lexical_cast<std::string>(ep.port()));
+                    std::to_string(ep.port()));
 
                 acceptor_->set_option(acceptor::msg_num(10));
                 acceptor_->set_option(acceptor::manage(true));
@@ -186,7 +186,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 {
                     boost::asio::ip::tcp::endpoint const& ep = *it;
                     std::string fullname(ep.address().to_string() + "." +
-                        boost::lexical_cast<std::string>(ep.port()));
+                        std::to_string(ep.port()));
 
                     data_window& w = sender_connection->window();
                     w.close();

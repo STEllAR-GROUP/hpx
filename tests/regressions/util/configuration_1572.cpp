@@ -6,6 +6,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 int hpx_main(int argc, char* argv[])
 {
     // check number of localities

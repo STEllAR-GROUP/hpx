@@ -17,9 +17,9 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_scalar.hpp>
 #include <boost/shared_array.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
@@ -53,8 +53,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         };
 
         typedef typename std::iterator_traits<OutIter>::value_type value_type;
-        typedef typename boost::mpl::if_<
-            boost::is_scalar<value_type>, value_type, rewritable_ref<value_type>
+        typedef typename std::conditional<
+            std::is_scalar<value_type>::value,
+            value_type, rewritable_ref<value_type>
         >::type type;
     };
 

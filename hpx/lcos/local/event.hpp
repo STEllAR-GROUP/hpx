@@ -27,78 +27,72 @@ namespace hpx { namespace lcos { namespace local
     /// Event semaphores can be used for synchronizing multiple threads that
     /// need to wait for an event to occur. When the event occurs, all threads
     /// waiting for the event are woken up.
-    namespace detail
+    class event
     {
-        template <typename Mutex = lcos::local::spinlock>
-        class event
+    private:
+        typedef lcos::local::spinlock mutex_type;
+
+    public:
+        /// \brief Construct a new event semaphore
+        event()
+          : event_(false)
+        {}
+
+        /// \brief Check if the event has occurred.
+        bool occurred()
         {
-        private:
-            typedef Mutex mutex_type;
+            return event_.load(boost::memory_order_acquire);
+        }
 
-        public:
-            /// \brief Construct a new event semaphore
-            event()
-              : event_(false)
-            {}
+        /// \brief Wait for the event to occur.
+        void wait()
+        {
+            if (event_.load(boost::memory_order_acquire))
+                return;
 
-            /// \brief Check if the event has occurred.
-            bool occurred()
+            boost::unique_lock<mutex_type> l(mtx_);
+            wait_locked(l);
+        }
+
+        /// \brief Release all threads waiting on this semaphore.
+        void set()
+        {
+            event_.store(true, boost::memory_order_release);
+
+            boost::unique_lock<mutex_type> l(mtx_);
+            set_locked(std::move(l));
+        }
+
+        /// \brief Reset the event
+        void reset()
+        {
+            event_.store(false, boost::memory_order_release);
+        }
+
+    private:
+        void wait_locked(boost::unique_lock<mutex_type>& l)
+        {
+            HPX_ASSERT(l.owns_lock());
+
+            while (!event_.load(boost::memory_order_acquire))
             {
-                return event_.load(boost::memory_order_acquire);
+                cond_.wait(l, "event::wait_locked");
             }
+        }
 
-            /// \brief Wait for the event to occur.
-            void wait()
-            {
-                if (event_.load(boost::memory_order_acquire))
-                    return;
+        void set_locked(boost::unique_lock<mutex_type> l)
+        {
+            HPX_ASSERT(l.owns_lock());
 
-                boost::unique_lock<mutex_type> l(mtx_);
-                wait_locked(l);
-            }
+            // release the threads
+            cond_.notify_all(std::move(l));
+        }
 
-            /// \brief Release all threads waiting on this semaphore.
-            void set()
-            {
-                event_.store(true, boost::memory_order_release);
+        mutex_type mtx_;      ///< This mutex protects the queue.
+        local::detail::condition_variable cond_;
 
-                boost::unique_lock<mutex_type> l(mtx_);
-                set_locked(std::move(l));
-            }
-
-            /// \brief Reset the event
-            void reset()
-            {
-                event_.store(false, boost::memory_order_release);
-            }
-
-        private:
-            void wait_locked(boost::unique_lock<mutex_type>& l)
-            {
-                HPX_ASSERT(l.owns_lock());
-
-                while (!event_.load(boost::memory_order_acquire))
-                {
-                    cond_.wait(l, "event::wait_locked");
-                }
-            }
-
-            void set_locked(boost::unique_lock<mutex_type> l)
-            {
-                HPX_ASSERT(l.owns_lock());
-
-                // release the threads
-                cond_.notify_all(std::move(l));
-            }
-
-            mutex_type mtx_;      ///< This mutex protects the queue.
-            local::detail::condition_variable cond_;
-
-            boost::atomic<bool> event_;
-        };
-    }
-
-    typedef detail::event<> event;
+        boost::atomic<bool> event_;
+    };
 }}}
 
 #if defined(HPX_MSVC)

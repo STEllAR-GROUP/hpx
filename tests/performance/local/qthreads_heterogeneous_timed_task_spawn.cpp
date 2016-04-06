@@ -43,7 +43,6 @@
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
 #include <boost/ref.hpp>
@@ -320,9 +319,9 @@ int main(
         header = false;
 
     // Set qthreads environment variables.
-    std::string const shepherds = boost::lexical_cast<std::string>
+    std::string const shepherds = std::to_string
         (vm["shepherds"].as<boost::uint64_t>());
-    std::string const workers = boost::lexical_cast<std::string>
+    std::string const workers = std::to_string
         (vm["workers-per-shepherd"].as<boost::uint64_t>());
 
     setenv("QT_NUM_SHEPHERDS", shepherds.c_str(), 1);

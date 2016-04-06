@@ -20,9 +20,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/parcelport/ipc/data_buffer.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/tuple.hpp>
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <map>
@@ -35,8 +34,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
     ///////////////////////////////////////////////////////////////////////////
     // This class implements an LRU cache to hold connections.
-    class data_buffer_cache : boost::noncopyable
+    class data_buffer_cache
     {
+        HPX_NON_COPYABLE(data_buffer_cache);
+
     public:
         typedef boost::recursive_mutex mutex_type;
 
@@ -44,7 +45,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         typedef connection_type value_type;
         typedef std::size_t key_type;
         typedef std::list<key_type> key_tracker_type;
-        typedef boost::tuple<
+        typedef util::tuple<
             value_type, key_tracker_type::iterator
         > cache_value_type;
         typedef std::multimap<key_type, cache_value_type> cache_type;
@@ -64,8 +65,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             // If it does ...
             if (it != cache_.end()) {
                 // remove the entry from the cache
-                conn = boost::get<0>(it->second);
-                key_tracker_.erase(boost::get<1>(it->second));
+                conn = util::get<0>(it->second);
+                key_tracker_.erase(util::get<1>(it->second));
                 cache_.erase(it);
 
                 check_invariants();
@@ -110,7 +111,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             // Add a new entry ...
             key_tracker_type::iterator it =
                 key_tracker_.insert(key_tracker_.end(), size);
-            cache_.insert(std::make_pair(size, boost::make_tuple(conn, it)));
+            cache_.insert(std::make_pair(size, util::make_tuple(conn, it)));
 
             check_invariants();
         }

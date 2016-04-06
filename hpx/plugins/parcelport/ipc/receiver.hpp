@@ -10,7 +10,6 @@
 #include <hpx/config/defines.hpp>
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/plugins/parcelport/ipc/data_window.hpp>
@@ -18,14 +17,16 @@
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio/placeholders.hpp>
-#include <boost/tuple/tuple.hpp>
+
+#include <string>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
@@ -42,7 +43,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
           : window_(io_service), parcelport_(parcelport)
         {
             std::string fullname(here.get<locality>().address() + "." +
-                boost::lexical_cast<std::string>(here.get<locality>().port()));
+                std::to_string(here.get<locality>().port()));
             window_.set_option(data_window::bound_to(fullname));
         }
 
@@ -83,26 +84,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
             // Issue a read operation to read the parcel data.
             void (receiver::*f)(boost::system::error_code const&,
-                    boost::tuple<Handler>)
+                    util::tuple<Handler>)
                 = &receiver::handle_read_data<Handler>;
 
             window_.async_read(buffer_->data_,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error,
-                    boost::make_tuple(handler)));
+                    util::make_tuple(handler)));
         }
 
     protected:
         /// Handle a completed read of message data.
         template <typename Handler>
         void handle_read_data(boost::system::error_code const& e,
-            boost::tuple<Handler> handler)
+            util::tuple<Handler> handler)
         {
             if (e) {
-                boost::get<0>(handler)(e);
+                util::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
+                async_read(util::get<0>(handler));
             }
             else {
                 // complete data point and pass it along
@@ -111,7 +112,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
                 // now send acknowledgment message
                 void (receiver::*f)(boost::system::error_code const&,
-                          boost::tuple<Handler>)
+                          util::tuple<Handler>)
                     = &receiver::handle_write_ack<Handler>;
 
                 buffer_->data_size_ = buffer_->data_.size();
@@ -129,13 +130,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
         template <typename Handler>
         void handle_write_ack(boost::system::error_code const& e,
-            boost::tuple<Handler> handler)
+            util::tuple<Handler> handler)
         {
             // Inform caller that data has been received ok.
-            boost::get<0>(handler)(e);
+            util::get<0>(handler)(e);
 
             // Issue a read operation to handle the next parcel.
-            async_read(boost::get<0>(handler));
+            async_read(util::get<0>(handler));
         }
 
     private:
