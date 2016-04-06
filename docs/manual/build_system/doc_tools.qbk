@@ -16,15 +16,15 @@ those are configured correctly.
 
 [variablelist CMake Variables needed for the Documentation Toolchain
     [[`DOXYGEN_ROOT:PATH`]
-     [Specifies where to look for the installation fo the __doxygen__ tool.]
+     [Specifies where to look for the installation of the __doxygen__ tool.]
     ]
     [[`BOOSTQUICKBOOK_ROOT:PATH`]
-     [Specifies where to look for the installation fo the __boost_quickbook__
+     [Specifies where to look for the installation of the __boost_quickbook__
       tool. This tool usually needs to be built by hand. See the
       __boost_quickbook__ documentation for more details on how to do this.]
     ]
     [[`BOOSTAUTOINDEX_ROOT:PATH`]
-     [Specifies where to look for the installation fo the __boost_auto_index__
+     [Specifies where to look for the installation of the __boost_auto_index__
       tool. This tool usually needs to be built by hand. See the
       __boost_auto_index__ documentation for more details on how to do this.
       The documentation can still be generated even if the __boost_auto_index__

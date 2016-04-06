@@ -33,7 +33,7 @@ dependencies:
         # introduce temporal file copies that don't show in the resulting image
         # size.
         # The problem is the "ADD/COPY" and "RUN rm" in Dockerfile. Those count
-        # as seperate steps and keep the temporal files stored as part of the
+        # as separate steps and keep the temporal files stored as part of the
         # image, expanding it by about 500 MB.
         # docker-compile.pl is a dirty workaround, and shall be removed ASAP.
         - cp tools/docker/Dockerfile tools/docker/.dockerignore .

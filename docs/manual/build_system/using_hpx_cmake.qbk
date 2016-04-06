@@ -123,7 +123,7 @@ HPX_DIR variable to point to the installation of __hpx__!
 [heading:cmake_integrate_hpx CMake macros to integrate HPX into existing Applications]
 
 In addition to the `add_hpx_component` and `add_hpx_executable` you can use the
-`hpx_setup_target` macro to have an already exisiting target to be used with the
+`hpx_setup_target` macro to have an already existing target to be used with the
 HPX libraries.
 
 ``
