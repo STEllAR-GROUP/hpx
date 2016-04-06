@@ -8,12 +8,13 @@
 #if !defined(HPX_UTIL_SECTION_SEP_17_2008_022PM)
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
-#include <map>
-#include <iostream>
-
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <boost/lexical_cast.hpp>
+
+#include <iostream>
+#include <map>
+#include <vector>
 
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(HPX_MSVC)

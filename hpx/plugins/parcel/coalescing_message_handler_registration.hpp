@@ -47,8 +47,8 @@ namespace hpx { namespace parcelset
 #define HPX_REGISTER_COALESCING_COUNTERS(Action, coalescing_name)             \
     namespace hpx { namespace parcelset                                       \
     {                                                                         \
-        template<>                                                            \
-        inline char const* get_action_coalescing_name<Action>()               \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        char const* get_action_coalescing_name<Action>()                      \
         {                                                                     \
             return coalescing_name;                                           \
         }                                                                     \
