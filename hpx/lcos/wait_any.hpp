@@ -140,19 +140,15 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_some.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/utility/swap.hpp>
 
-#include <algorithm>
-#include <iterator>
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

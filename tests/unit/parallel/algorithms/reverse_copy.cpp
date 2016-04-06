@@ -85,12 +85,14 @@ void test_reverse_copy()
     test_reverse_copy_async(seq(task), IteratorTag());
     test_reverse_copy_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_reverse_copy(execution_policy(seq), IteratorTag());
     test_reverse_copy(execution_policy(par), IteratorTag());
     test_reverse_copy(execution_policy(par_vec), IteratorTag());
 
     test_reverse_copy(execution_policy(seq(task)), IteratorTag());
     test_reverse_copy(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void reverse_copy_test()
@@ -190,11 +192,13 @@ void test_reverse_copy_exception()
     test_reverse_copy_exception_async(seq(task), IteratorTag());
     test_reverse_copy_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_reverse_copy_exception(execution_policy(seq), IteratorTag());
     test_reverse_copy_exception(execution_policy(par), IteratorTag());
 
     test_reverse_copy_exception(execution_policy(seq(task)), IteratorTag());
     test_reverse_copy_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void reverse_copy_exception_test()
@@ -292,11 +296,13 @@ void test_reverse_copy_bad_alloc()
     test_reverse_copy_bad_alloc_async(seq(task), IteratorTag());
     test_reverse_copy_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_reverse_copy_bad_alloc(execution_policy(seq), IteratorTag());
     test_reverse_copy_bad_alloc(execution_policy(par), IteratorTag());
 
     test_reverse_copy_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_reverse_copy_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void reverse_copy_bad_alloc_test()

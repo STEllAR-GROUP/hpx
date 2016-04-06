@@ -75,12 +75,14 @@ void test_count()
     test_count_async(seq(task), IteratorTag());
     test_count_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_count(execution_policy(seq), IteratorTag());
     test_count(execution_policy(par), IteratorTag());
     test_count(execution_policy(par_vec), IteratorTag());
 
     test_count(execution_policy(seq(task)), IteratorTag());
     test_count(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void count_test()
@@ -177,11 +179,13 @@ void test_count_exception()
     test_count_exception_async(seq(task), IteratorTag());
     test_count_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_count_exception(execution_policy(seq), IteratorTag());
     test_count_exception(execution_policy(par), IteratorTag());
 
     test_count_exception(execution_policy(seq(task)), IteratorTag());
     test_count_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void count_exception_test()
@@ -277,11 +281,13 @@ void test_count_bad_alloc()
     test_count_bad_alloc_async(seq(task), IteratorTag());
     test_count_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_count_bad_alloc(execution_policy(seq), IteratorTag());
     test_count_bad_alloc(execution_policy(par), IteratorTag());
 
     test_count_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_count_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void count_bad_alloc_test()

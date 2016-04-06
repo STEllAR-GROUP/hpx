@@ -112,12 +112,14 @@ void test_equal1()
     test_equal1_async(seq(task), IteratorTag());
     test_equal1_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_equal1(execution_policy(seq), IteratorTag());
     test_equal1(execution_policy(par), IteratorTag());
     test_equal1(execution_policy(par_vec), IteratorTag());
 
     test_equal1(execution_policy(seq(task)), IteratorTag());
     test_equal1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void equal_test1()
@@ -227,12 +229,14 @@ void test_equal2()
     test_equal2_async(seq(task), IteratorTag());
     test_equal2_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_equal2(execution_policy(seq), IteratorTag());
     test_equal2(execution_policy(par), IteratorTag());
     test_equal2(execution_policy(par_vec), IteratorTag());
 
     test_equal2(execution_policy(seq(task)), IteratorTag());
     test_equal2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void equal_test2()
@@ -336,11 +340,13 @@ void test_equal_exception()
     test_equal_exception_async(seq(task), IteratorTag());
     test_equal_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_equal_exception(execution_policy(seq), IteratorTag());
     test_equal_exception(execution_policy(par), IteratorTag());
 
     test_equal_exception(execution_policy(seq(task)), IteratorTag());
     test_equal_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void equal_exception_test()
@@ -442,11 +448,13 @@ void test_equal_bad_alloc()
     test_equal_bad_alloc_async(seq(task), IteratorTag());
     test_equal_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_equal_bad_alloc(execution_policy(seq), IteratorTag());
     test_equal_bad_alloc(execution_policy(par), IteratorTag());
 
     test_equal_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_equal_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void equal_bad_alloc_test()

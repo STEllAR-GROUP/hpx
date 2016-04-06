@@ -151,6 +151,7 @@ namespace test
         }
     };
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     template <typename IteratorTag>
     struct test_num_exceptions<hpx::parallel::execution_policy, IteratorTag>
     {
@@ -180,6 +181,7 @@ namespace test
             HPX_TEST_EQ(e.size(), 1u);
         }
     };
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     inline std::vector<std::size_t> iota(std::size_t size, std::size_t start)

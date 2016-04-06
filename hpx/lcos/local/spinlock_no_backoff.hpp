@@ -11,7 +11,6 @@
 #define HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

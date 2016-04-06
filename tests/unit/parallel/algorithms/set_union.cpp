@@ -81,12 +81,14 @@ void test_set_union1()
     test_set_union1_async(seq(task), IteratorTag());
     test_set_union1_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_union1(execution_policy(seq), IteratorTag());
     test_set_union1(execution_policy(par), IteratorTag());
     test_set_union1(execution_policy(par_vec), IteratorTag());
 
     test_set_union1(execution_policy(seq(task)), IteratorTag());
     test_set_union1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_union_test1()
@@ -173,12 +175,14 @@ void test_set_union2()
     test_set_union2_async(seq(task), IteratorTag());
     test_set_union2_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_union2(execution_policy(seq), IteratorTag());
     test_set_union2(execution_policy(par), IteratorTag());
     test_set_union2(execution_policy(par_vec), IteratorTag());
 
     test_set_union2(execution_policy(seq(task)), IteratorTag());
     test_set_union2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_union_test2()
@@ -293,11 +297,13 @@ void test_set_union_exception()
     test_set_union_exception_async(seq(task), IteratorTag());
     test_set_union_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_union_exception(execution_policy(seq), IteratorTag());
     test_set_union_exception(execution_policy(par), IteratorTag());
 
     test_set_union_exception(execution_policy(seq(task)), IteratorTag());
     test_set_union_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_union_exception_test()
@@ -410,11 +416,13 @@ void test_set_union_bad_alloc()
     test_set_union_bad_alloc_async(seq(task), IteratorTag());
     test_set_union_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_set_union_bad_alloc(execution_policy(seq), IteratorTag());
     test_set_union_bad_alloc(execution_policy(par), IteratorTag());
 
     test_set_union_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_set_union_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void set_union_bad_alloc_test()

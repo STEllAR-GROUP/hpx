@@ -52,7 +52,7 @@ namespace hpx { namespace threads { namespace coroutines
     class coroutine
     {
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine)
+        HPX_MOVABLE_ONLY(coroutine);
 
     public:
         friend struct detail::coroutine_accessor;

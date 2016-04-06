@@ -98,11 +98,13 @@ void test_copy_if_bad_alloc()
     test_copy_if_bad_alloc_async(seq(task), IteratorTag());
     test_copy_if_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_if_bad_alloc(execution_policy(seq), IteratorTag());
     test_copy_if_bad_alloc(execution_policy(par), IteratorTag());
 
     test_copy_if_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_copy_if_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void copy_if_bad_alloc_test()

@@ -10,6 +10,7 @@
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/performance_counters/counters.hpp>

@@ -157,12 +157,14 @@ void test_copy_if()
     test_copy_if_async(seq(task));
     test_copy_if_async(par(task));
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_if(execution_policy(seq));
     test_copy_if(execution_policy(par));
     test_copy_if(execution_policy(par_vec));
 
     test_copy_if(execution_policy(seq(task)));
     test_copy_if(execution_policy(par(task)));
+#endif
 
     test_copy_if_outiter(seq);
     test_copy_if_outiter(par);
@@ -171,12 +173,14 @@ void test_copy_if()
     test_copy_if_outiter_async(seq(task));
     test_copy_if_outiter_async(par(task));
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_if_outiter(execution_policy(seq));
     test_copy_if_outiter(execution_policy(par));
     test_copy_if_outiter(execution_policy(par_vec));
 
     test_copy_if_outiter(execution_policy(seq(task)));
     test_copy_if_outiter(execution_policy(par(task)));
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

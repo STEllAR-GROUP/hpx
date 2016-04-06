@@ -98,12 +98,14 @@ void test_rotate()
     test_rotate_async(seq(task), IteratorTag());
     test_rotate_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_rotate(execution_policy(seq), IteratorTag());
     test_rotate(execution_policy(par), IteratorTag());
     test_rotate(execution_policy(par_vec), IteratorTag());
 
     test_rotate(execution_policy(seq(task)), IteratorTag());
     test_rotate(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void rotate_test()
@@ -211,11 +213,13 @@ void test_rotate_exception()
     test_rotate_exception_async(seq(task), IteratorTag());
     test_rotate_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_rotate_exception(execution_policy(seq), IteratorTag());
     test_rotate_exception(execution_policy(par), IteratorTag());
 
     test_rotate_exception(execution_policy(seq(task)), IteratorTag());
     test_rotate_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void rotate_exception_test()
@@ -321,11 +325,13 @@ void test_rotate_bad_alloc()
     test_rotate_bad_alloc_async(seq(task), IteratorTag());
     test_rotate_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_rotate_bad_alloc(execution_policy(seq), IteratorTag());
     test_rotate_bad_alloc(execution_policy(par), IteratorTag());
 
     test_rotate_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_rotate_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void rotate_bad_alloc_test()

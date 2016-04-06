@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM)
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -18,7 +18,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
@@ -45,14 +45,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Iterator>
     struct algorithm_result_helper<
         Iterator,
-        typename boost::enable_if<
-                typename hpx::traits::segmented_local_iterator_traits<
-                        Iterator
-                    >::is_segmented_local_iterator
+        typename std::enable_if<
+                hpx::traits::is_segmented_local_iterator<Iterator>::value
             >::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator>
-            traits;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
 
         static HPX_FORCEINLINE Iterator
         call(typename traits::local_raw_iterator&& it)
@@ -64,21 +61,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Iterator1, typename Iterator2>
     struct algorithm_result_helper<
         std::pair<Iterator1, Iterator2>,
-        typename boost::enable_if<
-            typename boost::mpl::or_<
-                typename hpx::traits::segmented_local_iterator_traits<
-                        Iterator1
-                    >::is_segmented_local_iterator,
-                typename hpx::traits::segmented_local_iterator_traits<
-                        Iterator2
-                    >::is_segmented_local_iterator
-            >::type
-        >::type>
+        typename std::enable_if<
+                hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
+                hpx::traits::is_segmented_local_iterator<Iterator2>::value
+            >::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1>
-            traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2>
-            traits2;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
 
         static HPX_FORCEINLINE
         std::pair<
@@ -98,10 +87,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Iterator>
     struct algorithm_result_helper<
         future<Iterator>,
-        typename boost::enable_if<
-                typename hpx::traits::segmented_local_iterator_traits<
-                        Iterator
-                    >::is_segmented_local_iterator
+        typename std::enable_if<
+                hpx::traits::is_segmented_local_iterator<Iterator>::value
             >::type>
     {
         typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
@@ -121,21 +108,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Iterator1, typename Iterator2>
     struct algorithm_result_helper<
         future<std::pair<Iterator1, Iterator2> >,
-        typename boost::enable_if<
-            typename boost::mpl::or_<
-                typename hpx::traits::segmented_local_iterator_traits<
-                        Iterator1
-                    >::is_segmented_local_iterator,
-                typename hpx::traits::segmented_local_iterator_traits<
-                        Iterator2
-                    >::is_segmented_local_iterator
-            >::type
-        >::type>
+        typename std::enable_if<
+                hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
+                hpx::traits::is_segmented_local_iterator<Iterator2>::value
+            >::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1>
-            traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2>
-            traits2;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
 
         typedef std::pair<
                 typename traits1::local_raw_iterator,
@@ -173,7 +152,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             using hpx::traits::segmented_local_iterator_traits;
             return
                 detail::algorithm_result_helper<R>::call(
-                    algo.call(policy, boost::mpl::true_(),
+                    algo.call(policy, std::true_type(),
                         segmented_local_iterator_traits<Args>::local(args)...
                     )
                 );
@@ -185,7 +164,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             using hpx::traits::segmented_local_iterator_traits;
             return
                 detail::algorithm_result_helper<R>::call(
-                    algo.call(policy, boost::mpl::false_(),
+                    algo.call(policy, std::false_type(),
                         segmented_local_iterator_traits<Args>::local(args)...
                     )
                 );
@@ -200,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         sequential(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
-            algo.call(policy, boost::mpl::true_(),
+            algo.call(policy, std::true_type(),
                     segmented_local_iterator_traits<Args>::local(args)...
                 );
         }
@@ -210,7 +189,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         parallel(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
-            algo.call(policy, boost::mpl::false_(),
+            algo.call(policy, std::false_type(),
                     segmented_local_iterator_traits<Args>::local(args)...
                 );
         }
@@ -248,24 +227,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     // sequential
     template <typename Algo, typename ExPolicy, typename R, typename... Args>
     struct algorithm_invoker_action<
-                Algo, ExPolicy, boost::mpl::true_, R(Args const& ...)>
-        : hpx::actions::make_action<
+                Algo, ExPolicy, std::true_type, R(Args const& ...)>
+      : hpx::actions::make_action<
             R (*)(Algo const&, ExPolicy const&, Args const&...),
             &dispatcher<Algo, ExPolicy, Args...>::sequential,
             algorithm_invoker_action<
-                Algo, ExPolicy, boost::mpl::true_, R(Args const& ...)>
+                Algo, ExPolicy, std::true_type, R(Args const& ...)>
         >::type
     {};
 
     // parallel
     template <typename Algo, typename ExPolicy, typename R, typename... Args>
     struct algorithm_invoker_action<
-                Algo, ExPolicy, boost::mpl::false_, R(Args const& ...)>
-        : hpx::actions::make_action<
+                Algo, ExPolicy, std::false_type, R(Args const& ...)>
+      : hpx::actions::make_action<
             R (*)(Algo const&, ExPolicy const&, Args const&...),
             &dispatcher<Algo, ExPolicy, Args...>::parallel,
             algorithm_invoker_action<
-                Algo, ExPolicy, boost::mpl::false_, R(Args const& ...)>
+                Algo, ExPolicy, std::false_type, R(Args const& ...)>
         >::type
     {};
 
@@ -282,7 +261,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             >::type result_type;
 
         algorithm_invoker_action<
-            algo_type, ExPolicy, IsSeq,
+            algo_type, ExPolicy, typename IsSeq::type,
             result_type(typename hpx::util::decay<Args>::type const&...)
         > act;
 

@@ -76,12 +76,14 @@ void test_adjacent_find()
     test_adjacent_find_async(seq(task), IteratorTag());
     test_adjacent_find_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_adjacent_find(execution_policy(seq), IteratorTag());
     test_adjacent_find(execution_policy(par), IteratorTag());
     test_adjacent_find(execution_policy(par_vec), IteratorTag());
 
     test_adjacent_find(execution_policy(seq(task)), IteratorTag());
     test_adjacent_find(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void adjacent_find_test()

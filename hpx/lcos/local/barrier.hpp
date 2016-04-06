@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace local
         {
             boost::unique_lock<mutex_type> l(mtx_);
             if (cond_.size(l) < number_of_threads_-1) {
-                cond_.wait(l, "barrier::wait");
+                cond_.wait(std::move(l), "barrier::wait");
             }
             else {
                 // release the threads

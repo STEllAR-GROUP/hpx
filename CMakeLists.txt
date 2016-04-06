@@ -625,6 +625,14 @@ if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
 endif()
 
+# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.12
+hpx_option(HPX_WITH_GENERIC_EXECUTION_POLICY BOOL
+    "Enable the generic execution policy (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_GENERIC_EXECUTION_POLICY)
+  hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
+endif()
+
 # BADBAD: This enables an overload of swap is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -764,7 +772,7 @@ hpx_check_for_cxx11_defaulted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
 
 hpx_check_for_cxx11_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+  REQUIRED "HPX needs support for C++11 deleted functions")
 
 hpx_check_for_cxx11_explicit_cvt_ops(
   DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)

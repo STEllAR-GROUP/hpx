@@ -29,7 +29,7 @@ struct test_lock
     void operator()()
     {
         mutex_type mutex;
-        hpx::lcos::local::condition_variable condition;
+        hpx::lcos::local::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -67,7 +67,7 @@ struct test_trylock
     void operator()()
     {
         mutex_type mutex;
-        hpx::lcos::local::condition_variable condition;
+        hpx::lcos::local::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -113,7 +113,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     hpx::lcos::local::mutex done_mutex;
     bool done;
     bool locked;
-    hpx::lcos::local::condition_variable done_cond;
+    hpx::lcos::local::condition_variable_any done_cond;
 
     test_lock_times_out_if_other_thread_has_lock():
         done(false),locked(false)
@@ -201,7 +201,7 @@ struct test_timedlock
         test_lock_times_out_if_other_thread_has_lock<mutex_type>()();
 
         mutex_type mutex;
-        hpx::lcos::local::condition_variable condition;
+        hpx::lcos::local::condition_variable_any condition;
 
         // Test the lock's constructors.
         {

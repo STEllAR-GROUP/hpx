@@ -21,12 +21,13 @@ void test_sorted1()
     test_sorted1_async(seq(task), IteratorTag());
     test_sorted1_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted1(execution_policy(seq), IteratorTag());
     test_sorted1(execution_policy(par), IteratorTag());
     test_sorted1(execution_policy(par_vec), IteratorTag());
     test_sorted1(execution_policy(seq(task)), IteratorTag());
     test_sorted1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void sorted_test1()
@@ -47,12 +48,13 @@ void test_sorted2()
     test_sorted2_async(seq(task), IteratorTag());
     test_sorted2_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted2(execution_policy(seq), IteratorTag());
     test_sorted2(execution_policy(par), IteratorTag());
     test_sorted2(execution_policy(par_vec), IteratorTag());
     test_sorted2(execution_policy(seq(task)), IteratorTag());
     test_sorted2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void sorted_test2()
@@ -73,12 +75,13 @@ void test_sorted3()
     test_sorted3_async(seq(task), IteratorTag());
     test_sorted3_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted3(execution_policy(seq), IteratorTag());
     test_sorted3(execution_policy(par), IteratorTag());
     test_sorted3(execution_policy(par_vec), IteratorTag());
     test_sorted3(execution_policy(seq(task)), IteratorTag());
     test_sorted3(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void sorted_test3()
@@ -101,10 +104,13 @@ void test_sorted_exception()
     test_sorted_exception_async(seq(task), IteratorTag());
     test_sorted_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_exception(execution_policy(par), IteratorTag());
     test_sorted_exception(execution_policy(seq(task)), IteratorTag());
     test_sorted_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
+
 void sorted_exception_test()
 {
     test_sorted_exception<std::random_access_iterator_tag>();
@@ -126,10 +132,12 @@ void test_sorted_bad_alloc()
     test_sorted_bad_alloc_async(seq(task), IteratorTag());
     test_sorted_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_bad_alloc(execution_policy(par), IteratorTag());
     test_sorted_bad_alloc(execution_policy(seq), IteratorTag());
     test_sorted_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_sorted_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void sorted_bad_alloc_test()

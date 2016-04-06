@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 // #if HPX_DEBUG
 // #  define HPX_DEBUG_THREAD_POOL 1

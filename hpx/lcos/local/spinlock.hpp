@@ -13,7 +13,6 @@
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #include <hpx/exception.hpp>
 #endif
