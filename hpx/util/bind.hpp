@@ -21,9 +21,7 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/type_traits/integral_constant.hpp>
-#include <boost/ref.hpp>
 
-#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -84,12 +82,12 @@ namespace hpx { namespace util
             static HPX_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
             {
-                return std::move(t);
+                return std::forward<T>(t);
             }
         };
 
         template <
-            typename F, typename T, typename TD, typename Us,
+            typename F, typename T, typename Us,
             typename Enable = void
         >
         struct bind_eval_impl
@@ -121,21 +119,20 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename F, typename T, typename TD, typename Us>
-        struct bind_eval_impl<F, T, TD, Us,
+        template <typename F, typename T, typename Us>
+        struct bind_eval_impl<F, T, Us,
             typename std::enable_if<
-                traits::is_placeholder<TD>::value != 0
+                traits::is_placeholder<T>::value != 0
             >::type
         > : bind_eval_placeholder_impl<
-                static_cast<std::size_t>(traits::is_placeholder<TD>::value - 1),
-                T, Us
+                (std::size_t)traits::is_placeholder<T>::value - 1, T, Us
             >
         {};
 
-        template <typename F, typename T, typename TD, typename Us>
-        struct bind_eval_impl<F, T, TD, Us,
+        template <typename F, typename T, typename Us>
+        struct bind_eval_impl<F, T, Us,
             typename std::enable_if<
-                traits::is_bind_expression<TD>::value
+                traits::is_bind_expression<T>::value
             >::type
         >
         {
@@ -146,43 +143,16 @@ namespace hpx { namespace util
             static HPX_FORCEINLINE
             type call(T& t, Us&& unbound)
             {
-                return util::invoke_fused(
-                    t, std::forward<Us>(unbound));
+                return util::invoke_fused(t, std::forward<Us>(unbound));
             }
         };
-
-        template <typename F, typename T, typename X, typename Us>
-        struct bind_eval_impl<F, T, ::boost::reference_wrapper<X>, Us>
-        {
-            typedef X& type;
-
-            static HPX_FORCEINLINE
-            type call(T& t, Us&& /*unbound*/)
-            {
-                return t.get();
-            }
-        };
-
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
-        template <typename F, typename T, typename X, typename Us>
-        struct bind_eval_impl<F, T, ::std::reference_wrapper<X>, Us>
-        {
-            typedef X& type;
-
-            static HPX_FORCEINLINE
-            type call(T& t, Us&& /*unbound*/)
-            {
-                return t.get();
-            }
-        };
-#endif
 
         template <typename F, typename T, typename Us>
         HPX_FORCEINLINE
-        typename bind_eval_impl<F, T, typename std::decay<T>::type, Us>::type
+        typename bind_eval_impl<F, T, Us>::type
         bind_eval(T& t, Us&& unbound)
         {
-            return bind_eval_impl<F, T, typename std::decay<T>::type, Us>::call(
+            return bind_eval_impl<F, T, Us>::call(
                     t, std::forward<Us>(unbound));
         }
 
@@ -194,9 +164,7 @@ namespace hpx { namespace util
         struct bound_result_of<
             F, util::tuple<Ts...>, Us
         > : util::result_of<
-                F(typename bind_eval_impl<
-                    F, Ts, typename std::decay<Ts>::type, Us
-                >::type&&...)
+                F(typename bind_eval_impl<F, Ts, Us>::type&&...)
             >
         {};
 
@@ -204,9 +172,7 @@ namespace hpx { namespace util
         struct bound_result_of<
             F, util::tuple<Ts...> const, Us
         > : util::result_of<
-                F(typename bind_eval_impl<
-                    F, Ts const, typename std::decay<Ts>::type, Us
-                >::type&&...)
+                F(typename bind_eval_impl<F, Ts const, Us>::type&&...)
             >
         {};
 
@@ -228,8 +194,9 @@ namespace hpx { namespace util
         bound_impl(F& f, Ts& bound, Us&& unbound,
             pack_c<std::size_t, Is...>)
         {
-            return util::invoke(f, detail::bind_eval<F>(
-                util::get<Is>(bound), std::forward<Us>(unbound))...);
+            return util::invoke(f,
+                detail::bind_eval<F, typename util::tuple_element<Is, Ts>::type>(
+                    util::get<Is>(bound), std::forward<Us>(unbound))...);
         }
 
         template <typename T>
@@ -267,7 +234,7 @@ namespace hpx { namespace util
             template <typename ...Us>
             inline typename bound_result_of<
                 typename std::decay<F>::type,
-                util::tuple<typename std::decay<Ts>::type...>,
+                util::tuple<typename util::decay_unwrap<Ts>::type...>,
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs)
             {
@@ -279,7 +246,7 @@ namespace hpx { namespace util
             template <typename ...Us>
             inline typename bound_result_of<
                 typename std::decay<F>::type const,
-                util::tuple<typename std::decay<Ts>::type const...>,
+                util::tuple<typename util::decay_unwrap<Ts>::type const...>,
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) const
             {
@@ -304,7 +271,7 @@ namespace hpx { namespace util
 
         private:
             typename std::decay<F>::type _f;
-            util::tuple<typename std::decay<Ts>::type...> _args;
+            util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
         };
     }
 
