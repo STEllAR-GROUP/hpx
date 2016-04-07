@@ -10,11 +10,10 @@
 #include <hpx/util/function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <boost/asio.hpp>
+#include <boost/asio/deadline_timer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 
