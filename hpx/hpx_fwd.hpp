@@ -40,7 +40,6 @@
 #include <hpx/traits.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/traits/component_type_database.hpp>
-#include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/function.hpp>

@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/event.hpp>
-#include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/invoke.hpp>
 
 #include <boost/atomic.hpp>
@@ -38,6 +37,8 @@ namespace hpx { namespace lcos { namespace local
         template <typename F, typename ...Args>
         friend void call_once(once_flag& flag, F&& f, Args&&... args);
     };
+
+    #define HPX_ONCE_INIT ::hpx::lcos::local::once_flag()
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ...Args>
