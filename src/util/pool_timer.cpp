@@ -33,9 +33,10 @@ namespace hpx { namespace util { namespace detail
         mytimer_(hpx::get_runtime().get_thread_pool("timer_pool")->get_io_service())
     {}
 
-    void pool_timer::dummy(const boost::system::error_code &)
+    void pool_timer::timer_handler(const boost::system::error_code &)
     {
-        f_();
+        if(!is_stopped_ || !is_terminated_)
+            f_();
     }
 
     bool pool_timer::start(bool evaluate_)
@@ -67,7 +68,7 @@ namespace hpx { namespace util { namespace detail
             is_started_ = true;
             mytimer_.expires_from_now(microsecs_);
             boost::system::error_code e;
-            mytimer_.async_wait( util::bind(&pool_timer::dummy,
+            mytimer_.async_wait( util::bind(&pool_timer::timer_handler,
                 this->shared_from_this(),e));
             l.unlock();
             return true;
