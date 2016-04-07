@@ -13,10 +13,6 @@
 #include <hpx/error.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/filesystem_compatibility.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
@@ -24,9 +20,9 @@
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
 
+#include <cstddef>
 #include <exception>
 #include <string>
-#include <iosfwd>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -49,19 +45,10 @@ namespace hpx
         ///
         /// \param e    The parameter \p e holds the hpx::error code the new
         ///             exception should encapsulate.
-        explicit exception(error e = success)
-          : boost::system::system_error(make_error_code(e, plain))
-        {
-            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-            LERR_(error) << "created exception: " << this->what();
-        }
+        explicit exception(error e = success);
 
         /// Construct a hpx::exception from a boost#system_error.
-        explicit exception(boost::system::system_error const& e)
-          : boost::system::system_error(e)
-        {
-            LERR_(error) << "created exception: " << this->what();
-        }
+        explicit exception(boost::system::system_error const& e);
 
         /// Construct a hpx::exception from a \a hpx::error and an error message.
         ///
@@ -74,12 +61,7 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        exception(error e, char const* msg, throwmode mode = plain)
-          : boost::system::system_error(make_system_error_code(e, mode), msg)
-        {
-            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-            LERR_(error) << "created exception: " << this->what();
-        }
+        exception(error e, char const* msg, throwmode mode = plain);
 
         /// Construct a hpx::exception from a \a hpx::error and an error message.
         ///
@@ -92,19 +74,12 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        exception(error e, std::string const& msg, throwmode mode = plain)
-          : boost::system::system_error(make_system_error_code(e, mode), msg)
-        {
-            HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-            LERR_(error) << "created exception: " << this->what();
-        }
+        exception(error e, std::string const& msg, throwmode mode = plain);
 
         /// Destruct a hpx::exception
         ///
         /// \throws nothing
-        ~exception() throw()
-        {
-        }
+        ~exception();
 
         /// The function \a get_error() returns the hpx::error code stored
         /// in the referenced instance of a hpx::exception. It returns
@@ -112,11 +87,7 @@ namespace hpx
         /// from.
         ///
         /// \throws nothing
-        error get_error() const throw()
-        {
-            return static_cast<error>(
-                this->boost::system::system_error::code().value());
-        }
+        error get_error() const HPX_NOEXCEPT;
 
         /// The function \a get_error_code() returns a hpx::error_code which
         /// represents the same error condition as this hpx::exception instance.
@@ -126,12 +97,7 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        error_code get_error_code(throwmode mode = plain) const throw()
-        {
-            HPX_UNUSED(mode);
-            return error_code(this->boost::system::system_error::code().value(),
-                *this);
-        }
+        error_code get_error_code(throwmode mode = plain) const HPX_NOEXCEPT;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 #include <vector>
 
 // suppress warnings about dependent classes not being exported from the dll

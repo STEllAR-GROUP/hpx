@@ -6,9 +6,10 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/config/defaults.hpp>
+#include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/filesystem_compatibility.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 
