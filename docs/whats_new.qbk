@@ -25,7 +25,7 @@ to a different compute node).
   Extensions for Ranges (__cpp17_n4560__) proposal. This also includes the
   addition of projections to the existing algorithms. Please see [issue 1668]
   for a list of algorithms which have been adapted to __cpp17_n4560__.
-* We have started to implement index-based parallel for-loops based on a
+* We have implemented index-based parallel for-loops based on a
   corresponding standardization proposal (__cpp20_p0075r1__). Please see
   [issue 2016] for a list of available algorithms.
 * We have pervasively added (optional) executor arguments to all API functions
@@ -62,6 +62,12 @@ to a different compute node).
 * We have added new performance counters for parcel coalescing, file-IO, the
   AGAS cache, and overall scheduler time. Resetting performance counters has
   been overhauled and fixed.
+* We have introduced a generic client type `hpx::components::client<>` and
+  added support for using it with `hpx::async`. This removes the necessity to
+  implement specific client types for every component type without loosing
+  type safety. This deemphasizes the need for using the low level `hpx::id_type`
+  for referencing (possibly remote) component instances. The plan is to
+  deprecate the direct use of `hpx::id_type` in user code in the future.
 
 [heading Breaking Changes]
 
@@ -83,20 +89,42 @@ to a different compute node).
   feature was removed by the C++ committee from the Parallelism TS V1 when it
   was moved to C++17. This can still be enabled by specifying
   `-DHPX_WITH_GENERIC_EXECUTION_POLICY=On` at the configure step.
+* We have removed (default) support for the generic
+  `hpx::parallel::execution_poliy` because it was removed from the Parallelism
+  TS (__cpp11_n4104__) while it was being added to the upcomming C++17 Standard.
+  This facility can be still enabled at configure time by specifying
+  `-DHPX_WITH_GENERIC_EXECUTION_POLICY=On` to __cmake__.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2075] - Fixed some documentation typos
+* [pr    2072] - Refactor local::condition_variable
+* [pr    2070] - Refactor tuple based functionality
+* [pr    2069] - Fixed typos
+* [pr    2067] - Algorithm cleanup
+* [pr    2066] - Split credit fixes
+* [pr    2065] - Rename HPX_MOVABLE_BUT_NOT_COPYABLE to HPX_MOVABLE_ONLY
+* [pr    2064] - Fixed some typos in docs
+* [pr    2063] - Adding example demonstrating template components
+* [issue 2062] - Support component templates
+* [pr    2061] - Replace some uses of lexical_cast<string> with C++11
+                 std::to_string
+* [pr    2060] - Replace uses of boost::noncopyable with HPX_NON_COPYABLE
+* [pr    2059] - Adding missing for_loop algorithms
 * [pr    2058] - Move several definitions to more appropriate headers
 * [pr    2057] - Simplify assert_owns_lock and ignore_while_checking
 * [pr    2056] - Replacing std::result_of with util::result_of
+* [pr    2055] - Fix process launching/connecting back
+* [pr    2054] - Add a forwarding coroutine header
 * [pr    2053] - Replace uses of boost::unordered_map with std::unordered_map
 * [pr    2052] - Rewrite tuple unwrap
 * [pr    2050] - Replace uses of BOOST_SCOPED_ENUM with C++11 scoped enums
 * [pr    2049] - Attempt to narrow down split_credit problem
 * [pr    2048] - Fixing gcc startup hangs
 * [pr    2047] - Fixing when_xxx and wait_xxx for MSVC12
+* [pr    2046] - adding persistent_auto_chunk_size and related tests for for_each
 * [pr    2045] - Fixing HPX_HAVE_THREAD_BACKTRACE_DEPTH build time configuration
 * [pr    2044] - Adding missing service executor types
 * [pr    2043] - Removing ambiguous definitions for is_future_range and
@@ -135,6 +163,7 @@ Here is a list of the important tickets we closed for this release.
                  example
 * [pr    2018] - For loop algorithms
 * [pr    2017] - Non-recursive at_index implementation
+* [issue 2016] - Add index-based for-loops
 * [pr    2014] - Fixed dataflow if invoked action returns a future
 * [pr    2013] - Fixing compilation issues with external example
 * [pr    2012] - Added Sierpinski Triangle example
@@ -271,6 +300,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1897] - Changing parallel::sort to return the last iterator as
                  proposed by N4560
 * [issue 1896] - version 1.0?
+* [issue 1895] - Warning comment on numa_allocator is not very clear
 * [pr    1894] - Add support for compilers that have thread_local
 * [pr    1893] - Fixing 1890
 * [pr    1892] - Adds typed future_type for executor_traits
@@ -324,10 +354,13 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1684] - Race condition when using --hpx:connect?
 * [pr    1658] - Add serialization for std::set (as there is for std::vector
                  and std::map)
+* [pr    1641] - Generic client
 * [pr    1603] - Adds preferred namespace check to inspect tool
 * [issue 1523] - Remote async with deferred launch policy never executes
 * [issue 1472] - Serialization issues
 * [issue 1457] - Implement N4392: C++ Latches and Barriers
+* [pr    1444] - Enabling usage of moveonly types for component construction
+* [issue 1405] - Allow component constructors to take movable only types
 * [issue 1265] - Enable dataflow() to be usable with actions
 * [issue 1236] - NUMA aware allocators
 * [issue  559] - Add hpx::migrate facility
