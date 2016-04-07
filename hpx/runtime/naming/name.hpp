@@ -487,7 +487,7 @@ namespace hpx { namespace naming
         inline boost::int64_t power2(boost::int16_t log2credits)
         {
             HPX_ASSERT(log2credits >= 0);
-            return 1ull << log2credits;
+            return static_cast<boost::int64_t>(1) << log2credits;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -660,7 +660,7 @@ namespace hpx { namespace naming
             boost::int64_t debit);
 
         HPX_EXPORT boost::int64_t fill_credit_for_gid(gid_type& id,
-            boost::int64_t credits = HPX_GLOBALCREDIT_INITIAL);
+            boost::int64_t credits = boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type move_gid(gid_type& id);

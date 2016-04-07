@@ -163,7 +163,7 @@ namespace hpx { namespace components
             template <typename Component>
             static void call(Component* component)
             {
-                // The managed_component's controls the lifetime of the
+                // The managed_component controls the lifetime of the
                 // component implementation.
                 component->finalize();
                 delete component;
