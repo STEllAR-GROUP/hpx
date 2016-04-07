@@ -41,6 +41,7 @@ namespace sudoku
             typedef server::board::init_action action_type;
             hpx::apply<action_type>(this->get_id(), size);
         }
+
         //-------------------------------------------------------
 
         hpx::lcos::future<board_type>
@@ -52,7 +53,6 @@ namespace sudoku
             return hpx::async<action_type>(gid);
         }
 
-
         board_type access_board(){
 
             HPX_ASSERT(this->get_id());
@@ -62,65 +62,52 @@ namespace sudoku
 
         //------------------------------------------------------
 
-        void update_board(std::size_t level, std::size_t pos){
+        void update_board(std::size_t level, boost::uint8_t pos){
 
             HPX_ASSERT(this->get_id());
 
             typedef server::board::update_action action_type;
             hpx::apply<action_type>(this->get_id(), level, pos);
         }
-        //-----------------------------------------------------
 
+        //-----------------------------------------------------
 
         hpx::lcos::future<bool>
         check_board_async(hpx::naming::id_type const& gid,
-            board_type const& board_config, std::size_t level)
+            std::size_t level, boost::uint8_t value)
         {
             HPX_ASSERT(gid);
 
             typedef server::board::check_action action_type;
-            return hpx::async<action_type>(gid, board_config, level);
+            return hpx::async<action_type>(gid, level, value);
         }
 
-        bool check_board(board_type const& board_config, std::size_t level){
+        bool check_board(std::size_t level, boost::uint8_t value){
 
             HPX_ASSERT(this->get_id());
 
-            return check_board_async(this->get_id(), board_config, level).get();
+            return check_board_async(this->get_id(), level, value).get();
         }
 
         //---------------------------------------------------------
 
-        hpx::lcos::future<std::size_t> solve_board_async(
-            hpx::naming::id_type const& gid, board_type const& board_config,
-            std::size_t size, std::size_t level)
+        hpx::lcos::future<std::vector<boost::uint8_t>> solve_board_async(
+            hpx::naming::id_type const& gid, std::size_t size, std::size_t level)
         {
             HPX_ASSERT(gid);
 
+            cancellation_token ct;
             typedef server::board::solve_action action_type;
-            return hpx::async<action_type>(gid, board_config, size, level);
+            return hpx::async<action_type>(gid, size, level, std::ref(ct));
         }
 
-
-        std::size_t solve_board(board_type const& board_config, std::size_t size,
-            std::size_t level)
+        std::vector<boost::uint8_t> solve_board(std::size_t size, std::size_t level)
         {
             HPX_ASSERT(this->get_id());
 
-            return solve_board_async(this->get_id(),
-                board_config, size, level).get();
-        }
-
-        //---------------------------------------------------------
-
-        void clear_board(){
-
-            HPX_ASSERT(this->get_id());
-
-            hpx::apply<server::board::clear_action>(this->get_id());
+            return solve_board_async(this->get_id(), size, level).get();
         }
     };
-
 }
 
 #endif // HPX_SUDOKU_EXAMPLE
