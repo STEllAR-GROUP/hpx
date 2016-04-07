@@ -234,11 +234,11 @@ namespace hpx { namespace actions
         /// Perform thread initialization
         virtual void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
+            threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
 
         virtual void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
+            threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
 
         /// Return whether the given object was migrated
         virtual std::pair<bool, components::pinned_ptr>

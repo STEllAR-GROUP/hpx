@@ -220,7 +220,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_THREAD_GUARD_PAGE] `HPX_WITH_THREAD_GUARD_PAGE:BOOL`][Enable thread guard page (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_VALGRIND] `HPX_WITH_VALGRIND:BOOL`][Enable Valgrind instrumentation support.]]
         [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS] `HPX_WITH_VERIFY_LOCKS:BOOL`][Enable lock verification code (default: OFF, implicitly enabled in debug builds)]]
-        [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_BACKTRACE] `HPX_WITH_VERIFY_LOCKS_BACKTRACE:BOOL`][Enable thred stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_BACKTRACE] `HPX_WITH_VERIFY_LOCKS_BACKTRACE:BOOL`][Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_GLOBALLY] `HPX_WITH_VERIFY_LOCKS_GLOBALLY:BOOL`][Enable global lock verification code (default: OFF, implicitly enabled in debug builds)]]
 ] [/ Debugging Options]
 

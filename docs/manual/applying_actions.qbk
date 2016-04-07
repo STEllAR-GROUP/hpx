@@ -239,7 +239,7 @@ locality (the locality this code is executed on).
 
 [note Any `std::future<>` returned from `std::async()` is required to block in its
       destructor if the value has not been set for this future yet. This is not
-      true for `hpx::future<>` which will never block in its destriuctor, even
+      true for `hpx::future<>` which will never block in its destructor, even
       if the value has not been returned to the future yet. We believe that
       consistency in the behavior of futures is more important than standards
       conformance in this case.]

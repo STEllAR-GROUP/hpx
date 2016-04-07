@@ -529,7 +529,7 @@ hpx_option(HPX_WITH_VERIFY_LOCKS_GLOBALLY BOOL
   OFF
   CATEGORY "Debugging" ADVANCED)
 hpx_option(HPX_WITH_VERIFY_LOCKS_BACKTRACE BOOL
-  "Enable thred stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
+  "Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
   OFF
   CATEGORY "Debugging" ADVANCED)
 hpx_option(HPX_WITH_THREAD_DEBUG_INFO BOOL
