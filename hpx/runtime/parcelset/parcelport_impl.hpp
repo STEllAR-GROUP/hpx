@@ -10,6 +10,9 @@
 #ifndef HPX_PARCELSET_PARCELPORT_IMPL_HPP
 #define HPX_PARCELSET_PARCELPORT_IMPL_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
@@ -436,8 +439,8 @@ namespace hpx { namespace parcelset
             if (ec) {
                 // all errors during early parcel handling are fatal
                 boost::exception_ptr exception =
-                    hpx::detail::get_exception(hpx::exception(ec),
-                        "early_pending_parcel_handler", __FILE__, __LINE__,
+                    HPX_GET_EXCEPTION(ec,
+                        "early_pending_parcel_handler",
                         "error while handling early parcel: " +
                             ec.message() + "(" +
                             std::to_string(ec.value()) +

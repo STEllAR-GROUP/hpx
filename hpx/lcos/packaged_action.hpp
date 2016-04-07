@@ -8,7 +8,7 @@
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
@@ -74,9 +74,9 @@ namespace hpx { namespace lcos
             if (ec)
             {
                 boost::exception_ptr exception =
-                    hpx::detail::get_exception(hpx::exception(ec),
+                    HPX_GET_EXCEPTION(ec,
                         "packaged_action::parcel_write_handler",
-                        __FILE__, __LINE__, parcelset::dump_parcel(p));
+                        parcelset::dump_parcel(p));
                 (*impl)->set_exception(exception);
             }
         }
@@ -90,9 +90,9 @@ namespace hpx { namespace lcos
             if (ec)
             {
                 boost::exception_ptr exception =
-                    hpx::detail::get_exception(hpx::exception(ec),
+                    HPX_GET_EXCEPTION(ec,
                         "packaged_action::parcel_write_handler",
-                        __FILE__, __LINE__, parcelset::dump_parcel(p));
+                        parcelset::dump_parcel(p));
                 (*impl)->set_exception(exception);
             }
 

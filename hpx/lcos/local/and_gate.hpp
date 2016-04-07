@@ -7,6 +7,8 @@
 #define HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>

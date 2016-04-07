@@ -6,7 +6,9 @@
 #if !defined(HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM)
 #define HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

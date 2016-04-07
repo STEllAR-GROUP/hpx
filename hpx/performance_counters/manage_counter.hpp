@@ -9,7 +9,8 @@
 #if !defined(HPX_8B1A4443_7D95_4C0D_9970_7CEA4D049608)
 #define HPX_8B1A4443_7D95_4C0D_9970_7CEA4D049608
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
 

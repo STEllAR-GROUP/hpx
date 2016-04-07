@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_THREAD_TIMED_EXECUTOR_TRAITS_AUG_07_2015_0328PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/date_time_chrono.hpp>

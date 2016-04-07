@@ -14,7 +14,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 #endif
 
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>

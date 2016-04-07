@@ -6,8 +6,8 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_CREATORS_FEB_12_2012_0401PM)
 #define HPX_PERFORMANCE_COUNTERS_CREATORS_FEB_12_2012_0401PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>
 

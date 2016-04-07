@@ -26,7 +26,10 @@ namespace hpx
     /// \cond NOINTERNAL
     // forward declaration
     class error_code;
-    class exception;
+
+    class HPX_EXCEPTION_EXPORT exception;
+
+    struct HPX_EXCEPTION_EXPORT thread_interrupted;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////

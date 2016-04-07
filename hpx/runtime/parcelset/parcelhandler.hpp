@@ -8,9 +8,8 @@
 #if !defined(HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM)
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config/forceinline.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>

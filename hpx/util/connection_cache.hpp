@@ -16,21 +16,21 @@
 #define HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
 #include <map>
 #include <list>
 #include <stdexcept>
 #include <string>
-
-#include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

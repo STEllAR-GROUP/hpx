@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/agas/gva.hpp>

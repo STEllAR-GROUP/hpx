@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_LATCH_APR_19_2015_1002AM)
 #define HPX_LCOS_LATCH_APR_19_2015_1002AM
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/lcos/server/latch.hpp>

@@ -10,6 +10,8 @@
 #ifndef HPX_PARCELSET_ENCODE_PARCEL_HPP
 #define HPX_PARCELSET_ENCODE_PARCEL_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

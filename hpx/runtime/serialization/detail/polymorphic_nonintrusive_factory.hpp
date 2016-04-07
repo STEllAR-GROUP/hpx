@@ -9,7 +9,8 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_HPP
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>

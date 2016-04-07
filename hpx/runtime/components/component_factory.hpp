@@ -39,8 +39,7 @@
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>

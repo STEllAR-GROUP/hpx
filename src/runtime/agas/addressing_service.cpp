@@ -9,8 +9,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>

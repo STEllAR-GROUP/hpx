@@ -8,7 +8,7 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
-
+#include <hpx/exception.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime_fwd.hpp>

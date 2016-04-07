@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace server
                 // call the function, ignoring the return value
                 console_logging(std::forward<T>(v));
             }
-            catch (hpx::exception const& /*e*/) {
+            catch (...) {
                 /**/;      // no logging!
             }
             return util::unused;

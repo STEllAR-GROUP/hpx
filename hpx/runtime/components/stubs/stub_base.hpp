@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>

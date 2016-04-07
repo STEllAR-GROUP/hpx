@@ -6,11 +6,11 @@
 #if !defined(HPX_COMPONENTS_STUBS_MEMORY_MAR_06_2014_0831PM)
 #define HPX_COMPONENTS_STUBS_MEMORY_MAR_06_2014_0831PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/exception.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {

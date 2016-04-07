@@ -6,8 +6,8 @@
 #if !defined(HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM)
 #define HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>

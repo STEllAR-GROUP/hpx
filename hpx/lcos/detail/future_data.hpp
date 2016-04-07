@@ -7,6 +7,8 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/traits/get_remote_result.hpp>
@@ -496,7 +498,7 @@ namespace detail
                 set_value(std::move(get_remote_result_type::call(
                         std::forward<T>(result))));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // store the error instead
                 return set_exception(boost::current_exception());
             }
@@ -508,7 +510,7 @@ namespace detail
             try {
                 HPX_THROW_EXCEPTION(e, f, msg);
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // store the error code
                 set_exception(boost::current_exception());
             }
@@ -882,7 +884,7 @@ namespace detail
             boost::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
-                    boost::throw_exception(hpx::thread_interrupted());
+                    HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
                 if (this->is_ready_locked())
                     return;   // nothing we can do
@@ -904,7 +906,7 @@ namespace detail
                         "future can't be canceled at this time");
                 }
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 this->started_ = true;
                 this->set_exception(boost::current_exception());
                 throw;

@@ -10,9 +10,8 @@
 #define HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/exception_list.hpp>
 #include <hpx/async.hpp>
+#include <hpx/exception_list.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>

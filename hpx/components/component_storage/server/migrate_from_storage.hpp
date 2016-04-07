@@ -6,6 +6,8 @@
 #if !defined(HPX_MIGRATE_FROM_STORAGE_SERVER_FEB_09_2015_0330PM)
 #define HPX_MIGRATE_FROM_STORAGE_SERVER_FEB_09_2015_0330PM
 
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>

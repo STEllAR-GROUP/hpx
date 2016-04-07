@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_QUEUE_FEB_10_2011_1232PM)
 #define HPX_LCOS_QUEUE_FEB_10_2011_1232PM
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/lcos/server/queue.hpp>
 
@@ -73,9 +73,7 @@ namespace hpx { namespace lcos
 
             HPX_ASSERT(this->get_gid());
             boost::exception_ptr exception =
-                hpx::detail::get_exception(
-                    hpx::exception(hpx::no_success), "queue::abort_pending",
-                    __FILE__, __LINE__);
+                HPX_GET_EXCEPTION(hpx::no_success, "queue::abort_pending", "");
             return hpx::async<action_type>(this->get_gid(), exception);
         }
 
