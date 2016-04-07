@@ -10,6 +10,9 @@
 #define HPX_EXCEPTION_FWD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/error.hpp>
+
+#include <boost/exception_ptr.hpp>
 
 /// \cond NOINTERNAL
 namespace boost
@@ -60,6 +63,89 @@ namespace hpx
     /// \a hpx::error_code object with the behavior as specified above.
     ///
     HPX_EXCEPTION_EXPORT extern error_code throws;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Extract elements of the diagnostic information embedded in the given
+    // exception.
+
+    /// \brief Return the error message of the thrown exception.
+    ///
+    /// The function \a hpx::get_error_what can be used to extract the
+    /// diagnostic information element representing the error message as stored
+    /// in the given exception instance.
+    ///
+    /// \param e    The parameter \p e will be inspected for the requested
+    ///             diagnostic information elements which have been stored at
+    ///             the point where the exception was thrown. This parameter
+    ///             can be one of the following types: \a hpx::exception,
+    ///             \a hpx::error_code, \a boost::exception, or
+    ///             \a boost::exception_ptr.
+    ///
+    /// \returns    The error message stored in the exception
+    ///             If the exception instance does not hold
+    ///             this information, the function will return an empty string.
+    ///
+    /// \throws     std#bad_alloc (if one of the required allocations fails)
+    ///
+    /// \see        \a hpx::diagnostic_information(), \a hpx::get_error_host_name(),
+    ///             \a hpx::get_error_process_id(), \a hpx::get_error_function_name(),
+    ///             \a hpx::get_error_file_name(), \a hpx::get_error_line_number(),
+    ///             \a hpx::get_error_os_thread(), \a hpx::get_error_thread_id(),
+    ///             \a hpx::get_error_thread_description(), \a hpx::get_error()
+    ///             \a hpx::get_error_backtrace(), \a hpx::get_error_env(),
+    ///             \a hpx::get_error_config(), \a hpx::get_error_state()
+    ///
+    HPX_EXPORT std::string get_error_what(hpx::exception const& e);
+
+    /// \copydoc get_error_locality_id(hpx::exception const& e)
+    HPX_EXPORT std::string get_error_what(hpx::error_code const& e);
+
+    /// \cond NOINTERNAL
+    HPX_EXPORT std::string get_error_what(boost::exception const& e);
+    HPX_EXPORT std::string get_error_what(boost::exception_ptr const& e);
+    /// \endcond
+
+    /// \brief Return the locality id where the exception was thrown.
+    ///
+    /// The function \a hpx::get_error can be used to extract the
+    /// diagnostic information element representing the error value code as
+    /// stored in the given exception instance.
+    ///
+    /// \param e    The parameter \p e will be inspected for the requested
+    ///             diagnostic information elements which have been stored at
+    ///             the point where the exception was thrown. This parameter
+    ///             can be one of the following types: \a hpx::exception,
+    ///             \a hpx::error_code, or \a boost::exception_ptr.
+    ///
+    /// \returns    The error value code of the locality where the exception was
+    ///             thrown. If the exception instance does not hold
+    ///             this information, the function will return
+    ///             \a hpx::naming#invalid_locality_id.
+    ///
+    /// \throws     nothing
+    ///
+    /// \see        \a hpx::diagnostic_information(), \a hpx::get_error_host_name(),
+    ///             \a hpx::get_error_process_id(), \a hpx::get_error_function_name(),
+    ///             \a hpx::get_error_file_name(), \a hpx::get_error_line_number(),
+    ///             \a hpx::get_error_os_thread(), \a hpx::get_error_thread_id(),
+    ///             \a hpx::get_error_thread_description(),
+    ///             \a hpx::get_error_backtrace(), \a hpx::get_error_env(),
+    ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
+    ///             \a hpx::get_error_state()
+    ///
+    HPX_EXPORT error get_error(hpx::exception const& e);
+
+    /// \copydoc get_error(hpx::exception const& e)
+    HPX_EXPORT error get_error(hpx::error_code const& e);
+
+    /// \cond NOINTERNAL
+    HPX_EXPORT error get_error(boost::exception_ptr const& e);
+    /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \cond NOINTERNAL
+    HPX_EXPORT boost::exception_ptr get_exception_ptr(hpx::exception const& e);
+    /// \endcond
 }
 
 #include <hpx/throw_exception.hpp>

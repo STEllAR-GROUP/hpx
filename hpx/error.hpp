@@ -11,7 +11,9 @@
 #define HPX_ERROR_SEP_08_2013_1109AM
 
 #include <hpx/config.hpp>
-#include <hpx/config/export_definitions.hpp>
+
+#include <boost/system/error_code.hpp>
+
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -213,5 +215,23 @@ namespace hpx
     /// \endcond
 }
 
-#endif
+/// \cond NOEXTERNAL
+namespace boost
+{
+    namespace system
+    {
+        // make sure our errors get recognized by the Boost.System library
+        template<> struct is_error_code_enum<hpx::error>
+        {
+            static const bool value = true;
+        };
 
+        template<> struct is_error_condition_enum<hpx::error>
+        {
+            static const bool value = true;
+        };
+    }
+}
+/// \endcond
+
+#endif

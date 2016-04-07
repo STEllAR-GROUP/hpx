@@ -1129,6 +1129,16 @@ namespace hpx
         return get_error_state(detail::access_exception(e));
     }
 
+    boost::exception_ptr get_exception_ptr(hpx::exception const& e)
+    {
+        try {
+            throw e;
+        }
+        catch (...) {
+            return boost::current_exception();
+        }
+    }
+
     void assertion_failed(char const* expr, char const* function,
         char const* file, long line)
     {
