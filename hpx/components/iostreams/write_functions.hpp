@@ -12,11 +12,12 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 
-#include <ostream>
-#include <iterator>
 #include <algorithm>
 #include <deque>
+#include <iterator>
+#include <ostream>
 #include <type_traits>
+#include <vector>
 
 namespace hpx { namespace iostreams
 {
