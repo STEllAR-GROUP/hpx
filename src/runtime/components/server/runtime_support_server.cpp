@@ -639,7 +639,8 @@ namespace hpx { namespace components { namespace server
             // Note: we protect the entire loop here since the stopping condition
             // depends on the shared variable "dijkstra_color_"
             // Proper unlocking for possible remote actions needs to be taken care of
-            dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+            typedef boost::unique_lock<dijkstra_mtx_type> dijkstra_scoped_lock;
+            dijkstra_scoped_lock l(dijkstra_mtx_);
             do {
                 // Rule 4: Machine nr.0 initiates a probe by making itself white
                 // and sending a white token to machine nr.N - 1.
@@ -648,7 +649,7 @@ namespace hpx { namespace components { namespace server
                 dijkstra_termination_action act;
                 bool termination_aborted = false;
                 {
-                    util::unlock_guard<dijkstra_mtx_type::scoped_lock> ul(l);
+                    util::unlock_guard<dijkstra_scoped_lock> ul(l);
                     termination_aborted = lcos::reduce(act,
                         locality_ids, std_logical_or_type()).get()
                 }
@@ -765,14 +766,15 @@ namespace hpx { namespace components { namespace server
             // Note: we protect the entire loop here since the stopping condition
             // depends on the shared variable "dijkstra_color_"
             // Proper unlocking for possible remote actions needs to be taken care of
-            dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+            typedef boost::unique_lock<dijkstra_mtx_type> dijkstra_scoped_lock;
+            dijkstra_scoped_lock l(dijkstra_mtx_);
             do {
                 // Rule 4: Machine nr.0 initiates a probe by making itself white
                 // and sending a white token to machine nr.N - 1.
                 dijkstra_color_ = false;        // start off with white
 
                 {
-                    util::unlock_guard<dijkstra_mtx_type::scoped_lock> ul(l);
+                    util::unlock_guard<dijkstra_scoped_lock> ul(l);
                     send_dijkstra_termination_token(target_id - 1,
                         initiating_locality_id, num_localities, false);
                 }
@@ -1392,7 +1394,8 @@ namespace hpx { namespace components { namespace server
         char const* message_handler_type, char const* action, error_code& ec)
     {
         // locate the factory for the requested plugin type
-        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+        typedef boost::unique_lock<plugin_map_mutex_type> plugin_map_scoped_lock;
+        plugin_map_scoped_lock l(p_mtx_);
 
         plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
         if (it == plugins_.end() || !(*it).second.first) {
@@ -1454,7 +1457,8 @@ namespace hpx { namespace components { namespace server
         std::size_t interval, error_code& ec)
     {
         // locate the factory for the requested plugin type
-        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+        typedef boost::unique_lock<plugin_map_mutex_type> plugin_map_scoped_lock;
+        plugin_map_scoped_lock l(p_mtx_);
 
         plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
         if (it == plugins_.end() || !(*it).second.first) {
@@ -1513,7 +1517,8 @@ namespace hpx { namespace components { namespace server
         serialization::binary_filter* next_filter, error_code& ec)
     {
         // locate the factory for the requested plugin type
-        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+        typedef boost::unique_lock<plugin_map_mutex_type> plugin_map_scoped_lock;
+        plugin_map_scoped_lock l(p_mtx_);
 
         plugin_map_type::const_iterator it = plugins_.find(binary_filter_type);
         if (it == plugins_.end() || !(*it).second.first) {

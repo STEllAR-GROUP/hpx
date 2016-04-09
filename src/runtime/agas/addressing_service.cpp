@@ -2243,7 +2243,7 @@ bool addressing_service::get_cache_entry(
     gva_cache_key k(gid);
     gva_cache_key idbase_key;
 
-    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    boost::unique_lock<mutex_type> lock(gva_cache_mtx_);
     if(gva_cache_->get_entry(k, idbase_key, gva))
     {
         const boost::uint64_t id_msb =

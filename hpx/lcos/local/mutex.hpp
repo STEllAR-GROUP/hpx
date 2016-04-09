@@ -28,10 +28,6 @@ namespace hpx { namespace lcos { namespace local
         typedef lcos::local::spinlock mutex_type;
 
     public:
-        typedef boost::unique_lock<mutex> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
-
-    public:
         HPX_EXPORT mutex(char const* const description = "");
 
         HPX_EXPORT ~mutex();
@@ -62,10 +58,6 @@ namespace hpx { namespace lcos { namespace local
     class timed_mutex : private mutex
     {
         HPX_NON_COPYABLE(timed_mutex);
-
-    public:
-        typedef boost::unique_lock<timed_mutex> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<timed_mutex> scoped_try_lock;
 
     public:
         HPX_EXPORT timed_mutex(char const* const description = "");

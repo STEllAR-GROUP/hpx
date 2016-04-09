@@ -20,8 +20,9 @@
 #endif
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <list>
 #include <string>
@@ -50,7 +51,7 @@ namespace hpx { namespace util
 
         typedef Mutex mutex_type;
 
-        typedef typename mutex_type::scoped_lock unique_lock_type;
+        typedef boost::unique_lock<mutex_type> unique_lock_type;
 
         explicit one_size_heap_list(char const* class_name = "")
             : class_name_(class_name)

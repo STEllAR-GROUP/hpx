@@ -223,7 +223,6 @@ namespace hpx { namespace naming
         // prepare the given id, note: this function modifies the passed id
         void id_type_impl::preprocess_gid(serialization::output_archive& ar) const
         {
-            typedef gid_type::mutex_type::scoped_lock scoped_lock;
             // unmanaged gids do not require any special handling
             if (unmanaged == type_)
             {
@@ -251,14 +250,14 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         hpx::future<gid_type> split_gid_if_needed(gid_type& gid)
         {
-            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            typedef boost::unique_lock<gid_type::mutex_type> scoped_lock;
             scoped_lock l(gid.get_mutex());
             return split_gid_if_needed_locked(l, gid);
         }
 
         gid_type postprocess_incref(gid_type &gid)
         {
-            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            typedef boost::unique_lock<gid_type::mutex_type> scoped_lock;
             scoped_lock l(gid.get_mutex());
 
             gid_type new_gid = gid;             // strips lock-bit
@@ -308,11 +307,9 @@ namespace hpx { namespace naming
         }
 
         hpx::future<gid_type> split_gid_if_needed_locked(
-            gid_type::mutex_type::scoped_lock &l, gid_type& gid)
+            boost::unique_lock<gid_type::mutex_type> &l, gid_type& gid)
         {
             HPX_ASSERT_OWNS_LOCK(l);
-
-            typedef gid_type::mutex_type::scoped_lock scoped_lock;
 
             if (naming::detail::has_credits(gid))
             {
@@ -373,12 +370,12 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type move_gid(gid_type& gid)
         {
-            gid_type::mutex_type::scoped_lock l(gid.get_mutex());
+            boost::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
             return move_gid_locked(std::move(l), gid);
         }
 
         gid_type move_gid_locked(
-            gid_type::mutex_type::scoped_lock l, gid_type& gid)
+            boost::unique_lock<gid_type::mutex_type> l, gid_type& gid)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -395,13 +392,13 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type split_credits_for_gid(gid_type& id)
         {
-            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            typedef boost::unique_lock<gid_type::mutex_type> scoped_lock;
             scoped_lock l(id.get_mutex());
             return split_credits_for_gid_locked(l, id);
         }
 
         gid_type split_credits_for_gid_locked(
-            gid_type::mutex_type::scoped_lock& l, gid_type& id)
+            boost::unique_lock<gid_type::mutex_type>& l, gid_type& id)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -425,7 +422,7 @@ namespace hpx { namespace naming
             boost::int64_t added_credit = 0;
 
             {
-                typedef gid_type::mutex_type::scoped_lock scoped_lock;
+                typedef boost::unique_lock<gid_type::mutex_type> scoped_lock;
                 scoped_lock l(gid);
                 HPX_ASSERT(0 == get_credit_from_gid(gid));
 

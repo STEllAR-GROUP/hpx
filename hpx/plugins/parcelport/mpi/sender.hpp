@@ -123,7 +123,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             int next_free = -1;
             {
-                mutex_type::scoped_try_lock l(next_free_tag_mtx_);
+                boost::unique_lock<mutex_type> l(next_free_tag_mtx_, boost::try_to_lock);
                 if(l)
                     next_free = next_free_tag_locked();
             }

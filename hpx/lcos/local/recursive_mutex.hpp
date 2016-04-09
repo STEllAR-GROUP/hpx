@@ -10,7 +10,7 @@
 #if !defined(HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM)
 #define HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/atomic.hpp>
@@ -204,11 +204,6 @@ namespace hpx { namespace lcos { namespace local
 //                 }
 //                 return false;
 //             }
-
-        public:
-            typedef boost::unique_lock<recursive_mutex_impl> scoped_lock;
-            typedef boost::detail
-                ::try_lock_wrapper<recursive_mutex_impl> scoped_try_lock;
         };
     }
 
@@ -216,4 +211,3 @@ namespace hpx { namespace lcos { namespace local
 }}}
 
 #endif
-

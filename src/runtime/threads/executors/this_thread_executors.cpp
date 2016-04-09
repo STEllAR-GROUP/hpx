@@ -300,7 +300,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (state.compare_exchange_strong(expected, state_stopping))
         {
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
                 scheduler_.add_punit(0, thread_num_);
                 scheduler_.on_start_thread(0);
             }

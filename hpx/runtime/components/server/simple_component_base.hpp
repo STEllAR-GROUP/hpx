@@ -177,7 +177,7 @@ namespace hpx { namespace components
                 }
             }
 
-            naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
+            boost::unique_lock<naming::gid_type::mutex_type> l(gid_.get_mutex());
 
             if (!naming::detail::has_credits(gid_))
             {
