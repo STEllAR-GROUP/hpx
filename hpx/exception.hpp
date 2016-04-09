@@ -452,6 +452,47 @@ namespace hpx
     HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
     /// \endcond
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Extract elements of the diagnostic information embedded in the given
+    // exception.
+
+    /// \brief Return the error message of the thrown exception.
+    ///
+    /// The function \a hpx::get_error_what can be used to extract the
+    /// diagnostic information element representing the error message as stored
+    /// in the given exception instance.
+    ///
+    /// \param e    The parameter \p e will be inspected for the requested
+    ///             diagnostic information elements which have been stored at
+    ///             the point where the exception was thrown. This parameter
+    ///             can be one of the following types: \a hpx::exception,
+    ///             \a hpx::error_code, \a boost::exception, or
+    ///             \a boost::exception_ptr.
+    ///
+    /// \returns    The error message stored in the exception
+    ///             If the exception instance does not hold
+    ///             this information, the function will return an empty string.
+    ///
+    /// \throws     std#bad_alloc (if one of the required allocations fails)
+    ///
+    /// \see        \a hpx::diagnostic_information(), \a hpx::get_error_host_name(),
+    ///             \a hpx::get_error_process_id(), \a hpx::get_error_function_name(),
+    ///             \a hpx::get_error_file_name(), \a hpx::get_error_line_number(),
+    ///             \a hpx::get_error_os_thread(), \a hpx::get_error_thread_id(),
+    ///             \a hpx::get_error_thread_description(), \a hpx::get_error()
+    ///             \a hpx::get_error_backtrace(), \a hpx::get_error_env(),
+    ///             \a hpx::get_error_config(), \a hpx::get_error_state()
+    ///
+    HPX_EXPORT std::string get_error_what(hpx::exception const& e);
+
+    /// \copydoc get_error_locality_id(hpx::exception const& e)
+    HPX_EXPORT std::string get_error_what(hpx::error_code const& e);
+
+    /// \cond NOINTERNAL
+    HPX_EXPORT std::string get_error_what(boost::exception const& e);
+    HPX_EXPORT std::string get_error_what(boost::exception_ptr const& e);
+    /// \endcond
+
     /// \brief Return the locality id where the exception was thrown.
     ///
     /// The function \a hpx::get_error_locality_id can be used to extract the
@@ -489,6 +530,43 @@ namespace hpx
     /// \cond NOINTERNAL
     HPX_EXPORT boost::uint32_t get_error_locality_id(boost::exception const& e);
     HPX_EXPORT boost::uint32_t get_error_locality_id(boost::exception_ptr const& e);
+    /// \endcond
+
+    /// \brief Return the locality id where the exception was thrown.
+    ///
+    /// The function \a hpx::get_error can be used to extract the
+    /// diagnostic information element representing the error value code as
+    /// stored in the given exception instance.
+    ///
+    /// \param e    The parameter \p e will be inspected for the requested
+    ///             diagnostic information elements which have been stored at
+    ///             the point where the exception was thrown. This parameter
+    ///             can be one of the following types: \a hpx::exception,
+    ///             \a hpx::error_code, or \a boost::exception_ptr.
+    ///
+    /// \returns    The error value code of the locality where the exception was
+    ///             thrown. If the exception instance does not hold
+    ///             this information, the function will return
+    ///             \a hpx::naming#invalid_locality_id.
+    ///
+    /// \throws     nothing
+    ///
+    /// \see        \a hpx::diagnostic_information(), \a hpx::get_error_host_name(),
+    ///             \a hpx::get_error_process_id(), \a hpx::get_error_function_name(),
+    ///             \a hpx::get_error_file_name(), \a hpx::get_error_line_number(),
+    ///             \a hpx::get_error_os_thread(), \a hpx::get_error_thread_id(),
+    ///             \a hpx::get_error_thread_description(),
+    ///             \a hpx::get_error_backtrace(), \a hpx::get_error_env(),
+    ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
+    ///             \a hpx::get_error_state()
+    ///
+    HPX_EXPORT error get_error(hpx::exception const& e);
+
+    /// \copydoc get_error(hpx::exception const& e)
+    HPX_EXPORT error get_error(hpx::error_code const& e);
+
+    /// \cond NOINTERNAL
+    HPX_EXPORT error get_error(boost::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the hostname of the locality where the exception was
@@ -962,6 +1040,8 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // \cond NOINTERNAL
+    HPX_EXPORT boost::exception_ptr get_exception_ptr(hpx::exception const& e);
+
     // forwarder for HPX_ASSERT handler
     HPX_ATTRIBUTE_NORETURN HPX_EXPORT
     void assertion_failed(char const* expr, char const* function,

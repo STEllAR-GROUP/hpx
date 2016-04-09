@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/system/error_code.hpp>
 
@@ -97,4 +98,99 @@ namespace hpx
         }
         return get_hpx_category();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    error_code::error_code(error e, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success && e != no_success && !(mode & lightweight))
+            exception_ = detail::get_exception(e, "", mode);
+    }
+
+    error_code::error_code(error e, char const* func,
+            char const* file, long line, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success && e != no_success && !(mode & lightweight)) {
+            exception_ = detail::get_exception(e, "", mode, func, file, line);
+        }
+    }
+
+    error_code::error_code(error e, char const* msg, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success && e != no_success && !(mode & lightweight))
+            exception_ = detail::get_exception(e, msg, mode);
+    }
+
+    error_code::error_code(error e, char const* msg,
+            char const* func, char const* file, long line, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success && e != no_success && !(mode & lightweight)) {
+            exception_ = detail::get_exception(e, msg, mode, func, file, line);
+        }
+    }
+
+    error_code::error_code(error e, std::string const& msg,
+            throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success && e != no_success && !(mode & lightweight))
+            exception_ = detail::get_exception(e, msg, mode);
+    }
+
+    error_code::error_code(error e, std::string const& msg,
+            char const* func, char const* file, long line, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success && e != no_success && !(mode & lightweight)) {
+            exception_ = detail::get_exception(e, msg, mode, func, file, line);
+        }
+    }
+
+    error_code::error_code(int err, hpx::exception const& e)
+    {
+        this->boost::system::error_code::assign(err, get_hpx_category());
+        exception_ = get_exception_ptr(e);
+    }
+
+    error_code::error_code(boost::exception_ptr const& e)
+      : boost::system::error_code(make_system_error_code(get_error(e), rethrow)),
+        exception_(e)
+    {}
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::string error_code::get_message() const
+    {
+        if (exception_) {
+            try {
+                boost::rethrow_exception(exception_);
+            }
+            catch (boost::exception const& be) {
+                return dynamic_cast<std::exception const*>(&be)->what();
+            }
+        }
+        return get_error_what(*this);   // provide at least minimal error text
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    error_code& error_code::operator=(error_code const& rhs)
+    {
+        if (this != &rhs) {
+            if (rhs.value() == success) {
+                // if the rhs is a success code, we maintain our throw mode
+                this->boost::system::error_code::operator=(
+                    make_success_code(
+                        (category() == get_lightweight_hpx_category()) ?
+                            hpx::lightweight : hpx::plain));
+            }
+            else {
+                this->boost::system::error_code::operator=(rhs);
+            }
+            exception_ = rhs.exception_;
+        }
+        return *this;
+    }
+    /// \endcond
 }
