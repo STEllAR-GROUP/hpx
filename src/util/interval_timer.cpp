@@ -11,8 +11,9 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/make_shared.hpp>
+
+#include <mutex>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -42,7 +43,7 @@ namespace hpx { namespace util { namespace detail
 
     bool interval_timer::start(bool evaluate_)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         if (is_terminated_)
             return false;
 
@@ -50,7 +51,7 @@ namespace hpx { namespace util { namespace detail
             if (first_start_) {
                 first_start_ = false;
 
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 if (pre_shutdown_)
                 {
                     register_pre_shutdown_function(
@@ -85,7 +86,7 @@ namespace hpx { namespace util { namespace detail
         if (!is_started_)
             return start(evaluate_);
 
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
 
         if (is_terminated_)
             return false;
@@ -106,7 +107,7 @@ namespace hpx { namespace util { namespace detail
 
     bool interval_timer::stop()
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         is_stopped_ = true;
         return stop_locked();
     }
@@ -131,7 +132,7 @@ namespace hpx { namespace util { namespace detail
 
     void interval_timer::terminate()
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         if (!is_terminated_) {
             is_terminated_ = true;
             stop_locked();
@@ -155,18 +156,18 @@ namespace hpx { namespace util { namespace detail
 
     boost::int64_t interval_timer::get_interval() const
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         return microsecs_;
     }
 
     void interval_timer::slow_down(boost::int64_t max_interval)
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
     }
     void interval_timer::speed_up(boost::int64_t min_interval)
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
     }
 
@@ -174,7 +175,7 @@ namespace hpx { namespace util { namespace detail
         threads::thread_state_ex_enum statex)
     {
         try {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             if (is_stopped_ || is_terminated_ ||
                 statex == threads::wait_abort || 0 == microsecs_)
@@ -191,7 +192,7 @@ namespace hpx { namespace util { namespace detail
             bool result = false;
 
             {
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 result = f_();            // invoke the supplied function
             }
 
@@ -213,7 +214,7 @@ namespace hpx { namespace util { namespace detail
     }
 
     // schedule a high priority task after a given time interval
-    void interval_timer::schedule_thread(boost::unique_lock<mutex_type> & l)
+    void interval_timer::schedule_thread(std::unique_lock<mutex_type> & l)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -228,7 +229,7 @@ namespace hpx { namespace util { namespace detail
             // the allocators use hpx::lcos::local::spinlock. Unlocking the
             // lock here would be the right thing but leads to crashes and hangs
             // at shutdown.
-            //util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+            //util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             id = hpx::applier::register_thread_plain(
                 util::bind(&interval_timer::evaluate,
                     this->shared_from_this(), util::placeholders::_1),

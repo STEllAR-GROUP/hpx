@@ -16,7 +16,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -35,30 +35,30 @@ namespace hpx { namespace lcos { namespace local
         void notify_one(error_code& ec = throws)
         {
             util::ignore_all_while_checking ignore_lock;
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
             util::ignore_all_while_checking ignore_lock;
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             cond_.notify_all(std::move(l), ec);
         }
 
-        void wait(boost::unique_lock<mutex>& lock, error_code& ec = throws)
+        void wait(std::unique_lock<mutex>& lock, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            boost::unique_lock<mutex_type> l(mtx_);
-            util::unlock_guard<boost::unique_lock<mutex> > unlock(lock);
+            std::unique_lock<mutex_type> l(mtx_);
+            util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
 
             cond_.wait(std::move(l), ec);
         }
 
         template <class Predicate>
-        void wait(boost::unique_lock<mutex>& lock, Predicate pred,
+        void wait(std::unique_lock<mutex>& lock, Predicate pred,
             error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
@@ -69,15 +69,15 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
-        cv_status wait_until(boost::unique_lock<mutex>& lock,
+        cv_status wait_until(std::unique_lock<mutex>& lock,
             util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            boost::unique_lock<mutex_type> l(mtx_);
-            util::unlock_guard<boost::unique_lock<mutex> > unlock(lock);
+            std::unique_lock<mutex_type> l(mtx_);
+            util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(std::move(l), abs_time, ec);
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Predicate>
-        bool wait_until(boost::unique_lock<mutex>& lock,
+        bool wait_until(std::unique_lock<mutex>& lock,
             util::steady_time_point const& abs_time, Predicate pred,
             error_code& ec = throws)
         {
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace local
             return true;
         }
 
-        cv_status wait_for(boost::unique_lock<mutex>& lock,
+        cv_status wait_for(std::unique_lock<mutex>& lock,
             util::steady_duration const& rel_time,
             error_code& ec = throws)
         {
@@ -112,7 +112,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Predicate>
-        bool wait_for(boost::unique_lock<mutex>& lock,
+        bool wait_for(std::unique_lock<mutex>& lock,
             util::steady_duration const& rel_time, Predicate pred,
             error_code& ec = throws)
         {
@@ -132,14 +132,14 @@ namespace hpx { namespace lcos { namespace local
     public:
         void notify_one(error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
             util::ignore_all_while_checking ignore_lock;
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             cond_.notify_all(std::move(l), ec);
         }
 
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
             cond_.wait(std::move(l), ec);
@@ -174,7 +174,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =

@@ -20,6 +20,8 @@
 #include <hpx/include/run_as.hpp>
 #include <hpx/hpx_start.hpp>
 
+#include <mutex>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Store the command line arguments in global variables to make them available
 // to the startup code.
@@ -137,7 +139,7 @@ protected:
 
         // Now, wait for destructor to be called.
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
+            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
             if (rts_ != 0)
                 cond_.wait(lk);
         }
@@ -239,5 +241,3 @@ int main()
 
     return 0;
 }
-
-

@@ -23,6 +23,8 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <mutex>
+
 namespace hpx { namespace threads { namespace detail
 {
     // The function \a set_self_ptr sets a pointer to the (OS thread
@@ -300,7 +302,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (state.compare_exchange_strong(expected, state_stopping))
         {
             {
-                boost::unique_lock<mutex_type> l(mtx_);
+                std::unique_lock<mutex_type> l(mtx_);
                 scheduler_.add_punit(0, thread_num_);
                 scheduler_.on_start_thread(0);
             }

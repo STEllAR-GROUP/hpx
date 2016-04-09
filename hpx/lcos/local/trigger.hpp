@@ -17,8 +17,7 @@
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/thread/locks.hpp>
-
+#include <mutex>
 #include <utility>
 
 namespace hpx { namespace lcos { namespace local
@@ -52,7 +51,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs)
             {
-                boost::lock_guard<mutex_type> l(rhs.mtx_);
+                std::lock_guard<mutex_type> l(rhs.mtx_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
@@ -80,7 +79,7 @@ namespace hpx { namespace lcos { namespace local
         future<void> get_future(std::size_t* generation_value = 0,
             error_code& ec = hpx::throws)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
 
             HPX_ASSERT(generation_ != std::size_t(-1));
             ++generation_;
@@ -97,7 +96,7 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Trigger this object.
         bool set(error_code& ec = throws)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -150,7 +149,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             synchronize(generation_value, l, function_name, ec);
         }
 
@@ -191,7 +190,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         std::size_t next_generation()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -202,7 +201,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return generation_;
         }
 

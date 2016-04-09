@@ -20,13 +20,12 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/thread/locks.hpp>
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/make_shared.hpp>
 #endif
 
 #include <list>
+#include <mutex>
 
 namespace hpx { namespace agas
 {
@@ -368,7 +367,7 @@ response primary_namespace::begin_migration(
 
     naming::gid_type id = req.get_gid();
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     resolved_type r = resolve_gid_locked(l, id, ec);
     if (get<0>(r) == naming::invalid_gid)
@@ -416,7 +415,7 @@ response primary_namespace::end_migration(
 {
     naming::gid_type id = req.get_gid();
 
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
 
     using hpx::util::get;
 
@@ -438,7 +437,7 @@ response primary_namespace::end_migration(
 
 // wait if given object is currently being migrated
 void primary_namespace::wait_for_migration_locked(
-    boost::unique_lock<mutex_type>& l
+    std::unique_lock<mutex_type>& l
   , naming::gid_type id
   , error_code& ec)
 {
@@ -476,7 +475,7 @@ response primary_namespace::bind_gid(
 
     naming::detail::strip_internal_bits_from_gid(id);
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.lower_bound(id)
                            , begin = gvas_.begin()
@@ -652,7 +651,7 @@ response primary_namespace::resolve_gid(
     resolved_type r;
 
     {
-        boost::unique_lock<mutex_type> l(mutex_);
+        std::unique_lock<mutex_type> l(mutex_);
 
         // wait for any migration to be completed
         wait_for_migration_locked(l, id, ec);
@@ -692,7 +691,7 @@ response primary_namespace::unbind_gid(
     naming::gid_type id = req.get_gid();
     naming::detail::strip_internal_bits_from_gid(id);
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.find(id)
                            , end = gvas_.end();
@@ -885,7 +884,7 @@ response primary_namespace::allocate(
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::unique_lock<mutex_type>& l
+      , std::unique_lock<mutex_type>& l
       , const char* func_name
         )
     { // dump_refcnt_matches implementation
@@ -923,7 +922,7 @@ void primary_namespace::increment(
   , error_code& ec
     )
 { // {{{ increment implementation
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))
@@ -999,7 +998,7 @@ void primary_namespace::increment(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::resolve_free_list(
-    boost::unique_lock<mutex_type>& l
+    std::unique_lock<mutex_type>& l
   , std::list<refcnt_table_type::iterator> const& free_list
   , std::list<free_entry>& free_entry_list
   , naming::gid_type const& lower
@@ -1104,7 +1103,7 @@ void primary_namespace::decrement_sweep(
     free_entry_list.clear();
 
     {
-        boost::unique_lock<mutex_type> l(mutex_);
+        std::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
@@ -1273,7 +1272,7 @@ void primary_namespace::free_components_sync(
 } // }}}
 
 primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
-    boost::unique_lock<mutex_type>& l
+    std::unique_lock<mutex_type>& l
   , naming::gid_type const& gid
   , error_code& ec
     )

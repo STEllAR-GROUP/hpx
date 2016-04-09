@@ -18,7 +18,8 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/make_shared.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 namespace hpx { namespace agas
 {
@@ -300,7 +301,7 @@ response symbol_namespace::bind(
     std::string key = req.get_name();
     naming::gid_type gid = req.get_gid();
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key);
     gid_table_type::iterator end = gids_.end();
@@ -396,7 +397,7 @@ response symbol_namespace::bind(
             boost::shared_ptr<naming::gid_type> current_gid = gid_it->second;
 
             {
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
 
                 // split the credit as the receiving end will expect to keep the
                 // object alive
@@ -429,7 +430,7 @@ response symbol_namespace::resolve(
     // parameters
     std::string key = req.get_name();
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key);
     gid_table_type::iterator end = gids_.end();
@@ -472,7 +473,7 @@ response symbol_namespace::unbind(
     // parameters
     std::string key = req.get_name();
 
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key);
     gid_table_type::iterator end = gids_.end();
@@ -511,7 +512,7 @@ response symbol_namespace::iterate(
 { // {{{ iterate implementation
     iterate_names_function_type f = req.get_iterate_names_function();
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     for (gid_table_type::iterator it = gids_.begin(); it != gids_.end(); ++it)
     {
@@ -519,7 +520,7 @@ response symbol_namespace::iterate(
         naming::gid_type gid = *(it->second);
 
         {
-            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             f(key, gid);
         }
 
@@ -553,7 +554,7 @@ response symbol_namespace::on_event(
         return response(symbol_ns_on_event, no_success);
     }
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     bool handled = false;
     if (call_for_past_events)
@@ -567,7 +568,7 @@ response symbol_namespace::on_event(
             // split the credit as the receiving end will expect to keep the
             // object alive
             {
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 naming::gid_type new_gid = naming::detail::split_gid_if_needed(
                     *current_gid).get();
 

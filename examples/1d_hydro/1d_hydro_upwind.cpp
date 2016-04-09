@@ -20,7 +20,8 @@
 
 #include <boost/format.hpp>
 #include <boost/math/constants/constants.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
@@ -100,7 +101,7 @@ struct cell{
   {
     // first, we lock both the mutex of this cell, and the mutex of the other
     // cell
-    //    boost::lock_guard<hpx::lcos::local::mutex> this_lock(mtx),
+    //    std::lock_guard<hpx::lcos::local::mutex> this_lock(mtx),
     //      other_lock(other.mtx);
 
     rho = other.rho;
@@ -234,7 +235,7 @@ double timestep_size(boost::uint64_t timestep)
 {
   // locking
 
-  boost::lock_guard<hpx::lcos::local::mutex> l(grid.time_array.at(timestep).mtx);
+  std::lock_guard<hpx::lcos::local::mutex> l(grid.time_array.at(timestep).mtx);
 
   // if it has already been calculated, then just return the value
   if (grid.time_array.at(timestep).computed)
@@ -339,7 +340,7 @@ double timestep_size(boost::uint64_t timestep)
 
 cell compute(boost::uint64_t timestep, boost::uint64_t location)
 {
-    boost::lock_guard<hpx::lcos::local::mutex> l(grid.time_array.at(timestep)
+    std::lock_guard<hpx::lcos::local::mutex> l(grid.time_array.at(timestep)
         .fluid.at(location).mtx);
 
   // if it is already computed then just return the value

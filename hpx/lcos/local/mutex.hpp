@@ -15,8 +15,6 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
-#include <boost/thread/locks.hpp>
-
 namespace hpx { namespace lcos { namespace local
 {
     ///////////////////////////////////////////////////////////////////////////

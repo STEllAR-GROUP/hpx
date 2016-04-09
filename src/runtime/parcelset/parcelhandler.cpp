@@ -31,12 +31,11 @@
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/detail/endian.hpp>
 
 #include <algorithm>
+#include <mutex>
 #include <sstream>
 #include <string>
 
@@ -229,7 +228,7 @@ namespace hpx { namespace parcelset
         // flush all parcel buffers
         if(0 == num_thread)
         {
-            boost::unique_lock<mutex_type> l(handlers_mtx_, boost::try_to_lock);
+            std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
 
             if(l.owns_lock())
             {
@@ -244,7 +243,7 @@ namespace hpx { namespace parcelset
                     if ((*it).second)
                     {
                         boost::shared_ptr<policies::message_handler> p((*it).second);
-                        util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                        util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                         did_some_work =
                             p->flush(mode, stop_buffering) || did_some_work;
                     }
@@ -660,7 +659,7 @@ namespace hpx { namespace parcelset
         std::size_t num_messages, std::size_t interval,
         locality const& loc, error_code& ec)
     {
-        boost::unique_lock<mutex_type> l(handlers_mtx_);
+        std::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
 
@@ -668,7 +667,7 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<policies::message_handler> p;
 
             {
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval, ec));
             }

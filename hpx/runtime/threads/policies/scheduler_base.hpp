@@ -20,6 +20,7 @@
 #include <boost/make_shared.hpp>
 #endif
 
+#include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -29,6 +30,7 @@
 #include <boost/atomic.hpp>
 
 #include <algorithm>
+#include <mutex>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////

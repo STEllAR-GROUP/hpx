@@ -48,7 +48,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return hpx::threads::get_self_ptr() ?
                     (thread_id_type)hpx::threads::get_self_id().get() :
-                    thread_id_from_mutex<boost::mutex>::call();
+                    thread_id_from_mutex<void>::call();
             };
         };
 

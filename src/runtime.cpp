@@ -34,11 +34,9 @@
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
 #endif
 
-#include <boost/thread/locks.hpp>
-
 #include <iostream>
-#include <vector>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -268,7 +266,7 @@ namespace hpx
 
             {
                 // Initialize the root-CA
-                boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+                std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
                 root_ca.initialize();
 
@@ -304,7 +302,7 @@ namespace hpx
     components::security::signed_certificate_signing_request
         runtime::get_certificate_signing_request() const
     {
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
         // Initialize the sub-CA
         security_data_->subordinate_certificate_authority_.initialize();
@@ -324,7 +322,7 @@ namespace hpx
 
         {
             // tend to the given CSR
-            boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+            std::lock_guard<lcos::local::spinlock> l(security_mtx_);
             cert = security_data_->root_certificate_authority_.
                 sign_certificate_signing_request(csr);
         }
@@ -351,7 +349,7 @@ namespace hpx
                 "root-CA(%1%)") % root_cert);
 
             // initialize our certificate store
-            boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+            std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
             HPX_ASSERT(security_data_->cert_store_.get() == 0);
             security_data_->cert_store_.reset(
@@ -374,7 +372,7 @@ namespace hpx
 
             {
                 // finish initializing our sub-CA
-                boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+                std::lock_guard<lcos::local::spinlock> l(security_mtx_);
                 security_data_->locality_certificate_ = subca_cert;
                 security_data_
                     ->subordinate_certificate_authority_.set_certificate(subca_cert);
@@ -398,7 +396,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(security_data_.get() != 0);
         return security_data_->root_certificate_authority_.get_certificate(ec);
     }
@@ -406,7 +404,7 @@ namespace hpx
     components::security::signed_certificate
         runtime::get_certificate(error_code& ec) const
     {
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(security_data_.get() != 0);
         return security_data_->subordinate_certificate_authority_.get_certificate(ec);
     }
@@ -422,7 +420,7 @@ namespace hpx
             "runtime::add_locality_certificate: locality(%1%): adding locality "
             "certificate: %2%") % here() % cert);
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(0 != security_data_->cert_store_.get());
         // should have been created
         security_data_->cert_store_->insert(cert);
@@ -440,7 +438,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         return security_data_->locality_certificate_;
     }
 
@@ -457,7 +455,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
         using util::security::get_subordinate_certificate_authority_gid;
         return security_data_->cert_store_->at(
@@ -480,7 +478,7 @@ namespace hpx
             return;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         signed_suffix = security_data_->subordinate_certificate_authority_.
             get_key_pair().sign(suffix, ec);
     }
@@ -809,7 +807,7 @@ namespace hpx
     boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
         boost::uint32_t cores_needed)
     {
-        boost::lock_guard<boost::mutex> l(mtx_);
+        std::lock_guard<boost::mutex> l(mtx_);
 
         used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())

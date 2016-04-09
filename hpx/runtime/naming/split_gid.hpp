@@ -11,11 +11,13 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <mutex>
+
 namespace hpx { namespace naming { namespace detail
 {
     HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
     HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(
-        boost::unique_lock<gid_type::mutex_type> &l, gid_type& gid);
+        std::unique_lock<gid_type::mutex_type> &l, gid_type& gid);
 }}}
 
 #endif

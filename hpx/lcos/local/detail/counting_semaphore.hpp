@@ -14,9 +14,9 @@
 #include <hpx/util/assert_owns_lock.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <algorithm>
+#include <mutex>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -36,7 +36,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
           : value_(value)
         {}
 
-        void wait(boost::unique_lock<mutex_type>& l, boost::int64_t count)
+        void wait(std::unique_lock<mutex_type>& l, boost::int64_t count)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             value_ -= count;
         }
 
-        bool try_wait(boost::unique_lock<mutex_type>& l, boost::int64_t count = 1)
+        bool try_wait(std::unique_lock<mutex_type>& l, boost::int64_t count = 1)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -60,7 +60,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             return false;
         }
 
-        void signal(boost::unique_lock<mutex_type> l, boost::int64_t count)
+        void signal(std::unique_lock<mutex_type> l, boost::int64_t count)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -75,11 +75,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 if (!cond_.notify_one(std::move(l)))
                     break;
 
-                l = boost::unique_lock<mutex_type>(*mtx);
+                l = std::unique_lock<mutex_type>(*mtx);
             }
         }
 
-        boost::int64_t signal_all(boost::unique_lock<mutex_type> l)
+        boost::int64_t signal_all(std::unique_lock<mutex_type> l)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 

@@ -26,6 +26,7 @@
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <mutex>
 #include <sstream>
 #include <cstddef>
 
@@ -660,7 +661,7 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type move_gid(gid_type& id);
-        HPX_EXPORT gid_type move_gid_locked(boost::unique_lock<gid_type::mutex_type> l,
+        HPX_EXPORT gid_type move_gid_locked(std::unique_lock<gid_type::mutex_type> l,
             gid_type& gid);
 
         HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
@@ -670,7 +671,7 @@ namespace hpx { namespace naming
         // the returned copy
         HPX_EXPORT gid_type split_credits_for_gid(gid_type& id);
         HPX_EXPORT gid_type split_credits_for_gid_locked(
-            boost::unique_lock<gid_type::mutex_type>& l, gid_type& id);
+            std::unique_lock<gid_type::mutex_type>& l, gid_type& id);
     }
 
     HPX_EXPORT gid_type operator+ (gid_type const& lhs, gid_type const& rhs);

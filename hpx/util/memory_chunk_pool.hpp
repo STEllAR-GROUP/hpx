@@ -8,15 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-
 #include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/util/memory_chunk.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/thread/locks.hpp>
-//
+
 #include <cstdlib>
+#include <mutex>
 #include <vector>
 
 // forward declare pool
@@ -131,7 +130,7 @@ namespace hpx { namespace util
             }
 
             {
-                boost::lock_guard<mutex_type> l(backup_chunks_mtx_);
+                std::lock_guard<mutex_type> l(backup_chunks_mtx_);
                 typename backup_chunks_type::iterator it =
                     backup_chunks_.lower_bound(size);
 
@@ -184,7 +183,7 @@ namespace hpx { namespace util
             }
             else
             {
-                boost::lock_guard<mutex_type> l(backup_chunks_mtx_);
+                std::lock_guard<mutex_type> l(backup_chunks_mtx_);
                 if(backup_size_ <= backup_threshold_)
                 {
                     backup_size_ += size;

@@ -11,26 +11,26 @@
 #include "allgather.hpp"
 
 #include <boost/bind.hpp>
-#include <boost/ref.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/ref.hpp>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server
 {
     void allgather::init(std::size_t item,std::size_t np)
     {
-      //boost::lock_guard<hpx::util::spinlock> l(mtx_);
+      //std::lock_guard<hpx::util::spinlock> l(mtx_);
       item_ = item;
       value_ = item*3.14159;
     }
 
     void allgather::compute(std::vector<hpx::naming::id_type> const& point_components)
     {
-     // boost::lock_guard<hpx::util::spinlock> l(mtx_);
+     // std::lock_guard<hpx::util::spinlock> l(mtx_);
       typedef std::vector<hpx::lcos::future< double > > lazy_results_type;
       lazy_results_type lazy_results;
 
@@ -46,7 +46,7 @@ namespace ag { namespace server
     double allgather::get_item() const
     {
       //std::cout << " Get_item " << item_ << std::endl;
-      //boost::lock_guard<hpx::util::spinlock> l(mtx_);
+      //std::lock_guard<hpx::util::spinlock> l(mtx_);
       return value_;
     }
 

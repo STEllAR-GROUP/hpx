@@ -17,8 +17,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <list>
-
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 namespace hpx { namespace agas
 {
@@ -315,7 +314,7 @@ response locality_namespace::allocate(
     boost::uint32_t const num_threads = req.get_num_threads();
     naming::gid_type const suggested_prefix = req.get_suggested_prefix();
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_DEBUG)
     for (partition_table_type::value_type const& partition : partitions_)
@@ -417,7 +416,7 @@ response locality_namespace::resolve_locality(
     using hpx::util::get;
     boost::uint32_t prefix = naming::get_locality_id_from_gid(req.get_gid());
 
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
     partition_table_type::iterator it = partitions_.find(prefix);
 
     if(it != partitions_.end())
@@ -440,7 +439,7 @@ response locality_namespace::free(
     naming::gid_type locality = req.get_gid();
     boost::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     partition_table_type::iterator pit = partitions_.find(prefix)
                                  , pend = partitions_.end();
@@ -527,7 +526,7 @@ response locality_namespace::localities(
 { // {{{ localities implementation
     using hpx::util::get;
 
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
 
     std::vector<boost::uint32_t> p;
 
@@ -554,7 +553,7 @@ response locality_namespace::resolved_localities(
 { // {{{ localities implementation
     using hpx::util::get;
 
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
 
     std::map<naming::gid_type, parcelset::endpoints_type> localities;
 
@@ -586,7 +585,7 @@ response locality_namespace::get_num_localities(
   , error_code& ec
     )
 { // {{{ get_num_localities implementation
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
 
     boost::uint32_t num_localities =
         static_cast<boost::uint32_t>(partitions_.size());
@@ -606,7 +605,7 @@ response locality_namespace::get_num_threads(
   , error_code& ec
     )
 { // {{{ get_num_threads implementation
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
 
     std::vector<boost::uint32_t> num_threads;
 

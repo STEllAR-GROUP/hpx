@@ -19,11 +19,11 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/aligned_storage.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
-#include <new>
 #include <memory>
+#include <mutex>
+#include <new>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ namespace hpx { namespace components { namespace detail
 
         typedef Mutex mutex_type;
 
-        typedef boost::unique_lock<mutex_type> scoped_lock;
+        typedef std::unique_lock<mutex_type> scoped_lock;
 
         typedef boost::aligned_storage<sizeof(value_type),
             boost::alignment_of<value_type>::value> storage_type;

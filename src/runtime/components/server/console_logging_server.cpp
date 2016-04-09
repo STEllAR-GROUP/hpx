@@ -20,7 +20,7 @@
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 // definitions related to console logging
@@ -50,7 +50,7 @@ namespace hpx { namespace components { namespace server
     // implementation of console based logging
     void console_logging(messages_type const& msgs)
     {
-        boost::lock_guard<util::spinlock> l(util::detail::get_log_lock());
+        std::lock_guard<util::spinlock> l(util::detail::get_log_lock());
 
         using hpx::util::get;
 

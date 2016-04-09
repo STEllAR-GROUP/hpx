@@ -12,7 +12,8 @@
 #include <hpx/util/spinlock.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -45,7 +46,7 @@ namespace hpx { namespace util
             naming::gid_type const& lower
           , naming::gid_type const& upper)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             lower_ = lower;
             upper_ = upper;
         }

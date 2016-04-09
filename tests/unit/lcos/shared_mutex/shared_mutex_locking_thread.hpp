@@ -13,6 +13,10 @@
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
 
+#include <boost/thread/locks.hpp>
+
+#include <mutex>
+
 namespace test
 {
     template <typename Lock>
@@ -52,7 +56,7 @@ namespace test
 
             // increment count to show we're unblocked
             {
-                boost::unique_lock<hpx::lcos::local::mutex> ublock(
+                std::unique_lock<hpx::lcos::local::mutex> ublock(
                     unblocked_count_mutex);
 
                 ++unblocked_count;
@@ -65,9 +69,9 @@ namespace test
             }
 
             // wait to finish
-            boost::unique_lock<hpx::lcos::local::mutex> finish_lock(finish_mutex);
+            std::unique_lock<hpx::lcos::local::mutex> finish_lock(finish_mutex);
             {
-                boost::unique_lock<hpx::lcos::local::mutex> ublock(
+                std::unique_lock<hpx::lcos::local::mutex> ublock(
                     unblocked_count_mutex);
 
                 --simultaneous_running_count;
@@ -98,12 +102,12 @@ namespace test
 
         void operator()()
         {
-            boost::unique_lock<hpx::lcos::local::shared_mutex>  lk(rwm);
+            std::unique_lock<hpx::lcos::local::shared_mutex>  lk(rwm);
             {
-                boost::unique_lock<hpx::lcos::local::mutex> ulk(unblocked_mutex);
+                std::unique_lock<hpx::lcos::local::mutex> ulk(unblocked_mutex);
                 ++unblocked_count;
             }
-            boost::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
+            std::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
         }
     };
 
@@ -132,10 +136,10 @@ namespace test
         {
             boost::shared_lock<hpx::lcos::local::shared_mutex>  lk(rwm);
             {
-                boost::unique_lock<hpx::lcos::local::mutex> ulk(unblocked_mutex);
+                std::unique_lock<hpx::lcos::local::mutex> ulk(unblocked_mutex);
                 ++unblocked_count;
             }
-            boost::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
+            std::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
         }
     };
 
@@ -164,10 +168,10 @@ namespace test
         {
             boost::upgrade_lock<hpx::lcos::local::shared_mutex> lk(rwm);
             {
-                boost::unique_lock<hpx::lcos::local::mutex> ulk(unblocked_mutex);
+                std::unique_lock<hpx::lcos::local::mutex> ulk(unblocked_mutex);
                 ++unblocked_count;
             }
-            boost::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
+            std::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
         }
     };
 }

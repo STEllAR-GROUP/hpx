@@ -12,7 +12,8 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -65,7 +66,7 @@ namespace hpx { namespace lcos { namespace local
         ///                 yielded.
         void wait(boost::int64_t count = 1)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             sem_.wait(l, count);
         }
 
@@ -82,20 +83,20 @@ namespace hpx { namespace lcos { namespace local
         ///                 are available at this point in time.
         bool try_wait(boost::int64_t count = 1)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return sem_.try_wait(l, count);
         }
 
         /// \brief Signal the semaphore
         void signal(boost::int64_t count = 1)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             sem_.signal(std::move(l), count);
         }
 
         boost::int64_t signal_all()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return sem_.signal_all(std::move(l));
         }
 

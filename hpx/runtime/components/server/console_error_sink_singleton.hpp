@@ -12,8 +12,8 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/signals2.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <mutex>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,13 +35,13 @@ namespace hpx { namespace components { namespace server
         template <typename F, typename Connection>
         bool register_error_sink(F sink, Connection& conn)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return (conn = dispatcher_.connect(sink)).connected();
         }
 
         void operator()(std::string const& msg)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             dispatcher_(msg);
         }
 

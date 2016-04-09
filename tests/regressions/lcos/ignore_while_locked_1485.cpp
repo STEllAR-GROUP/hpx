@@ -11,6 +11,8 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <mutex>
+
 struct wait_for_flag
 {
     hpx::lcos::local::spinlock mutex;
@@ -30,7 +32,7 @@ struct wait_for_flag
             if (first)
             {
                 {
-                    boost::lock_guard<hpx::lcos::local::spinlock> lk(local_mutex);
+                    std::lock_guard<hpx::lcos::local::spinlock> lk(local_mutex);
                     running = true;
                 }
 
@@ -38,7 +40,7 @@ struct wait_for_flag
                 local_cond_var.notify_all();
             }
 
-            boost::unique_lock<hpx::lcos::local::spinlock> lk(mutex);
+            std::unique_lock<hpx::lcos::local::spinlock> lk(mutex);
             cond_var.wait(mutex);
         }
         ++woken;
@@ -61,7 +63,7 @@ void test_condition_with_mutex()
 
     // wait for the thread to run
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lk(local_mutex);
+        std::unique_lock<hpx::lcos::local::spinlock> lk(local_mutex);
         while (!running)
             local_cond_var.wait(lk);
     }
@@ -70,7 +72,7 @@ void test_condition_with_mutex()
     data.flag.store(true);
 
     {
-        boost::lock_guard<hpx::lcos::local::spinlock> lock(data.mutex);
+        std::lock_guard<hpx::lcos::local::spinlock> lock(data.mutex);
         data.cond_var.notify_one();
     }
 

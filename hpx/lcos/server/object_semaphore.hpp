@@ -18,9 +18,9 @@
 #include <hpx/lcos/base_lco.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <memory>
+#include <mutex>
 
 namespace hpx { namespace lcos { namespace server
 {
@@ -89,7 +89,7 @@ struct object_semaphore
 
   private:
     // assumes that this thread has acquired l
-    void resume(boost::unique_lock<mutex_type>& l)
+    void resume(std::unique_lock<mutex_type>& l)
     { // {{{
         HPX_ASSERT(l.owns_lock());
 
@@ -114,7 +114,7 @@ struct object_semaphore
             thread_queue_.pop_front();
 
             {
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
 
                 // set the LCO's result
                 applier::trigger(id, std::move(value));
@@ -137,7 +137,7 @@ struct object_semaphore
         std::unique_ptr<queue_value_entry> node
             (new queue_value_entry(val, count));
 
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         value_queue_.push_back(*node);
 
         node.release();
@@ -150,7 +150,7 @@ struct object_semaphore
         // push the LCO's GID onto the queue
         std::unique_ptr<queue_thread_entry> node(new queue_thread_entry(lco));
 
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
 
         thread_queue_.push_back(*node);
 
@@ -161,7 +161,7 @@ struct object_semaphore
 
     void abort_pending(error ec)
     { // {{{
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
 
         LLCO_(info)
             << "object_semaphore::abort_pending: thread_queue is not empty, "
@@ -197,7 +197,7 @@ struct object_semaphore
             lcos::template base_lco_with_value<ValueType>::get_value_action
         action_type;
 
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
 
         typename thread_queue_type::const_iterator it = thread_queue_.begin()
                                                  , end = thread_queue_.end();
