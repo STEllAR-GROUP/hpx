@@ -15,6 +15,7 @@
 
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 
 
 namespace hpx { namespace util
@@ -24,6 +25,11 @@ namespace hpx { namespace util
 
 namespace hpx { namespace util { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    typedef boost::asio::basic_deadline_timer<
+            boost::chrono::steady_clock
+          , util::chrono_traits<boost::chrono::steady_clock>
+        > deadline_timer;
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT pool_timer
       : public boost::enable_shared_from_this<pool_timer>
