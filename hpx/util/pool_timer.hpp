@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace detail
 
         bool is_started() const { return is_started_; }
         bool is_terminated() const { return is_terminated_; }
-        void timer_handler(const boost::system::error_code &);
+        void timer_handler();
 
         void terminate();             // handle system shutdown
         bool stop_locked();
