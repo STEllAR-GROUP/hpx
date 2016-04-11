@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

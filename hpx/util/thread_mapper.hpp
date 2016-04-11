@@ -10,14 +10,14 @@
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <map>
-#include <vector>
-#include <string>
-
 #include <boost/thread/thread.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/function.hpp>
 #include <boost/bimap.hpp>
+
+#include <map>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

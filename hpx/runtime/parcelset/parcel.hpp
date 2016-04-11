@@ -11,7 +11,6 @@
 #define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/runtime/components/component_type.hpp>

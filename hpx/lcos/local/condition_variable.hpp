@@ -8,7 +8,7 @@
 #define HPX_LCOS_LOCAL_CONDITION_VARIABLE_DEC_4_2013_0130PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>

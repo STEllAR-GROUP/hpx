@@ -8,7 +8,7 @@
 #ifndef HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 #define HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 
-#include <hpx/error.hpp>
+#include <hpx/throw_exception.hpp>
 
 namespace hpx { namespace util { namespace detail
 {

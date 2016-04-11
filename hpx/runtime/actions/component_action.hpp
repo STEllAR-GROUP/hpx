@@ -9,7 +9,6 @@
 #define HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>

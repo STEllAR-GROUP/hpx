@@ -7,7 +7,7 @@
 #define HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/component_type.hpp>

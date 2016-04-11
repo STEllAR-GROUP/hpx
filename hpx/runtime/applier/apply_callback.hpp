@@ -6,9 +6,9 @@
 #if !defined(HPX_APPLIER_APPLY_CALLBACK_DEC_16_2012_1228PM)
 #define HPX_APPLIER_APPLY_CALLBACK_DEC_16_2012_1228PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 

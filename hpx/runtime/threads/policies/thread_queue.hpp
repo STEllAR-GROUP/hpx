@@ -8,6 +8,8 @@
 #define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/block_profiler.hpp>

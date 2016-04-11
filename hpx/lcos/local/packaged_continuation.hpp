@@ -8,6 +8,8 @@
 #define HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -380,7 +382,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
-                    boost::throw_exception(hpx::thread_interrupted());
+                    HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
                 if (this->is_ready_locked())
                     return;   // nothing we can do
@@ -402,7 +404,7 @@ namespace hpx { namespace lcos { namespace detail
                         "future can't be canceled at this time");
                 }
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 this->started_ = true;
                 this->set_exception(boost::current_exception());
                 throw;

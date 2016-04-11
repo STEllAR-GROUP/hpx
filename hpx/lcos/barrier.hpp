@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_BARRIER_MAR_10_2010_0307PM)
 #define HPX_LCOS_BARRIER_MAR_10_2010_0307PM
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/lcos/stubs/barrier.hpp>
 

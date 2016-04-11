@@ -9,8 +9,7 @@
 #define HPX_PX_THREAD_MAY_20_2008_0910AM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>

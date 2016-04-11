@@ -9,12 +9,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+#if defined(HPX_DEBUG)
+#include <hpx/util/logging.hpp>
+#endif
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/shared_ptr.hpp>

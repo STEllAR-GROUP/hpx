@@ -8,6 +8,7 @@
 #define HPX_LCOS_PROMISE_FEB_03_2009_0841AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>

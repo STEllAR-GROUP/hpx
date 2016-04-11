@@ -7,8 +7,8 @@
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_21_2008_0159PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>

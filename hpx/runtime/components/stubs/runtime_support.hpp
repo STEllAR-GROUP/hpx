@@ -7,7 +7,8 @@
 #if !defined(HPX_COMPONENTS_STUBS_RUNTIME_SUPPORT_JUN_09_2008_0503PM)
 #define HPX_COMPONENTS_STUBS_RUNTIME_SUPPORT_JUN_09_2008_0503PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>

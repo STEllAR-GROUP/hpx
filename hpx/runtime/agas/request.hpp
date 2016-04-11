@@ -10,8 +10,8 @@
 #if !defined(HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685)
 #define HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 
-#include <hpx/config/export_definitions.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>

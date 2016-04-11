@@ -225,6 +225,7 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/runtime/threads/thread.hpp>

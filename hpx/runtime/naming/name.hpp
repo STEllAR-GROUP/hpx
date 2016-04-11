@@ -9,7 +9,6 @@
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>

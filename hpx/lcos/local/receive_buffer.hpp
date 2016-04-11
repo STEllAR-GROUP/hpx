@@ -7,7 +7,8 @@
 #if !defined(HPX_LCOS_LOCAL_RECEIVE_BUFFER_MAY_08_2014_1102AM)
 #define HPX_LCOS_LOCAL_RECEIVE_BUFFER_MAY_08_2014_1102AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>

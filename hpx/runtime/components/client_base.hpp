@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_access.hpp>

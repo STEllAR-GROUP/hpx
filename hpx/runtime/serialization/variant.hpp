@@ -9,8 +9,9 @@
 #ifndef HPX_SERIALIZATION_VARIANT_HPP
 #define HPX_SERIALIZATION_VARIANT_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/exception.hpp>
 
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/pop_front.hpp>

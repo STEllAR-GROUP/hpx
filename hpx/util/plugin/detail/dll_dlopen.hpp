@@ -7,9 +7,11 @@
 #ifndef HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
-#include <string>
-#include <stdexcept>
-#include <iostream>
+#include <hpx/config.hpp>
+#include <hpx/util/plugin/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -21,10 +23,11 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
-#include <utility>
 
-#include <hpx/exception.hpp>
-#include <hpx/util/plugin/config.hpp>
+#include <iostream>
+#include <string>
+#include <stdexcept>
+#include <utility>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
 #include <link.h>

@@ -6,11 +6,10 @@
 #if !defined(HPX_UTIL_ROOT_CERTIFICATE_AUTHORITY_MAY_30_2013_0405PM)
 #define HPX_UTIL_ROOT_CERTIFICATE_AUTHORITY_MAY_30_2013_0405PM
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_SODIUM)
-
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/components/security/key_pair.hpp>
 #include <hpx/components/security/server/root_certificate_authority.hpp>

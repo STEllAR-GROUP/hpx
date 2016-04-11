@@ -147,6 +147,7 @@ namespace hpx
 #else
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/future_access.hpp>
