@@ -79,7 +79,7 @@ namespace hpx
         /// Destruct a hpx::exception
         ///
         /// \throws nothing
-        ~exception();
+        ~exception() throw();
 
         /// The function \a get_error() returns the hpx::error code stored
         /// in the referenced instance of a hpx::exception. It returns

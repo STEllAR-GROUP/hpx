@@ -116,7 +116,7 @@ namespace hpx
     /// Destruct a hpx::exception
     ///
     /// \throws nothing
-    exception::~exception()
+    exception::~exception() throw()
     {
     }
 
