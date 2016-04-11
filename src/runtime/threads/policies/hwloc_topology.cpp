@@ -15,6 +15,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <boost/format.hpp>
