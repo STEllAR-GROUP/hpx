@@ -17,6 +17,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
