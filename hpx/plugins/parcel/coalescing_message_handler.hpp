@@ -45,7 +45,8 @@ namespace hpx { namespace plugins { namespace parcel
         void put_parcel(parcelset::locality const & dest,
             parcelset::parcel p, write_handler_type f);
 
-        bool flush(bool stop_buffering = false);
+        bool flush(parcelset::policies::message_handler::flush_mode mode,
+            bool stop_buffering = false);
 
         // access performance counter data
         boost::int64_t get_parcels_count(bool reset);
@@ -59,6 +60,7 @@ namespace hpx { namespace plugins { namespace parcel
     protected:
         bool timer_flush();
         bool flush_locked(boost::unique_lock<mutex_type>& l,
+            parcelset::policies::message_handler::flush_mode mode,
             bool stop_buffering);
 
     private:
@@ -67,6 +69,7 @@ namespace hpx { namespace plugins { namespace parcel
         detail::message_buffer buffer_;
         util::interval_timer timer_;
         bool stopped_;
+        bool allow_background_flush_;
 
         // performance counter data
         boost::int64_t num_parcels_;
