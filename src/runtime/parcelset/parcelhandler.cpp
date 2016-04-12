@@ -233,6 +233,10 @@ namespace hpx { namespace parcelset
 
             if(l.owns_lock())
             {
+                using parcelset::policies::message_handler;
+                message_handler::flush_mode mode =
+                    message_handler::flush_mode_buffer_full;
+
                 message_handler_map::iterator end = handlers_.end();
                 for (message_handler_map::iterator it = handlers_.begin();
                      it != end; ++it)
@@ -241,7 +245,8 @@ namespace hpx { namespace parcelset
                     {
                         boost::shared_ptr<policies::message_handler> p((*it).second);
                         util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
-                        did_some_work = p->flush(stop_buffering) || did_some_work;
+                        did_some_work =
+                            p->flush(mode, stop_buffering) || did_some_work;
                     }
                 }
             }
