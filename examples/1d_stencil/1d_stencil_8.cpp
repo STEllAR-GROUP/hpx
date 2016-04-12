@@ -18,6 +18,7 @@
 #include "print_time_results.hpp"
 
 #include <stack>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables

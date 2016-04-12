@@ -17,9 +17,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <algorithm>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)

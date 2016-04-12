@@ -10,6 +10,8 @@
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/ostream.hpp>
 
+#include <string>
+
 namespace hpx
 {
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream<> cout;
@@ -21,4 +23,3 @@ namespace hpx
 }
 
 #endif // HPX_8F5A7F0B_E4CE_422C_B58A_2AEC43AD2057
-

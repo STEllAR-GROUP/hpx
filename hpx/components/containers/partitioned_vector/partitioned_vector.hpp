@@ -20,10 +20,11 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <iterator>
-#include <algorithm>
+#include <string>
 #include <type_traits>
 
 #include <boost/cstdint.hpp>

@@ -20,6 +20,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <string>
+
 namespace hpx { namespace traits
 {
     // Inject additional configuration data into the factory registry for this

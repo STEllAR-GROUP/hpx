@@ -8,10 +8,11 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
-#include <memory>
-#include <vector>
-#include <iostream>
 #include <functional>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

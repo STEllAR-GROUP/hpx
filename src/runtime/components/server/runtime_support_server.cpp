@@ -60,6 +60,7 @@
 #include <algorithm>
 #include <set>
 #include <sstream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions

@@ -20,6 +20,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {

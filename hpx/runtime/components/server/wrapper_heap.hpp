@@ -21,8 +21,8 @@
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
-#include <new>
 #include <memory>
+#include <new>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

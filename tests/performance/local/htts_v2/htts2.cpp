@@ -10,6 +10,8 @@
 
 #include <boost/program_options.hpp>
 
+#include <string>
+
 namespace htts2
 {
 

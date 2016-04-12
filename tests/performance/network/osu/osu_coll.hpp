@@ -8,6 +8,8 @@
 #define LARGE_MESSAGE_SIZE 8192
 #define ITERATIONS_LARGE 100
 
+#include <string>
+
 struct params
 {
     std::size_t max_msg_size;

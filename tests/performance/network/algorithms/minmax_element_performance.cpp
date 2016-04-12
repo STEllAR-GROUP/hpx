@@ -15,6 +15,7 @@
 #include <boost/random.hpp>
 
 #include <iostream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

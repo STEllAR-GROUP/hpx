@@ -17,6 +17,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <list>
+#include <string>
 
 #include <boost/thread/locks.hpp>
 

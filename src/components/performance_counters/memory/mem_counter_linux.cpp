@@ -22,11 +22,11 @@
 #include <boost/fusion/include/io.hpp>
 #include <boost/format.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <algorithm>
 #include <iterator>
+#include <string>
 #include <vector>
 
 BOOST_FUSION_DEFINE_STRUCT(

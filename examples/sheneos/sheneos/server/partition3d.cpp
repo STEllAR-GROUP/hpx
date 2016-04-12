@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <memory>
+#include <string>
 
 #include <boost/move/move.hpp>
 

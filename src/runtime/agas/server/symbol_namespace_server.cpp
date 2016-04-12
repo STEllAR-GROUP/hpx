@@ -20,6 +20,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <string>
+
 namespace hpx { namespace agas
 {
 

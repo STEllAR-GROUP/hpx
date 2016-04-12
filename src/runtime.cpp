@@ -37,8 +37,8 @@
 #include <boost/thread/locks.hpp>
 
 #include <iostream>
-#include <vector>
 #include <memory>
+#include <string>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)

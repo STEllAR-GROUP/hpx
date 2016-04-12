@@ -11,6 +11,8 @@
 //
 #include <boost/random/uniform_int_distribution.hpp>
 //
+#include <string>
+//
 #if defined(HPX_DEBUG)
 #define HPX_SORT_BY_KEY_TEST_SIZE (1 << 16)
 #else

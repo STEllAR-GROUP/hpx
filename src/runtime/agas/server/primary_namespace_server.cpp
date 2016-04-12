@@ -27,6 +27,7 @@
 #endif
 
 #include <list>
+#include <string>
 
 namespace hpx { namespace agas
 {

@@ -14,6 +14,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <iostream>
+#include <string>
 
 // =========================shared_ptr test==============================
 struct A

@@ -13,9 +13,10 @@
 
 #include <boost/format.hpp>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <set>
+#include <string>
 
 namespace hpx { namespace util { namespace batch_environments
 {

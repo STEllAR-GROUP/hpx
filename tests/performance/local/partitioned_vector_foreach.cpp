@@ -18,6 +18,7 @@
 #include "worker_timed.hpp"
 
 #include <stdexcept>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

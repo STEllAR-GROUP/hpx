@@ -19,6 +19,8 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/chrono.hpp>
 
+#include <string>
+
 namespace
 {
     hpx::lcos::local::mutex multiple_wake_mutex;

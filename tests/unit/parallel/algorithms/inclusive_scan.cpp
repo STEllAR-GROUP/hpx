@@ -6,6 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <string>
+
 #include "inclusive_scan_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

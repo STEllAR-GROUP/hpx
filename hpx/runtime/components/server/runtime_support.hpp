@@ -39,9 +39,10 @@
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
-#include <map>
 #include <list>
+#include <map>
 #include <set>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 

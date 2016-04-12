@@ -45,8 +45,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/ref.hpp>
 
-#include <sstream>
 #include <cstdlib>
+#include <sstream>
+#include <string>
 
 namespace hpx { namespace detail
 {

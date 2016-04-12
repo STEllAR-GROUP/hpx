@@ -10,12 +10,12 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 
-#include <iostream>
 #include <fstream>
-#include <vector>
+#include <iostream>
 #include <string>
-#include <boost/algorithm/string.hpp>
+#include <vector>
 
+#include <boost/algorithm/string.hpp>
 
 std::vector<std::string> words;
 

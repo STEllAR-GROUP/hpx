@@ -9,11 +9,12 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <iostream>
-#include <functional>
 #include <algorithm>
-#include <numeric>
+#include <functional>
+#include <iostream>
 #include <iterator>
+#include <numeric>
+#include <string>
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/functions.hpp>

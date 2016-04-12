@@ -16,6 +16,8 @@
 
 #include <boost/program_options.hpp>
 
+#include <string>
+
 #ifndef DOXYGEN
 #if !defined(HPX_MAIN_EXPORT)
 #define HPX_MAIN_EXPORT /**/

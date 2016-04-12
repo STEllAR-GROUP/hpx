@@ -12,6 +12,7 @@
 #include "jacobi_component/grid.hpp"
 #include "jacobi_component/solver.hpp"
 
+#include <string>
 #include <vector>
 
 using boost::program_options::variables_map;

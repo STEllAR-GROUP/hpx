@@ -17,6 +17,8 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {

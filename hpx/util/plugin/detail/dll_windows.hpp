@@ -21,8 +21,8 @@
 #include <boost/throw_exception.hpp>
 
 #include <iostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #include <windows.h>

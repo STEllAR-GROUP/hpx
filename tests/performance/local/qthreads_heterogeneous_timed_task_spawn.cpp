@@ -34,8 +34,9 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 
 #include <qthread/qthread.h>
 

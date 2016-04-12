@@ -14,9 +14,10 @@
 #include <tests/regressions/actions/components/action_move_semantics.hpp>
 #include <tests/regressions/actions/components/movable_objects.hpp>
 
+#include <string>
+
 using hpx::test::movable_object;
 using hpx::test::non_movable_object;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>

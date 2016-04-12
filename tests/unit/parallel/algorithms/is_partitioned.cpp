@@ -13,6 +13,7 @@
 #include "test_utils.hpp"
 
 #include <iostream>
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>

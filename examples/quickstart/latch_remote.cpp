@@ -9,6 +9,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 static const char* const latch_name = "latch_remote_example";
 

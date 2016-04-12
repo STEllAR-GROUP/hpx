@@ -32,6 +32,8 @@
 #include <boost/thread/condition.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <string>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx

@@ -9,6 +9,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <boost/range/functions.hpp>
 
+#include <string>
+
 #include "test_utils.hpp"
 
 //////////////////////////////////////////////////////////////////////////////

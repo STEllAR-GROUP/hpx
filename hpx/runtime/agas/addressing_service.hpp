@@ -32,6 +32,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <map>
+#include <string>
 #include <vector>
 
 namespace hpx { namespace util

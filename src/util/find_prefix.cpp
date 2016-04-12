@@ -33,6 +33,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <string>
+
 namespace hpx { namespace util
 {
     static const char* prefix_ = 0;

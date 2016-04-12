@@ -20,9 +20,10 @@
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 namespace hpx { namespace util
 {

@@ -8,9 +8,10 @@
 #define HPX_PARALLEL_TEST_IS_SORTED_MAY28_15_1320
 
 //
-#include <random>
-#include <limits>
 #include <iomanip>
+#include <limits>
+#include <random>
+#include <string>
 //
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>

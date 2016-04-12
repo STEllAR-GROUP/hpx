@@ -21,6 +21,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <type_traits>
 
 #include <boost/cstdint.hpp>

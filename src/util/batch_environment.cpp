@@ -16,6 +16,7 @@
 #include <hpx/util/batch_environments/pbs_environment.hpp>
 
 #include <iostream>
+#include <string>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>

@@ -19,6 +19,7 @@
 #include <boost/generator_iterator.hpp>
 
 #include <map>
+#include <string>
 
 #define NS_STR "hpx::performance_counters::papi::util::"
 

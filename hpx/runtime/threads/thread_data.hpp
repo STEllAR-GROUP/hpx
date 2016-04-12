@@ -28,6 +28,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <stack>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 

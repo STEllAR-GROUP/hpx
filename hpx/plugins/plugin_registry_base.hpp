@@ -12,6 +12,8 @@
 #include <hpx/util/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {

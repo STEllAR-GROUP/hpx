@@ -17,8 +17,8 @@
 
 #include <boost/cstdint.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

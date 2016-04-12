@@ -19,6 +19,8 @@
 #include <boost/regex.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {

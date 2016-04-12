@@ -41,8 +41,9 @@
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>

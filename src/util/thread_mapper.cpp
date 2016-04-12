@@ -7,6 +7,7 @@
 #include <hpx/exception.hpp>
 
 #include <cstring>
+#include <string>
 
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>

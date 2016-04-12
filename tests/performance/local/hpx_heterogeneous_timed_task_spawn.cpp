@@ -11,6 +11,7 @@
 #include "worker_timed.hpp"
 
 #include <stdexcept>
+#include <string>
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>

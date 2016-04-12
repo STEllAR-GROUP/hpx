@@ -6,6 +6,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/manage_config.hpp>
 
+#include <string>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////

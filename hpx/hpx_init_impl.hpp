@@ -11,6 +11,8 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/find_prefix.hpp>
 
+#include <string>
+
 namespace hpx
 {
     /// \cond NOINTERNAL

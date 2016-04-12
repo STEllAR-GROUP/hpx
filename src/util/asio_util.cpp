@@ -19,8 +19,8 @@
 #include <boost/system/error_code.hpp>
 
 #include <ctime>
-#include <string>
 #include <sstream>
+#include <string>
 
 #if defined(HPX_WINDOWS)
 // Prevent asio from initialising Winsock, the object must be constructed

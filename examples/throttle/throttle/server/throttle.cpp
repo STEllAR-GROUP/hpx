@@ -14,6 +14,8 @@
 #include <boost/thread.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <string>
+
 #include "throttle.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

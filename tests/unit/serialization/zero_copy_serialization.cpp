@@ -15,6 +15,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct data_buffer

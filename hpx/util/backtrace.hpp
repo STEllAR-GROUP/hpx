@@ -12,6 +12,8 @@
 #  include <hpx/util/backtrace/backtrace.hpp>
 #else
 
+#include <string>
+
 namespace hpx { namespace util
 {
     struct backtrace {};

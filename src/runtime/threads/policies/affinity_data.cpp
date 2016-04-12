@@ -11,6 +11,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <algorithm>
+#include <string>
 
 #include <boost/format.hpp>
 

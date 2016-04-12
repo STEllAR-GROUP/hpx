@@ -29,6 +29,7 @@
 #include <boost/detail/atomic_count.hpp>
 
 #include <memory>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 

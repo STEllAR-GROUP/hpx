@@ -12,6 +12,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 template <typename T>
 struct Base
 {

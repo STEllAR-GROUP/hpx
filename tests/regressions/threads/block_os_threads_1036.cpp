@@ -16,6 +16,8 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/scoped_array.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 void blocker(
     boost::atomic<boost::uint64_t>* entered

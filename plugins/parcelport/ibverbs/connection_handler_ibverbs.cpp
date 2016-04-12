@@ -26,6 +26,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <string>
+
 #if (defined(__linux) || defined(linux) || defined(__linux__))
 #include <ifaddrs.h>
 #include <netinet/in.h>

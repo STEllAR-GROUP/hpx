@@ -12,6 +12,8 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 REGISTER_TEMPLATE_ACCUMULATOR(double);
 REGISTER_TEMPLATE_ACCUMULATOR(int);

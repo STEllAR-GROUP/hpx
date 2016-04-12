@@ -6,6 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 
+#include <string>
+
 #include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

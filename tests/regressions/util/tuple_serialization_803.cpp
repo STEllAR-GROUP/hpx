@@ -13,6 +13,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 typedef hpx::util::tuple<int, double, std::string> tuple_type;
 typedef hpx::util::tuple<int, double, std::string> tuple_base_type;
 

@@ -10,8 +10,9 @@
 
 #include "test_utils.hpp"
 
-#include <iostream>
 #include <ctime>
+#include <iostream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -10,12 +10,12 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <utility>
-#include <memory>
-#include <string>
-#include <vector>
 #include <deque>
 #include <list>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <boost/move/move.hpp>
 #include <boost/assign/std/vector.hpp>

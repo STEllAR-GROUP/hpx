@@ -9,6 +9,8 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <string>
+
 #include <tests/unit/agas/components/simple_refcnt_checker.hpp>
 #include <tests/unit/agas/components/managed_refcnt_checker.hpp>
 

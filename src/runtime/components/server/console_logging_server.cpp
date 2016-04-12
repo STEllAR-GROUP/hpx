@@ -22,6 +22,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 // definitions related to console logging
 

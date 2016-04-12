@@ -25,11 +25,11 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <deque>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
-#include <deque>
 
 #include <hpx/config/warnings_prefix.hpp>
 

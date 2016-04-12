@@ -25,6 +25,7 @@
 
 #include <memory>
 #include <numeric>
+#include <string>
 
 namespace hpx { namespace agas
 {

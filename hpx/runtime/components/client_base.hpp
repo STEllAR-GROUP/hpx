@@ -21,9 +21,10 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <type_traits>
 
 #include <boost/mpl/bool.hpp>
 

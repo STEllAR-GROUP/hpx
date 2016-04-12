@@ -21,6 +21,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <memory>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset

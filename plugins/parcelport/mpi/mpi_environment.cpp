@@ -19,6 +19,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <cstdlib>
+#include <string>
 
 namespace hpx { namespace util
 {

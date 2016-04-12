@@ -15,6 +15,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/atomic.hpp>
 
+#include <string>
 #include <unordered_map>
 
 #include <hpx/config/warnings_prefix.hpp>

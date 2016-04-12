@@ -9,6 +9,8 @@
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 ////////////////////////////////////////////////////////////////////////////////
 void test_scan_non_commutative() {
     std::vector<std::string> const vs = {

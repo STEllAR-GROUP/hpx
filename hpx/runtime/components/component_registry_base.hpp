@@ -14,6 +14,8 @@
 
 #include <boost/mpl/list.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {

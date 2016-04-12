@@ -26,8 +26,9 @@
 
 #include <boost/bind.hpp>
 
-#include <map>
 #include <algorithm>
+#include <map>
+#include <string>
 
 namespace hpx { namespace parcelset
 {

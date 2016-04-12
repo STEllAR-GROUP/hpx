@@ -14,6 +14,8 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <string>
+
 char const* const help = "commands: reset, add [amount], query, help, quit";
 
 ///////////////////////////////////////////////////////////////////////////////

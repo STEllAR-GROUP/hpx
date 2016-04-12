@@ -34,10 +34,11 @@
 #endif
 
 #include <iostream>
-#include <sstream>
-#include <vector>
-#include <new>
 #include <memory>
+#include <new>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>

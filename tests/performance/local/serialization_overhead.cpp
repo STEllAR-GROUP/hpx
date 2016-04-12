@@ -13,8 +13,9 @@
 #include <boost/lexical_cast.hpp>
 
 #include <algorithm>
-#include <iterator>
 #include <fstream>
+#include <iterator>
+#include <string>
 
 // This function will never be called
 int test_function(hpx::serialization::serialize_buffer<double> const& b)

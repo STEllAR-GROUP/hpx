@@ -34,6 +34,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <fstream>
+#include <string>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 

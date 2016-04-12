@@ -35,6 +35,8 @@
 
 #include <boost/archive/basic_archive.hpp>
 
+#include <string>
+
 namespace hpx
 {
     bool is_starting();

@@ -12,6 +12,8 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void print(T const& t)

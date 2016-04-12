@@ -15,6 +15,8 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
+#include <string>
+
 namespace hpx { namespace agas { namespace stubs
 {
 

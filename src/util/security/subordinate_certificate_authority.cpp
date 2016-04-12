@@ -14,6 +14,8 @@
 
 #include <boost/function.hpp>
 
+#include <string>
+
 namespace hpx { namespace util { namespace security
 {
     subordinate_certificate_authority::~subordinate_certificate_authority()

@@ -10,6 +10,8 @@
 
 #include <boost/range/functions.hpp>
 
+#include <string>
+
 #include "test_utils.hpp"
 
 // FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408

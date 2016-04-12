@@ -31,6 +31,7 @@
 #include <hpx/runtime.hpp>
 
 #include <sstream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 BOOST_FUSION_ADAPT_STRUCT(

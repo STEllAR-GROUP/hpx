@@ -14,10 +14,11 @@
 #include <boost/thread/locks.hpp>
 
 #include <algorithm>
-#include <iostream>
-#include <vector>
-#include <memory>
 #include <cstdio>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 

@@ -10,9 +10,9 @@
 
 #include <boost/program_options.hpp>
 
+#include <chrono>
 #include <vector>
 #include <string>
-#include <chrono>
 
 int hpx_main(boost::program_options::variables_map& vm)
 {

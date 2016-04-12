@@ -6,6 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <string>
+
 // use smaller array sizes for debug tests
 #if defined(HPX_DEBUG)
 #define HPX_SORT_TEST_SIZE          50000L

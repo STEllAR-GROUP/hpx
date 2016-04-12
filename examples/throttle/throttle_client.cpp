@@ -15,6 +15,7 @@
 #include <boost/format.hpp>
 
 #include <sstream>
+#include <string>
 
 using boost::program_options::variables_map;
 

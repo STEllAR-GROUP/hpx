@@ -16,6 +16,7 @@
 #include <boost/range/functions.hpp>
 
 #include <stdexcept>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 int delay = 1000;

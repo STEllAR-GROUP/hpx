@@ -16,6 +16,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {

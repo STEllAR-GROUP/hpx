@@ -23,6 +23,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
 
+#include <string>
+
 namespace hpx { namespace parcelset
 {
     namespace policies { namespace tcp

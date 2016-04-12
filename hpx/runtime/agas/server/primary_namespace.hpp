@@ -32,6 +32,7 @@
 #endif
 
 #include <map>
+#include <string>
 
 namespace hpx { namespace agas
 {

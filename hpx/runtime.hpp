@@ -30,6 +30,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <memory>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 

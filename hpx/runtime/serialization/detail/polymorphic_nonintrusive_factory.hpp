@@ -21,6 +21,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
 
+#include <string>
 #include <typeinfo>
 #include <unordered_map>
 

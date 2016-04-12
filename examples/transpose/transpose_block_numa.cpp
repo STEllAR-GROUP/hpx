@@ -15,6 +15,7 @@
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
+#include <string>
 #include <vector>
 
 #define COL_SHIFT 1000.00           // Constant to shift column index

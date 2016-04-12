@@ -19,9 +19,10 @@
 
 #include <boost/format.hpp>
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fstream>
+#include <string>
 
 namespace hpx { namespace util
 {

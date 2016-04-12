@@ -26,6 +26,7 @@
 
 #include <map>
 #include <set>
+#include <string>
 
 #include <boost/format.hpp>
 #include <boost/bimap.hpp>

@@ -9,6 +9,8 @@
 #include <H5Cpp.h>
 #include <boost/cstdint.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to hdf5
 namespace interpolate1d

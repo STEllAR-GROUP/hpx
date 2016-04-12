@@ -10,6 +10,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 

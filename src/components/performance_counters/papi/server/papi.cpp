@@ -19,6 +19,7 @@
 #include <hpx/exception.hpp>
 
 #include <functional>
+#include <string>
 
 #include <boost/version.hpp>
 #include <boost/format.hpp>

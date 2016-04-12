@@ -6,6 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <string>
+
 #include "is_sorted_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////

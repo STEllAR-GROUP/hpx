@@ -14,6 +14,8 @@
 
 #include <boost/chrono.hpp>
 
+#include <string>
+
 #include "thread_group.hpp"
 #include "shared_mutex_locking_thread.hpp"
 

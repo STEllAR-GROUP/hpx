@@ -7,6 +7,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/hpx_init.hpp>
 #include <iostream>
+#include <string>
 #include <stdlib.h>
 
 typedef boost::atomic<int> int_atomic;

@@ -11,6 +11,8 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <string>
+
 namespace jacobi_smp {
 
     void jacobi_kernel_wrap(range const & y_range, std::size_t n,

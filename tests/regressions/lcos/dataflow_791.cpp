@@ -12,7 +12,6 @@
 
 #include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <vector>
 
 #include <hpx/util/lightweight_test.hpp>
 
@@ -20,6 +19,8 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <string>
+#include <vector>
 
 using std::vector;
 using hpx::lcos::shared_future;

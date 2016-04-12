@@ -7,6 +7,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 void test_make_future()
 {

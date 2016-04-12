@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <string>
 
 namespace hpx { namespace util
 {

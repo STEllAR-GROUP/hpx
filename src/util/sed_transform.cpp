@@ -10,6 +10,8 @@
 #include <boost/regex.hpp>
 #include <boost/make_shared.hpp>
 
+#include <string>
+
 namespace hpx { namespace util
 {
 

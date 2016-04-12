@@ -20,9 +20,10 @@
 #include <boost/atomic.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <iterator>
 #include <ios>
 #include <iostream>
+#include <iterator>
+#include <string>
 #include <utility>
 
 namespace hpx { namespace iostreams

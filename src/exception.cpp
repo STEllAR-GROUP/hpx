@@ -36,6 +36,7 @@
 #include <iostream>
 #endif
 #include <sstream>
+#include <string>
 
 #ifdef __APPLE__
 #include <crt_externs.h>

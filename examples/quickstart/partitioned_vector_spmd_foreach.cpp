@@ -21,6 +21,7 @@
 
 #include <ctime>
 #include <cstdlib>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

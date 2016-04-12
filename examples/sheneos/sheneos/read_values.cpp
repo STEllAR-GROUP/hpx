@@ -7,6 +7,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <string>
+
 #include "read_values.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include <iostream>
+#include <string>
 
 
 

@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <string>
 #include <vector>
 
 #include <boost/chrono.hpp>

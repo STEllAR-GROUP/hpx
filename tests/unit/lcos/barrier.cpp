@@ -11,6 +11,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 void barrier_test(hpx::id_type const& id, boost::atomic<std::size_t>& c)
 {
