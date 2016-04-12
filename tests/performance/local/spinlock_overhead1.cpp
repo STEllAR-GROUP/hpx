@@ -21,6 +21,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <stdexcept>
+#include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

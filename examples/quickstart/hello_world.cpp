@@ -18,9 +18,9 @@
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <vector>
 #include <list>
 #include <set>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // The purpose of this example is to execute a HPX-thread printing "Hello world"

@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <vector>
 
 // FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
 #if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)

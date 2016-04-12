@@ -51,6 +51,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <string.h>
 #include <stdlib.h>
 

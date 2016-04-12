@@ -29,6 +29,7 @@
 #include <boost/format.hpp>
 
 #include <string>
+#include <vector>
 
 #include <apex_api.hpp>
 

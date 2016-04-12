@@ -10,6 +10,7 @@
 #include <boost/assign/std/vector.hpp>
 
 #include <string>
+#include <vector>
 
 #include <tests/unit/agas/components/simple_mobile_object.hpp>
 

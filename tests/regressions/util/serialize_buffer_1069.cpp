@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <vector>
 
 ////----------------------------------------------------------------------------
 #define MEMORY_BLOCK_SIZE 0x01000000

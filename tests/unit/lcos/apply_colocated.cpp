@@ -11,6 +11,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 bool on_shutdown_executed = false;
 boost::uint32_t locality_id = boost::uint32_t(-1);

@@ -8,6 +8,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 static const char* const latch_name = "latch_remote_test";

@@ -20,6 +20,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/io/ios_state.hpp>
 
+#include <vector>
+
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////

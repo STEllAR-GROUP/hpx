@@ -13,6 +13,8 @@
 
 #include <boost/format.hpp>
 
+#include <vector>
+
 namespace hpx { namespace agas { namespace server
 {
     response primary_namespace::route(parcelset::parcel && p)

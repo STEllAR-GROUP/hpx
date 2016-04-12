@@ -32,6 +32,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization support for the performance counter actions

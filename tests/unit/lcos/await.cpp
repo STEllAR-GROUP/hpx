@@ -17,6 +17,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<int> fib1(int n)

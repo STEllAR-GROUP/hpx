@@ -13,8 +13,8 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

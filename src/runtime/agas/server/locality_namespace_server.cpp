@@ -18,6 +18,7 @@
 
 #include <list>
 #include <string>
+#include <vector>
 
 #include <boost/thread/locks.hpp>
 

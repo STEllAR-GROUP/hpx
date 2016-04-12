@@ -17,6 +17,7 @@
 #include <boost/cstdint.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters

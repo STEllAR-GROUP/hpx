@@ -17,6 +17,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <string>
+#include <vector>
 
 // TODO: Remove the use of the name "prefix"
 

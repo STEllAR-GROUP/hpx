@@ -27,10 +27,9 @@
 #include <boost/ref.hpp>
 
 #include <algorithm>
-#include <vector>
-
-#include <iostream>
 #include <ctime>
+#include <iostream>
+#include <vector>
 
 using namespace hpx;
 namespace po = boost::program_options;

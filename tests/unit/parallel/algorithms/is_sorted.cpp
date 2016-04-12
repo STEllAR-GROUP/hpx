@@ -7,9 +7,9 @@
 #include <hpx/hpx.hpp>
 
 #include <string>
+#include <vector>
 
 #include "is_sorted_tests.hpp"
-
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>

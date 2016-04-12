@@ -18,9 +18,9 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <algorithm>
 #include <type_traits>
 #include <vector>
-#include <algorithm>
 
 #include <boost/utility/enable_if.hpp>
 

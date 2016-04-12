@@ -15,6 +15,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::serialization::serialize_buffer<int> test(hpx::serialization

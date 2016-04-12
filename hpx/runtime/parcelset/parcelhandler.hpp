@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace parcelset
 {

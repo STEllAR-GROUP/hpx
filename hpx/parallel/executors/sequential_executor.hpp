@@ -18,9 +18,10 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
-#include <iterator>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {

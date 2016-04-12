@@ -9,6 +9,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 std::ptrdiff_t num_threads = 16;
 

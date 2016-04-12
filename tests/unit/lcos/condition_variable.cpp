@@ -20,6 +20,7 @@
 #include <boost/chrono.hpp>
 
 #include <string>
+#include <vector>
 
 namespace
 {

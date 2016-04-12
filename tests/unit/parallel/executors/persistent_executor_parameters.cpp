@@ -16,6 +16,7 @@
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <vector>
 
 #include <boost/ref.hpp>
 

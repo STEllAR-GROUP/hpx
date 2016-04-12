@@ -22,8 +22,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace threads { namespace detail
 {

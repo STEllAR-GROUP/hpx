@@ -30,6 +30,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

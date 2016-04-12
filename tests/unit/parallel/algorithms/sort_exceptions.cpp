@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 
 #include <string>
+#include <vector>
 
 // use smaller array sizes for debug tests
 #if defined(HPX_DEBUG)

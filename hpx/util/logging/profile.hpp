@@ -37,6 +37,7 @@
 #include <boost/function.hpp>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <hpx/util/logging/format_fwd.hpp>
 #include <hpx/util/logging/detail/find_format_writer.hpp>
 

@@ -16,6 +16,7 @@
 #include <hpx/include/thread_executors.hpp>
 
 #include <string>
+#include <vector>
 
 namespace detail
 {

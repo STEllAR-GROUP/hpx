@@ -15,6 +15,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include <string>
+#include <vector>
 
 char const* const help = "commands: reset, add [amount], query, help, quit";
 

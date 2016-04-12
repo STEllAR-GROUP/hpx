@@ -48,6 +48,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace detail
 {

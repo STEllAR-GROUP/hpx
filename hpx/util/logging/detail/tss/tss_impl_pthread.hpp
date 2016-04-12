@@ -20,8 +20,8 @@
 #ifndef JT28092007_BOOST_TSS_IMPL_PTHREAD
 #define JT28092007_BOOST_TSS_IMPL_PTHREAD
 
-#include <vector>
 #include <memory>
+#include <vector>
 #include <pthread.h>
 
 namespace hpx { namespace util { namespace logging { namespace detail {

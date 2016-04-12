@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

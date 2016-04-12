@@ -17,6 +17,7 @@
 #include <boost/move/move.hpp>
 
 #include <string>
+#include <vector>
 
 #include "read_values.hpp"
 #include "partition3d.hpp"

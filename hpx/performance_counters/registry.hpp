@@ -12,6 +12,7 @@
 #include <hpx/util/function.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters

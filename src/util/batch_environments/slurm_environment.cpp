@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace util { namespace batch_environments
 {

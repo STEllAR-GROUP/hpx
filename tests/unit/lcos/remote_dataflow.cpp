@@ -12,6 +12,7 @@
 #include <boost/atomic.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<boost::uint32_t> void_f_count;

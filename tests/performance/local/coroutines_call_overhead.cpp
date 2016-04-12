@@ -15,6 +15,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include <string>
+#include <vector>
 
 #include "worker_timed.hpp"
 

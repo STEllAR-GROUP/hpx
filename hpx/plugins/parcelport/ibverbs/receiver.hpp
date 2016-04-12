@@ -26,6 +26,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <vector>
+
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     class connection_handler;

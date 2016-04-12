@@ -12,6 +12,7 @@
 #include <limits>
 #include <random>
 #include <string>
+#include <vector>
 //
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>

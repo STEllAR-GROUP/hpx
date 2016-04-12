@@ -9,6 +9,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 struct decrement_server
   : hpx::components::managed_component_base<decrement_server>

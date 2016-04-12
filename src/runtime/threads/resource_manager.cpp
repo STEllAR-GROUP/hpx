@@ -12,6 +12,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <vector>
+
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////

@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <vector>
 
 unsigned long num_cores = 0;
 

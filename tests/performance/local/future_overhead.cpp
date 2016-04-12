@@ -14,6 +14,7 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
+#include <vector>
 
 #include <boost/format.hpp>
 #include <boost/bind.hpp>

@@ -19,6 +19,7 @@
 #endif
 #include <fstream>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INITIAL_TIMES_SIZE 64000

@@ -7,6 +7,7 @@
 #include <hpx/util/manage_config.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace util
 {

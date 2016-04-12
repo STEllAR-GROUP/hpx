@@ -24,8 +24,8 @@
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <algorithm>
 #include <cstdio>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 

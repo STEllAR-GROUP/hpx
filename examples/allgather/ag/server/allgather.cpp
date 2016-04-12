@@ -15,8 +15,9 @@
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server

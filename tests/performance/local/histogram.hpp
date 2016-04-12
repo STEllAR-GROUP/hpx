@@ -6,9 +6,9 @@
 #ifndef HISTOGRAM_HPP
 #define HISTOGRAM_HPP
 
-#include <vector>
-#include <limits>
 #include <functional>
+#include <limits>
+#include <vector>
 #include <boost/version.hpp>
 #include <boost/range.hpp>
 #include <boost/parameter/keyword.hpp>

@@ -14,6 +14,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <string>
+#include <vector>
 
 #include "nqueen.hpp"
 

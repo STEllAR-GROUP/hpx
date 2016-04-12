@@ -13,6 +13,7 @@
 #include <boost/lockfree/queue.hpp>
 
 #include <iostream>
+#include <vector>
 
 using boost::lockfree::queue;
 

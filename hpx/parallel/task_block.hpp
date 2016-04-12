@@ -28,6 +28,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <vector>
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
     namespace detail

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/barrier.hpp>

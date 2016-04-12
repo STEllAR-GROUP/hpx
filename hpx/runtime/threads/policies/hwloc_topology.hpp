@@ -23,7 +23,7 @@
 
 #include <boost/format.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <vector>
 
 #if defined(HPX_NATIVE_MIC) && HWLOC_API_VERSION < 0x00010600
 #error On Intel Xeon/Phi coprosessors HPX cannot be use with a HWLOC version earlier than V1.6.

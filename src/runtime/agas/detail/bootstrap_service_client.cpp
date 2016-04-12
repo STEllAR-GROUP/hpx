@@ -9,6 +9,7 @@
 #include <hpx/runtime/agas/detail/bootstrap_service_client.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace agas { namespace detail
 {

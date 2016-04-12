@@ -30,10 +30,11 @@
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
 
-#include <stdexcept>
-#include <typeinfo>
 #include <algorithm>
 #include <iosfwd>
+#include <stdexcept>
+#include <typeinfo>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if BOOST_WORKAROUND(HPX_MSVC, >= 1400)

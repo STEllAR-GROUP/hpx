@@ -25,6 +25,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include <boost/format.hpp>
 #include <boost/atomic.hpp>

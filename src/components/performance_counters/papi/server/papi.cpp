@@ -20,6 +20,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #include <boost/version.hpp>
 #include <boost/format.hpp>

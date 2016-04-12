@@ -28,6 +28,7 @@
 
 #include <list>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace agas
 {

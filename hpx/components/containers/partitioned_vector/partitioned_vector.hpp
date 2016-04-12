@@ -22,10 +22,11 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <memory>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 

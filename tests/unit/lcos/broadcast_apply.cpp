@@ -9,6 +9,8 @@
 #include <hpx/lcos/broadcast.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 void f1()
 {
 }

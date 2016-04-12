@@ -11,6 +11,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include <string>
+#include <vector>
 
 #include "../server/partition3d.hpp"
 

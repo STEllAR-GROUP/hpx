@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 int bulk_test(hpx::thread::id tid, int value, bool is_par)

@@ -12,6 +12,7 @@
 #include <boost/atomic.hpp>
 
 #include <string>
+#include <vector>
 
 #include "test_utils.hpp"
 

@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 char const* gather_basename = "/test/gather/";
 

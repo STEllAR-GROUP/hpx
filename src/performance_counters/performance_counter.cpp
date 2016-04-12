@@ -12,6 +12,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters

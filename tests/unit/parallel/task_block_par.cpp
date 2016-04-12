@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <vector>
 
 using hpx::parallel::define_task_block;
 using hpx::parallel::task_block;

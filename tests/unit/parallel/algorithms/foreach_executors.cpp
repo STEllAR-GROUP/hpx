@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 
 #include <string>
+#include <vector>
 
 #include "foreach_tests.hpp"
 

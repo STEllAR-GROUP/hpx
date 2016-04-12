@@ -13,6 +13,8 @@
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/lcos/async.hpp>
 
+#include <vector>
+
 namespace hpx { namespace agas {
     struct request;
     struct response;

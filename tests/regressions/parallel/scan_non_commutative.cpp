@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 void test_scan_non_commutative() {

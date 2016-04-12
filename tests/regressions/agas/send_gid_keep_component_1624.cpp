@@ -8,8 +8,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server

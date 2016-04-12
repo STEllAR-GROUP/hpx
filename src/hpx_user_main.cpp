@@ -7,6 +7,7 @@
 #include <hpx/exception.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx_startup::user_main, if necessary. This has to be in a

@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <boost/move/move.hpp>
 #include <boost/assign/std/vector.hpp>

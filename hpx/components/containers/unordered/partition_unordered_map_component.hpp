@@ -26,10 +26,10 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <iostream>
-#include <tuple>
-#include <vector>
 #include <string>
+#include <tuple>
 #include <unordered_map>
+#include <vector>
 
 namespace hpx { namespace server
 {

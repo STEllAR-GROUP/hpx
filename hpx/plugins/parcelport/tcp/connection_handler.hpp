@@ -24,6 +24,7 @@
 #include <boost/asio/ip/host_name.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace parcelset
 {

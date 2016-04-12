@@ -14,10 +14,11 @@
 
 #include <apex_api.hpp>
 
-#include <iostream>
-#include <random>
 #include <cmath>
+#include <iostream>
 #include <list>
+#include <random>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>

@@ -12,6 +12,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 struct A
 {
     A() : a(8) {}

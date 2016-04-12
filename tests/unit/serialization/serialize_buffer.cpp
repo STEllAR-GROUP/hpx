@@ -12,6 +12,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::serialization::serialize_buffer<char> buffer_plain_type;
 

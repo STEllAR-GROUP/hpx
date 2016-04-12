@@ -12,6 +12,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <string>
+#include <vector>
 
 namespace jacobi_smp {
 

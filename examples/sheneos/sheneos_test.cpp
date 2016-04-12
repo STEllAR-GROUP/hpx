@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <vector>
 
 #include "sheneos/interpolator.hpp"
 

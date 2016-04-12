@@ -21,6 +21,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace agas
 {

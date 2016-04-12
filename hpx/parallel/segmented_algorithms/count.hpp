@@ -19,9 +19,10 @@
 
 #include <algorithm>
 #include <iterator>
+#include <list>
 #include <numeric>
 #include <type_traits>
-#include <list>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {

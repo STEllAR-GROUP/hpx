@@ -17,9 +17,9 @@
 #include <boost/thread/locks.hpp>
 #include <boost/swap.hpp>
 
-#include <vector>
-#include <utility>
 #include <iosfwd>
+#include <utility>
+#include <vector>
 
 namespace hpx { namespace iostreams { namespace detail
 {

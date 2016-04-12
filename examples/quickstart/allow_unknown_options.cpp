@@ -11,6 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <string>
+#include <vector>
 
 int hpx_main(int argc, char* argv[])
 {

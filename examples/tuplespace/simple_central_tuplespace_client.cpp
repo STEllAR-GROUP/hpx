@@ -13,6 +13,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include <string>
+#include <vector>
 
 #include "central_tuplespace/simple_central_tuplespace.hpp"
 #include "small_big_object.hpp"

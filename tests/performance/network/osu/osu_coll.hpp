@@ -9,6 +9,7 @@
 #define ITERATIONS_LARGE 100
 
 #include <string>
+#include <vector>
 
 struct params
 {

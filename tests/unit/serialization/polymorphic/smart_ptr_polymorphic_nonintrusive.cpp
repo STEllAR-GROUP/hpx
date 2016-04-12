@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 // =========================shared_ptr test==============================
 struct A

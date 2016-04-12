@@ -25,6 +25,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

@@ -20,6 +20,7 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins

@@ -16,8 +16,8 @@
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include <papi.h>
 

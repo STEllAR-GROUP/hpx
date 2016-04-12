@@ -9,6 +9,8 @@
 #include <hpx/lcos/reduce.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 boost::uint32_t f1()
 {
     return hpx::get_locality_id();

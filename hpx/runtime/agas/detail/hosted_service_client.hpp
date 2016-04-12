@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace agas { namespace detail
 {

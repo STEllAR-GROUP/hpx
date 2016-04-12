@@ -15,8 +15,8 @@
 #include <boost/chrono.hpp>
 #include <boost/random.hpp>
 
-#include <vector>
 #include <ctime>
+#include <vector>
 
 int const writers = 3;
 int const readers = 3;

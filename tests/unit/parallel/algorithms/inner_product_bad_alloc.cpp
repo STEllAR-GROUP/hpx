@@ -8,11 +8,12 @@
 #include <hpx/include/parallel_inner_product.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "test_utils.hpp"
-
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <vector>
+
+#include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>

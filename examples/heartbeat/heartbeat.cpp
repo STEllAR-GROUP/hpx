@@ -21,6 +21,7 @@
 #include <boost/cstdint.hpp>
 
 #include <string>
+#include <vector>
 
 // include Windows specific performance counter binding
 #if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0

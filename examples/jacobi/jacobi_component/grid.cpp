@@ -8,6 +8,8 @@
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <vector>
+
 #include "grid.hpp"
 #include "row.hpp"
 

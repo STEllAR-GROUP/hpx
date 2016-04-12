@@ -16,6 +16,7 @@
 #  include <unistd.h>
 #  include <sys/stat.h>
 #  include <linux/limits.h>
+#  include <vector>
 #elif __APPLE__
 #  include <mach-o/dyld.h>
 #elif defined(__FreeBSD__)

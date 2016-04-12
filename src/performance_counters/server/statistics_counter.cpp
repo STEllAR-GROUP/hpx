@@ -42,6 +42,7 @@
 #include <boost/spirit/include/qi_parse.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server

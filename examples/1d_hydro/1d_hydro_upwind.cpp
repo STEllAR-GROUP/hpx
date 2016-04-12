@@ -22,6 +22,8 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <vector>
+
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 

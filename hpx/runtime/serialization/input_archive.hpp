@@ -21,6 +21,7 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <memory>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

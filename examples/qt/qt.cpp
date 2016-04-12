@@ -8,6 +8,8 @@
 #include <hpx/include/thread_executors.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
+#include <vector>
+
 using hpx::util::high_resolution_timer;
 
 #include <QtGui/QApplication>

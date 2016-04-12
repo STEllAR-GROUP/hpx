@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <string>
+#include <vector>
 
 #include "../dimension.hpp"
 

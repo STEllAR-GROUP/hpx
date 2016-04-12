@@ -8,6 +8,8 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define ZEROCOPY_DATASIZE   1024*1024
 

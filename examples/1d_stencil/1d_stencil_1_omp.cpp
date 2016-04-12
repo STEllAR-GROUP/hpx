@@ -18,8 +18,8 @@
 #include <boost/program_options.hpp>
 #include <boost/chrono.hpp>
 
-#include <vector>
 #include <cstdlib>
+#include <vector>
 
 #include <omp.h>
 

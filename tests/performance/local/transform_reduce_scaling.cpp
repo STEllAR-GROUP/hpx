@@ -12,6 +12,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>

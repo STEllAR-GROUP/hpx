@@ -7,6 +7,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <vector>
+
 #define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                              \
     void BOOST_PP_CAT(NAME, _)(TYPE const & value)                              \
     {                                                                           \

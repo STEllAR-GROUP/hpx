@@ -12,6 +12,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>

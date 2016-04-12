@@ -8,6 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <stdlib.h>
 
 typedef boost::atomic<int> int_atomic;

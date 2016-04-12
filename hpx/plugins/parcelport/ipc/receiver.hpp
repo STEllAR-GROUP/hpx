@@ -27,6 +27,7 @@
 #include <boost/asio/placeholders.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {

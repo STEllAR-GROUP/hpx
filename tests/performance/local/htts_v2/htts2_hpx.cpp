@@ -16,6 +16,7 @@
 #include <boost/assign/std/vector.hpp>
 
 #include <string>
+#include <vector>
 
 template <typename BaseClock = boost::chrono::steady_clock>
 struct hpx_driver : htts2::driver

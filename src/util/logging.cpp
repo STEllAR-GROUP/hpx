@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #include <android/log.h>

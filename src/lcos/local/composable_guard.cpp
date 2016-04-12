@@ -8,6 +8,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <vector>
+
 namespace hpx { namespace lcos { namespace local {
 
 void run_composable(guard_task *task);

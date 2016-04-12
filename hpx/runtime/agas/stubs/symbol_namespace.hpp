@@ -16,6 +16,7 @@
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace agas { namespace stubs
 {
