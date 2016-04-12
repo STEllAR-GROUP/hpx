@@ -15,33 +15,22 @@
 #include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
-namespace
-{
-  boost::regex include_regex(
-    "^\\s*#\\s*include\\s*<([^\n>]*)>\\s*$"     // # include <foobar>
-    "|"
-    "^\\s*#\\s*include\\s*\"([^\n\"]*)\"\\s*$"  // # include "foobar"
-    , boost::regex::normal);
-
-  struct names_includes
-  {
-    char const* name_regex;
-    char const* name;
-    char const* include;
-  };
-
-  names_includes names[] =
-  {
-    { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
-    { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
-    { 0, 0, 0 }
-  };
-} // unnamed namespace
-
 namespace boost
 {
   namespace inspect
   {
+    boost::regex include_regex(
+      "^\\s*#\\s*include\\s*<([^\n>]*)>\\s*$"     // # include <foobar>
+      "|"
+      "^\\s*#\\s*include\\s*\"([^\n\"]*)\"\\s*$"  // # include "foobar"
+      , boost::regex::normal);
+
+    names_includes const names[] =
+    {
+      { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
+      { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
+      { 0, 0, 0 }
+    };
 
     //  include_check constructor  -------------------------------------------//
 
@@ -57,6 +46,23 @@ namespace boost
       register_signature( ".hxx" );
       register_signature( ".inc" );
       register_signature( ".ipp" );
+
+      for (names_includes const* names_it = &names[0];
+           names_it->name_regex != 0;
+           ++names_it)
+      {
+        std::string rx(names_it->name_regex);
+        rx +=
+          "|"                   // or (ignored)
+          "("
+          "//[^\\n]*"           // single line comments (//)
+          "|"
+          "/\\*.*?\\*/"         // multi line comments (/**/)
+          "|"
+          "\"(?:\\\\\\\\|\\\\\"|[^\"])*\"" // string literals
+          ")";
+        regex_data.push_back(names_regex_data(names_it, rx));
+      }
     }
 
     //  inspect ( C++ source files )  ---------------------------------------//
@@ -84,22 +90,20 @@ namespace boost
 
       // for all given names, check whether corresponding include was found
       std::set<std::string> checked_includes;
-      for (names_includes* names_it = &names[0]; names_it->name_regex != 0;
-           ++names_it)
+      for (names_regex_data const& d : regex_data)
       {
         // avoid checking the same include twice
-        auto checked_includes_it = checked_includes.find(names_it->include);
+        auto checked_includes_it = checked_includes.find(d.data->include);
         if (checked_includes_it != checked_includes.end())
            continue;
 
-        boost::regex name_regex(names_it->name_regex);
-        boost::sregex_iterator cur(contents.begin(), contents.end(), name_regex), end;
+        boost::sregex_iterator cur(contents.begin(), contents.end(), d.pattern), end;
         for(/**/; cur != end; ++cur)
         {
           auto m = *cur;
           if (m[1].matched)
           {
-            auto include_it = includes.find(names_it->include);
+            auto include_it = includes.find(d.data->include);
             if (include_it == includes.end())
             {
               // include is missing
@@ -120,12 +124,12 @@ namespace boost
               ++m_errors;
               error(library_name, full_path, string(name())
                   + " missing #include ("
-                  + std::string(names_it->include)
+                  + std::string(d.data->include)
                   + ") for symbol "
-                  + std::string(names_it->name) + " on line "
+                  + std::string(d.data->name) + " on line "
                   + linelink(full_path, boost::lexical_cast<string>(line_number)));
             }
-            checked_includes.insert(names_it->include);
+            checked_includes.insert(d.data->include);
 
             // avoid errors to be reported twice
             break;
