@@ -94,6 +94,10 @@ to a different compute node).
   TS (__cpp11_n4104__) while it was being added to the upcomming C++17 Standard.
   This facility can be still enabled at configure time by specifying
   `-DHPX_WITH_GENERIC_EXECUTION_POLICY=On` to __cmake__.
+* Facilities that used to expect an explicit `boost::unique_lock` now take an
+  `std::unique_lock`. Additionally, `condition_variable` no longer aliases
+  `condition_variable_any`; its interface now only works with
+  `std::unique_lock<local::mutex>`.
 
 [heading Bug Fixes (Closed Tickets)]
 
