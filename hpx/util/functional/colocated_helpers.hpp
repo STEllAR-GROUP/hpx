@@ -7,7 +7,7 @@
 #define HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -51,7 +51,7 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct apply_continuation_impl
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(apply_continuation_impl)
+            HPX_MOVABLE_ONLY(apply_continuation_impl);
         public:
             typedef typename util::decay<Bound>::type bound_type;
 
@@ -160,7 +160,7 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct async_continuation_impl
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(async_continuation_impl)
+            HPX_MOVABLE_ONLY(async_continuation_impl);
         public:
             typedef typename util::decay<Bound>::type bound_type;
 

@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
 
 class child
 {
-    HPX_MOVABLE_BUT_NOT_COPYABLE(child);
+    HPX_MOVABLE_ONLY(child);
 
 public:
     PROCESS_INFORMATION proc_info;

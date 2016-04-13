@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/io_service.hpp>

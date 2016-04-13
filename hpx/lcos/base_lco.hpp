@@ -8,15 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/ini.hpp>
-
-#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
-
-#include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -123,13 +118,5 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::connect_action, base_connect_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::disconnect_action, base_disconnect_action)
-
-///////////////////////////////////////////////////////////////////////////////
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(
-    hpx::lcos::base_lco::set_event_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(
-    hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
 
 #endif

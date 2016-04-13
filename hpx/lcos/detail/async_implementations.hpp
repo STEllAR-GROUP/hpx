@@ -7,6 +7,7 @@
 #define HPX_LCOS_ASYNC_IMPLEMENTATIONS_APR_13_2015_0829AM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>

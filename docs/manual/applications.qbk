@@ -123,7 +123,7 @@ only (this function will be invoked as the first __hpx__ thread of your applicat
 All __hpx__ API functions can be used from within this function.
 
 The thread executing the function [funcref hpx::start `hpx::start`] will *not* block
-waiting for the runtime system to exit, but will return immediatlely.
+waiting for the runtime system to exit, but will return immediately.
 
 [important You cannot use any of the __hpx__ API functions other that
            [funcref hpx::stop `hpx::stop`] from inside your `main()` function.]

@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_TIMED_EXECUTOR_TRAITS_AUG_04_2015_0525PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/lcos/future.hpp>

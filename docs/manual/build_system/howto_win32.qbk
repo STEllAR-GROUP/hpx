@@ -61,7 +61,7 @@
           the default `C:\Program Files\hpx`. I prefer simpler paths *without*
           white space, like `C:\bin\hpx` or `D:\bin\hpx` etc.]
 
-  To insert new env-vars klick on "Add Entrz" and then insert the name
+  To insert new env-vars click on "Add Entry" and then insert the name
   inside "Name", select `PATH` as Type and put the path-name in "Path"
   text field. Repeat this for the first three variables.
 

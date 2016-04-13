@@ -7,6 +7,8 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/traits/get_remote_result.hpp>
@@ -174,7 +176,7 @@ namespace detail
     template <typename F1, typename F2>
     class compose_cb_impl
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl)
+        HPX_MOVABLE_ONLY(compose_cb_impl);
 
     public:
         template <typename A1, typename A2>
@@ -496,7 +498,7 @@ namespace detail
                 set_value(std::move(get_remote_result_type::call(
                         std::forward<T>(result))));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // store the error instead
                 return set_exception(boost::current_exception());
             }
@@ -508,7 +510,7 @@ namespace detail
             try {
                 HPX_THROW_EXCEPTION(e, f, msg);
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // store the error code
                 set_exception(boost::current_exception());
             }
@@ -577,10 +579,8 @@ namespace detail
 
             // block if this entry is empty
             if (state_ == empty) {
-                cond_.wait(l, "future_data::wait", ec);
+                cond_.wait(std::move(l), "future_data::wait", ec);
                 if (ec) return;
-
-                HPX_ASSERT(state_ != empty);
             }
 
             if (&ec != &throws)
@@ -596,13 +596,13 @@ namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_state_ex_enum const reason =
-                    cond_.wait_until(l, abs_time, "future_data::wait_until", ec);
+                    cond_.wait_until(std::move(l), abs_time,
+                        "future_data::wait_until", ec);
                 if (ec) return future_status::uninitialized;
 
                 if (reason == threads::wait_timeout)
                     return future_status::timeout;
 
-                HPX_ASSERT(state_ != empty);
                 return future_status::ready;
             }
 
@@ -884,7 +884,7 @@ namespace detail
             boost::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
-                    boost::throw_exception(hpx::thread_interrupted());
+                    HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
                 if (this->is_ready_locked())
                     return;   // nothing we can do
@@ -906,7 +906,7 @@ namespace detail
                         "future can't be canceled at this time");
                 }
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 this->started_ = true;
                 this->set_exception(boost::current_exception());
                 throw;

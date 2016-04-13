@@ -44,7 +44,7 @@ using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper functions
-inline boost::uint64_t get_credit(id_type const& id)
+inline boost::int64_t get_credit(id_type const& id)
 {
     return hpx::naming::detail::get_credit_from_gid(id.get_gid());
 }
@@ -65,12 +65,13 @@ void hpx_test_main(
   , hpx::id_type const& locality
     )
 {
-    boost::uint64_t const hpx_globalcredit_initial = HPX_GLOBALCREDIT_INITIAL;
+    boost::int64_t const hpx_globalcredit_initial =
+        static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL);
 
     // HPX_GLOBALCREDIT_INITIAL should be a power of 2
-    boost::uint16_t log2_initial_credit =
+    boost::int16_t log2_initial_credit =
         hpx::naming::detail::log2(hpx_globalcredit_initial);
-    boost::uint64_t restored_initial_credits =
+    boost::int64_t restored_initial_credits =
         hpx::naming::detail::power2(log2_initial_credit);
     HPX_TEST_EQ(restored_initial_credits, hpx_globalcredit_initial);
 

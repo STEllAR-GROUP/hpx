@@ -9,6 +9,8 @@
 #ifndef HPX_PARTITIONED_VECTOR_HPP
 #define HPX_PARTITIONED_VECTOR_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>

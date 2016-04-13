@@ -9,6 +9,7 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
@@ -16,7 +17,7 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <boost/exception_ptr.hpp>
 

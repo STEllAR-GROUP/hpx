@@ -63,7 +63,8 @@ namespace hpx { namespace components { namespace server
     {
         naming::gid_type gid(hpx::applier::get_applier().get_raw_locality());
         gid.set_lsb(new boost::uint8_t[size]);
-        naming::detail::set_credit_for_gid(gid, HPX_GLOBALCREDIT_INITIAL);
+        naming::detail::set_credit_for_gid(gid,
+            boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
         return gid;
     }
 }}}

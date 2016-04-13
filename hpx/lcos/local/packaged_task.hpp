@@ -7,6 +7,7 @@
 #define HPX_LCOS_LOCAL_PACKAGED_TASK_MAR_01_2012_0121PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
@@ -273,7 +274,7 @@ namespace hpx { namespace lcos { namespace local
         typedef lcos::detail::task_base<Result> task_impl_type;
 
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(futures_factory)
+        HPX_MOVABLE_ONLY(futures_factory);
 
     public:
         // support for result_of
@@ -396,7 +397,7 @@ namespace hpx { namespace lcos { namespace local
         class packaged_task_base
         {
         private:
-            HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task_base)
+            HPX_MOVABLE_ONLY(packaged_task_base);
 
         public:
             // construction and destruction
@@ -520,7 +521,7 @@ namespace hpx { namespace lcos { namespace local
     class packaged_task<R(Ts...)>
       : private detail::packaged_task_base<R, R(Ts...)>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
+        HPX_MOVABLE_ONLY(packaged_task);
 
         typedef detail::packaged_task_base<R, R(Ts...)> base_type;
 

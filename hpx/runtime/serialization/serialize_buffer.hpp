@@ -8,8 +8,8 @@
 #define HPX_SERIALIZATION_SERIALIZE_BUFFER_APR_05_2013_0312PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
-
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 

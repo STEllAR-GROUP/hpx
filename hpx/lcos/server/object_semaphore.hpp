@@ -7,8 +7,8 @@
 #if !defined(HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E)
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -182,7 +182,7 @@ struct object_semaphore
                     "aborting pending thread");
             }
 
-            catch (hpx::exception const& /*e*/)
+            catch (...)
             {
                 applier::trigger_error(id, boost::current_exception());
             }

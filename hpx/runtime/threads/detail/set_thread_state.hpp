@@ -7,8 +7,9 @@
 #define HPX_RUNTIME_THREADS_DETAIL_SET_THREAD_STATE_JAN_13_2013_0518PM
 
 #include <hpx/config/asio.hpp>
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>

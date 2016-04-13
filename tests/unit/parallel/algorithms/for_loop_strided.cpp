@@ -34,7 +34,7 @@ void test_for_loop_strided(ExPolicy && policy, IteratorTag)
                 v = 43;
         });
 
-    int stride = std::rand() % c.size();
+    int stride = (std::rand() % (c.size() - 1)) + 1;
 
     hpx::parallel::for_loop_strided(
         std::forward<ExPolicy>(policy),
@@ -77,7 +77,7 @@ void test_for_loop_strided_async(ExPolicy && p, IteratorTag)
                 v = 43;
         });
 
-    int stride = std::rand() % c.size();
+    int stride = (std::rand() % (c.size() - 1)) + 1;
 
     auto f =
         hpx::parallel::for_loop_strided(
@@ -144,7 +144,7 @@ void test_for_loop_strided_idx(ExPolicy && policy)
                 v = 43;
         });
 
-    int stride = std::rand() % c.size();
+    int stride = (std::rand() % (c.size() - 1)) + 1;
 
     hpx::parallel::for_loop_strided(
         std::forward<ExPolicy>(policy),
@@ -186,7 +186,7 @@ void test_for_loop_strided_idx_async(ExPolicy && p)
                 v = 43;
         });
 
-    int stride = std::rand() % c.size();
+    int stride = (std::rand() % (c.size() - 1)) + 1;
 
     auto f =
         hpx::parallel::for_loop_strided(

@@ -9,7 +9,6 @@
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
@@ -487,7 +486,7 @@ namespace hpx { namespace naming
         inline boost::int64_t power2(boost::int16_t log2credits)
         {
             HPX_ASSERT(log2credits >= 0);
-            return 1ull << log2credits;
+            return static_cast<boost::int64_t>(1) << log2credits;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -660,7 +659,7 @@ namespace hpx { namespace naming
             boost::int64_t debit);
 
         HPX_EXPORT boost::int64_t fill_credit_for_gid(gid_type& id,
-            boost::int64_t credits = HPX_GLOBALCREDIT_INITIAL);
+            boost::int64_t credits = boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type move_gid(gid_type& id);
@@ -711,7 +710,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(id_type_impl)
+            HPX_MOVABLE_ONLY(id_type_impl);
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t);

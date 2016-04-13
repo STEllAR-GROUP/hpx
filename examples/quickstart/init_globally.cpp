@@ -137,7 +137,7 @@ protected:
 
         // Now, wait for destructor to be called.
         {
-            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
+            boost::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
             if (rts_ != 0)
                 cond_.wait(lk);
         }
@@ -148,7 +148,7 @@ protected:
 
 private:
     hpx::lcos::local::spinlock mtx_;
-    hpx::lcos::local::condition_variable cond_;
+    hpx::lcos::local::condition_variable_any cond_;
 
     std::mutex startup_mtx_;
     std::condition_variable startup_cond_;

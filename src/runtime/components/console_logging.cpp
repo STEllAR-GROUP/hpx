@@ -16,8 +16,8 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
-#include <boost/fusion/include/at_c.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ namespace hpx { namespace components
     void fallback_console_logging_locked(messages_type const& msgs,
         std::string fail_msg = "")
     {
-        using boost::fusion::at_c;
+        using hpx::util::get;
 
         if (!fail_msg.empty())
             fail_msg = "Logging failed due to: " + fail_msg + "\n";
@@ -34,30 +34,30 @@ namespace hpx { namespace components
         for (std::size_t i = 0; i != msgs.size(); ++i)
         {
             message_type const& msg = msgs[i];
-            switch (at_c<0>(msg)) {
+            switch (get<0>(msg)) {
             default:
             case destination_hpx:
-                LHPX_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
+                LHPX_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
             case destination_timing:
-                LTIM_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
+                LTIM_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
             case destination_agas:
-                LAGAS_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
+                LAGAS_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
             case destination_parcel:
-                LPT_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
+                LPT_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
             case destination_app:
-                LAPP_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
+                LAPP_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
             case destination_debuglog:
-                LDEB_CONSOLE_ << fail_msg << at_c<2>(msg);
+                LDEB_CONSOLE_ << fail_msg << get<2>(msg);
                 break;
             }
         }

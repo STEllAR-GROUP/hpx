@@ -50,7 +50,7 @@ The ParalleX model has been devised to address these challenges by enabling a
 new computing dynamic through the application of message-driven computation in
 a global address space context with lightweight synchronization. The work on
 __hpx__ is centered around implementing the concepts as defined by the ParalleX
-model. __hpx__ is currently targetted at conventional machines, such as classical Linux based
+model. __hpx__ is currently targeted at conventional machines, such as classical Linux based
 Beowulf clusters and SMP nodes.
 
 We fully understand that the success of __hpx__ (and ParalleX) is very much the
@@ -133,12 +133,12 @@ the project through discussions, pull requests, documentation patches, etc.
   __hpx__, implemented the parallel sort algorithm, and made several other
   contributions.
 * Erik Schnetter (Perimeter Institute for Theoretical Physics), who greatly
-  helped to make __hpx__ more robust by sumbitting a large amount of problem
+  helped to make __hpx__ more robust by submitting a large amount of problem
   reports, feature requests, and made several direct contributions.
 * Mathias Gaunard (Metascale), who contributed several patches to reduce
   compile time warnings generated while compiling __hpx__.
 * Andreas Buhr, who helped fixing some documentation inconsistencies.
-* Patricia Grubel (__nmsu__), who contributed the desciption
+* Patricia Grubel (__nmsu__), who contributed the description
   of the different __hpx__ thread scheduler policies and is working on the
   performance analysis of our thread scheduling subsystem.
 * Lars Viklund, who contributed platform specific patches for FreeBSD and MSVC12.
@@ -161,7 +161,7 @@ the project through discussions, pull requests, documentation patches, etc.
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and
 support our work. We would also like to thank the following organizations for
-granting us allocations of thier compute resources:
+granting us allocations of their compute resources:
 LSU HPC, LONI, XSEDE and the Gauss Center for Supercomputing.
 
 __hpx__ is currently funded by the following grants:

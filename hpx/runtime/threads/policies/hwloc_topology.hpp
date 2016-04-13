@@ -10,14 +10,13 @@
 #if !defined(HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036)
 #define HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036
 
-#include <hpx/config/defines.hpp>
-#if defined(HPX_HAVE_HWLOC)
+#include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
 
-#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/exception.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>

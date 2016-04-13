@@ -31,7 +31,7 @@ the build process. The build process consists of the following parts:
   * hpx_init: The __hpx__ initialization library that applications need to link
     against to define the __hpx__ entry points (disabled for static builds).
   * iostreams_component: The component used for (distributed) IO (always enabled).
-  * component_storage_component: The component needed for migration to persistant storage.
+  * component_storage_component: The component needed for migration to persistent storage.
   * unordered_component: The component needed for a distributed (partitioned) hash table.
   * partioned_vector_component: The component needed for a distributed (partitioned) vector.
   * memory_component: A dynamically loaded plugin that exposed memory based performance counters (only available on Linux).

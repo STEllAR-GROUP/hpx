@@ -10,6 +10,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>

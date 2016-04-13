@@ -8,7 +8,7 @@
 #if !defined(HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770)
 #define HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770
 
-#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 

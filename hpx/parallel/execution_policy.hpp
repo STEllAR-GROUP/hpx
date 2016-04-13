@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>

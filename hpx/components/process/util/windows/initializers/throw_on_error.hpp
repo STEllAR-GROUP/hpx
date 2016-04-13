@@ -14,6 +14,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
+#include <hpx/throw_exception.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 
 namespace hpx { namespace components { namespace process { namespace windows {

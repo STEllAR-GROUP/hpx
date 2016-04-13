@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/applier_fwd.hpp>

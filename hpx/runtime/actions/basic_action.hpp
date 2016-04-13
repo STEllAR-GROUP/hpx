@@ -11,6 +11,7 @@
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM
 
 #include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
@@ -43,6 +44,7 @@
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/atomic.hpp>
 
+#include <exception>
 #include <sstream>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -61,7 +63,7 @@ namespace hpx { namespace actions
         template <typename Action, typename F, typename ...Ts>
         struct continuation_thread_function
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function)
+            HPX_MOVABLE_ONLY(continuation_thread_function);
 
         public:
             explicit continuation_thread_function(
@@ -197,7 +199,7 @@ namespace hpx { namespace actions
                 catch (hpx::thread_interrupted const&) { //-V565
                     /* swallow this exception */
                 }
-                catch (hpx::exception const& e) {
+                catch (std::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing "
                         << Derived::get_action_name(lva) << ": " << e.what();

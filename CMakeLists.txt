@@ -529,7 +529,7 @@ hpx_option(HPX_WITH_VERIFY_LOCKS_GLOBALLY BOOL
   OFF
   CATEGORY "Debugging" ADVANCED)
 hpx_option(HPX_WITH_VERIFY_LOCKS_BACKTRACE BOOL
-  "Enable thred stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
+  "Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
   OFF
   CATEGORY "Debugging" ADVANCED)
 hpx_option(HPX_WITH_THREAD_DEBUG_INFO BOOL
@@ -782,7 +782,7 @@ hpx_check_for_cxx11_defaulted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
 
 hpx_check_for_cxx11_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+  REQUIRED "HPX needs support for C++11 deleted functions")
 
 hpx_check_for_cxx11_explicit_cvt_ops(
   DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
@@ -1229,7 +1229,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v0.1
+    v0.5-rc0
     VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")

@@ -14,7 +14,8 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
-#include <hpx/exception.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <signal.h>
 
@@ -31,7 +32,7 @@ void terminate(const Process &p)
 }
 
 template <class Process>
-void terminate(const Process &p, boost::system::error_code &ec)
+void terminate(const Process &p, hpx::error_code &ec)
 {
     if (::kill(p.pid, SIGKILL) == -1)
     {

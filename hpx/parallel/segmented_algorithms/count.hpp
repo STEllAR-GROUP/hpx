@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 #include <type_traits>
 #include <list>
 

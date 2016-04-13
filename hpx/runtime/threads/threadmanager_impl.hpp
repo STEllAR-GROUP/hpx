@@ -9,8 +9,7 @@
 #define HPX_THREADMANAGER_IMPL_HPP
 
 #include <hpx/config.hpp>
-
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/naming/name.hpp>

@@ -15,8 +15,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/logging.hpp>
-
-#include <boost/fusion/include/vector.hpp>
+#include <hpx/util/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -71,7 +70,7 @@ namespace hpx { namespace components { namespace server
                 // call the function, ignoring the return value
                 console_logging(std::forward<T>(v));
             }
-            catch (hpx::exception const& /*e*/) {
+            catch (...) {
                 /**/;      // no logging!
             }
             return util::unused;

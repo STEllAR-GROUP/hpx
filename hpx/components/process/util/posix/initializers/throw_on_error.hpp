@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <unistd.h>

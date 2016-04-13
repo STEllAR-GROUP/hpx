@@ -14,14 +14,14 @@
 struct wait_for_flag
 {
     hpx::lcos::local::spinlock mutex;
-    hpx::lcos::local::condition_variable cond_var;
+    hpx::lcos::local::condition_variable_any cond_var;
 
     wait_for_flag()
       : flag(false), woken(0)
     {}
 
     void wait(hpx::lcos::local::spinlock& local_mutex,
-        hpx::lcos::local::condition_variable& local_cond_var, bool& running)
+        hpx::lcos::local::condition_variable_any& local_cond_var, bool& running)
     {
         bool first = true;
         while (!flag)
@@ -54,7 +54,7 @@ void test_condition_with_mutex()
 
     bool running = false;
     hpx::lcos::local::spinlock local_mutex;
-    hpx::lcos::local::condition_variable local_cond_var;
+    hpx::lcos::local::condition_variable_any local_cond_var;
 
     hpx::thread thread(&wait_for_flag::wait, boost::ref(data),
         boost::ref(local_mutex), boost::ref(local_cond_var), boost::ref(running));

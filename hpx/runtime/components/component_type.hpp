@@ -8,7 +8,6 @@
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -17,6 +16,8 @@
 #endif
 
 #include <boost/cstdint.hpp>
+
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

@@ -10,13 +10,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/async.hpp>
 

@@ -6,13 +6,16 @@
 #if !defined(HPX_LCOS_LOCAL_TRIGGER_SEP_09_2012_1229PM)
 #define HPX_LCOS_LOCAL_TRIGGER_SEP_09_2012_1229PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/thread/locks.hpp>
 
@@ -28,7 +31,7 @@ namespace hpx { namespace lcos { namespace local
         typedef Mutex mutex_type;
 
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(base_trigger)
+        HPX_MOVABLE_ONLY(base_trigger);
         typedef std::list<conditional_trigger*> condition_list_type;
 
     public:
@@ -217,7 +220,7 @@ namespace hpx { namespace lcos { namespace local
     struct trigger : public base_trigger<no_mutex>
     {
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(trigger)
+        HPX_MOVABLE_ONLY(trigger);
         typedef base_trigger<no_mutex> base_type;
 
     public:

@@ -11,7 +11,9 @@
 #define HPX_ERROR_SEP_08_2013_1109AM
 
 #include <hpx/config.hpp>
-#include <hpx/config/export_definitions.hpp>
+
+#include <boost/system/error_code.hpp>
+
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,15 +213,25 @@ namespace hpx
         /*    */ ""
     };
     /// \endcond
-
-    /// \cond NOINTERNAL
-
-    /// \brief throw an hpx::exception initialized from the given arguments
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
-    void throw_exception(error e, std::string const& msg,
-        std::string const& func, std::string const& file = "", long line = -1);
-    /// \endcond
 }
 
-#endif
+/// \cond NOEXTERNAL
+namespace boost
+{
+    namespace system
+    {
+        // make sure our errors get recognized by the Boost.System library
+        template<> struct is_error_code_enum<hpx::error>
+        {
+            static const bool value = true;
+        };
 
+        template<> struct is_error_condition_enum<hpx::error>
+        {
+            static const bool value = true;
+        };
+    }
+}
+/// \endcond
+
+#endif

@@ -8,7 +8,6 @@
 #define HPX_UTIL_WRAPPER_HEAP_JUN_12_2008_0904AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>

@@ -14,7 +14,7 @@
 struct moveonly
 {
 private:
-    HPX_MOVABLE_BUT_NOT_COPYABLE(moveonly);
+    HPX_MOVABLE_ONLY(moveonly);
 
 public:
     moveonly() {}

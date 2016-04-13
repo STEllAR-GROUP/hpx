@@ -18,7 +18,7 @@
 # pragma once
 #endif
 
-#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 

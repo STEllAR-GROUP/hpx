@@ -177,7 +177,7 @@ data gathered to the specified file name, which avoids cluttering the console
 output of your application.
 
 The command line option `--hpx:print-counter` supports using a limited set of
-wildcards for a (very limited) set of use cases. In particular, all occurences
+wildcards for a (very limited) set of use cases. In particular, all occurrences
 of [teletype]`#*` as in `locality#*` and in `worker-thread#*`[c++] will be automatically expanded
 to the proper set of performance counter names representing the actual
 environment for the executed program. For instance, if your program is utilizing

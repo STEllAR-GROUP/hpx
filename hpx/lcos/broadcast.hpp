@@ -135,6 +135,7 @@ namespace hpx { namespace lcos
 #define HPX_LCOS_BROADCAST_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>

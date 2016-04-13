@@ -8,6 +8,7 @@
 #define HPX_LCOS_PROMISE_FEB_03_2009_0841AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -464,7 +465,7 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class promise
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise);
 
     public:
         typedef detail::promise<Result, RemoteResult> wrapped_type;
@@ -620,7 +621,7 @@ namespace hpx { namespace lcos
     template <>
     class promise<void, util::unused_type>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise);
 
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;

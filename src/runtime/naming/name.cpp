@@ -268,7 +268,8 @@ namespace hpx { namespace naming
             HPX_ASSERT(gid_was_split(gid));
 
             // Fill the new gid with our new credit and mark it as being split
-            naming::detail::set_credit_for_gid(new_gid, HPX_GLOBALCREDIT_INITIAL);
+            naming::detail::set_credit_for_gid(new_gid,
+                static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL));
             set_credit_split_mask_for_gid(new_gid);
 
             // Another concurrent split operation might have happened
@@ -281,9 +282,11 @@ namespace hpx { namespace naming
             boost::int64_t src_credit = get_credit_from_gid(gid);
             HPX_ASSERT(src_credit >= 2);
 
-            boost::int64_t split_credit = HPX_GLOBALCREDIT_INITIAL - 2;
+            boost::int64_t split_credit =
+                static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL) - 2;
             boost::int64_t new_credit = src_credit + split_credit;
-            boost::int64_t overflow_credit = new_credit - HPX_GLOBALCREDIT_INITIAL;
+            boost::int64_t overflow_credit = new_credit -
+                static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL);
 
             new_credit
                 = (std::min)(
@@ -342,7 +345,8 @@ namespace hpx { namespace naming
 
                     // We add HPX_GLOBALCREDIT_INITIAL credits for the new gid
                     // and HPX_GLOBALCREDIT_INITIAL - 2 for the old one.
-                    boost::int64_t new_credit = (HPX_GLOBALCREDIT_INITIAL - 1) * 2;
+                    boost::int64_t new_credit = 2 *
+                        (static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL) - 1);
 
                     naming::gid_type new_gid = gid;     // strips lock-bit
                     HPX_ASSERT(new_gid != invalid_gid);

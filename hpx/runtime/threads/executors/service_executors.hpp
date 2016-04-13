@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_SERVICE_EXECUTOR_JAN_13_2013_0222PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_description.hpp>

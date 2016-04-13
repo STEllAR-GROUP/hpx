@@ -7,8 +7,7 @@
 #if !defined(HPX_COMPONENTS_MEMORY_BLOCK_OCT_22_2008_0416PM)
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_22_2008_0416PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/util/unwrapped.hpp>

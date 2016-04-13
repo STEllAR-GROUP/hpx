@@ -121,27 +121,28 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/traits/future_access.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_any.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/lcos/when_any.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/is_sequence.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/utility/swap.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,7 +216,7 @@ namespace hpx { namespace lcos
 
             template <typename Future>
             void operator()(Future& future,
-                typename boost::enable_if_c<
+                typename std::enable_if<
                     traits::is_future<Future>::value
                 >::type* = 0) const
             {
@@ -241,7 +242,7 @@ namespace hpx { namespace lcos
                         if (!shared_state->is_ready())
                         {
                             shared_state->set_on_completed(
-                                util::bind(
+                                util::deferred_call(
                                     &when_any<Sequence>::on_future_ready,
                                     when_.shared_from_this(),
                                     idx_, threads::get_self_id()));
@@ -261,29 +262,34 @@ namespace hpx { namespace lcos
             template <typename Sequence_>
             HPX_FORCEINLINE
             void operator()(Sequence_& sequence,
-                typename boost::enable_if_c<
+                typename std::enable_if<
                     traits::is_future_range<Sequence_>::value
                 >::type* = 0) const
             {
                 apply(sequence);
             }
 
-            template <typename Sequence_>
+            template <typename Tuple, std::size_t ...Is>
             HPX_FORCEINLINE
-            void apply(Sequence_& sequence,
-                typename boost::enable_if_c<
-                    boost::fusion::traits::is_sequence<Sequence_>::value
-                >::type* = 0) const
+            void apply(Tuple& tuple, util::detail::pack_c<std::size_t, Is...>) const
             {
-                boost::fusion::for_each(sequence, *this);
+                int const _sequencer[]= {
+                    (((*this)(util::get<Is>(tuple))), 0)...
+                };
+                (void)_sequencer;
+            }
+
+            template <typename ...Ts>
+            HPX_FORCEINLINE
+            void apply(util::tuple<Ts...>& sequence) const
+            {
+                apply(sequence,
+                    typename util::detail::make_index_pack<sizeof...(Ts)>::type());
             }
 
             template <typename Sequence_>
             HPX_FORCEINLINE
-            void apply(Sequence_& sequence,
-                typename boost::disable_if_c<
-                    boost::fusion::traits::is_sequence<Sequence_>::value
-                >::type* = 0) const
+            void apply(Sequence_& sequence) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
@@ -364,8 +370,8 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range>
-    typename boost::enable_if<traits::is_future_range<Range>,
-        lcos::future<when_any_result<typename util::decay<Range>::type> > >::type
+    typename std::enable_if<traits::is_future_range<Range>::value,
+        lcos::future<when_any_result<typename std::decay<Range>::type> > >::type
     when_any(Range& lazy_values)
     {
         typedef Range result_type;
@@ -376,15 +382,15 @@ namespace hpx { namespace lcos
                 std::move(lazy_values_));
 
         lcos::local::futures_factory<when_any_result<result_type>()> p(
-            util::bind(&detail::when_any<result_type>::operator(), f));
+            util::deferred_call(&detail::when_any<result_type>::operator(), f));
 
         p.apply();
         return p.get_future();
     }
 
     template <typename Range>
-    typename boost::enable_if<traits::is_future_range<Range>,
-        lcos::future<when_any_result<typename util::decay<Range>::type> > >::type
+    typename std::enable_if<traits::is_future_range<Range>::value,
+        lcos::future<when_any_result<typename std::decay<Range>::type> > >::type
     when_any(Range&& lazy_values)
     {
         return lcos::when_any(lazy_values);
@@ -409,10 +415,10 @@ namespace hpx { namespace lcos
         return lcos::when_any(lazy_values_);
     }
 
-    inline lcos::future<when_any_result<hpx::util::tuple<> > > //-V524
+    inline lcos::future<when_any_result<util::tuple<> > > //-V524
     when_any()
     {
-        typedef when_any_result<hpx::util::tuple<> > result_type;
+        typedef when_any_result<util::tuple<> > result_type;
 
         return lcos::make_ready_future(result_type());
     }
@@ -436,11 +442,11 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
     lcos::future<when_any_result<
-        hpx::util::tuple<typename traits::acquire_future<Ts>::type...>
+        util::tuple<typename traits::acquire_future<Ts>::type...>
     > >
     when_any(Ts&&... ts)
     {
-        typedef hpx::util::tuple<
+        typedef util::tuple<
                 typename traits::acquire_future<Ts>::type...
             > result_type;
 
@@ -452,7 +458,7 @@ namespace hpx { namespace lcos
                 std::move(lazy_values));
 
         lcos::local::futures_factory<when_any_result<result_type>()> p(
-            util::bind(&detail::when_any<result_type>::operator(), f));
+            util::deferred_call(&detail::when_any<result_type>::operator(), f));
 
         p.apply();
         return p.get_future();

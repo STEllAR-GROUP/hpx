@@ -9,8 +9,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
@@ -33,6 +33,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -985,7 +986,8 @@ bool addressing_service::unbind_range_local(
     )
 { // {{{ unbind_range implementation
     try {
-        request req(primary_ns_unbind_gid, lower_id, count);
+        request req(primary_ns_unbind_gid,
+            naming::detail::get_stripped_gid(lower_id), count);
         response rep;
 
         // if this id is managed by another locality, forward the request
@@ -1808,7 +1810,7 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
     }
 
     naming::gid_type const e_lower = pending_incref.first;
-    request req(primary_ns_increment_credit, e_lower, pending_incref.second);
+    request req(primary_ns_increment_credit, e_lower, e_lower, pending_incref.second);
 
     naming::id_type target(
         stubs::primary_namespace::get_service_instance(e_lower)
@@ -1947,7 +1949,7 @@ lcos::future<bool> addressing_service::register_name_async(
         using util::placeholders::_1;
         return f.then(util::bind(
                 util::one_shot(&correct_credit_on_failure),
-                _1, id, HPX_GLOBALCREDIT_INITIAL, new_credit
+                _1, id, boost::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
             ));
     }
 
