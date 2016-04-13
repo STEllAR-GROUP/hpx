@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,12 +15,16 @@
 #include <hpx/util/deferred_call.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
 #include <boost/exception_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -48,43 +52,62 @@ namespace hpx { namespace parallel { namespace util
                     executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
+
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                    parameters_type;
+
                 typedef typename hpx::util::tuple<FwdIter, std::size_t>
                     tuple_type;
 
+                // inform parameter traits
+                scoped_executor_parameters<parameters_type> scoped_param(
+                    policy.parameters());
+
                 std::vector<hpx::future<Result> > inititems;
                 std::list<boost::exception_ptr> errors;
-                std::vector<tuple_type> shape;
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    shape = get_bulk_iteration_shape(policy, inititems, f1,
-                        first, count, 1);
-
-                    std::vector<hpx::future<Result> > workitems;
-                    workitems.reserve(shape.size());
+                    std::vector<tuple_type> shape =
+                        get_bulk_iteration_shape(policy, inititems, f1,
+                            first, count, 1);
 
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
-                    workitems = executor_traits::async_execute(
-                        policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        shape);
 
+                    std::vector<hpx::future<Result> > workitems =
+                        executor_traits::async_execute(
+                            policy.executor(),
+                            bind(invoke_fused(), std::forward<F1>(f1), _1),
+                            std::move(shape));
+
+                    inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));
                 }
                 catch (...) {
-                    detail::handle_local_exceptions<ExPolicy>::call(
+                    handle_local_exceptions<ExPolicy>::call(
                         boost::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
                 hpx::wait_all(inititems);
-                detail::handle_local_exceptions<ExPolicy>::call(
+
+                // always rethrow if 'errors' is not empty or inititems has
+                // exceptional future
+                handle_local_exceptions<ExPolicy>::call(
                     inititems, errors, std::forward<F3>(f3));
 
-                return f2(std::move(inititems));
+                try {
+                    return f2(std::move(inititems));
+                }
+                catch (...) {
+                    // rethrow either bad_alloc or exception_list
+                    handle_local_exceptions<ExPolicy>::call(
+                        boost::current_exception());
+                }
             }
         };
 
@@ -101,43 +124,53 @@ namespace hpx { namespace parallel { namespace util
                     executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
+
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                    parameters_type;
+                typedef scoped_executor_parameters<parameters_type>
+                    scoped_executor_parameters;
+
                 typedef typename hpx::util::tuple<FwdIter, std::size_t>
                     tuple_type;
 
+                // inform parameter traits
+                boost::shared_ptr<scoped_executor_parameters>
+                    scoped_param(boost::make_shared<
+                            scoped_executor_parameters
+                        >(policy.parameters()));
+
                 std::vector<hpx::future<Result> > inititems;
                 std::list<boost::exception_ptr> errors;
-                std::vector<tuple_type> shape;
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    shape = get_bulk_iteration_shape(policy, inititems, f1,
-                        first, count, 1);
-
-                    std::vector<hpx::future<Result> > workitems;
-                    workitems.reserve(shape.size());
+                    std::vector<tuple_type> shape =
+                        get_bulk_iteration_shape(policy, inititems, f1,
+                            first, count, 1);
 
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
-                    workitems = executor_traits::async_execute(
-                        policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        shape);
 
+                    std::vector<hpx::future<Result> > workitems =
+                        executor_traits::async_execute(
+                            policy.executor(),
+                            bind(invoke_fused(), std::forward<F1>(f1), _1),
+                            std::move(shape));
+
+                    inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));
                 }
-                catch (std::bad_alloc const&) {
-                    return hpx::make_exceptional_future<R>(
-                        boost::current_exception());
-                }
                 catch (...) {
-                    errors.push_back(boost::current_exception());
+                    handle_local_exceptions<ExPolicy>::call(
+                        boost::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
                 return hpx::dataflow(
-                    [f2, f3, errors](
+                    [f2, f3, errors, scoped_param](
                         std::vector<hpx::future<Result> > && r) mutable -> R
                     {
                         detail::handle_local_exceptions<ExPolicy>::call(
