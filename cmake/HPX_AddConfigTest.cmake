@@ -82,6 +82,8 @@ macro(add_hpx_config_test variable)
           "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
         OUTPUT_VARIABLE ${variable}_OUTPUT
         COPY_FILE ${test_binary})
+       hpx_debug("Compile test: ${variable}")
+       hpx_debug("Compilation output: \n\n${${variable}_OUTPUT}") 
     endif()
 
     set(_run_msg "Success")
@@ -107,6 +109,7 @@ macro(add_hpx_config_test variable)
       hpx_add_config_define(${definition})
     endforeach()
   elseif(${variable}_REQUIRED)
+    hpx_warn("Test failed, detailed output:\n\n${${variable}_OUTPUT}")
     hpx_error(${${variable}_REQUIRED})
   endif()
 endmacro()
