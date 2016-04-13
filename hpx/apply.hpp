@@ -42,7 +42,7 @@ namespace hpx { namespace detail
         >::type
         call(F&& f, Ts&&... ts)
         {
-            util::thread_description desc(f, "apply_disptach::call");
+            util::thread_description desc(f, "apply_dispatch::call");
             threads::register_thread_nullary(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
                 desc);
