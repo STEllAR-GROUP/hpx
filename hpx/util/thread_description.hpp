@@ -80,7 +80,8 @@ namespace hpx { namespace util
             typename std::enable_if<
                 traits::is_action<Action>::value
             >::type>
-        explicit thread_description(Action) HPX_NOEXCEPT
+        explicit thread_description(Action,
+                char const* altname = 0) HPX_NOEXCEPT
           : type_(data_type_description)
         {
             data_.desc_ = hpx::actions::detail::get_action_name<Action>();
@@ -159,7 +160,8 @@ namespace hpx { namespace util
             typename std::enable_if<
                 traits::is_action<Action>::value
             >::type>
-        explicit thread_description(Action) HPX_NOEXCEPT
+        explicit thread_description(Action,
+            char const* altname = 0) HPX_NOEXCEPT
         {
         }
 
