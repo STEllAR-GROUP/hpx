@@ -206,11 +206,8 @@ namespace hpx { namespace lcos { namespace detail
                 return;
             }
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            util::thread_description desc(func_);
-#else
-            util::thread_description desc("dataflow_frame::finalize");
-#endif
+            util::thread_description desc(func_, "dataflow_frame::finalize");
+
             // schedule the final function invocation with high priority
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);

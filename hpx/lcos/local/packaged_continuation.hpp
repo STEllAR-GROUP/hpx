@@ -304,12 +304,7 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::detail::shared_state_ptr_for<Future>::type const&
             ) = &continuation::async_impl;
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            util::thread_description desc(f_);
-#else
-            util::thread_description desc("continuation::async");
-#endif
-
+            util::thread_description desc(f_, "continuation::async");
             sched.add(util::bind(async_impl_ptr, std::move(this_), f), desc);
 
             if (&ec != &throws)
