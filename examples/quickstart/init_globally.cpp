@@ -75,13 +75,17 @@ struct manage_global_runtime
         hpx::detail::init_winsocket();
 #endif
 
+        // make sure hpx_main is always executed
+        std::vector<std::string> cfg;
+        cfg.push_back("hpx.run_hpx_main!=1");
+
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-        auto start_function =
+        hpx::util::function_nonser<int(int, char**)> start_function =
             hpx::util::bind(&manage_global_runtime::hpx_main, this, _1, _2);
 
-        if (!hpx::start(start_function, __argc, __argv, hpx::runtime_mode_console))
+        if (!hpx::start(start_function, __argc, __argv, cfg, hpx::runtime_mode_console))
         {
             // Something went wrong while initializing the runtime.
             // This early we can't generate any output, just bail out.

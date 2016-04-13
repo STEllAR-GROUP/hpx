@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #define HPX_INIT_IMPL_OCT_04_2012_0123PM
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/find_prefix.hpp>
 
@@ -265,12 +266,15 @@ namespace hpx
         options_description desc_commandline(
             std::string("Usage: ") + app_name +  " [options]");
 
+        util::function_nonser<int(boost::program_options::variables_map& vm)>
+            main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
 
-        return init(
-            util::bind(detail::init_helper, util::placeholders::_1, f),
-            desc_commandline, argc, argv, cfg, empty, empty, mode);
+        HPX_ASSERT(argc != 0 && argv != 0);
+
+        return init(main_f, desc_commandline, argc, argv, cfg,
+            empty, empty, mode);
     }
 
     // Main entry point for launching the HPX runtime system.
@@ -280,6 +284,27 @@ namespace hpx
     {
         std::string app_name(HPX_APPLICATION_STRING);
         return init(f, app_name, argc, argv, mode);
+    }
+
+    inline int
+    init(util::function_nonser<int(int, char**)> const& f,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            "Usage: " + app_name +  " [options]");
+
+        util::function_nonser<int(boost::program_options::variables_map& vm)>
+            main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
+        util::function_nonser<void()> const empty;
+
+        HPX_ASSERT(argc != 0 && argv != 0);
+
+        return init(main_f, desc_commandline, argc, argv, cfg,
+            empty, empty, mode);
     }
 }
 
