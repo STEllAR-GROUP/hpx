@@ -9,8 +9,10 @@
 // This 'container' is used to gather futures that need to become
 // ready before the actual serialization process can be started
 
-#include <hpx/lcos/future.hpp>
+#include <hpx/config.hpp>
 #include <hpx/dataflow.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <boost/shared_ptr.hpp>

@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 
 namespace hpx { namespace lcos { namespace detail
