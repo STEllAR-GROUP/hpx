@@ -127,6 +127,7 @@ namespace hpx { namespace components { namespace server
         ///             component instance.
         void finalize() {}
 
+        void delete_function_lists();
         void tidy();
 
         // This component type requires valid locality id for its actions to

@@ -937,6 +937,14 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void runtime_support::delete_function_lists()
+    {
+        pre_startup_functions_.clear();
+        startup_functions_.clear();
+        pre_shutdown_functions_.clear();
+        shutdown_functions_.clear();
+    }
+
     void runtime_support::tidy()
     {
         boost::lock_guard<component_map_mutex_type> l(cm_mtx_);
