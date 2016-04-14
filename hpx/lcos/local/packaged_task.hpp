@@ -13,6 +13,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <boost/exception_ptr.hpp>
 

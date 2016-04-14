@@ -126,8 +126,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        typedef util::tuple<thread_data*, boost::uint64_t>
-            thread_description;
+        typedef util::tuple<thread_data*, boost::uint64_t> thread_description;
 #else
         typedef thread_data thread_description;
 #endif
