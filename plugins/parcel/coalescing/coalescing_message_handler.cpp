@@ -89,7 +89,7 @@ namespace hpx { namespace plugins { namespace parcel
             util::bind(&coalescing_message_handler::timer_flush, this_()),
             util::bind(&coalescing_message_handler::flush, this_(),
                 parcelset::policies::message_handler::flush_mode_timer, true),
-            boost::posix_time::microseconds(detail::get_interval(interval)),
+            boost::chrono::microseconds(detail::get_interval(interval)),
             std::string(action_name) + "_timer",
             true),
         stopped_(false),
