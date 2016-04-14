@@ -13,6 +13,7 @@
 #include <boost/lockfree/queue.hpp>
 
 #include <iostream>
+#include <mutex>
 
 using boost::lockfree::queue;
 
@@ -57,7 +58,7 @@ void lock_and_wait(
     while (true)
     {
         // Try to acquire the mutex.
-        boost::unique_lock<mutex> l(m, boost::try_to_lock);
+        std::unique_lock<mutex> l(m, std::try_to_lock);
 
         if (l.owns_lock())
         {

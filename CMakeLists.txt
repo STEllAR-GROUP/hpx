@@ -844,11 +844,17 @@ hpx_check_for_cxx11_std_is_null_pointer(
 hpx_check_for_cxx11_std_is_placeholder(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
 
+hpx_check_for_cxx11_std_lock_guard(
+  REQUIRED "HPX needs support for C++11 std::lock_guard")
+
 hpx_check_for_cxx11_std_reference_wrapper(
   DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 
 hpx_check_for_cxx11_std_to_string(
   REQUIRED "HPX needs support for C++11 std::to_string")
+
+hpx_check_for_cxx11_std_unique_lock(
+  REQUIRED "HPX needs support for C++11 std::unique_lock")
 
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")

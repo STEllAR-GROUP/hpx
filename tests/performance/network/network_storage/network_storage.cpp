@@ -11,13 +11,13 @@
 #include <boost/atomic.hpp>
 #include <boost/array.hpp>
 #include <boost/random.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <algorithm>
-#include <iostream>
-#include <vector>
-#include <memory>
 #include <cstdio>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <vector>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 
@@ -334,7 +334,7 @@ int RemoveCompletions()
     while(FuturesActive)
     {
         {
-            boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
+            std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
             for(std::vector<hpx::future<int> > &futvec : ActiveFutures) {
                 for(std::vector<hpx::future<int> >::iterator fut = futvec.begin();
                     fut != futvec.end(); /**/)
@@ -462,7 +462,7 @@ void test_write(
                 );
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
+                std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
                 ActiveFutures[send_rank].push_back(
                     hpx::async(actWrite, locality,
@@ -634,7 +634,7 @@ void test_read(
             {
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
+                std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
                 using hpx::util::placeholders::_1;
                 std::size_t buffer_address =

@@ -24,7 +24,7 @@ template <typename M>
 struct test_lock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_lock lock_type;
+    typedef boost::unique_lock<M> lock_type;
 
     void operator()()
     {
@@ -62,7 +62,7 @@ template <typename M>
 struct test_trylock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_try_lock try_lock_type;
+    typedef boost::unique_lock<M> try_lock_type;
 
     void operator()()
     {
@@ -189,7 +189,7 @@ template <typename M>
 struct test_timedlock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_lock try_lock_for_type;
+    typedef boost::unique_lock<M> try_lock_for_type;
 
     static bool fake_predicate()
     {
@@ -266,7 +266,7 @@ template <typename M>
 struct test_recursive_lock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_lock lock_type;
+    typedef boost::unique_lock<M> lock_type;
 
     void operator()()
     {

@@ -9,12 +9,14 @@
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <mutex>
+
 namespace hpx { namespace util
 {
     naming::gid_type unique_id_ranges::get_id(std::size_t count)
     {
         // create a new id
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
 
         // ensure next_id doesn't overflow
         while (!lower_ || (lower_ + count) > upper_)
@@ -25,7 +27,7 @@ namespace hpx { namespace util
             std::size_t count_ = (std::max)(std::size_t(range_delta), count);
 
             {
-                unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 lower = hpx::agas::get_next_id(count_);
             }
 

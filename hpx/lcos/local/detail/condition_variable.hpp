@@ -14,7 +14,8 @@
 #include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local { namespace detail
@@ -31,7 +32,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             HPX_NON_COPYABLE(relock_guard);
 
         public:
-            explicit relock_guard(boost::unique_lock<mutex_type>& l)
+            explicit relock_guard(std::unique_lock<mutex_type>& l)
               : l_(l)
             {}
 
@@ -41,7 +42,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             }
 
         private:
-            boost::unique_lock<mutex_type>& l_;
+            std::unique_lock<mutex_type>& l_;
         };
 
     private:
@@ -98,28 +99,28 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         HPX_EXPORT ~condition_variable();
 
         HPX_EXPORT bool empty(
-            boost::unique_lock<mutex_type> const& lock) const;
+            std::unique_lock<mutex_type> const& lock) const;
 
         HPX_EXPORT std::size_t size(
-            boost::unique_lock<mutex_type> const& lock) const;
+            std::unique_lock<mutex_type> const& lock) const;
 
         // Return false if no more threads are waiting (returns true if queue
         // is non-empty).
         HPX_EXPORT bool notify_one(
-            boost::unique_lock<mutex_type> lock, error_code& ec = throws);
+            std::unique_lock<mutex_type> lock, error_code& ec = throws);
 
         HPX_EXPORT void notify_all(
-            boost::unique_lock<mutex_type> lock, error_code& ec = throws);
+            std::unique_lock<mutex_type> lock, error_code& ec = throws);
 
         HPX_EXPORT void abort_all(
-            boost::unique_lock<mutex_type> lock);
+            std::unique_lock<mutex_type> lock);
 
         HPX_EXPORT threads::thread_state_ex_enum wait(
-            boost::unique_lock<mutex_type>&& lock,
+            std::unique_lock<mutex_type>&& lock,
             char const* description, error_code& ec = throws);
 
         threads::thread_state_ex_enum wait(
-            boost::unique_lock<mutex_type>& lock,
+            std::unique_lock<mutex_type>& lock,
             char const* description, error_code& ec = throws)
         {
             relock_guard rl(lock);
@@ -127,26 +128,26 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait(
-            boost::unique_lock<mutex_type>&& lock,
+            std::unique_lock<mutex_type>&& lock,
             error_code& ec = throws)
         {
             return wait(std::move(lock), "condition_variable::wait", ec);
         }
 
         threads::thread_state_ex_enum wait(
-            boost::unique_lock<mutex_type>& lock,
+            std::unique_lock<mutex_type>& lock,
             error_code& ec = throws)
         {
             return wait(lock, "condition_variable::wait", ec);
         }
 
         HPX_EXPORT threads::thread_state_ex_enum wait_until(
-            boost::unique_lock<mutex_type>&& lock,
+            std::unique_lock<mutex_type>&& lock,
             util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws);
 
         threads::thread_state_ex_enum wait_until(
-            boost::unique_lock<mutex_type>& lock,
+            std::unique_lock<mutex_type>& lock,
             util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws)
         {
@@ -155,7 +156,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_until(
-            boost::unique_lock<mutex_type>&& lock,
+            std::unique_lock<mutex_type>&& lock,
             util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
@@ -164,7 +165,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_until(
-            boost::unique_lock<mutex_type>& lock,
+            std::unique_lock<mutex_type>& lock,
             util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
@@ -173,7 +174,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_for(
-            boost::unique_lock<mutex_type>&& lock,
+            std::unique_lock<mutex_type>&& lock,
             util::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
@@ -181,7 +182,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_for(
-            boost::unique_lock<mutex_type>& lock,
+            std::unique_lock<mutex_type>& lock,
             util::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
@@ -189,7 +190,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_for(
-            boost::unique_lock<mutex_type>&& lock,
+            std::unique_lock<mutex_type>&& lock,
             util::steady_duration const& rel_time,
             error_code& ec = throws)
         {
@@ -198,7 +199,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_for(
-            boost::unique_lock<mutex_type>& lock,
+            std::unique_lock<mutex_type>& lock,
             util::steady_duration const& rel_time,
             error_code& ec = throws)
         {
@@ -208,11 +209,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     private:
         template <typename Mutex>
-        void abort_all(boost::unique_lock<Mutex> lock);
+        void abort_all(std::unique_lock<Mutex> lock);
 
         // re-add the remaining items to the original queue
         HPX_EXPORT void prepend_entries(
-            boost::unique_lock<mutex_type>& lock, queue_type& queue);
+            std::unique_lock<mutex_type>& lock, queue_type& queue);
 
     private:
         queue_type queue_;

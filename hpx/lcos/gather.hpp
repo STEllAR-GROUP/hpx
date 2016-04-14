@@ -139,8 +139,8 @@ namespace hpx { namespace lcos
 #include <hpx/util/decay.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -162,7 +162,7 @@ namespace hpx { namespace lcos
                 std::vector<T> data(num_sites_);
 
                 {
-                    boost::unique_lock<mutex_type> l(mtx_);
+                    std::unique_lock<mutex_type> l(mtx_);
                     std::swap(data, data_);
                 }
 
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos
 
             hpx::future<std::vector<T> > get_result(std::size_t which, T && t)
             {
-                boost::unique_lock<mutex_type> l(mtx_);
+                std::unique_lock<mutex_type> l(mtx_);
 
                 using util::placeholders::_1;
                 hpx::future<std::vector<T> > f = gate_.get_future().then(
@@ -194,7 +194,7 @@ namespace hpx { namespace lcos
 
             void set_result(std::size_t which, T && t)
             {
-                boost::unique_lock<mutex_type> l(mtx_);
+                std::unique_lock<mutex_type> l(mtx_);
                 set_result_locked(which, std::move(t), l);
             }
 

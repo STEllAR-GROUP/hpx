@@ -10,8 +10,8 @@
 
 #include <boost/system/system_error.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <mutex>
 #include <set>
 #include <string>
 
@@ -100,7 +100,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     boost::system::error_code exception_list::get_error() const
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         if (exceptions_.empty())
             return hpx::no_success;
         return hpx::get_error(exceptions_.front());
@@ -108,7 +108,7 @@ namespace hpx
 
     std::string exception_list::get_message() const
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         if (exceptions_.empty())
             return "";
 
@@ -130,12 +130,12 @@ namespace hpx
 
     void exception_list::add(boost::exception_ptr const& e)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         if (exceptions_.empty())
         {
             hpx::exception ex;
             {
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 ex = hpx::exception(hpx::get_error(e));
             }
 
