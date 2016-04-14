@@ -149,6 +149,7 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/util/assert.hpp>

@@ -227,7 +227,7 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>

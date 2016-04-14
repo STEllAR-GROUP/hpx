@@ -23,6 +23,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/promise.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 
