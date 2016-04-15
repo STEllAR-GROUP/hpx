@@ -7,7 +7,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
-#include <hpx/parallel/algorithms/sort_by_key.hpp>
 #include <hpx/parallel/algorithms/reduce_by_key.hpp>
 //
 #include <boost/random/uniform_int_distribution.hpp>
@@ -53,7 +52,7 @@ namespace debug {
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
-void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, const Op &op, const HelperOp &ho)
+void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const Op &op, const HelperOp &ho)
 {
     static_assert(
             hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -106,7 +105,7 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, const Op &op, const Hel
     o_values = values;
     o_keys = keys;
 
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    hpx::util::high_resolution_timer t;
     // reduce_by_key, blocking when seq, par, par_vec
     auto result = hpx::parallel::reduce_by_key(
             std::forward<ExPolicy>(policy),
@@ -115,11 +114,15 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, const Op &op, const Hel
             keys.begin(),
             values.begin(),
             op);
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    double elapsed = t.elapsed();
 
     bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
+    HPX_TEST(is_equal);
     if (is_equal) {
-        //std::cout << "Test Passed\n";
+        if (benchmark) {
+            std::cout << "<DartMeasurement name=\"ReduceByKeyTime\" \n"
+                << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+        }    
     }
     else {
         debug::output("keys     ", o_keys);
@@ -139,7 +142,7 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op, cons
     static_assert(
             hpx::parallel::is_execution_policy<ExPolicy>::value,
             "hpx::parallel::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), sync);
+    msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), async);
     std::cout << "\n";
 
     Tval rnd_min =  -256;
@@ -221,29 +224,29 @@ void test_reduce_by_key1()
     //
     hpx::util::high_resolution_timer t;
     do {
-        test_reduce_by_key1(seq,     int(), int(), std::equal_to<int>(), [](int key){return key;});
-        test_reduce_by_key1(par,     int(), int(), std::equal_to<int>(), [](int key){return key;});
-        test_reduce_by_key1(par_vec, int(), int(), std::equal_to<int>(), [](int key){return key;});
+        test_reduce_by_key1(seq,     int(), int(), false, std::equal_to<int>(), [](int key){return key;});
+        test_reduce_by_key1(par,     int(), int(), false, std::equal_to<int>(), [](int key){return key;});
+        test_reduce_by_key1(par_vec, int(), int(), false, std::equal_to<int>(), [](int key){return key;});
         //
         // default comparison operator (std::equal_to)
-        test_reduce_by_key1(seq,     int(), double(), std::equal_to<double>(), [](int key){return key;});
-        test_reduce_by_key1(par,     int(), double(), std::equal_to<double>(), [](int key){return key;});
-        test_reduce_by_key1(par_vec, int(), double(), std::equal_to<double>(), [](int key){return key;});
+        test_reduce_by_key1(seq,     int(), double(), false, std::equal_to<double>(), [](int key){return key;});
+        test_reduce_by_key1(par,     int(), double(), false, std::equal_to<double>(), [](int key){return key;});
+        test_reduce_by_key1(par_vec, int(), double(), false, std::equal_to<double>(), [](int key){return key;});
         //
         //
-        test_reduce_by_key1(seq,     double(), double(),
+        test_reduce_by_key1(seq,     double(), double(), false,
                             [](double a, double b) { return std::floor(a)==std::floor(b); },
                             [](double a){ return std::floor(a); }
         );
-        test_reduce_by_key1(par,     double(), double(),
+        test_reduce_by_key1(par,     double(), double(), false,
                             [](double a, double b) { return std::floor(a)==std::floor(b); },
                             [](double a){ return std::floor(a); }
         );
-        test_reduce_by_key1(par_vec, double(), double(),
+        test_reduce_by_key1(par_vec, double(), double(), false,
                             [](double a, double b) { return std::floor(a)==std::floor(b); },
                             [](double a){ return std::floor(a); }
         );
-    } while (t.elapsed()<5);
+    } while (t.elapsed()<2);
     //
 
     hpx::util::high_resolution_timer t2;
@@ -253,7 +256,13 @@ void test_reduce_by_key1()
         //
         test_reduce_by_key_async(seq(task), int(), double(), std::equal_to<double>(), [](int key){return key;});
         test_reduce_by_key_async(par(task), int(), double(), std::equal_to<double>(), [](int key){return key;});
-    } while (t2.elapsed()<5);
+    } while (t2.elapsed()<2);
+
+    // one last test with timing output enabled
+    test_reduce_by_key1(par, double(), double(), true,
+                        [](double a, double b) { return std::floor(a)==std::floor(b); },
+                        [](double a){ return std::floor(a); }
+    );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
