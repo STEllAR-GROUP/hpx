@@ -9,6 +9,8 @@
 
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {

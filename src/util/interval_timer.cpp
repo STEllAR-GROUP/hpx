@@ -14,6 +14,7 @@
 #include <boost/make_shared.hpp>
 
 #include <mutex>
+#include <string>
 
 namespace hpx { namespace util { namespace detail
 {

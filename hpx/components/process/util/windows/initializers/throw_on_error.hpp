@@ -17,6 +17,8 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 
+#include <string>
+
 namespace hpx { namespace components { namespace process { namespace windows {
 
 namespace initializers {

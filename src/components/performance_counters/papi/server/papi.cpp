@@ -23,6 +23,8 @@
 
 #include <functional>
 #include <mutex>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace papi_ns = hpx::performance_counters::papi;

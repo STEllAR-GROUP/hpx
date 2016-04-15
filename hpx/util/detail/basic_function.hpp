@@ -21,6 +21,7 @@
 #include <boost/mpl/bool.hpp>
 
 #include <cstring>
+#include <string>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>

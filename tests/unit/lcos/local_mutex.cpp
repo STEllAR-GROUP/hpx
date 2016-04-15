@@ -17,6 +17,9 @@
 #include <boost/chrono.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <string>
+#include <vector>
+
 boost::chrono::milliseconds const delay(1000);
 boost::chrono::milliseconds const timeout_resolution(100);
 

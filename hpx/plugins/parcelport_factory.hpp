@@ -19,6 +19,9 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
 {

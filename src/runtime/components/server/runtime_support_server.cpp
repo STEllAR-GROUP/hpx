@@ -60,6 +60,8 @@
 #include <mutex>
 #include <set>
 #include <sstream>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions

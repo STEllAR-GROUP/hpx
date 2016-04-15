@@ -11,6 +11,8 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
 struct A : hpx::components::abstract_component_base<A>

@@ -13,6 +13,8 @@
 #include <hpx/hpx.hpp>
 
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>

@@ -21,8 +21,8 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
-#include <iterator>
 #include <functional>
+#include <iterator>
 #include <type_traits>
 #include <vector>
 

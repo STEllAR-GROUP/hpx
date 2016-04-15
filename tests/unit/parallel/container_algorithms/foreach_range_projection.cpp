@@ -6,6 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 
+#include <string>
+#include <vector>
+
 #include "foreach_tests_projection.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -13,6 +13,8 @@
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
+#include <string>
+
 namespace hpx { namespace plugins { namespace parcel
 {
     ///////////////////////////////////////////////////////////////////////////

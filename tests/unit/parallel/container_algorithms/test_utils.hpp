@@ -12,6 +12,7 @@
 
 #include <numeric>
 #include <random>
+#include <vector>
 
 namespace test
 {

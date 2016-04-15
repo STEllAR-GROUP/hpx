@@ -48,6 +48,8 @@
 #include <cstdlib>
 #include <mutex>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace detail
 {

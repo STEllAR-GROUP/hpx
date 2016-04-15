@@ -18,8 +18,8 @@
 
 #include <iosfwd>
 #include <string>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util
 {

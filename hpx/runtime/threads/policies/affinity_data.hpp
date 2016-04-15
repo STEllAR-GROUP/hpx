@@ -10,6 +10,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace threads { namespace policies
 {

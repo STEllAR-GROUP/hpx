@@ -42,6 +42,8 @@
 #include <map>
 #include <mutex>
 #include <set>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

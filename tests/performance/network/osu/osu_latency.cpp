@@ -14,6 +14,8 @@
 #include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define MESSAGE_ALIGNMENT 64
 #define MAX_ALIGNMENT 65536

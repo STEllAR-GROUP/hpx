@@ -9,6 +9,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 void test(hpx::naming::id_type id) {}
 HPX_PLAIN_ACTION(test, test_action);

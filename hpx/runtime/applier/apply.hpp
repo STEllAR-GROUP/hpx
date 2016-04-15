@@ -33,11 +33,11 @@
 #include <boost/format.hpp>
 #include <boost/make_shared.hpp>
 
-#include <vector>
-#include <map>
 #include <algorithm>
-#include <type_traits>
+#include <map>
 #include <memory>
+#include <type_traits>
+#include <vector>
 
 // FIXME: Error codes?
 

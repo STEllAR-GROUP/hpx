@@ -14,6 +14,8 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
+#include <vector>
+
 namespace hpx { namespace lcos
 {
 }}

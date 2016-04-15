@@ -26,6 +26,8 @@
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {

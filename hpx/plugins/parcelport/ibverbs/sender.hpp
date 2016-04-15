@@ -23,6 +23,8 @@
 
 #include <mutex>
 
+#include <vector>
+
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     class connection_handler;

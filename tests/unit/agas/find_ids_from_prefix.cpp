@@ -9,6 +9,9 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::simple_component_base<test_server>

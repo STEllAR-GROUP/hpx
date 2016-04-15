@@ -20,6 +20,8 @@
 #include <boost/chrono.hpp>
 
 #include <mutex>
+#include <string>
+#include <vector>
 
 namespace
 {

@@ -6,8 +6,10 @@
 #if !defined(HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM)
 #define HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM
 
-#include <string>
 #include <hpx/config.hpp>
+
+#include <string>
+#include <vector>
 
 #if defined(HPX_HAVE_LOGGING)
 
@@ -209,8 +211,6 @@ namespace hpx { namespace util
 
 #else
 // logging is disabled all together
-
-#include <vector>
 
 namespace hpx { namespace util { namespace detail
 {

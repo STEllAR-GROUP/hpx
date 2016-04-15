@@ -10,6 +10,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <string>
+#include <vector>
+
 int hpx_main(int argc, char* argv[])
 {
     for (int i = 0; i != argc; ++i)

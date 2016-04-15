@@ -6,6 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx_startup::user_main, if necessary. This has to be in a
 // separate translation unit to ensure the linker can pick or ignore this

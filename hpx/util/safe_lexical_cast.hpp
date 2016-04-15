@@ -11,6 +11,8 @@
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <string>
+
 namespace hpx { namespace util
 {
     template <class DestType, class SrcType>

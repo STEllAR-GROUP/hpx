@@ -13,9 +13,9 @@
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 
-#include <string>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <string>
 #include <vector>
 
 #include <boost/filesystem/path.hpp>

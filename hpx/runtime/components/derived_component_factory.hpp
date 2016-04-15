@@ -23,6 +23,8 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {

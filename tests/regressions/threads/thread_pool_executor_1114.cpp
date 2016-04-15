@@ -15,6 +15,7 @@
 #include <hpx/include/thread_executors.hpp>
 
 #include <iostream>
+#include <vector>
 
 using hpx::async;
 using std::vector;

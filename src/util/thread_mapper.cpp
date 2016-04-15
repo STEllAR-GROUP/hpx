@@ -10,6 +10,7 @@
 
 #include <cstring>
 #include <mutex>
+#include <string>
 
 #if defined(__linux__)
 #include <sys/syscall.h>

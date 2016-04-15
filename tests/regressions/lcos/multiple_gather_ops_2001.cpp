@@ -12,6 +12,8 @@
 #include <boost/cstdint.hpp>
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 char const* gather_basename = "/test/gather/";
 

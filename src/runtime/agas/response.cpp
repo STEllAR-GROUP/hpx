@@ -8,8 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <vector>
-
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -19,6 +17,9 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/tuple.hpp>
+
+#include <string>
+#include <vector>
 
 // The number of types that response's variant can represent.
 #define HPX_AGAS_RESPONSE_SUBTYPES 12

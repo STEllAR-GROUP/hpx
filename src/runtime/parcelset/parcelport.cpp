@@ -18,6 +18,8 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
 
+#include <string>
+
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////

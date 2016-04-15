@@ -17,6 +17,7 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server

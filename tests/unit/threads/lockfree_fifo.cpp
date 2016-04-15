@@ -15,6 +15,8 @@
 
 #include <boost/lockfree/queue.hpp>
 
+#include <vector>
+
 std::vector<boost::lockfree::queue<boost::uint64_t>*> queues;
 std::vector<boost::uint64_t> stolen;
 

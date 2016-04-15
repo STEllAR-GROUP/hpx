@@ -17,6 +17,8 @@
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
 
+#include <string>
+
 namespace hpx { namespace agas
 {
 #if defined(HPX_MSVC)

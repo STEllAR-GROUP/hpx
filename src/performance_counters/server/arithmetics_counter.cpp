@@ -17,6 +17,9 @@
 
 #include <mutex>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {

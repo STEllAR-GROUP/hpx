@@ -19,6 +19,8 @@
 
 #include <mutex>
 #include <stack>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables

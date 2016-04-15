@@ -14,8 +14,9 @@
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 
-#include <type_traits>
 #include <sstream>
+#include <string>
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace iostreams { namespace detail

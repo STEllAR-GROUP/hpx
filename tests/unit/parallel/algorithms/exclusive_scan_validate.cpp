@@ -11,6 +11,9 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/functions.hpp>
 
+#include <string>
+#include <vector>
+
 #include "test_utils.hpp"
 
 // uncomment to see some numbers from scan algorithm validation

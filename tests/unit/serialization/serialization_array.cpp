@@ -15,6 +15,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <numeric>
+#include <vector>
 
 template <typename T>
 struct A

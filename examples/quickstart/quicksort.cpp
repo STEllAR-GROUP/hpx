@@ -10,8 +10,10 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/async.hpp>
 
-#include <algorithm>
 #include <boost/atomic.hpp>
+
+#include <algorithm>
+#include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

@@ -10,6 +10,9 @@
 
 #include <hpx/util/find_prefix.hpp>
 
+#include <string>
+#include <vector>
+
 namespace hpx
 {
     /// \cond NOINTERNAL

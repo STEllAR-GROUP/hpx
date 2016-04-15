@@ -9,6 +9,8 @@
 #include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/locality_namespace.hpp>
 
+#include <vector>
+
 namespace hpx { namespace agas { namespace stubs
 {
 template <typename Result>

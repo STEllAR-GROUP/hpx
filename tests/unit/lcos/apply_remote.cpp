@@ -11,6 +11,8 @@
 
 #include <mutex>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 bool root_locality = false;
 boost::int32_t final_result;

@@ -10,6 +10,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 int test0()
 {

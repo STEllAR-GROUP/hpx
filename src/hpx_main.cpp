@@ -10,6 +10,9 @@
 
 #include <boost/scoped_array.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx_main, if necessary. This has to be in a separate
 // translation unit to ensure the linker can pick or ignore this function,

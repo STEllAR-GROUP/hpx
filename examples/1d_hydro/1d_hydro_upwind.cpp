@@ -23,6 +23,8 @@
 
 #include <mutex>
 
+#include <vector>
+
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 

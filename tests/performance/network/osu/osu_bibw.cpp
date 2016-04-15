@@ -13,6 +13,8 @@
 
 #include <boost/range/irange.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define LOOP_SMALL  100
 #define WINDOW_SIZE_SMALL  2048

@@ -22,13 +22,15 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <cstddef>
 #include <ios>
 #include <iomanip>
 #include <iostream>
 #include <list>
 #include <mutex>
 #include <sstream>
-#include <cstddef>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

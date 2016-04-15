@@ -25,8 +25,8 @@
 
 #include <iostream>
 #include <mutex>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)

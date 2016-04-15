@@ -23,8 +23,9 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
-#include <vector>
 #include <iterator>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace components
 {

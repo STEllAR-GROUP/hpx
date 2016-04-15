@@ -16,6 +16,9 @@
 
 #include <mutex>
 
+#include <string>
+#include <vector>
+
 // TODO: Remove the use of the name "prefix"
 
 namespace hpx { namespace agas

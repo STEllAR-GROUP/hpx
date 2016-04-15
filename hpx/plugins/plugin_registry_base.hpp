@@ -12,6 +12,9 @@
 #include <hpx/util/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {

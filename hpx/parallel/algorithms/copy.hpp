@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <vector>
 
 #include <boost/shared_array.hpp>
 

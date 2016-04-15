@@ -34,6 +34,7 @@
 
 #include <fstream>
 #include <mutex>
+#include <string>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 

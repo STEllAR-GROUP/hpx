@@ -16,6 +16,9 @@
 #include <boost/make_shared.hpp>
 #include <boost/move/move.hpp>
 
+#include <string>
+#include <vector>
+
 #include "read_values.hpp"
 #include "partition3d.hpp"
 #include "interpolator.hpp"

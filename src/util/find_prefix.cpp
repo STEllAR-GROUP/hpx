@@ -16,6 +16,7 @@
 #  include <unistd.h>
 #  include <sys/stat.h>
 #  include <linux/limits.h>
+#  include <vector>
 #elif __APPLE__
 #  include <mach-o/dyld.h>
 #elif defined(__FreeBSD__)
@@ -32,6 +33,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/tokenizer.hpp>
+
+#include <string>
 
 namespace hpx { namespace util
 {

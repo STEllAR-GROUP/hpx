@@ -46,6 +46,7 @@
 
 #include <exception>
 #include <sstream>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 

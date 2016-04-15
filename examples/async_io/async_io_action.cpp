@@ -15,6 +15,9 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/thread_executors.hpp>
 
+#include <string>
+#include <vector>
+
 namespace detail
 {
     // this function will be executed by a dedicated OS thread

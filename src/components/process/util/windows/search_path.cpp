@@ -18,9 +18,9 @@
 #include <boost/tokenizer.hpp>
 #include <boost/array.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
-#include <stdexcept>
 #include <cstdlib>
+#include <stdexcept>
+#include <string>
 #include <shellapi.h>
 
 namespace hpx { namespace components { namespace process { namespace windows

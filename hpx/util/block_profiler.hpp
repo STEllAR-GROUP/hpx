@@ -21,6 +21,8 @@
 #include <boost/accumulators/statistics/moment.hpp>
 #endif
 
+#include <string>
+
 #define HPX_DONT_USE_BLOCK_PROFILER
 
 ///////////////////////////////////////////////////////////////////////////////

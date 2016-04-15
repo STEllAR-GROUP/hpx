@@ -21,6 +21,8 @@
 #include <hpx/components/security/capability.hpp>
 #endif
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {

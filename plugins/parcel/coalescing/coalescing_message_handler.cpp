@@ -21,6 +21,8 @@
 
 #include <mutex>
 
+#include <string>
+
 namespace hpx { namespace traits
 {
     // Inject additional configuration data into the factory registry for this

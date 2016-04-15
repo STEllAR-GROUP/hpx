@@ -12,6 +12,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 
+#include <vector>
+
 namespace hpx { namespace agas { namespace stubs
 {
 

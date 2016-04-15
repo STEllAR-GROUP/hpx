@@ -11,9 +11,10 @@
 #define HPX_BACKTRACE_HPP
 
 #include <hpx/config/export_definitions.hpp>
+
+#include <iosfwd>
 #include <string>
 #include <vector>
-#include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

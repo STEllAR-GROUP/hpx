@@ -14,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx
 {

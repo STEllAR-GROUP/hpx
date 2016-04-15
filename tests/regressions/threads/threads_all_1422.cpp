@@ -10,6 +10,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+#include <vector>
+
 unsigned long num_cores = 0;
 
 int hpx_main(int argc, char ** argv)

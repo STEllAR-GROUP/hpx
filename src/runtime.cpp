@@ -37,6 +37,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)

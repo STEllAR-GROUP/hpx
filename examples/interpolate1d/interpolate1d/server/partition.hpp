@@ -11,6 +11,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <string>
+
 #include "../dimension.hpp"
 
 namespace interpolate1d { namespace server

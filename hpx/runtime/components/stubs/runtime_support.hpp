@@ -21,6 +21,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
 
+#include <vector>
+
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////

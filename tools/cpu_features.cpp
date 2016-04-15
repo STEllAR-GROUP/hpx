@@ -5,11 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <set>
-#include <vector>
-#include <ios>
 #include <iomanip>
+#include <ios>
 #include <iostream>
+#include <set>
+#include <string>
+#include <vector>
 
 #include <boost/program_options.hpp>
 

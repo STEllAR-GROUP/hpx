@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace util { namespace batch_environments {
 

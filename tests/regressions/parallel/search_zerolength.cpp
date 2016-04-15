@@ -8,6 +8,9 @@
 #include <hpx/include/parallel_search.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+#include <vector>
+
 void search_zero_dist_test()
 {
     using hpx::parallel::seq;

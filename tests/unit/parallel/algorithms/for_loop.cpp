@@ -10,6 +10,8 @@
 #include <hpx/include/parallel_for_loop.hpp>
 
 #include <algorithm>
+#include <string>
+#include <vector>
 
 #include "test_utils.hpp"
 

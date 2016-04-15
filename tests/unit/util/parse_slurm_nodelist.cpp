@@ -7,6 +7,8 @@
 #include <hpx/util/batch_environment.hpp>
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 int main()
 {

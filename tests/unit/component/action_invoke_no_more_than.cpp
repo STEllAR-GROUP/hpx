@@ -9,6 +9,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<int> count_call_void(0);
 boost::atomic<int> count_call_future_void(0);

@@ -19,11 +19,13 @@
 #include <boost/atomic.hpp>
 #include <boost/iostreams/stream.hpp>
 
-#include <iterator>
 #include <ios>
 #include <iostream>
 #include <mutex>
+#include <iterator>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace iostreams
 {

@@ -9,6 +9,8 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 struct my_executor : hpx::parallel::parallel_executor {};
 

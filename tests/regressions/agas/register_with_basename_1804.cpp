@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include <boost/shared_ptr.hpp>

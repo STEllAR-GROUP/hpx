@@ -16,8 +16,8 @@
 
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace hpx { namespace serialization
 {

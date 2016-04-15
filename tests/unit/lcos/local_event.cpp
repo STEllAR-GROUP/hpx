@@ -12,6 +12,9 @@
 
 #include <boost/atomic.hpp>
 
+#include <string>
+#include <vector>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;

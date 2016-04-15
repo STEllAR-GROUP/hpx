@@ -17,6 +17,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <vector>
 
 #include <hpx/runtime/serialization/serialize.hpp>

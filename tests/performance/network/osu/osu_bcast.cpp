@@ -16,6 +16,8 @@
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <vector>
+
 #include <benchmarks/network/osu_coll.hpp>
 #include <benchmarks/network/broadcast.hpp>
 

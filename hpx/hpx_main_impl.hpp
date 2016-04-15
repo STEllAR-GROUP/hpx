@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Default implementation of main() if all the user provides is

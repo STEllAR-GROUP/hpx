@@ -23,6 +23,8 @@
 #include <iostream>
 #include <mutex>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace util
 {

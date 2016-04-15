@@ -23,6 +23,8 @@
 
 #include <mutex>
 
+#include <string>
+
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
 {
     parcelset::locality parcelport_address(util::runtime_configuration const & ini)

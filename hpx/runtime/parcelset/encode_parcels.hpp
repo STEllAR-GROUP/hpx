@@ -24,6 +24,7 @@
 #include <boost/cstdint.hpp>
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace hpx

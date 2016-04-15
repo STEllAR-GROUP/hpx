@@ -12,6 +12,7 @@
 #include <boost/program_options.hpp>
 
 #include <iostream>
+#include <string>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

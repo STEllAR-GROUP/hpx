@@ -6,6 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <string>
+#include <vector>
+
 // This application will just sit and wait for being terminated from the
 // console window for the specified amount of time. This is useful for testing
 // the heartbeat tool which connects and disconnects to a running application.

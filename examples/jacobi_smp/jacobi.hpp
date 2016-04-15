@@ -7,10 +7,10 @@
 #ifndef JACOBI_SMP_JACOBI_HPP
 #define JACOBI_SMP_JACOBI_HPP
 
-#include <vector>
-#include <string>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace jacobi_smp {
     void jacobi(

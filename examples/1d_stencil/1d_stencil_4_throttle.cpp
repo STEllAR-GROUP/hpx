@@ -28,6 +28,9 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#include <string>
+#include <vector>
+
 #include <apex_api.hpp>
 
 using hpx::naming::id_type;

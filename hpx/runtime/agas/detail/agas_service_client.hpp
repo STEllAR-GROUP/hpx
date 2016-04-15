@@ -14,8 +14,8 @@
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/lcos/future.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace agas { namespace detail
 {

@@ -10,9 +10,11 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/deferred_call.hpp>
 
-#include <algorithm>
-
 #include <boost/range/functions.hpp>
+
+#include <algorithm>
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 int bulk_test(hpx::thread::id tid, int value, bool is_par)

@@ -19,6 +19,7 @@
 #include <boost/io/ios_state.hpp>
 
 #include <mutex>
+#include <vector>
 
 #include <hwloc.h>
 

@@ -18,6 +18,8 @@
 
 #include <list>
 #include <mutex>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace agas
 {

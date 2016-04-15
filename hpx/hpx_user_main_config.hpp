@@ -7,8 +7,9 @@
 #define HPX_USER_MAIN_CONFIG_JUL_26_2015_0222PM
 
 #include <hpx/config.hpp>
-#include <vector>
+
 #include <string>
+#include <vector>
 
 namespace hpx_startup
 {
