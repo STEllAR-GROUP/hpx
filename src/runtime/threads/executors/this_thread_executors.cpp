@@ -23,6 +23,8 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <mutex>
 
 namespace hpx { namespace threads { namespace detail

@@ -33,6 +33,7 @@
 #error Boost.Context is available only with Boost V1.51 or later
 #endif
 
+#include <boost/atomic.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>

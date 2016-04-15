@@ -6,6 +6,7 @@
 #include <hpx/lcos/local/composable_guard.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/hpx_init.hpp>
+#include <boost/atomic.hpp>
 #include <iostream>
 #include <string>
 #include <vector>

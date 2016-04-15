@@ -24,6 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/bind.hpp>
 
 #include <algorithm>

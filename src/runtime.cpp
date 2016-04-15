@@ -34,6 +34,8 @@
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
 #endif
 
+#include <boost/atomic.hpp>
+
 #include <iostream>
 #include <memory>
 #include <mutex>

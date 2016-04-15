@@ -10,6 +10,8 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////

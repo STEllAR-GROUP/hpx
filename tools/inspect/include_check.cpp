@@ -29,6 +29,7 @@ namespace boost
     {
       { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
       { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
+      { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
       { 0, 0, 0 }
     };
 

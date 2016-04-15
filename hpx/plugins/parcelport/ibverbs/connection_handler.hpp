@@ -19,6 +19,8 @@
 
 #include <hpx/util/memory_chunk_pool.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <vector>
 
 namespace hpx { namespace parcelset {

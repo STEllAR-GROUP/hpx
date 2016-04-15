@@ -23,8 +23,9 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #endif
 
-#include <boost/ref.hpp>
+#include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/ref.hpp>
 
 #include <cstdint>
 #include <mutex>

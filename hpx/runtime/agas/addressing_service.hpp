@@ -24,6 +24,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cache/lru_cache.hpp>
 #include <boost/cache/statistics/local_full_statistics.hpp>

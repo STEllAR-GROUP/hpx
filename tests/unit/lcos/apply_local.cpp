@@ -9,6 +9,8 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////

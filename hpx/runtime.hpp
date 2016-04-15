@@ -26,6 +26,7 @@
 #include <hpx/components/security/certificate_store.hpp>
 #endif
 
+#include <boost/atomic.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
 #include <memory>

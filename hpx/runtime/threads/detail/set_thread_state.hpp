@@ -19,6 +19,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/asio/basic_deadline_timer.hpp>
 
 namespace hpx { namespace threads { namespace detail
