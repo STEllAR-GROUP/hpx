@@ -22,9 +22,10 @@
 #   include <hpx/util/tick_counter.hpp>
 #endif
 
+#include <boost/atomic.hpp>
+#include <boost/exception_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/atomic.hpp>
 #include <boost/unordered_set.hpp>
 
 #include <map>

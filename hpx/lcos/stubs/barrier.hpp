@@ -11,6 +11,8 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/server/barrier.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace stubs
 {

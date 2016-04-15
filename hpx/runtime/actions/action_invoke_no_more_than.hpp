@@ -17,6 +17,8 @@
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 #include <memory>
 
 namespace hpx { namespace actions { namespace detail

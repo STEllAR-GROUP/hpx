@@ -12,6 +12,8 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 #include <list>
 #include <utility>
 #include <vector>

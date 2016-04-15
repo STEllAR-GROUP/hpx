@@ -13,6 +13,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/ini.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 namespace hpx { namespace lcos
 {
     /// The \a base_lco class is the common base class for all LCO's

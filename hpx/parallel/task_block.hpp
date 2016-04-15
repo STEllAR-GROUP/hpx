@@ -23,11 +23,12 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 #include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
 
 #include <mutex>
-
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)

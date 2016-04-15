@@ -17,6 +17,8 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 #include <memory>
 #include <mutex>
 #include <queue>

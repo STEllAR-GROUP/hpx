@@ -21,6 +21,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
 

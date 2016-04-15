@@ -11,6 +11,8 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/lcos/server/latch.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {

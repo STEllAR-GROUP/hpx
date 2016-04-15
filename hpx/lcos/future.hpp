@@ -31,6 +31,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/if.hpp>

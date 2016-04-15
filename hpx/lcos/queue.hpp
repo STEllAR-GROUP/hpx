@@ -10,6 +10,8 @@
 #include <hpx/include/client.hpp>
 #include <hpx/lcos/server/queue.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {

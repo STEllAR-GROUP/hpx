@@ -24,9 +24,10 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/mpl/bool.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/mpl/bool.hpp>
 
 #include <memory>
 #include <mutex>

@@ -15,6 +15,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 namespace hpx
 {
     class HPX_API_EXPORT runtime;

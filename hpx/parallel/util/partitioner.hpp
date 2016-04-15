@@ -22,6 +22,7 @@
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/range/functions.hpp>
 
 #include <iterator>
