@@ -14,6 +14,8 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <boost/intrusive_ptr.hpp>
+
 #include <mutex>
 
 #if defined(__ANDROID__) || defined(ANDROID)

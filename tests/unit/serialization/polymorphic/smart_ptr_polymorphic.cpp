@@ -13,6 +13,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/intrusive_ptr.hpp>
+
 #include <iostream>
 #include <string>
 #include <vector>

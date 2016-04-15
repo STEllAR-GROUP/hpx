@@ -21,12 +21,13 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <boost/intrusive_ptr.hpp>
+#include <boost/mpl/bool.hpp>
+
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/mpl/bool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Client objects are equivalent to futures
