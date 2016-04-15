@@ -46,9 +46,9 @@ namespace hpx { namespace util
 #endif
     }
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION) && !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
     void thread_description::init_from_alternative_name(char const* altname)
     {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION) && !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
         type_ = data_type_description;
         data_.desc_ = altname;
         if (altname == 0)
@@ -56,6 +56,6 @@ namespace hpx { namespace util
             hpx::threads::thread_id_type id = hpx::threads::get_self_id();
             if (id) *this = hpx::threads::get_thread_description(id);
         }
-    }
 #endif
+    }
 }}

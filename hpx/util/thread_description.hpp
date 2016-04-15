@@ -137,6 +137,10 @@ namespace hpx { namespace util
             data_type_address = 1
         };
 
+    private:
+        // expose for ABI compatibility reasons
+        HPX_EXPORT void init_from_alternative_name(char const* altname);
+
     public:
         thread_description() HPX_NOEXCEPT
         {
