@@ -23,7 +23,7 @@
 
 #define CHECK_LOCKED_VALUE_EQUAL(mutex_name, value, expected_value)           \
     {                                                                         \
-        std::unique_lock<hpx::lcos::local::mutex> lock(mutex_name);         \
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex_name);           \
         HPX_TEST_EQ(value, expected_value);                                   \
     }
 
