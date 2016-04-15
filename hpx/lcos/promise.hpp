@@ -26,9 +26,10 @@
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/exception_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 

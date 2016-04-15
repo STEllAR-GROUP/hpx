@@ -25,9 +25,13 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/apex.hpp>
 
-#if !defined(HPX_WINDOWS)
-#  include <signal.h>
-#endif
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/assign/std/vector.hpp>
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #   include <cstdlib>
@@ -40,12 +44,9 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/assign/std/vector.hpp>
-#include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
+#if !defined(HPX_WINDOWS)
+#  include <signal.h>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

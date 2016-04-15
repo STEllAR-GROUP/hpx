@@ -16,6 +16,9 @@
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
 
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include <iterator>
 #include <list>
 #include <memory>

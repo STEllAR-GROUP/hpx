@@ -26,6 +26,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <map>

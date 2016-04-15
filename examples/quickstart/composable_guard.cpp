@@ -5,6 +5,7 @@
 #include <hpx/lcos/local/composable_guard.hpp>
 #include <hpx/hpx_init.hpp>
 #include <boost/atomic.hpp>
+#include <boost/shared_ptr.hpp>
 #include <iostream>
 
 // This program illustrates the use of composable guards to perform

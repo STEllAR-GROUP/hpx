@@ -17,6 +17,8 @@
 
 #include <hpx/runtime/threads_fwd.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 #include <map>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail

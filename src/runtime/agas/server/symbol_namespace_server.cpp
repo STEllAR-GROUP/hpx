@@ -18,6 +18,7 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 

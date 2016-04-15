@@ -7,6 +7,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/hpx_init.hpp>
 #include <boost/atomic.hpp>
+#include <boost/shared_ptr.hpp>
 #include <iostream>
 #include <string>
 #include <vector>

@@ -31,6 +31,8 @@ namespace boost
       { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
       { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
       { "(\\bboost\\s*::\\s*intrusive_ptr\\b)", "boost::intrusive_ptr", "boost/intrusive_ptr.hpp" },
+      { "(\\bboost\\s*::\\s*make_shared\\b)", "boost::make_shared", "boost/make_shared.hpp" },
+      { "(\\bboost\\s*::\\s*shared_ptr\\b)", "boost::shared_ptr", "boost/shared_ptr.hpp" },
       { 0, 0, 0 }
     };
 

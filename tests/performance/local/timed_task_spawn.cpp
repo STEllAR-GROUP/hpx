@@ -12,18 +12,19 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/format.hpp>
+#include <boost/math/common_factor.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
+
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/format.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/math/common_factor.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
 #include "worker_timed.hpp"
 

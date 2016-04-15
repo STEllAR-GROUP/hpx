@@ -10,6 +10,8 @@
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 namespace hpx { namespace threads { namespace detail
 {
     void* get_tss_data(void const* key)

@@ -15,6 +15,8 @@
 #include <hpx/util/function.hpp>
 
 #include <boost/bind.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 

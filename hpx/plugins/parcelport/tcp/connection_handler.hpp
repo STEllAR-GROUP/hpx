@@ -22,6 +22,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <vector>

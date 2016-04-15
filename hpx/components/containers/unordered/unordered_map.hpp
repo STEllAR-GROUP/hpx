@@ -19,13 +19,14 @@
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 #include <hpx/components/containers/unordered/unordered_map_segmented_iterator.hpp>
 
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <vector>
-
-#include <boost/cstdint.hpp>
 
 /// The hpx::unordered_map and its API's are defined here.
 ///

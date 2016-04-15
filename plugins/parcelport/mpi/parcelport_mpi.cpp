@@ -35,6 +35,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/archive/basic_archive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 

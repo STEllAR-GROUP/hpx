@@ -11,6 +11,9 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 struct registration_wrapper
 {

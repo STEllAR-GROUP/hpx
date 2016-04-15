@@ -13,6 +13,9 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write,
     boost::shared_ptr<hpx::lcos::local::promise<int> > p)

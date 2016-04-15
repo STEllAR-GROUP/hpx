@@ -17,6 +17,7 @@
 #include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
 
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace ipc

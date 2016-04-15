@@ -11,6 +11,9 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

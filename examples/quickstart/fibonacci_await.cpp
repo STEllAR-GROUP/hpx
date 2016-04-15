@@ -13,11 +13,13 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 
-#include <iostream>
-#include <string>
-
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include <iostream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t threshold = 2;
