@@ -25,10 +25,10 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
 
-#include <map>
 #include <list>
+#include <map>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 
@@ -177,7 +177,7 @@ namespace hpx { namespace util
         ///          \a reclaim().
         connection_type get(key_type const& l)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             // Check if this key already exists in the cache.
             typename cache_type::iterator const it = cache_.find(l);
@@ -234,7 +234,7 @@ namespace hpx { namespace util
         bool get_or_reserve(key_type const& l, connection_type& conn,
             bool force_insert = false)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             typename cache_type::iterator const it = cache_.find(l);
 
@@ -351,7 +351,7 @@ namespace hpx { namespace util
         ///       a prior call to \a get() or \a get_or_reserve().
         void reclaim(key_type const& l, connection_type const& conn)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             // Search for an entry for this key.
             typename cache_type::iterator const ct = cache_.find(l);
@@ -407,7 +407,7 @@ namespace hpx { namespace util
         /// than the maximum number of overall connections, and false otherwise.
         bool full() const
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return (connections_ >= max_connections_);
         }
 
@@ -415,7 +415,7 @@ namespace hpx { namespace util
         /// than the maximum connection count per locality, and false otherwise.
         bool full(key_type const& l) const
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             if (!cache_.count(l))
                 return false || (connections_ >= max_connections_);
@@ -434,7 +434,7 @@ namespace hpx { namespace util
         ///       invariants.
         void clear()
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             key_tracker_.clear();
             cache_.clear();
             connections_ = 0;
@@ -458,7 +458,7 @@ namespace hpx { namespace util
         ///       invariants.
         void clear(key_type const& l)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             // Check if this key already exists in the cache.
             typename cache_type::iterator it = cache_.find(l);
@@ -485,7 +485,7 @@ namespace hpx { namespace util
         /// all associated counts.
         void clear(key_type const& l, connection_type const& conn)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             // Check if this key already exists in the cache.
             typename cache_type::iterator const it = cache_.find(l);
@@ -509,31 +509,31 @@ namespace hpx { namespace util
         // access statistics
         boost::int64_t get_cache_insertions(bool reset)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(insertions_, reset);
         }
 
         boost::int64_t get_cache_evictions(bool reset)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(evictions_, reset);
         }
 
         boost::int64_t get_cache_hits(bool reset)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(hits_, reset);
         }
 
         boost::int64_t get_cache_misses(bool reset)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(misses_, reset);
         }
 
         boost::int64_t get_cache_reclaims(bool reset)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(reclaims_, reset);
         }
 

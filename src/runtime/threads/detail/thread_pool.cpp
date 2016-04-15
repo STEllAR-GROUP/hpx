@@ -27,6 +27,7 @@
 #include <boost/exception_ptr.hpp>
 
 #include <cstdint>
+#include <mutex>
 #include <numeric>
 
 namespace hpx { namespace threads { namespace detail
@@ -67,7 +68,7 @@ namespace hpx { namespace threads { namespace detail
             {
                 // still running
                 lcos::local::no_mutex mtx;
-                boost::unique_lock<lcos::local::no_mutex> l(mtx);
+                std::unique_lock<lcos::local::no_mutex> l(mtx);
                 stop_locked(l);
             }
             threads_.clear();
@@ -257,7 +258,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    bool thread_pool<Scheduler>::run(boost::unique_lock<boost::mutex>& l,
+    bool thread_pool<Scheduler>::run(std::unique_lock<boost::mutex>& l,
         std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
@@ -436,7 +437,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     void thread_pool<Scheduler>::stop (
-        boost::unique_lock<boost::mutex>& l, bool blocking)
+        std::unique_lock<boost::mutex>& l, bool blocking)
     {
         HPX_ASSERT(l.owns_lock());
 

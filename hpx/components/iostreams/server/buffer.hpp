@@ -14,11 +14,11 @@
 #include <hpx/components/iostreams/write_functions.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/swap.hpp>
 
 #include <iosfwd>
 #include <utility>
+#include <mutex>
 #include <vector>
 
 namespace hpx { namespace iostreams { namespace detail
@@ -63,13 +63,13 @@ namespace hpx { namespace iostreams { namespace detail
 
         bool empty() const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return !data_.get() || data_->empty();
         }
 
         buffer init()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
 
             buffer b;
             boost::swap(b.data_, data_);
@@ -79,7 +79,7 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Char>
         std::streamsize write(Char const* s, std::streamsize n)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             std::copy(s, s + n, std::back_inserter(*data_));
             return n;
         }
@@ -87,14 +87,14 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Mutex>
         void write(write_function_type const& f, Mutex& mtx)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (data_.get() && !data_->empty())
             {
                 boost::shared_ptr<std::vector<char> > data(data_);
                 data_.reset();
                 l.unlock();
 
-                boost::lock_guard<Mutex> ll(mtx);
+                std::lock_guard<Mutex> ll(mtx);
                 f(*data);
             }
         }

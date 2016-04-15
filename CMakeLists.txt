@@ -564,10 +564,17 @@ if(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF)
   hpx_add_config_define(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
 endif()
 
+hpx_option(HPX_WITH_THREAD_DESCRIPTION_FULL BOOL
+  "Use function address for thread description (default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
-    set(HPX_HAVE_THREAD_DESCRIPTION ON CACHE INTERNAL "")
+    if(HPX_WITH_THREAD_DESCRIPTION_FULL)
+      hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION_FULL)
+    endif()
 endif()
 
 if(HPX_WITH_THREAD_DEBUG_INFO)
@@ -575,6 +582,9 @@ if(HPX_WITH_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_HAVE_THREAD_PHASE_INFORMATION)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
   hpx_add_config_define(HPX_HAVE_THREAD_DEADLOCK_DETECTION)
+  if(HPX_WITH_THREAD_DESCRIPTION_FULL)
+    hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION_FULL)
+  endif()
 endif()
 
 # run hpx_main on all localities by default
@@ -844,11 +854,17 @@ hpx_check_for_cxx11_std_is_null_pointer(
 hpx_check_for_cxx11_std_is_placeholder(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
 
+hpx_check_for_cxx11_std_lock_guard(
+  REQUIRED "HPX needs support for C++11 std::lock_guard")
+
 hpx_check_for_cxx11_std_reference_wrapper(
   DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 
 hpx_check_for_cxx11_std_to_string(
   REQUIRED "HPX needs support for C++11 std::to_string")
+
+hpx_check_for_cxx11_std_unique_lock(
+  REQUIRED "HPX needs support for C++11 std::unique_lock")
 
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")

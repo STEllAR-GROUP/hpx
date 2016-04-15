@@ -31,9 +31,9 @@
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
 #include <boost/config.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <fstream>
+#include <mutex>
 #include <string>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
@@ -119,7 +119,7 @@ struct file_t : is_generic, non_const_context<detail::file_info>
     template <class msg_type>
     void operator()(const msg_type & msg) const
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
 
         if (!non_const_context_base::context().out)
             non_const_context_base::context().open();   // make sure file is opened

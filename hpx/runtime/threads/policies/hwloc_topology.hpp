@@ -248,7 +248,6 @@ namespace hpx { namespace threads
         std::size_t num_of_pus_;
 
         mutable hpx::util::spinlock topo_mtx;
-        typedef hpx::util::spinlock::scoped_lock scoped_lock;
 
         std::vector<std::size_t> socket_numbers_;
         std::vector<std::size_t> numa_node_numbers_;

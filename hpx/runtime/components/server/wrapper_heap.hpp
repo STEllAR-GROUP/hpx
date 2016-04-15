@@ -22,6 +22,7 @@
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <memory>
+#include <mutex>
 #include <new>
 #include <string>
 
@@ -78,7 +79,7 @@ namespace hpx { namespace components { namespace detail
 
         typedef Mutex mutex_type;
 
-        typedef typename mutex_type::scoped_lock scoped_lock;
+        typedef std::unique_lock<mutex_type> scoped_lock;
 
         typedef boost::aligned_storage<sizeof(value_type),
             boost::alignment_of<value_type>::value> storage_type;

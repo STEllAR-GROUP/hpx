@@ -38,14 +38,15 @@
 #endif
 
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/ref.hpp>
 
 #include <cstdlib>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -933,7 +934,7 @@ void big_boot_barrier::notify()
     naming::resolver_client& agas_client = rt.get_agas_client();
 
     {
-        boost::lock_guard<boost::mutex> lk(mtx, boost::adopt_lock);
+        std::lock_guard<boost::mutex> lk(mtx, std::adopt_lock);
         if (agas_client.get_status() == state_starting)
             --connected;
     }

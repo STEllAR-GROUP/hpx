@@ -25,13 +25,13 @@
 
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/shared_ptr.hpp>
 #endif
 
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -255,7 +255,7 @@ struct HPX_EXPORT primary_namespace
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::unique_lock<mutex_type>& l
+      , std::unique_lock<mutex_type>& l
       , const char* func_name
         );
 #endif
@@ -270,7 +270,7 @@ struct HPX_EXPORT primary_namespace
 
     // helper function
     void wait_for_migration_locked(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , naming::gid_type id
       , error_code& ec);
 
@@ -373,7 +373,7 @@ struct HPX_EXPORT primary_namespace
 
   private:
     resolved_type resolve_gid_locked(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , naming::gid_type const& gid
       , error_code& ec
         );
@@ -399,7 +399,7 @@ struct HPX_EXPORT primary_namespace
     };
 
     void resolve_free_list(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , std::list<refcnt_table_type::iterator> const& free_list
       , std::list<free_entry>& free_entry_list
       , naming::gid_type const& lower

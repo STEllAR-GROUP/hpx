@@ -10,18 +10,17 @@
 
 #include <hpx/util/assert.hpp>
 
-#include <cstddef>
-
-#include <iostream>
-
 #include <boost/io/ios_state.hpp>
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/thread/locks.hpp>
 
 // Use smart_ptr's spinlock header because this header is used by the CMake
 // config tests, and therefore we can't include other hpx headers in this file.
 #include <boost/smart_ptr/detail/spinlock.hpp>
+
+#include <cstddef>
+#include <iostream>
+#include <mutex>
 
 namespace hpx { namespace util
 {
@@ -86,7 +85,7 @@ struct fixture
     {
         if (!t)
         {
-            boost::lock_guard<mutex_type> l(mutex_);
+            std::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): "
@@ -104,7 +103,7 @@ struct fixture
     {
         if (!(t == u))
         {
-            boost::lock_guard<mutex_type> l(mutex_);
+            std::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -123,7 +122,7 @@ struct fixture
     {
         if (!(t != u))
         {
-            boost::lock_guard<mutex_type> l(mutex_);
+            std::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -141,7 +140,7 @@ struct fixture
     {
         if (!(t < u))
         {
-            boost::lock_guard<mutex_type> l(mutex_);
+            std::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -160,7 +159,7 @@ struct fixture
     {
         if (!(t <= u))
         {
-            boost::lock_guard<mutex_type> l(mutex_);
+            std::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -179,7 +178,7 @@ struct fixture
     {
         if (!(t >= u && t <= v))
         {
-            boost::lock_guard<mutex_type> l(mutex_);
+            std::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             if (!(t >= u))
             {

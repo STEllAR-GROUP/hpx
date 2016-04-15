@@ -23,7 +23,6 @@
 
 #include <boost/ref.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/serialization/vector.hpp>
 
 void out(std::vector<unsigned int> vec)

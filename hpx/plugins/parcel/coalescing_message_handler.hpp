@@ -18,8 +18,9 @@
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/cstdint.hpp>
+
+#include <mutex>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -59,7 +60,7 @@ namespace hpx { namespace plugins { namespace parcel
 
     protected:
         bool timer_flush();
-        bool flush_locked(boost::unique_lock<mutex_type>& l,
+        bool flush_locked(std::unique_lock<mutex_type>& l,
             parcelset::policies::message_handler::flush_mode mode,
             bool stop_buffering);
 

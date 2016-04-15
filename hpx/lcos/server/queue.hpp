@@ -17,9 +17,8 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
-#include <boost/thread/locks.hpp>
-
 #include <memory>
+#include <mutex>
 #include <queue>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ namespace hpx { namespace lcos { namespace server
         void set_value (RemoteType && result)
         {
             // push back the new value onto the queue
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             queue_.push(
                 traits::get_remote_result<ValueType, RemoteType>::call(
                     std::move(result)));
@@ -91,7 +90,7 @@ namespace hpx { namespace lcos { namespace server
         ///               to this LCO instance.
         void set_exception(boost::exception_ptr const& /*e*/)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             cond_.abort_all(std::move(l));
         }
 
@@ -101,7 +100,7 @@ namespace hpx { namespace lcos { namespace server
         // into the value queue.
         ValueType get_value(error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // cond_.wait() unlocks the lock before suspension and re-locks it
             // afterwards. During this time span another thread may retrieve

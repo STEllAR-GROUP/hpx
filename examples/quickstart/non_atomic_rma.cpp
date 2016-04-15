@@ -23,7 +23,6 @@
 //Boost includes
 #include <boost/program_options.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/ref.hpp>
 
 #include <algorithm>

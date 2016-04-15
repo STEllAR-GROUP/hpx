@@ -22,10 +22,9 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/thread/locks.hpp>
-
-#include <map>
 #include <list>
+#include <map>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 
@@ -57,7 +56,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
         bool get(key_type const& size, connection_type& conn)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             // Check if a matching entry exists ...
             cache_type::iterator const it = cache_.lower_bound(size);
@@ -81,7 +80,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         // add the given data_buffer to the cache, evict old entries if needed
         void add(key_type const& size, connection_type const& conn)
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
 
             if (key_tracker_.empty()) {
                 HPX_ASSERT(cache_.empty());
@@ -118,13 +117,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
         bool full() const
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return (cache_.size() >= max_cache_size_);
         }
 
         void clear()
         {
-            boost::lock_guard<mutex_type> lock(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             key_tracker_.clear();
             cache_.clear();
 

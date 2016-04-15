@@ -23,10 +23,10 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <deque>
 #include <map>
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
@@ -300,7 +300,7 @@ namespace hpx { namespace parcelset
 
         boost::uint64_t get_pending_parcels_count(bool /*reset*/)
         {
-            boost::lock_guard<lcos::local::spinlock> l(mtx_);
+            std::lock_guard<lcos::local::spinlock> l(mtx_);
             return pending_parcels_.size();
         }
 

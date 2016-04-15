@@ -18,7 +18,8 @@
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 #include <string>
 
@@ -117,7 +118,7 @@ namespace hpx { namespace plugins { namespace parcel
         parcelset::locality const& dest, parcelset::parcel p,
         write_handler_type f)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         ++num_parcels_;
 
         if (stopped_) {
@@ -164,7 +165,7 @@ namespace hpx { namespace plugins { namespace parcel
     bool coalescing_message_handler::timer_flush()
     {
         // adjust timer if needed
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         if (!buffer_.empty())
         {
             flush_locked(l,
@@ -180,12 +181,12 @@ namespace hpx { namespace plugins { namespace parcel
         parcelset::policies::message_handler::flush_mode mode,
         bool stop_buffering)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         return flush_locked(l, mode, stop_buffering);
     }
 
     bool coalescing_message_handler::flush_locked(
-        boost::unique_lock<mutex_type>& l,
+        std::unique_lock<mutex_type>& l,
         parcelset::policies::message_handler::flush_mode mode,
         bool stop_buffering)
     {
@@ -201,7 +202,7 @@ namespace hpx { namespace plugins { namespace parcel
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
 
-            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             timer_.stop();              // interrupt timer
         }
 
@@ -224,7 +225,7 @@ namespace hpx { namespace plugins { namespace parcel
     boost::int64_t
     coalescing_message_handler::get_average_time_between_parcels(bool reset)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         boost::int64_t now = util::high_resolution_clock::now();
         if (num_parcels_ == 0)
         {
@@ -253,7 +254,7 @@ namespace hpx { namespace plugins { namespace parcel
 
     boost::int64_t coalescing_message_handler::get_parcels_count(bool reset)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         boost::int64_t num_parcels = num_parcels_ - reset_num_parcels_;
         if (reset)
             reset_num_parcels_ = num_parcels_;
@@ -263,7 +264,7 @@ namespace hpx { namespace plugins { namespace parcel
     boost::int64_t
         coalescing_message_handler::get_parcels_per_message_count(bool reset)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
 
         if (num_messages_ == 0)
         {
@@ -294,7 +295,7 @@ namespace hpx { namespace plugins { namespace parcel
 
     boost::int64_t coalescing_message_handler::get_messages_count(bool reset)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         boost::int64_t num_messages = num_messages_ - reset_num_messages_;
         if (reset)
             reset_num_messages_ = num_messages_;

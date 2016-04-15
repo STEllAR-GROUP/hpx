@@ -9,7 +9,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 #include <vector>
 
@@ -20,7 +20,7 @@ hpx::util::spinlock result_mutex;
 
 void receive_result(boost::int32_t i)
 {
-    boost::lock_guard<hpx::util::spinlock> l(result_mutex);
+    std::lock_guard<hpx::util::spinlock> l(result_mutex);
     if (i > final_result)
         final_result = i;
 }

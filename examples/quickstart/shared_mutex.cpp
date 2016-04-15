@@ -14,8 +14,10 @@
 #include <boost/atomic.hpp>
 #include <boost/chrono.hpp>
 #include <boost/random.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <ctime>
+#include <mutex>
 #include <vector>
 
 int const writers = 3;
@@ -43,7 +45,7 @@ int main()
 
                 for (int j = 0; j < cycles; ++j)
                 {
-                    boost::unique_lock<hpx::lcos::local::shared_mutex> ul(stm);
+                    std::unique_lock<hpx::lcos::local::shared_mutex> ul(stm);
 
                     hpx::cout << "^^^ Writer " << i << " starting..." << std::endl;
                     hpx::this_thread::sleep_for(milliseconds(dist(urng)));

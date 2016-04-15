@@ -11,13 +11,14 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/move/move.hpp>
+#include <boost/assign/std/vector.hpp>
+
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/move/move.hpp>
-#include <boost/assign/std/vector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 int make_int()
@@ -453,7 +454,7 @@ unsigned callback_called = 0;
 
 void wait_callback(hpx::lcos::shared_future<int>)
 {
-    boost::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
+    std::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
     ++callback_called;
 }
 
@@ -488,7 +489,7 @@ void test_wait_callback()
 
 void do_nothing_callback(hpx::lcos::local::promise<int>& /*pi*/)
 {
-    boost::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
+    std::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
     ++callback_called;
 }
 

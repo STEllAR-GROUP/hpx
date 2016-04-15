@@ -33,8 +33,8 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <mutex>
 #include <sstream>
 #include <vector>
 
@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 sizeof(buffer_.num_chunks_)));
 
             {
-                boost::unique_lock<mutex_type> lk(mtx_);
+                std::unique_lock<mutex_type> lk(mtx_);
                 if(!socket_.is_open())
                 {
                     lk.unlock();
@@ -116,7 +116,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         void shutdown()
         {
-            boost::lock_guard<mutex_type> lk(mtx_);
+            std::lock_guard<mutex_type> lk(mtx_);
             // gracefully and portably shutdown the socket
             boost::system::error_code ec;
             if (socket_.is_open()) {
@@ -200,7 +200,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 }
 
                 {
-                    boost::unique_lock<mutex_type> lk(mtx_);
+                    std::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -256,7 +256,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_read_data<Handler>;
 
                 {
-                    boost::unique_lock<mutex_type> lk(mtx_);
+                    std::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -304,7 +304,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
                 ack_ = true;
                 {
-                    boost::unique_lock<mutex_type> lk(mtx_);
+                    std::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();

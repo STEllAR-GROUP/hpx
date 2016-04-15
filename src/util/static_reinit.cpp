@@ -9,8 +9,7 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
-
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -33,13 +32,13 @@ namespace hpx { namespace util
         void register_functions(construct_type const& construct,
             destruct_type const& destruct)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             funcs_.push_back(value_type(construct, destruct));
         }
 
         void construct_all()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             for (value_type const& val : funcs_)
             {
                 val.first();
@@ -48,7 +47,7 @@ namespace hpx { namespace util
 
         void destruct_all()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             for (value_type const& val : funcs_)
             {
                 val.second();

@@ -29,9 +29,9 @@
 #include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/dynamic_bitset.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -249,25 +249,25 @@ protected:
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , error_code& ec = throws
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_non_blocking(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , error_code& ec
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     std::vector<hpx::future<std::vector<response> > >
     send_refcnt_requests_async(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_sync(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , error_code& ec
         );
 

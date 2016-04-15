@@ -19,8 +19,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/thread/locks.hpp>
-
+#include <mutex>
 #include <string>
 
 namespace hpx
@@ -65,7 +64,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             return;
         }
 
-        boost::unique_lock<mutex_type> lk(mtx_);
+        std::unique_lock<mutex_type> lk(mtx_);
 
         // initialize the affinity configuration for this scheduler
         threads::policies::init_affinity_data data("pu", affinity_desc);
@@ -89,7 +88,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // inform the scheduler to stop the core
         {
-            boost::unique_lock<mutex_type> lk(mtx_);
+            std::unique_lock<mutex_type> lk(mtx_);
             pool_.stop(lk, true);
         }
 
@@ -218,7 +217,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (&ec != &throws)
             ec = make_success_code();
 
-        boost::lock_guard<mutex_type> lk(mtx_);
+        std::lock_guard<mutex_type> lk(mtx_);
         return pool_.get_thread_count(unknown, thread_priority_default,
             std::size_t(-1), false);
     }

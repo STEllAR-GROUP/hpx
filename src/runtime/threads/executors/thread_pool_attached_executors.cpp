@@ -19,8 +19,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/thread/locks.hpp>
-
 namespace hpx
 {
     threads::policies::callback_notifier

@@ -27,11 +27,10 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/ref.hpp>
 
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -363,7 +362,7 @@ namespace hpx {
     {
         // signal successful initialization
         {
-            boost::lock_guard<boost::mutex> lk(mtx);
+            std::lock_guard<boost::mutex> lk(mtx);
             running = true;
             cond.notify_all();
         }
@@ -401,7 +400,7 @@ namespace hpx {
 
         // wait for the thread to run
         {
-            boost::unique_lock<boost::mutex> lk(mtx);
+            std::unique_lock<boost::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -441,7 +440,7 @@ namespace hpx {
             // manager
             boost::mutex mtx;
             boost::condition cond;
-            boost::unique_lock<boost::mutex> l(mtx);
+            std::unique_lock<boost::mutex> l(mtx);
 
             boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
                 boost::ref(cond), boost::ref(mtx)));
@@ -483,7 +482,7 @@ namespace hpx {
 
         LRT_(info) << "runtime_impl: stopped all services";
 
-        boost::lock_guard<boost::mutex> l(mtx);
+        std::lock_guard<boost::mutex> l(mtx);
         cond.notify_all();                  // we're done now
     }
 
@@ -500,7 +499,7 @@ namespace hpx {
 
             // store the exception to be able to rethrow it later
             {
-                boost::lock_guard<boost::mutex> l(mtx_);
+                std::lock_guard<boost::mutex> l(mtx_);
                 exception_ = e;
             }
 
@@ -544,7 +543,7 @@ namespace hpx {
     {
         if (state_.load() > state_running)
         {
-            boost::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<boost::mutex> l(mtx_);
             if (exception_)
             {
                 boost::exception_ptr e = exception_;

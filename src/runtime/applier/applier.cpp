@@ -83,9 +83,8 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        util::thread_description d = desc;
-        if (!desc)
-            d = util::thread_description(func);
+        util::thread_description d =
+            desc ? desc : util::thread_description(func, "register_thread_nullary");
 
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
@@ -111,9 +110,8 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        util::thread_description d = desc;
-        if (!desc)
-            d = util::thread_description(func);
+        util::thread_description d =
+            desc ? desc : util::thread_description(func, "register_thread");
 
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function), std::move(func)),
@@ -139,9 +137,8 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        util::thread_description d = desc;
-        if (!desc)
-            d = util::thread_description(func);
+        util::thread_description d =
+            desc ? desc : util::thread_description(func, "register_thread_plain");
 
         threads::thread_init_data data(std::move(func),
             d, 0, priority, os_thread, threads::get_stack_size(stacksize));
@@ -186,9 +183,8 @@ namespace hpx { namespace applier
             return;
         }
 
-        util::thread_description d = desc;
-        if (!desc)
-            d = util::thread_description(func);
+        util::thread_description d =
+            desc ? desc : util::thread_description(func, "register_thread_nullary");
 
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
@@ -212,9 +208,8 @@ namespace hpx { namespace applier
             return;
         }
 
-        util::thread_description d = desc;
-        if (!desc)
-            d = util::thread_description(func);
+        util::thread_description d =
+            desc ? desc : util::thread_description(func, "register_work");
 
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function), std::move(func)),
@@ -239,9 +234,8 @@ namespace hpx { namespace applier
             return;
         }
 
-        util::thread_description d = desc;
-        if (!desc)
-            d = util::thread_description(func);
+        util::thread_description d =
+            desc ? desc : util::thread_description(func, "register_work_plain");
 
         threads::thread_init_data data(std::move(func),
             d, lva, priority, os_thread, threads::get_stack_size(stacksize));
@@ -265,9 +259,8 @@ namespace hpx { namespace applier
             return;
         }
 
-        util::thread_description d = desc;
-        if (!desc)
-            d = util::thread_description(func);
+        util::thread_description d =
+            desc ? desc : util::thread_description(func, "register_work_plain");
 
         threads::thread_init_data data(std::move(func),
             d, lva, priority, os_thread, threads::get_stack_size(stacksize),

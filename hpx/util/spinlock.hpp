@@ -12,7 +12,6 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
 namespace hpx { namespace util
@@ -75,12 +74,8 @@ struct spinlock
     {
         return &m;
     }
-
-    typedef boost::unique_lock<spinlock> scoped_lock;
-    typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
 };
 
 }}
 
 #endif // HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770
-

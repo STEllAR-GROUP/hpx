@@ -14,6 +14,7 @@
 
 #include <boost/chrono.hpp>
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -22,7 +23,7 @@
 
 #define CHECK_LOCKED_VALUE_EQUAL(mutex_name, value, expected_value)           \
     {                                                                         \
-        boost::unique_lock<hpx::lcos::local::mutex> lock(mutex_name);         \
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex_name);         \
         HPX_TEST_EQ(value, expected_value);                                   \
     }
 
@@ -42,7 +43,7 @@ void test_only_one_upgrade_lock_permitted()
     mutex_type unblocked_count_mutex;
     hpx::lcos::local::condition_variable unblocked_condition;
     mutex_type finish_mutex;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     try
     {
@@ -92,7 +93,7 @@ void test_can_lock_upgrade_if_currently_locked_shared()
     mutex_type unblocked_count_mutex;
     hpx::lcos::local::condition_variable unblocked_condition;
     mutex_type finish_mutex;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     unsigned const reader_count = 10;
 
@@ -120,7 +121,7 @@ void test_can_lock_upgrade_if_currently_locked_shared()
         );
 
         {
-            boost::unique_lock<mutex_type> lk(unblocked_count_mutex);
+            std::unique_lock<mutex_type> lk(unblocked_count_mutex);
             while(unblocked_count < (reader_count + 1))
             {
                 unblocked_condition.wait(lk);
@@ -165,7 +166,7 @@ void test_if_other_thread_has_write_lock_try_lock_shared_returns_false()
     mutex_type finish_mutex;
     mutex_type unblocked_mutex;
     unsigned unblocked_count = 0;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
     hpx::thread writer(test::simple_writing_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
@@ -194,7 +195,7 @@ void test_if_other_thread_has_write_lock_try_lock_upgrade_returns_false()
     mutex_type finish_mutex;
     mutex_type unblocked_mutex;
     unsigned unblocked_count = 0;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
     hpx::thread writer(test::simple_writing_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
@@ -249,7 +250,7 @@ void test_if_other_thread_has_shared_lock_try_lock_shared_returns_true()
     mutex_type finish_mutex;
     mutex_type unblocked_mutex;
     unsigned unblocked_count = 0;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
     hpx::thread writer(test::simple_reading_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
@@ -278,7 +279,7 @@ void test_if_other_thread_has_shared_lock_try_lock_upgrade_returns_true()
     mutex_type finish_mutex;
     mutex_type unblocked_mutex;
     unsigned unblocked_count = 0;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
     hpx::thread writer(test::simple_reading_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
@@ -307,7 +308,7 @@ void test_if_other_thread_has_upgrade_lock_try_lock_upgrade_returns_false()
     mutex_type finish_mutex;
     mutex_type unblocked_mutex;
     unsigned unblocked_count = 0;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
     hpx::thread writer(test::simple_upgrade_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
