@@ -46,7 +46,7 @@ namespace hpx { namespace util
 #endif
     }
 
-#if !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
+#if defined(HPX_HAVE_THREAD_DESCRIPTION) && !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
     void thread_description::init_from_alternative_name(char const* altname)
     {
         type_ = data_type_description;
