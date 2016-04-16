@@ -3,6 +3,7 @@
 //  Copyright Beman Dawes 2002.
 //  Copyright Rene Rivera 2004-2006.
 //  Copyright Gennaro Prota 2006.
+//  Copyright Hartmut Kaiser 2014-2016.
 
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -66,6 +67,8 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "endline_whitespace_check.hpp"
 #include "length_check.hpp"
 #include "include_check.hpp"
+#include "deprecated_include_check.hpp"
+#include "deprecated_name_check.hpp"
 
 //#include "cvs_iterator.hpp"
 
@@ -831,6 +834,8 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool whitespace_ck = false;
     bool length_ck = false;
     bool include_ck = false;
+    bool deprecated_include_ck = false;
+    bool deprecated_names_ck = false;
 
     desc_commandline.add_options()
         ("help,h", "print some command line help")
@@ -874,6 +879,12 @@ int cpp_main( int argc_param, char * argv_param[] )
             "check for exceeding character limit (default: off)")
         ("include", value<bool>(&include_ck)->implicit_value(false),
             "check for certain #include's (default: off)")
+        ("deprecated_include",
+            value<bool>(&deprecated_include_ck)->implicit_value(false),
+            "check for deprecated #include's (default: off)")
+        ("deprecated_name",
+            value<bool>(&deprecated_names_ck)->implicit_value(false),
+            "check for deprecated names usage violations (default: off)")
 
         ("all,a", "check for all violations (default: no checks are performed)")
         ;
@@ -952,6 +963,8 @@ int cpp_main( int argc_param, char * argv_param[] )
         whitespace_ck = true;
         length_ck = true;
         include_ck = true;
+        deprecated_include_ck = true;
+        deprecated_names_ck = true;
     }
 
     std::string output_path("-");
@@ -1011,6 +1024,12 @@ int cpp_main( int argc_param, char * argv_param[] )
   if ( include_ck)
       inspectors.push_back(inspector_element (
           new boost::inspect::include_check()) );
+  if ( deprecated_include_ck)
+      inspectors.push_back(inspector_element (
+          new boost::inspect::deprecated_include_check()) );
+  if ( deprecated_names_ck)
+      inspectors.push_back(inspector_element (
+          new boost::inspect::deprecated_name_check()) );
 
   //// perform the actual inspection, using the requested type of iteration
     for(auto const& search_root: search_roots)
