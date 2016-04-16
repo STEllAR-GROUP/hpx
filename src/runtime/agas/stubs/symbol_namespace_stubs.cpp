@@ -8,6 +8,8 @@
 #include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 
+#include <vector>
+
 namespace hpx { namespace agas { namespace stubs
 {
 

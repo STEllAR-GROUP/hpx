@@ -18,8 +18,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <vector>
 #include <sstream>
+#include <vector>
 
 namespace hpx { namespace parcelset
 {

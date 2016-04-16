@@ -13,17 +13,16 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <math.h>
-#include <vector>
 #include <list>
+#include <iostream>
 #include <set>
+#include <vector>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 
 #include <boost/ref.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/serialization/vector.hpp>
 
 void out(std::vector<unsigned int> vec)

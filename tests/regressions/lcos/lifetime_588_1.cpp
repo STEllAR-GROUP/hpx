@@ -10,6 +10,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 #define NUM_INSTANCES 100
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -6,8 +6,10 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include "is_sorted_tests.hpp"
+#include <string>
+#include <vector>
 
+#include "is_sorted_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>

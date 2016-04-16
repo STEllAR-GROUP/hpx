@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace local
         ///       destructor. This may require additional coordination.
         ~latch ()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ == 0);
         }
 
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace local
         ///
         void count_down_and_wait()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ > 0);
 
             if (--counter_ == 0)
@@ -102,7 +102,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT(n >= 0);
 
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ >= n);
 
             if ((counter_ -= n) == 0)
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace local
         ///
         bool is_ready() const HPX_NOEXCEPT
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return counter_ == 0;
         }
 
@@ -127,14 +127,14 @@ namespace hpx { namespace lcos { namespace local
         ///
         void wait() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (counter_ > 0)
                 cond_.wait(std::move(l), "hpx::local::latch::wait");
         }
 
         void abort_all()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             cond_.abort_all(std::move(l));
         }
 

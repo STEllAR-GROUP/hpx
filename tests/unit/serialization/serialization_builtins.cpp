@@ -10,6 +10,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <vector>
+
 template <typename T>
 struct A
 {

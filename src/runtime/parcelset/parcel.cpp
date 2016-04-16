@@ -9,6 +9,7 @@
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 
 #include <sstream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset

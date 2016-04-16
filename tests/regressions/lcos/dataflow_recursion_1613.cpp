@@ -13,6 +13,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <vector>
+
 #define NUM_FUTURES std::size_t(300)
 
 // One way to force recursion is to make all futures depend on the next and

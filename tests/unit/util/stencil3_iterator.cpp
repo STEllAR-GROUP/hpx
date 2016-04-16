@@ -9,9 +9,11 @@
 
 #include <hpx/util/transform_iterator.hpp>
 
-#include <sstream>
-
 #include <boost/range/functions.hpp>
+
+#include <sstream>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace test

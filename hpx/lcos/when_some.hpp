@@ -241,11 +241,11 @@ namespace hpx
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <mutex>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -415,7 +415,7 @@ namespace hpx { namespace lcos
                 if (new_count <= needed_count_)
                 {
                     {
-                        boost::lock_guard<mutex_type> l(this->mtx_);
+                        std::lock_guard<mutex_type> l(this->mtx_);
                         lazy_values_.indices.push_back(idx);
                     }
                     if (new_count == needed_count_) {

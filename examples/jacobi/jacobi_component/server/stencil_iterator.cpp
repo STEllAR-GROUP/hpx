@@ -12,6 +12,8 @@
 
 #include <boost/make_shared.hpp>
 
+#include <vector>
+
 namespace jacobi
 {
     namespace server

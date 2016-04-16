@@ -13,6 +13,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 /**
  * In this class we use the custom c-tor macro to simply delegate to
  * another c-tor without actually accessing the archive.

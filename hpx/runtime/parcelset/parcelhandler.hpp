@@ -26,8 +26,11 @@
 
 #include <boost/bind.hpp>
 
-#include <map>
 #include <algorithm>
+#include <map>
+#include <mutex>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace parcelset
 {
@@ -362,7 +365,7 @@ namespace hpx { namespace parcelset
         {
             write_handler_type f;
             {
-                boost::lock_guard<mutex_type> l(mtx_);
+                std::lock_guard<mutex_type> l(mtx_);
                 f = write_handler_;
             }
             f(ec, p);
@@ -370,7 +373,7 @@ namespace hpx { namespace parcelset
 
         write_handler_type set_write_handler(write_handler_type f)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             std::swap(f, write_handler_);
             return f;
         }

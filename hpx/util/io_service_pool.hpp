@@ -14,8 +14,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/thread/mutex.hpp>

@@ -15,8 +15,8 @@
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <vector>
 #include <iterator>
+#include <vector>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/range/functions.hpp>

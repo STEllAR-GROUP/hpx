@@ -11,6 +11,9 @@
 
 #include <boost/range/functions.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {

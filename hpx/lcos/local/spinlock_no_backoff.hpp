@@ -15,8 +15,6 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
-#include <boost/thread/locks.hpp>
-
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
 #  if !defined( BOOST_SP_HAS_SYNC )
@@ -99,11 +97,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_RELEASED(this);
             util::unregister_lock(this);
         }
-
-        typedef boost::unique_lock<spinlock_no_backoff> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<spinlock_no_backoff> scoped_try_lock;
     };
 }}}
 
 #endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
-

@@ -10,8 +10,9 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include <boost/range/functions.hpp>
 #include <boost/type_traits/is_same.hpp>

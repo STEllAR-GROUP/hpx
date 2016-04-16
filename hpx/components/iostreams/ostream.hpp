@@ -16,14 +16,16 @@
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
 
-#include <boost/iostreams/stream.hpp>
 #include <boost/atomic.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/iostreams/stream.hpp>
 
-#include <iterator>
 #include <ios>
 #include <iostream>
+#include <mutex>
+#include <iterator>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace iostreams
 {
@@ -222,7 +224,7 @@ namespace hpx { namespace iostreams
 
         bool flush()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (!this->detail::buffer::empty())
             {
                 // Create the next buffer, returns the previous buffer
@@ -254,7 +256,7 @@ namespace hpx { namespace iostreams
         // reset this object during runtime system shutdown
         void uninitialize()
         {
-            boost::unique_lock<mutex_type> l(mtx_, boost::try_to_lock);
+            std::unique_lock<mutex_type> l(mtx_, std::try_to_lock);
             if (l)
             {
                 streaming_operator_sync(hpx::async_flush, l);   // unlocks l
@@ -273,28 +275,28 @@ namespace hpx { namespace iostreams
         // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::endl manipulator
         ostream& operator<<(hpx::iostreams::endl_type const& m)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::async_flush manipulator
         ostream& operator<<(hpx::iostreams::async_flush_type const& m)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_async(m, l);
         }
 
         // hpx::async_endl manipulator
         ostream& operator<<(hpx::iostreams::async_endl_type const& m)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_async(m, l);
         }
 
@@ -302,14 +304,14 @@ namespace hpx { namespace iostreams
         template <typename T>
         ostream& operator<<(T const& subject)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return streaming_operator_lazy(subject);
         }
 
         ///////////////////////////////////////////////////////////////////////
         ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return streaming_operator_lazy(manip_fun);
         }
     };

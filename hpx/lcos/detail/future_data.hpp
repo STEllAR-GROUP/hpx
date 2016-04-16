@@ -28,11 +28,11 @@
 #include <boost/math/common_factor_ct.hpp>
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/max.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/type_traits/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <memory>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -412,7 +412,7 @@ namespace detail
         template <typename Target>
         void set_value(Target && data, error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked()) {
@@ -448,7 +448,7 @@ namespace detail
         template <typename Target>
         void set_exception(Target && data, error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked()) {
@@ -555,7 +555,7 @@ namespace detail
         {
             if (!data_sink) return;
 
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
 
             if (is_ready_locked()) {
 
@@ -575,7 +575,7 @@ namespace detail
 
         virtual void wait(error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -591,7 +591,7 @@ namespace detail
         wait_until(boost::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -616,7 +616,7 @@ namespace detail
         /// \a future.
         bool is_ready() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return is_ready_locked();
         }
 
@@ -627,13 +627,13 @@ namespace detail
 
         bool has_value() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return state_ == value;
         }
 
         bool has_exception() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return state_ == exception;
         }
 
@@ -747,13 +747,13 @@ namespace detail
     private:
         bool started_test() const
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             return started_;
         }
 
         bool started_test_and_set()
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             if (started_)
                 return true;
 
@@ -764,7 +764,7 @@ namespace detail
     protected:
         void check_started()
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             if (started_) {
                 HPX_THROW_EXCEPTION(task_already_started,
                     "task_base::check_started",
@@ -831,12 +831,12 @@ namespace detail
     protected:
         threads::thread_id_type get_thread_id() const
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
         void set_thread_id(threads::thread_id_type id)
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
         }
 
@@ -881,7 +881,7 @@ namespace detail
 
         void cancel()
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();

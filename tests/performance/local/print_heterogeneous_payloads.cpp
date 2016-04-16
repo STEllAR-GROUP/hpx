@@ -6,8 +6,9 @@
 
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
+#include <vector>
 
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>

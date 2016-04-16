@@ -22,8 +22,8 @@
 #include <boost/fusion/include/io.hpp>
 
 #include <fstream>
-#include <string>
 #include <iterator>
+#include <string>
 
 // type to store parser output
 BOOST_FUSION_DEFINE_STRUCT(

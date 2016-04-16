@@ -23,7 +23,9 @@
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
 #include <boost/range/functions.hpp>
+
 #include <iterator>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util

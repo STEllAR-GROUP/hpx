@@ -47,12 +47,13 @@
 #include <unwind.h>
 #include <boost/cstdint.hpp>
 #endif
-#include <string.h>
-#include <stdlib.h>
+#include <iomanip>
 #include <ostream>
 #include <sstream>
-#include <iomanip>
 #include <string>
+#include <vector>
+#include <string.h>
+#include <stdlib.h>
 
 #if defined(HPX_MSVC)
 #include <windows.h>

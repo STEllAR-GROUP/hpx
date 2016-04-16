@@ -16,11 +16,10 @@
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
 
-#include <list>
 #include <iterator>
+#include <list>
 #include <memory>
-
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -54,7 +53,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void add(connection_ptr const & ptr)
         {
-            boost::unique_lock<mutex_type> l(connections_mtx_);
+            std::unique_lock<mutex_type> l(connections_mtx_);
             connections_.push_back(ptr);
         }
 
@@ -86,7 +85,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             // If some are still in progress, give them back
             if(connections.begin() != end)
             {
-                boost::unique_lock<mutex_type> l(connections_mtx_);
+                std::unique_lock<mutex_type> l(connections_mtx_);
                 connections_.insert(
                     connections_.end()
                   , std::make_move_iterator(connections.begin())
@@ -99,7 +98,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             connection_list connections;
             {
-                boost::unique_lock<mutex_type> l(connections_mtx_, boost::try_to_lock);
+                std::unique_lock<mutex_type> l(connections_mtx_, std::try_to_lock);
                 if(l && !connections_.empty())
                 {
                     connections.push_back(connections_.front());
@@ -123,7 +122,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             int next_free = -1;
             {
-                mutex_type::scoped_try_lock l(next_free_tag_mtx_);
+                std::unique_lock<mutex_type> l(next_free_tag_mtx_, std::try_to_lock);
                 if(l)
                     next_free = next_free_tag_locked();
             }

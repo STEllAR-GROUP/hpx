@@ -13,7 +13,8 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -44,7 +45,7 @@ namespace hpx { namespace lcos { namespace local
             if (event_.load(boost::memory_order_acquire))
                 return;
 
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             wait_locked(l);
         }
 
@@ -53,7 +54,7 @@ namespace hpx { namespace lcos { namespace local
         {
             event_.store(true, boost::memory_order_release);
 
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             set_locked(std::move(l));
         }
 
@@ -64,7 +65,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        void wait_locked(boost::unique_lock<mutex_type>& l)
+        void wait_locked(std::unique_lock<mutex_type>& l)
         {
             HPX_ASSERT(l.owns_lock());
 
@@ -74,7 +75,7 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
-        void set_locked(boost::unique_lock<mutex_type> l)
+        void set_locked(std::unique_lock<mutex_type> l)
         {
             HPX_ASSERT(l.owns_lock());
 

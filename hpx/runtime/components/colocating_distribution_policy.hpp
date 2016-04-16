@@ -26,8 +26,8 @@
 #include <hpx/lcos/future.hpp>
 
 #include <algorithm>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 namespace hpx { namespace components
 {

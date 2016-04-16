@@ -11,6 +11,9 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {

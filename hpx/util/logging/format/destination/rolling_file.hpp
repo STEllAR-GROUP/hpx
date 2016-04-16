@@ -31,8 +31,8 @@
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
 #include <fstream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 

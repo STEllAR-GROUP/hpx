@@ -9,9 +9,9 @@
 
 #include <boost/range/functions.hpp>
 
-#include <vector>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>

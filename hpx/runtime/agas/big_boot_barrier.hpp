@@ -26,6 +26,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
+#include <string>
+
 namespace hpx { namespace agas
 {
 

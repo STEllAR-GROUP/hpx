@@ -24,6 +24,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
 
+#include <mutex>
 #include <sstream>
 #include <utility>
 
@@ -177,7 +178,7 @@ namespace hpx { namespace components
                 }
             }
 
-            naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
+            std::unique_lock<naming::gid_type::mutex_type> l(gid_.get_mutex());
 
             if (!naming::detail::has_credits(gid_))
             {

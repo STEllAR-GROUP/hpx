@@ -6,9 +6,9 @@
 #if !defined(HPX_UTIL_BUFFER_POOL_HPP)
 #define HPX_UTIL_BUFFER_POOL_HPP
 
-#include <vector>
 #include <list>
 #include <map>
+#include <vector>
 
 #include <boost/shared_ptr.hpp>
 

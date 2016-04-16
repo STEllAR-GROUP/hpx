@@ -10,6 +10,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/include/client.hpp>
 
+#include <string>
+#include <vector>
+
 #include "stubs/partition3d.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

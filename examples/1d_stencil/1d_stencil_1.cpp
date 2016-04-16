@@ -13,6 +13,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <vector>
+
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

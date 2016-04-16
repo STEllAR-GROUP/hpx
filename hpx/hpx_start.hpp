@@ -14,6 +14,9 @@
 
 #include <boost/program_options.hpp>
 
+#include <string>
+#include <vector>
+
 #ifndef DOXYGEN
 ///////////////////////////////////////////////////////////////////////////////
 // One of these functions must be implemented by the application for the

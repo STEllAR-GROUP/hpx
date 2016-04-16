@@ -11,6 +11,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 boost::int32_t times2(boost::int32_t i)
 {
     return i * 2;

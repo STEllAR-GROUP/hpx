@@ -13,6 +13,8 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
+#include <string>
+
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     boost::int64_t, int64_t,
     hpx::actions::base_lco_with_value_int64_get,

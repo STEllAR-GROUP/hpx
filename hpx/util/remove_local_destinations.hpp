@@ -10,10 +10,10 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <vector>
-
 #include <boost/dynamic_bitset.hpp>
+
 #include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

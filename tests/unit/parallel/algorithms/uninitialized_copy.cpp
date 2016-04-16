@@ -6,6 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <string>
+#include <vector>
+
 #include "uninitialized_copy_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////

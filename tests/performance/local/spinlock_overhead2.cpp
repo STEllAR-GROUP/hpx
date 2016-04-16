@@ -19,9 +19,9 @@
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/chrono/duration.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <stdexcept>
+#include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -193,7 +193,7 @@ double null_function(std::size_t i)
     double d = 0.;
     std::size_t idx = i % N;
     {
-        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
+        std::lock_guard<test::local_spinlock> l(mtx[idx]);
         d = global_init[idx];
     }
     for (double j = 0; j < num_iterations; ++j)
@@ -201,7 +201,7 @@ double null_function(std::size_t i)
         d += 1 / (2. * j + 1);
     }
     {
-        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
+        std::lock_guard<test::local_spinlock> l(mtx[idx]);
         global_init[idx] = d;
     }
     return d;

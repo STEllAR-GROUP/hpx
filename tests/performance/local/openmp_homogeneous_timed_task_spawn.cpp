@@ -40,8 +40,9 @@
 
 #include <omp.h>
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>

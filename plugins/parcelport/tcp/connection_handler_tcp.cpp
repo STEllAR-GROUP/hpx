@@ -20,7 +20,10 @@
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
+
+#include <string>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
 {
@@ -114,7 +117,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     {
         {
             // cancel all pending read operations, close those sockets
-            boost::lock_guard<lcos::local::spinlock> l(connections_mtx_);
+            std::lock_guard<lcos::local::spinlock> l(connections_mtx_);
             for (boost::shared_ptr<receiver> const& c : accepted_connections_)
             {
                 c->shutdown();
@@ -212,7 +215,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
 #if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
         {
-            boost::lock_guard<lcos::local::spinlock> lock(connections_mtx_);
+            std::lock_guard<lcos::local::spinlock> lock(connections_mtx_);
             write_connections_.insert(sender_connection);
         }
 #endif
@@ -281,7 +284,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
             {
                 // keep track of all accepted connections
-                boost::lock_guard<lcos::local::spinlock> l(connections_mtx_);
+                std::lock_guard<lcos::local::spinlock> l(connections_mtx_);
                 accepted_connections_.insert(c);
             }
 
@@ -300,7 +303,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         else
         {
             // remove this connection from the list of known connections
-            boost::lock_guard<lcos::local::spinlock> l(mtx_);
+            std::lock_guard<lcos::local::spinlock> l(mtx_);
             accepted_connections_.erase(receiver_conn);
         }
     }
@@ -323,7 +326,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 //         if (e != boost::asio::error::eof)
         {
             // remove this connection from the list of known connections
-            boost::lock_guard<lcos::local::spinlock> l(connections_mtx_);
+            std::lock_guard<lcos::local::spinlock> l(connections_mtx_);
             accepted_connections_.erase(receiver_conn);
         }
     }

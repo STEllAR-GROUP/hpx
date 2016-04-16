@@ -31,6 +31,7 @@
 #include <boost/spirit/include/qi_sequence.hpp>
 
 #include <string>
+#include <vector>
 
 #if defined(HPX_WINDOWS)
 #  include <process.h>

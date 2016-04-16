@@ -13,6 +13,9 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <string>
+#include <vector>
+
 #include "nqueen.hpp"
 
 int hpx_main(boost::program_options::variables_map&)

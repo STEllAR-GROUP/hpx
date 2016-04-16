@@ -25,8 +25,9 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <vector>
 
 #include <apex_api.hpp>
 

@@ -10,8 +10,10 @@
 
 #include <boost/assign/std/vector.hpp>
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
 
 // The affinity masks this test is verifying the results against are specific
 // to a particular machine. If you enable this option you might see a lot of

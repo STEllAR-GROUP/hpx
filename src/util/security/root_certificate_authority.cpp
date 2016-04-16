@@ -10,6 +10,8 @@
 
 #include <hpx/util/security/root_certificate_authority.hpp>
 
+#include <string>
+
 namespace hpx { namespace util { namespace security
 {
     root_certificate_authority::~root_certificate_authority()

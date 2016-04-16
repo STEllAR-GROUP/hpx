@@ -27,6 +27,7 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <sstream>
+#include <string>
 
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>

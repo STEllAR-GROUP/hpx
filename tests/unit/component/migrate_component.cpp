@@ -14,6 +14,8 @@
 
 #include <boost/chrono.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::migration_support<

@@ -12,6 +12,9 @@
 #include <boost/assign.hpp>
 #include <boost/ref.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 int test()
 {

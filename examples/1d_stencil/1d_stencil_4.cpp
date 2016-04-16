@@ -20,6 +20,8 @@
 #include <hpx/include/parallel_algorithm.hpp>
 #include <boost/range/irange.hpp>
 
+#include <vector>
+
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

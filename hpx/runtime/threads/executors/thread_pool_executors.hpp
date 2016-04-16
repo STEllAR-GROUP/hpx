@@ -16,6 +16,8 @@
 #include <boost/atomic.hpp>
 #include <boost/chrono.hpp>
 
+#include <vector>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads { namespace executors

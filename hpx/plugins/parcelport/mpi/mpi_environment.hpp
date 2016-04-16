@@ -15,6 +15,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <cstdlib>
+#include <string>
 
 namespace hpx { namespace util
 {

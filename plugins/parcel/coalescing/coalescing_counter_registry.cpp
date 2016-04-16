@@ -13,6 +13,8 @@
 #include <boost/format.hpp>
 #include <boost/regex.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel
 {

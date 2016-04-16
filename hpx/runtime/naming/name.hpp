@@ -22,12 +22,15 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <cstddef>
 #include <ios>
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <mutex>
 #include <sstream>
-#include <cstddef>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -334,9 +337,6 @@ namespace hpx { namespace naming
 
             HPX_ITT_SYNC_RELEASED(this);
         }
-
-        typedef boost::unique_lock<gid_type> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<gid_type> scoped_try_lock;
 
         mutex_type& get_mutex() const { return const_cast<mutex_type&>(*this); }
 
@@ -663,7 +663,7 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type move_gid(gid_type& id);
-        HPX_EXPORT gid_type move_gid_locked(gid_type::mutex_type::scoped_lock l,
+        HPX_EXPORT gid_type move_gid_locked(std::unique_lock<gid_type::mutex_type> l,
             gid_type& gid);
 
         HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
@@ -673,7 +673,7 @@ namespace hpx { namespace naming
         // the returned copy
         HPX_EXPORT gid_type split_credits_for_gid(gid_type& id);
         HPX_EXPORT gid_type split_credits_for_gid_locked(
-            gid_type::mutex_type::scoped_lock& l, gid_type& id);
+            std::unique_lock<gid_type::mutex_type>& l, gid_type& id);
     }
 
     HPX_EXPORT gid_type operator+ (gid_type const& lhs, gid_type const& rhs);

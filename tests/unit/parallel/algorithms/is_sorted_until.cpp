@@ -10,9 +10,11 @@
 
 #include <boost/range/functions.hpp>
 
-#include "test_utils.hpp"
-
 #include <iostream>
+#include <string>
+#include <vector>
+
+#include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>

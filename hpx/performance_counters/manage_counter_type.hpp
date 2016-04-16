@@ -16,6 +16,8 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>
 
+#include <string>
+
 namespace hpx { namespace performance_counters
 {
     /// \cond NOINTERNAL

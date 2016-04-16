@@ -9,9 +9,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <vector>
 #include <iostream>
-
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

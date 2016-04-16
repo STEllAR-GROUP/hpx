@@ -24,11 +24,12 @@
 #include <boost/version.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
-#include <vector>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/xtime.hpp>
 #include <boost/bind.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // hpx::util::logging::manipulator
+
+#include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace writer {
 

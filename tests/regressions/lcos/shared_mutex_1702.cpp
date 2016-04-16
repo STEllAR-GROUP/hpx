@@ -10,6 +10,10 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
 
+#include <boost/thread/locks.hpp>
+
+#include <mutex>
+
 int main()
 {
     typedef hpx::lcos::local::shared_mutex shared_mutex_type;
@@ -18,7 +22,7 @@ int main()
     shared_mutex_type mtx;
 
     {
-        boost::unique_lock<shared_mutex_type> l(mtx);
+        std::unique_lock<shared_mutex_type> l(mtx);
         data = 42;
     }
 

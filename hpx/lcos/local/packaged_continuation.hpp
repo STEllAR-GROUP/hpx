@@ -23,8 +23,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/type_traits/remove_reference.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <mutex>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,12 +171,12 @@ namespace hpx { namespace lcos { namespace detail
     protected:
         threads::thread_id_type get_id() const
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
         void set_id(threads::thread_id_type const& id)
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
         }
 
@@ -217,7 +217,7 @@ namespace hpx { namespace lcos { namespace detail
             >::type const& f, error_code& ec)
         {
             {
-                boost::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::run",
@@ -261,7 +261,7 @@ namespace hpx { namespace lcos { namespace detail
             error_code& ec)
         {
             {
-                boost::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async",
@@ -276,9 +276,9 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::detail::shared_state_ptr_for<Future>::type const&
             ) = &continuation::async_impl;
 
+            util::thread_description desc(f_, "continuation::async");
             applier::register_thread_plain(
-                util::bind(async_impl_ptr, std::move(this_), f),
-                util::thread_description(f_));
+                util::bind(async_impl_ptr, std::move(this_), f), desc);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -291,7 +291,7 @@ namespace hpx { namespace lcos { namespace detail
             threads::executor& sched, error_code& ec)
         {
             {
-                boost::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async",
@@ -306,9 +306,8 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::detail::shared_state_ptr_for<Future>::type const&
             ) = &continuation::async_impl;
 
-            sched.add(
-                util::bind(async_impl_ptr, std::move(this_), f),
-                util::thread_description(f_));
+            util::thread_description desc(f_, "continuation::async");
+            sched.add(util::bind(async_impl_ptr, std::move(this_), f), desc);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -322,7 +321,7 @@ namespace hpx { namespace lcos { namespace detail
             Executor& exec, error_code& ec)
         {
             {
-                boost::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async_exec",
@@ -379,7 +378,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void cancel()
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();

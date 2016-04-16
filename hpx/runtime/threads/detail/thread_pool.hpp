@@ -22,8 +22,9 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include <vector>
+#include <mutex>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -44,8 +45,8 @@ namespace hpx { namespace threads { namespace detail
         std::size_t init(std::size_t num_threads,
             policies::init_affinity_data const& data);
 
-        bool run(boost::unique_lock<boost::mutex>& l, std::size_t num_threads);
-        void stop(boost::unique_lock<boost::mutex>& l, bool blocking = true);
+        bool run(std::unique_lock<boost::mutex>& l, std::size_t num_threads);
+        void stop(std::unique_lock<boost::mutex>& l, bool blocking = true);
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
 

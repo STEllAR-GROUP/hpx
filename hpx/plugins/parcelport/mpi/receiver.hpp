@@ -14,10 +14,9 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver_connection.hpp>
 
-#include <list>
 #include <iterator>
-
-#include <boost/thread/locks.hpp>
+#include <list>
+#include <mutex>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -48,7 +47,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             // We accept as many connections as we can ...
             connection_list connections;
             {
-                boost::unique_lock<mutex_type> l(connections_mtx_, boost::try_to_lock);
+                std::unique_lock<mutex_type> l(connections_mtx_, std::try_to_lock);
                 if(l && !connections_.empty())
                 {
                     connections.push_back(connections_.front());
@@ -93,7 +92,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             // If some are still in progress, give them back
             if(connections.begin() != end)
             {
-                boost::unique_lock<mutex_type> l(connections_mtx_);
+                std::unique_lock<mutex_type> l(connections_mtx_);
                 connections_.insert(
                     connections_.end()
                   , std::make_move_iterator(connections.begin())
@@ -104,13 +103,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         connection_ptr accept()
         {
-            boost::unique_lock<mutex_type> l(headers_mtx_, boost::try_to_lock);
+            std::unique_lock<mutex_type> l(headers_mtx_, std::try_to_lock);
             if(l)
                 return accept_locked(l);
             return connection_ptr();
         }
 
-        connection_ptr accept_locked(boost::unique_lock<mutex_type> & header_lock)
+        connection_ptr accept_locked(std::unique_lock<mutex_type> & header_lock)
         {
             connection_ptr res;
             util::mpi_environment::scoped_try_lock l;

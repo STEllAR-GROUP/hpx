@@ -15,7 +15,8 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 namespace hpx { namespace lcos { namespace local { namespace detail
 {
@@ -32,13 +33,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                    "aborting threads";
 
             local::no_mutex no_mtx;
-            boost::unique_lock<local::no_mutex> lock(no_mtx);
+            std::unique_lock<local::no_mutex> lock(no_mtx);
             abort_all<local::no_mutex>(std::move(lock));
         }
     }
 
     bool condition_variable::empty(
-        boost::unique_lock<mutex_type> const& lock) const
+        std::unique_lock<mutex_type> const& lock) const
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -46,7 +47,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     std::size_t condition_variable::size(
-        boost::unique_lock<mutex_type> const& lock) const
+        std::unique_lock<mutex_type> const& lock) const
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -56,7 +57,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     // Return false if no more threads are waiting (returns true if queue
     // is non-empty).
     bool condition_variable::notify_one(
-        boost::unique_lock<mutex_type> lock, error_code& ec)
+        std::unique_lock<mutex_type> lock, error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -95,7 +96,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     void condition_variable::notify_all(
-        boost::unique_lock<mutex_type> lock, error_code& ec)
+        std::unique_lock<mutex_type> lock, error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -157,7 +158,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             ec = make_success_code();
     }
 
-    void condition_variable::abort_all(boost::unique_lock<mutex_type> lock)
+    void condition_variable::abort_all(std::unique_lock<mutex_type> lock)
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -165,7 +166,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     threads::thread_state_ex_enum condition_variable::wait(
-        boost::unique_lock<mutex_type>&& lock,
+        std::unique_lock<mutex_type>&& lock,
         char const* description, error_code& ec)
     {
         HPX_ASSERT(threads::get_self_ptr() != 0);
@@ -189,7 +190,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     threads::thread_state_ex_enum condition_variable::wait_until(
-        boost::unique_lock<mutex_type>&& lock,
+        std::unique_lock<mutex_type>&& lock,
         util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
@@ -214,7 +215,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     template <typename Mutex>
-    void condition_variable::abort_all(boost::unique_lock<Mutex> lock)
+    void condition_variable::abort_all(std::unique_lock<Mutex> lock)
     {
         // new threads might have been added while we were notifying
         while(!queue_.empty())
@@ -255,7 +256,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         << threads::get_thread_description(tid);
 
                 // unlock while notifying thread as this can suspend
-                util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
+                util::unlock_guard<std::unique_lock<Mutex> > unlock(lock);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
@@ -278,7 +279,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     // re-add the remaining items to the original queue
     void condition_variable::prepend_entries(
-        boost::unique_lock<mutex_type>& lock, queue_type& queue)
+        std::unique_lock<mutex_type>& lock, queue_type& queue)
     {
         HPX_ASSERT(lock.owns_lock());
 

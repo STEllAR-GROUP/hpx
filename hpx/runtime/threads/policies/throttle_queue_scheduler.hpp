@@ -16,8 +16,9 @@
 
 #include <boost/thread/shared_mutex.hpp>
 
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
 #include <time.h>
 
 #include <hpx/config/warnings_prefix.hpp>

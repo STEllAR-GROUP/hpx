@@ -10,6 +10,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <vector>
+
 namespace jacobi_smp {
 
     void jacobi_kernel_wrap(

@@ -17,6 +17,7 @@
 #include <boost/iostreams/filter/bzip2.hpp>
 
 #include <memory>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

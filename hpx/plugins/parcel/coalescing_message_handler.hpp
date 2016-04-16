@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/util/pool_timer.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
@@ -18,8 +18,9 @@
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/cstdint.hpp>
+
+#include <mutex>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -59,7 +60,7 @@ namespace hpx { namespace plugins { namespace parcel
 
     protected:
         bool timer_flush();
-        bool flush_locked(boost::unique_lock<mutex_type>& l,
+        bool flush_locked(std::unique_lock<mutex_type>& l,
             parcelset::policies::message_handler::flush_mode mode,
             bool stop_buffering);
 
@@ -67,7 +68,7 @@ namespace hpx { namespace plugins { namespace parcel
         mutable mutex_type mtx_;
         parcelset::parcelport* pp_;
         detail::message_buffer buffer_;
-        util::interval_timer timer_;
+        util::pool_timer timer_;
         bool stopped_;
         bool allow_background_flush_;
 

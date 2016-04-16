@@ -12,6 +12,8 @@
 #include <boost/range/functions.hpp>
 #include <boost/atomic.hpp>
 
+#include <vector>
+
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////

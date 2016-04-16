@@ -14,6 +14,9 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <string>
+#include <vector>
+
 char const* const help =
     "commands: reset, addint [amount], addfloat [amount], query, help, quit";
 

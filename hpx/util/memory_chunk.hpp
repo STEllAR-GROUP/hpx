@@ -19,7 +19,7 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 namespace hpx { namespace util
 {
@@ -88,7 +88,7 @@ namespace hpx { namespace util
 
         bool full() const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked();
             if(allocated_ == chunk_size_)
             {
@@ -99,7 +99,7 @@ namespace hpx { namespace util
 
         bool contains(char * p) const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return contains_locked(p);
         }
 
@@ -116,7 +116,7 @@ namespace hpx { namespace util
         void check_invariants(char * p = 0, std::size_t size = 0) const
         {
 #ifdef HPX_DEBUG
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked(p, size);
 #endif
         }
@@ -153,7 +153,7 @@ namespace hpx { namespace util
 
         char *allocate(size_type size)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked();
 
             if(!data_) charge();
@@ -204,7 +204,7 @@ namespace hpx { namespace util
 
         bool deallocate(char * p, size_type size)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(data_);
             if(!contains_locked(p))
                 return false;

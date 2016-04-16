@@ -8,8 +8,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #define NUM_YIELD_TESTS 1000
 

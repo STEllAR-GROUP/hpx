@@ -26,12 +26,13 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/detail/endian.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
 #include <limits>
+#include <mutex>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -558,12 +559,12 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::mapped_type mapped_type;
 
-            boost::unique_lock<lcos::local::spinlock> l(mtx_);
+            std::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
             // we need to acquire a lock. This should not cause any problems
             // (famous last words)
             util::ignore_while_checking<
-                boost::unique_lock<lcos::local::spinlock>
+                std::unique_lock<lcos::local::spinlock>
             > il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
@@ -587,12 +588,12 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::mapped_type mapped_type;
 
-            boost::unique_lock<lcos::local::spinlock> l(mtx_);
+            std::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
             // we need to acquire a lock. This should not cause any problems
             // (famous last words)
             util::ignore_while_checking<
-                boost::unique_lock<lcos::local::spinlock>
+                std::unique_lock<lcos::local::spinlock>
             > il(&l);
 
             HPX_ASSERT(parcels.size() == handlers.size());
@@ -669,7 +670,7 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::iterator iterator;
 
             {
-                boost::lock_guard<lcos::local::spinlock> l(mtx_);
+                std::lock_guard<lcos::local::spinlock> l(mtx_);
 
                 iterator it = pending_parcels_.find(locality_id);
 
@@ -713,7 +714,7 @@ namespace hpx { namespace parcelset
             std::vector<locality> destinations;
 
             {
-                boost::unique_lock<lcos::local::spinlock> l(mtx_, boost::try_to_lock);
+                std::unique_lock<lcos::local::spinlock> l(mtx_, std::try_to_lock);
                 if(l.owns_lock())
                 {
                     if (parcel_destinations_.empty())
@@ -833,7 +834,7 @@ namespace hpx { namespace parcelset
                 connection_cache_.clear(locality_id, sender_connection);
             }
             {
-                boost::lock_guard<lcos::local::spinlock> l(mtx_);
+                std::lock_guard<lcos::local::spinlock> l(mtx_);
 
                 HPX_ASSERT(locality_id == sender_connection->destination());
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);

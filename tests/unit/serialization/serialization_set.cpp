@@ -12,6 +12,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 template <typename CARGO>
 struct DummyContainer
 {

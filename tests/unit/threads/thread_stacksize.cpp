@@ -9,6 +9,8 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 void test_small_stacksize()
 {

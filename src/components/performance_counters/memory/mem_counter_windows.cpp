@@ -9,6 +9,9 @@
 
 #include <hpx/exception.hpp>
 #include <boost/format.hpp>
+
+#include <string>
+
 #include <psapi.h>
 
 namespace hpx { namespace performance_counters { namespace memory

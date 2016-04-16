@@ -30,6 +30,8 @@
 #include <boost/mpl/identity.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <mutex>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
@@ -162,13 +164,13 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_id() const
         {
-            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            std::unique_lock<naming::gid_type> l(gid_.get_mutex());
             return get_gid_locked(std::move(l));
         }
 
         naming::id_type get_unmanaged_id() const
         {
-            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            std::unique_lock<naming::gid_type> l(gid_.get_mutex());
             return naming::id_type(gid_, id_type::unmanaged);
         }
 
@@ -182,7 +184,7 @@ namespace hpx { namespace lcos { namespace detail
     protected:
         // The GID needs to be split in order to keep the shared state alive.
         naming::id_type get_gid_locked(
-            boost::unique_lock<naming::gid_type> l) const
+            std::unique_lock<naming::gid_type> l) const
         {
             hpx::future<naming::gid_type> gid =
                 naming::detail::split_gid_if_needed_locked(l, gid_);
@@ -290,7 +292,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
+            std::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
             // special precautions for it to go out of scope

@@ -13,8 +13,8 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace parcelset {
     class parcelport;

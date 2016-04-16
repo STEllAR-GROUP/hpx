@@ -19,7 +19,9 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace agas
 {

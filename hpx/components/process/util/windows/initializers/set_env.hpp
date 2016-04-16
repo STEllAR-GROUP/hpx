@@ -19,8 +19,8 @@
 
 #include <boost/range/numeric.hpp>
 
-#include <iterator>
 #include <cstddef>
+#include <iterator>
 #include <vector>
 #include <windows.h>
 

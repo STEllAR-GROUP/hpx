@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 
 #include <cstdlib>
+#include <string>
 #include <vector>
 
 #include <boost/config.hpp>

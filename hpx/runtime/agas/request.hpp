@@ -22,6 +22,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <memory>
+#include <string>
 
 // The number of types that the request's variant can represent.
 #define HPX_AGAS_REQUEST_SUBTYPES 13

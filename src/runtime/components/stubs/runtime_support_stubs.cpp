@@ -19,6 +19,7 @@
 #include <hpx/traits/action_was_object_migrated.hpp>
 
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace components { namespace stubs
 {

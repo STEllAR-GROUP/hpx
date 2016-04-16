@@ -13,13 +13,19 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/chrono.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <mutex>
+
+#include <string>
+#include <vector>
 
 #include "thread_group.hpp"
 #include "shared_mutex_locking_thread.hpp"
 
 #define CHECK_LOCKED_VALUE_EQUAL(mutex_name, value, expected_value)           \
     {                                                                         \
-        boost::unique_lock<hpx::lcos::local::mutex> lock(mutex_name);         \
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex_name);         \
         HPX_TEST_EQ(value, expected_value);                                   \
     }
 
@@ -39,7 +45,7 @@ void test_multiple_readers()
     mutex_type unblocked_count_mutex;
     hpx::lcos::local::condition_variable unblocked_condition;
     mutex_type finish_mutex;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     try
     {
@@ -55,7 +61,7 @@ void test_multiple_readers()
         }
 
         {
-            boost::unique_lock<mutex_type> lk(unblocked_count_mutex);
+            std::unique_lock<mutex_type> lk(unblocked_count_mutex);
             while(unblocked_count < number_of_threads)
             {
                 unblocked_condition.wait(lk);
@@ -95,14 +101,14 @@ void test_only_one_writer_permitted()
     mutex_type unblocked_count_mutex;
     hpx::lcos::local::condition_variable unblocked_condition;
     mutex_type finish_mutex;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     try
     {
         for (unsigned i = 0; i != number_of_threads; ++i)
         {
             pool.create_thread(
-                test::locking_thread<boost::unique_lock<shared_mutex_type> >(
+                test::locking_thread<std::unique_lock<shared_mutex_type> >(
                     rw_mutex, unblocked_count, unblocked_count_mutex,
                     unblocked_condition, finish_mutex,
                     simultaneous_running_count, max_simultaneous_running
@@ -145,7 +151,7 @@ void test_reader_blocks_writer()
     mutex_type unblocked_count_mutex;
     hpx::lcos::local::condition_variable unblocked_condition;
     mutex_type finish_mutex;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     try
     {
@@ -159,7 +165,7 @@ void test_reader_blocks_writer()
         );
 
         {
-            boost::unique_lock<mutex_type> lk(unblocked_count_mutex);
+            std::unique_lock<mutex_type> lk(unblocked_count_mutex);
             while(unblocked_count<1)
             {
                 unblocked_condition.wait(lk);
@@ -170,7 +176,7 @@ void test_reader_blocks_writer()
             unblocked_count, 1u);
 
         pool.create_thread(
-            test::locking_thread<boost::unique_lock<shared_mutex_type> >(
+            test::locking_thread<std::unique_lock<shared_mutex_type> >(
                 rw_mutex, unblocked_count, unblocked_count_mutex,
                 unblocked_condition, finish_mutex,
                 simultaneous_running_count, max_simultaneous_running
@@ -206,14 +212,14 @@ void test_unlocking_writer_unblocks_all_readers()
     test::thread_group pool;
 
     hpx::lcos::local::shared_mutex rw_mutex;
-    boost::unique_lock<hpx::lcos::local::shared_mutex>  write_lock(rw_mutex);
+    std::unique_lock<hpx::lcos::local::shared_mutex>  write_lock(rw_mutex);
     unsigned unblocked_count = 0;
     unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
     hpx::lcos::local::condition_variable unblocked_condition;
     mutex_type finish_mutex;
-    boost::unique_lock<mutex_type> finish_lock(finish_mutex);
+    std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     unsigned const reader_count = 10;
 
@@ -238,7 +244,7 @@ void test_unlocking_writer_unblocks_all_readers()
         write_lock.unlock();
 
         {
-            boost::unique_lock<mutex_type> lk(unblocked_count_mutex);
+            std::unique_lock<mutex_type> lk(unblocked_count_mutex);
             while(unblocked_count<reader_count)
             {
                 unblocked_condition.wait(lk);
@@ -278,9 +284,9 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
     mutex_type unblocked_count_mutex;
     hpx::lcos::local::condition_variable unblocked_condition;
     mutex_type finish_reading_mutex;
-    boost::unique_lock<mutex_type> finish_reading_lock(finish_reading_mutex);
+    std::unique_lock<mutex_type> finish_reading_lock(finish_reading_mutex);
     mutex_type finish_writing_mutex;
-    boost::unique_lock<mutex_type> finish_writing_lock(finish_writing_mutex);
+    std::unique_lock<mutex_type> finish_writing_lock(finish_writing_mutex);
 
     unsigned const reader_count = 10;
     unsigned const writer_count = 10;
@@ -303,7 +309,7 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
         for(unsigned i = 0; i != writer_count; ++i)
         {
             pool.create_thread(
-                test::locking_thread<boost::unique_lock<shared_mutex_type> >(
+                test::locking_thread<std::unique_lock<shared_mutex_type> >(
                     rw_mutex, unblocked_count, unblocked_count_mutex,
                     unblocked_condition, finish_writing_mutex,
                     simultaneous_running_writers, max_simultaneous_writers
@@ -312,7 +318,7 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
         }
 
         {
-            boost::unique_lock<mutex_type> lk(unblocked_count_mutex);
+            std::unique_lock<mutex_type> lk(unblocked_count_mutex);
             while(unblocked_count<reader_count)
             {
                 unblocked_condition.wait(lk);
@@ -327,7 +333,7 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
         finish_reading_lock.unlock();
 
         {
-            boost::unique_lock<mutex_type> lk(unblocked_count_mutex);
+            std::unique_lock<mutex_type> lk(unblocked_count_mutex);
             while (unblocked_count < (reader_count + 1))
             {
                 unblocked_condition.wait(lk);

@@ -20,6 +20,7 @@
 #include <boost/shared_array.hpp>
 
 #include <memory>
+#include <string>
 
 namespace hpx { namespace components { namespace process { namespace windows {
 

@@ -11,8 +11,9 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>

@@ -11,6 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <type_traits>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 #include <boost/range/irange.hpp>

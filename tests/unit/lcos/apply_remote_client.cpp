@@ -9,6 +9,9 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <mutex>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 bool root_locality = false;
 boost::int32_t final_result;
@@ -16,7 +19,7 @@ hpx::util::spinlock result_mutex;
 
 void receive_result(boost::int32_t i)
 {
-    hpx::util::spinlock::scoped_lock l(result_mutex);
+    std::lock_guard<hpx::util::spinlock> l(result_mutex);
     if (i > final_result)
         final_result = i;
 }

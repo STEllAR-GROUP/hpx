@@ -26,7 +26,9 @@
 #include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
+
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
@@ -174,7 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             parallel::exception_list errors;
 
             {
-                boost::lock_guard<mutex_type> l(mtx_);
+                std::lock_guard<mutex_type> l(mtx_);
                 std::swap(tasks_, tasks);
                 std::swap(errors_, errors);
             }
@@ -255,7 +257,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 executor_traits<executor_type>::async_execute(
                     policy_.executor(), std::forward<F>(f));
 
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));
         }
 
@@ -310,7 +312,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 executor_traits<Executor>::async_execute(
                     exec, std::forward<F>(f));
 
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));
         }
 

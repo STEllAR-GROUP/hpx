@@ -24,6 +24,7 @@
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
 #include <algorithm>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util

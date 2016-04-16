@@ -20,9 +20,10 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <stdexcept>
+#include <vector>
 
 #include <boost/range/functions.hpp>
 #include <boost/range/irange.hpp>

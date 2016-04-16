@@ -8,6 +8,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <string>
+
 int hpx_main(int argc, char* argv[])
 {
     // check number of localities

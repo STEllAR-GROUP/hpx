@@ -7,8 +7,9 @@
 
 #include "worker_timed.hpp"
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t num_level_tasks = 16;

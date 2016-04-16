@@ -7,6 +7,9 @@
 
 #include <boost/assign/std.hpp>
 
+#include <string>
+#include <vector>
+
 #include "sheneos/interpolator.hpp"
 
 using boost::program_options::variables_map;
