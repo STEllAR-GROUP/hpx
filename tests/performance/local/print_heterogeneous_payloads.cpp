@@ -134,6 +134,7 @@ int app_main(
 
     // Randomly shuffle the entire sequence to deal with drift.
     // fix for gcc 4.5:
+    using hpx::util::placeholders::_1;
     boost::function<boost::uint64_t(boost::uint64_t)> shuffler_f =
         hpx::util::bind(&shuffler, boost::ref(prng), _1);
     std::random_shuffle(payloads.begin(), payloads.end()

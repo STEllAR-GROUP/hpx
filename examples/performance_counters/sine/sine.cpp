@@ -193,6 +193,8 @@ namespace performance_counters { namespace sine
     void startup()
     {
         using namespace hpx::performance_counters;
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
 
         // define the counter types
         generic_counter_type_data const counter_types[] =

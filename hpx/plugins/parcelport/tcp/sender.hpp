@@ -144,8 +144,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             void (sender::*f)(boost::system::error_code const&, std::size_t)
                 = &sender::handle_write;
 
+            using util::placeholders::_1;
+            using util::placeholders::_2;
             boost::asio::async_write(socket_, buffers,
-                util::bind(f, shared_from_this(), ::_1, ::_2));
+                util::bind(f, shared_from_this(), _1, _2));
         }
 
     private:
@@ -179,9 +181,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             void (sender::*f)(boost::system::error_code const&)
                 = &sender::handle_read_ack;
 
+            using util::placeholders::_1;
             boost::asio::async_read(socket_,
                 boost::asio::buffer(&ack_, sizeof(ack_)),
-                util::bind(f, shared_from_this(), ::_1));
+                util::bind(f, shared_from_this(), _1));
         }
 
         void handle_read_ack(boost::system::error_code const& e)

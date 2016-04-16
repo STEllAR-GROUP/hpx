@@ -130,16 +130,16 @@ namespace hpx {
       : runtime(rtcfg, init_affinity),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
-            util::bind(&runtime_impl::init_tss, This(),
-                "main-thread", ::_1, ::_2, false),
+            util::bind(&runtime_impl::init_tss, This(), "main-thread",
+                util::placeholders::_1, util::placeholders::_2, false),
             util::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
             util::bind(&runtime_impl::init_tss, This(), "io-thread",
-                ::_1, ::_2, true),
+                util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             util::bind(&runtime_impl::init_tss, This(), "timer-thread",
-                ::_1, ::_2, true),
+                util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         scheduler_(init),
         notifier_(runtime_impl<SchedulingPolicy>::
@@ -149,7 +149,7 @@ namespace hpx {
                 timer_pool_, scheduler_, notifier_, num_threads)),
         parcel_handler_(rtcfg, thread_manager_.get(),
             util::bind(&runtime_impl::init_tss, This(), "parcel-thread",
-                ::_1, ::_2, true),
+                util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
@@ -610,11 +610,13 @@ namespace hpx {
         typedef void (runtime_impl::*report_error_t)(
             std::size_t, boost::exception_ptr const&);
 
+        using util::placeholders::_1;
+        using util::placeholders::_2;
         return notification_policy_type(
-            util::bind(&runtime_impl::init_tss, This(), prefix, ::_1, ::_2, false),
+            util::bind(&runtime_impl::init_tss, This(), prefix, _1, _2, false),
             util::bind(&runtime_impl::deinit_tss, This()),
             util::bind(static_cast<report_error_t>(&runtime_impl::report_error),
-                This(), ::_1, ::_2));
+                This(), _1, _2));
     }
 
     template <typename SchedulingPolicy>

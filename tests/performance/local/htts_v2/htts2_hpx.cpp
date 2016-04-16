@@ -38,6 +38,7 @@ struct hpx_driver : htts2::driver
         hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
         boost::program_options::options_description desc;
 
+        using hpx::util::placeholders::_1;
         hpx::init(hpx::util::bind(&hpx_driver::run_impl, boost::ref(*this), _1),
             desc, argc_, argv_, cfg);
     }
@@ -85,6 +86,7 @@ struct hpx_driver : htts2::driver
 
         for (boost::uint64_t i = 0; i < this->tasks_; ++i)
         {
+            using hpx::util::placeholders::_1;
             hpx::threads::register_thread_plain(
                 hpx::util::bind(&hpx_driver::payload_thread_function,
                     boost::ref(*this), _1)

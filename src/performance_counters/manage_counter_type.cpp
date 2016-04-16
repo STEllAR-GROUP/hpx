@@ -77,6 +77,8 @@ namespace hpx { namespace performance_counters
         hpx::util::function_nonser<boost::int64_t(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, error_code& ec)
     {
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
         return install_counter_type(name, counter_raw, helptext,
             util::bind(&hpx::performance_counters::locality_raw_counter_creator,
                 _1, counter_value, _2),

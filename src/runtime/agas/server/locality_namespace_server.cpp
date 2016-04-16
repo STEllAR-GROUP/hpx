@@ -172,6 +172,8 @@ void locality_namespace::register_counter_types(
     error_code& ec
     )
 {
+    using util::placeholders::_1;
+    using util::placeholders::_2;
     boost::format help_count(
         "returns the number of invocations of the AGAS service '%s'");
     boost::format help_time(
@@ -218,6 +220,8 @@ void locality_namespace::register_global_counter_types(
     error_code& ec
     )
 {
+    using util::placeholders::_1;
+    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
         util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::locality_namespace_service_name));
@@ -675,40 +679,41 @@ response locality_namespace::statistics_counter(
 
     typedef locality_namespace::counter_data cd;
 
+    using util::placeholders::_1;
     util::function_nonser<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case locality_ns_allocate:
             get_data_func = util::bind(&cd::get_allocate_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_resolve_locality:
             get_data_func = util::bind(&cd::get_resolve_locality_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_free:
             get_data_func = util::bind(&cd::get_free_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_localities:
             get_data_func = util::bind(&cd::get_localities_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_resolved_localities:
             get_data_func = util::bind(&cd::get_resolved_localities_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_num_localities:
             get_data_func = util::bind(&cd::get_num_localities_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_num_threads:
             get_data_func = util::bind(&cd::get_num_threads_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_overall_count, &counter_data_, _1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -722,32 +727,32 @@ response locality_namespace::statistics_counter(
         switch (code) {
         case locality_ns_allocate:
             get_data_func = util::bind(&cd::get_allocate_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_resolve_locality:
             get_data_func = util::bind(&cd::get_resolve_locality_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_free:
-            get_data_func = util::bind(&cd::get_free_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_free_time, &counter_data_, _1);
             break;
         case locality_ns_localities:
             get_data_func = util::bind(&cd::get_localities_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_resolved_localities:
             get_data_func = util::bind(&cd::get_resolved_localities_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_num_localities:
             get_data_func = util::bind(&cd::get_num_localities_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case locality_ns_num_threads:
-            get_data_func = util::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_num_threads_time, &counter_data_, _1);
             break;
         case locality_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_overall_time, &counter_data_, _1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter

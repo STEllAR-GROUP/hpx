@@ -171,6 +171,8 @@ void component_namespace::register_counter_types(
     error_code& ec
     )
 {
+    using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
     boost::format help_count(
         "returns the number of invocations of the AGAS service '%s'");
     boost::format help_time(
@@ -217,6 +219,8 @@ void component_namespace::register_global_counter_types(
     error_code& ec
     )
 {
+    using util::placeholders::_1;
+    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
         util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::component_namespace_service_name));
@@ -718,41 +722,42 @@ response component_namespace::statistics_counter(
 
     typedef component_namespace::counter_data cd;
 
+    using util::placeholders::_1;
     util::function_nonser<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case component_ns_bind_prefix:
             get_data_func = util::bind(&cd::get_bind_prefix_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_bind_name:
             get_data_func = util::bind(&cd::get_bind_name_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_resolve_id:
             get_data_func = util::bind(&cd::get_resolve_id_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_unbind_name:
             get_data_func = util::bind(&cd::get_unbind_name_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_iterate_types:
             get_data_func = util::bind(&cd::get_iterate_types_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_get_component_type_name:
             get_data_func = util::bind(&cd::get_component_type_name_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_num_localities:
             get_data_func = util::bind(&cd::get_num_localities_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_statistics_counter:
             get_data_func = util::bind(&cd::get_overall_count,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -766,31 +771,31 @@ response component_namespace::statistics_counter(
         switch (code) {
         case component_ns_bind_prefix:
             get_data_func = util::bind(&cd::get_bind_prefix_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_bind_name:
-            get_data_func = util::bind(&cd::get_bind_name_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_bind_name_time, &counter_data_, _1);
             break;
         case component_ns_resolve_id:
-            get_data_func = util::bind(&cd::get_resolve_id_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_resolve_id_time, &counter_data_, _1);
             break;
         case component_ns_unbind_name:
-            get_data_func = util::bind(&cd::get_unbind_name_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_unbind_name_time, &counter_data_, _1);
             break;
         case component_ns_iterate_types:
             get_data_func = util::bind(&cd::get_iterate_types_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_get_component_type_name:
             get_data_func = util::bind(&cd::get_component_type_name_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_num_localities:
             get_data_func = util::bind(&cd::get_num_localities_time,
-                &counter_data_, ::_1);
+                &counter_data_, _1);
             break;
         case component_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_overall_time, &counter_data_, _1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter

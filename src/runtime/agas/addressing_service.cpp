@@ -959,7 +959,6 @@ hpx::future<bool> addressing_service::bind_range_async(
     using util::placeholders::_1;
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
-
     return f.then(util::bind(
             util::one_shot(&addressing_service::bind_postproc),
             this, _1, id, g
@@ -2591,43 +2590,46 @@ boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 /// Install performance counter types exposing properties from the local cache.
 void addressing_service::register_counter_types()
 { // {{{
+    using util::placeholders::_1;
+    using util::placeholders::_2;
+
     // install
     util::function_nonser<boost::int64_t(bool)> cache_entries(
-        util::bind(&addressing_service::get_cache_entries, this, ::_1));
+        util::bind(&addressing_service::get_cache_entries, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_hits(
-        util::bind(&addressing_service::get_cache_hits, this, ::_1));
+        util::bind(&addressing_service::get_cache_hits, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_misses(
-        util::bind(&addressing_service::get_cache_misses, this, ::_1));
+        util::bind(&addressing_service::get_cache_misses, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_evictions(
-        util::bind(&addressing_service::get_cache_evictions, this, ::_1));
+        util::bind(&addressing_service::get_cache_evictions, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_insertions(
-        util::bind(&addressing_service::get_cache_insertions, this, ::_1));
+        util::bind(&addressing_service::get_cache_insertions, this, _1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_count(
         util::bind(
-            &addressing_service::get_cache_get_entry_count, this, ::_1));
+            &addressing_service::get_cache_get_entry_count, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_insertion_count(
         util::bind(
-            &addressing_service::get_cache_insertion_entry_count, this, ::_1));
+            &addressing_service::get_cache_insertion_entry_count, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_count(
         util::bind(
-            &addressing_service::get_cache_update_entry_count, this, ::_1));
+            &addressing_service::get_cache_update_entry_count, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_count(
         util::bind(
-            &addressing_service::get_cache_erase_entry_count, this, ::_1));
+            &addressing_service::get_cache_erase_entry_count, this, _1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_time(
         util::bind(
-            &addressing_service::get_cache_get_entry_time, this, ::_1));
+            &addressing_service::get_cache_get_entry_time, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_insertion_time(
         util::bind(
-            &addressing_service::get_cache_insertion_entry_time, this, ::_1));
+            &addressing_service::get_cache_insertion_entry_time, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_time(
         util::bind(
-            &addressing_service::get_cache_update_entry_time, this, ::_1));
+            &addressing_service::get_cache_update_entry_time, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_time(
         util::bind(
-            &addressing_service::get_cache_erase_entry_time, this, ::_1));
+            &addressing_service::get_cache_erase_entry_time, this, _1));
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {

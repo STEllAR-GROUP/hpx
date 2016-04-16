@@ -820,6 +820,9 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy>::
         register_counter_types()
     {
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+
         typedef threadmanager_impl ti;
         performance_counters::create_counter_func counts_creator(
             util::bind(&ti::thread_counts_counter_creator, this, _1, _2));
