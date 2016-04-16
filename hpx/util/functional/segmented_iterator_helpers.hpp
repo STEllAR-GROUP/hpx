@@ -21,18 +21,8 @@ namespace hpx { namespace util { namespace functional
                     Iterator
                 >::segment_iterator type;
 
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iter>
-            struct result<This(Iter)>
-            {
-                typedef typename apply::type type;
-            };
-
             template <typename Iter>
-            typename result<segmented_iterator_segment(Iter)>::type
-            operator()(Iter iter) const
+            type operator()(Iter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::segment(iter);
             };
@@ -48,18 +38,8 @@ namespace hpx { namespace util { namespace functional
                     Iterator
                 >::local_iterator type;
 
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iter>
-            struct result<This(Iter)>
-            {
-                typedef typename apply::type type;
-            };
-
             template <typename Iter>
-            typename result<segmented_iterator_local(Iter)>::type
-            operator()(Iter iter) const
+            type operator()(Iter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::local(iter);
             };
@@ -75,18 +55,8 @@ namespace hpx { namespace util { namespace functional
                     Iterator
                 >::local_iterator type;
 
-            template <typename T>
-            struct result;
-
-            template <typename This, typename SegIter>
-            struct result<This(SegIter)>
-            {
-                typedef typename apply::type type;
-            };
-
             template <typename SegIter>
-            typename result<segmented_iterator_begin(SegIter)>::type
-            operator()(SegIter iter) const
+            type operator()(SegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::begin(iter);
             };
@@ -102,18 +72,8 @@ namespace hpx { namespace util { namespace functional
                     Iterator
                 >::local_iterator type;
 
-            template <typename T>
-            struct result;
-
-            template <typename This, typename SegIter>
-            struct result<This(SegIter)>
-            {
-                typedef typename apply::type type;
-            };
-
             template <typename SegIter>
-            typename result<segmented_iterator_end(SegIter)>::type
-            operator()(SegIter iter) const
+            type operator()(SegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::end(iter);
             };
@@ -129,18 +89,8 @@ namespace hpx { namespace util { namespace functional
                     Iterator
                 >::local_raw_iterator type;
 
-            template <typename T>
-            struct result;
-
-            template <typename This, typename LocalSegIter>
-            struct result<This(LocalSegIter)>
-            {
-                typedef typename apply::type type;
-            };
-
             template <typename LocalSegIter>
-            typename result<segmented_iterator_local_begin(LocalSegIter)>::type
-            operator()(LocalSegIter iter) const
+            type operator()(LocalSegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::begin(iter);
             };
@@ -156,18 +106,8 @@ namespace hpx { namespace util { namespace functional
                     Iterator
                 >::local_raw_iterator type;
 
-            template <typename T>
-            struct result;
-
-            template <typename This, typename LocalSegIter>
-            struct result<This(LocalSegIter)>
-            {
-                typedef typename apply::type type;
-            };
-
             template <typename LocalSegIter>
-            typename result<segmented_iterator_local_end(LocalSegIter)>::type
-            operator()(LocalSegIter iter) const
+            type operator()(LocalSegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::end(iter);
             };

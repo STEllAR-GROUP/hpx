@@ -240,7 +240,6 @@ void function_object_test2()
 
 struct Z
 {
-    typedef int result_type;
     int operator()(int a, int b) const { return a + 10 * b; }
 };
 

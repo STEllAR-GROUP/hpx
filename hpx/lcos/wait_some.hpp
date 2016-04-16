@@ -287,7 +287,6 @@ namespace hpx { namespace lcos
 
         public:
             typedef Sequence argument_type;
-            typedef void result_type;
 
             wait_some(argument_type && lazy_values, std::size_t n)
               : lazy_values_(std::move(lazy_values))
@@ -296,7 +295,7 @@ namespace hpx { namespace lcos
               , goal_reached_on_calling_thread_(false)
             {}
 
-            result_type operator()()
+            void operator()()
             {
                 // set callback functions to executed wait future is ready
                 set_on_completed_callback(*this);
@@ -325,11 +324,8 @@ namespace hpx { namespace lcos
         template <typename Future>
         struct wait_get_shared_state
         {
-            typedef
-                typename traits::detail::shared_state_ptr_for<Future>::type const&
-                result_type;
-
-            HPX_FORCEINLINE result_type
+            HPX_FORCEINLINE
+            typename traits::detail::shared_state_ptr_for<Future>::type const&
             operator()(Future const& f) const
             {
                 return traits::detail::get_shared_state(f);

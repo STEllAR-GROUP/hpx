@@ -36,11 +36,8 @@ namespace test
     {
         struct stencil_transformer
         {
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
+            template <typename Iterator>
+            struct result
             {
                 typedef typename std::iterator_traits<Iterator>::reference
                     element_type;
@@ -51,12 +48,10 @@ namespace test
 
             // it will dereference tuple(it-1, it, it+1)
             template <typename Iterator>
-            typename result<stencil_transformer(Iterator)>::type
+            typename result<Iterator>::type
             operator()(Iterator const& it) const
             {
-                typedef typename result<
-                        stencil_transformer(Iterator)
-                    >::type type;
+                typedef typename result<Iterator>::type type;
                 return type(*test::previous(it), *it, *test::next(it));
             }
         };
@@ -152,11 +147,8 @@ namespace test
     template <typename F>
     struct custom_stencil_transformer
     {
-        template <typename T>
-        struct result;
-
-        template <typename This, typename Iterator>
-        struct result<This(Iterator)>
+        template <typename Iterator>
+        struct result
         {
             typedef typename std::iterator_traits<Iterator>::reference
                 element_type;
@@ -172,10 +164,10 @@ namespace test
 
         // it will dereference tuple(it-1, it, it+1)
         template <typename Iterator>
-        typename result<custom_stencil_transformer(Iterator)>::type
+        typename result<Iterator>::type
         operator()(Iterator const& it) const
         {
-            typedef typename result<custom_stencil_transformer(Iterator)>::type type;
+            typedef typename result<Iterator>::type type;
             return type(f_(*test::previous(it)), *it, f_(*test::next(it)));
         }
 

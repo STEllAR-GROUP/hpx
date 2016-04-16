@@ -37,15 +37,6 @@ namespace test
     template <typename IteratorBase, typename IteratorValue>
     struct previous_transformer
     {
-        template <typename T>
-        struct result;
-
-        template <typename This, typename Iterator>
-        struct result<This(Iterator)>
-        {
-            typedef typename std::iterator_traits<Iterator>::reference type;
-        };
-
         previous_transformer() {}
 
         // at position 'begin' it will dereference 'value', otherwise 'it-1'
@@ -78,15 +69,6 @@ namespace test
     template <typename IteratorBase, typename IteratorValue>
     struct next_transformer
     {
-        template <typename T>
-        struct result;
-
-        template <typename This, typename Iterator>
-        struct result<This(Iterator)>
-        {
-            typedef typename std::iterator_traits<Iterator>::reference type;
-        };
-
         next_transformer() {}
 
         // at position 'end' it will dereference 'value', otherwise 'it+1'

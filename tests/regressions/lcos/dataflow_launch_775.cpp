@@ -20,8 +20,6 @@ typedef hpx::lcos::shared_future< double > future_type;
 template< typename Value >
 struct mul
 {
-    typedef double result_type;
-
     const Value a;
 
     mul( const Value alpha )

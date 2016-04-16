@@ -106,8 +106,8 @@ namespace hpx { namespace detail
         call(launch launch_policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
-                F(Ts&&...)
-            >::type result_type;
+                    F(Ts&&...)
+                >::type result_type;
 
             if (launch_policy == launch::sync) {
                 return detail::call_sync(

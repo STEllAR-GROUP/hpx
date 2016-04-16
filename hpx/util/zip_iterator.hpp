@@ -236,12 +236,10 @@ namespace hpx { namespace util
         template <typename ...Ts>
         struct dereference_iterator<tuple<Ts...> >
         {
-            typedef typename zip_iterator_reference<
-                tuple<Ts...>
-            >::type result_type;
-
             template <std::size_t ...Is>
-            static result_type call(detail::pack_c<std::size_t, Is...>,
+            static typename zip_iterator_reference<
+                tuple<Ts...>
+            >::type call(detail::pack_c<std::size_t, Is...>,
                 tuple<Ts...> const& iterators)
             {
                 return util::forward_as_tuple(*util::get<Is>(iterators)...);
@@ -250,8 +248,6 @@ namespace hpx { namespace util
 
         struct increment_iterator
         {
-            typedef void result_type;
-
             template <typename T>
             void operator()(T& iter) const
             {
@@ -261,8 +257,6 @@ namespace hpx { namespace util
 
         struct decrement_iterator
         {
-            typedef void result_type;
-
             template <typename T>
             void operator()(T& iter) const
             {
@@ -273,8 +267,6 @@ namespace hpx { namespace util
         struct advance_iterator
         {
             explicit advance_iterator(std::ptrdiff_t n) : n_(n) {}
-
-            typedef void result_type;
 
             template <typename T>
             void operator()(T& iter) const
@@ -426,19 +418,8 @@ namespace hpx { namespace traits
             template <typename Iterator>
             struct apply
             {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename SegIter>
-                struct result<This(SegIter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::local_raw_iterator type;
-                };
-
                 template <typename SegIter>
-                typename result<get_raw_iterator(SegIter)>::type
+                typename segmented_iterator_traits<Iterator>::local_raw_iterator
                 operator()(SegIter iter) const
                 {
                     return iter.local();
@@ -451,19 +432,8 @@ namespace hpx { namespace traits
             template <typename Iterator>
             struct apply
             {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename SegIter>
-                struct result<This(SegIter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::local_iterator type;
-                };
-
                 template <typename SegIter>
-                typename result<get_remote_iterator(SegIter)>::type
+                typename segmented_iterator_traits<Iterator>::local_iterator
                 operator()(SegIter iter) const
                 {
                     return iter.remote();
@@ -495,18 +465,17 @@ namespace hpx { namespace traits
             call(util::detail::pack_c<std::size_t, Is...>,
                 util::tuple<Ts_...> const& t)
             {
-                return util::make_tuple(typename F::template apply<
-                    typename util::tuple_element<Is, tuple_type>::type>()(
-                        util::get<Is>(t))...);
+                return util::make_tuple(
+                    typename F::template apply<Ts>()(util::get<Is>(t))...);
             }
 
             template <typename ...Ts_>
             static result_type
             call(util::zip_iterator<Ts_...> const& iter)
             {
-                return call(typename util::detail::make_index_pack<
-                            util::tuple_size<tuple_type>::value
-                        >::type(), iter.get_iterator_tuple());
+                using hpx::util::detail::make_index_pack;
+                return call(typename make_index_pack<sizeof...(Ts)>::type(),
+                    iter.get_iterator_tuple());
             }
         };
     }
