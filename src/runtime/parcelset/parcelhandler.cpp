@@ -236,7 +236,7 @@ namespace hpx { namespace parcelset
             {
                 using parcelset::policies::message_handler;
                 message_handler::flush_mode mode =
-                    message_handler::flush_mode_buffer_full;
+                    message_handler::flush_mode_background_work;
 
                 message_handler_map::iterator end = handlers_.end();
                 for (message_handler_map::iterator it = handlers_.begin();
@@ -276,6 +276,9 @@ namespace hpx { namespace parcelset
                 pp.second->stop(blocking);
             }
         }
+
+        // release all message handlers
+        handlers_.clear();
     }
 
     naming::resolver_client& parcelhandler::get_resolver()

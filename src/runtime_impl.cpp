@@ -214,6 +214,8 @@ namespace hpx {
     {
         LRT_(debug) << "~runtime_impl(entering)";
 
+        runtime_support_->delete_function_lists();
+
         // stop all services
         parcel_handler_.stop();     // stops parcel pools as well
         thread_manager_->stop();    // stops timer_pool_ as well
