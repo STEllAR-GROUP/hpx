@@ -212,12 +212,7 @@ private:
     static void do_sleep (int sleep_ms) {
         const int NANOSECONDS_PER_SECOND = 1000 * 1000 * 1000;
         boost::xtime to_wait;
-#if BOOST_VERSION < 105000
-        xtime_get(&to_wait, boost::TIME_UTC);
-#else
-        // V1.50 changes the name of boost::TIME_UTC
         xtime_get(&to_wait, boost::TIME_UTC_);
-#endif
         to_wait.sec += sleep_ms / 1000;
         to_wait.nsec += (sleep_ms % 1000) * (NANOSECONDS_PER_SECOND / 1000);
         to_wait.sec += to_wait.nsec / NANOSECONDS_PER_SECOND ;

@@ -1623,16 +1623,6 @@ install( # Install external dependencies
   FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".git" EXCLUDE)
 
-if(Boost_VERSION LESS 104900)
-  # Install Boost.Serialization patch for older Boost versions only
-  install(
-    DIRECTORY external/serialization/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-endif()
-
 if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(

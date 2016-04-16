@@ -18,11 +18,6 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 104900
-// Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than V1.49.
-#endif
-
 #if defined(HPX_WINDOWS)
 #if !defined(WIN32)
 #  define WIN32
