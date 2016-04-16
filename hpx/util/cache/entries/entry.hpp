@@ -1,15 +1,16 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(BOOST_CACHE_ENTRY_NOV_17_2008_1032AM)
-#define BOOST_CACHE_ENTRY_NOV_17_2008_1032AM
+#if !defined(HPX_UTIL_CACHE_ENTRY_NOV_17_2008_1032AM)
+#define HPX_UTIL_CACHE_ENTRY_NOV_17_2008_1032AM
 
+#include <hpx/config.hpp>
 #include <boost/operators.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache { namespace entries
+namespace hpx { namespace util { namespace cache { namespace entries
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Value, typename Derived = void>
@@ -32,7 +33,7 @@ namespace boost { namespace cache { namespace entries
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class entry entry.hpp boost/cache/entries/entry.hpp
+    /// \class entry entry.hpp hpx/util/cache/entries/entry.hpp
     ///
     /// \tparam Value     The data type to be stored in a cache. It has to be
     ///                   default constructible, copy constructible and
@@ -131,7 +132,6 @@ namespace boost { namespace cache { namespace entries
     private:
         value_type value_;
     };
-
-}}}
+}}}}
 
 #endif

@@ -1,19 +1,21 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(BOOST_CACHE_LRU_ENTRY_NOV_17_2008_0231PM)
-#define BOOST_CACHE_LRU_ENTRY_NOV_17_2008_0231PM
+#if !defined(HPX_UTIL_CACHE_LRU_ENTRY_NOV_17_2008_0231PM)
+#define HPX_UTIL_CACHE_LRU_ENTRY_NOV_17_2008_0231PM
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/cache/entries/entry.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/cache/entries/entry.hpp>
+
+#include <boost/chrono/chrono.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache { namespace entries
+namespace hpx { namespace util { namespace cache { namespace entries
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class lru_entry lru_entry.hpp boost/cache/entries/lru_entry.hpp
+    /// \class lru_entry lru_entry.hpp hpx/util/cache/entries/lru_entry.hpp
     ///
     /// The \a lru_entry type can be used to store arbitrary values in a cache.
     /// Using this type as the cache's entry type makes sure that the least
@@ -37,14 +39,14 @@ namespace boost { namespace cache { namespace entries
     public:
         /// \brief Any cache entry has to be default constructible
         lru_entry()
-          : access_time_(boost::posix_time::microsec_clock::local_time())
+          : access_time_(boost::chrono::steady_clock::now())
         {}
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
         explicit lru_entry(Value const& val)
           : base_type(val),
-            access_time_(boost::posix_time::microsec_clock::local_time())
+            access_time_(boost::chrono::steady_clock::now())
         {}
 
         /// \brief    The function \a touch is called by a cache holding this
@@ -60,12 +62,12 @@ namespace boost { namespace cache { namespace entries
         ///           the sort order as mandated by the cache's UpdatePolicy
         bool touch()
         {
-            access_time_ = boost::posix_time::microsec_clock::local_time();
+            access_time_ = boost::chrono::steady_clock::now();
             return true;
         }
 
         /// \brief Returns the last access time of the entry.
-        boost::posix_time::ptime const& get_access_time() const
+        boost::chrono::steady_clock::time_point const& get_access_time() const
         {
             return access_time_;
         }
@@ -78,9 +80,8 @@ namespace boost { namespace cache { namespace entries
         }
 
     private:
-        boost::posix_time::ptime access_time_;
+        boost::chrono::steady_clock::time_point access_time_;
     };
-
-}}}
+}}}}
 
 #endif

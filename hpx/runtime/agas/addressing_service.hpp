@@ -23,10 +23,10 @@
 #include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/util/cache/lru_cache.hpp>
+#include <hpx/util/cache/statistics/local_full_statistics.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/cache/lru_cache.hpp>
-#include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/make_shared.hpp>
@@ -71,10 +71,10 @@ public:
     // {{{ gva cache
     struct gva_cache_key;
 
-    typedef boost::cache::lru_cache<
+    typedef hpx::util::cache::lru_cache<
         gva_cache_key
       , gva
-      , boost::cache::statistics::local_full_statistics
+      , hpx::util::cache::statistics::local_full_statistics
     > gva_cache_type;
     // }}}
 

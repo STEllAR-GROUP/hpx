@@ -9,8 +9,9 @@
 #include <hpx/config/defines.hpp>
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <boost/cache/entries/lru_entry.hpp>
-#include <boost/cache/local_cache.hpp>
+#include <hpx/util/cache/entries/lru_entry.hpp>
+#include <hpx/util/cache/local_cache.hpp>
+
 #include <boost/shared_ptr.hpp>
 
 #include <netdb.h>

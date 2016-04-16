@@ -1,15 +1,17 @@
-//  Copyright (c) 2008 Hartmut Kaiser
+//  Copyright (c) 2008-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_main.hpp>
+#include <hpx/util/cache/entries/lru_entry.hpp>
+#include <hpx/util/cache/statistics/local_statistics.hpp>
+#include <hpx/util/cache/local_cache.hpp>
+#include <hpx/util/lightweight_test.hpp>
+
 #include <string>
-
-#include <boost/cache/entries/lru_entry.hpp>
-#include <boost/cache/statistics/local_statistics.hpp>
-#include <boost/cache/local_cache.hpp>
-
-#include <boost/detail/lightweight_test.hpp>
+#include <map>
+#include <functional>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct data
@@ -22,7 +24,7 @@ struct data
     char const* const value;
 };
 
-data entries[] =
+data cache_entries[] =
 {
     data ("white", "255,255,255"),
     data ("yellow", "255,255,0"),
@@ -36,7 +38,7 @@ data entries[] =
 ///////////////////////////////////////////////////////////////////////////////
 void test_statistics_insert()
 {
-    using namespace boost::cache;
+    using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
@@ -47,29 +49,29 @@ void test_statistics_insert()
 
     cache_type c(3);
 
-    BOOST_TEST(3 == c.capacity());
+    HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
     for (data* d = &cache_entries[0]; d->key != NULL; ++d) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
     // there should be 3 items in the cache
-    BOOST_TEST(3 == c.size());
+    HPX_TEST(3 == c.size());
 
     // retrieve statistics
     statistics::local_statistics const& stats = c.get_statistics();
-    BOOST_TEST(0 == stats.hits());
-    BOOST_TEST(0 == stats.misses());
-    BOOST_TEST(6 == stats.insertions());
-    BOOST_TEST(3 == stats.evictions());
+    HPX_TEST(0 == stats.hits());
+    HPX_TEST(0 == stats.misses());
+    HPX_TEST(6 == stats.insertions());
+    HPX_TEST(3 == stats.evictions());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_statistics_insert_with_touch()
 {
-    using namespace boost::cache;
+    using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
@@ -80,50 +82,50 @@ void test_statistics_insert_with_touch()
 
     cache_type c(3);
 
-    BOOST_TEST(3 == c.capacity());
+    HPX_TEST(3 == c.capacity());
 
     // insert 3 items into the cache
     int i = 0;
     data* d = &cache_entries[0];
 
     for (/**/; i < 3 && d->key != NULL; ++d, ++i) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
-    BOOST_TEST(3 == c.size());
+    HPX_TEST(3 == c.size());
 
     // now touch the first item
     std::string white;
-    BOOST_TEST(c.get_entry("white", white));
-    BOOST_TEST(white == "255,255,255");
+    HPX_TEST(c.get_entry("white", white));
+    HPX_TEST(white == "255,255,255");
 
     // add two more items
     for (i = 0; i < 2 && d->key != NULL; ++d, ++i) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 == c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 == c.size());
     }
 
     // provoke a miss
     std::string yellow;
-    BOOST_TEST(!c.get_entry("yellow", yellow));
+    HPX_TEST(!c.get_entry("yellow", yellow));
 
     // there should be 3 items in the cache, and white should be there as well
-    BOOST_TEST(3 == c.size());
-    BOOST_TEST(c.holds_key("white"));   // does not call the entry's touch()
+    HPX_TEST(3 == c.size());
+    HPX_TEST(c.holds_key("white"));   // does not call the entry's touch()
 
     // retrieve statistics
     statistics::local_statistics const& stats = c.get_statistics();
-    BOOST_TEST(1 == stats.hits());
-    BOOST_TEST(1 == stats.misses());
-    BOOST_TEST(5 == stats.insertions());
-    BOOST_TEST(2 == stats.evictions());
+    HPX_TEST(1 == stats.hits());
+    HPX_TEST(1 == stats.misses());
+    HPX_TEST(5 == stats.insertions());
+    HPX_TEST(2 == stats.evictions());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_statistics_update()
 {
-    using namespace boost::cache;
+    using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
@@ -134,37 +136,37 @@ void test_statistics_update()
 
     cache_type c(4);    // this time we can hold 4 items
 
-    BOOST_TEST(4 == c.capacity());
+    HPX_TEST(4 == c.capacity());
 
     // insert 3 items into the cache
     int i = 0;
     data* d = &cache_entries[0];
 
     for (/**/; i < 3 && d->key != NULL; ++d, ++i) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
     // there should be 3 items in the cache
-    BOOST_TEST(3 == c.size());
+    HPX_TEST(3 == c.size());
 
     // now update some items
-    BOOST_TEST(c.update("black", "255,0,0"));     // isn't in the cache
-    BOOST_TEST(4 == c.size());
+    HPX_TEST(c.update("black", "255,0,0"));     // isn't in the cache
+    HPX_TEST(4 == c.size());
 
-    BOOST_TEST(c.update("yellow", "255,0,0"));
-    BOOST_TEST(4 == c.size());
+    HPX_TEST(c.update("yellow", "255,0,0"));
+    HPX_TEST(4 == c.size());
 
     std::string yellow;
-    BOOST_TEST(c.get_entry("yellow", yellow));
-    BOOST_TEST(yellow == "255,0,0");
+    HPX_TEST(c.get_entry("yellow", yellow));
+    HPX_TEST(yellow == "255,0,0");
 
     // retrieve statistics
     statistics::local_statistics const& stats = c.get_statistics();
-    BOOST_TEST(2 == stats.hits());
-    BOOST_TEST(1 == stats.misses());
-    BOOST_TEST(4 == stats.insertions());
-    BOOST_TEST(0 == stats.evictions());
+    HPX_TEST(2 == stats.hits());
+    HPX_TEST(1 == stats.misses());
+    HPX_TEST(4 == stats.insertions());
+    HPX_TEST(0 == stats.evictions());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,7 +187,7 @@ struct erase_func
 
 void test_statistics_erase_one()
 {
-    using namespace boost::cache;
+    using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
@@ -196,29 +198,29 @@ void test_statistics_erase_one()
 
     cache_type c(3);
 
-    BOOST_TEST(3 == c.capacity());
+    HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
     for (data* d = &cache_entries[0]; d->key != NULL; ++d) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
     entry_type blue;
-    BOOST_TEST(c.get_entry("blue", blue));
+    HPX_TEST(c.get_entry("blue", blue));
 
     c.erase(erase_func("blue"));            // removals count as eviction
 
     // there should be 2 items in the cache
-    BOOST_TEST(!c.get_entry("blue", blue));
-    BOOST_TEST(2 == c.size());
+    HPX_TEST(!c.get_entry("blue", blue));
+    HPX_TEST(2 == c.size());
 
     // retrieve statistics
     statistics::local_statistics const& stats = c.get_statistics();
-    BOOST_TEST(1 == stats.hits());
-    BOOST_TEST(1 == stats.misses());
-    BOOST_TEST(6 == stats.insertions());
-    BOOST_TEST(4 == stats.evictions());
+    HPX_TEST(1 == stats.hits());
+    HPX_TEST(1 == stats.misses());
+    HPX_TEST(6 == stats.insertions());
+    HPX_TEST(4 == stats.evictions());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -228,6 +230,7 @@ int main()
     test_statistics_insert_with_touch();
     test_statistics_update();
     test_statistics_erase_one();
-    return boost::report_errors();
+
+    return hpx::util::report_errors();
 }
 

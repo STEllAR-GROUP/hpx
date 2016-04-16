@@ -1,12 +1,13 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(BOOST_CACHE_LOCAL_FULL_STATISTICS_AUG_11_2014_1029AM)
-#define BOOST_CACHE_LOCAL_FULL_STATISTICS_AUG_11_2014_1029AM
+#if !defined(HPX_UTIL_CACHE_LOCAL_FULL_STATISTICS_AUG_11_2014_1029AM)
+#define HPX_UTIL_CACHE_LOCAL_FULL_STATISTICS_AUG_11_2014_1029AM
 
-#include <boost/cache/statistics/local_statistics.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/cache/statistics/local_statistics.hpp>
 
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
@@ -17,7 +18,7 @@
 #include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache { namespace statistics
+namespace hpx { namespace util { namespace cache { namespace statistics
 {
     ///////////////////////////////////////////////////////////////////////////
     class local_full_statistics : public local_statistics
@@ -158,8 +159,7 @@ namespace boost { namespace cache { namespace statistics
         api_counter_data update_entry_;
         api_counter_data erase_entry_;
     };
-
-}}}
+}}}}
 
 #endif
 
