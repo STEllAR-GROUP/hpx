@@ -11,8 +11,8 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -123,7 +123,7 @@ void interruption_point_thread(hpx::lcos::local::barrier* b,
     hpx::lcos::local::spinlock* m, bool* failed)
 {
     try {
-        boost::lock_guard<hpx::lcos::local::spinlock> lk(*m);
+        std::lock_guard<hpx::lcos::local::spinlock> lk(*m);
         hpx::this_thread::interruption_point();
         *failed = true;
     }
@@ -139,7 +139,7 @@ void do_test_thread_interrupts_at_interruption_point()
     hpx::lcos::local::spinlock m;
     hpx::lcos::local::barrier b(2);
     bool failed = false;
-    boost::unique_lock<hpx::lcos::local::spinlock> lk(m);
+    std::unique_lock<hpx::lcos::local::spinlock> lk(m);
     hpx::thread thrd(&interruption_point_thread, &b, &m, &failed);
     thrd.interrupt();
     lk.unlock();
@@ -164,7 +164,7 @@ void disabled_interruption_point_thread(hpx::lcos::local::spinlock* m,
     hpx::this_thread::disable_interruption dc;
     b->wait();
     try {
-        boost::lock_guard<hpx::lcos::local::spinlock> lk(*m);
+        std::lock_guard<hpx::lcos::local::spinlock> lk(*m);
         hpx::this_thread::interruption_point();
         *failed = false;
     }
@@ -185,9 +185,9 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     b.wait();       // Make sure the test thread has been started and marked itself
                     // to disable interrupts.
     try {
-        boost::unique_lock<hpx::lcos::local::spinlock> lk(m);
+        std::unique_lock<hpx::lcos::local::spinlock> lk(m);
         hpx::util::ignore_while_checking<
-            boost::unique_lock<hpx::lcos::local::spinlock> > il(&lk);
+            std::unique_lock<hpx::lcos::local::spinlock> > il(&lk);
         thrd.interrupt();
     }
     catch(hpx::exception& e) {
@@ -212,9 +212,11 @@ void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct non_copyable_functor:
-    boost::noncopyable
+class non_copyable_functor
 {
+    HPX_NON_COPYABLE(non_copyable_functor);
+
+public:
     unsigned value;
 
     non_copyable_functor()
@@ -255,7 +257,7 @@ void test_creation_through_reference_wrapper()
 //
 //     void operator()()
 //     {
-//         boost::lock_guard<boost::mutex> lk(mut);
+//         std::lock_guard<boost::mutex> lk(mut);
 //         while(!done)
 //         {
 //             cond.wait(lk);
@@ -276,7 +278,7 @@ void test_creation_through_reference_wrapper()
 //     HPX_TEST(!joined);
 //     HPX_TEST(thrd.joinable());
 //     {
-//         boost::lock_guard<boost::mutex> lk(f.mut);
+//         std::lock_guard<boost::mutex> lk(f.mut);
 //         f.done=true;
 //         f.cond.notify_one();
 //     }

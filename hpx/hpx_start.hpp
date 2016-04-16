@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +13,9 @@
 #include <hpx/hpx_user_main_config.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/lexical_cast.hpp>
+
+#include <string>
+#include <vector>
 
 #ifndef DOXYGEN
 ///////////////////////////////////////////////////////////////////////////////
@@ -368,8 +370,54 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline bool
-    start(boost::program_options::options_description const& desc_cmdline, int argc,
-        char** argv, hpx::runtime_mode mode);
+    start(boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, hpx::runtime_mode mode);
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
+    ///
+    /// In console mode it will execute the user supplied function `hpx_main`,
+    /// in worker mode it will execute an empty `hpx_main`.
+    ///
+    /// \param desc_cmdline [in] This parameter may hold the description of
+    ///                     additional command line arguments understood by the
+    ///                     application. These options will be prepended to
+    ///                     the default command line options understood by
+    ///                     \a hpx::init (see description below).
+    /// \param argc         [in] The number of command line arguments passed
+    ///                     in \p argv. This is usually the unchanged value as
+    ///                     passed by the operating system (to `main()`).
+    /// \param argv         [in] The command line arguments for this
+    ///                     application, usually that is the value as passed
+    ///                     by the operating system (to `main()`).
+    /// \param mode         [in] The mode the created runtime environment
+    ///                     should be initialized in. There has to be exactly
+    ///                     one locality in each HPX application which is
+    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     all other localities have to be run in worker mode
+    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     set up automatically, but sometimes it is necessary
+    ///                     to explicitly specify the mode.
+    ///
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
+    ///
+    /// \note               If the parameter \p mode is runtime_mode_default,
+    ///                     the created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     command line arguments passed in `argc`/`argv`.
+    ///                     Otherwise it will be executed as specified by the
+    ///                     parameter\p mode.
+    inline bool
+    start(boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode);
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
@@ -521,6 +569,155 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     inline bool start(int (*f)(boost::program_options::variables_map& vm),
         std::string const& app_name, int argc, char** argv,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    ///
+    /// \param f            [in] The function to be scheduled as an HPX
+    ///                     thread. Usually this function represents the main
+    ///                     entry point of any HPX application.
+    /// \param app_name     [in] The name of the application.
+    /// \param argc         [in] The number of command line arguments passed
+    ///                     in \p argv. This is usually the unchanged value as
+    ///                     passed by the operating system (to `main()`).
+    /// \param argv         [in] The command line arguments for this
+    ///                     application, usually that is the value as passed
+    ///                     by the operating system (to `main()`).
+    /// \param mode         [in] The mode the created runtime environment
+    ///                     should be initialized in. There has to be exactly
+    ///                     one locality in each HPX application which is
+    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     all other localities have to be run in worker mode
+    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     set up automatically, but sometimes it is necessary
+    ///                     to explicitly specify the mode.
+    ///
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
+    ///
+    /// \note               The created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     command line arguments passed in `argc`/`argv`.
+    inline bool start(util::function_nonser<int(int, char**)> const&,
+        std::string const& app_name, int argc, char** argv,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    ///
+    /// \param f            [in] The function to be scheduled as an HPX
+    ///                     thread. Usually this function represents the main
+    ///                     entry point of any HPX application.
+    /// \param argc         [in] The number of command line arguments passed
+    ///                     in \p argv. This is usually the unchanged value as
+    ///                     passed by the operating system (to `main()`).
+    /// \param argv         [in] The command line arguments for this
+    ///                     application, usually that is the value as passed
+    ///                     by the operating system (to `main()`).
+    /// \param mode         [in] The mode the created runtime environment
+    ///                     should be initialized in. There has to be exactly
+    ///                     one locality in each HPX application which is
+    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     all other localities have to be run in worker mode
+    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     set up automatically, but sometimes it is necessary
+    ///                     to explicitly specify the mode.
+    ///
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
+    ///
+    /// \note               The created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     command line arguments passed in `argc`/`argv`.
+    inline bool start(int (*f)(boost::program_options::variables_map& vm),
+        int argc, char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    ///
+    /// \param f            [in] The function to be scheduled as an HPX
+    ///                     thread. Usually this function represents the main
+    ///                     entry point of any HPX application.
+    /// \param argc         [in] The number of command line arguments passed
+    ///                     in \p argv. This is usually the unchanged value as
+    ///                     passed by the operating system (to `main()`).
+    /// \param argv         [in] The command line arguments for this
+    ///                     application, usually that is the value as passed
+    ///                     by the operating system (to `main()`).
+    /// \param mode         [in] The mode the created runtime environment
+    ///                     should be initialized in. There has to be exactly
+    ///                     one locality in each HPX application which is
+    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     all other localities have to be run in worker mode
+    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     set up automatically, but sometimes it is necessary
+    ///                     to explicitly specify the mode.
+    ///
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
+    ///
+    /// \note               The created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     command line arguments passed in `argc`/`argv`.
+    inline bool start(util::function_nonser<int(int, char**)> const& f,
+        int argc, char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    ///
+    /// \param f            [in] The function to be scheduled as an HPX
+    ///                     thread. Usually this function represents the main
+    ///                     entry point of any HPX application.
+    /// \param argc         [in] The number of command line arguments passed
+    ///                     in \p argv. This is usually the unchanged value as
+    ///                     passed by the operating system (to `main()`).
+    /// \param argv         [in] The command line arguments for this
+    ///                     application, usually that is the value as passed
+    ///                     by the operating system (to `main()`).
+    /// \param cfg          A list of configuration settings which will be added
+    ///                     to the system configuration before the runtime
+    ///                     instance is run. Each of the entries in this list
+    ///                     must have the format of a fully defined key/value
+    ///                     pair from an ini-file (for instance
+    ///                     'hpx.component.enabled=1')
+    /// \param mode         [in] The mode the created runtime environment
+    ///                     should be initialized in. There has to be exactly
+    ///                     one locality in each HPX application which is
+    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     all other localities have to be run in worker mode
+    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     set up automatically, but sometimes it is necessary
+    ///                     to explicitly specify the mode.
+    ///
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
+    ///
+    /// \note               The created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     command line arguments passed in `argc`/`argv`.
+    inline bool start(util::function_nonser<int(int, char**)> const& f,
+        int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 }
 

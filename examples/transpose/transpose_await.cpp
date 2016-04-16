@@ -12,6 +12,7 @@
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
+#include <string>
 #include <vector>
 
 #define COL_SHIFT 1000.00           // Constant to shift column index
@@ -108,7 +109,7 @@ struct sub_block
     double * data_;
     mode mode_;
 
-    HPX_MOVABLE_BUT_NOT_COPYABLE(sub_block);
+    HPX_MOVABLE_ONLY(sub_block);
 };
 
 struct block_component

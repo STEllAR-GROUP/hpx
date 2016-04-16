@@ -7,16 +7,19 @@
 #define HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/dynamic_bitset.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <list>
+#include <mutex>
 #include <utility>
 
 namespace hpx { namespace lcos { namespace local
@@ -29,7 +32,7 @@ namespace hpx { namespace lcos { namespace local
         typedef Mutex mutex_type;
 
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(base_and_gate)
+        HPX_MOVABLE_ONLY(base_and_gate);
         typedef std::list<conditional_trigger*> condition_list_type;
 
     public:
@@ -54,7 +57,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs)
             {
-                boost::lock_guard<mutex_type> l(rhs.mtx_);
+                std::lock_guard<mutex_type> l(rhs.mtx_);
                 received_segments_ = std::move(rhs.received_segments_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
@@ -80,13 +83,13 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         /// \brief get a future allowing to wait for the gate to fire
-        future<void> get_future(std::size_t count = std::size_t(~0U),
+        future<void> get_future(std::size_t count = std::size_t(-1),
             std::size_t* generation_value = 0, error_code& ec = hpx::throws)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
 
             // by default we use as many segments as specified during construction
-            if (count == std::size_t(~0U))
+            if (count == std::size_t(-1))
                 count = received_segments_.size();
             HPX_ASSERT(count != 0);
 
@@ -109,7 +112,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename OuterLock>
         bool set(std::size_t which, OuterLock & outer_lock, error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (which >= received_segments_.size())
             {
                 // out of bounds index
@@ -153,7 +156,7 @@ namespace hpx { namespace lcos { namespace local
         bool set(std::size_t which, error_code& ec = throws)
         {
             no_mutex mtx;
-            boost::unique_lock<no_mutex> lk(mtx);
+            std::unique_lock<no_mutex> lk(mtx);
             return set(which, lk, ec);
         }
 
@@ -196,7 +199,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             synchronize(generation_value, l, function_name, ec);
         }
 
@@ -237,7 +240,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         std::size_t next_generation()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -248,7 +251,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return generation_;
         }
 
@@ -286,7 +289,7 @@ namespace hpx { namespace lcos { namespace local
     struct and_gate : public base_and_gate<no_mutex>
     {
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(and_gate)
+        HPX_MOVABLE_ONLY(and_gate);
         typedef base_and_gate<no_mutex> base_type;
 
     public:

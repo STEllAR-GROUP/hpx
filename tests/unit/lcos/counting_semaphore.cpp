@@ -12,7 +12,6 @@
 
 #include <boost/ref.hpp>
 #include <boost/atomic.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <string>
 #include <vector>
@@ -47,7 +46,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

@@ -10,6 +10,8 @@
 #include <hpx/lcos/wait_all.hpp>
 
 #include <boost/foreach.hpp>
+
+#include <vector>
 #include <time.h>
 
 #include "random_mem_access/random_mem_access.hpp"

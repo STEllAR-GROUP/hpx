@@ -14,8 +14,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
 
-#include <string>
 #include <map>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace plugin {

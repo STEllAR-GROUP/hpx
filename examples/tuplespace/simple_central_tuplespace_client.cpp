@@ -8,10 +8,12 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
+
+#include <string>
+#include <vector>
 
 #include "central_tuplespace/simple_central_tuplespace.hpp"
 #include "small_big_object.hpp"

@@ -9,18 +9,22 @@
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+#if defined(HPX_DEBUG)
+#include <hpx/util/logging.hpp>
+#endif
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <list>
+#include <mutex>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,7 +51,7 @@ namespace hpx { namespace util
 
         typedef Mutex mutex_type;
 
-        typedef typename mutex_type::scoped_lock unique_lock_type;
+        typedef std::unique_lock<mutex_type> unique_lock_type;
 
         explicit one_size_heap_list(char const* class_name = "")
             : class_name_(class_name)

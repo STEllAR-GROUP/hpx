@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,12 +9,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -104,7 +103,7 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
-        call(BOOST_SCOPED_ENUM(launch) launch_policy, F&& f, Ts&&... ts)
+        call(launch launch_policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
                 F(Ts&&...)
@@ -143,7 +142,7 @@ namespace hpx { namespace detail
         >::type
         call(F&& f, Ts&&... ts)
         {
-            return async_dispatch<BOOST_SCOPED_ENUM(launch)>::call(
+            return async_dispatch<launch>::call(
                 launch::all, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
@@ -222,8 +221,9 @@ namespace hpx
             std::forward<F>(f), std::forward<Ts>(ts)...
         ))
     {
-        return detail::async_dispatch<typename util::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+        return detail::async_dispatch<
+                typename util::decay<F>::type
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }
 

@@ -8,7 +8,7 @@
 
 [section:lcos Using LCOs]
 
-Lightweight Control Objects provide synchrhonization for HPX applications. Most
+Lightweight Control Objects provide synchronization for HPX applications. Most
 of them are familiar from other frameworks, but a few of them work in slightly
 special different ways adapted to HPX.
 

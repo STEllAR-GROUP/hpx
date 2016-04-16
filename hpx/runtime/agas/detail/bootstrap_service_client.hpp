@@ -17,6 +17,9 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 
+#include <string>
+#include <vector>
+
 namespace hpx { namespace agas { namespace detail
 {
     struct bootstrap_data_type

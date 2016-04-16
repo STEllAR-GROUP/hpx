@@ -21,6 +21,8 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace util { namespace batch_environments
 {
@@ -220,7 +222,7 @@ namespace hpx { namespace util { namespace batch_environments
                                     }
                                     dec *= 10;
                                 }
-                                s += boost::lexical_cast<std::string>(i);
+                                s += std::to_string(i);
                                 if(push_now)
                                 {
                                     tmp_nodes.push_back(s);

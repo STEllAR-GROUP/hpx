@@ -9,7 +9,6 @@
 #include <hpx/config/defines.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/runtime_configuration.hpp>

@@ -12,7 +12,7 @@
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
@@ -28,11 +28,11 @@
 #include <boost/cache/lru_cache.hpp>
 #include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/dynamic_bitset.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <map>
+#include <mutex>
+#include <string>
 #include <vector>
 
 namespace hpx { namespace util
@@ -46,8 +46,12 @@ struct request;
 struct response;
 HPX_EXPORT void destroy_big_boot_barrier();
 
-struct HPX_EXPORT addressing_service : boost::noncopyable
+struct HPX_EXPORT addressing_service
 {
+private:
+    HPX_NON_COPYABLE(addressing_service);
+
+public:
     // {{{ types
     typedef components::component_type component_id_type;
 
@@ -245,25 +249,25 @@ protected:
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , error_code& ec = throws
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_non_blocking(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , error_code& ec
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     std::vector<hpx::future<std::vector<response> > >
     send_refcnt_requests_async(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_sync(
-        boost::unique_lock<mutex_type>& l
+        std::unique_lock<mutex_type>& l
       , error_code& ec
         );
 

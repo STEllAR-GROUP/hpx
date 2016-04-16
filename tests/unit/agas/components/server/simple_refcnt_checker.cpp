@@ -9,6 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <sstream>
+#include <string>
 
 #include <tests/unit/agas/components/server/simple_refcnt_checker.hpp>
 

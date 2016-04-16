@@ -95,9 +95,13 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/when_each.hpp>
 #include <hpx/util/detail/pack.hpp>
+
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -115,13 +119,15 @@ namespace hpx { namespace lcos
     }
 
     template <typename F, typename Iterator>
-    void wait_each(F&& f, Iterator begin, Iterator end)
+    void
+    wait_each(F&& f, Iterator begin, Iterator end)
     {
         lcos::when_each(std::forward<F>(f), begin, end).wait();
     }
 
     template <typename F, typename Iterator>
-    void wait_each_n(F&& f, Iterator begin, std::size_t count)
+    void
+    wait_each_n(F&& f, Iterator begin, std::size_t count)
     {
         when_each_n(std::forward<F>(f), begin, count).wait();
     }
@@ -134,11 +140,9 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    typename boost::disable_if<
-        boost::mpl::or_<
-            traits::is_future<typename util::decay<F>::type>,
-            util::detail::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
-        >
+    typename std::enable_if<
+        !traits::is_future<typename std::decay<F>::type>::value &&
+        util::detail::all_of<traits::is_future<Ts>...>::value
     >::type
     wait_each(F&& f, Ts&&... ts)
     {

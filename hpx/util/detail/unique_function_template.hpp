@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2016 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
@@ -24,6 +25,7 @@ namespace hpx { namespace util { namespace detail
     struct unique_function_vtable_ptr
     {
         typename callable_vtable<Sig>::invoke_t invoke;
+        typename callable_vtable<Sig>::get_function_address_t get_function_address;
         vtable::get_type_t get_type;
         vtable::destruct_t destruct;
         vtable::delete_t delete_;
@@ -32,6 +34,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         unique_function_vtable_ptr(construct_vtable<T>) HPX_NOEXCEPT
           : invoke(&callable_vtable<Sig>::template invoke<T>)
+          , get_function_address(&callable_vtable<Sig>::template get_function_address<T>)
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)
           , delete_(&vtable::template delete_<T>)
@@ -68,7 +71,7 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable_ptr<R(Ts...)> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, R(Ts...), Serializable> base_type;
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function)
+        HPX_MOVABLE_ONLY(unique_function);
 
     public:
         typedef typename base_type::result_type result_type;
@@ -141,7 +144,7 @@ namespace hpx { namespace util
     {
         typedef unique_function<R(Ts...), false> base_type;
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function_nonser);
+        HPX_MOVABLE_ONLY(unique_function_nonser);
 
     public:
         unique_function_nonser() HPX_NOEXCEPT
@@ -186,6 +189,33 @@ namespace hpx { namespace util
         return f.empty();
     }
 
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
+}}
+
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    template <typename Sig, bool Serializable>
+    struct get_function_address<util::unique_function<Sig, Serializable> >
+    {
+        static std::size_t
+            call(util::unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
+
+#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
+    template <typename Sig>
+    struct get_function_address<util::unique_function_nonser<Sig> >
+    {
+        static std::size_t
+            call(util::unique_function_nonser<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
 #   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 

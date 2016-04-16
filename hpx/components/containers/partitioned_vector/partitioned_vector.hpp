@@ -9,6 +9,8 @@
 #ifndef HPX_PARTITIONED_VECTOR_HPP
 #define HPX_PARTITIONED_VECTOR_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
@@ -18,11 +20,13 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
-#include <cstdint>
-#include <memory>
-#include <iterator>
 #include <algorithm>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 
@@ -131,7 +135,7 @@ namespace hpx
     ///
     template <typename T>
     class partitioned_vector
-      : hpx::components::client_base<partitioned_vector<T>,
+      : public hpx::components::client_base<partitioned_vector<T>,
             hpx::components::server::distributed_metadata_base<
                 server::partitioned_vector_config_data> >
     {
@@ -335,6 +339,15 @@ namespace hpx
         void register_as_sync(std::string const& symbolic_name)
         {
             register_as(symbolic_name).get();
+        }
+
+        // construct from id
+        partitioned_vector(future<id_type> && f)
+        {
+            using util::placeholders::_1;
+            f.share().then(
+                util::bind(&partitioned_vector::connect_to_helper, this, _1)
+            );
         }
 
     public:

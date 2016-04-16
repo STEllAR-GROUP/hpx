@@ -17,11 +17,10 @@
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/move.hpp>
 
+#include <algorithm>
 #include <type_traits>
 #include <vector>
-#include <algorithm>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -342,7 +341,7 @@ namespace hpx { namespace components
                         [](hpx::future<std::vector<hpx::id_type> > && v)
                             -> std::vector<Client>
                         {
-                            return make_client<Client>(v.get());
+                            return make_clients<Client>(v.get());
                         }
                     );
             }

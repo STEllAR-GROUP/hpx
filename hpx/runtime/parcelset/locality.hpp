@@ -21,6 +21,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <memory>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -29,7 +30,7 @@ namespace hpx { namespace parcelset
         BOOST_MPL_HAS_XXX_TRAIT_DEF(iterator_category);
     };
 
-    class locality
+    class HPX_EXPORT locality
     {
         template <typename Impl>
         class impl;

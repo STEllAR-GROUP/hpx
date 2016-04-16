@@ -8,7 +8,6 @@
 #define HPX_UTIL_WRAPPER_HEAP_JUN_12_2008_0904AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -19,12 +18,12 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
-#include <new>
 #include <memory>
+#include <mutex>
+#include <new>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,8 +62,10 @@ namespace hpx { namespace components { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////////
     template<typename T, typename Allocator, typename Mutex = hpx::lcos::local::spinlock>
-    class wrapper_heap : private boost::noncopyable
+    class wrapper_heap
     {
+        HPX_NON_COPYABLE(wrapper_heap);
+
     public:
         typedef T value_type;
         typedef Allocator allocator_type;
@@ -78,7 +79,7 @@ namespace hpx { namespace components { namespace detail
 
         typedef Mutex mutex_type;
 
-        typedef typename mutex_type::scoped_lock scoped_lock;
+        typedef std::unique_lock<mutex_type> scoped_lock;
 
         typedef boost::aligned_storage<sizeof(value_type),
             boost::alignment_of<value_type>::value> storage_type;

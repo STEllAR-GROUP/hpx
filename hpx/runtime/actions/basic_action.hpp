@@ -11,6 +11,7 @@
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM
 
 #include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
@@ -22,10 +23,11 @@
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/is_valid_action.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
@@ -42,7 +44,9 @@
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/atomic.hpp>
 
+#include <exception>
 #include <sstream>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -60,7 +64,7 @@ namespace hpx { namespace actions
         template <typename Action, typename F, typename ...Ts>
         struct continuation_thread_function
         {
-            HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function)
+            HPX_MOVABLE_ONLY(continuation_thread_function);
 
         public:
             explicit continuation_thread_function(
@@ -196,7 +200,7 @@ namespace hpx { namespace actions
                 catch (hpx::thread_interrupted const&) { //-V565
                     /* swallow this exception */
                 }
-                catch (hpx::exception const& e) {
+                catch (std::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing "
                         << Derived::get_action_name(lva) << ": " << e.what();
@@ -274,7 +278,7 @@ namespace hpx { namespace actions
         {
             template <typename IdOrPolicy, typename ...Ts>
             HPX_FORCEINLINE static LocalResult call(
-                boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
+                boost::mpl::false_, launch policy,
                 IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
@@ -283,7 +287,7 @@ namespace hpx { namespace actions
 
             template <typename IdOrPolicy, typename ...Ts>
             HPX_FORCEINLINE static LocalResult call(
-                boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
+                boost::mpl::true_, launch policy,
                 IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
@@ -294,7 +298,7 @@ namespace hpx { namespace actions
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
         HPX_FORCEINLINE local_result_type operator()(
-            BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+            launch policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
             return util::void_guard<local_result_type>(),
@@ -311,7 +315,7 @@ namespace hpx { namespace actions
 
         template <typename ...Ts>
         HPX_FORCEINLINE local_result_type operator()(
-            BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+            launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
             return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
@@ -331,7 +335,7 @@ namespace hpx { namespace actions
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
         >::type
-        operator()(BOOST_SCOPED_ENUM(launch) policy,
+        operator()(launch policy,
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
             return util::void_guard<local_result_type>(),
@@ -360,7 +364,7 @@ namespace hpx { namespace actions
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
         >::type
-        operator()(BOOST_SCOPED_ENUM(launch) policy,
+        operator()(launch policy,
             DistPolicy const& dist_policy, Ts&&... vs) const
         {
             return (*this)(launch::all, dist_policy, throws,

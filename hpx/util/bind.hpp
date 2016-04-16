@@ -11,6 +11,7 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
@@ -260,10 +261,8 @@ namespace hpx { namespace util
             {}
 #endif
 
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            bound& operator=(bound const&) = delete;
-            bound& operator=(bound&&) = delete;
-#endif
+            HPX_DELETE_COPY_ASSIGN(bound);
+            HPX_DELETE_MOVE_ASSIGN(bound);
 
             template <typename ...Us>
             inline typename bound_result_of<
@@ -294,6 +293,13 @@ namespace hpx { namespace util
             {
                 ar & _f;
                 ar & _args;
+            }
+
+            std::size_t get_function_address() const
+            {
+                return traits::get_function_address<
+                        typename std::decay<F>::type
+                    >::call(_f);
             }
 
         private:
@@ -383,6 +389,11 @@ namespace hpx { namespace util
                 ar & _f;
             }
 
+            std::size_t get_function_address() const
+            {
+                return traits::get_function_address<F>::call(_f);
+            }
+
         public: // exposition-only
             F _f;
 #           if !defined(HPX_DISABLE_ASSERTS)
@@ -417,6 +428,27 @@ namespace hpx { namespace traits
     struct is_placeholder<util::detail::placeholder<I> >
       : boost::integral_constant<int, I>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct get_function_address<util::detail::bound<Sig> >
+    {
+        static std::size_t
+            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
+
+    template <typename F>
+    struct get_function_address<util::detail::one_shot_wrapper<F> >
+    {
+        static std::size_t
+            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

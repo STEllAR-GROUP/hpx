@@ -7,13 +7,11 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_MINMAX_JAN_24_2016_0800PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -21,9 +19,9 @@
 
 #include <algorithm>
 #include <iterator>
+#include <list>
 #include <type_traits>
-
-#include <boost/type_traits/is_same.hpp>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -39,14 +37,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         segmented_minormax(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj,
-            boost::mpl::true_)
+            SegIter first, SegIter last, F && f, Proj && proj, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-
-            using boost::mpl::true_;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -61,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(
-                        traits::get_id(sit), algo, policy, true_(),
+                        traits::get_id(sit), algo, policy, std::true_type(),
                         beg, end, f, proj);
 
                     positions.push_back(traits::compose(send, out));
@@ -75,7 +70,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(
-                        traits::get_id(sit), algo, policy, true_(),
+                        traits::get_id(sit), algo, policy, std::true_type(),
                         beg, end, f, proj);
 
                     positions.push_back(traits::compose(sit, out));
@@ -90,7 +85,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         local_iterator_type out = dispatch(
-                            traits::get_id(sit), algo, policy, true_(),
+                            traits::get_id(sit), algo, policy, std::true_type(),
                             beg, end, f, proj);
 
                         positions.push_back(traits::compose(sit, out));
@@ -103,7 +98,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(
-                        traits::get_id(sit), algo, policy, true_(),
+                        traits::get_id(sit), algo, policy, std::true_type(),
                         beg, end, f, proj);
 
                     positions.push_back(traits::compose(sit, out));
@@ -119,18 +114,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         segmented_minormax(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj,
-            boost::mpl::false_)
+            SegIter first, SegIter last, F && f, Proj && proj, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
-            typedef typename std::iterator_traits<SegIter>::iterator_category
-                iterator_category;
-            typedef typename boost::mpl::bool_<boost::is_same<
-                    iterator_category, std::input_iterator_tag
-                >::value> forced_seq;
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
             typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
 
             segment_iterator sit = traits::segment(first);
@@ -236,9 +228,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         min_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef typename parallel::is_sequential_execution_policy<
-                    ExPolicy
-                >::type is_seq;
+            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
 
             SegIter result = first;
             if (first == last || ++first == last)
@@ -262,9 +252,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         max_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef typename parallel::is_sequential_execution_policy<
-                    ExPolicy
-                >::type is_seq;
+            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
 
             SegIter result = first;
             if (first == last || ++first == last)
@@ -311,8 +299,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, std::pair<SegIter, SegIter>
         >::type
         segmented_minmax(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj,
-            boost::mpl::true_)
+            SegIter first, SegIter last, F && f, Proj && proj, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -322,8 +309,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef std::pair<
                     local_iterator_type, local_iterator_type
                 > local_iterator_pair_type;
-
-            using boost::mpl::true_;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -338,7 +323,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_pair_type out = dispatch(
-                        traits::get_id(sit), algo, policy, true_(),
+                        traits::get_id(sit), algo, policy, std::true_type(),
                         beg, end, f, proj);
 
                     positions.push_back(std::make_pair(
@@ -354,7 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_pair_type out = dispatch(
-                        traits::get_id(sit), algo, policy, true_(),
+                        traits::get_id(sit), algo, policy, std::true_type(),
                         beg, end, f, proj);
 
                     positions.push_back(std::make_pair(
@@ -371,7 +356,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         local_iterator_pair_type out = dispatch(
-                            traits::get_id(sit), algo, policy, true_(),
+                            traits::get_id(sit), algo, policy, std::true_type(),
                             beg, end, f, proj);
 
                         positions.push_back(std::make_pair(
@@ -386,7 +371,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_pair_type out = dispatch(
-                        traits::get_id(sit), algo, policy, true_(),
+                        traits::get_id(sit), algo, policy, std::true_type(),
                         beg, end, f, proj);
 
                     positions.push_back(std::make_pair(
@@ -406,18 +391,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, std::pair<SegIter, SegIter>
         >::type
         segmented_minmax(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj,
-            boost::mpl::false_)
+            SegIter first, SegIter last, F && f, Proj && proj, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
-            typedef typename std::iterator_traits<SegIter>::iterator_category
-                iterator_category;
-            typedef typename boost::mpl::bool_<boost::is_same<
-                    iterator_category, std::input_iterator_tag
-                >::value> forced_seq;
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
             typedef std::pair<SegIter, SegIter> result_type;
             typedef util::detail::algorithm_result<ExPolicy, result_type> result;
 
@@ -538,9 +520,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         minmax_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef typename parallel::is_sequential_execution_policy<
-                    ExPolicy
-                >::type is_seq;
+            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
             typedef std::pair<SegIter, SegIter> result_type;
 
             result_type result(first, first);

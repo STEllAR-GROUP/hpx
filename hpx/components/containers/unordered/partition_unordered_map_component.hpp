@@ -16,6 +16,8 @@
 /// except all API'are defined as component action. All the API's in client
 /// classes are asynchronous API which return the futures.
 
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
@@ -24,10 +26,10 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <iostream>
-#include <tuple>
-#include <vector>
 #include <string>
+#include <tuple>
 #include <unordered_map>
+#include <vector>
 
 namespace hpx { namespace server
 {

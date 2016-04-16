@@ -11,6 +11,8 @@
 
 #include <boost/ptr_container/ptr_map.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {

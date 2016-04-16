@@ -20,13 +20,14 @@
 
 #include <boost/asio/placeholders.hpp>
 #include <boost/integer/endian.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
+
+#include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
@@ -97,7 +98,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         {
             next_function_type f = 0;
             {
-                boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
+                std::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
                 f = next_;
             }
             if(f != 0)
@@ -186,7 +187,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         bool next(next_function_type f)
         {
-            boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
+            std::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
             next_ = f;
             return false;
         }

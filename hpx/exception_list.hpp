@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,12 +10,12 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
-#include <boost/thread/locks.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/system/error_code.hpp>
 
 #include <list>
+#include <mutex>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -67,7 +67,7 @@ namespace hpx
         /// \note Complexity: Constant time.
         std::size_t size() const HPX_NOEXCEPT
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.size();
         }
 
@@ -75,14 +75,14 @@ namespace hpx
         /// within the exception_list.
         exception_list_type::const_iterator begin() const HPX_NOEXCEPT
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.begin();
         }
 
         /// An iterator which is the past-the-end value for the exception_list.
         exception_list_type::const_iterator end() const HPX_NOEXCEPT
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.end();
         }
 

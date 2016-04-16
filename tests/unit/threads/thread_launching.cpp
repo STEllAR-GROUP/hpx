@@ -9,7 +9,6 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <string>
 #include <vector>
@@ -71,12 +70,16 @@ void test_thread_callable_object_no_arguments()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct callable_noncopyable_no_args
-  : boost::noncopyable
+class callable_noncopyable_no_args
 {
+    HPX_NON_COPYABLE(callable_noncopyable_no_args);
+
+public:
     typedef void result_type;
 
     static bool called;
+
+    callable_noncopyable_no_args() {}
 
     void operator()() const
     {

@@ -10,6 +10,8 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
@@ -220,7 +222,7 @@ void init_globals()
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'threshold', "
             "should be in between 2 and n-value, value specified: " +
-                boost::lexical_cast<std::string>(threshold));
+                std::to_string(threshold));
         return;
     }
 
@@ -230,7 +232,7 @@ void init_globals()
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'distribute-at', "
             "should be in between 2 and n-value, value specified: " +
-                boost::lexical_cast<std::string>(distribute_at));
+                std::to_string(distribute_at));
         return;
     }
 

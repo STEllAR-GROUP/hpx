@@ -14,7 +14,10 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/functions.hpp>
 
+#include <vector>
+
 #include "test_utils.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 void inclusive_scan_benchmark()
 {

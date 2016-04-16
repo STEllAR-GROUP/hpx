@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
@@ -20,14 +20,14 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/thread/locks.hpp>
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/make_shared.hpp>
 #endif
 
 #include <list>
+#include <mutex>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace agas
 {
@@ -365,14 +365,14 @@ response primary_namespace::begin_migration(
     request const& req
   , error_code& ec)
 {
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     naming::gid_type id = req.get_gid();
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     resolved_type r = resolve_gid_locked(l, id, ec);
-    if (at_c<0>(r) == naming::invalid_gid)
+    if (get<0>(r) == naming::invalid_gid)
     {
         l.unlock();
 
@@ -396,7 +396,7 @@ response primary_namespace::begin_migration(
                 id,
                 hpx::util::make_tuple(
                     false, 0,
-                    boost::make_shared<lcos::local::condition_variable>()
+                    boost::make_shared<lcos::local::condition_variable_any>()
                 )
             ));
 #endif
@@ -407,7 +407,7 @@ response primary_namespace::begin_migration(
     // flag this id as being migrated
     hpx::util::get<0>(it->second) = true;
 
-    return response(primary_ns_begin_migration, at_c<0>(r), at_c<1>(r), at_c<2>(r));
+    return response(primary_ns_begin_migration, get<0>(r), get<1>(r), get<2>(r));
 }
 
 // migration of the given object is complete
@@ -417,7 +417,7 @@ response primary_namespace::end_migration(
 {
     naming::gid_type id = req.get_gid();
 
-    boost::lock_guard<mutex_type> l(mutex_);
+    std::lock_guard<mutex_type> l(mutex_);
 
     using hpx::util::get;
 
@@ -439,7 +439,7 @@ response primary_namespace::end_migration(
 
 // wait if given object is currently being migrated
 void primary_namespace::wait_for_migration_locked(
-    boost::unique_lock<mutex_type>& l
+    std::unique_lock<mutex_type>& l
   , naming::gid_type id
   , error_code& ec)
 {
@@ -468,7 +468,7 @@ response primary_namespace::bind_gid(
   , error_code& ec
     )
 { // {{{ bind_gid implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     // parameters
     gva g = req.get_gva();
@@ -477,7 +477,7 @@ response primary_namespace::bind_gid(
 
     naming::detail::strip_internal_bits_from_gid(id);
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.lower_bound(id)
                            , begin = gvas_.begin()
@@ -645,7 +645,7 @@ response primary_namespace::resolve_gid(
   , error_code& ec
     )
 { // {{{ resolve_gid implementation
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     // parameters
     naming::gid_type id = req.get_gid();
@@ -653,7 +653,7 @@ response primary_namespace::resolve_gid(
     resolved_type r;
 
     {
-        boost::unique_lock<mutex_type> l(mutex_);
+        std::unique_lock<mutex_type> l(mutex_);
 
         // wait for any migration to be completed
         wait_for_migration_locked(l, id, ec);
@@ -662,7 +662,7 @@ response primary_namespace::resolve_gid(
         r = resolve_gid_locked(l, id, ec);
     }
 
-    if (at_c<0>(r) == naming::invalid_gid)
+    if (get<0>(r) == naming::invalid_gid)
     {
         LAGAS_(info) << (boost::format(
             "primary_namespace::resolve_gid, gid(%1%), response(no_success)")
@@ -678,9 +678,9 @@ response primary_namespace::resolve_gid(
     LAGAS_(info) << (boost::format(
         "primary_namespace::resolve_gid, gid(%1%), base(%2%), "
         "gva(%3%), locality_id(%4%)")
-        % id % at_c<0>(r) % at_c<1>(r) % at_c<2>(r));
+        % id % get<0>(r) % get<1>(r) % get<2>(r));
 
-    return response(primary_ns_resolve_gid, at_c<0>(r), at_c<1>(r), at_c<2>(r));
+    return response(primary_ns_resolve_gid, get<0>(r), get<1>(r), get<2>(r));
 } // }}}
 
 response primary_namespace::unbind_gid(
@@ -693,7 +693,7 @@ response primary_namespace::unbind_gid(
     naming::gid_type id = req.get_gid();
     naming::detail::strip_internal_bits_from_gid(id);
 
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.find(id)
                            , end = gvas_.end();
@@ -747,18 +747,22 @@ response primary_namespace::increment_credit(
     request const& req
   , error_code& ec
     )
-{ // change_credit_non_blocking implementation
+{ // increment_credit implementation
     // parameters
     boost::int64_t credits = req.get_credit();
-    naming::gid_type lower = req.get_gid();
+    naming::gid_type lower = req.get_lower_bound();
+    naming::gid_type upper = req.get_upper_bound();
 
     naming::detail::strip_internal_bits_from_gid(lower);
+    naming::detail::strip_internal_bits_from_gid(upper);
+
+    if (lower == upper)
+        ++upper;
 
     // Increment.
-    naming::gid_type upper = lower;
     if (credits > 0)
     {
-        increment(lower, ++upper, credits, ec);
+        increment(lower, upper, credits, ec);
         if (ec) return response();
     }
     else
@@ -861,8 +865,8 @@ response primary_namespace::allocate(
     next_id_ = upper;
 
     // Set the initial credit count.
-    naming::detail::set_credit_for_gid(lower, HPX_GLOBALCREDIT_INITIAL);
-    naming::detail::set_credit_for_gid(upper, HPX_GLOBALCREDIT_INITIAL);
+    naming::detail::set_credit_for_gid(lower, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
+    naming::detail::set_credit_for_gid(upper, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::allocate, count(%1%), "
@@ -882,7 +886,7 @@ response primary_namespace::allocate(
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::unique_lock<mutex_type>& l
+      , std::unique_lock<mutex_type>& l
       , const char* func_name
         )
     { // dump_refcnt_matches implementation
@@ -920,7 +924,7 @@ void primary_namespace::increment(
   , error_code& ec
     )
 { // {{{ increment implementation
-    boost::unique_lock<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))
@@ -960,7 +964,9 @@ void primary_namespace::increment(
         refcnt_table_type::iterator it = refcnts_.find(raw);
         if (it == refcnts_.end())
         {
-            boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
+            boost::int64_t count =
+                boost::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
+
             std::pair<refcnt_table_type::iterator, bool> p =
                 refcnts_.insert(refcnt_table_type::value_type(raw, count));
             if (!p.second)
@@ -968,7 +974,7 @@ void primary_namespace::increment(
                 l.unlock();
 
                 HPX_THROWS_IF(ec, invalid_data
-                    , "primary_namespace::decrement_sweep"
+                    , "primary_namespace::increment"
                     , boost::str(boost::format(
                         "couldn't create entry in reference count table, "
                         "raw(%1%), ref-count(%3%)")
@@ -994,7 +1000,7 @@ void primary_namespace::increment(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::resolve_free_list(
-    boost::unique_lock<mutex_type>& l
+    std::unique_lock<mutex_type>& l
   , std::list<refcnt_table_type::iterator> const& free_list
   , std::list<free_entry>& free_entry_list
   , naming::gid_type const& lower
@@ -1004,7 +1010,7 @@ void primary_namespace::resolve_free_list(
 {
     HPX_ASSERT_OWNS_LOCK(l);
 
-    using boost::fusion::at_c;
+    using hpx::util::get;
 
     typedef refcnt_table_type::iterator iterator;
 
@@ -1022,7 +1028,7 @@ void primary_namespace::resolve_free_list(
         resolved_type r = resolve_gid_locked(l, gid, ec);
         if (ec) return;
 
-        naming::gid_type& raw = at_c<0>(r);
+        naming::gid_type& raw = get<0>(r);
         if (raw == naming::invalid_gid)
         {
             l.unlock();
@@ -1037,7 +1043,7 @@ void primary_namespace::resolve_free_list(
         }
 
         // Make sure the GVA is valid.
-        gva& g = at_c<1>(r);
+        gva& g = get<1>(r);
 
         // REVIEW: Should we do more to make sure the GVA is valid?
         if (HPX_UNLIKELY(components::component_invalid == g.type))
@@ -1075,7 +1081,7 @@ void primary_namespace::resolve_free_list(
 
         // Add the information needed to destroy these components to the
         // free list.
-        free_entry_list.push_back(free_entry(resolved, gid, at_c<2>(r)));
+        free_entry_list.push_back(free_entry(resolved, gid, get<2>(r)));
 
         // remove this entry from the refcnt table
         refcnts_.erase(it);
@@ -1099,7 +1105,7 @@ void primary_namespace::decrement_sweep(
     free_entry_list.clear();
 
     {
-        boost::unique_lock<mutex_type> l(mutex_);
+        std::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
@@ -1139,8 +1145,23 @@ void primary_namespace::decrement_sweep(
             refcnt_table_type::iterator it = refcnts_.find(raw);
             if (it == refcnts_.end())
             {
-                boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL)
-                    - credits;
+                if (credits > boost::int64_t(HPX_GLOBALCREDIT_INITIAL))
+                {
+                    l.unlock();
+
+                    HPX_THROWS_IF(ec, invalid_data
+                      , "primary_namespace::decrement_sweep"
+                      , boost::str(boost::format(
+                            "negative entry in reference count table, raw(%1%), "
+                            "refcount(%2%)")
+                            % raw
+                            % (boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits)));
+                    return;
+                }
+
+                boost::int64_t count =
+                    boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
+
                 std::pair<refcnt_table_type::iterator, bool> p =
                     refcnts_.insert(refcnt_table_type::value_type(raw, count));
                 if (!p.second)
@@ -1198,8 +1219,8 @@ void primary_namespace::free_components_sync(
   , naming::gid_type const& upper
   , error_code& ec
     )
-{ // {{{ kill_sync implementation
-    using boost::fusion::at_c;
+{ // {{{ free_components_sync implementation
+    using hpx::util::get;
 
     std::vector<lcos::future<void> > futures;
 
@@ -1253,11 +1274,11 @@ void primary_namespace::free_components_sync(
 } // }}}
 
 primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
-    boost::unique_lock<mutex_type>& l
+    std::unique_lock<mutex_type>& l
   , naming::gid_type const& gid
   , error_code& ec
     )
-{ // {{{ resolve_gid implementation
+{ // {{{ resolve_gid_locked implementation
     HPX_ASSERT_OWNS_LOCK(l);
 
     // parameters

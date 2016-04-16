@@ -11,9 +11,12 @@
 #if !defined(HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F)
 #define HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>
+
+#include <string>
 
 namespace hpx { namespace performance_counters
 {

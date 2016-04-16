@@ -10,10 +10,12 @@
 
 #include <boost/range/functions.hpp>
 
-#include "test_utils.hpp"
-
-#include <iostream>
 #include <ctime>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -92,12 +94,14 @@ void test_min_element()
     test_min_element_async(seq(task), IteratorTag());
     test_min_element_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_min_element(execution_policy(seq), IteratorTag());
     test_min_element(execution_policy(par), IteratorTag());
     test_min_element(execution_policy(par_vec), IteratorTag());
 
     test_min_element(execution_policy(seq(task)), IteratorTag());
     test_min_element(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void min_element_test()
@@ -253,11 +257,13 @@ void test_min_element_exception()
     test_min_element_exception_async(seq(task), IteratorTag());
     test_min_element_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_min_element_exception(execution_policy(seq), IteratorTag());
     test_min_element_exception(execution_policy(par), IteratorTag());
 
     test_min_element_exception(execution_policy(seq(task)), IteratorTag());
     test_min_element_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void min_element_exception_test()
@@ -409,11 +415,13 @@ void test_min_element_bad_alloc()
     test_min_element_bad_alloc_async(seq(task), IteratorTag());
     test_min_element_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_min_element_bad_alloc(execution_policy(seq), IteratorTag());
     test_min_element_bad_alloc(execution_policy(par), IteratorTag());
 
     test_min_element_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_min_element_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void min_element_bad_alloc_test()

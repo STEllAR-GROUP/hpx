@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,11 +17,9 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 
 #include <type_traits>
-
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -29,15 +27,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     namespace detail
     {
         template <typename F, typename Enable = void>
-        struct async_execute_result
+        struct distribution_policy_execute_result
         {
-            typedef typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type type;
+            typedef typename hpx::util::result_of<F()>::type type;
         };
 
         template <typename Action>
-        struct async_execute_result<Action,
+        struct distribution_policy_execute_result<Action,
             typename std::enable_if<hpx::traits::is_action<Action>::value>::type>
         {
             typedef typename Action::local_result_type type;
@@ -91,7 +87,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F>
         typename std::enable_if<
             !hpx::traits::is_action<F>::value,
-            hpx::future<typename detail::async_execute_result<F>::type>
+            hpx::future<
+                typename detail::distribution_policy_execute_result<F>::type
+            >
         >::type
         async_execute_impl(F && f) const
         {
@@ -134,10 +132,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        hpx::future<typename detail::async_execute_result<F>::type>
+        hpx::future<
+            typename detail::distribution_policy_execute_result<F>::type
+        >
         async_execute(F && f) const
         {
             return async_execute_impl(std::forward<F>(f));
+        }
+
+        template <typename F>
+        typename detail::distribution_policy_execute_result<F>::type
+        execute(F && f)
+        {
+            return async_execute_impl(std::forward<F>(f)).get();
         }
         /// \endcond
 

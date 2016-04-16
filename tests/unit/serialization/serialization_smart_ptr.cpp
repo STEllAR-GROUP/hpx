@@ -13,6 +13,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 void test_shared()
 {
     boost::shared_ptr<int> ip(new int(7));

@@ -9,8 +9,7 @@
 #define HPX_LCOS_ASYNC_FWD_SEP_28_2011_0840AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/util/decay.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,17 +49,19 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F, typename ...Ts>
     HPX_FORCEINLINE
-    auto async(F&& f, Ts&&... ts)
+    auto async(F && f, Ts &&... ts)
     ->  decltype(detail::async_action_dispatch<
-                    Action, typename util::decay<F>::type
-            >::call(std::forward<F>(f), std::forward<Ts>(ts)...
-        ));
+                Action, typename util::decay<F>::type
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...)
+        );
 
     template <typename F, typename ...Ts>
-    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
-    ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...
-        ));
+    HPX_FORCEINLINE
+    auto async(F&& f, Ts&&... ts)
+    ->  decltype(detail::async_dispatch<
+                typename util::decay<F>::type
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...)
+        );
 }
 
 #endif

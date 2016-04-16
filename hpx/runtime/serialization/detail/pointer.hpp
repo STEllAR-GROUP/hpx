@@ -16,12 +16,29 @@
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/eval_if.hpp>
 
+#include <memory>
+#include <string>
+#include <utility>
+
 namespace hpx { namespace serialization
 {
+    namespace detail
+    {
+        struct ptr_helper;
+
+        typedef std::unique_ptr<ptr_helper> ptr_helper_ptr;
+    }
+
+    HPX_FORCEINLINE
+        void register_pointer(input_archive & ar, boost::uint64_t pos,
+            detail::ptr_helper_ptr helper);
+
+    template <typename Helper>
+    Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos);
+
     namespace detail
     {
         template <class Pointer>

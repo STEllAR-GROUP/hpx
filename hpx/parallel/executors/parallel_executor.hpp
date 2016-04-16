@@ -16,9 +16,6 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/auto_chunk_size.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/decay.hpp>
-
-#include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -37,7 +34,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typedef auto_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
-        explicit parallel_executor(BOOST_SCOPED_ENUM(launch) l = launch::async)
+        explicit parallel_executor(launch l = launch::async)
           : l_(l)
         {}
 
@@ -49,9 +46,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        hpx::future<typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type>
+        hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute(F && f)
         {
             return hpx::async(l_, std::forward<F>(f));
@@ -71,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
     private:
         /// \cond NOINTERNAL
-        BOOST_SCOPED_ENUM(launch) l_;
+        launch l_;
         /// \endcond
     };
 }}}

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,8 @@
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+
+#include <string>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -66,8 +68,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Depending on the subclass implementation, this may block in some
     // situations.
     void service_executor::add(closure_type && f,
-        char const* desc, threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        util::thread_description const& desc,
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize, error_code& ec)
     {
         ++task_count_;
 
@@ -123,7 +126,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     void service_executor::add_at(
         boost::chrono::steady_clock::time_point const& abs_time,
-        closure_type && f, char const* desc,
+        closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         ++task_count_;
@@ -141,7 +144,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     void service_executor::add_after(
         boost::chrono::steady_clock::duration const& rel_time,
-        closure_type && f, char const* desc,
+        closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         return add_at(boost::chrono::steady_clock::now() + rel_time,

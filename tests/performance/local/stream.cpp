@@ -23,12 +23,11 @@
 
 #include <hpx/parallel/util/numa_allocator.hpp>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #ifndef STREAM_TYPE
 #define STREAM_TYPE double

@@ -11,7 +11,6 @@
 #define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/runtime/components/component_type.hpp>
@@ -30,6 +29,8 @@
 #include <boost/detail/atomic_count.hpp>
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -47,7 +48,7 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcel
     {
     private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(parcel)
+        HPX_MOVABLE_ONLY(parcel);
 
     private:
 #if defined(HPX_DEBUG)
@@ -138,7 +139,7 @@ namespace hpx { namespace parcelset
         struct data
         {
         private:
-            HPX_MOVABLE_BUT_NOT_COPYABLE(data)
+            HPX_MOVABLE_ONLY(data);
 
         public:
             data()

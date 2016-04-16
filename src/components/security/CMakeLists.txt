@@ -13,9 +13,7 @@ if(HPX_WITH_SECURITY)
     HEADER_ROOT ${root}
     AUTOGLOB)
 
-  add_hpx_pseudo_dependencies(components.security
-                              security_component)
-  add_hpx_pseudo_dependencies(core
-                            components.security)
+  add_hpx_pseudo_dependencies(components.security_ security_component)
+  add_hpx_pseudo_dependencies(core components.security_)
 
 endif()

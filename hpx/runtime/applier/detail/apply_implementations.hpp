@@ -7,6 +7,7 @@
 #define HPX_APPLY_IMPLEMENTATIONS_APR_13_2015_0945AM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -16,7 +17,8 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/util/move.hpp>
+
+#include <boost/format.hpp>
 
 #include <utility>
 

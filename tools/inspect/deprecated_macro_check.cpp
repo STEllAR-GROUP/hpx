@@ -12,7 +12,6 @@
 #include <functional>
 #include "function_hyper.hpp"
 #include "boost/regex.hpp"
-#include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
 
 namespace fs = boost::filesystem;

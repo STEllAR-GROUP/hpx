@@ -15,12 +15,12 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/util/coroutine/detail/tss.hpp>
+#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #endif
 
-#include <boost/noncopyable.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -30,6 +30,7 @@
 #include <boost/atomic.hpp>
 
 #include <algorithm>
+#include <mutex>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,8 +60,12 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
-    struct scheduler_base : boost::noncopyable
+    struct scheduler_base
     {
+    private:
+        HPX_NON_COPYABLE(scheduler_base);
+
+    public:
         scheduler_base(std::size_t num_threads,
                 char const* description = "",
                 scheduler_mode mode = nothing_special)
@@ -310,7 +315,7 @@ namespace hpx { namespace threads { namespace policies
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:
-        util::coroutines::detail::tss_data_node* find_tss_data(void const* key)
+        coroutines::detail::tss_data_node* find_tss_data(void const* key)
         {
             if (!thread_data_)
                 return 0;
@@ -318,13 +323,13 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void add_new_tss_node(void const* key,
-            boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>
+            boost::shared_ptr<coroutines::detail::tss_cleanup_function>
                 const& func, void* tss_data)
         {
             if (!thread_data_)
             {
                 thread_data_ =
-                    boost::make_shared<util::coroutines::detail::tss_storage>();
+                    boost::make_shared<coroutines::detail::tss_storage>();
             }
             thread_data_->insert(key, func, tss_data);
         }
@@ -337,7 +342,7 @@ namespace hpx { namespace threads { namespace policies
 
         void* get_tss_data(void const* key)
         {
-            if (util::coroutines::detail::tss_data_node* const current_node =
+            if (coroutines::detail::tss_data_node* const current_node =
                     find_tss_data(key))
             {
                 return current_node->get_value();
@@ -346,10 +351,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void set_tss_data(void const* key,
-            boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>
+            boost::shared_ptr<coroutines::detail::tss_cleanup_function>
                 const& func, void* tss_data, bool cleanup_existing)
         {
-            if (util::coroutines::detail::tss_data_node* const current_node =
+            if (coroutines::detail::tss_data_node* const current_node =
                     find_tss_data(key))
             {
                 if (func || (tss_data != 0))
@@ -364,7 +369,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     protected:
-        boost::shared_ptr<util::coroutines::detail::tss_storage> thread_data_;
+        boost::shared_ptr<coroutines::detail::tss_storage> thread_data_;
 #endif
     };
 }}}

@@ -9,6 +9,9 @@
 #include <hpx/include/parallel_transform_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+#include <vector>
+
 // FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
 #if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 void test_zero()
@@ -248,7 +251,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

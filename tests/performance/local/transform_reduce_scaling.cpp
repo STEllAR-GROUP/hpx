@@ -11,6 +11,8 @@
 #include "worker_timed.hpp"
 
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
@@ -106,7 +108,7 @@ int main(int argc, char* argv[])
 {
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
     boost::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 

@@ -40,6 +40,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_FULL_RPATH HPX_WITH_FULL_RPATH]
 * [link build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK HPX_WITH_GCC_VERSION_CHECK]
 * [link build_system.cmake_variables.HPX_WITH_GENERIC_CONTEXT_COROUTINES HPX_WITH_GENERIC_CONTEXT_COROUTINES]
+* [link build_system.cmake_variables.HPX_WITH_GENERIC_EXECUTION_POLICY HPX_WITH_GENERIC_EXECUTION_POLICY]
 * [link build_system.cmake_variables.HPX_WITH_HIDDEN_VISIBILITY HPX_WITH_HIDDEN_VISIBILITY]
 * [link build_system.cmake_variables.HPX_WITH_HWLOC HPX_WITH_HWLOC]
 * [link build_system.cmake_variables.HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY]
@@ -66,6 +67,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_FULL_RPATH] `HPX_WITH_FULL_RPATH:BOOL`][Build and link HPX libraries and executables with full RPATHs (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK] `HPX_WITH_GCC_VERSION_CHECK:BOOL`][Don't ignore version reported by gcc (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_GENERIC_CONTEXT_COROUTINES] `HPX_WITH_GENERIC_CONTEXT_COROUTINES:BOOL`][Use Boost.Context as the underlying coroutines context switch implementation.]]
+        [[[#build_system.cmake_variables.HPX_WITH_GENERIC_EXECUTION_POLICY] `HPX_WITH_GENERIC_EXECUTION_POLICY:BOOL`][Enable the generic execution policy (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_HIDDEN_VISIBILITY] `HPX_WITH_HIDDEN_VISIBILITY:BOOL`][Use -fvisibility=hidden for builds on platforms which support it (default ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_HWLOC] `HPX_WITH_HWLOC:BOOL`][Use Hwloc for hardware topolgy information and thread pinning. If disabled, performance might be reduced.]]
         [[[#build_system.cmake_variables.HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY] `HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY:BOOL`][Enable backwards compatibility for hpx::lcos::local::dataflow() functions]]
@@ -119,6 +121,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_SCHEDULER_LOCAL_STORAGE HPX_WITH_SCHEDULER_LOCAL_STORAGE]
 * [link build_system.cmake_variables.HPX_WITH_STACKTRACES HPX_WITH_STACKTRACES]
 * [link build_system.cmake_variables.HPX_WITH_SWAP_CONTEXT_EMULATION HPX_WITH_SWAP_CONTEXT_EMULATION]
+* [link build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_DEPTH HPX_WITH_THREAD_BACKTRACE_DEPTH]
 * [link build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION]
 * [link build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH]
 * [link build_system.cmake_variables.HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES]
@@ -139,6 +142,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_SCHEDULER_LOCAL_STORAGE] `HPX_WITH_SCHEDULER_LOCAL_STORAGE:BOOL`][Enable scheduler local storage for all HPX schedulers (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_STACKTRACES] `HPX_WITH_STACKTRACES:BOOL`][Attach backtraces to HPX exceptions (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_SWAP_CONTEXT_EMULATION] `HPX_WITH_SWAP_CONTEXT_EMULATION:BOOL`][Emulate SwapContext API for coroutines (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_DEPTH] `HPX_WITH_THREAD_BACKTRACE_DEPTH:STRING`][Thread stack back trace depth being captured (default: 5)]]
         [[[#build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION] `HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION:BOOL`][Enable thread stack back trace being captured on suspension (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH] `HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH:STRING`][Thread stack back trace depth being captured on suspension (default: 5)]]
         [[[#build_system.cmake_variables.HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES] `HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES:BOOL`][Enable measuring thread creation and cleanup times (default: OFF)]]
@@ -203,6 +207,7 @@ The options are split into these categories:
 
 [#build_system.cmake_variables.Debugging][h3 Debugging Options]
 * [link build_system.cmake_variables.HPX_WITH_THREAD_DEBUG_INFO HPX_WITH_THREAD_DEBUG_INFO]
+* [link build_system.cmake_variables.HPX_WITH_THREAD_DESCRIPTION_FULL HPX_WITH_THREAD_DESCRIPTION_FULL]
 * [link build_system.cmake_variables.HPX_WITH_THREAD_GUARD_PAGE HPX_WITH_THREAD_GUARD_PAGE]
 * [link build_system.cmake_variables.HPX_WITH_VALGRIND HPX_WITH_VALGRIND]
 * [link build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS HPX_WITH_VERIFY_LOCKS]
@@ -211,10 +216,11 @@ The options are split into these categories:
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_THREAD_DEBUG_INFO] `HPX_WITH_THREAD_DEBUG_INFO:BOOL`][Enable thread debugging information (default: OFF, implicitly enabled in debug builds)]]
+        [[[#build_system.cmake_variables.HPX_WITH_THREAD_DESCRIPTION_FULL] `HPX_WITH_THREAD_DESCRIPTION_FULL:BOOL`][Use function address for thread description (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_THREAD_GUARD_PAGE] `HPX_WITH_THREAD_GUARD_PAGE:BOOL`][Enable thread guard page (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_VALGRIND] `HPX_WITH_VALGRIND:BOOL`][Enable Valgrind instrumentation support.]]
         [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS] `HPX_WITH_VERIFY_LOCKS:BOOL`][Enable lock verification code (default: OFF, implicitly enabled in debug builds)]]
-        [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_BACKTRACE] `HPX_WITH_VERIFY_LOCKS_BACKTRACE:BOOL`][Enable thred stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_BACKTRACE] `HPX_WITH_VERIFY_LOCKS_BACKTRACE:BOOL`][Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_GLOBALLY] `HPX_WITH_VERIFY_LOCKS_GLOBALLY:BOOL`][Enable global lock verification code (default: OFF, implicitly enabled in debug builds)]]
 ] [/ Debugging Options]
 

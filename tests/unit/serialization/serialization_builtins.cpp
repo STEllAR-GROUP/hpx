@@ -10,6 +10,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <vector>
+
 template <typename T>
 struct A
 {
@@ -107,7 +109,7 @@ void test(T min, T max)
         for(T c = min; c < max; ++c)
         {
             T cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc);
+            iarchive >> cc; HPX_TEST(c == cc);
         }
     }
     {
@@ -122,7 +124,7 @@ void test(T min, T max)
         for(T c = min; c < max; ++c)
         {
             A<T> cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc.t_);
+            iarchive >> cc; HPX_TEST(c == cc.t_);
         }
     }
 }
@@ -141,7 +143,7 @@ void test_fp(T min, T max)
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
             T cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc);
+            iarchive >> cc; HPX_TEST(c == cc);
         }
     }
     {
@@ -156,7 +158,7 @@ void test_fp(T min, T max)
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
             A<T> cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc.t_);
+            iarchive >> cc; HPX_TEST(c == cc.t_);
         }
     }
 }

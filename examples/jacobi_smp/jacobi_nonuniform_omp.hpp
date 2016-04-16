@@ -10,8 +10,8 @@
 
 #include "jacobi_nonuniform.hpp"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace jacobi_smp {
     void jacobi(

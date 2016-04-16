@@ -7,24 +7,27 @@
 #ifndef HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
-#include <string>
-#include <stdexcept>
-#include <iostream>
+#include <hpx/config.hpp>
+#include <hpx/util/plugin/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/once.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
-#include <utility>
 
-#include <hpx/exception.hpp>
-#include <hpx/util/plugin/config.hpp>
+#include <iostream>
+#include <mutex>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
 #include <link.h>
@@ -114,8 +117,8 @@ namespace hpx { namespace util { namespace plugin {
             {
                 if (NULL != h_)
                 {
-                    dll::initialize_mutex();
-                    boost::lock_guard<boost::mutex> lock(dll::mutex_instance());
+                    std::lock_guard<boost::recursive_mutex> lock(
+                        dll::mutex_instance());
 
                     dll::deinit_library(h_);
                     dlerror();
@@ -208,8 +211,7 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            initialize_mutex();
-            boost::lock_guard<boost::mutex> lock(mutex_instance());
+            std::lock_guard<boost::recursive_mutex> lock(mutex_instance());
 
             static_assert(
                 boost::is_pointer<SymbolType>::value,
@@ -273,8 +275,7 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                initialize_mutex();
-                boost::lock_guard<boost::mutex> lock(mutex_instance());
+                std::lock_guard<boost::recursive_mutex> lock(mutex_instance());
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
@@ -356,8 +357,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (NULL != dll_handle)
             {
-                initialize_mutex();
-                boost::lock_guard<boost::mutex> lock(mutex_instance());
+                std::lock_guard<boost::recursive_mutex> lock(mutex_instance());
 
                 deinit_library(dll_handle);
                 dlerror();
@@ -365,20 +365,11 @@ namespace hpx { namespace util { namespace plugin {
             }
         }
 
-    // protect access to dl... functions
-        static boost::mutex &mutex_instance()
+        // protect access to dl... functions
+        static boost::recursive_mutex &mutex_instance()
         {
-            static boost::mutex mutex;
+            static boost::recursive_mutex mutex;
             return mutex;
-        }
-        static void mutex_init()
-        {
-            mutex_instance();
-        }
-        static void initialize_mutex()
-        {
-            static boost::once_flag been_here = BOOST_ONCE_INIT;
-            boost::call_once(mutex_init, been_here);
         }
 
     private:

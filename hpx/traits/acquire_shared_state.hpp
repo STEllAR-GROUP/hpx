@@ -14,10 +14,9 @@
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 
-#include <vector>
 #include <iterator>
+#include <vector>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/range/functions.hpp>
@@ -68,6 +67,7 @@ namespace hpx { namespace traits
     struct acquire_shared_state_impl<T,
         typename boost::disable_if_c<is_future_or_future_range<T>::value>::type>
     {
+        typedef T type;
 
         template <typename T_>
         HPX_FORCEINLINE

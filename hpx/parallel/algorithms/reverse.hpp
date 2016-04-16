@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,14 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -25,9 +24,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -55,7 +52,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, BidirIter
             >::type
-            parallel(ExPolicy policy, BidirIter first, BidirIter last)
+            parallel(ExPolicy && policy, BidirIter first, BidirIter last)
             {
                 typedef std::reverse_iterator<BidirIter> destination_iterator;
                 typedef hpx::util::zip_iterator<BidirIter, destination_iterator>
@@ -64,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last)),
                         std::distance(first, last) / 2,
@@ -123,19 +120,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<BidirIter>::value)>
+        hpx::traits::is_iterator<BidirIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
     {
-        typedef typename std::iterator_traits<BidirIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::bidirectional_iterator_tag, iterator_category>::value),
-            "Required at least bidirectional iterator.");
+            (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+            "Requires at least bidirectional iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::reverse<BidirIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last);
@@ -180,17 +173,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<BidirIter, OutIter>
             >::type
-            parallel(ExPolicy policy, BidirIter first, BidirIter last,
+            parallel(ExPolicy && policy, BidirIter first, BidirIter last,
                 OutIter dest_first)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
 
                 return util::detail::convert_to_result(
-                    detail::copy<std::pair<iterator, OutIter> >()
-                        .call(
-                            policy, boost::mpl::false_(),
-                            iterator(last), iterator(first), dest_first
-                        ),
+                    detail::copy<std::pair<iterator, OutIter> >().call(
+                        std::forward<ExPolicy>(policy), std::false_type(),
+                        iterator(last), iterator(first), dest_first
+                    ),
                     [](std::pair<iterator, OutIter> const& p)
                         -> std::pair<BidirIter, OutIter>
                     {
@@ -259,37 +251,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<BidirIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<BidirIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
     >::type
     reverse_copy(ExPolicy && policy, BidirIter first, BidirIter last,
         OutIter dest_first)
     {
-        typedef typename std::iterator_traits<BidirIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::bidirectional_iterator_tag, input_iterator_category>::value),
-            "Required at least bidirectional iterator.");
-
+            (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+            "Requires at least bidirectional iterator.");
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::reverse_copy<std::pair<BidirIter, OutIter> >().call(

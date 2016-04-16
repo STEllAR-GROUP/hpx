@@ -7,10 +7,16 @@
 
 #include <hpx/components/component_storage/component_storage.hpp>
 
+#include <vector>
+
 namespace hpx { namespace components
 {
     component_storage::component_storage(hpx::id_type target_locality)
       : base_type(hpx::new_<server::component_storage>(target_locality))
+    {}
+
+    component_storage::component_storage(hpx::future<naming::id_type> && f)
+      : base_type(hpx::new_<server::component_storage>(f.get()))
     {}
 
     ///////////////////////////////////////////////////////////////////////////

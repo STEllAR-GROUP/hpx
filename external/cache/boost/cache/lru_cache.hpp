@@ -38,7 +38,7 @@ namespace boost { namespace cache
     >
     class lru_cache
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(lru_cache)
+        HPX_MOVABLE_ONLY(lru_cache);
     public:
         typedef Key key_type;
         typedef Entry entry_type;

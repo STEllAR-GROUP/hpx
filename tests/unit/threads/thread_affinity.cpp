@@ -15,9 +15,9 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <vector>
 #include <list>
 #include <set>
+#include <vector>
 
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>

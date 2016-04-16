@@ -1,27 +1,50 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_DEC_4_2013_0130PM)
-#define HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_DEC_4_2013_0130PM
+#ifndef HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP
+#define HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/unlock_guard.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/thread/locks.hpp>
+
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local { namespace detail
 {
-    class condition_variable : boost::noncopyable
+    class condition_variable
     {
+        HPX_NON_COPYABLE(condition_variable);
+
+    private:
+        typedef lcos::local::spinlock mutex_type;
+
+        class relock_guard
+        {
+            HPX_NON_COPYABLE(relock_guard);
+
+        public:
+            explicit relock_guard(std::unique_lock<mutex_type>& l)
+              : l_(l)
+            {}
+
+            ~relock_guard()
+            {
+                l_.lock();
+            }
+
+        private:
+            std::unique_lock<mutex_type>& l_;
+        };
+
     private:
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -71,280 +94,78 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         };
 
     public:
-        condition_variable()
-        {}
+        HPX_EXPORT condition_variable();
 
-        ~condition_variable()
-        {
-            if (!queue_.empty())
-            {
-                LERR_(fatal)
-                    << "~condition_variable: queue is not empty, "
-                       "aborting threads";
+        HPX_EXPORT ~condition_variable();
 
-                local::no_mutex no_mtx;
-                boost::unique_lock<local::no_mutex> lock(no_mtx);
-                abort_all(std::move(lock));
-            }
-        }
+        HPX_EXPORT bool empty(
+            std::unique_lock<mutex_type> const& lock) const;
 
-        template <typename Mutex>
-        bool empty(boost::unique_lock<Mutex> const& lock) const
-        {
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            return queue_.empty();
-        }
-
-        template <typename Mutex>
-        std::size_t size(boost::unique_lock<Mutex> const& lock) const
-        {
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            return queue_.size();
-        }
+        HPX_EXPORT std::size_t size(
+            std::unique_lock<mutex_type> const& lock) const;
 
         // Return false if no more threads are waiting (returns true if queue
         // is non-empty).
-        template <typename Mutex>
-        bool notify_one(boost::unique_lock<Mutex> lock, error_code& ec = throws)
-        {
-            HPX_ASSERT_OWNS_LOCK(lock);
+        HPX_EXPORT bool notify_one(
+            std::unique_lock<mutex_type> lock, error_code& ec = throws);
 
-            if (!queue_.empty())
-            {
-                threads::thread_id_repr_type id = queue_.front().id_;
+        HPX_EXPORT void notify_all(
+            std::unique_lock<mutex_type> lock, error_code& ec = throws);
 
-                // remove item from queue before error handling
-                queue_.front().id_ = threads::invalid_thread_id_repr;
-                queue_.pop_front();
+        HPX_EXPORT void abort_all(
+            std::unique_lock<mutex_type> lock);
 
-                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
-                {
-                    lock.unlock();
+        HPX_EXPORT threads::thread_state_ex_enum wait(
+            std::unique_lock<mutex_type>&& lock,
+            char const* description, error_code& ec = throws);
 
-                    HPX_THROWS_IF(ec, null_thread_id,
-                        "condition_variable::notify_one",
-                        "NULL thread id encountered");
-                    return false;
-                }
-
-                bool not_empty = !queue_.empty();
-                lock.unlock();
-
-                threads::set_thread_state(threads::thread_id_type(
-                        reinterpret_cast<threads::thread_data*>(id)),
-                    threads::pending, threads::wait_signaled,
-                    threads::thread_priority_default, ec);
-                return not_empty;
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return false;
-        }
-
-        // re-add the remaining items to the original queue
-        template <typename Mutex>
-        void prepend_entries(boost::unique_lock<Mutex>& lock, queue_type& queue)
-        {
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            // splice is constant time only if it == end
-            queue.splice(queue.end(), queue_);
-            queue_.swap(queue);
-        }
-
-        template <typename Mutex>
-        void notify_all(boost::unique_lock<Mutex> lock, error_code& ec = throws)
-        {
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            // swap the list
-            queue_type queue;
-            queue.swap(queue_);
-
-            if (!queue.empty())
-            {
-                // update reference to queue for all queue entries
-                for (queue_entry& qe : queue)
-                    qe.q_ = &queue;
-
-                do {
-                    threads::thread_id_repr_type id = queue.front().id_;
-
-                    // remove item from queue before error handling
-                    queue.front().id_ = threads::invalid_thread_id_repr;
-                    queue.pop_front();
-
-                    if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
-                    {
-                        prepend_entries(lock, queue);
-                        lock.unlock();
-
-                        HPX_THROWS_IF(ec, null_thread_id,
-                            "condition_variable::notify_all",
-                            "NULL thread id encountered");
-                        return;
-                    }
-
-                    error_code local_ec;
-                    threads::set_thread_state(threads::thread_id_type(
-                            reinterpret_cast<threads::thread_data*>(id)),
-                        threads::pending, threads::wait_signaled,
-                        threads::thread_priority_default, local_ec);
-
-                    if (local_ec)
-                    {
-                        prepend_entries(lock, queue);
-                        lock.unlock();
-
-                        if (&ec != &throws)
-                        {
-                            ec = std::move(local_ec);
-                        }
-                        else
-                        {
-                            boost::rethrow_exception(
-                                hpx::detail::access_exception(local_ec));
-                        }
-                        return;
-                    }
-
-                } while (!queue.empty());
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-        template <typename Mutex>
-        void abort_all(boost::unique_lock<Mutex> lock)
-        {
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            // new threads might have been added while we were notifying
-            while(!queue_.empty())
-            {
-                // swap the list
-                queue_type queue;
-                queue.swap(queue_);
-
-                // update reference to queue for all queue entries
-                for (queue_entry& qe : queue)
-                    qe.q_ = &queue;
-
-                while (!queue.empty())
-                {
-                    threads::thread_id_repr_type id = queue.front().id_;
-
-                    queue.front().id_ = threads::invalid_thread_id_repr;
-                    queue.pop_front();
-
-                    if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
-                    {
-                        LERR_(fatal)
-                            << "condition_variable::abort_all:"
-                            << " NULL thread id encountered";
-                        continue;
-                    }
-
-                    // we know that the id is actually the pointer to the thread
-                    threads::thread_id_type tid(
-                        reinterpret_cast<threads::thread_data*>(id));
-
-                    LERR_(fatal)
-                            << "condition_variable::abort_all:"
-                            << " pending thread: "
-                            << get_thread_state_name(
-                                    threads::get_thread_state(tid))
-                            << "(" << tid << "): "
-                            << threads::get_thread_description(tid);
-
-                    // unlock while notifying thread as this can suspend
-                    util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
-
-                    // forcefully abort thread, do not throw
-                    error_code ec(lightweight);
-                    threads::set_thread_state(tid,
-                        threads::pending, threads::wait_abort,
-                        threads::thread_priority_default, ec);
-                    if (ec)
-                    {
-                        LERR_(fatal)
-                            << "condition_variable::abort_all:"
-                            << " could not abort thread: "
-                            << get_thread_state_name(
-                                    threads::get_thread_state(tid))
-                            << "(" << tid << "): "
-                            << threads::get_thread_description(tid);
-                    }
-                }
-            }
-        }
-
-        template <typename Mutex>
-        threads::thread_state_ex_enum
-        wait(boost::unique_lock<Mutex>& lock,
+        threads::thread_state_ex_enum wait(
+            std::unique_lock<mutex_type>& lock,
             char const* description, error_code& ec = throws)
         {
-            HPX_ASSERT(threads::get_self_ptr() != 0);
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id().get(), &queue_);
-            queue_.push_back(f);
-
-            reset_queue_entry r(f, queue_);
-            threads::thread_state_ex_enum reason = threads::wait_unknown;
-            {
-                // yield this thread
-                util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
-                reason = this_thread::suspend(threads::suspended, description, ec);
-                if (ec) return threads::wait_unknown;
-            }
-
-            return (f.id_ != threads::invalid_thread_id_repr) ?
-                threads::wait_timeout : reason;
+            relock_guard rl(lock);
+            return wait(std::move(lock), description, ec);
         }
 
-        template <typename Mutex>
-        threads::thread_state_ex_enum
-        wait(boost::unique_lock<Mutex>& lock, error_code& ec = throws)
+        threads::thread_state_ex_enum wait(
+            std::unique_lock<mutex_type>&& lock,
+            error_code& ec = throws)
+        {
+            return wait(std::move(lock), "condition_variable::wait", ec);
+        }
+
+        threads::thread_state_ex_enum wait(
+            std::unique_lock<mutex_type>& lock,
+            error_code& ec = throws)
         {
             return wait(lock, "condition_variable::wait", ec);
         }
 
-        template <typename Mutex>
-        threads::thread_state_ex_enum
-        wait_until(boost::unique_lock<Mutex>& lock,
+        HPX_EXPORT threads::thread_state_ex_enum wait_until(
+            std::unique_lock<mutex_type>&& lock,
+            util::steady_time_point const& abs_time,
+            char const* description, error_code& ec = throws);
+
+        threads::thread_state_ex_enum wait_until(
+            std::unique_lock<mutex_type>& lock,
             util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws)
         {
-            HPX_ASSERT(threads::get_self_ptr() != 0);
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id().get(), &queue_);
-            queue_.push_back(f);
-
-            reset_queue_entry r(f, queue_);
-            threads::thread_state_ex_enum reason = threads::wait_unknown;
-            {
-                // yield this thread
-                util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
-                reason = this_thread::suspend(abs_time, description, ec);
-                if (ec) return threads::wait_unknown;
-            }
-
-            return (f.id_ != threads::invalid_thread_id_repr) ?
-                threads::wait_timeout : reason;
+            relock_guard rl(lock);
+            return wait_until(std::move(lock), abs_time, description, ec);
         }
 
-        template <typename Mutex>
-        threads::thread_state_ex_enum
-        wait_until(boost::unique_lock<Mutex>& lock,
+        threads::thread_state_ex_enum wait_until(
+            std::unique_lock<mutex_type>&& lock,
+            util::steady_time_point const& abs_time,
+            error_code& ec = throws)
+        {
+            return wait_until(std::move(lock), abs_time,
+                "condition_variable::wait_until", ec);
+        }
+
+        threads::thread_state_ex_enum wait_until(
+            std::unique_lock<mutex_type>& lock,
             util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
@@ -352,24 +173,47 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 "condition_variable::wait_until", ec);
         }
 
-        template <typename Mutex>
-        threads::thread_state_ex_enum
-        wait_for(boost::unique_lock<Mutex>& lock,
+        threads::thread_state_ex_enum wait_for(
+            std::unique_lock<mutex_type>&& lock,
+            util::steady_duration const& rel_time,
+            char const* description, error_code& ec = throws)
+        {
+            return wait_until(std::move(lock), rel_time.from_now(), description, ec);
+        }
+
+        threads::thread_state_ex_enum wait_for(
+            std::unique_lock<mutex_type>& lock,
             util::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), description, ec);
         }
 
-        template <typename Mutex>
-        threads::thread_state_ex_enum
-        wait_for(boost::unique_lock<Mutex>& lock,
+        threads::thread_state_ex_enum wait_for(
+            std::unique_lock<mutex_type>&& lock,
+            util::steady_duration const& rel_time,
+            error_code& ec = throws)
+        {
+            return wait_until(std::move(lock), rel_time.from_now(),
+                "condition_variable::wait_for", ec);
+        }
+
+        threads::thread_state_ex_enum wait_for(
+            std::unique_lock<mutex_type>& lock,
             util::steady_duration const& rel_time,
             error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(),
                 "condition_variable::wait_for", ec);
         }
+
+    private:
+        template <typename Mutex>
+        void abort_all(std::unique_lock<Mutex> lock);
+
+        // re-add the remaining items to the original queue
+        HPX_EXPORT void prepend_entries(
+            std::unique_lock<mutex_type>& lock, queue_type& queue);
 
     private:
         queue_type queue_;

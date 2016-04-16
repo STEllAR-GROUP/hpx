@@ -11,6 +11,11 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#include <boost/lexical_cast.hpp>
+
+#include <string>
+#include <vector>
+
 #include "nqueen.hpp"
 
 int hpx_main(boost::program_options::variables_map&)
@@ -38,7 +43,7 @@ int hpx_main(boost::program_options::variables_map&)
 
             std::size_t i = 0;
             std::list<nqueen::board> b;
-            nqueen::board bi;
+            nqueen::board bi = hpx::new_<nqueen::board>(locality_);
             while(i != sz)
             {
                 b.push_back(bi);
@@ -61,7 +66,7 @@ int hpx_main(boost::program_options::variables_map&)
         else if(cmd == "default")
         {
             soln_count_total = 0;
-            nqueen::board a;
+            nqueen::board a = hpx::new_<nqueen::board>(locality_);
             std::size_t i = 0;
             std::vector<nqueen::board> b;
             while(i != default_size)

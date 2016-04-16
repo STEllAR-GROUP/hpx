@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
@@ -41,38 +42,13 @@ namespace hpx { namespace parallel { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // This implementation of is_iterator seems to work fine even for
-        // VS2013 which has an implementation of std::iterator_traits which is
-        // SFINAE-unfriendly.
-        template <typename T>
-        struct is_iterator
-        {
-            template <typename U, typename =
-                typename std::iterator_traits<U>::pointer>
-            static char test(U&&);
-
-            static long test(...);
-
-            static bool const value =
-                sizeof(test(std::declval<T>())) == sizeof(char);
-        };
-    }
-
-    template <typename Iter, typename Enable = void>
-    struct is_iterator
-      : detail::is_iterator<typename hpx::util::decay<Iter>::type>
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
         template <typename F, typename Iter, typename Enable = void>
         struct projected_result_of
         {};
 
         template <typename Proj, typename Iter>
         struct projected_result_of<Proj, Iter,
-                typename std::enable_if<detail::is_iterator<Iter>::value>::type>
+                typename std::enable_if<hpx::traits::is_iterator<Iter>::value>::type>
           : hpx::util::result_of<Proj(
                     typename std::iterator_traits<Iter>::reference
                 )>
@@ -103,7 +79,7 @@ namespace hpx { namespace parallel { namespace traits
 
         template <typename Proj, typename Iter>
         struct is_projected<Proj, Iter,
-                typename std::enable_if<detail::is_iterator<Iter>::value>::type>
+                typename std::enable_if<hpx::traits::is_iterator<Iter>::value>::type>
           : hpx::traits::is_callable<Proj(
                     typename std::iterator_traits<Iter>::reference
                 )>

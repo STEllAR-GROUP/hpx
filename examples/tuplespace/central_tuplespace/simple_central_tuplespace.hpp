@@ -9,6 +9,8 @@
 
 #include <hpx/include/components.hpp>
 
+#include <string>
+
 #include "stubs/simple_central_tuplespace.hpp"
 
 namespace examples

@@ -12,6 +12,9 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/chrono.hpp>
 
+#include <string>
+#include <vector>
+
 #include <tests/unit/agas/components/simple_refcnt_checker.hpp>
 #include <tests/unit/agas/components/managed_refcnt_checker.hpp>
 

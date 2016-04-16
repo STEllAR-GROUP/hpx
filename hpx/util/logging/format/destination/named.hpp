@@ -31,10 +31,10 @@
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
 #include <hpx/util/logging/format/array.hpp> // array
-#include <vector>
-#include <map>
 #include <boost/type_traits/is_base_of.hpp>
+#include <map>
 #include <sstream>
+#include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 

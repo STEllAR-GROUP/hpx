@@ -12,7 +12,6 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/async_fwd.hpp>
-#include <hpx/util/move.hpp>
 
 namespace hpx { namespace detail
 {
@@ -22,7 +21,7 @@ namespace hpx { namespace detail
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_colocated(naming::id_type const& gid, Ts&&... vs);
+    async_colocated(naming::id_type const& id, Ts&&... vs);
 
     template <
         typename Component, typename Signature, typename Derived,
@@ -33,7 +32,7 @@ namespace hpx { namespace detail
         >::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , naming::id_type const& gid, Ts&&... vs);
+      , naming::id_type const& id, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
@@ -48,7 +47,7 @@ namespace hpx { namespace detail
         >
     >::type
     async_colocated(Continuation && cont,
-        naming::id_type const& gid, Ts&&... vs);
+        naming::id_type const& id, Ts&&... vs);
 
     template <
         typename Continuation,
@@ -65,7 +64,7 @@ namespace hpx { namespace detail
     async_colocated(
         Continuation && cont
       , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , naming::id_type const& gid, Ts&&... vs);
+      , naming::id_type const& id, Ts&&... vs);
 #endif
 }}
 

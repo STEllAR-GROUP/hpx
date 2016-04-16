@@ -7,9 +7,11 @@
 #ifndef HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 #define HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 
-#include <string>
-#include <stdexcept>
-#include <iostream>
+#include <hpx/config.hpp>
+#include <hpx/util/plugin/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
@@ -17,10 +19,11 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
-#include <utility>
 
-#include <hpx/util/plugin/config.hpp>
-#include <hpx/exception.hpp>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 #include <windows.h>
 #include <Shlwapi.h>

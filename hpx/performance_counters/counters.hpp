@@ -7,7 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -17,6 +17,7 @@
 #include <boost/cstdint.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -578,58 +579,60 @@ namespace hpx { namespace performance_counters
         ///////////////////////////////////////////////////////////////////////
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
-        naming::gid_type create_raw_counter(counter_info const&,
+        HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
             hpx::util::function_nonser<boost::int64_t()> const&, error_code&);
 
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
-        naming::gid_type create_raw_counter(counter_info const&,
+        HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
             hpx::util::function_nonser<boost::int64_t(bool)> const&, error_code&);
 
         // Helper function for creating a new performance counter instance
         // based on a given counter value.
-        naming::gid_type create_raw_counter_value(counter_info const&,
-            boost::int64_t*, error_code&);
+        HPX_EXPORT naming::gid_type create_raw_counter_value(
+            counter_info const&, boost::int64_t*, error_code&);
 
         // Creation function for aggregating performance counters; to be
         // registered with the counter types.
-        naming::gid_type statistics_counter_creator(counter_info const&,
-            error_code&);
+        HPX_EXPORT naming::gid_type statistics_counter_creator(
+            counter_info const&, error_code&);
 
         // Creation function for aggregating performance counters; to be
         // registered with the counter types.
-        naming::gid_type arithmetics_counter_creator(counter_info const&,
-            error_code&);
+        HPX_EXPORT naming::gid_type arithmetics_counter_creator(
+            counter_info const&, error_code&);
 
         // Creation function for uptime counters.
-        naming::gid_type uptime_counter_creator(counter_info const&,
-            error_code&);
+        HPX_EXPORT naming::gid_type uptime_counter_creator(
+            counter_info const&, error_code&);
 
         // Creation function for instance counters.
-        naming::gid_type component_instance_counter_creator(counter_info const&,
-            error_code&);
+        HPX_EXPORT naming::gid_type component_instance_counter_creator(
+            counter_info const&, error_code&);
 
         // \brief Create a new statistics performance counter instance based on
         //        the given base counter name and given base time interval
         //        (milliseconds).
-        naming::gid_type create_statistics_counter(
+        HPX_EXPORT naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
             std::vector<boost::int64_t> const& parameters,
             error_code& ec = throws);
 
         // \brief Create a new arithmetics performance counter instance based on
         //        the given base counter names
-        naming::gid_type create_arithmetics_counter(counter_info const& info,
+        HPX_EXPORT naming::gid_type create_arithmetics_counter(
+            counter_info const& info,
             std::vector<std::string> const& base_counter_names,
             error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given
         //        counter info
-        naming::gid_type create_counter(counter_info const& info,
+        HPX_EXPORT naming::gid_type create_counter(counter_info const& info,
             error_code& ec = throws);
 
         // \brief Create an arbitrary counter on this locality
-        naming::gid_type create_counter_local(counter_info const& info);
+        HPX_EXPORT naming::gid_type create_counter_local(
+            counter_info const& info);
     }
 }}
 

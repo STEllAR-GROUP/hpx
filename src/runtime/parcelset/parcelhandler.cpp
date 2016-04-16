@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/asio.hpp>
@@ -14,13 +14,16 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
+#include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/promise.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 
@@ -29,14 +32,14 @@
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/detail/endian.hpp>
 
 #include <algorithm>
+#include <mutex>
 #include <sstream>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -227,10 +230,14 @@ namespace hpx { namespace parcelset
         // flush all parcel buffers
         if(0 == num_thread)
         {
-            boost::unique_lock<mutex_type> l(handlers_mtx_, boost::try_to_lock);
+            std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
 
             if(l.owns_lock())
             {
+                using parcelset::policies::message_handler;
+                message_handler::flush_mode mode =
+                    message_handler::flush_mode_background_work;
+
                 message_handler_map::iterator end = handlers_.end();
                 for (message_handler_map::iterator it = handlers_.begin();
                      it != end; ++it)
@@ -238,8 +245,9 @@ namespace hpx { namespace parcelset
                     if ((*it).second)
                     {
                         boost::shared_ptr<policies::message_handler> p((*it).second);
-                        util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
-                        did_some_work = p->flush(stop_buffering) || did_some_work;
+                        util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                        did_some_work =
+                            p->flush(mode, stop_buffering) || did_some_work;
                     }
                 }
             }
@@ -268,6 +276,9 @@ namespace hpx { namespace parcelset
                 pp.second->stop(blocking);
             }
         }
+
+        // release all message handlers
+        handlers_.clear();
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
@@ -440,7 +451,7 @@ namespace hpx { namespace parcelset
             typedef std::pair<boost::shared_ptr<parcelport>, locality> destination_pair;
             destination_pair dest = find_appropriate_destination(addrs[0].locality_);
 
-            if (load_message_handlers_)
+            if (load_message_handlers_ && !hpx::is_stopped_or_shutting_down())
             {
                 policies::message_handler* mh =
                     p.get_message_handler(this, dest.second);
@@ -653,7 +664,7 @@ namespace hpx { namespace parcelset
         std::size_t num_messages, std::size_t interval,
         locality const& loc, error_code& ec)
     {
-        boost::unique_lock<mutex_type> l(handlers_mtx_);
+        std::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
 
@@ -661,7 +672,7 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<policies::message_handler> p;
 
             {
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval, ec));
             }
@@ -711,7 +722,15 @@ namespace hpx { namespace parcelset
         else if (!(*it).second.get()) {
             l.unlock();
             if (&ec != &throws)
+            {
                 ec = make_error_code(bad_parameter, lightweight);
+            }
+            else
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "parcelhandler::get_message_handler",
+                    "couldn't find an appropriate message handler");
+            }
             return 0;           // no message handler available
         }
 

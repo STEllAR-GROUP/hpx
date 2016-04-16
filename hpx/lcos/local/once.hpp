@@ -7,39 +7,42 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_ONCE_JAN_03_2013_0810PM)
-#define HPX_LCOS_LOCAL_ONCE_JAN_03_2013_0810PM
+#ifndef HPX_LCOS_LOCAL_ONCE_HPP
+#define HPX_LCOS_LOCAL_ONCE_HPP
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/event.hpp>
-#include <hpx/lcos/local/once_fwd.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <boost/atomic.hpp>
+
+#include <utility>
 
 namespace hpx { namespace lcos { namespace local
 {
     struct once_flag
     {
+    private:
+        HPX_NON_COPYABLE(once_flag);
+
+    public:
         once_flag() HPX_NOEXCEPT
           : status_(0)
         {}
-
-        HPX_NON_COPYABLE(once_flag)
 
     private:
         boost::atomic<long> status_;
         lcos::local::event event_;
 
-        template <typename Function>
-        friend void call_once(once_flag& flag, Function f);
+        template <typename F, typename ...Args>
+        friend void call_once(once_flag& flag, F&& f, Args&&... args);
     };
 
+    #define HPX_ONCE_INIT ::hpx::lcos::local::once_flag()
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Function>
-    void call_once(once_flag& flag, Function f)
+    template <typename F, typename ...Args>
+    void call_once(once_flag& flag, F&& f, Args&&... args)
     {
         // Try for a quick win: if the procedure has already been called
         // just skip through:
@@ -57,7 +60,7 @@ namespace hpx { namespace lcos { namespace local
                     // wrapped function was throwing an exception before
                     flag.event_.reset();
 
-                    f();
+                    util::invoke(std::forward<F>(f), std::forward<Args>(args)...);
 
                     // set status to done, release waiting threads
                     flag.status_.store(function_complete_flag_value);
@@ -83,4 +86,4 @@ namespace hpx { namespace lcos { namespace local
     }
 }}}
 
-#endif
+#endif /*HPX_LCOS_LOCAL_ONCE_HPP*/

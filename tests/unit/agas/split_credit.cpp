@@ -9,6 +9,9 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <string>
+#include <vector>
+
 #include <tests/unit/agas/components/simple_refcnt_checker.hpp>
 #include <tests/unit/agas/components/managed_refcnt_checker.hpp>
 
@@ -44,7 +47,7 @@ using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper functions
-inline boost::uint64_t get_credit(id_type const& id)
+inline boost::int64_t get_credit(id_type const& id)
 {
     return hpx::naming::detail::get_credit_from_gid(id.get_gid());
 }
@@ -62,19 +65,21 @@ template <
 >
 void hpx_test_main(
     variables_map& vm
+  , hpx::id_type const& locality
     )
 {
-    boost::uint64_t const hpx_globalcredit_initial = HPX_GLOBALCREDIT_INITIAL;
+    boost::int64_t const hpx_globalcredit_initial =
+        static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL);
 
     // HPX_GLOBALCREDIT_INITIAL should be a power of 2
-    boost::uint16_t log2_initial_credit =
+    boost::int16_t log2_initial_credit =
         hpx::naming::detail::log2(hpx_globalcredit_initial);
-    boost::uint64_t restored_initial_credits =
+    boost::int64_t restored_initial_credits =
         hpx::naming::detail::power2(log2_initial_credit);
     HPX_TEST_EQ(restored_initial_credits, hpx_globalcredit_initial);
 
     {
-        Client object(find_here());
+        Client object(locality);
 
         id_type g0 = split_credits(object.get_id());
 
@@ -86,12 +91,40 @@ void hpx_test_main(
         HPX_TEST_EQ(get_credit(object.get_id()), hpx_globalcredit_initial/4);
         HPX_TEST_EQ(get_credit(g1), hpx_globalcredit_initial/4);
 
+        id_type g2 = split_credits(object.get_id());
+
+        HPX_TEST_EQ(get_credit(object.get_id()), hpx_globalcredit_initial/8);
+        HPX_TEST_EQ(get_credit(g2), hpx_globalcredit_initial/8);
+
+        id_type g3 = split_credits(object.get_id());
+
+        HPX_TEST_EQ(get_credit(object.get_id()), hpx_globalcredit_initial/16);
+        HPX_TEST_EQ(get_credit(g3), hpx_globalcredit_initial/16);
+
+        id_type g4 = split_credits(object.get_id());
+
+        HPX_TEST_EQ(get_credit(object.get_id()), hpx_globalcredit_initial/32);
+        HPX_TEST_EQ(get_credit(g4), hpx_globalcredit_initial/32);
+
+        id_type g5 = split_credits(object.get_id());
+
+        HPX_TEST_EQ(get_credit(object.get_id()), hpx_globalcredit_initial/64);
+        HPX_TEST_EQ(get_credit(g5), hpx_globalcredit_initial/64);
+
         cout << "  " << object.get_id() << " : "
                      << get_credit(object.get_id()) << "\n"
              << "  " << g0 << " : "
                      << get_credit(g0) << "\n"
              << "  " << g1 << " : "
-                     << get_credit(g1) << "\n" << flush;
+                     << get_credit(g1) << "\n"
+             << "  " << g2 << " : "
+                     << get_credit(g2) << "\n"
+             << "  " << g3 << " : "
+                     << get_credit(g3) << "\n"
+             << "  " << g4 << " : "
+                     << get_credit(g4) << "\n"
+             << "  " << g5 << " : "
+                     << get_credit(g5) << "\n" << flush;
     }
 }
 
@@ -100,18 +133,19 @@ int hpx_main(
     variables_map& vm
     )
 {
+    for (hpx::id_type const& l : hpx::find_all_localities())
     {
         cout << std::string(80, '#') << "\n"
-             << "simple component test\n"
+             << "simple component test: " << l << "\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<simple_object>(vm);
+        hpx_test_main<simple_object>(vm, l);
 
         cout << std::string(80, '#') << "\n"
-             << "managed component test\n"
+             << "managed component test: " << l << "\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<managed_object>(vm);
+        hpx_test_main<managed_object>(vm, l);
     }
 
     finalize();

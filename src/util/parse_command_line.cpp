@@ -9,10 +9,10 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <string>
-#include <stdexcept>
 #include <cctype>
 #include <fstream>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 #include <boost/filesystem.hpp>
@@ -762,13 +762,13 @@ namespace hpx { namespace util
             }
             else if (boost::any_cast<double>(&value)) {
                 add_as_option(command_line, v.first,
-                    boost::lexical_cast<std::string>(v.second.as<double>()));
+                    std::to_string(v.second.as<double>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
             else if (boost::any_cast<int>(&value)) {
                 add_as_option(command_line, v.first,
-                    boost::lexical_cast<std::string>(v.second.as<int>()));
+                    std::to_string(v.second.as<int>()));
                 if (!command_line.empty())
                     command_line += " ";
             }

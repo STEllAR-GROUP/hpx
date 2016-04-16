@@ -8,9 +8,8 @@
 #if !defined(HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM)
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config/forceinline.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -25,11 +24,13 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/bind.hpp>
 
-#include <map>
 #include <algorithm>
+#include <map>
+#include <mutex>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace parcelset
 {
@@ -40,8 +41,10 @@ namespace hpx { namespace parcelset
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
-    class HPX_EXPORT parcelhandler : boost::noncopyable
+    class HPX_EXPORT parcelhandler
     {
+        HPX_NON_COPYABLE(parcelhandler);
+
     private:
         void parcel_sink(parcel const& p);
 
@@ -362,7 +365,7 @@ namespace hpx { namespace parcelset
         {
             write_handler_type f;
             {
-                boost::lock_guard<mutex_type> l(mtx_);
+                std::lock_guard<mutex_type> l(mtx_);
                 f = write_handler_;
             }
             f(ec, p);
@@ -370,7 +373,7 @@ namespace hpx { namespace parcelset
 
         write_handler_type set_write_handler(write_handler_type f)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             std::swap(f, write_handler_);
             return f;
         }

@@ -9,6 +9,9 @@
 
 #include <boost/assign/std/vector.hpp>
 
+#include <string>
+#include <vector>
+
 #include <tests/unit/agas/components/simple_mobile_object.hpp>
 
 using boost::program_options::variables_map;

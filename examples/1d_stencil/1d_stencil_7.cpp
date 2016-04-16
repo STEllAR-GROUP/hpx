@@ -14,6 +14,8 @@
 
 #include <boost/shared_array.hpp>
 
+#include <vector>
+
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

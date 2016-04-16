@@ -28,6 +28,9 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#include <string>
+#include <vector>
+
 #include <apex_api.hpp>
 
 using hpx::naming::id_type;
@@ -142,7 +145,7 @@ private:
     std::unique_ptr<double[]> data_;
     std::size_t size_;
 
-    HPX_MOVABLE_BUT_NOT_COPYABLE(partition_data);
+    HPX_MOVABLE_ONLY(partition_data);
 };
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)

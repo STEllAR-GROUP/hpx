@@ -6,8 +6,7 @@
 #if !defined(HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM)
 #define HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/async.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/dataflow.hpp>
@@ -24,7 +23,9 @@
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
 #include <boost/range/functions.hpp>
+
 #include <iterator>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util
@@ -35,14 +36,15 @@ namespace hpx { namespace parallel { namespace util
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
-        template <typename ExPolicy, typename R, typename Result = void>
+        template <typename ExPolicy_, typename R, typename Result = void>
         struct static_partitioner
         {
-            template <typename FwdIter, typename F1, typename F2>
-            static R call(ExPolicy policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2, std::size_t chunk_size)
+            template <typename ExPolicy, typename FwdIter, typename F1, typename F2>
+            static R call(ExPolicy && policy, FwdIter first,
+                std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef typename hpx::util::tuple<FwdIter, std::size_t>
@@ -55,7 +57,7 @@ namespace hpx { namespace parallel { namespace util
                 try {
                     // estimate a chunk size based on number of cores used
                     shape = get_bulk_iteration_shape(policy, inititems, f1,
-                        first, count, chunk_size);
+                        first, count, 1);
 
                     std::vector<hpx::future<Result> > workitems;
                     workitems.reserve(shape.size());
@@ -85,15 +87,17 @@ namespace hpx { namespace parallel { namespace util
                 return f2(std::move(inititems));
             }
 
-            template <typename FwdIter, typename F1, typename F2, typename Data>
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2, typename Data>
                 // requires is_container<Data>
-            static R call_with_data(ExPolicy policy,
+            static R call_with_data(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
                 HPX_ASSERT(boost::size(data) >= boost::size(chunk_sizes));
 
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef typename hpx::util::decay<Data>::type data_type;
@@ -152,11 +156,13 @@ namespace hpx { namespace parallel { namespace util
                 return f2(std::move(workitems));
             }
 
-            template <typename FwdIter, typename F1, typename F2>
-            static R call_with_index(ExPolicy policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2, std::size_t chunk_size)
+            template <typename ExPolicy, typename FwdIter, typename Stride, typename F1,
+                typename F2>
+            static R call_with_index(ExPolicy && policy, FwdIter first,
+                std::size_t count, Stride stride, F1 && f1, F2 && f2)
             {
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef hpx::util::tuple<std::size_t, FwdIter, std::size_t>
@@ -168,9 +174,8 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    std::size_t base_idx = 0;
                     shape = get_bulk_iteration_shape_idx(policy, inititems, f1,
-                        base_idx, first, count, chunk_size);
+                        first, count, stride);
 
                     std::vector<hpx::future<Result> > workitems;
                     workitems.reserve(shape.size());
@@ -204,11 +209,11 @@ namespace hpx { namespace parallel { namespace util
         struct static_partitioner<parallel_task_execution_policy, R, Result>
         {
             template <typename ExPolicy, typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(ExPolicy policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::size_t chunk_size)
+            static hpx::future<R> call(ExPolicy && policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef typename hpx::util::tuple<FwdIter, std::size_t>
@@ -221,7 +226,7 @@ namespace hpx { namespace parallel { namespace util
                 try {
                     // estimate a chunk size based on number of cores used
                     shape = get_bulk_iteration_shape(policy, inititems, f1,
-                        first, count, chunk_size);
+                        first, count, 1);
 
                     std::vector<hpx::future<Result> > workitems;
                     workitems.reserve(shape.size());
@@ -258,13 +263,14 @@ namespace hpx { namespace parallel { namespace util
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2, typename Data>
                 // requires is_container<Data>
-            static hpx::future<R> call_with_data(ExPolicy policy,
+            static hpx::future<R> call_with_data(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
                 HPX_ASSERT(boost::size(data) >= boost::size(chunk_sizes));
 
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef typename hpx::util::decay<Data>::type data_type;
@@ -328,13 +334,14 @@ namespace hpx { namespace parallel { namespace util
                     std::move(workitems));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2>
-            static hpx::future<R> call_with_index(ExPolicy policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::size_t chunk_size)
+            template <typename ExPolicy, typename FwdIter, typename Stride,
+                typename F1, typename F2>
+            static hpx::future<R> call_with_index(ExPolicy && policy,
+                FwdIter first, std::size_t count, Stride stride,
+                F1 && f1, F2 && f2)
             {
-                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
                 typedef hpx::util::tuple<std::size_t, FwdIter, std::size_t>
@@ -346,9 +353,8 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    std::size_t base_idx = 0;
                     shape = get_bulk_iteration_shape_idx(policy, inititems, f1,
-                        base_idx, first, count, chunk_size);
+                        first, count, stride);
 
                     std::vector<hpx::future<Result> > workitems;
                     workitems.reserve(shape.size());
@@ -401,39 +407,45 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename R, typename Result>
-        struct partitioner<ExPolicy, R, Result,
+        template <typename ExPolicy_, typename R, typename Result>
+        struct partitioner<ExPolicy_, R, Result,
             parallel::traits::static_partitioner_tag>
         {
-            template <typename FwdIter, typename F1, typename F2>
-            static R call(ExPolicy policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2,
-                std::size_t chunk_size = 0)
+            template <typename ExPolicy, typename FwdIter, typename F1, typename F2>
+            static R call(ExPolicy && policy, FwdIter first,
+                std::size_t count, F1 && f1, F2 && f2)
             {
-                return static_partitioner<ExPolicy, R, Result>::call(
-                    policy, first, count,
-                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                return static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, R, Result
+                    >::call(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
 
-            template <typename FwdIter, typename F1, typename F2, typename Data>
-            static R call_with_data(ExPolicy policy, FwdIter first,
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2, typename Data>
+            static R call_with_data(ExPolicy && policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
-                return static_partitioner<ExPolicy, R, Result>::call_with_data(
-                    policy, first, count,
-                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_sizes,
-                    std::forward<Data>(data));
+                return static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, R, Result
+                    >::call_with_data(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2), chunk_sizes,
+                        std::forward<Data>(data));
             }
 
-            template <typename FwdIter, typename F1, typename F2>
-            static R call_with_index(ExPolicy policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2,
-                std::size_t chunk_size = 0)
+            template <typename ExPolicy, typename FwdIter, typename Stride, typename F1,
+                typename F2>
+            static R call_with_index(ExPolicy && policy, FwdIter first,
+                std::size_t count, Stride stride, F1 && f1, F2 && f2)
             {
-                return static_partitioner<ExPolicy, R, Result>::call_with_index(
-                    policy, first, count,
-                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                return static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, R, Result
+                    >::call_with_index(
+                        std::forward<ExPolicy>(policy), first, count, stride,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
         };
 
@@ -443,36 +455,41 @@ namespace hpx { namespace parallel { namespace util
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2>
-            static hpx::future<R> call(ExPolicy policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::size_t chunk_size = 0)
+            static hpx::future<R> call(ExPolicy && policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
-                return static_partitioner<ExPolicy, R, Result>::call(
-                    policy, first, count,
-                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                return static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, R, Result
+                    >::call(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2, typename Data>
-            static hpx::future<R> call_with_data(ExPolicy policy,
+            static hpx::future<R> call_with_data(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
-                return static_partitioner<ExPolicy, R, Result>::call_with_data(
-                    policy, first, count,
-                    std::forward<F1>(f1), std::forward<F2>(f2),
-                    chunk_sizes, std::forward<Data>(data));
+                return static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, R, Result
+                    >::call_with_data(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2),
+                        chunk_sizes, std::forward<Data>(data));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2>
-            static hpx::future<R> call_with_index(ExPolicy policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::size_t chunk_size = 0)
+            template <typename ExPolicy, typename FwdIter, typename Stride,
+                typename F1, typename F2>
+            static hpx::future<R> call_with_index(ExPolicy && policy,
+                FwdIter first, std::size_t count, Stride stride,
+                F1 && f1, F2 && f2)
             {
-                return static_partitioner<ExPolicy, R, Result>::call_with_index(
-                    policy, first, count,
-                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+                return static_partitioner<
+                        typename hpx::util::decay<ExPolicy>::type, R, Result
+                    >::call_with_index(
+                        std::forward<ExPolicy>(policy), first, count, stride,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
         };
 

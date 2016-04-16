@@ -18,7 +18,6 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -29,8 +28,8 @@
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <mutex>
 #include <numeric>
 #include <sstream>
 
@@ -160,7 +159,7 @@ namespace hpx { namespace threads
         get_thread_count(thread_state_enum state, thread_priority priority,
             std::size_t num_thread, bool reset) const
     {
-        boost::lock_guard<mutex_type> lk(mtx_);
+        std::lock_guard<mutex_type> lk(mtx_);
         return pool_.get_thread_count(state, priority, num_thread, reset);
     }
 
@@ -172,7 +171,7 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy>::
         abort_all_suspended_threads()
     {
-        boost::lock_guard<mutex_type> lk(mtx_);
+        std::lock_guard<mutex_type> lk(mtx_);
         pool_.abort_all_suspended_threads();
     }
 
@@ -185,7 +184,7 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy>::
         cleanup_terminated(bool delete_all)
     {
-        boost::lock_guard<mutex_type> lk(mtx_);
+        std::lock_guard<mutex_type> lk(mtx_);
         return pool_.cleanup_terminated(delete_all);
     }
 
@@ -281,7 +280,7 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        typedef scheduling_policy_type spt;
+        typedef detail::thread_pool<scheduling_policy_type> spt;
 
         using util::placeholders::_1;
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
@@ -296,7 +295,7 @@ namespace hpx { namespace threads
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < threads_.size())
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
         {
             policies::maintain_queue_wait_times = true;
 
@@ -334,7 +333,7 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        typedef scheduling_policy_type spt;
+        typedef detail::thread_pool<scheduling_policy_type> spt;
 
         using util::placeholders::_1;
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
@@ -349,7 +348,7 @@ namespace hpx { namespace threads
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < threads_.size())
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
         {
             policies::maintain_queue_wait_times = true;
 
@@ -654,6 +653,14 @@ namespace hpx { namespace threads
             },
 #endif
 #endif
+            // /threads{locality#%d/total}/time/overall
+            // /threads{locality#%d/worker-thread%d}/time/overall
+            { "time/overall",
+              util::bind(&ti::get_cumulative_duration, this, -1, _1),
+              util::bind(&ti::get_cumulative_duration, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
             // /threads{locality#%d/total}/count/instantaneous/all
             // /threads{locality#%d/worker-thread%d}/count/instantaneous/all
             { "count/instantaneous/all",
@@ -924,6 +931,12 @@ namespace hpx { namespace threads
             },
 #endif
 #endif
+            { "/threads/time/overall", performance_counters::counter_raw,
+              "returns the overall time spent running the scheduler on a core",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
               "returns the overall current number of HPX-threads instantiated at the "
               "referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
@@ -1044,7 +1057,7 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy>::
         run(std::size_t num_threads)
     {
-        boost::unique_lock<mutex_type> lk(mtx_);
+        std::unique_lock<mutex_type> lk(mtx_);
 
         if (pool_.get_os_thread_count() != 0 ||
             pool_.has_reached_state(state_running))
@@ -1071,7 +1084,7 @@ namespace hpx { namespace threads
     {
         LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")";
 
-        boost::unique_lock<mutex_type> lk(mtx_);
+        std::unique_lock<mutex_type> lk(mtx_);
         pool_.stop(lk, blocking);
 
         LTM_(info) << "stop: stopping timer pool";
@@ -1141,6 +1154,13 @@ namespace hpx { namespace threads
     }
 #endif
 #endif
+
+    template <typename SchedulingPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy>::
+        get_cumulative_duration(std::size_t num, bool reset)
+    {
+        return pool_.get_cumulative_duration(num, reset);
+    }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     ///////////////////////////////////////////////////////////////////////////

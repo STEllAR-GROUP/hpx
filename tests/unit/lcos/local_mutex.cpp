@@ -17,6 +17,9 @@
 #include <boost/chrono.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <string>
+#include <vector>
+
 boost::chrono::milliseconds const delay(1000);
 boost::chrono::milliseconds const timeout_resolution(100);
 
@@ -24,12 +27,12 @@ template <typename M>
 struct test_lock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_lock lock_type;
+    typedef boost::unique_lock<M> lock_type;
 
     void operator()()
     {
         mutex_type mutex;
-        hpx::lcos::local::condition_variable condition;
+        hpx::lcos::local::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -62,12 +65,12 @@ template <typename M>
 struct test_trylock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_try_lock try_lock_type;
+    typedef boost::unique_lock<M> try_lock_type;
 
     void operator()()
     {
         mutex_type mutex;
-        hpx::lcos::local::condition_variable condition;
+        hpx::lcos::local::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -113,7 +116,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     hpx::lcos::local::mutex done_mutex;
     bool done;
     bool locked;
-    hpx::lcos::local::condition_variable done_cond;
+    hpx::lcos::local::condition_variable_any done_cond;
 
     test_lock_times_out_if_other_thread_has_lock():
         done(false),locked(false)
@@ -189,7 +192,7 @@ template <typename M>
 struct test_timedlock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_lock try_lock_for_type;
+    typedef boost::unique_lock<M> try_lock_for_type;
 
     static bool fake_predicate()
     {
@@ -201,7 +204,7 @@ struct test_timedlock
         test_lock_times_out_if_other_thread_has_lock<mutex_type>()();
 
         mutex_type mutex;
-        hpx::lcos::local::condition_variable condition;
+        hpx::lcos::local::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -266,7 +269,7 @@ template <typename M>
 struct test_recursive_lock
 {
     typedef M mutex_type;
-    typedef typename M::scoped_lock lock_type;
+    typedef boost::unique_lock<M> lock_type;
 
     void operator()()
     {
@@ -334,7 +337,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+        std::to_string(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

@@ -9,10 +9,11 @@
 
 #include <hpx/util/transform_iterator.hpp>
 
-#include <sstream>
-#include <iterator>
-#include <vector>
 #include <algorithm>
+#include <iterator>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include <boost/range/functions.hpp>
 

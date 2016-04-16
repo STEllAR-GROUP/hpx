@@ -21,8 +21,8 @@
 #define JT28092007_BOOST_TSS_IMPL_WIN32
 
 #include <hpx/util/assert.hpp>
-#include <vector>
 #include <memory>
+#include <vector>
 
 #   include <windef.h>
 

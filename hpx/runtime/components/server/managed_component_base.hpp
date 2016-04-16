@@ -8,7 +8,13 @@
 #define HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40703
+// this needs to go first to workaround a weird GCC4.6 ICE
+#include <hpx/util/reinitializable_static.hpp>
+#endif
+
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -19,7 +25,6 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/throw_exception.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -158,7 +163,7 @@ namespace hpx { namespace components
             template <typename Component>
             static void call(Component* component)
             {
-                // The managed_component's controls the lifetime of the
+                // The managed_component controls the lifetime of the
                 // component implementation.
                 component->finalize();
                 delete component;
@@ -180,8 +185,10 @@ namespace hpx { namespace components
     template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     class managed_component_base
-      : public traits::detail::managed_component_tag, boost::noncopyable
+      : public traits::detail::managed_component_tag
     {
+        HPX_NON_COPYABLE(managed_component_base);
+
     private:
         Component& derived()
         {
@@ -265,9 +272,6 @@ namespace hpx { namespace components
         naming::gid_type get_base_gid() const;
 
     public:
-        // This component type does not support migration.
-        static HPX_CONSTEXPR bool supports_migration() { return false; }
-
         // Pinning functionality
         void pin() {}
         void unpin() {}
@@ -371,8 +375,10 @@ namespace hpx { namespace components
     /// \tparam Derived
     ///
     template <typename Component, typename Derived>
-    class managed_component : boost::noncopyable
+    class managed_component
     {
+        HPX_NON_COPYABLE(managed_component);
+
     public:
         typedef typename boost::mpl::if_<
                 boost::is_same<Derived, detail::this_type>,

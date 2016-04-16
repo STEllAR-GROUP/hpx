@@ -9,8 +9,8 @@
 #if !defined(HPX_A16135FC_AA32_444F_BB46_549AD456A661)
 #define HPX_A16135FC_AA32_444F_BB46_549AD456A661
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
@@ -26,6 +26,8 @@
 
 #include <map>
 #include <set>
+#include <string>
+#include <vector>
 
 #include <boost/format.hpp>
 #include <boost/bimap.hpp>
@@ -75,8 +77,12 @@ struct HPX_EXPORT component_namespace
     struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
-    struct counter_data :  boost::noncopyable
+    struct counter_data
     {
+    private:
+        HPX_NON_COPYABLE(counter_data);
+
+    public:
         typedef lcos::local::spinlock mutex_type;
 
         struct api_counter_data

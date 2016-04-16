@@ -9,6 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 //
 #include <random>
+#include <vector>
 
 #include  <boost/nondet_random.hpp>
 #include <boost/random/mersenne_twister.hpp>

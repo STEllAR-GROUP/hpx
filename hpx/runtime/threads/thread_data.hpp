@@ -9,28 +9,26 @@
 #define HPX_PX_THREAD_MAY_20_2008_0910AM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/lockfree/stack.hpp>
 
 #include <stack>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -41,41 +39,6 @@ namespace hpx { namespace threads
 
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        // Why do we use std::stack + a lock here?
-        template <typename CoroutineImpl>
-        struct coroutine_allocator
-        {
-            coroutine_allocator()
-              : heap_(128)
-            {}
-
-            CoroutineImpl* get()
-            {
-                return get_locked();
-            }
-
-            CoroutineImpl* try_get() //-V524
-            {
-                return get_locked();
-            }
-
-            void deallocate(CoroutineImpl* c)
-            {
-                heap_.push(c);
-            }
-
-        private:
-            CoroutineImpl* get_locked()
-            {
-                CoroutineImpl* result = 0;
-                heap_.pop(result);
-                return result;
-            }
-
-            boost::lockfree::stack<CoroutineImpl*> heap_;
-        };
-
         ///////////////////////////////////////////////////////////////////////
         struct thread_exit_callback_node
         {
@@ -113,7 +76,7 @@ namespace hpx { namespace threads
     /// implemented by the thread-manager.
     class thread_data
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(thread_data);
+        HPX_MOVABLE_ONLY(thread_data);
 
         // Avoid warning about using 'this' in initializer list
         thread_data* this_() { return this; }
@@ -288,42 +251,43 @@ namespace hpx { namespace threads
         }
 
 #ifndef HPX_HAVE_THREAD_DESCRIPTION
-        char const* get_description() const
+        util::thread_description get_description() const
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
-        char const* set_description(char const* /*value*/)
+        util::thread_description set_description(util::thread_description /*value*/)
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
 
-        char const* get_lco_description() const
+        util::thread_description get_lco_description() const
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
-        char const* set_lco_description(char const* /*value*/)
+        util::thread_description set_lco_description(util::thread_description /*value*/)
         {
-            return "<unknown>";
+            return util::thread_description("<unknown>");
         }
 #else
-        char const* get_description() const
+        util::thread_description get_description() const
         {
             mutex_type::scoped_lock l(this);
-            return description_ ? description_ : "<unknown>";
+            return description_;
         }
-        char const* set_description(char const* value)
+        util::thread_description set_description(util::thread_description value)
         {
             mutex_type::scoped_lock l(this);
             std::swap(description_, value);
             return value;
         }
 
-        char const* get_lco_description() const
+        util::thread_description get_lco_description() const
         {
             mutex_type::scoped_lock l(this);
-            return lco_description_ ? lco_description_ : "<unknown>";
+            return lco_description_;
         }
-        char const* set_lco_description(char const* value)
+        util::thread_description set_lco_description(
+            util::thread_description value)
         {
             mutex_type::scoped_lock l(this);
             std::swap(lco_description_, value);
@@ -591,8 +555,8 @@ namespace hpx { namespace threads
             component_id_(init_data.lva),
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            description_(init_data.description ? init_data.description : ""),
-            lco_description_(""),
+            description_(init_data.description),
+            lco_description_(),
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             parent_locality_id_(init_data.parent_locality_id),
@@ -647,8 +611,8 @@ namespace hpx { namespace threads
             component_id_ = init_data.lva;
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            description_ = (init_data.description ? init_data.description : "");
-            lco_description_ = "";
+            description_ = (init_data.description);
+            lco_description_ = util::thread_description();
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             parent_locality_id_ = init_data.parent_locality_id;
@@ -699,8 +663,8 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        char const* description_;
-        char const* lco_description_;
+        util::thread_description description_;
+        util::thread_description lco_description_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE

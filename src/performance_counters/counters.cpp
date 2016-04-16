@@ -19,7 +19,6 @@
 #include <hpx/lcos/local/packaged_continuation.hpp>
 
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
@@ -31,6 +30,9 @@
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/include/qi_directive.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization support for the performance counter actions
@@ -101,7 +103,7 @@ namespace hpx { namespace performance_counters
                 if (-1 != path.parentinstanceindex_)
                 {
                     result += "#";
-                    result += boost::lexical_cast<std::string>
+                    result += std::to_string
                                 (path.parentinstanceindex_);
                 }
                 if (!path.instancename_.empty())
@@ -112,7 +114,7 @@ namespace hpx { namespace performance_counters
                 if (-1 != path.instanceindex_)
                 {
                     result += "#";
-                    result += boost::lexical_cast<std::string>(path.instanceindex_);
+                    result += std::to_string(path.instanceindex_);
                 }
             }
             result += "}";

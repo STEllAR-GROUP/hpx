@@ -11,6 +11,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 

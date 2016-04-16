@@ -11,6 +11,9 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
@@ -143,7 +146,7 @@ namespace hpx { namespace performance_counters
 
     namespace detail
     {
-        std::string regex_from_pattern(std::string const& pattern,
+        HPX_EXPORT std::string regex_from_pattern(std::string const& pattern,
             error_code& ec);
     }
 }}

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_TIMED_EXECUTOR_TRAITS_AUG_04_2015_0525PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/lcos/future.hpp>
@@ -19,9 +18,6 @@
 
 #include <type_traits>
 #include <utility>
-
-#include <boost/range/functions.hpp>
-#include <boost/range/irange.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
 #define HPX_ENABLE_WORKAROUND_FOR_GCC46
@@ -95,10 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename future_type<
-                    Executor,
-                    typename hpx::util::result_of<
-                        typename hpx::util::decay<F>::type()
-                    >::type
+                    Executor, typename hpx::util::result_of<F()>::type
                 >::type
 #else
             ->  decltype(exec.async_execute(std::forward<F>(f)))
@@ -128,10 +121,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename future_type<
-                    Executor,
-                    typename hpx::util::result_of<
-                        typename hpx::util::decay<F>::type()
-                    >::type
+                    Executor, typename hpx::util::result_of<F()>::type
                 >::type
 #else
             ->  decltype(exec.async_execute(std::forward<F>(f)))
@@ -155,10 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
         ->  typename future_type<
-                Executor,
-                typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type
+                Executor, typename hpx::util::result_of<F()>::type
             >::type
 #else
         ->  decltype(
@@ -181,9 +168,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(hpx::traits::detail::wrap_int, Executor& exec,
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type
+            ->  typename hpx::util::result_of<F()>::type
 #else
             ->  decltype(call_execute(exec, std::forward<F>(f)))
 #endif
@@ -211,9 +196,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(hpx::traits::detail::wrap_int, Executor& exec,
                     util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type
+            ->  typename hpx::util::result_of<F()>::type
 #else
             ->  decltype(call_execute(exec, std::forward<F>(f)))
 #endif
@@ -235,9 +218,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         auto call_execute_at(Executor& exec,
                 util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::result_of<
-                typename hpx::util::decay<F>::type()
-            >::type
+        ->  typename hpx::util::result_of<F()>::type
 #else
         ->  decltype(
                 execute_at_helper<
@@ -368,9 +349,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 hpx::util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
         ->  typename future<
-                typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type
+                typename hpx::util::result_of<F()>::type
             >::type
 #else
         ->  decltype(
@@ -408,9 +387,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 hpx::util::steady_duration const& rel_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
         ->  typename future<
-                typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type
+                typename hpx::util::result_of<F()>::type
             >::type
 #else
         ->  decltype(
@@ -449,9 +426,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         execute_at(executor_type& exec,
                 hpx::util::steady_time_point const& abs_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::result_of<
-                typename hpx::util::decay<F>::type()
-            >::type
+        ->  typename hpx::util::result_of<F()>::type
 #else
         ->  decltype(detail::call_execute_at(exec, abs_time, std::forward<F>(f)))
 #endif
@@ -485,9 +460,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         execute_after(executor_type& exec,
                 hpx::util::steady_duration const& rel_time, F && f)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::result_of<
-                typename hpx::util::decay<F>::type()
-            >::type
+        ->  typename hpx::util::result_of<F()>::type
 #else
         ->  decltype(
                 detail::call_execute_at(exec, rel_time.from_now(),

@@ -14,6 +14,7 @@
 #include <hpx/include/lcos.hpp>
 
 #include <iostream>
+#include <string>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>

@@ -6,6 +6,8 @@
 #if !defined(HPX_MIGRATE_FROM_STORAGE_SERVER_FEB_09_2015_0330PM)
 #define HPX_MIGRATE_FROM_STORAGE_SERVER_FEB_09_2015_0330PM
 
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
@@ -16,6 +18,8 @@
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
+
+#include <vector>
 
 namespace hpx { namespace components { namespace server
 {
@@ -145,7 +149,7 @@ namespace hpx { namespace components { namespace server
             .then(
                 [to_resurrect, target_locality](
                     future<std::pair<naming::id_type, naming::address> > && f)
-                        -> future<naming::id_type>
+                ->  future<naming::id_type>
                 {
                     // rethrow errors
                     std::pair<naming::id_type, naming::address> r = f.get();

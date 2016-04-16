@@ -19,6 +19,8 @@
 
 #include <boost/iterator/counting_iterator.hpp>
 
+#include <vector>
+
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

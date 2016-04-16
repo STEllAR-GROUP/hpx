@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,8 +8,8 @@
 #if !defined(HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM)
 #define HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -19,14 +19,12 @@
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
-#include <boost/mpl/or.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <iterator>
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -135,7 +133,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 if (first1 == last1)
@@ -151,7 +149,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
                     first2, std::distance(first2, last2),
                     [first1, last1, first2, last2, f, tok](
                             FwdIter2 part_begin, std::size_t part_count
@@ -263,30 +262,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           [first1, last1). Also returns true if [first2, last2) is empty.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     includes(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter1>::value ||
+               !hpx::traits::is_forward_iterator<InIter2>::value
+            > is_seq;
 
         return detail::includes().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -364,30 +358,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           [first1, last1). Also returns true if [first2, last2) is empty.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     includes(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, F && f)
     {
-        typedef typename std::iterator_traits<InIter1>::iterator_category
-            iterator_category1;
-        typedef typename std::iterator_traits<InIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category1>::value),
+            (hpx::traits::is_input_iterator<InIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category2>::value),
+            (hpx::traits::is_input_iterator<InIter2>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category1>,
-            boost::is_same<std::input_iterator_tag, iterator_category2>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter1>::value ||
+               !hpx::traits::is_forward_iterator<InIter2>::value
+            > is_seq;
 
         return detail::includes().call(
             std::forward<ExPolicy>(policy), is_seq(),

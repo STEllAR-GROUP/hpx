@@ -96,7 +96,7 @@ usually generate the counter values based on direct measurements, and
 aggregate counters which take another counter and transform its values before
 generating their own counter values. An example for a simple counter is given
 [link hpx.manual.performance_counters.names.example above]: counting retired
-__hpx__-threads. An aggreagate counter is shown as an example
+__hpx__-threads. An aggregate counter is shown as an example
 [link hpx.manual.performance_counters.names.example above] as well:
 calculating the average of the underlying counter values sampled at constant
 time intervals.
@@ -123,7 +123,7 @@ assumed (see also __existing_counters__).
 
 Every locality of an application exposes its own set of Performance
 Counter types and Performance Counter instances. The set of exposed counters
-is determinded dynamically at application start based on the execution
+is determined dynamically at application start based on the execution
 environment of the application. For instance, this set is influenced by the
 current hardware environment for the locality (such as whether the locality has
 access to accelerators), and the software environment of the application (such
@@ -142,17 +142,17 @@ wildcard matching rules implemented by common shells (like bash).
 
 [table Wildcard characters in the performance counter type
     [[Wildcard]     [Description]]
-    [[`*`]          [This wildchard character matches any number (zero or
+    [[`*`]          [This wildcard character matches any number (zero or
                      more) of arbitrary characters.]]
-    [[`?`]          [This wildchard character matches any single arbitrary
+    [[`?`]          [This wildcard character matches any single arbitrary
                      character.]]
-    [[`[...]`]      [This wildchard character matches any single character
+    [[`[...]`]      [This wildcard character matches any single character
                      from the list of specified within the square brackets.]]
 ]
 
 [table Wildcard characters in the performance counter instance name
     [[Wildcard]     [Description]]
-    [[`*`]          [This wildchard character matches any locality or any
+    [[`*`]          [This wildcard character matches any locality or any
                      thread, depending on whether it is used for `locality#*`
                      or `worker-thread#*`. No other wildcards are allowed
                      in counter instance names.]]

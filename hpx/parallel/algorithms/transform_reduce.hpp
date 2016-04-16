@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,8 +8,8 @@
 #if !defined(HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM)
 #define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -21,13 +21,12 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <boost/range/functions.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
-#include <numeric>
 #include <iterator>
+#include <numeric>
 #include <type_traits>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -63,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce, typename Convert>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 if (first == last)
@@ -77,7 +76,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     reference;
 
                 return util::partitioner<ExPolicy, T>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [r, conv](FwdIter part_begin, std::size_t part_size) -> T
                     {
                         T val = conv(*part_begin);
@@ -103,20 +103,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         inline typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
+        transform_reduce_(ExPolicy && policy, InIter first, InIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::false_type)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                iterator_category;
-
             static_assert(
-                (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+                (hpx::traits::is_input_iterator<InIter>::value),
                 "Requires at least input iterator.");
 
-            typedef typename boost::mpl::or_<
-                parallel::is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, iterator_category>
-            >::type is_seq;
+            typedef std::integral_constant<bool,
+                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
 
             typedef typename hpx::util::decay<T>::type init_type;
 
@@ -132,7 +129,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
+        transform_reduce_(ExPolicy && policy, InIter first, InIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::true_type);
 
         /// \endcond
@@ -232,22 +229,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename T, typename Reduce,
         typename Convert>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     transform_reduce(ExPolicy&& policy, InIter first, InIter last,
         Convert && conv_op, T init, Reduce && red_op)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
-        static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
-            "Requires at least input iterator.");
-
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::transform_reduce_(
             std::forward<ExPolicy>(policy), first, last, std::move(init),

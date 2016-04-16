@@ -11,11 +11,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -31,9 +33,8 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <vector>
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 #include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -57,11 +58,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         template <typename IterPair>
-        struct copy_pair
-          : public detail::algorithm<copy_pair<IterPair>, IterPair>
+        struct copy
+          : public detail::algorithm<copy<IterPair>, IterPair>
         {
-            copy_pair()
-              : copy_pair::algorithm("copy")
+            copy()
+              : copy::algorithm("copy")
             {}
 
             template <typename ExPolicy, typename InIter, typename OutIter>
@@ -75,18 +76,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, std::pair<FwdIter, OutIter>
-                    >::type result_type;
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [](reference t)
@@ -97,24 +95,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
+
         template<typename InIter, typename OutIter, typename Enable = void>
-        struct copy;
+        struct copy_iter;
 
         template <typename InIter, typename OutIter>
-        struct copy<
+        struct copy_iter<
             InIter, OutIter,
-            typename boost::enable_if<typename hpx::traits::segmented_iterator_traits<InIter>::is_segmented_iterator>::type
-        > : public copy_pair<std::pair<
+            typename std::enable_if<
+                hpx::traits::segmented_iterator_traits<InIter>::is_segmented_iterator::value
+             >::type
+        > : public copy<std::pair<
             typename hpx::traits::segmented_iterator_traits<InIter>::local_iterator,
             typename hpx::traits::segmented_iterator_traits<OutIter>::local_iterator
         >>
         {};
 
         template<typename InIter, typename OutIter>
-        struct copy<
+        struct copy_iter<
             InIter, OutIter,
-            typename boost::disable_if<typename hpx::traits::segmented_iterator_traits<OutIter>::is_segmented_iterator>::type
-        > : public copy_pair<std::pair<InIter, OutIter>>
+            typename std::enable_if<
+                !hpx::traits::segmented_iterator_traits<OutIter>::is_segmented_iterator::value
+            >::type
+        > : public copy<std::pair<InIter, OutIter>>
         {};
 
         /// \endcond
@@ -170,15 +173,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
            return detail::transfer<
-                detail::copy<InIter, OutIter>
+//                detail::copy<std::pair<InIter, OutIter>>
+                detail::copy_iter<InIter, OutIter>
             >(std::forward<ExPolicy>(policy), first, last, dest);
     }
 
@@ -223,18 +227,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, std::pair<FwdIter, OutIter>
-                    >::type result_type;
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first, dest),
                         count,
                         [](reference t)
@@ -304,48 +305,37 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     copy_n(ExPolicy && policy, InIter first, Size count, OutIter dest)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
-
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         using hpx::util::tagged_pair;
         using hpx::util::make_tagged_pair;
 
         // if count is representing a negative value, we do nothing
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<
                     ExPolicy, tagged_pair<tag::in(InIter), tag::out(OutIter)>
                 >::get(make_tagged_pair<tag::in, tag::out>(first, dest));
         }
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return make_tagged_pair<tag::in, tag::out>(
             detail::copy_n<std::pair<InIter, OutIter> >().call(
@@ -396,7 +386,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest, Pred && pred, Proj && proj = Proj())
             {
                 typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
@@ -420,8 +410,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ExPolicy, std::pair<FwdIter, OutIter>, std::size_t
                     > scan_partitioner_type;
                 return scan_partitioner_type::call(
-                    policy, make_zip_iterator(first, flags.get()),
-                    count, init,
+                    std::forward<ExPolicy>(policy),
+                    make_zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
                     [pred, proj](zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
@@ -551,8 +541,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected<Proj, InIter>
@@ -563,30 +553,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f,
         Proj && proj = Proj())
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-        typedef typename std::iterator_traits<OutIter>::iterator_category
-            output_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
-
         static_assert(
-            (boost::mpl::or_<
-                boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
-                boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::copy_if<std::pair<InIter, OutIter> >().call(

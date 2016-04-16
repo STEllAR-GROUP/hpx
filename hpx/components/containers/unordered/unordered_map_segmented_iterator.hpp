@@ -24,6 +24,7 @@
 #include <iterator>
 #include <limits>
 #include <type_traits>
+#include <vector>
 
 #include <boost/integer.hpp>
 // #include <boost/iterator/iterator_facade.hpp>

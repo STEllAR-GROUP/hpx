@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,8 +8,8 @@
 #if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM)
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -22,9 +22,8 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -54,7 +53,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename T>
         typename util::detail::algorithm_result<ExPolicy>::type
-        parallel_sequential_uninitialized_fill_n(ExPolicy policy,
+        parallel_sequential_uninitialized_fill_n(ExPolicy && policy,
             Iter first, std::size_t count, T const& value)
         {
             if (count == 0)
@@ -68,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return util::partitioner_with_cleanup<
                     ExPolicy, void, partition_result_type
                 >::call(
-                    policy, first, count,
+                    std::forward<ExPolicy>(policy), first, count,
                     [value, tok](Iter it, std::size_t part_size)
                         mutable -> partition_result_type
                     {
@@ -111,13 +110,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, Iter first, Iter last,
+            parallel(ExPolicy && policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                return parallel_sequential_uninitialized_fill_n(policy, first,
+                return parallel_sequential_uninitialized_fill_n(
+                    std::forward<ExPolicy>(policy), first,
                     std::distance(first, last), value);
             }
         };
@@ -165,25 +165,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///
     template <typename ExPolicy, typename InIter, typename T>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy>::type
     >::type
     uninitialized_fill(ExPolicy && policy, InIter first, InIter last,
         T const& value)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            input_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value),
-            "Requires at least an input iterator.");
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Required at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::uninitialized_fill().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -213,11 +209,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
                 T const& value)
             {
-                return parallel_sequential_uninitialized_fill_n(policy, first,
-                    count, value);
+                return parallel_sequential_uninitialized_fill_n(
+                    std::forward<ExPolicy>(policy), first, count, value);
             }
         };
         /// \endcond
@@ -267,26 +263,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy>::type
     >::type
     uninitialized_fill_n(ExPolicy && policy, FwdIter first, Size count,
         T const& value)
     {
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            forward_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, forward_iterator_category>::value),
-            "Requires at least a forward iterator.");
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
 
         // if count is representing a negative value, we do nothing
-        if (detail::is_negative<Size>::call(count))
+        if (detail::is_negative(count))
+        {
             return util::detail::algorithm_result<ExPolicy>::get();
+        }
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_fill_n().call(
             std::forward<ExPolicy>(policy), is_seq(),

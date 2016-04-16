@@ -8,6 +8,8 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <string>
+
 #include "read_values.hpp"
 #include "partition.hpp"
 #include "interpolate1d.hpp"

@@ -11,6 +11,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 bool a_ctor = false;
 bool a_dtor = false;
 bool b_ctor = false;

@@ -8,6 +8,7 @@
 #define HPX_LCOS_PROMISE_FEB_03_2009_0841AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -24,11 +25,12 @@
 #include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/exception_ptr.hpp>
+
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -162,13 +164,13 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_id() const
         {
-            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            std::unique_lock<naming::gid_type> l(gid_.get_mutex());
             return get_gid_locked(std::move(l));
         }
 
         naming::id_type get_unmanaged_id() const
         {
-            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            std::unique_lock<naming::gid_type> l(gid_.get_mutex());
             return naming::id_type(gid_, id_type::unmanaged);
         }
 
@@ -182,7 +184,7 @@ namespace hpx { namespace lcos { namespace detail
     protected:
         // The GID needs to be split in order to keep the shared state alive.
         naming::id_type get_gid_locked(
-            boost::unique_lock<naming::gid_type> l) const
+            std::unique_lock<naming::gid_type> l) const
         {
             hpx::future<naming::gid_type> gid =
                 naming::detail::split_gid_if_needed_locked(l, gid_);
@@ -290,7 +292,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
+            std::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
             // special precautions for it to go out of scope
@@ -381,8 +383,10 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     // This is a placeholder shim used for the type erased memory management
     // for all promise types
-    struct managed_promise : boost::noncopyable
+    struct managed_promise
     {
+        HPX_NON_COPYABLE(managed_promise);
+
     private:
         struct tag {};
         typedef lcos::local::spinlock_pool<tag> mutex_type;
@@ -463,7 +467,7 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class promise
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise);
 
     public:
         typedef detail::promise<Result, RemoteResult> wrapped_type;
@@ -619,7 +623,7 @@ namespace hpx { namespace lcos
     template <>
     class promise<void, util::unused_type>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_ONLY(promise);
 
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;

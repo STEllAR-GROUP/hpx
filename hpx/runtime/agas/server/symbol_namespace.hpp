@@ -23,6 +23,8 @@
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <map>
+#include <string>
+#include <vector>
 
 #include <boost/format.hpp>
 #include <boost/shared_ptr.hpp>
@@ -69,8 +71,12 @@ struct HPX_EXPORT symbol_namespace
     struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
-    struct counter_data :  boost::noncopyable
+    struct counter_data
     {
+    private:
+        HPX_NON_COPYABLE(counter_data);
+
+    public:
         typedef lcos::local::spinlock mutex_type;
 
         struct api_counter_data

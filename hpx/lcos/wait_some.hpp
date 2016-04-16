@@ -146,29 +146,29 @@ namespace hpx
 }
 #else
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/traits/future_access.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/is_sequence.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,18 +180,16 @@ namespace hpx { namespace lcos
         template <typename Sequence>
         struct wait_some;
 
-        template <typename Sequence, typename Callback>
-        struct set_wait_on_completed_callback_impl
+        template <typename Sequence>
+        struct set_wait_some_callback_impl
         {
-            explicit set_wait_on_completed_callback_impl(
-                    wait_some<Sequence>& wait, Callback const& callback)
-              : wait_(wait),
-                callback_(callback)
+            explicit set_wait_some_callback_impl(wait_some<Sequence>& wait)
+              : wait_(wait)
             {}
 
             template <typename SharedState>
             void operator()(SharedState& shared_state,
-                typename boost::enable_if_c<
+                typename std::enable_if<
                     traits::is_shared_state<SharedState>::value
                 >::type* = 0) const
             {
@@ -207,7 +205,11 @@ namespace hpx { namespace lcos
                     // execute_deferred might have made the future ready
                     if (!shared_state->is_ready())
                     {
-                        shared_state->set_on_completed(Callback(callback_));
+                        shared_state->set_on_completed(
+                            util::deferred_call(
+                                &wait_some<Sequence>::on_future_ready,
+                                wait_.shared_from_this(),
+                                threads::get_self_id()));
                         return;
                     }
                 }
@@ -220,50 +222,52 @@ namespace hpx { namespace lcos
             template <typename Sequence_>
             HPX_FORCEINLINE
             void operator()(Sequence_& sequence,
-                typename boost::disable_if_c<
-                    traits::is_shared_state<Sequence_>::value
+                typename std::enable_if<
+                    !traits::is_shared_state<Sequence_>::value
                 >::type* = 0) const
             {
                 apply(sequence);
             }
 
-            template <typename Sequence_>
+            template <typename Tuple, std::size_t ...Is>
             HPX_FORCEINLINE
-            void apply(Sequence_& sequence,
-                typename boost::enable_if_c<
-                    boost::fusion::traits::is_sequence<Sequence_>::value
-                >::type* = 0) const
+            void apply(Tuple& tuple, util::detail::pack_c<std::size_t, Is...>) const
             {
-                boost::fusion::for_each(sequence, *this);
+                int const _sequencer[]= {
+                    (((*this)(util::get<Is>(tuple))), 0)...
+                };
+                (void)_sequencer;
+            }
+
+            template <typename ...Ts>
+            HPX_FORCEINLINE
+            void apply(util::tuple<Ts...>& sequence) const
+            {
+                apply(sequence,
+                    typename util::detail::make_index_pack<sizeof...(Ts)>::type());
             }
 
             template <typename Sequence_>
             HPX_FORCEINLINE
-            void apply(Sequence_& sequence,
-                typename boost::disable_if_c<
-                    boost::fusion::traits::is_sequence<Sequence_>::value
-                >::type* = 0) const
+            void apply(Sequence_& sequence) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
 
             wait_some<Sequence>& wait_;
-            Callback const& callback_;
         };
 
-        template <typename Sequence, typename Callback>
-        void set_on_completed_callback(wait_some<Sequence>& wait,
-            Callback const& callback)
+        template <typename Sequence>
+        void set_on_completed_callback(wait_some<Sequence>& wait)
         {
-            set_wait_on_completed_callback_impl<Sequence, Callback>
-                set_on_completed_callback_helper(wait, callback);
-            set_on_completed_callback_helper.apply(wait.lazy_values_);
+            set_wait_some_callback_impl<Sequence> callback(wait);
+            callback.apply(wait.lazy_values_);
         }
 
         template <typename Sequence>
         struct wait_some : boost::enable_shared_from_this<wait_some<Sequence> > //-V690
         {
-        private:
+        public:
             void on_future_ready(threads::thread_id_type const& id)
             {
                 if (count_.fetch_add(1) + 1 == needed_count_)
@@ -295,10 +299,7 @@ namespace hpx { namespace lcos
             result_type operator()()
             {
                 // set callback functions to executed wait future is ready
-                set_on_completed_callback(*this,
-                    util::bind(
-                        &wait_some::on_future_ready, this->shared_from_this(),
-                        threads::get_self_id()));
+                set_on_completed_callback(*this);
 
                 // if all of the requested futures are already set, our
                 // callback above has already been called often enough, otherwise
@@ -420,7 +421,8 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    Iterator wait_some_n(std::size_t n, Iterator begin,
+    Iterator
+    wait_some_n(std::size_t n, Iterator begin,
         std::size_t count, error_code& ec = throws)
     {
         typedef
@@ -491,7 +493,7 @@ namespace hpx { namespace lcos
     template <typename... Ts>
     void wait_some(std::size_t n, error_code& ec, Ts&&...ts)
     {
-        typedef hpx::util::tuple<
+        typedef util::tuple<
                 typename traits::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
 
@@ -521,7 +523,7 @@ namespace hpx { namespace lcos
     template <typename... Ts>
     void wait_some(std::size_t n, Ts&&...ts)
     {
-        typedef hpx::util::tuple<
+        typedef util::tuple<
                 typename traits::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
 

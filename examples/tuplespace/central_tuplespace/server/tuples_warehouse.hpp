@@ -14,8 +14,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include <boost/unordered_map.hpp>
 #include <hpx/util/storage/tuple.hpp>

@@ -11,7 +11,7 @@
 namespace hpx { namespace components { namespace stubs
 {
 
-lcos::future<components::memory_block_data> memory_block::get_async(
+lcos::future<components::memory_block_data> memory_block::get_data_async(
     naming::id_type const& targetgid)
 {
     // Create a future, execute the required action,
@@ -21,7 +21,7 @@ lcos::future<components::memory_block_data> memory_block::get_async(
     return hpx::async<action_type>(targetgid);
 }
 
-lcos::future<components::memory_block_data> memory_block::get_async(
+lcos::future<components::memory_block_data> memory_block::get_data_async(
     naming::id_type const& targetgid,
     components::memory_block_data const& cfg)
 {

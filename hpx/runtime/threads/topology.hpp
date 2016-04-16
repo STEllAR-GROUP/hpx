@@ -19,10 +19,11 @@
 #include <boost/variant.hpp>
 #include <boost/dynamic_bitset.hpp>
 
-#include <string>
-#include <vector>
 #include <iosfwd>
 #include <limits>
+#include <string>
+#include <vector>
+
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
             && HPX_HAVE_MAX_CPU_COUNT > 64)
 #include <bitset>

@@ -6,8 +6,8 @@
 #if !defined(HPX_RUNTIME_THREADS_DETAIL_CREATE_THREAD_JAN_13_2013_0439PM)
 #define HPX_RUNTIME_THREADS_DETAIL_CREATE_THREAD_JAN_13_2013_0439PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -40,7 +40,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        if (0 == data.description)
+        if (!data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "threads::detail::create_thread", "description is NULL");

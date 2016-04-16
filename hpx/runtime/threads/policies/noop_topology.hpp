@@ -10,12 +10,12 @@
 #if !defined(HPX_079E367D_741C_4FA1_913F_EA33A192BDAD)
 #define HPX_079E367D_741C_4FA1_913F_EA33A192BDAD
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 #if !defined(HPX_HAVE_HWLOC)
-
+#include <hpx/error_code.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/exception.hpp>
 
 #if defined(__ANDROID__) && defined(ANDROID)
 #include <cpu-features.h>

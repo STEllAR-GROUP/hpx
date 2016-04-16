@@ -14,14 +14,14 @@
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/config.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/mpl/or.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/mpl/or.hpp>
 
 #include <memory>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

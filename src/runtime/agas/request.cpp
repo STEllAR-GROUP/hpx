@@ -6,8 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -15,6 +16,8 @@
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
+
+#include <string>
 
 namespace hpx { namespace agas
 {
@@ -430,6 +433,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_gid_gva_prefix);
         return data->get_data<request_data::subtype_gid_gva_prefix, 1>(ec);
     }
 
@@ -458,28 +462,15 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
-        switch (data->which())
-        {
-            case request_data::subtype_gid_gid_credit:
-                return data->get_data<request_data::subtype_gid_gid_credit, 2>(ec);
-
-            case request_data::subtype_gid_count:
-                return static_cast<boost::int64_t>(
-                    data->get_data<request_data::subtype_gid_count, 1>(ec));
-
-            default: {
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "request::get_credit",
-                    "invalid operation for request type");
-                return 0;
-            }
-        }
+        HPX_ASSERT(data->which() == request_data::subtype_gid_gid_credit);
+        return data->get_data<request_data::subtype_gid_gid_credit, 2>(ec);
     }
 
     components::component_type request::get_component_type(
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_ctype);
         return data->get_data<request_data::subtype_ctype, 0>(ec);
     }
 
@@ -517,6 +508,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_iterate_names_function);
         return data->get_data<request_data::subtype_iterate_names_function, 0>(ec);
     }
 
@@ -524,6 +516,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_iterate_types_function);
         return data->get_data<request_data::subtype_iterate_types_function, 0>(ec);
     }
 
@@ -576,6 +569,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_gid_gid_credit);
         return data->get_data<request_data::subtype_gid_gid_credit, 0>(ec);
     }
 
@@ -583,6 +577,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_gid_gid_credit);
         return data->get_data<request_data::subtype_gid_gid_credit, 1>(ec);
     }
 
@@ -617,6 +612,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_name);
         return data->get_data<request_data::subtype_name, 0>(ec);
     }
 
@@ -624,6 +620,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_locality_count);
         return data->get_data<request_data::subtype_locality_count, 2>(ec);
     }
 
@@ -631,6 +628,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_locality_count);
         return data->get_data<request_data::subtype_locality_count, 3>(ec);
     }
 
@@ -638,6 +636,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_name_evt_id);
         return data->get_data<request_data::subtype_name_evt_id, 1>(ec);
     }
 
@@ -645,6 +644,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_name_evt_id);
         return data->get_data<request_data::subtype_name_evt_id, 2>(ec);
     }
 
@@ -652,6 +652,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
+        HPX_ASSERT(data->which() == request_data::subtype_name_evt_id);
         return data->get_data<request_data::subtype_name_evt_id, 3>(ec);
     }
 

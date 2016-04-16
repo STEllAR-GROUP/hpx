@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,12 +6,14 @@
 #if !defined(HPX_PARALLEL_UTIL_DETAIL_HANDLE_LOCAL_EXCEPTIONS_OCT_03_2014_0142PM)
 #define HPX_PARALLEL_UTIL_DETAIL_HANDLE_LOCAL_EXCEPTIONS_OCT_03_2014_0142PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/hpx_finalize.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
+#include <list>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

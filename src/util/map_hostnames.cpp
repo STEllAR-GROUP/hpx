@@ -8,8 +8,8 @@
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/asio_util.hpp>
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>

@@ -11,6 +11,9 @@
 #include <boost/range/functions.hpp>
 #include <boost/atomic.hpp>
 
+#include <string>
+#include <vector>
+
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,11 +98,13 @@ void test_for_each_n_exception()
     test_for_each_n_exception_async(seq(task), IteratorTag(), Proj());
     test_for_each_n_exception_async(par(task), IteratorTag(), Proj());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_n_exception(execution_policy(seq), IteratorTag(), Proj());
     test_for_each_n_exception(execution_policy(par), IteratorTag(), Proj());
 
     test_for_each_n_exception(execution_policy(seq(task)), IteratorTag(), Proj());
     test_for_each_n_exception(execution_policy(par(task)), IteratorTag(), Proj());
+#endif
 }
 
 template <typename Proj>
@@ -151,7 +156,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

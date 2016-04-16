@@ -9,6 +9,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 boost::int32_t increment(boost::int32_t i)
 {
@@ -85,16 +87,6 @@ void test_remote_async_cb(hpx::id_type const& target)
         HPX_TEST_EQ(callback_called.load(), 2);
     }
 
-//     {
-//         increment_action inc;
-//
-//         callback_called.store(0);
-//         hpx::future<boost::int32_t> f1 =
-//             hpx::async_cb(hpx::util::bind(inc, target, 42), &cb);
-//         HPX_TEST_EQ(f1.get(), 43);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//     }
-
     {
         callback_called.store(0);
         hpx::future<boost::int32_t> f1 =
@@ -127,35 +119,6 @@ void test_remote_async_cb(hpx::id_type const& target)
         HPX_TEST_EQ(f2.get(), 41);
         HPX_TEST_EQ(callback_called.load(), 1);
     }
-
-//     {
-//         hpx::future<hpx::id_type> dec_f =
-//             hpx::components::new_<decrement_server>(target);
-//         hpx::id_type dec = dec_f.get();
-//
-//         call_action call;
-//
-//         callback_called.store(0);
-//         hpx::future<boost::int32_t> f1 =
-//             hpx::async_cb(hpx::util::bind(call, dec, 42), &cb);
-//         HPX_TEST_EQ(f1.get(), 41);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//
-//         using hpx::util::placeholders::_1;
-//         using hpx::util::placeholders::_2;
-//
-//         callback_called.store(0);
-//         hpx::future<boost::int32_t> f2 =
-//             hpx::async_cb(hpx::util::bind(call, _1, 42), dec, &cb);
-//         HPX_TEST_EQ(f2.get(), 41);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-
-//         callback_called.store(0);
-//         hpx::future<boost::int32_t> f3 =
-//             hpx::async_cb(hpx::util::bind(call, _1, _2), dec, &cb, 42);
-//         HPX_TEST_EQ(f3.get(), 41);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//     }
 
     {
         hpx::future<hpx::id_type> dec_f =

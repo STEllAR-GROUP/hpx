@@ -9,22 +9,22 @@
 #define HPX_UTIL_DETAIL_BASIC_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/get_table.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/mpl/bool.hpp>
 
+#include <cstring>
+#include <string>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
-#include <cstring>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -120,13 +120,20 @@ namespace hpx { namespace util { namespace detail
     template <typename VTablePtr, typename R, typename ...Ts>
     class function_base<VTablePtr, R(Ts...)>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(function_base)
+        HPX_MOVABLE_ONLY(function_base);
 
-        static VTablePtr const empty_table;
+        // make sure the empty table instance is initialized in time, even
+        // during early startup
+        static VTablePtr const* get_empty_table()
+        {
+            static VTablePtr const empty_table =
+                detail::construct_vtable<detail::empty_function<R(Ts...)> >();
+            return &empty_table;
+        }
 
     public:
         function_base() HPX_NOEXCEPT
-          : vptr(&empty_table)
+          : vptr(get_empty_table())
         {
             std::memset(object, 0, vtable::function_storage_size);
             vtable::default_construct<empty_function<R(Ts...)> >(object);
@@ -137,7 +144,7 @@ namespace hpx { namespace util { namespace detail
         {
             // move-construct
             std::memcpy(object, other.object, vtable::function_storage_size);
-            other.vptr = &empty_table;
+            other.vptr = get_empty_table();
             vtable::default_construct<empty_function<R(Ts...)> >(other.object);
         }
 
@@ -185,7 +192,7 @@ namespace hpx { namespace util { namespace detail
             {
                 vptr->delete_(object);
 
-                vptr = &empty_table;
+                vptr = get_empty_table();
                 vtable::default_construct<empty_function<R(Ts...)> >(object);
             }
         }
@@ -256,6 +263,11 @@ namespace hpx { namespace util { namespace detail
             return vptr->invoke(object, std::forward<Ts>(vs)...);
         }
 
+        std::size_t get_function_address() const
+        {
+            return vptr->get_function_address(object);
+        }
+
     private:
         template <typename T>
         static VTablePtr const* get_table_ptr() HPX_NOEXCEPT
@@ -267,10 +279,6 @@ namespace hpx { namespace util { namespace detail
         VTablePtr const *vptr;
         mutable void* object[vtable::function_storage_size];
     };
-
-    template <typename VTablePtr, typename R, typename ...Ts>
-    VTablePtr const function_base<VTablePtr, R(Ts...)>::empty_table =
-        detail::construct_vtable<detail::empty_function<R(Ts...)> >();
 
     template <typename Sig, typename VTablePtr>
     static bool is_empty_function(function_base<VTablePtr, Sig> const& f) HPX_NOEXCEPT
@@ -289,7 +297,7 @@ namespace hpx { namespace util { namespace detail
           , R(Ts...)
         >
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function)
+        HPX_MOVABLE_ONLY(basic_function);
 
         typedef serializable_function_vtable_ptr<VTablePtr> vtable_ptr;
         typedef function_base<vtable_ptr, R(Ts...)> base_type;
@@ -350,7 +358,7 @@ namespace hpx { namespace util { namespace detail
     class basic_function<VTablePtr, R(Ts...), false>
       : public function_base<VTablePtr, R(Ts...)>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function)
+        HPX_MOVABLE_ONLY(basic_function);
 
         typedef function_base<VTablePtr, R(Ts...)> base_type;
 

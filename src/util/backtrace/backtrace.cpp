@@ -16,7 +16,6 @@
 #include <hpx/async.hpp>
 
 #include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <hpx/util/backtrace/backtrace.hpp>
 
@@ -48,11 +47,13 @@
 #include <unwind.h>
 #include <boost/cstdint.hpp>
 #endif
-#include <string.h>
-#include <stdlib.h>
+#include <iomanip>
 #include <ostream>
 #include <sstream>
-#include <iomanip>
+#include <string>
+#include <vector>
+#include <string.h>
+#include <stdlib.h>
 
 #if defined(HPX_MSVC)
 #include <windows.h>
@@ -64,10 +65,9 @@
 
 namespace hpx { namespace util {
 
-    namespace stack_trace {
-#if defined(BOOST_HAVE_EXECINFO) && defined(BOOST_HAVE_UNWIND) && \
-        defined(BOOST_HAVE_EXECINFO)
-
+    namespace stack_trace
+    {
+#if defined(BOOST_HAVE_EXECINFO) && defined(BOOST_HAVE_UNWIND)
         struct trace_data
         {
             trace_data(void **array,std::size_t size)
@@ -198,7 +198,7 @@ namespace hpx { namespace util {
         HPX_API_EXPORT std::string get_symbols(void *const *addresses,
             std::size_t size)
         {
-            std::string res = boost::lexical_cast<std::string>(size)
+            std::string res = std::to_string(size)
                 + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
@@ -248,7 +248,7 @@ namespace hpx { namespace util {
             try {
                 if(ptr==0)
                     return std::string();
-                std::string res = boost::lexical_cast<std::string>(size)
+                std::string res = std::to_string(size)
                     + ((1==size)?" frame:":" frames:");
                 for(std::size_t i=0;i<size;i++) {
                     res+='\n';
@@ -336,7 +336,7 @@ namespace hpx { namespace util {
         HPX_API_EXPORT std::string get_symbols(void *const *addresses,
             std::size_t size)
         {
-            std::string res = boost::lexical_cast<std::string>(size)
+            std::string res = std::to_string(size)
                 + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);

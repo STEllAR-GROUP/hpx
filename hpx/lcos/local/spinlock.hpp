@@ -13,19 +13,18 @@
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #endif
-#include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
-#include <boost/thread/locks.hpp>
-
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
+#  if !defined( BOOST_SP_HAS_SYNC )
+#    include <boost/detail/interlocked.hpp>
+#  endif
 #else
 #  if !defined(__ANDROID__) && !defined(ANDROID)
 #    include <boost/smart_ptr/detail/spinlock_sync.hpp>
@@ -46,6 +45,9 @@ namespace hpx { namespace lcos { namespace local
     /// boost::mutex-compatible spinlock class
     struct spinlock
     {
+    private:
+        HPX_NON_COPYABLE(spinlock);
+
     private:
 #if defined(__ANDROID__) && defined(ANDROID)
         int v_;
@@ -128,8 +130,6 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, desc, "");
         }
 
-        HPX_NON_COPYABLE(spinlock)
-
         ~spinlock()
         {
             HPX_ITT_SYNC_DESTROY(this);
@@ -196,10 +196,6 @@ namespace hpx { namespace lcos { namespace local
             __sync_lock_release(&v_);
 #endif
         }
-
-    public:
-        typedef boost::unique_lock<spinlock> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
     };
 }}}
 

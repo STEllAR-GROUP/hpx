@@ -20,6 +20,8 @@
 #include <hpx/include/parallel_algorithm.hpp>
 #include <boost/range/irange.hpp>
 
+#include <vector>
+
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +75,7 @@ private:
     std::unique_ptr<double[]> data_;
     std::size_t size_;
 
-    HPX_MOVABLE_BUT_NOT_COPYABLE(partition_data);
+    HPX_MOVABLE_ONLY(partition_data);
 };
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)

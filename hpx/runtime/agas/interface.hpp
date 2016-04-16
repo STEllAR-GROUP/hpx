@@ -19,10 +19,15 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace agas
 {
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT bool is_console();
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT bool register_name_sync(

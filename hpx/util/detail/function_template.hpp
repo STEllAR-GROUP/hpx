@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2016 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/copyable_vtable.hpp>
@@ -25,6 +26,7 @@ namespace hpx { namespace util { namespace detail
     struct function_vtable_ptr
     {
         typename callable_vtable<Sig>::invoke_t invoke;
+        typename callable_vtable<Sig>::get_function_address_t get_function_address;
         copyable_vtable::copy_t copy;
         vtable::get_type_t get_type;
         vtable::destruct_t destruct;
@@ -34,6 +36,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         function_vtable_ptr(construct_vtable<T>) HPX_NOEXCEPT
           : invoke(&callable_vtable<Sig>::template invoke<T>)
+          , get_function_address(&callable_vtable<Sig>::template get_function_address<T>)
           , copy(&copyable_vtable::template copy<T>)
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)
@@ -233,6 +236,32 @@ namespace hpx { namespace util
         return f.empty();
     }
 
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    template <typename Sig, bool Serializable>
+    struct get_function_address<util::function<Sig, Serializable> >
+    {
+        static std::size_t
+            call(util::function<Sig, Serializable> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
+
+#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
+    template <typename Sig>
+    struct get_function_address<util::function_nonser<Sig> >
+    {
+        static std::size_t
+            call(util::function_nonser<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
 #   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 

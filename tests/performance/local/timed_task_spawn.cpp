@@ -13,6 +13,8 @@
 #include <hpx/hpx.hpp>
 
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
@@ -357,7 +359,7 @@ int hpx_main(
 
         ///////////////////////////////////////////////////////////////////////
         boost::uint64_t tasks_per_feeder = 0;
-        boost::uint64_t total_tasks = 0;
+        //boost::uint64_t total_tasks = 0;
         boost::uint64_t suspended_tasks_per_feeder = 0;
         boost::uint64_t total_suspended_tasks = 0;
 

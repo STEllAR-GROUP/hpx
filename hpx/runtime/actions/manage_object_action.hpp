@@ -8,17 +8,17 @@
 #define HPX_RUNTIME_ACTIONS_MANAGE_OBJECT_ACTION_JAN_26_2010_0141PM
 
 #include <hpx/config.hpp>
-
-#include <cstring>
-#include <boost/cstdint.hpp>
-
-#include <hpx/config/warnings_prefix.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+
+#include <boost/cstdint.hpp>
+
+#include <cstring>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions

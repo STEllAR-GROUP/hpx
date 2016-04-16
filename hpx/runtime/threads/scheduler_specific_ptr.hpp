@@ -12,9 +12,8 @@
 #define HPX_RUNTIME_THREADS_SCHEDULER_TSS_AUG_08_2015_0733PM
 
 #include <hpx/config.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/util/coroutine/detail/tss.hpp>
+#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -26,7 +25,7 @@ namespace hpx { namespace threads
     {
         HPX_API_EXPORT void set_tss_data(void const* key,
             boost::shared_ptr<
-                util::coroutines::detail::tss_cleanup_function
+                coroutines::detail::tss_cleanup_function
             > const& func,
             void* tss_data, bool cleanup_existing);
         HPX_API_EXPORT void* get_tss_data(void const* key);
@@ -39,7 +38,7 @@ namespace hpx { namespace threads
     private:
         HPX_NON_COPYABLE(scheduler_specific_ptr);
 
-        struct delete_data : util::coroutines::detail::tss_cleanup_function
+        struct delete_data : coroutines::detail::tss_cleanup_function
         {
             void operator()(void* data)
             {
@@ -48,7 +47,7 @@ namespace hpx { namespace threads
         };
 
         struct run_custom_cleanup_function
-          : util::coroutines::detail::tss_cleanup_function
+          : coroutines::detail::tss_cleanup_function
         {
             void (*cleanup_function)(T*);
 
@@ -62,7 +61,7 @@ namespace hpx { namespace threads
             }
         };
 
-        boost::shared_ptr<util::coroutines::detail::tss_cleanup_function> cleanup;
+        boost::shared_ptr<coroutines::detail::tss_cleanup_function> cleanup;
 
     public:
         typedef T element_type;
@@ -83,7 +82,7 @@ namespace hpx { namespace threads
             if (get_self_ptr())
             {
                 detail::set_tss_data(this,
-                    boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>(),
+                    boost::shared_ptr<coroutines::detail::tss_cleanup_function>(),
                     0, true);
             }
         }
@@ -105,7 +104,7 @@ namespace hpx { namespace threads
         {
             T* const temp = get();
             detail::set_tss_data(this,
-                boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>(),
+                boost::shared_ptr<coroutines::detail::tss_cleanup_function>(),
                 0, false);
             return temp;
         }

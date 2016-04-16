@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM)
 #define HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 
 #include <iterator>
@@ -24,8 +24,8 @@ namespace hpx { namespace parallel { namespace util
         struct loop
         {
             ///////////////////////////////////////////////////////////////////
-            template <typename Iter, typename F>
-            static Iter call(Iter it, Iter end, F && f)
+            template <typename Begin, typename End, typename F>
+            static Begin call(Begin it, End end, F && f)
             {
                 for (/**/; it != end; ++it)
                     f(it);
@@ -33,8 +33,9 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
 
-            template <typename Iter, typename CancelToken, typename F>
-            static Iter call(Iter it, Iter end, CancelToken& tok, F && func)
+            template <typename Begin, typename End, typename CancelToken,
+                typename F>
+            static Begin call(Begin it, End end, CancelToken& tok, F && func)
             {
                 for (/**/; it != end; ++it)
                 {
@@ -48,19 +49,19 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename F>
-    HPX_FORCEINLINE Iter
-    loop(Iter begin, Iter end, F && f)
+    template <typename Begin, typename End, typename F>
+    HPX_FORCEINLINE Begin
+    loop(Begin begin, End end, F && f)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        typedef typename std::iterator_traits<Begin>::iterator_category cat;
         return detail::loop<cat>::call(begin, end, std::forward<F>(f));
     }
 
-    template <typename Iter, typename CancelToken, typename F>
-    HPX_FORCEINLINE Iter
-    loop(Iter begin, Iter end, CancelToken& tok, F && f)
+    template <typename Begin, typename End, typename CancelToken, typename F>
+    HPX_FORCEINLINE Begin
+    loop(Begin begin, End end, CancelToken& tok, F && f)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        typedef typename std::iterator_traits<Begin>::iterator_category cat;
         return detail::loop<cat>::call(begin, end, tok, std::forward<F>(f));
     };
 

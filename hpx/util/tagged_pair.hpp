@@ -10,7 +10,6 @@
 #define HPX_UTIL_TAGGED_PAIR_DEC_23_2015_1014AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tagged.hpp>
 #include <hpx/util/tuple.hpp>

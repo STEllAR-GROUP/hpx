@@ -18,7 +18,7 @@ Counter to provide the data. When a consumer queries performance data, the
 __hpx__ runtime system calls the provider to collect the data. The runtime
 system uses an internal registry to determine which provider to call.
 
-Generally, there two ways of exposing yur own Performance Counter data: a
+Generally, there two ways of exposing your own Performance Counter data: a
 simple, function based way and a more complex, but more powerful way of
 implementing a full Performance Counter. Both alternatives are described in
 the following sections.
@@ -50,7 +50,7 @@ For instance, here is such a function returning how often it was invoked:
     }
 
 This example function exposes a linearly increasing value as our performance
-data. The value is incrememnted on each invocation, e.g. each time a consumer
+data. The value is incremented on each invocation, e.g. each time a consumer
 requests the counter data of this Performance Counter.
 
 The next step in exposing this counter to the runtime system is to register
@@ -78,7 +78,7 @@ any consumer instantiates and queries an instance of this counter type.
 
 Now it is possible to instantiate a new counter instance based on
 the naming scheme `"/test{locality#*/total}/data"`, where '`*`' is a zero
-based integer index indentifying the locality for which the counter instance
+based integer index identifying the locality for which the counter instance
 should be accessed. The function [funcref hpx::performance_counters::install_counter_type `install_counter_type`]
 enables to instantiate exactly one counter instance for each locality. Repeated
 requests to instantiate such a counter will return the same instance, e.g. the
@@ -113,7 +113,7 @@ for a full example demonstrating this functionality.
 
 [section:full_counters Implementing a Full Performance Counter]
 
-Somtimes, the simple way of exposing a single value as a Performance Counter is
+Sometimes, the simple way of exposing a single value as a Performance Counter is
 not sufficient. For that reason, __hpx__ provides a means of implementing full
 Performance Counters which support:
 

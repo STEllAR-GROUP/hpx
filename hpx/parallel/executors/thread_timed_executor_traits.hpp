@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_THREAD_TIMED_EXECUTOR_TRAITS_AUG_07_2015_0328PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -120,15 +119,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \returns f()'s result through a future
         ///
         template <typename F>
-        static hpx::future<typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type>
+        static hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute_at(executor_type& sched,
                 hpx::util::steady_time_point const& abs_time, F && f)
         {
-            typedef typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type result_type;
+            typedef typename hpx::util::result_of<F()>::type result_type;
 
             lcos::local::packaged_task<result_type()> task(std::forward<F>(f));
             hpx::future<result_type> result = task.get_future();
@@ -152,15 +147,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \returns f()'s result through a future
         ///
         template <typename F>
-        static hpx::future<typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type>
+        static hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute_after(executor_type& sched,
                 hpx::util::steady_duration const& rel_time, F && f)
         {
-            typedef typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type result_type;
+            typedef typename hpx::util::result_of<F()>::type result_type;
 
             lcos::local::packaged_task<result_type()> task(std::forward<F>(f));
             hpx::future<result_type> result = task.get_future();
@@ -185,9 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \returns f()'s result
         ///
         template <typename F>
-        static typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
+        static typename hpx::util::result_of<F()>::type
         execute_at(executor_type& sched,
                 hpx::util::steady_time_point const& abs_time, F && f)
         {
@@ -211,9 +200,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \returns f()'s result
         ///
         template <typename F>
-        static typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
+        static typename hpx::util::result_of<F()>::type
         execute_after(executor_type& sched,
                 hpx::util::steady_duration const& rel_time, F && f)
         {

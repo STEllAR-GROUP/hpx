@@ -7,8 +7,8 @@
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_21_2008_0159PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
@@ -19,7 +19,6 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -40,8 +39,10 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     /// \brief The memory_block_header holds all information needed to describe
     ///        a block of memory managed by a server#memory_block component.
-    class memory_block_header : boost::noncopyable //-V690
+    class memory_block_header //-V690
     {
+        HPX_DELETE_COPY_CTOR(memory_block_header);
+
     public:
         /// This constructor is called on the locality where there memory_block
         /// is hosted
@@ -439,8 +440,10 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     ///
-    class memory_block : boost::noncopyable
+    class memory_block
     {
+        HPX_NON_COPYABLE(memory_block);
+
     public:
         typedef detail::memory_block_header wrapped_type;
         typedef memory_block type_holder;

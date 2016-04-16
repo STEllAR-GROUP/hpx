@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -36,21 +36,7 @@ namespace hpx { namespace lcos { namespace local
     ///         synchronize a given number of \a threads.
     class latch
     {
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-    public:
-        latch (latch const&) = delete;
-        latch (latch&&) = delete;
-
-        latch& operator= (latch const&) = delete;
-        latch& operator= (latch&&) = delete;
-#else
-    private:
-        latch (latch const&);
-        latch (latch&&);
-
-        latch& operator= (latch const&);
-        latch& operator= (latch&&);
-#endif
+        HPX_NON_COPYABLE(latch);
 
     private:
         typedef lcos::local::spinlock mutex_type;
@@ -78,7 +64,7 @@ namespace hpx { namespace lcos { namespace local
         ///       destructor. This may require additional coordination.
         ~latch ()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ == 0);
         }
 
@@ -94,13 +80,13 @@ namespace hpx { namespace lcos { namespace local
         ///
         void count_down_and_wait()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ > 0);
 
             if (--counter_ == 0)
                 cond_.notify_all(std::move(l));    // release the threads
             else
-                cond_.wait(l, "hpx::local::latch::count_down_and_wait");
+                cond_.wait(std::move(l), "hpx::local::latch::count_down_and_wait");
         }
 
         /// Decrements counter_ by n. Does not block.
@@ -116,7 +102,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT(n >= 0);
 
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ >= n);
 
             if ((counter_ -= n) == 0)
@@ -129,7 +115,7 @@ namespace hpx { namespace lcos { namespace local
         ///
         bool is_ready() const HPX_NOEXCEPT
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return counter_ == 0;
         }
 
@@ -141,14 +127,14 @@ namespace hpx { namespace lcos { namespace local
         ///
         void wait() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (counter_ > 0)
-                cond_.wait(l, "hpx::local::latch::wait");
+                cond_.wait(std::move(l), "hpx::local::latch::wait");
         }
 
         void abort_all()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             cond_.abort_all(std::move(l));
         }
 

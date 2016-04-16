@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#include <hpx/exception.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/format.hpp>
-#include <boost/noncopyable.hpp>
 
 #include "certificate.hpp"
 #include "public_key.hpp"
@@ -23,8 +23,10 @@
 
 namespace hpx { namespace components { namespace security
 {
-    class certificate_store : private boost::noncopyable
+    class certificate_store
     {
+        HPX_NON_COPYABLE(certificate_store);
+
         typedef std::map<
             naming::gid_type, signed_type<certificate>
         > store_type;

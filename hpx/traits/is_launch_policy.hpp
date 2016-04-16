@@ -16,13 +16,18 @@
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/mpl/or.hpp>
 
+namespace hpx { namespace threads
+{
+    class executor;
+}}
+
 namespace hpx { namespace traits
 {
     namespace detail
     {
         template <typename Policy>
         struct is_launch_policy
-          : boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
+          : boost::is_same<launch, Policy>
         {};
 
         template <typename Policy>

@@ -27,9 +27,11 @@
 #endif
 
 #include <boost/smart_ptr/scoped_ptr.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -95,7 +97,7 @@ namespace hpx
         /// \brief Manage list of functions to call on exit
         void on_exit(util::function_nonser<void()> const& f)
         {
-            boost::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<boost::mutex> l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -112,7 +114,7 @@ namespace hpx
 
             typedef util::function_nonser<void()> value_type;
 
-            boost::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<boost::mutex> l(mtx_);
             for (value_type const& f : on_exit_functions_)
                 f();
         }
@@ -154,20 +156,10 @@ namespace hpx
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry();
-        /*
-        {
-            return *counters_;
-        }
-        */
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
         performance_counters::registry const& get_counter_registry() const;
-        /*
-        {
-            return *counters_;
-        }
-        */
 
         /// \brief Return a reference to the internal PAPI thread manager
         util::thread_mapper& get_thread_mapper();
@@ -324,6 +316,8 @@ namespace hpx
         // stop periodic evaluation of counters during shutdown
         void stop_evaluating_counters();
 
+        void register_message_handler(char const* message_handler_type,
+            char const* action, error_code& ec = throws);
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
@@ -434,7 +428,7 @@ namespace hpx {
     bool runtime::verify_parcel_suffix(Buffer const& data,
         naming::gid_type& parcel_id, error_code& ec) const
     {
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         return components::security::verify(*cert_store(ec), data, parcel_id);
     }
 }

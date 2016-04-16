@@ -14,6 +14,9 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <string>
+#include <vector>
+
 #include "worker_timed.hpp"
 
 char const* benchmark_name = "Context Switching Overhead - HPX";

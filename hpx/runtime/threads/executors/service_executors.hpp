@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,12 +7,13 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_SERVICE_EXECUTOR_JAN_13_2013_0222PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -24,13 +25,15 @@ namespace hpx { namespace threads { namespace executors
           : public threads::detail::scheduled_executor_base
         {
         public:
-            service_executor(char const* pool_name, char const* pool_name_suffix = "");
+            service_executor(char const* pool_name,
+                char const* pool_name_suffix = "");
             ~service_executor();
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            void add(closure_type && f, char const* description,
+            void add(closure_type && f,
+                util::thread_description const& description,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec);
 
@@ -39,7 +42,7 @@ namespace hpx { namespace threads { namespace executors
             // bounds on the executor's queue size.
             void add_at(
                 boost::chrono::steady_clock::time_point const& abs_time,
-                closure_type && f, char const* description,
+                closure_type && f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Schedule given function for execution in this executor no sooner
@@ -47,7 +50,7 @@ namespace hpx { namespace threads { namespace executors
             // violate bounds on the executor's queue size.
             void add_after(
                 boost::chrono::steady_clock::duration const& rel_time,
-                closure_type && f, char const* description,
+                closure_type && f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
@@ -74,7 +77,7 @@ namespace hpx { namespace threads { namespace executors
     ///
     /// This enum type allows to specify the kind of the HPX thread pool to use
     /// for a given \a service_executor.
-    BOOST_SCOPED_ENUM_START(service_executor_type)
+    enum class service_executor_type
     {
         io_thread_pool,        ///< Selects creating a service executor using
                                ///< the I/O pool of threads
@@ -85,13 +88,12 @@ namespace hpx { namespace threads { namespace executors
         main_thread            ///< Selects creating a service executor using
                                ///< the main thread
     };
-    BOOST_SCOPED_ENUM_END
 
     namespace detail
     {
         /// \cond NOINTERNAL
         inline threads::detail::scheduled_executor_base*
-        get_service_executor(BOOST_SCOPED_ENUM(service_executor_type) t,
+        get_service_executor(service_executor_type t,
             char const* name_suffix = "")
         {
             switch(t)
@@ -126,7 +128,7 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     struct service_executor : public scheduled_executor
     {
-        service_executor(BOOST_SCOPED_ENUM(service_executor_type) t,
+        service_executor(service_executor_type t,
                 char const* name_suffix = "")
           : scheduled_executor(detail::get_service_executor(t, name_suffix))
         {}

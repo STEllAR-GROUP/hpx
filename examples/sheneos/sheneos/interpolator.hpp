@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+#include <string>
 #include <vector>
 
 #include "stubs/partition3d.hpp"

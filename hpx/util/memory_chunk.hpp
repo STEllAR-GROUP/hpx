@@ -9,7 +9,17 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
+// include unist.d conditionally to check for POSIX version. Not all OSs have the
+// unistd header...
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
+#if defined(_POSIX_VERSION)
+#include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
+#endif
+
+#include <mutex>
 
 namespace hpx { namespace util
 {
@@ -78,7 +88,7 @@ namespace hpx { namespace util
 
         bool full() const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked();
             if(allocated_ == chunk_size_)
             {
@@ -89,7 +99,7 @@ namespace hpx { namespace util
 
         bool contains(char * p) const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return contains_locked(p);
         }
 
@@ -106,7 +116,7 @@ namespace hpx { namespace util
         void check_invariants(char * p = 0, std::size_t size = 0) const
         {
 #ifdef HPX_DEBUG
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked(p, size);
 #endif
         }
@@ -143,7 +153,7 @@ namespace hpx { namespace util
 
         char *allocate(size_type size)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked();
 
             if(!data_) charge();
@@ -194,7 +204,7 @@ namespace hpx { namespace util
 
         bool deallocate(char * p, size_type size)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(data_);
             if(!contains_locked(p))
                 return false;

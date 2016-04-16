@@ -6,9 +6,9 @@
 #ifndef HISTOGRAM_HPP
 #define HISTOGRAM_HPP
 
-#include <vector>
-#include <limits>
 #include <functional>
+#include <limits>
+#include <vector>
 #include <boost/version.hpp>
 #include <boost/range.hpp>
 #include <boost/parameter/keyword.hpp>
@@ -90,7 +90,7 @@ namespace impl
         template <typename Args>
         void operator ()(Args const &args)
         {
-            std::size_t cnt = count(args);
+            //std::size_t cnt = count(args);
             {
                 if (args[sample] < this->bin_positions[1])
                 {

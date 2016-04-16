@@ -8,8 +8,8 @@
 #if !defined(HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM)
 #define HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>

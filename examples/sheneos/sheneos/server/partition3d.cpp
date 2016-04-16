@@ -10,6 +10,8 @@
 
 #include <cmath>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <boost/move/move.hpp>
 
@@ -266,7 +268,7 @@ namespace sheneos { namespace server
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "partition3d::interpolate_one",
                 "requested to interpolate more than one physical value: " +
-                boost::lexical_cast<std::string>(eosvalue));
+                std::to_string(eosvalue));
         }
 
         // Calculate all required values.
@@ -321,7 +323,7 @@ namespace sheneos { namespace server
 
         HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition3d::interpolate_one",
             "requested to interpolate unknown physical value: " +
-            boost::lexical_cast<std::string>(eosvalue));
+            std::to_string(eosvalue));
 
         return 0;
     }

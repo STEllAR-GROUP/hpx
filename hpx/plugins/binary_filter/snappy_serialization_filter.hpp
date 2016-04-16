@@ -16,6 +16,7 @@
 #include <boost/iostreams/filter/zlib.hpp>
 
 #include <memory>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

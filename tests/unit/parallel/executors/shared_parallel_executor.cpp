@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,8 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <string>
+#include <type_traits>
 #include <vector>
 
 #include <boost/range/functions.hpp>
@@ -25,9 +27,7 @@ struct shared_parallel_executor
     };
 
     template <typename F>
-    hpx::shared_future<typename hpx::util::result_of<
-        typename hpx::util::decay<F>::type()
-    >::type>
+    hpx::shared_future<typename hpx::util::result_of<F()>::type>
     async_execute(F && f)
     {
         return hpx::async(std::forward<F>(f));
@@ -102,12 +102,38 @@ void test_bulk_async()
     hpx::when_all(futs).get();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void void_test() {}
+
+void test_sync_void()
+{
+    typedef shared_parallel_executor executor;
+    typedef hpx::parallel::executor_traits<executor> traits;
+
+    executor exec;
+    traits::execute(exec, &void_test);
+}
+
+void test_async_void()
+{
+    typedef shared_parallel_executor executor;
+    typedef hpx::parallel::executor_traits<executor> traits;
+
+    executor exec;
+    hpx::shared_future<void> fut = traits::async_execute(exec, &void_test);
+    fut.get();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
     test_sync();
     test_async();
     test_bulk_sync();
     test_bulk_async();
+
+    test_sync_void();
+    test_async_void();
 
     return hpx::finalize();
 }
@@ -117,7 +143,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

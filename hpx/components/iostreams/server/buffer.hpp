@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,15 +6,19 @@
 #if !defined(HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM)
 #define HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/spinlock.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+
+#include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/swap.hpp>
 
+#include <iosfwd>
+#include <utility>
+#include <mutex>
 #include <vector>
 
 namespace hpx { namespace iostreams { namespace detail
@@ -59,13 +63,13 @@ namespace hpx { namespace iostreams { namespace detail
 
         bool empty() const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return !data_.get() || data_->empty();
         }
 
         buffer init()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
 
             buffer b;
             boost::swap(b.data_, data_);
@@ -75,7 +79,7 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Char>
         std::streamsize write(Char const* s, std::streamsize n)
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             std::copy(s, s + n, std::back_inserter(*data_));
             return n;
         }
@@ -83,14 +87,14 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Mutex>
         void write(write_function_type const& f, Mutex& mtx)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (data_.get() && !data_->empty())
             {
                 boost::shared_ptr<std::vector<char> > data(data_);
                 data_.reset();
                 l.unlock();
 
-                boost::lock_guard<Mutex> ll(mtx);
+                std::lock_guard<Mutex> ll(mtx);
                 f(*data);
             }
         }
@@ -101,9 +105,9 @@ namespace hpx { namespace iostreams { namespace detail
     private:
         friend class hpx::serialization::access;
 
-        HPX_COMPONENT_EXPORT void save(
+        HPX_IOSTREAMS_EXPORT void save(
             serialization::output_archive& ar, unsigned) const;
-        HPX_COMPONENT_EXPORT void load(
+        HPX_IOSTREAMS_EXPORT void load(
             serialization::input_archive& ar, unsigned);
 
         HPX_SERIALIZATION_SPLIT_MEMBER();

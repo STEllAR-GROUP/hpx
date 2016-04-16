@@ -7,7 +7,7 @@
 #define HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -18,10 +18,13 @@
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_guard.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/if.hpp>
+#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
+
 #include <boost/preprocessor/cat.hpp>
-#include <boost/type_traits/is_same.hpp>
+
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace lcos
 {
@@ -35,8 +38,8 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class base_lco_with_value : public base_lco
     {
-        typedef typename boost::mpl::if_<
-            boost::is_same<void, Result>, util::unused_type, Result
+        typedef typename std::conditional<
+            std::is_void<Result>::value, util::unused_type, Result
         >::type result_type;
 
     protected:
@@ -162,9 +165,6 @@ namespace hpx { namespace traits
     HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(                                \
         Value                                                                   \
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(                                 \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE(Value, Name)                           \
@@ -177,6 +177,9 @@ namespace hpx { namespace traits
     HPX_REGISTER_TYPED_CONTINUATION(                                            \
         Value                                                                   \
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
+    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(                                 \
+        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
+        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(                                    \

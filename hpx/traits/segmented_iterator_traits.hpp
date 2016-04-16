@@ -59,6 +59,11 @@ namespace hpx { namespace traits
         }
     };
 
+    template <typename Iterator, typename Enable>
+    struct is_segmented_local_iterator
+      : segmented_local_iterator_traits<Iterator>::is_segmented_local_iterator
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>
     struct projected_iterator

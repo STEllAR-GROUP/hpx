@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations.hpp>
@@ -25,8 +26,8 @@
 #include <hpx/lcos/future.hpp>
 
 #include <algorithm>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 namespace hpx { namespace components
 {
@@ -150,7 +151,7 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async(BOOST_SCOPED_ENUM(launch) policy, Ts&&... vs) const
+        async(launch policy, Ts&&... vs) const
         {
             if (!id_)
             {
@@ -169,7 +170,7 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async_cb(BOOST_SCOPED_ENUM(launch) policy, Callback&& cb, Ts&&... vs) const
+        async_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
             {

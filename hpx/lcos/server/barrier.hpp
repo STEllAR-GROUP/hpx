@@ -6,8 +6,8 @@
 #if !defined(HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM)
 #define HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -16,7 +16,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
@@ -69,9 +69,9 @@ namespace hpx { namespace lcos { namespace server
         /// entered this function.
         void set_event()
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (cond_.size(l) < number_of_threads_-1) {
-                cond_.wait(l, "barrier::set_event");
+                cond_.wait(std::move(l), "barrier::set_event");
             }
             else {
                 cond_.notify_all(std::move(l));
@@ -88,7 +88,7 @@ namespace hpx { namespace lcos { namespace server
         void set_exception(boost::exception_ptr const& e)
         {
             try {
-                boost::unique_lock<mutex_type> l(mtx_);
+                std::unique_lock<mutex_type> l(mtx_);
                 cond_.abort_all(std::move(l));
 
                 boost::rethrow_exception(e);

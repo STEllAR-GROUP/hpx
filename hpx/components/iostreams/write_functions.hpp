@@ -12,12 +12,12 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/ref.hpp>
-
-#include <ostream>
-#include <iterator>
 #include <algorithm>
 #include <deque>
+#include <iterator>
+#include <ostream>
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace iostreams
 {
@@ -51,7 +51,7 @@ std_ostream_write_function(std::vector<char> const& in, std::ostream& os)
 inline write_function_type make_std_ostream_write_function(std::ostream& os)
 {
     return util::bind(std_ostream_write_function,
-        util::placeholders::_1, boost::ref(os));
+        util::placeholders::_1, std::ref(os));
 }
 
 }}

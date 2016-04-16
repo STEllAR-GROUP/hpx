@@ -15,6 +15,8 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
+#include <string>
+
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////

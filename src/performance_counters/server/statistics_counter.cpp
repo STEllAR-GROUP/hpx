@@ -8,6 +8,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -32,13 +33,16 @@
 
 #include <boost/version.hpp>
 #include <boost/chrono/chrono.hpp>
-#include <boost/thread/locks.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
+
+#include <mutex>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
@@ -273,7 +277,7 @@ namespace hpx { namespace performance_counters { namespace server
     hpx::performance_counters::counter_value
         statistics_counter<Statistic>::get_counter_value(bool reset)
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
 
         hpx::performance_counters::counter_value value;
 
@@ -316,7 +320,7 @@ namespace hpx { namespace performance_counters { namespace server
         }
         else {
             // accumulate new value
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             value_->add_value(static_cast<double>(base_value.value_));
         }
         return true;
@@ -327,7 +331,7 @@ namespace hpx { namespace performance_counters { namespace server
     {
         // lock here to avoid checking out multiple reference counted GIDs
         // from AGAS. This
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
 
         if (!base_counter_id_) {
             // get or create the base counter
@@ -335,7 +339,7 @@ namespace hpx { namespace performance_counters { namespace server
             hpx::id_type base_counter_id;
             {
                 // We need to unlock the lock here since get_counter might suspend
-                util::unlock_guard<boost::unique_lock<mutex_type> > unlock(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > unlock(l);
                 base_counter_id = get_counter(base_counter_name_, ec);
             }
             // After reacquiring the lock, we need to check again if base_counter_id_
@@ -358,7 +362,7 @@ namespace hpx { namespace performance_counters { namespace server
                     boost::str(boost::format(
                         "could not get or create performance counter: '%s'") %
                             base_counter_name_)
-                    )
+                    );
                 return false;
             }
         }
@@ -395,7 +399,7 @@ namespace hpx { namespace performance_counters { namespace server
                 counter_value base_value;
                 if (evaluate_base_counter(base_value))
                 {
-                    boost::lock_guard<mutex_type> l(mtx_);
+                    std::lock_guard<mutex_type> l(mtx_);
                     value_->add_value(static_cast<double>(base_value.value_));
                     prev_value_ = base_value;
                 }
@@ -429,7 +433,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     void statistics_counter<Statistic>::reset_counter_value()
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
 
         // reset accumulator
         value_.reset(new detail::counter_type_from_statistic<Statistic>(

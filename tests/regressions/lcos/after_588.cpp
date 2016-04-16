@@ -10,6 +10,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <vector>
+
 struct test
     : hpx::components::managed_component_base<test>
 {

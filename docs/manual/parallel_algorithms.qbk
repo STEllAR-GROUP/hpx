@@ -118,7 +118,7 @@ __exception_list__ object.
 
 __hpx__ provides implementations of the following parallel algorithms:
 
-[table Non-modifying Parallel Algorithms (In Header: <hpx/include/parallel_algortithm.hpp>)
+[table Non-modifying Parallel Algorithms (In Header: <hpx/include/parallel_algorithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref all_of] ]
      [Checks if a predicate is `true` for all  of the elements in a range.]
@@ -306,7 +306,7 @@ __hpx__ provides implementations of the following parallel algorithms:
 [table Numeric Parallel Algorithms (In Header: <hpx/include/parallel_numeric.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref adjacent_difference] ]
-     [Calculates the difference between each element in an input range and the preceeding elemnt.]
+     [Calculates the difference between each element in an input range and the preceding element.]
      [`<hpx/include/parallel_adjacent_difference.hpp>`]]
     [[ [algoref inner_product] ]
      [Accumulates the inner products of two input ranges.]
@@ -341,6 +341,22 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algoref uninitialized_fill_n] ]
      [Copies an object to an uninitialized area of memory.]
      [`<hpx/include/parallel_uninitialized_fill.hpp>`]]
+]
+
+[table Index-based for-loops (In Header: <hpx/include/parallel_algorithm.hpp>)
+    [[Name]     [Description]   [In Header]]
+    [[ [algorefv2 for_loop] ]
+     [Implements loop functionality over a range specified by integral or iterator bounds.]
+     [`<hpx/include/parallel_for_loop.hpp>`]]
+    [[ [algorefv2 for_loop_strided] ]
+     [Implements loop functionality over a range specified by integral or iterator bounds.]
+     [`<hpx/include/parallel_for_loop.hpp>`]]
+    [[ [algorefv2 for_loop_n] ]
+     [Implements loop functionality over a range specified by integral or iterator bounds.]
+     [`<hpx/include/parallel_for_loop.hpp>`]]
+    [[ [algorefv2 for_loop_n_strided] ]
+     [Implements loop functionality over a range specified by integral or iterator bounds.]
+     [`<hpx/include/parallel_for_loop.hpp>`]]
 ]
 
 [endsect]
@@ -454,11 +470,11 @@ __hpx__-thread (such as the number of loop iterations combined to run as a
 single task).
 
 An executor parameter object is responsible for exposing the calculation of the
-size of the chunks scheduled. It abstracts the (potentiall platform-specific)
+size of the chunks scheduled. It abstracts the (potential platform-specific)
 algorithms of determining those chunks sizes.
 
 The way executor parameters are implemented is aligned with the way executors
-are implemented. All functionalities of concrete executior parameter types are
+are implemented. All functionalities of concrete executor parameter types are
 exposed and accessible through a corresponding
 [classref hpx::parallel::v3::executor_parameter_traits `hpx::parallel::executor_parameter_traits`]
 type.
@@ -474,7 +490,7 @@ This call synchronously retrieves the size of a single chunk of loop iterations
 (or similar) to combine for execution on a single __hpx__-thread if the overall
 number of tasks to schedule is given by `num_tasks`. The lambda
 function exposes a means of test-probing the execution of a single iteration
-for performance measurment purposes (the execution parameter type might
+for performance measurement purposes (the execution parameter type might
 dynamically determine the execution time of one or more tasks in order to
 calculate the chunk size, see
 [classref hpx::parallel::v3::auto_chunk_size `hpx::parallel::auto_chunk_size`]
@@ -610,7 +626,7 @@ function passed to `define_task_block`:
 [heading Using Execution Policies with Task Blocks]
 
 In __hpx__ we implemented some extensions for `task_block` beyond the actual
-standards porposal __cpp11_n4088__. The main addition is that a `task_block`
+standards proposal __cpp11_n4088__. The main addition is that a `task_block`
 can be invoked with a execution policy as its first argument, very similar to
 the parallel algorithms.
 
@@ -640,8 +656,8 @@ created `task_block`. In the following example the use of an explicit
 
 This also causes the [classref hpx::parallel::v2::task_block `hpx::parallel::task_block`]
 object to be a template in our implementation.
-The template argment is the type of the execution policy used to create the
-task block. The template argment defaults to
+The template argument is the type of the execution policy used to create the
+task block. The template argument defaults to
 [classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::parallel_execution_policy`].
 
 __hpx__ still supports calling
@@ -686,7 +702,7 @@ function enables this use case:
 __hpx__ still supports calling
 [funcref hpx::parallel::v2::task_block::run `hpx::parallel::task_block::run`]
 without an explicit executor object. In this case the task will be run using
-the executor assiciated with the execution policy which was used to call
+the executor associated with the execution policy which was used to call
 [funcref hpx::parallel::v2::define_task_block `hpx::parallel::define_task_block`].
 
 [endsect]

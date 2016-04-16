@@ -8,12 +8,28 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <type_traits>
 #include <utility>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits { namespace detail
+{
+    template <typename T>
+    struct is_deferred_callable;
+
+    template <typename F, typename ...Ts>
+    struct is_deferred_callable<F(Ts...)>
+      : is_callable<
+            typename util::decay_unwrap<F>::type(
+                typename util::decay_unwrap<Ts>::type...)
+        >
+    {};
+}}}
 
 namespace hpx { namespace util
 {
@@ -55,9 +71,8 @@ namespace hpx { namespace util
             {}
 #endif
 
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            deferred& operator=(deferred&&) = delete;
-#endif
+            HPX_DELETE_COPY_ASSIGN(deferred);
+            HPX_DELETE_MOVE_ASSIGN(deferred);
 
             inline typename deferred_result_of<F(Ts...)>::type
             operator()()
@@ -70,6 +85,13 @@ namespace hpx { namespace util
             {
                 ar & _f;
                 ar & _args;
+            }
+
+            std::size_t get_function_address() const
+            {
+                return traits::get_function_address<
+                        typename util::decay_unwrap<F>::type
+                    >::call(_f);
             }
 
         private:
@@ -101,6 +123,21 @@ namespace hpx { namespace util
 
         return std::forward<F>(f);
     }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct get_function_address<util::detail::deferred<Sig> >
+    {
+        static std::size_t
+            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_address();
+        }
+    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

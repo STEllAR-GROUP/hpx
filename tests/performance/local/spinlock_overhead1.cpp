@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_each.hpp>
@@ -18,9 +18,10 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <mutex>
 #include <stdexcept>
+#include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -167,7 +168,7 @@ double null_function(std::size_t i)
     double d = 0.;
     std::size_t idx = i % N;
     {
-        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
+        std::lock_guard<test::local_spinlock> l(mtx[idx]);
         d = global_init[idx];
     }
     for (double j = 0.; j < num_iterations; ++j)
@@ -175,7 +176,7 @@ double null_function(std::size_t i)
         d += 1. / (2. * j + 1.);
     }
     {
-        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
+        std::lock_guard<test::local_spinlock> l(mtx[idx]);
         global_init[idx] = d;
     }
     return d;

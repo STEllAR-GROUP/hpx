@@ -16,6 +16,7 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 cmake_policy(VERSION 2.8.12)
 if(NOT(CMAKE_VERSION VERSION_LESS 3.1.0))
   cmake_policy(SET CMP0054 OLD)
+  cmake_policy(SET CMP0042 NEW)
 endif()
 
 # Overrides must go before the project() statement, otherwise they are ignored.
@@ -298,8 +299,10 @@ hpx_option(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF BOOL
   ON
   CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(HPX_WITH_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
-  ON CATEGORY "Thread Manager" ADVANCED)
+hpx_option(HPX_WITH_STACKTRACES BOOL
+  "Attach backtraces to HPX exceptions (default: ON)"
+  ON
+  CATEGORY "Thread Manager" ADVANCED)
 
 hpx_option(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION BOOL
   "Enable thread stack back trace being captured on suspension (default: OFF)"
@@ -312,20 +315,22 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   if(WIN32)
     hpx_libraries(dbghelp)
   endif()
+
+  hpx_option(HPX_WITH_THREAD_BACKTRACE_DEPTH STRING
+    "Thread stack back trace depth being captured (default: 5)"
+    "5"
+    CATEGORY "Thread Manager" ADVANCED)
+  hpx_add_config_define(HPX_HAVE_THREAD_BACKTRACE_DEPTH
+    ${HPX_WITH_THREAD_BACKTRACE_DEPTH})
 endif()
-
-hpx_option(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING
-  "Thread stack back trace depth being captured on suspension (default: 5)"
-  "5" CATEGORY "Thread Manager" ADVANCED)
-
-hpx_option(HPX_WITH_THREAD_FULLBACKTRACE_ON_SUSPENSION BOOL
-  "Enable thread stack back trace being captured on suspension (default: OFF)"
-  OFF CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_add_config_define(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION)
-  hpx_add_config_define(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH
-    ${HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
+
+  hpx_option(HPX_WITH_THREAD_FULLBACKTRACE_ON_SUSPENSION BOOL
+    "Enable thread stack back trace being captured on suspension (default: OFF)"
+    OFF
+    CATEGORY "Thread Manager" ADVANCED)
   if(HPX_WITH_THREAD_FULLBACKTRACE_ON_SUSPENSION)
     hpx_add_config_define(HPX_HAVE_THREAD_FULLBAKCTRACE_ON_SUSPENSION)
   endif()
@@ -524,7 +529,7 @@ hpx_option(HPX_WITH_VERIFY_LOCKS_GLOBALLY BOOL
   OFF
   CATEGORY "Debugging" ADVANCED)
 hpx_option(HPX_WITH_VERIFY_LOCKS_BACKTRACE BOOL
-  "Enable thred stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
+  "Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
   OFF
   CATEGORY "Debugging" ADVANCED)
 hpx_option(HPX_WITH_THREAD_DEBUG_INFO BOOL
@@ -559,10 +564,17 @@ if(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF)
   hpx_add_config_define(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
 endif()
 
+hpx_option(HPX_WITH_THREAD_DESCRIPTION_FULL BOOL
+  "Use function address for thread description (default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
-    set(HPX_HAVE_THREAD_DESCRIPTION ON CACHE INTERNAL "")
+    if(HPX_WITH_THREAD_DESCRIPTION_FULL)
+      hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION_FULL)
+    endif()
 endif()
 
 if(HPX_WITH_THREAD_DEBUG_INFO)
@@ -570,6 +582,9 @@ if(HPX_WITH_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_HAVE_THREAD_PHASE_INFORMATION)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
   hpx_add_config_define(HPX_HAVE_THREAD_DEADLOCK_DETECTION)
+  if(HPX_WITH_THREAD_DESCRIPTION_FULL)
+    hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION_FULL)
+  endif()
 endif()
 
 # run hpx_main on all localities by default
@@ -618,6 +633,14 @@ hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
     ON ADVANCED)
 if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
+endif()
+
+# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.12
+hpx_option(HPX_WITH_GENERIC_EXECUTION_POLICY BOOL
+    "Enable the generic execution policy (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_GENERIC_EXECUTION_POLICY)
+  hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
 endif()
 
 # BADBAD: This enables an overload of swap is necessary to work around the
@@ -759,7 +782,7 @@ hpx_check_for_cxx11_defaulted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
 
 hpx_check_for_cxx11_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+  REQUIRED "HPX needs support for C++11 deleted functions")
 
 hpx_check_for_cxx11_explicit_cvt_ops(
   DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
@@ -789,7 +812,7 @@ hpx_check_for_cxx11_rvalue_references(
   REQUIRED "HPX needs support for C++11 rvalue references")
 
 hpx_check_for_cxx11_scoped_enums(
-  DEFINITIONS HPX_HAVE_CXX11_SCOPED_ENUMS)
+  REQUIRED "HPX needs support for C++11 scoped enums")
 
 hpx_check_for_cxx11_static_assert(
   REQUIRED "HPX needs support for C++11 static_assert")
@@ -831,11 +854,23 @@ hpx_check_for_cxx11_std_is_null_pointer(
 hpx_check_for_cxx11_std_is_placeholder(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
 
+hpx_check_for_cxx11_std_lock_guard(
+  REQUIRED "HPX needs support for C++11 std::lock_guard")
+
 hpx_check_for_cxx11_std_reference_wrapper(
   DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 
+hpx_check_for_cxx11_std_to_string(
+  REQUIRED "HPX needs support for C++11 std::to_string")
+
+hpx_check_for_cxx11_std_unique_lock(
+  REQUIRED "HPX needs support for C++11 std::unique_lock")
+
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")
+
+hpx_check_for_cxx11_std_unordered_map(
+  REQUIRED "HPX needs support for C++11 std::unordered_map")
 
 hpx_check_for_cxx11_std_type_traits(
   DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
@@ -853,6 +888,10 @@ hpx_check_for_cxx14_std_integer_sequence(
 
 hpx_check_for_cxx14_std_result_of_sfinae(
   DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
+
+# check for experimental facilities
+hpx_check_for_cxx_experimental_std_optional(
+  DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
 
 ################################################################################
 # Check for misc system headers
@@ -926,6 +965,10 @@ if(WIN32)
       # disabled for now as this flag crashes debugger
       # hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
       # hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
+
+      # Update 2 requires to set _ENABLE_ATOMIC_ALIGNMENT_FIX for it to compile
+      # atomics
+      hpx_add_config_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
     endif()
 
     # Runtime type information
@@ -979,6 +1022,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # MSVC2012/2013 are overeager to report 'qualifier applied to function type
     # has no meaning; ignored'
     hpx_add_compile_flag(-wd4180)
+
+    # max symbol length exceeded
+    hpx_add_compile_flag(-wd4503)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
@@ -1080,7 +1126,7 @@ else()
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-    hpx_add_compile_flag_if_available(-Wno-deprecated-register CXX C)
+    hpx_add_compile_flag_if_available(-Wno-deprecated-register LANGUAGES CXX C)
   endif()
 
   if(HPX_WITH_HIDDEN_VISIBILITY)
@@ -1189,7 +1235,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v0.1
+    v0.5-rc0
     VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")

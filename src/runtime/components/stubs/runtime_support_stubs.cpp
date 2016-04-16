@@ -14,12 +14,12 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace components { namespace stubs
 {

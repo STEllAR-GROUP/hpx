@@ -7,7 +7,8 @@
 #if !defined(HPX_COMPONENTS_STUBS_RUNTIME_SUPPORT_JUN_09_2008_0503PM)
 #define HPX_COMPONENTS_STUBS_RUNTIME_SUPPORT_JUN_09_2008_0503PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -16,10 +17,11 @@
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
+
+#include <vector>
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -337,13 +339,15 @@ namespace hpx { namespace components { namespace stubs
         /// \brief Retrieve configuration information
         static lcos::future<util::section> get_config_async(
             naming::id_type const& targetgid);
-        static void get_config(naming::id_type const& targetgid, util::section& ini);
+        static void get_config(naming::id_type const& targetgid,
+            util::section& ini);
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve instance count for given component type
         static lcos::future<boost::int32_t > get_instance_count_async(
             naming::id_type const& targetgid, components::component_type type);
-        static boost::int32_t  get_instance_count(naming::id_type const& targetgid,
+        static boost::int32_t  get_instance_count(
+            naming::id_type const& targetgid,
             components::component_type type);
 
         ///////////////////////////////////////////////////////////////////////

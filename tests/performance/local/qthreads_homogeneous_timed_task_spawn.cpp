@@ -33,14 +33,14 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 
 #include <qthread/qthread.h>
 
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
 using boost::program_options::variables_map;
@@ -186,9 +186,9 @@ int main(
     }
 
     // Set qthreads environment variables.
-    std::string const shepherds = boost::lexical_cast<std::string>
+    std::string const shepherds = std::to_string
         (vm["shepherds"].as<boost::uint64_t>());
-    std::string const workers = boost::lexical_cast<std::string>
+    std::string const workers = std::to_string
         (vm["workers-per-shepherd"].as<boost::uint64_t>());
 
     setenv("QT_NUM_SHEPHERDS", shepherds.c_str(), 1);

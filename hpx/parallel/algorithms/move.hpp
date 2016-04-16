@@ -8,8 +8,8 @@
 #if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM)
 #define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -21,9 +21,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -64,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
@@ -75,7 +73,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return get_iter_pair(
                     for_each_n<zip_iterator>().call(
-                        policy, boost::mpl::false_(),
+                        std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [](reference t) {
@@ -91,7 +89,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename InIter, typename OutIter>
         struct move<
             InIter, OutIter,
-            typename boost::enable_if<typename hpx::traits::segmented_iterator_traits<InIter>::is_segmented_iterator>::type
+            typename std::enable_if<
+                hpx::traits::segmented_iterator_traits<InIter>::is_segmented_iterator::value
+            >::type
         > : public move_pair<std::pair<
             typename hpx::traits::segmented_iterator_traits<InIter>::local_iterator,
             typename hpx::traits::segmented_iterator_traits<OutIter>::local_iterator
@@ -101,7 +101,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template<typename InIter, typename OutIter>
         struct move<
             InIter, OutIter,
-            typename boost::disable_if<typename hpx::traits::segmented_iterator_traits<OutIter>::is_segmented_iterator>::type
+            typename std::enable_if<
+                !hpx::traits::segmented_iterator_traits<OutIter>::is_segmented_iterator::value
+            >::type
         > : public move_pair<std::pair<InIter, OutIter>>
         {};
         /// \endcond
@@ -160,8 +162,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        traits::is_iterator<InIter>::value &&
-        traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type

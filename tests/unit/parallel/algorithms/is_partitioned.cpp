@@ -10,9 +10,11 @@
 
 #include <boost/range/functions.hpp>
 
-#include "test_utils.hpp"
-
 #include <iostream>
+#include <string>
+#include <vector>
+
+#include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -74,12 +76,13 @@ void test_partitioned1()
     test_partitioned1_async(seq(task), IteratorTag());
     test_partitioned1_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_partitioned1(execution_policy(seq), IteratorTag());
     test_partitioned1(execution_policy(par), IteratorTag());
     test_partitioned1(execution_policy(par_vec), IteratorTag());
     test_partitioned1(execution_policy(seq(task)), IteratorTag());
     test_partitioned1(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void partitioned_test1()
@@ -159,12 +162,13 @@ void test_partitioned2()
     test_partitioned2_async(seq(task), IteratorTag());
     test_partitioned2_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_partitioned2(execution_policy(seq), IteratorTag());
     test_partitioned2(execution_policy(par), IteratorTag());
     test_partitioned2(execution_policy(par_vec), IteratorTag());
     test_partitioned2(execution_policy(seq(task)), IteratorTag());
     test_partitioned2(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void partitioned_test2()
@@ -259,12 +263,13 @@ void test_partitioned3()
     test_partitioned3_async(seq(task), IteratorTag());
     test_partitioned3_async(par(task), IteratorTag());
 
-
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_partitioned3(execution_policy(seq), IteratorTag());
     test_partitioned3(execution_policy(par), IteratorTag());
     test_partitioned3(execution_policy(par_vec), IteratorTag());
     test_partitioned3(execution_policy(seq(task)), IteratorTag());
     test_partitioned3(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void partitioned_test3()
@@ -372,10 +377,13 @@ void test_partitioned_exception()
     test_partitioned_async_exception(seq(task), IteratorTag());
     test_partitioned_async_exception(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_partitioned_exception(execution_policy(par), IteratorTag());
     test_partitioned_exception(execution_policy(seq(task)), IteratorTag());
     test_partitioned_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
+
 void partitioned_exception_test()
 {
     test_partitioned_exception<std::random_access_iterator_tag>();
@@ -479,10 +487,12 @@ void test_partitioned_bad_alloc()
     test_partitioned_async_bad_alloc(seq(task), IteratorTag());
     test_partitioned_async_bad_alloc(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_partitioned_bad_alloc(execution_policy(par), IteratorTag());
     test_partitioned_bad_alloc(execution_policy(seq), IteratorTag());
     test_partitioned_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_partitioned_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void partitioned_bad_alloc_test()
@@ -512,7 +522,7 @@ int main(int argc, char* argv[])
 
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

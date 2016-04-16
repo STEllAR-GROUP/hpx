@@ -10,6 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <mutex>
 #include <vector>
 
 hpx::lcos::local::spinlock check_mutex;
@@ -21,14 +22,14 @@ struct tss_value_t
 {
     tss_value_t()
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
+        std::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
         ++tss_instances;
         ++tss_total;
         value = 0;
     }
     ~tss_value_t()
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
+        std::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
         --tss_instances;
     }
     int value;

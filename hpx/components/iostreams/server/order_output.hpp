@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,14 +6,16 @@
 #if !defined(HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM)
 #define HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/components/iostreams/server/buffer.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <hpx/components/iostreams/server/buffer.hpp>
+
 #include <boost/cstdint.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <map>
+#include <mutex>
+#include <utility>
 
 namespace hpx { namespace iostreams { namespace detail
 {
@@ -27,7 +29,7 @@ namespace hpx { namespace iostreams { namespace detail
         void output(boost::uint32_t locality_id, boost::uint64_t count,
             detail::buffer in, F const& write_f, Mutex& mtx)
         {
-            boost::unique_lock<Mutex> l(mtx);
+            std::unique_lock<Mutex> l(mtx);
             data_type& data = output_data_map_[locality_id];
 
             if (count == data.first)
@@ -36,7 +38,7 @@ namespace hpx { namespace iostreams { namespace detail
                 if (!in.empty())
                 {
                     // output the line as requested
-                    util::unlock_guard<boost::unique_lock<Mutex> > ul(l);
+                    util::unlock_guard<std::unique_lock<Mutex> > ul(l);
                     in.write(write_f, mtx);
                 }
                 ++data.first;
@@ -49,7 +51,7 @@ namespace hpx { namespace iostreams { namespace detail
                     if (!next_in.empty())
                     {
                         // output the next line
-                        util::unlock_guard<boost::unique_lock<Mutex> > ul(l);
+                        util::unlock_guard<std::unique_lock<Mutex> > ul(l);
                         next_in.write(write_f, mtx);
                     }
                     data.second.erase(next);

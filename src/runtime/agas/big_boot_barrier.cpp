@@ -38,16 +38,18 @@
 #endif
 
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
 
-#include <sstream>
 #include <cstdlib>
+#include <mutex>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace detail
 {
@@ -928,8 +930,14 @@ void big_boot_barrier::wait_hosted(
 
 void big_boot_barrier::notify()
 {
-    boost::lock_guard<boost::mutex> lk(mtx, boost::adopt_lock);
-    --connected;
+    runtime& rt = get_runtime();
+    naming::resolver_client& agas_client = rt.get_agas_client();
+
+    {
+        std::lock_guard<boost::mutex> lk(mtx, std::adopt_lock);
+        if (agas_client.get_status() == state_starting)
+            --connected;
+    }
     cond.notify_all();
 }
 

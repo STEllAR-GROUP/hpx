@@ -11,6 +11,9 @@
 
 #include <boost/atomic.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 void barrier_test(hpx::id_type const& id, boost::atomic<std::size_t>& c)
 {
@@ -175,7 +178,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+        std::to_string(hpx::threads::hardware_concurrency());
     cfg += "hpx.run_hpx_main!=1";
 
     // Initialize and run HPX

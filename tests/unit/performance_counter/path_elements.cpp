@@ -8,6 +8,8 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace test
 {

@@ -6,6 +6,8 @@
 #if !defined(HPX_MIGRATE_TO_STORAGE_SERVER_FEB_04_2015_1021AM)
 #define HPX_MIGRATE_TO_STORAGE_SERVER_FEB_04_2015_1021AM
 
+#include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
@@ -14,6 +16,8 @@
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
+
+#include <vector>
 
 namespace hpx { namespace components { namespace server
 {

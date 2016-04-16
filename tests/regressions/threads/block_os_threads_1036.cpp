@@ -16,6 +16,9 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/scoped_array.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 void blocker(
     boost::atomic<boost::uint64_t>* entered
@@ -106,7 +109,7 @@ int main(
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+        std::to_string(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX.
     return hpx::init(cmdline, argc, argv, cfg);

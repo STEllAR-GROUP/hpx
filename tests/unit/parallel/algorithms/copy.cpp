@@ -10,6 +10,9 @@
 
 #include <boost/range/functions.hpp>
 
+#include <string>
+#include <vector>
+
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
@@ -128,12 +131,14 @@ void test_copy()
     test_copy_async(seq(task), IteratorTag());
     test_copy_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy(execution_policy(seq), IteratorTag());
     test_copy(execution_policy(par), IteratorTag());
     test_copy(execution_policy(par_vec), IteratorTag());
 
     test_copy(execution_policy(seq(task)), IteratorTag());
     test_copy(execution_policy(par(task)), IteratorTag());
+#endif
 
     //assure output iterator will work
     test_copy_outiter(seq, IteratorTag());
@@ -143,12 +148,14 @@ void test_copy()
     test_copy_outiter_async(seq(task), IteratorTag());
     test_copy_outiter_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_outiter(execution_policy(seq), IteratorTag());
     test_copy_outiter(execution_policy(par), IteratorTag());
     test_copy_outiter(execution_policy(par_vec), IteratorTag());
 
     test_copy_outiter(execution_policy(seq(task)), IteratorTag());
     test_copy_outiter(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void copy_test()
@@ -247,11 +254,13 @@ void test_copy_exception()
     test_copy_exception_async(seq(task), IteratorTag());
     test_copy_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_exception(execution_policy(seq), IteratorTag());
     test_copy_exception(execution_policy(par), IteratorTag());
 
     test_copy_exception(execution_policy(seq(task)), IteratorTag());
     test_copy_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void copy_exception_test()
@@ -348,11 +357,13 @@ void test_copy_bad_alloc()
     test_copy_bad_alloc_async(seq(task), IteratorTag());
     test_copy_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_copy_bad_alloc(execution_policy(seq), IteratorTag());
     test_copy_bad_alloc(execution_policy(par), IteratorTag());
 
     test_copy_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_copy_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void copy_bad_alloc_test()
@@ -392,7 +403,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

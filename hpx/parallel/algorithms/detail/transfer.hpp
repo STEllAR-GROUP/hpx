@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/util/tagged_pair.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -39,27 +40,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
               std::false_type)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                    input_iterator_category;
-            typedef typename std::iterator_traits<OutIter>::iterator_category
-                    output_iterator_category;
-
-            typedef typename boost::mpl::or_<
-                    parallel::is_sequential_execution_policy<ExPolicy>,
-                    boost::is_same<std::input_iterator_tag, input_iterator_category>,
-                    boost::is_same<std::output_iterator_tag, output_iterator_category>
-            >::type is_seq;
-
+            typedef std::integral_constant<bool,
+                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    !hpx::traits::is_forward_iterator<InIter>::value ||
+                    !hpx::traits::is_forward_iterator<OutIter>::value
+                > is_seq;
             return Algo().call(
-                    std::forward<ExPolicy>(policy), is_seq(),
-                    first, last, dest);
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest);
         }
 
         // forward declare segmented version
         template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
-                ExPolicy, std::pair<InIter, OutIter>
-            >::type
+            ExPolicy, std::pair<InIter, OutIter>
+        >::type
         transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
             std::true_type);
 
@@ -103,50 +98,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //
 
         /// \endcond
-        template <
-            typename Algo, typename ExPolicy, typename InIter, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::v1::is_execution_policy<ExPolicy>::value &&
-                traits::is_iterator<InIter>::value &&
-                traits::is_iterator<OutIter>::value)
-        >
+        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::parallel::v1::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_iterator<OutIter>::value)>
         typename util::detail::algorithm_result<
-            ExPolicy, hpx::util::tagged_pair<
-                tag::in(InIter),
-                tag::out(OutIter)
-            >
+            ExPolicy, hpx::util::tagged_pair<tag::in(InIter),tag::out(OutIter)>
         >::type
         transfer(ExPolicy && policy, InIter first, InIter last, OutIter dest)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                input_iterator_category;
-            typedef typename std::iterator_traits<OutIter>::iterator_category
-                output_iterator_category;
-
             static_assert(
-                (boost::is_base_of<
-                    std::input_iterator_tag, input_iterator_category>::value),
+                (hpx::traits::is_input_iterator<InIter>::value),
                 "Required at least input iterator.");
-
             static_assert(
-                (boost::mpl::or_<
-                    boost::is_base_of<
-                        std::forward_iterator_tag, output_iterator_category>,
-                    boost::is_same<
-                        std::output_iterator_tag, output_iterator_category>
-                >::value),
+                (hpx::traits::is_output_iterator<OutIter>::value ||
+                    hpx::traits::is_forward_iterator<OutIter>::value),
                 "Requires at least output iterator.");
 
-            typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-            typedef typename iterator_traits::is_segmented_iterator is_segmented;
+            typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-            return hpx::util::make_tagged_pair<
-                tag::in,
-                tag::out>(
+            return hpx::util::make_tagged_pair<tag::in,tag::out>(
                     transfer_<Algo>(
                         std::forward<ExPolicy>(policy), first, last, dest,
-                        is_segmented())
-                    );
+                        is_segmented()));
         }
     }
 }}}

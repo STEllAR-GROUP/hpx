@@ -8,7 +8,9 @@
 #if !defined(HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM)
 #define HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -18,9 +20,8 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -47,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
-            parallel(ExPolicy policy, InIter first, InIter last,
+            parallel(ExPolicy && policy, InIter first, InIter last,
                 T const& val)
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;
@@ -63,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [val, tok](std::size_t base_idx, InIter it,
                             std::size_t part_size) mutable
                         {
@@ -136,25 +137,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a val, then the algorithm returns \a last.
     ///
     template <typename ExPolicy, typename InIter, typename T>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find(ExPolicy && policy, InIter first, InIter last, T const& val)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::find<InIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -184,7 +180,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -199,7 +195,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [f, tok](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -286,25 +282,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           algorithm returns \a last.
     ///
     template <typename ExPolicy, typename InIter, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_if(ExPolicy && policy, InIter first, InIter last, F && f)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::find_if<InIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -339,7 +330,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -354,7 +345,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [f, tok](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -365,7 +356,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 if (!f(v))
                                     tok.cancel(i);
                             });
-
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                         {
@@ -442,25 +432,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           algorithm returns \a last.
     ///
     template <typename ExPolicy, typename InIter, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_if_not(ExPolicy && policy, InIter first, InIter last, F && f)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::find_if_not<InIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -491,7 +476,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy policy, FwdIter first1, FwdIter last1,
+            parallel(ExPolicy && policy, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
@@ -513,7 +498,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
-                        policy, first1, count-(diff-1),
+                        std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
                         [=](std::size_t base_idx, FwdIter it,
                             std::size_t part_size) mutable
                         {
@@ -612,29 +597,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           is found, \a last1 is also returned.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
     >::type
     find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2)
     {
-        typedef typename std::iterator_traits<FwdIter1>::iterator_category
-            iterator_category1;
-
-        typedef typename std::iterator_traits<FwdIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category1
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category2
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -717,29 +691,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// algorithm their own predicate \a f.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
     >::type
     find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, F && f)
     {
-        typedef typename std::iterator_traits<FwdIter1>::iterator_category
-            iterator_category1;
-
-        typedef typename std::iterator_traits<FwdIter2>::iterator_category
-            iterator_category2;
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category1
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, iterator_category2
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
@@ -781,7 +744,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
-            parallel(ExPolicy policy, InIter first, InIter last,
+            parallel(ExPolicy && policy, InIter first, InIter last,
                 FwdIter s_first, FwdIter s_last, Pred && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;
@@ -803,7 +766,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
-                        policy, first, count,
+                        std::forward<ExPolicy>(policy), first, count, 1,
                         [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
                             std::size_t part_size) mutable
                         {
@@ -812,7 +775,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 [&tok, &s_first, &s_last, &op]
                                 (reference v, std::size_t i)
                                 {
-                                    for(FwdIter iter = s_first; iter != s_last; ++iter) {
+                                    for(FwdIter iter = s_first; iter != s_last; ++iter)
+                                    {
                                         if(op(v,*iter))
                                             tok.cancel(i);
                                     }
@@ -889,34 +853,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           is found, \a last is also returned.
     ///
     template <typename ExPolicy, typename InIter, typename FwdIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_first_of(ExPolicy && policy, InIter first, InIter last,
         FwdIter s_first, FwdIter s_last)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            s_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
-            "Requires at least input iterator.");
-
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, s_iterator_category
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::find_first_of<InIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -998,34 +952,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           algorithm their own predicate \a f.
     ///
     template <typename ExPolicy, typename InIter, typename FwdIter, typename Pred>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_first_of(ExPolicy && policy, InIter first, InIter last,
         FwdIter s_first, FwdIter s_last, Pred && op)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<FwdIter>::iterator_category
-            s_iterator_category;
-
         static_assert(
-            (boost::is_base_of<
-                std::input_iterator_tag, iterator_category
-            >::value),
-            "Requires at least input iterator.");
-
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least forward iterator.");
         static_assert(
-            (boost::is_base_of<
-                std::forward_iterator_tag, s_iterator_category
-            >::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::find_first_of<InIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

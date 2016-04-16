@@ -11,6 +11,7 @@
 #include <boost/exception_ptr.hpp>
 
 #include <stdexcept>
+#include <string>
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////

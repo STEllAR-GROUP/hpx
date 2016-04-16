@@ -8,10 +8,12 @@
 #include <hpx/include/parallel_minmax.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "test_utils.hpp"
-
-#include <iostream>
 #include <ctime>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -92,12 +94,14 @@ void test_max_element()
     test_max_element_async(seq(task), IteratorTag());
     test_max_element_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_max_element(execution_policy(seq), IteratorTag());
     test_max_element(execution_policy(par), IteratorTag());
     test_max_element(execution_policy(par_vec), IteratorTag());
 
     test_max_element(execution_policy(seq(task)), IteratorTag());
     test_max_element(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void max_element_test()
@@ -249,11 +253,13 @@ void test_max_element_exception()
     test_max_element_exception_async(seq(task), IteratorTag());
     test_max_element_exception_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_max_element_exception(execution_policy(seq), IteratorTag());
     test_max_element_exception(execution_policy(par), IteratorTag());
 
     test_max_element_exception(execution_policy(seq(task)), IteratorTag());
     test_max_element_exception(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void max_element_exception_test()
@@ -401,11 +407,13 @@ void test_max_element_bad_alloc()
     test_max_element_bad_alloc_async(seq(task), IteratorTag());
     test_max_element_bad_alloc_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_max_element_bad_alloc(execution_policy(seq), IteratorTag());
     test_max_element_bad_alloc(execution_policy(par), IteratorTag());
 
     test_max_element_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_max_element_bad_alloc(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void max_element_bad_alloc_test()

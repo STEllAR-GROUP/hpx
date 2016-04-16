@@ -10,21 +10,20 @@
 #if !defined(HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036)
 #define HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036
 
-#include <hpx/config/defines.hpp>
-#if defined(HPX_HAVE_HWLOC)
+#include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
 
-#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/exception.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
 
 #include <boost/format.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <vector>
 
 #if defined(HPX_NATIVE_MIC) && HWLOC_API_VERSION < 0x00010600
 #error On Intel Xeon/Phi coprosessors HPX cannot be use with a HWLOC version earlier than V1.6.
@@ -249,7 +248,6 @@ namespace hpx { namespace threads
         std::size_t num_of_pus_;
 
         mutable hpx::util::spinlock topo_mtx;
-        typedef hpx::util::spinlock::scoped_lock scoped_lock;
 
         std::vector<std::size_t> socket_numbers_;
         std::vector<std::size_t> numa_node_numbers_;

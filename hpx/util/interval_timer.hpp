@@ -10,17 +10,16 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <algorithm>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -70,7 +69,7 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         // schedule a high priority task after a given time interval
-        void schedule_thread(boost::unique_lock<mutex_type> & l);
+        void schedule_thread(std::unique_lock<mutex_type> & l);
 
         threads::thread_state_enum
             evaluate(threads::thread_state_ex_enum statex);
@@ -99,7 +98,7 @@ namespace hpx { namespace util
 {
     class HPX_EXPORT interval_timer
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(interval_timer)
+        HPX_MOVABLE_ONLY(interval_timer);
 
     public:
         interval_timer();

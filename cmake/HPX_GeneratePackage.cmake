@@ -52,12 +52,17 @@ endforeach()
 
 if(HPX_WITH_STATIC_LINKING)
   set(HPX_CONF_LIBRARIES "hpx;${HPX_LIBRARIES}")
-  set(HPX_PKG_LIBRARIES "-lhpx ${HPX_PKG_LIBRARIES}")
-  set(HPX_PKG_DEBUG_LIBRARIES "-lhpxd ${HPX_PKG_DEBUG_LIBRARIES}")
+  set(HPX_PKG_LIBRARIES "\${libdir}/libhpx.a ${HPX_PKG_LIBRARIES}")
+  set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpxd.a ${HPX_PKG_DEBUG_LIBRARIES}")
 else()
   set(HPX_CONF_LIBRARIES "hpx;hpx_init;${HPX_LIBRARIES}")
-  set(HPX_PKG_LIBRARIES "-lhpx -lhpx_init ${HPX_PKG_LIBRARIES}")
-  set(HPX_PKG_DEBUG_LIBRARIES "-lhpxd -lhpx_initd ${HPX_PKG_DEBUG_LIBRARIES}")
+  if(APPLE)
+    set(HPX_PKG_LIBRARIES "\${libdir}/libhpx.dylib \${libdir}/libhpx_init.a ${HPX_PKG_LIBRARIES}")
+    set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpxd.dylib \${libdir}/libhpx_initd.a ${HPX_PKG_DEBUG_LIBRARIES}")
+  else()
+    set(HPX_PKG_LIBRARIES "\${libdir}/libhpx.so \${libdir}/libhpx_init.a ${HPX_PKG_LIBRARIES}")
+    set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpxd.so \${libdir}/libhpx_initd.a ${HPX_PKG_DEBUG_LIBRARIES}")
+  endif()
 endif()
 
 # Get the include directories we need ...
@@ -97,6 +102,8 @@ set(HPX_CMAKE_CONF_INCLUDE_DIRS
   "${_NEEDED_CMAKE_INCLUDE_DIRS}"
 )
 set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
+set(HPX_CONF_LIBRARY_DIR ${HPX_LIBRARY_DIR})
+
 configure_file(cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}Config.cmake"
   ESCAPE_QUOTES @ONLY)

@@ -9,22 +9,20 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <type_traits>
-#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
-#include <boost/shared_ptr.hpp>
-#else
 #include <memory>
-#endif
+#include <type_traits>
 
 namespace hpx { namespace components
 {
     namespace detail
     {
-        struct pinned_ptr_base
+        class pinned_ptr_base
         {
+            HPX_NON_COPYABLE(pinned_ptr_base);
+
+        public:
             pinned_ptr_base() HPX_NOEXCEPT
               : lva_(0)
             {}
@@ -35,21 +33,6 @@ namespace hpx { namespace components
 
             virtual ~pinned_ptr_base() {}
 
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            pinned_ptr_base(pinned_ptr_base const&) = delete;
-            pinned_ptr_base(pinned_ptr_base &&) = delete;
-
-            pinned_ptr_base& operator= (pinned_ptr_base const&) = delete;
-            pinned_ptr_base& operator= (pinned_ptr_base &&) = delete;
-#else
-        private:
-            pinned_ptr_base(pinned_ptr_base const&);
-            pinned_ptr_base(pinned_ptr_base &&);
-
-            pinned_ptr_base& operator= (pinned_ptr_base const&);
-            pinned_ptr_base& operator= (pinned_ptr_base &&);
-#endif
-
         protected:
             naming::address::address_type lva_;
         };
@@ -57,6 +40,8 @@ namespace hpx { namespace components
         template <typename Component>
         class pinned_ptr : public pinned_ptr_base
         {
+            HPX_NON_COPYABLE(pinned_ptr);
+
         public:
             pinned_ptr() HPX_NOEXCEPT {}
 
@@ -71,21 +56,6 @@ namespace hpx { namespace components
             {
                 unpin();
             }
-
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-            pinned_ptr(pinned_ptr const&) = delete;
-            pinned_ptr(pinned_ptr &&) = delete;
-
-            pinned_ptr& operator= (pinned_ptr const&) = delete;
-            pinned_ptr& operator= (pinned_ptr &&) = delete;
-#else
-        private:
-            pinned_ptr(pinned_ptr const&);
-            pinned_ptr(pinned_ptr &&);
-
-            pinned_ptr& operator= (pinned_ptr const&);
-            pinned_ptr& operator= (pinned_ptr &&);
-#endif
 
         protected:
             void pin()
@@ -129,14 +99,8 @@ namespace hpx { namespace components
         }
 
 #if !defined(HPX_INTEL_VERSION) || (HPX_INTEL_VERSION > 1400)
-#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-        pinned_ptr(pinned_ptr const&) = delete;
-        pinned_ptr& operator= (pinned_ptr const&) = delete;
-#else
-    private:
-        pinned_ptr(pinned_ptr const&);
-        pinned_ptr& operator= (pinned_ptr const&);
-#endif
+        HPX_DELETE_COPY_CTOR(pinned_ptr);
+        HPX_DELETE_COPY_ASSIGN(pinned_ptr);
 #endif
 
     private:
@@ -145,11 +109,7 @@ namespace hpx { namespace components
           : data_(new detail::pinned_ptr<Component>(lva))
         {}
 
-#if defined(HPX_INTEL_VERSION) && (HPX_INTEL_VERSION < 1400)
-        boost::shared_ptr<detail::pinned_ptr_base> data_;
-#else
         std::unique_ptr<detail::pinned_ptr_base> data_;
-#endif
     };
 }}
 

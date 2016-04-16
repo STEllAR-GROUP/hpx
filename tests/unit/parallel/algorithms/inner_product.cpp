@@ -8,10 +8,12 @@
 #include <hpx/include/parallel_inner_product.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "test_utils.hpp"
-
-#include <iostream>
 #include <ctime>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -72,12 +74,14 @@ void test_inner_product()
     test_inner_product_async(seq(task), IteratorTag());
     test_inner_product_async(par(task), IteratorTag());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_inner_product(execution_policy(seq), IteratorTag());
     test_inner_product(execution_policy(par), IteratorTag());
     test_inner_product(execution_policy(par_vec), IteratorTag());
 
     test_inner_product(execution_policy(seq(task)), IteratorTag());
     test_inner_product(execution_policy(par(task)), IteratorTag());
+#endif
 }
 
 void inner_product_test()

@@ -10,7 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
@@ -19,15 +19,19 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/chrono.hpp>
 
+#include <mutex>
+#include <string>
+#include <vector>
+
 namespace
 {
-    hpx::lcos::local::spinlock multiple_wake_mutex;
+    hpx::lcos::local::mutex multiple_wake_mutex;
     hpx::lcos::local::condition_variable multiple_wake_cond;
     unsigned multiple_wake_count=0;
 
     void wait_for_condvar_and_increase_count()
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lk(multiple_wake_mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
         multiple_wake_cond.wait(lk);
         ++multiple_wake_count;
     }
@@ -43,7 +47,7 @@ namespace
 ///////////////////////////////////////////////////////////////////////////////
 struct wait_for_flag
 {
-    hpx::lcos::local::spinlock mutex;
+    hpx::lcos::local::mutex mutex;
     hpx::lcos::local::condition_variable cond_var;
     bool flag;
     unsigned woken;
@@ -71,7 +75,7 @@ struct wait_for_flag
 
     void wait_without_predicate()
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
         while(!flag)
         {
             cond_var.wait(lock);
@@ -81,7 +85,7 @@ struct wait_for_flag
 
     void wait_with_predicate()
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
         cond_var.wait(lock,check_flag(flag));
         if(flag)
         {
@@ -94,7 +98,7 @@ struct wait_for_flag
         boost::chrono::system_clock::time_point const timeout =
             boost::chrono::system_clock::now() + boost::chrono::milliseconds(5);
 
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
         while(!flag)
         {
             if(cond_var.wait_until(lock,timeout) == hpx::lcos::local::cv_status::timeout)
@@ -110,7 +114,7 @@ struct wait_for_flag
         boost::chrono::system_clock::time_point const timeout =
             boost::chrono::system_clock::now() + boost::chrono::milliseconds(5);
 
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
         if(cond_var.wait_until(lock,timeout,check_flag(flag)) && flag)
         {
             ++woken;
@@ -118,7 +122,7 @@ struct wait_for_flag
     }
     void relative_wait_until_with_predicate()
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
         if(cond_var.wait_for(lock,boost::chrono::milliseconds(5),
             check_flag(flag)) && flag)
         {
@@ -134,7 +138,7 @@ void test_condition_notify_one_wakes_from_wait()
     hpx::thread thread(&wait_for_flag::wait_without_predicate, boost::ref(data));
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
         data.flag=true;
     }
 
@@ -151,7 +155,7 @@ void test_condition_notify_one_wakes_from_wait_with_predicate()
     hpx::thread thread(&wait_for_flag::wait_with_predicate, boost::ref(data));
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
         data.flag=true;
     }
 
@@ -168,7 +172,7 @@ void test_condition_notify_one_wakes_from_wait_until()
     hpx::thread thread(&wait_for_flag::wait_until_without_predicate, boost::ref(data));
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
         data.flag=true;
     }
 
@@ -185,7 +189,7 @@ void test_condition_notify_one_wakes_from_wait_until_with_predicate()
     hpx::thread thread(&wait_for_flag::wait_until_with_predicate, boost::ref(data));
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
         data.flag=true;
     }
 
@@ -203,7 +207,7 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
         boost::ref(data));
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
         data.flag=true;
     }
 
@@ -231,7 +235,7 @@ void test_multiple_notify_one_calls_wakes_multiple_threads()
     hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lk(multiple_wake_mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
         HPX_TEST(multiple_wake_count==3);
     }
 
@@ -257,7 +261,7 @@ void test_condition_notify_all_wakes_from_wait()
         }
 
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
             data.flag=true;
         }
 
@@ -288,7 +292,7 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
         }
 
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
             data.flag=true;
         }
 
@@ -319,7 +323,7 @@ void test_condition_notify_all_wakes_from_wait_until()
         }
 
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
             data.flag=true;
         }
 
@@ -350,7 +354,7 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
         }
 
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
             data.flag=true;
         }
 
@@ -381,7 +385,7 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
         }
 
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
             data.flag=true;
         }
 
@@ -415,7 +419,7 @@ void test_notify_all_following_notify_one_wakes_all_threads()
     hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lk(multiple_wake_mutex);
+        std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
         HPX_TEST(multiple_wake_count==3);
     }
 
@@ -429,7 +433,7 @@ struct condition_test_data
 {
     condition_test_data() : notified(0), awoken(0) { }
 
-    hpx::lcos::local::spinlock mutex;
+    hpx::lcos::local::mutex mutex;
     hpx::lcos::local::condition_variable condition;
     int notified;
     int awoken;
@@ -437,7 +441,7 @@ struct condition_test_data
 
 void condition_test_thread(condition_test_data* data)
 {
-    boost::unique_lock<hpx::lcos::local::spinlock> lock(data->mutex);
+    std::unique_lock<hpx::lcos::local::mutex> lock(data->mutex);
     HPX_TEST(lock ? true : false);
     while (!(data->notified > 0))
         data->condition.wait(lock);
@@ -460,7 +464,7 @@ private:
 
 void condition_test_waits(condition_test_data* data)
 {
-    boost::unique_lock<hpx::lcos::local::spinlock> lock(data->mutex);
+    std::unique_lock<hpx::lcos::local::mutex> lock(data->mutex);
     HPX_TEST(lock ? true : false);
 
     // Test wait.
@@ -512,7 +516,7 @@ void condition_test_waits(condition_test_data* data)
 
 void test_condition_waits()
 {
-    typedef boost::unique_lock<hpx::lcos::local::spinlock> unique_lock;
+    typedef std::unique_lock<hpx::lcos::local::mutex> unique_lock;
 
     condition_test_data data;
 
@@ -601,9 +605,9 @@ boost::chrono::milliseconds const timeout_resolution(100);
 void test_wait_until_times_out()
 {
     hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::spinlock m;
+    hpx::lcos::local::mutex m;
 
-    boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
+    std::unique_lock<hpx::lcos::local::mutex> lock(m);
     boost::chrono::system_clock::time_point const start =
         boost::chrono::system_clock::now();
     boost::chrono::system_clock::time_point const timeout = start + delay;
@@ -618,9 +622,9 @@ void test_wait_until_times_out()
 void test_wait_until_with_predicate_times_out()
 {
     hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::spinlock m;
+    hpx::lcos::local::mutex m;
 
-    boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
+    std::unique_lock<hpx::lcos::local::mutex> lock(m);
     boost::chrono::system_clock::time_point const start =
         boost::chrono::system_clock::now();
     boost::chrono::system_clock::time_point const timeout = start + delay;
@@ -636,9 +640,9 @@ void test_wait_until_with_predicate_times_out()
 void test_relative_wait_until_with_predicate_times_out()
 {
     hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::spinlock m;
+    hpx::lcos::local::mutex m;
 
-    boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
+    std::unique_lock<hpx::lcos::local::mutex> lock(m);
     boost::chrono::system_clock::time_point const start =
         boost::chrono::system_clock::now();
 
@@ -653,9 +657,9 @@ void test_relative_wait_until_with_predicate_times_out()
 void test_wait_until_relative_times_out()
 {
     hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::spinlock m;
+    hpx::lcos::local::mutex m;
 
-    boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
+    std::unique_lock<hpx::lcos::local::mutex> lock(m);
     boost::chrono::system_clock::time_point const start =
         boost::chrono::system_clock::now();
 
@@ -712,7 +716,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+        std::to_string(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

@@ -7,6 +7,8 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/traits/get_remote_result.hpp>
@@ -16,32 +18,29 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 
 #include <boost/detail/atomic_count.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/math/common_factor_ct.hpp>
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/max.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/type_traits/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <memory>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    BOOST_SCOPED_ENUM_START(future_status)
+    enum class future_status
     {
         ready, timeout, deferred, uninitialized
     };
-    BOOST_SCOPED_ENUM_END
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,7 +176,7 @@ namespace detail
     template <typename F1, typename F2>
     class compose_cb_impl
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl)
+        HPX_MOVABLE_ONLY(compose_cb_impl);
 
     public:
         template <typename A1, typename A2>
@@ -199,6 +198,7 @@ namespace detail
             f2_();
         }
 
+    private:
         F1 f1_;
         F2 f2_;
     };
@@ -243,7 +243,7 @@ namespace detail
     template <typename Result>
     struct future_data : future_data_refcnt_base
     {
-        HPX_NON_COPYABLE(future_data)
+        HPX_NON_COPYABLE(future_data);
 
         typedef typename future_data_result<Result>::type result_type;
         typedef util::unique_function_nonser<void()> completed_callback_type;
@@ -412,7 +412,7 @@ namespace detail
         template <typename Target>
         void set_value(Target && data, error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked()) {
@@ -448,7 +448,7 @@ namespace detail
         template <typename Target>
         void set_exception(Target && data, error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked()) {
@@ -498,7 +498,7 @@ namespace detail
                 set_value(std::move(get_remote_result_type::call(
                         std::forward<T>(result))));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // store the error instead
                 return set_exception(boost::current_exception());
             }
@@ -510,7 +510,7 @@ namespace detail
             try {
                 HPX_THROW_EXCEPTION(e, f, msg);
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // store the error code
                 set_exception(boost::current_exception());
             }
@@ -555,7 +555,7 @@ namespace detail
         {
             if (!data_sink) return;
 
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
 
             if (is_ready_locked()) {
 
@@ -575,36 +575,34 @@ namespace detail
 
         virtual void wait(error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
-                cond_.wait(l, "future_data::wait", ec);
+                cond_.wait(std::move(l), "future_data::wait", ec);
                 if (ec) return;
-
-                HPX_ASSERT(state_ != empty);
             }
 
             if (&ec != &throws)
                 ec = make_success_code();
         }
 
-        virtual BOOST_SCOPED_ENUM(future_status)
+        virtual future_status
         wait_until(boost::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_state_ex_enum const reason =
-                    cond_.wait_until(l, abs_time, "future_data::wait_until", ec);
+                    cond_.wait_until(std::move(l), abs_time,
+                        "future_data::wait_until", ec);
                 if (ec) return future_status::uninitialized;
 
                 if (reason == threads::wait_timeout)
                     return future_status::timeout;
 
-                HPX_ASSERT(state_ != empty);
                 return future_status::ready;
             }
 
@@ -618,7 +616,7 @@ namespace detail
         /// \a future.
         bool is_ready() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return is_ready_locked();
         }
 
@@ -629,13 +627,13 @@ namespace detail
 
         bool has_value() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return state_ == value;
         }
 
         bool has_exception() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return state_ == exception;
         }
 
@@ -737,7 +735,7 @@ namespace detail
             this->future_data<Result>::wait(ec);
         }
 
-        virtual BOOST_SCOPED_ENUM(future_status)
+        virtual future_status
         wait_until(boost::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
@@ -749,13 +747,13 @@ namespace detail
     private:
         bool started_test() const
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             return started_;
         }
 
         bool started_test_and_set()
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             if (started_)
                 return true;
 
@@ -766,7 +764,7 @@ namespace detail
     protected:
         void check_started()
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             if (started_) {
                 HPX_THROW_EXCEPTION(task_already_started,
                     "task_base::check_started",
@@ -785,41 +783,17 @@ namespace detail
         }
 
         // run in a separate thread
-        virtual void apply(BOOST_SCOPED_ENUM(launch) policy,
+        virtual void apply(launch policy,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
-            check_started();
-
-            future_base_type this_(this);
-
-            char const* desc = hpx::threads::get_thread_description(
-                hpx::threads::get_self_id());
-
-            if (sched_) {
-                sched_->add(util::bind(&task_base::run_impl, std::move(this_)),
-                    desc ? desc : "task_base::apply", threads::pending, false,
-                    stacksize, ec);
-            }
-            else if (policy == launch::fork) {
-                threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, std::move(this_)),
-                    desc ? desc : "task_base::apply", threads::pending, false,
-                    threads::thread_priority_boost, get_worker_thread_num(),
-                    stacksize, ec);
-            }
-            else {
-                threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, std::move(this_)),
-                    desc ? desc : "task_base::apply", threads::pending, false,
-                    priority, std::size_t(-1), stacksize, ec);
-            }
+            HPX_ASSERT(false);      // shouldn't ever be called
         }
 
     protected:
-        threads::thread_state_enum run_impl()
+        static threads::thread_state_enum run_impl(future_base_type this_)
         {
-            this->do_run();
+            this_->do_run();
             return threads::terminated;
         }
 
@@ -857,12 +831,12 @@ namespace detail
     protected:
         threads::thread_id_type get_thread_id() const
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
         void set_thread_id(threads::thread_id_type id)
         {
-            boost::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
         }
 
@@ -891,44 +865,10 @@ namespace detail
         };
 
     protected:
-        // run in a separate thread
-        void apply(BOOST_SCOPED_ENUM(launch) policy,
-            threads::thread_priority priority,
-            threads::thread_stacksize stacksize, error_code& ec)
+        static threads::thread_state_enum run_impl(future_base_type this_)
         {
-            this->check_started();
-
-            future_base_type this_(this);
-
-            char const* desc = hpx::threads::get_thread_description(
-                hpx::threads::get_self_id());
-
-            if (this->sched_) {
-                this->sched_->add(
-                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
-                    desc ? desc : "cancelable_task_base::apply",
-                    threads::pending, false, stacksize, ec);
-            }
-            else if (policy == launch::fork) {
-                threads::register_thread_plain(
-                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
-                    desc ? desc : "cancelable_task_base::apply",
-                    threads::pending, false, threads::thread_priority_boost,
-                    get_worker_thread_num(), stacksize, ec);
-            }
-            else {
-                threads::register_thread_plain(
-                    util::bind(&cancelable_task_base::run_impl, std::move(this_)),
-                    desc ? desc : "cancelable_task_base::apply",
-                    threads::pending, false, priority, std::size_t(-1),
-                    stacksize, ec);
-            }
-        }
-
-        threads::thread_state_enum run_impl()
-        {
-            reset_id r(*this);
-            this->do_run();
+            reset_id r(*this_);
+            this_->do_run();
             return threads::terminated;
         }
 
@@ -941,10 +881,10 @@ namespace detail
 
         void cancel()
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
-                    boost::throw_exception(hpx::thread_interrupted());
+                    HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
                 if (this->is_ready_locked())
                     return;   // nothing we can do
@@ -966,7 +906,7 @@ namespace detail
                         "future can't be canceled at this time");
                 }
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 this->started_ = true;
                 this->set_exception(boost::current_exception());
                 throw;

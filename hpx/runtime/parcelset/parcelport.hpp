@@ -11,8 +11,8 @@
 #define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
 #include <hpx/config.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -23,19 +23,17 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/thread/locks.hpp>
 
+#include <deque>
 #include <map>
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
-#include <deque>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
-#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
 #define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
 #endif
 
@@ -53,9 +51,10 @@ namespace hpx { namespace parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
     class HPX_EXPORT parcelport
-      : public boost::enable_shared_from_this<parcelport>,
-        boost::noncopyable
+      : public boost::enable_shared_from_this<parcelport>
     {
+        HPX_NON_COPYABLE(parcelport);
+
     private:
         // avoid warnings about using \a this in member initializer list
         parcelport& This() { return *this; }
@@ -301,7 +300,7 @@ namespace hpx { namespace parcelset
 
         boost::uint64_t get_pending_parcels_count(bool /*reset*/)
         {
-            boost::lock_guard<lcos::local::spinlock> l(mtx_);
+            std::lock_guard<lcos::local::spinlock> l(mtx_);
             return pending_parcels_.size();
         }
 

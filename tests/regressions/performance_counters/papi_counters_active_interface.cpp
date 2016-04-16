@@ -12,8 +12,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
 
-#include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 const char *counter_name = "/papi{locality#0/worker-thread#0}/PAPI_SR_INS";

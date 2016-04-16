@@ -17,8 +17,8 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
-#include <string>
 #include <map>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_NAME_2(name1, name2)                                       \

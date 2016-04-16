@@ -12,6 +12,7 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
-#include <hpx/util/move.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -124,7 +124,7 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async(BOOST_SCOPED_ENUM(launch) policy, Ts&&... vs) const
+        async(launch policy, Ts&&... vs) const
         {
             return hpx::detail::async_impl<Action>(policy,
                 get_next_target(), std::forward<Ts>(vs)...);
@@ -138,7 +138,7 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async_cb(BOOST_SCOPED_ENUM(launch) policy, Callback&& cb, Ts&&... vs) const
+        async_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::async_cb_impl<Action>(policy,
                 get_next_target(), std::forward<Callback>(cb),

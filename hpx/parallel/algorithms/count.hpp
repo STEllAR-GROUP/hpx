@@ -8,8 +8,8 @@
 #if !defined(HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM)
 #define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -20,12 +20,11 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <boost/range/functions.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy policy, Iter first, Iter last,
+            parallel(ExPolicy && policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
@@ -66,7 +65,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 return util::partitioner<ExPolicy, difference_type>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [value](Iter part_begin, std::size_t part_size) -> difference_type
                     {
                         difference_type ret = 0;
@@ -95,13 +95,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         count_(ExPolicy && policy, InIter first, InIter last, T const& value,
             std::false_type)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                category;
-
-            typedef typename boost::mpl::or_<
-                parallel::is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, category>
-            >::type is_seq;
+            typedef std::integral_constant<bool,
+                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference_type;
@@ -165,23 +162,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename InIter, typename T>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type
     >::type
     count(ExPolicy && policy, InIter first, InIter last, T const& value)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            category;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, category>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::count_(
             std::forward<ExPolicy>(policy), first, last, value,
@@ -214,7 +207,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy policy, Iter first, Iter last, Pred && op)
+            parallel(ExPolicy && policy, Iter first, Iter last, Pred && op)
             {
                 if (first == last)
                 {
@@ -224,7 +217,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 return util::partitioner<ExPolicy, difference_type>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [op](Iter part_begin, std::size_t part_size) -> difference_type
                     {
                         difference_type ret = 0;
@@ -253,13 +247,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                category;
-
-            typedef typename boost::mpl::or_<
-                parallel::is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, category>
-            >::type is_seq;
+            typedef std::integral_constant<bool,
+                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference_type;
@@ -340,23 +331,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename InIter, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type
     >::type
     count_if(ExPolicy && policy, InIter first, InIter last, F && f)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            category;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, category>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Required at least input iterator.");
 
-        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
-        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::count_if_(
             std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),

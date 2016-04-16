@@ -9,11 +9,13 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <iostream>
-#include <functional>
 #include <algorithm>
-#include <numeric>
+#include <functional>
+#include <iostream>
 #include <iterator>
+#include <numeric>
+#include <string>
+#include <vector>
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/functions.hpp>
@@ -93,6 +95,25 @@ void test_auto_chunk_size()
     }
 }
 
+void test_persistent_auto_chunk_size()
+{
+    {
+        hpx::parallel::persistent_auto_chunk_size pacs;
+        chunk_size_test(pacs);
+    }
+
+    {
+        hpx::parallel::persistent_auto_chunk_size pacs(
+            boost::chrono::milliseconds(0),boost::chrono::milliseconds(1));
+        chunk_size_test(pacs);
+    }
+
+    {
+        hpx::parallel::persistent_auto_chunk_size pacs(boost::chrono::milliseconds(0));
+        chunk_size_test(pacs);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -107,6 +128,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     test_static_chunk_size();
     test_guided_chunk_size();
     test_auto_chunk_size();
+    test_persistent_auto_chunk_size();
 
     return hpx::finalize();
 }
@@ -126,7 +148,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

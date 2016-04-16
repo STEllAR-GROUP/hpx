@@ -35,8 +35,9 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/function.hpp>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 #include <hpx/util/logging/format_fwd.hpp>
 #include <hpx/util/logging/detail/find_format_writer.hpp>
 

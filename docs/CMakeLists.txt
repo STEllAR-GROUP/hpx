@@ -49,10 +49,12 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/error.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/error_code.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_list.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/throw_exception.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
@@ -68,6 +70,9 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_induction.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_reduction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
@@ -113,6 +118,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_parameter_traits.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/persistent_auto_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/sequential_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/service_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
@@ -151,6 +157,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/gather.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/reduce.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_all.hpp"
@@ -173,18 +180,17 @@ set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
 
 set(doxygen_definition_list
     "DOXYGEN:=1"
-    "BOOST_SCOPED_ENUM_START(x):=enum x"
-    "BOOST_SCOPED_ENUM_END="
-    "BOOST_SCOPED_ENUM(x):=x"
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
     "HPX_EXPORT="
     "HPX_API_EXPORT="
     "HPX_ALWAYS_EXPORT="
-    "HPX_STD_FUNCTION=std::function"
     "extern="
-    "BOOST_NOEXCEPT="
-    "HPX_INLINE_NAMESPACE(x)=namespace x")
+    "HPX_NOEXCEPT="
+    "HPX_CONSTEXPR="
+    "HPX_FORCEINLINE="
+    "HPX_INLINE_NAMESPACE(x)=namespace x"
+    "HPX_CONCEPT_REQUIRES_(x)=")
 
 #############################################################################
 # Definitions for autodoc.doxy.in

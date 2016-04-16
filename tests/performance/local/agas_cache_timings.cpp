@@ -19,10 +19,12 @@
 #include <boost/icl/closed_interval.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
-#include <utility>
 #include <algorithm>
-#include <map>
 #include <iostream>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "histogram.hpp"
 

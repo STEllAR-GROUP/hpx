@@ -6,6 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <string>
+#include <vector>
+
 // use smaller array sizes for debug tests
 #if defined(HPX_DEBUG)
 #define HPX_SORT_TEST_SIZE          50000L
@@ -93,6 +96,7 @@ void test_sort1()
     test_sort1_async_str(seq(task), std::greater<std::string>());
     test_sort1_async_str(par(task), std::greater<std::string>());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sort1(execution_policy(seq),       int());
     test_sort1(execution_policy(par),       int());
     test_sort1(execution_policy(par_vec),   int());
@@ -100,6 +104,7 @@ void test_sort1()
     test_sort1(execution_policy(par(task)), int());
     test_sort1(execution_policy(seq(task)), std::string());
     test_sort1(execution_policy(par(task)), std::string());
+#endif
 }
 
 void test_sort2()
@@ -138,11 +143,13 @@ void test_sort2()
     test_sort2_async(seq(task), double(), std::greater<double>());
     test_sort2_async(par(task), float(),  std::greater<float>());
 
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sort2(execution_policy(seq),       int());
     test_sort2(execution_policy(par),       int());
     test_sort2(execution_policy(par_vec),   int());
     test_sort2(execution_policy(seq(task)), int());
     test_sort2(execution_policy(par(task)), int());
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +191,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

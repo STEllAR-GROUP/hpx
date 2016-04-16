@@ -16,6 +16,9 @@
 #include <boost/make_shared.hpp>
 #include <boost/move/move.hpp>
 
+#include <string>
+#include <vector>
+
 #include "read_values.hpp"
 #include "partition3d.hpp"
 #include "interpolator.hpp"
@@ -83,7 +86,7 @@ namespace sheneos
             for (std::size_t i = 0; i < partitions_.size(); ++i)
             {
                 hpx::agas::unregister_name(data.symbolic_name_ +
-                    boost::lexical_cast<std::string>(i++));
+                    std::to_string(i++));
             }
         }
     }
@@ -130,10 +133,9 @@ namespace sheneos
         partitions_.reserve(data.num_instances_);
         for (std::size_t i = 0; i < data.num_instances_; ++i)
         {
-            using boost::lexical_cast;
             partitions_.push_back(hpx::naming::id_type());
             hpx::naming::id_type id = hpx::agas::resolve_name(
-                    data.symbolic_name_ + lexical_cast<std::string>(i)).get();
+                    data.symbolic_name_ + std::to_string(i)).get();
         }
 
         // Read required data from given file.
@@ -253,9 +255,8 @@ namespace sheneos
         // Register symbolic names of all involved components.
         for (hpx::naming::id_type const& id : partitions_)
         {
-            using boost::lexical_cast;
             hpx::agas::register_name(
-                symbolic_name_base + lexical_cast<std::string>(i++),
+                symbolic_name_base + std::to_string(i++),
                 id);
         }
 

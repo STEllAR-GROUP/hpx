@@ -9,9 +9,8 @@
 #if !defined(HPX_AGAS_LOCALITY_NAMESPACE_APR_04_2013_1107AM)
 #define HPX_AGAS_LOCALITY_NAMESPACE_APR_04_2013_1107AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
@@ -25,9 +24,10 @@
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <map>
+#include <string>
+#include <vector>
 
 #include <boost/format.hpp>
-#include <boost/fusion/include/vector.hpp>
 #include <boost/atomic.hpp>
 
 namespace hpx { namespace agas
@@ -52,7 +52,7 @@ struct HPX_EXPORT locality_namespace
     typedef boost::int32_t component_type;
 
     // stores the locality endpoints, and number of OS-threads running on this locality
-    typedef boost::fusion::vector2<
+    typedef hpx::util::tuple<
         parcelset::endpoints_type, boost::uint32_t>
     partition_type;
 
@@ -72,8 +72,12 @@ struct HPX_EXPORT locality_namespace
     struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
-    struct counter_data :  boost::noncopyable
+    struct counter_data
     {
+    private:
+        HPX_NON_COPYABLE(counter_data);
+
+    public:
         typedef lcos::local::spinlock mutex_type;
 
         struct api_counter_data

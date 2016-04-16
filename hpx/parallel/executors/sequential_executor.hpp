@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,17 +14,14 @@
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
-#include <iterator>
-
-#include <boost/range/functions.hpp>
-#include <boost/range/const_iterator.hpp>
-#include <boost/type_traits/is_void.hpp>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -50,13 +47,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        static typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
+        static typename hpx::util::result_of<F()>::type
         execute(F && f)
         {
             try {
-                return f();
+                return hpx::util::invoke(f);
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
@@ -69,9 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        static hpx::future<typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type>
+        static hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute(F && f)
         {
             return hpx::async(launch::deferred, std::forward<F>(f));

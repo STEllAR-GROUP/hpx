@@ -6,6 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
 
+#include <string>
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx_startup::user_main, if necessary. This has to be in a
 // separate translation unit to ensure the linker can pick or ignore this function,
@@ -36,6 +39,6 @@ int hpx_startup::user_main()
     HPX_THROW_EXCEPTION(hpx::not_implemented,
         "The console locality does not implement any main entry point usable "
         "as the main HPX thread (e.g. no hpx_main, hpx_startup::user_main, etc.)",
-        "hpx_startup::user_main")
+        "hpx_startup::user_main");
 }
 

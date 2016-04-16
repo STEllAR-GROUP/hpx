@@ -15,6 +15,8 @@
 #include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 char* align_buffer (char* ptr, unsigned long align_size)
 {

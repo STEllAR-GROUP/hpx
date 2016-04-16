@@ -34,17 +34,18 @@
 #endif
 
 #include <iostream>
-#include <sstream>
-#include <vector>
-#include <new>
 #include <memory>
+#include <new>
+#include <sstream>
+#include <string>
+#include <vector>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/format.hpp>
-#include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/assign/std/vector.hpp>
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -1280,7 +1281,7 @@ namespace hpx
     int stop(error_code& ec)
     {
         if (threads::get_self_ptr()) {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+            HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "this function cannot be called from an HPX thread");
             return -1;
         }
@@ -1294,6 +1295,7 @@ namespace hpx
         }
 
         int result = rt->wait();
+
         rt->stop();
         rt->rethrow_exception();
 

@@ -54,4 +54,6 @@
 For more detailed information about using __cmake__ please refer its documentation
 and also the section __cmake_hpx__.
 
+[include howto_win32.qbk]
+
 [endsect] [/ How to Install __hpx__ on Windows]

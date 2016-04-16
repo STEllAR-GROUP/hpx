@@ -13,6 +13,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 
+#include <vector>
+
 namespace hpx { namespace agas { namespace stubs
 {
 

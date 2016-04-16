@@ -6,6 +6,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
@@ -55,12 +57,12 @@ namespace hpx { namespace components
             result = "component";
 
         if (type == get_base_type(type) || component_invalid == type)
-            result += "[" + boost::lexical_cast<std::string>(type) + "]";
+            result += "[" + std::to_string(type) + "]";
         else {
             result += "[" +
-                boost::lexical_cast<std::string>
+                std::to_string
                   (static_cast<int>(get_derived_type(type))) +
-                "(" + boost::lexical_cast<std::string>
+                "(" + std::to_string
                     (static_cast<int>(get_base_type(type))) + ")"
                 "]";
         }

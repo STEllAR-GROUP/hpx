@@ -12,7 +12,6 @@
 
 #include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <vector>
 
 #include <hpx/util/lightweight_test.hpp>
 
@@ -20,6 +19,8 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <string>
+#include <vector>
 
 using std::vector;
 using hpx::lcos::shared_future;
@@ -106,7 +107,7 @@ int main(int argc, char *argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+        std::to_string(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(argc, argv, cfg);

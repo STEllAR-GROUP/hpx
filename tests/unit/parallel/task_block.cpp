@@ -9,6 +9,9 @@
 #include <hpx/include/parallel_task_block.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
+#include <vector>
+
 using hpx::parallel::define_task_block;
 using hpx::parallel::task_block;
 using hpx::parallel::par;
@@ -115,6 +118,7 @@ void define_task_block_test2()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
 #if defined(HPX_HAVE_CXX14_LAMBDAS)
 void define_task_block_test3()
 {
@@ -163,6 +167,7 @@ void define_task_block_test3()
     HPX_TEST(task21_flag);
     HPX_TEST(task3_flag);
 }
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,8 +296,10 @@ int hpx_main()
 {
     define_task_block_test1();
     define_task_block_test2();
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
 #if defined(HPX_HAVE_CXX14_LAMBDAS)
     define_task_block_test3();
+#endif
 #endif
 
     define_task_block_exceptions_test1();
@@ -309,7 +316,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+        std::to_string(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

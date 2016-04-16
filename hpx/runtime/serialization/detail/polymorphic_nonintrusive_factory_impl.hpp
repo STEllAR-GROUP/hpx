@@ -14,6 +14,8 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 
+#include <string>
+
 namespace hpx { namespace serialization { namespace detail
 {
    template <class T>

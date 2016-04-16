@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,17 +18,15 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/program_options.hpp>
 
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace util
 {
@@ -68,14 +66,6 @@ namespace hpx { namespace util
         {
             encode(str, '\n', "\\n");
             return str;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        inline std::string enquote(std::string const& arg)
-        {
-            if (arg.find_first_of(" \t") != std::string::npos)
-                return std::string("\"") + arg + "\"";
-            return arg;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -291,7 +281,7 @@ namespace hpx { namespace util
                     default_threads = batch_threads;
 
                 cfgmap.config_["hpx.os_threads"] =
-                    boost::lexical_cast<std::string>(batch_threads);
+                    std::to_string(batch_threads);
             }
             else if (batch_threads != std::size_t(-1))
             {
@@ -370,7 +360,7 @@ namespace hpx { namespace util
         {
             std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
             if ("all" == cores_str) {
-                cfgmap.config_["hpx.cores"] = boost::lexical_cast<std::string>(
+                cfgmap.config_["hpx.cores"] = std::to_string(
                     get_number_of_default_cores(env));
             }
 
@@ -415,10 +405,13 @@ namespace hpx { namespace util
         // The AGAS host name and port number are pre-initialized from
         //the command line
         std::string agas_host =
-            cfgmap.get_value<std::string>("hpx.agas.address", "");
+            cfgmap.get_value<std::string>("hpx.agas.address",
+                rtcfg_.get_entry("hpx.agas.address", ""));
         boost::uint16_t agas_port =
             cfgmap.get_value<boost::uint16_t>("hpx.agas.port",
-                HPX_INITIAL_IP_PORT);
+                boost::lexical_cast<boost::uint16_t>(
+                    rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)
+                ));
 
         if (vm.count("hpx:agas")) {
             if (!util::split_ip_address(
@@ -514,7 +507,9 @@ namespace hpx { namespace util
         // locality.
         std::string hpx_host =
             cfgmap.get_value<std::string>("hpx.parcel.address",
-                env.host_name(HPX_INITIAL_IP_ADDRESS));
+                env.host_name(
+                    rtcfg_.get_entry("hpx.parcel.address", HPX_INITIAL_IP_ADDRESS)
+                ));
 
         // we expect dynamic connections if:
         //  - --hpx:expect-connecting-localities or
@@ -530,10 +525,16 @@ namespace hpx { namespace util
         ini_config += std::string("hpx.expect_connecting_localities=") +
             (expect_connections ? "1" : "0");
 
+        boost::uint16_t initial_hpx_port = 0;
+        if (num_localities_ != 1 || expect_connections)
+        {
+            initial_hpx_port =
+                boost::lexical_cast<boost::uint16_t>(
+                    rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
+        }
+
         boost::uint16_t hpx_port =
-            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
-                (num_localities_ == 1 && !expect_connections) ?
-                    0 : HPX_INITIAL_IP_PORT);
+            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port", initial_hpx_port);
 
         bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
@@ -578,7 +579,10 @@ namespace hpx { namespace util
         // has been retrieved from the environment)
         if (mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
-            hpx_port = HPX_CONNECTING_IP_PORT;
+            hpx_port = cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
+                boost::lexical_cast<boost::uint16_t>(
+                    rtcfg_.get_entry("hpx.parcel.port", HPX_CONNECTING_IP_PORT)
+                ));
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
@@ -633,7 +637,7 @@ namespace hpx { namespace util
             if (!vm.count("hpx:worker") || node != 0)
             {
                 ini_config += "hpx.locality!=" +
-                    boost::lexical_cast<std::string>(node);
+                    std::to_string(node);
             }
         }
 
@@ -648,7 +652,9 @@ namespace hpx { namespace util
             }
         }
 
-        if (vm.count("hpx:connect") && hpx_host==std::string("127.0.0.1")) {
+        if ((vm.count("hpx:connect") || mode_ == hpx::runtime_mode_connect) &&
+            hpx_host == "127.0.0.1")
+        {
             hpx_host = hpx::util::resolve_public_ip_address();
         }
 
@@ -664,17 +670,14 @@ namespace hpx { namespace util
             ini_config += "hpx.bind!=" + affinity_bind_;
 
         pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
-        ini_config += "hpx.pu_step=" +
-            hpx::util::safe_lexical_cast<std::string>(pu_step_);
+        ini_config += "hpx.pu_step=" + std::to_string(pu_step_);
 
         pu_offset_ = detail::handle_pu_offset(cfgmap, vm, 0);
-        ini_config += "hpx.pu_offset=" +
-            hpx::util::safe_lexical_cast<std::string>(pu_offset_);
+        ini_config += "hpx.pu_offset=" + std::to_string(pu_offset_);
 
         numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
             affinity_bind_.empty() ? 0 : 1);
-        ini_config += "hpx.numa_sensitive=" +
-            hpx::util::safe_lexical_cast<std::string>(numa_sensitive_);
+        ini_config += "hpx.numa_sensitive=" + std::to_string(numa_sensitive_);
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
@@ -721,9 +724,9 @@ namespace hpx { namespace util
 
         // write HPX and AGAS network parameters to the proper ini-file entries
         ini_config += "hpx.parcel.address=" + hpx_host;
-        ini_config += "hpx.parcel.port=" + boost::lexical_cast<std::string>(hpx_port);
+        ini_config += "hpx.parcel.port=" + std::to_string(hpx_port);
         ini_config += "hpx.agas.address=" + agas_host;
-        ini_config += "hpx.agas.port=" + boost::lexical_cast<std::string>(agas_port);
+        ini_config += "hpx.agas.port=" + std::to_string(agas_port);
 
         if (run_agas_server) {
             ini_config += "hpx.agas.service_mode=bootstrap";
@@ -792,14 +795,14 @@ namespace hpx { namespace util
 
         // Set number of cores and OS threads in configuration.
         ini_config += "hpx.os_threads=" +
-            boost::lexical_cast<std::string>(num_threads_);
+            std::to_string(num_threads_);
         ini_config += "hpx.cores=" +
-            boost::lexical_cast<std::string>(num_cores_);
+            std::to_string(num_cores_);
 
         // Set number of localities in configuration (do it everywhere,
         // even if this information is only used by the AGAS server).
         ini_config += "hpx.localities=" +
-            boost::lexical_cast<std::string>(num_localities_);
+            std::to_string(num_localities_);
 
         // FIXME: AGAS V2: if a locality is supposed to run the AGAS
         //        service only and requests to use 'priority_local' as the

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,8 +8,8 @@
 #if !defined(HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM)
 #define HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -20,12 +20,12 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <boost/range/functions.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
-#include <numeric>
 #include <iterator>
+#include <numeric>
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r)
             {
                 if (first == last)
@@ -64,7 +64,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 return util::partitioner<ExPolicy, T>::call(
-                    policy, first, std::distance(first, last),
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
                     [r](FwdIter part_begin, std::size_t part_size) -> T
                     {
                         T val = *part_begin;
@@ -152,23 +153,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter, typename T, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last, T init, F && f)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::reduce<T>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -229,23 +227,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter, typename T>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last, T init)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::reduce<T>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -307,25 +302,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::value_type>::type
+            typename std::iterator_traits<InIter>::value_type
+        >::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last)
     {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-        typedef typename std::iterator_traits<InIter>::value_type value_type;
-
         static_assert(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+            (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef typename std::iterator_traits<InIter>::value_type value_type;
+
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
         return detail::reduce<value_type>().call(
             std::forward<ExPolicy>(policy), is_seq(),

@@ -7,11 +7,8 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_HIERARCHY)
 #define HPX_THREADMANAGER_SCHEDULING_HIERARCHY
 
-#include <vector>
-#include <memory>
-
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -19,6 +16,10 @@
 
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

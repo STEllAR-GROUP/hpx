@@ -10,9 +10,11 @@
 
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <algorithm>
-
 #include <boost/format.hpp>
+
+#include <algorithm>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace threads { namespace policies { namespace detail
 {

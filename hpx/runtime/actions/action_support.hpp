@@ -20,7 +20,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
@@ -235,11 +234,11 @@ namespace hpx { namespace actions
         /// Perform thread initialization
         virtual void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
+            threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
 
         virtual void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
+            threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
 
         /// Return whether the given object was migrated
         virtual std::pair<bool, components::pinned_ptr>

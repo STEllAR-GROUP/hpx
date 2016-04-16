@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>
@@ -34,11 +34,11 @@
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
 #endif
 
-#include <boost/thread/locks.hpp>
-
 #include <iostream>
-#include <vector>
 #include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -51,6 +51,7 @@
 
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
     void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -103,6 +104,7 @@ namespace hpx
 
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void termination_handler(int signum)
     {
         if (signum != SIGINT &&
@@ -128,6 +130,13 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // There is no need to protect these global from thread concurrent access
+    // as they are access during early startup only.
+    std::vector<hpx::util::tuple<char const*, char const*> >
+        message_handler_registrations;
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void new_handler()
     {
         HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
@@ -258,7 +267,7 @@ namespace hpx
 
             {
                 // Initialize the root-CA
-                boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+                std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
                 root_ca.initialize();
 
@@ -294,7 +303,7 @@ namespace hpx
     components::security::signed_certificate_signing_request
         runtime::get_certificate_signing_request() const
     {
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
         // Initialize the sub-CA
         security_data_->subordinate_certificate_authority_.initialize();
@@ -314,7 +323,7 @@ namespace hpx
 
         {
             // tend to the given CSR
-            boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+            std::lock_guard<lcos::local::spinlock> l(security_mtx_);
             cert = security_data_->root_certificate_authority_.
                 sign_certificate_signing_request(csr);
         }
@@ -341,7 +350,7 @@ namespace hpx
                 "root-CA(%1%)") % root_cert);
 
             // initialize our certificate store
-            boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+            std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
             HPX_ASSERT(security_data_->cert_store_.get() == 0);
             security_data_->cert_store_.reset(
@@ -364,7 +373,7 @@ namespace hpx
 
             {
                 // finish initializing our sub-CA
-                boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+                std::lock_guard<lcos::local::spinlock> l(security_mtx_);
                 security_data_->locality_certificate_ = subca_cert;
                 security_data_
                     ->subordinate_certificate_authority_.set_certificate(subca_cert);
@@ -388,7 +397,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(security_data_.get() != 0);
         return security_data_->root_certificate_authority_.get_certificate(ec);
     }
@@ -396,7 +405,7 @@ namespace hpx
     components::security::signed_certificate
         runtime::get_certificate(error_code& ec) const
     {
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(security_data_.get() != 0);
         return security_data_->subordinate_certificate_authority_.get_certificate(ec);
     }
@@ -412,7 +421,7 @@ namespace hpx
             "runtime::add_locality_certificate: locality(%1%): adding locality "
             "certificate: %2%") % here() % cert);
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(0 != security_data_->cert_store_.get());
         // should have been created
         security_data_->cert_store_->insert(cert);
@@ -430,7 +439,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         return security_data_->locality_certificate_;
     }
 
@@ -447,7 +456,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
         using util::security::get_subordinate_certificate_authority_gid;
         return security_data_->cert_store_->at(
@@ -470,7 +479,7 @@ namespace hpx
             return;
         }
 
-        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
         signed_suffix = security_data_->subordinate_certificate_authority_.
             get_key_pair().sign(suffix, ec);
     }
@@ -518,20 +527,20 @@ namespace hpx
         // initialize our TSS
         if (NULL == runtime::runtime_.get())
         {
-            HPX_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
+            HPX_ASSERT(NULL == threads::thread_self::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
             runtime::uptime_.reset(new boost::uint64_t);
             *runtime::uptime_.get() = util::high_resolution_clock::now();
 
-            threads::coroutine_type::impl_type::init_self();
+            threads::thread_self::init_self();
         }
     }
 
     void runtime::deinit_tss()
     {
         // reset our TSS
-        threads::coroutine_type::impl_type::reset_self();
+        threads::thread_self::reset_self();
         runtime::uptime_.reset();
         runtime::runtime_.reset();
         util::reset_held_lock_data();
@@ -603,6 +612,13 @@ namespace hpx
     {
         if (active_counters_.get())
             active_counters_->stop_evaluating_counters();
+    }
+
+    void runtime::register_message_handler(char const* message_handler_type,
+        char const* action, error_code& ec)
+    {
+        return runtime_support_->register_message_handler(
+            message_handler_type, action, ec);
     }
 
     parcelset::policies::message_handler* runtime::create_message_handler(
@@ -716,7 +732,7 @@ namespace hpx
             },
 
             // action invocation counters
-            { "/runtime/count/action_invocation", performance_counters::counter_raw,
+            { "/runtime/count/action-invocation", performance_counters::counter_raw,
               "returns the number of (local) invocations of a specific action "
               "on this locality (the action type has to be specified as the "
               "counter parameter)",
@@ -726,7 +742,7 @@ namespace hpx
               ""
             },
 
-            { "/runtime/count/remote_action_invocation",
+            { "/runtime/count/remote-action-invocation",
               performance_counters::counter_raw,
               "returns the number of (remote) invocations of a specific action "
               "on this locality (the action type has to be specified as the "
@@ -792,7 +808,7 @@ namespace hpx
     boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
         boost::uint32_t cores_needed)
     {
-        boost::lock_guard<boost::mutex> l(mtx_);
+        std::lock_guard<boost::mutex> l(mtx_);
 
         used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
@@ -1181,7 +1197,7 @@ namespace hpx
         if (NULL != rt)
         {
             state st = rt->get_state();
-            return st == state_stopped || st == state_shutdown;
+            return st >= state_shutdown;
         }
         return true;        // assume stopped
     }
@@ -1446,6 +1462,19 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a message handler plugin
+    void register_message_handler(char const* message_handler_type,
+        char const* action, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            return rt->register_message_handler(message_handler_type, action, ec);
+        }
+
+        // store the request for later
+        message_handler_registrations.push_back(
+            hpx::util::make_tuple(message_handler_type, action));
+    }
+
     parcelset::policies::message_handler* create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,

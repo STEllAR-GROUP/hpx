@@ -7,6 +7,8 @@
 #define HPX_PARALLEL_ALGORITHMS_SET_OPERATION_MAR_06_2015_0704PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
+
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
@@ -15,9 +17,10 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_scalar.hpp>
 #include <boost/shared_array.hpp>
+
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
@@ -51,8 +54,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         };
 
         typedef typename std::iterator_traits<OutIter>::value_type value_type;
-        typedef typename boost::mpl::if_<
-            boost::is_scalar<value_type>, value_type, rewritable_ref<value_type>
+        typedef typename std::conditional<
+            std::is_scalar<value_type>::value,
+            value_type, rewritable_ref<value_type>
         >::type type;
     };
 
@@ -71,7 +75,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         RanIter1 first1, RanIter1 last1, RanIter2 first2, RanIter2 last2,
         OutIter dest, F && f, Combiner && combiner, SetOp && setop)
     {
-        typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
         typedef typename std::iterator_traits<RanIter1>::difference_type
             difference_type1;
         typedef typename std::iterator_traits<RanIter2>::difference_type
@@ -168,10 +171,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 }
 
                 // finally, copy data to destination
-                parallel::util::foreach_n_partitioner<
+                parallel::util::foreach_partitioner<
                         hpx::parallel::parallel_execution_policy
                     >::call(par, chunks.get(), cores,
-                        [buffer, dest](set_chunk_data* chunk, std::size_t)
+                        [buffer, dest](
+                            std::size_t, set_chunk_data* chunk, std::size_t)
                         {
                             std::copy(buffer.get() + chunk->start,
                                 buffer.get() + chunk->start + chunk->len,
@@ -179,8 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         });
 
                 return dest;
-            },
-            1);
+            });
     }
 
     /// \endcond

@@ -8,8 +8,7 @@
 #define HPX_DERIVED_COMPONENT_FACTORY_NOV_05_2008_1209PM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
@@ -23,6 +22,8 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>
+
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,11 +6,11 @@
 #pragma once // prevent multiple inclusions of this header file.
 
 #include <hpx/config/defines.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
 #endif
-
 
 namespace hpx { namespace util
 {
@@ -28,10 +28,18 @@ namespace hpx { namespace util
 
     struct apex_wrapper
     {
-        apex_wrapper(char const* const name)
+        apex_wrapper(thread_description const& name)
           : name_(name), stopped(false)
         {
-            profiler_ = apex::start(name_);
+            if (name_.kind() == thread_description::data_type_description)
+            {
+                profiler_ = apex::start(name_.get_description());
+            }
+            else
+            {
+                profiler_ = apex::start(
+                    apex_function_address(name_.get_address()));
+            }
         }
         ~apex_wrapper()
         {
@@ -52,7 +60,7 @@ namespace hpx { namespace util
             }
         }
 
-        char const* const name_;
+        thread_description name_;
         bool stopped;
         apex::profiler * profiler_;
     };
@@ -74,7 +82,7 @@ namespace hpx { namespace util
 
     struct apex_wrapper
     {
-        apex_wrapper(char const* const name) {}
+        apex_wrapper(thread_description const& name) {}
         ~apex_wrapper() {}
     };
 

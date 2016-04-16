@@ -20,12 +20,12 @@
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
-#include <vector>
 #include <iterator>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace components
 {

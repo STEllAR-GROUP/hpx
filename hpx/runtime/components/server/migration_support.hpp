@@ -16,8 +16,7 @@
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/thread/locks.hpp>
-
+#include <mutex>
 #include <type_traits>
 #include <utility>
 
@@ -64,7 +63,7 @@ namespace hpx { namespace components
         // Pinning functionality
         void pin()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(pin_count_ != ~0x0u);
             if (pin_count_ != ~0x0u)
                 ++pin_count_;
@@ -75,11 +74,11 @@ namespace hpx { namespace components
             agas::mark_as_migrated(this->gid_,
                 [this]() mutable -> std::pair<bool, hpx::future<void> >
                 {
-                    boost::unique_lock<mutex_type> l(mtx_);
-                    HPX_ASSERT(pin_count_ != 0);
-                    if (pin_count_ != ~0x0u)
+                    std::unique_lock<mutex_type> l(mtx_);
+                    HPX_ASSERT(this->pin_count_ != 0);
+                    if (this->pin_count_ != ~0x0u)
                     {
-                        if (--pin_count_ == 0)
+                        if (--this->pin_count_ == 0)
                         {
                             // trigger pending migration if this was the last
                             // unpin and a migration operation is pending
@@ -99,12 +98,12 @@ namespace hpx { namespace components
 
         boost::uint32_t pin_count() const
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return pin_count_;
         }
         void mark_as_migrated()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(1 == pin_count_);
             pin_count_ = ~0x0u;
         }
@@ -116,7 +115,7 @@ namespace hpx { namespace components
             return agas::mark_as_migrated(to_migrate.get_gid(),
                 [this]() mutable -> std::pair<bool, hpx::future<void> >
                 {
-                    boost::unique_lock<mutex_type> l(mtx_);
+                    std::unique_lock<mutex_type> l(mtx_);
 
                     // make sure that no migration is currently in flight
                     if (was_marked_for_migration_)
