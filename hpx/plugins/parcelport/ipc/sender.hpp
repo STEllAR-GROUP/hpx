@@ -17,6 +17,7 @@
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -103,7 +104,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 = &sender::handle_write<Handler, ParcelPostprocess>;
 
             window_.async_write(buffer_->data_,
-                boost::bind(f, shared_from_this(),
+                util::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, ::_2,
                     util::make_tuple(handler, parcel_postprocess)));
         }
@@ -132,7 +133,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                       util::tuple<Handler, ParcelPostprocess>)
                 = &sender::handle_read_ack<Handler, ParcelPostprocess>;
 
-            window_.async_read_ack(boost::bind(f, shared_from_this(),
+            window_.async_read_ack(util::bind(f, shared_from_this(),
                 boost::asio::placeholders::error, handler));
         }
 

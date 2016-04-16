@@ -6,6 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/format.hpp>
 
@@ -223,7 +224,7 @@ namespace performance_counters { namespace sine
               // where '<locality_id>' is the number of the locality the
               // counter has to be instantiated on. The function 'immediate_sine'
               // is used as the source of counter data for the created counter.
-              boost::bind(&hpx::performance_counters::locality_raw_counter_creator,
+              hpx::util::bind(&hpx::performance_counters::locality_raw_counter_creator,
                   _1, &immediate_sine, _2),
               &hpx::performance_counters::locality_counter_discoverer,
               ""

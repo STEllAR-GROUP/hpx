@@ -14,8 +14,9 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -195,7 +196,7 @@ void primary_namespace::register_counter_types(
     boost::format help_time(
         "returns the overall execution time of the AGAS service '%s'");
     performance_counters::create_counter_func creator(
-        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::primary_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -236,7 +237,7 @@ void primary_namespace::register_global_counter_types(
     )
 {
     performance_counters::create_counter_func creator(
-        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::primary_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -1412,41 +1413,41 @@ response primary_namespace::statistics_counter(
     {
         switch (code) {
         case primary_ns_route:
-            get_data_func = boost::bind(&cd::get_route_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_route_count, &counter_data_, ::_1);
             break;
         case primary_ns_bind_gid:
-            get_data_func = boost::bind(&cd::get_bind_gid_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_bind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = boost::bind(&cd::get_resolve_gid_count,
+            get_data_func = util::bind(&cd::get_resolve_gid_count,
                 &counter_data_, ::_1);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = boost::bind(&cd::get_unbind_gid_count,
+            get_data_func = util::bind(&cd::get_unbind_gid_count,
                 &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-            get_data_func = boost::bind(&cd::get_increment_credit_count,
+            get_data_func = util::bind(&cd::get_increment_credit_count,
                 &counter_data_, ::_1);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = boost::bind(&cd::get_decrement_credit_count,
+            get_data_func = util::bind(&cd::get_decrement_credit_count,
                 &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_count,
+            get_data_func = util::bind(&cd::get_allocate_count,
                 &counter_data_, ::_1);
             break;
         case primary_ns_begin_migration:
-            get_data_func = boost::bind(&cd::get_begin_migration_count,
+            get_data_func = util::bind(&cd::get_begin_migration_count,
                 &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
-            get_data_func = boost::bind(&cd::get_end_migration_count,
+            get_data_func = util::bind(&cd::get_end_migration_count,
                 &counter_data_, ::_1);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_count,
+            get_data_func = util::bind(&cd::get_overall_count,
                 &counter_data_, ::_1);
             break;
         default:
@@ -1460,38 +1461,38 @@ response primary_namespace::statistics_counter(
         HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case primary_ns_route:
-            get_data_func = boost::bind(&cd::get_route_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_route_time, &counter_data_, ::_1);
             break;
         case primary_ns_bind_gid:
-            get_data_func = boost::bind(&cd::get_bind_gid_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_bind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = boost::bind(&cd::get_resolve_gid_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_resolve_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-            get_data_func = boost::bind(&cd::get_increment_credit_time,
+            get_data_func = util::bind(&cd::get_increment_credit_time,
                 &counter_data_, ::_1);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = boost::bind(&cd::get_decrement_credit_time,
+            get_data_func = util::bind(&cd::get_decrement_credit_time,
                 &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_allocate_time, &counter_data_, ::_1);
             break;
         case primary_ns_begin_migration:
-            get_data_func = boost::bind(&cd::get_begin_migration_time,
+            get_data_func = util::bind(&cd::get_begin_migration_time,
                 &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
-            get_data_func = boost::bind(&cd::get_end_migration_time,
+            get_data_func = util::bind(&cd::get_end_migration_time,
                 &counter_data_, ::_1);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_time,
+            get_data_func = util::bind(&cd::get_overall_time,
                 &counter_data_, ::_1);
             break;
         default:

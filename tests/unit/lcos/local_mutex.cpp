@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
@@ -164,7 +165,7 @@ struct test_lock_times_out_if_other_thread_has_lock
             {
                 boost::unique_lock<hpx::lcos::local::mutex> lk(done_mutex);
                 HPX_TEST(done_cond.wait_for(lk,boost::chrono::seconds(2),
-                                                 boost::bind(&this_type::is_done,this)));
+                    hpx::util::bind(&this_type::is_done,this)));
                 HPX_TEST(!locked);
             }
 

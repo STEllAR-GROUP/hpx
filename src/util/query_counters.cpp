@@ -7,9 +7,10 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/query_counters.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/query_counters.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
@@ -33,8 +34,8 @@ namespace hpx { namespace util
             std::vector<std::string> const& shortnames, bool csv_header)
       : names_(names), destination_(dest), format_(form),
             counter_shortnames_(shortnames), csv_header_(csv_header),
-        timer_(boost::bind(&query_counters::evaluate, this_()),
-            boost::bind(&query_counters::terminate, this_()),
+        timer_(util::bind(&query_counters::evaluate, this_()),
+            util::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
     {
         // add counter prefix, if necessary

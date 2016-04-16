@@ -13,10 +13,10 @@
 #include <hpx/plugins/parcelport/ipc/interprocess_errors.hpp>
 #include <hpx/plugins/parcelport/ipc/message.hpp>
 #include <hpx/plugins/parcelport/ipc/data_buffer.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_io_object.hpp>
-#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/system/system_error.hpp>
@@ -230,7 +230,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                     std::size_t size = 0;
                     if (0 == (size = impl->try_read(data_, ec)) && !ec) {
                         // repost this handler
-                        io_service_.post(boost::bind(
+                        io_service_.post(util::bind(
                             &read_operation::call, this->shared_from_this()));
                     }
                     else {
@@ -483,7 +483,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 boost::make_shared<operation_type>(
                     impl, this->get_io_service(), data, handler));
 
-            this->get_io_service().post(boost::bind(&operation_type::call, op));
+            this->get_io_service().post(util::bind(&operation_type::call, op));
         }
 
         template <typename Handler>

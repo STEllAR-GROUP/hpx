@@ -10,7 +10,6 @@
 
 #include "allgather.hpp"
 
-#include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/ref.hpp>
 

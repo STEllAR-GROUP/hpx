@@ -20,6 +20,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -30,7 +31,6 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
-#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -107,7 +107,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_read_header<Handler>;
 
                 boost::asio::async_read(socket_, buffers,
-                    boost::bind(f, shared_from_this(),
+                    util::bind(f, shared_from_this(),
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred,
                         util::make_tuple(handler)));
@@ -128,8 +128,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     private:
         /// Handle a completed read of the message size from the
         /// message header.
-        /// The handler is passed using a tuple since boost::bind seems to have
-        /// trouble binding a function object created using boost::bind as a
+        /// The handler is passed using a tuple since util::bind seems to have
+        /// trouble binding a function object created using util::bind as a
         /// parameter.
         template <typename Handler>
         void handle_read_header(boost::system::error_code const& e,
@@ -215,7 +215,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     socket_.set_option(quickack);
 #endif
                     boost::asio::async_read(socket_, buffers,
-                        boost::bind(f, shared_from_this(),
+                        util::bind(f, shared_from_this(),
                             boost::asio::placeholders::error, handler));
                 }
             }
@@ -271,7 +271,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     socket_.set_option(quickack);
 #endif
                     boost::asio::async_read(socket_, buffers,
-                        boost::bind(f, shared_from_this(),
+                        util::bind(f, shared_from_this(),
                             boost::asio::placeholders::error, handler));
                 }
             }
@@ -315,7 +315,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     }
                     boost::asio::async_write(socket_,
                         boost::asio::buffer(&ack_, sizeof(ack_)),
-                        boost::bind(f, shared_from_this(),
+                        util::bind(f, shared_from_this(),
                             boost::asio::placeholders::error, handler));
                 }
             }

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -59,7 +60,7 @@ int hpx_main()
         for (boost::uint64_t i = 0; i < (os_thread_count - 1); ++i)
         {
             hpx::threads::register_work(
-                boost::bind(&blocker, &entered, &started, &blocked_threads),
+                hpx::util::bind(&blocker, &entered, &started, &blocked_threads),
                 "blocker", hpx::threads::pending,
                 hpx::threads::thread_priority_normal);
         }

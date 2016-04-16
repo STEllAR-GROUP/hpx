@@ -6,6 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 
@@ -63,7 +64,7 @@ int hpx_main(variables_map& vm)
 
         // Create the hpx-threads.
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work(boost::bind
+            register_work(hpx::util::bind
                 (&suspend_test, boost::ref(b), iterations, suspend_duration));
 
         b.wait(); // Wait for all hpx-threads to enter the barrier.

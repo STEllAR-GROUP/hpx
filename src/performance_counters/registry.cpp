@@ -12,6 +12,7 @@
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -444,7 +445,7 @@ namespace hpx { namespace performance_counters
         boost::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
         hpx::util::function_nonser<boost::int64_t(bool)> func(
-            boost::bind(wrap_counter, countervalue, ::_1));
+            util::bind(wrap_counter, countervalue, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 
@@ -459,7 +460,7 @@ namespace hpx { namespace performance_counters
         error_code& ec)
     {
         hpx::util::function_nonser<boost::int64_t(bool)> func(
-            boost::bind(&wrap_raw_counter, f, ::_1));
+            util::bind(&wrap_raw_counter, f, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 

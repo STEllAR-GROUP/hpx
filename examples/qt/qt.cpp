@@ -7,6 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/thread_executors.hpp>
 #include <hpx/lcos/future_wait.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <vector>
 
@@ -42,7 +43,7 @@ void qt_main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
 
-    widget main(boost::bind(run, _1, _2));
+    widget main(hpx::util::bind(run, _1, _2));
     main.show();
 
     app.exec();

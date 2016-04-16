@@ -29,7 +29,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/bind.hpp>
 #include <boost/regex.hpp>
 #include <boost/assign/std/vector.hpp>
 

@@ -15,6 +15,7 @@
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/io/ios_state.hpp>
@@ -94,7 +95,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 acceptor_->bind(ep);
                 acceptor_->listen();
                 acceptor_->async_accept(receiver_conn->socket(),
-                    boost::bind(&connection_handler::handle_accept,
+                    util::bind(&connection_handler::handle_accept,
                         this,
                         boost::asio::placeholders::error, receiver_conn));
             }
@@ -278,7 +279,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             receiver_conn.reset(new receiver(io_service, get_max_inbound_message_size(),
                 *this));
             acceptor_->async_accept(receiver_conn->socket(),
-                boost::bind(&connection_handler::handle_accept,
+                util::bind(&connection_handler::handle_accept,
                     this,
                     boost::asio::placeholders::error, receiver_conn));
 
@@ -296,7 +297,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // now accept the incoming connection by starting to read from the
             // socket
             c->async_read(
-                boost::bind(&connection_handler::handle_read_completion,
+                util::bind(&connection_handler::handle_read_completion,
                     this,
                     boost::asio::placeholders::error, c));
         }

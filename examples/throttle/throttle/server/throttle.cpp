@@ -8,9 +8,9 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 
 #include <mutex>
@@ -114,7 +114,7 @@ namespace throttle { namespace server
             std::to_string(shepherd) + ")");
 
         hpx::applier::register_thread(
-            boost::bind(&throttle::throttle_controller, this, shepherd),
+            hpx::util::bind(&throttle::throttle_controller, this, shepherd),
             description.c_str(),
             hpx::threads::pending, true,
             hpx::threads::thread_priority_critical,
@@ -128,7 +128,7 @@ namespace throttle { namespace server
             std::to_string(shepherd) + ")");
 
         hpx::applier::register_thread(
-            boost::bind(&throttle::suspend, this, shepherd),
+            hpx::util::bind(&throttle::suspend, this, shepherd),
             description.c_str(),
             hpx::threads::pending, true,
             hpx::threads::thread_priority_critical,

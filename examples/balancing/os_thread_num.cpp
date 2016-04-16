@@ -7,6 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/local/barrier.hpp>
+#include <hpx/util/bind.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <map>
@@ -81,7 +82,7 @@ int hpx_main(variables_map& vm)
 
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
-                register_work(boost::bind(&get_os_thread_num
+                register_work(hpx::util::bind(&get_os_thread_num
                                         , boost::ref(barr)
                                         , boost::ref(os_threads))
                   , "get_os_thread_num"

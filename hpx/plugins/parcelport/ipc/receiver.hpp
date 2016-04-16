@@ -17,11 +17,11 @@
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
@@ -90,7 +90,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 = &receiver::handle_read_data<Handler>;
 
             window_.async_read(buffer_->data_,
-                boost::bind(f, shared_from_this(),
+                util::bind(f, shared_from_this(),
                     boost::asio::placeholders::error,
                     util::make_tuple(handler)));
         }
@@ -125,7 +125,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
                 // acknowledge to have received the parcel
                 window_.async_write_ack(
-                    boost::bind(f, shared_from_this(),
+                    util::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
         }
