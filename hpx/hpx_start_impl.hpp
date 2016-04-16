@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +7,7 @@
 #define HPX_START_IMPL_OCT_04_2012_0252PM
 
 #include <hpx/hpx_start.hpp>
-
+#include <hpx/util/assert.hpp>
 #include <hpx/util/find_prefix.hpp>
 
 #include <string>
@@ -268,18 +268,15 @@ namespace hpx
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
 
-        if (argc == 0 || argv == 0)
-        {
-            char *dummy_argv[2] = { const_cast<char*>(app_name.c_str()), 0 };
-            return start(desc_commandline, 1, dummy_argv, mode);
-        }
-
+        util::function_nonser<int(boost::program_options::variables_map& vm)>
+            main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
 
-        return start(
-            util::bind(detail::init_helper, util::placeholders::_1, f),
-            desc_commandline, argc, argv, cfg, empty, empty, mode);
+        HPX_ASSERT(argc != 0 && argv != 0);
+
+        return start(main_f, desc_commandline, argc, argv, cfg, empty, empty,
+            mode);
     }
 
     // Main non-blocking entry point for launching the HPX runtime system.
@@ -288,6 +285,26 @@ namespace hpx
     {
         std::string app_name(HPX_APPLICATION_STRING);
         return start(f, app_name, argc, argv, mode);
+    }
+
+    inline bool start(util::function_nonser<int(int, char**)> const& f,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            "Usage: " + app_name +  " [options]");
+
+        util::function_nonser<int(boost::program_options::variables_map& vm)>
+            main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
+        util::function_nonser<void()> const empty;
+
+        HPX_ASSERT(argc != 0 && argv != 0);
+
+        return start(main_f, desc_commandline, argc, argv, cfg,
+            empty, empty, mode);
     }
 }
 
