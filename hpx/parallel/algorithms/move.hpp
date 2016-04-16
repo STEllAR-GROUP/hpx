@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -31,6 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+
         // sequential move
         template <typename InIter, typename OutIter>
         inline std::pair<InIter, OutIter>
@@ -43,13 +45,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return std::make_pair(first, dest);
         }
 
-
         template <typename IterPair>
-        struct move
-            : public detail::algorithm<move<IterPair>, IterPair>
+        struct move_pair :
+            public detail::algorithm<detail::move_pair<IterPair>, IterPair>
         {
-            move()
-              : move::algorithm("move")
+            move_pair()
+              : move_pair::algorithm("move")
             {}
 
             template <typename ExPolicy, typename InIter, typename OutIter>
@@ -83,6 +84,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        template<typename InIter, typename OutIter, typename Enable = void>
+        struct move;
+
+        template <typename InIter, typename OutIter>
+        struct move<
+            InIter, OutIter,
+            typename boost::enable_if<typename hpx::traits::segmented_iterator_traits<InIter>::is_segmented_iterator>::type
+        > : public move_pair<std::pair<
+            typename hpx::traits::segmented_iterator_traits<InIter>::local_iterator,
+            typename hpx::traits::segmented_iterator_traits<OutIter>::local_iterator
+        >>
+        {};
+
+        template<typename InIter, typename OutIter>
+        struct move<
+            InIter, OutIter,
+            typename boost::disable_if<typename hpx::traits::segmented_iterator_traits<OutIter>::is_segmented_iterator>::type
+        > : public move_pair<std::pair<InIter, OutIter>>
+        {};
         /// \endcond
     }
 
@@ -146,8 +167,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     move(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        return detail::transfer<detail::move>(
-            std::forward<ExPolicy>(policy), first, last, dest);
+        return detail::transfer<
+                detail::move<InIter, OutIter>
+            >(std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}
 

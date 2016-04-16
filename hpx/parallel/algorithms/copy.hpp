@@ -27,7 +27,6 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
-#include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -58,11 +57,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         template <typename IterPair>
-        struct copy
-          : public detail::algorithm<copy<IterPair>, IterPair>
+        struct copy_pair
+          : public detail::algorithm<copy_pair<IterPair>, IterPair>
         {
-            copy()
-              : copy::algorithm("copy")
+            copy_pair()
+              : copy_pair::algorithm("copy")
             {}
 
             template <typename ExPolicy, typename InIter, typename OutIter>
@@ -97,6 +96,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        template<typename InIter, typename OutIter, typename Enable = void>
+        struct copy;
+
+        template <typename InIter, typename OutIter>
+        struct copy<
+            InIter, OutIter,
+            typename boost::enable_if<typename hpx::traits::segmented_iterator_traits<InIter>::is_segmented_iterator>::type
+        > : public copy_pair<std::pair<
+            typename hpx::traits::segmented_iterator_traits<InIter>::local_iterator,
+            typename hpx::traits::segmented_iterator_traits<OutIter>::local_iterator
+        >>
+        {};
+
+        template<typename InIter, typename OutIter>
+        struct copy<
+            InIter, OutIter,
+            typename boost::disable_if<typename hpx::traits::segmented_iterator_traits<OutIter>::is_segmented_iterator>::type
+        > : public copy_pair<std::pair<InIter, OutIter>>
+        {};
+
         /// \endcond
     }
 
@@ -157,8 +177,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        return detail::transfer<
-                detail::copy
+           return detail::transfer<
+                detail::copy<InIter, OutIter>
             >(std::forward<ExPolicy>(policy), first, last, dest);
     }
 

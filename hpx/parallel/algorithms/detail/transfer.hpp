@@ -32,9 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         // parallel version
-        template <
-            template <typename IterPair> class Algo,
-            typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
@@ -52,15 +50,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     boost::is_same<std::output_iterator_tag, output_iterator_category>
             >::type is_seq;
 
-            return Algo<std::pair<InIter, OutIter>>().call(
+            return Algo().call(
                     std::forward<ExPolicy>(policy), is_seq(),
                     first, last, dest);
         }
 
         // forward declare segmented version
-        template <
-            template <typename IterPair> class Algo,
-            typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
                 ExPolicy, std::pair<InIter, OutIter>
             >::type
@@ -108,8 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// \endcond
         template <
-            template <typename IterPair> class Algo,
-            typename ExPolicy, typename InIter, typename OutIter,
+            typename Algo, typename ExPolicy, typename InIter, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::v1::is_execution_policy<ExPolicy>::value &&
                 traits::is_iterator<InIter>::value &&

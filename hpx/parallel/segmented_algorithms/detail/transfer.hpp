@@ -243,9 +243,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <
-            template <typename IterPair> class Algo,
-            typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
@@ -272,15 +270,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     typename output_iterator_traits::local_iterator
                 > result_iterator_pair;
 
-            return segmented_transfer(Algo<result_iterator_pair>(),
+            return segmented_transfer(Algo(),
+            //segmented_transfer(Algo<result_iterator_pair>(),
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest);
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <
-            template <typename IterPair> class Algo,
-            typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter, OutIter>
         >::type
