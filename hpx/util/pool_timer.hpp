@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/shared_ptr.hpp>
 

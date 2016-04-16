@@ -21,6 +21,8 @@
 #include <hpx/hpx_start.hpp>
 
 #include <mutex>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Store the command line arguments in global variables to make them available

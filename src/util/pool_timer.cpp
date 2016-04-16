@@ -3,19 +3,25 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/chrono/chrono.hpp>
 #include <boost/asio/deadline_timer.hpp>
+
+#include <string>
+#include <mutex>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -101,7 +107,7 @@ namespace hpx { namespace util { namespace detail
 
     bool pool_timer::start(bool evaluate_)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         if (is_terminated_)
             return false;
 
@@ -109,7 +115,7 @@ namespace hpx { namespace util { namespace detail
             if (first_start_) {
                 first_start_ = false;
 
-                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                 if (pre_shutdown_)
                 {
                     register_pre_shutdown_function(
@@ -139,7 +145,7 @@ namespace hpx { namespace util { namespace detail
 
     bool pool_timer::stop()
     {
-        boost::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         return stop_locked();
     }
 
@@ -158,7 +164,7 @@ namespace hpx { namespace util { namespace detail
 
     void pool_timer::terminate()
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         if (!is_terminated_) {
             is_terminated_ = true;
             stop_locked();
