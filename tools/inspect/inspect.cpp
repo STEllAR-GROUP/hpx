@@ -572,85 +572,85 @@ namespace
   }
 
 //  worst_offenders_count_helper  --------------------------------------------------//
-
-  void worst_offenders_count_helper( const string & current_library, int err_count )
-  {
-        lib_error_count lec;
-        lec.library = current_library;
-        lec.error_count = err_count;
-        libs.push_back( lec );
-  }
-//  worst_offenders_count  -----------------------------------------------------//
-
-  void worst_offenders_count()
-  {
-    if ( msgs.empty() )
-    {
-      return;
-    }
-    string current_library( msgs.begin()->library );
-    int err_count = 0;
-    for ( error_msg_vector::iterator itr ( msgs.begin() );
-      itr != msgs.end(); ++itr )
-    {
-      if ( current_library != itr->library )
-      {
-        worst_offenders_count_helper( current_library, err_count );
-        current_library = itr->library;
-        err_count = 0;
-      }
-      ++err_count;
-    }
-    worst_offenders_count_helper( current_library, err_count );
-  }
-
-//  display_worst_offenders  -------------------------------------------------//
-
-  void display_worst_offenders(std::ostream& out)
-  {
-    if (display_mode == display_brief)
-      return;
-    if (display_format == display_text)
-    {
-      out << "Worst Offenders:\n";
-    }
-    else
-    {
-      out <<
-        "<h2>Worst Offenders</h2>\n"
-        "<blockquote>\n"
-        ;
-    }
-
-    int display_count = 0;
-    int last_error_count = 0;
-    for ( lib_error_count_vector::iterator itr ( libs.begin() );
-          itr != libs.end()
-            && (display_count < max_offenders
-                || itr->error_count == last_error_count);
-          ++itr, ++display_count )
-    {
-      if (display_format == display_text)
-      {
-        out << itr->library << " " << itr->error_count << "\n";
-      }
-      else
-      {
-        out
-          << "  <a href=\"#"
-          << itr->library
-          << "\">" << itr->library
-          << "</a> ("
-          << itr->error_count << ")<br>\n";
-      }
-      last_error_count = itr->error_count;
-    }
-
-    if (display_format == display_text)
-      out << "\n";
-    else
-      out << "</blockquote>\n";
-  }
+//
+//   void worst_offenders_count_helper( const string & current_library, int err_count )
+//   {
+//         lib_error_count lec;
+//         lec.library = current_library;
+//         lec.error_count = err_count;
+//         libs.push_back( lec );
+//   }
+// //  worst_offenders_count  -----------------------------------------------------//
+//
+//   void worst_offenders_count()
+//   {
+//     if ( msgs.empty() )
+//     {
+//       return;
+//     }
+//     string current_library( msgs.begin()->library );
+//     int err_count = 0;
+//     for ( error_msg_vector::iterator itr ( msgs.begin() );
+//       itr != msgs.end(); ++itr )
+//     {
+//       if ( current_library != itr->library )
+//       {
+//         worst_offenders_count_helper( current_library, err_count );
+//         current_library = itr->library;
+//         err_count = 0;
+//       }
+//       ++err_count;
+//     }
+//     worst_offenders_count_helper( current_library, err_count );
+//   }
+//
+// //  display_worst_offenders  -------------------------------------------------//
+//
+//   void display_worst_offenders(std::ostream& out)
+//   {
+//     if (display_mode == display_brief)
+//       return;
+//     if (display_format == display_text)
+//     {
+//       out << "Worst Offenders:\n";
+//     }
+//     else
+//     {
+//       out <<
+//         "<h2>Worst Offenders</h2>\n"
+//         "<blockquote>\n"
+//         ;
+//     }
+//
+//     int display_count = 0;
+//     int last_error_count = 0;
+//     for ( lib_error_count_vector::iterator itr ( libs.begin() );
+//           itr != libs.end()
+//             && (display_count < max_offenders
+//                 || itr->error_count == last_error_count);
+//           ++itr, ++display_count )
+//     {
+//       if (display_format == display_text)
+//       {
+//         out << itr->library << " " << itr->error_count << "\n";
+//       }
+//       else
+//       {
+//         out
+//           << "  <a href=\"#"
+//           << itr->library
+//           << "\">" << itr->library
+//           << "</a> ("
+//           << itr->error_count << ")<br>\n";
+//       }
+//       last_error_count = itr->error_count;
+//     }
+//
+//     if (display_format == display_text)
+//       out << "\n";
+//     else
+//       out << "</blockquote>\n";
+//   }
 
   const char * doctype_declaration()
   {
@@ -1175,11 +1175,11 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
 
   std::sort( msgs.begin(), msgs.end() );
 
-  worst_offenders_count();
-  std::stable_sort( libs.begin(), libs.end() );
-
-  if ( !libs.empty() && display_mode != display_brief)
-    display_worst_offenders(out);
+//   worst_offenders_count();
+//   std::stable_sort( libs.begin(), libs.end() );
+//
+//   if ( !libs.empty() && display_mode != display_brief)
+//     display_worst_offenders(out);
 
   if ( !msgs.empty() )
   {

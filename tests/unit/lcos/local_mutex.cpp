@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 boost::chrono::milliseconds const delay(1000);
 boost::chrono::milliseconds const timeout_resolution(100);
@@ -127,7 +128,7 @@ struct test_lock_times_out_if_other_thread_has_lock
         Lock lock(m,boost::defer_lock);
         lock.try_lock_for(boost::chrono::milliseconds(50));
 
-        boost::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
         locked=lock.owns_lock();
         done=true;
         done_cond.notify_one();
@@ -137,7 +138,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     {
         Lock lock(m,boost::chrono::milliseconds(50));
 
-        boost::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
         locked=lock.owns_lock();
         done=true;
         done_cond.notify_one();

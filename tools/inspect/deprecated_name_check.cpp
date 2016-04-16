@@ -30,8 +30,8 @@ namespace boost
       { "(\\bboost\\s*::\\s*noncopyable\\b)", "HPX_NON_COPYABLE" },
       { "(\\bboost\\s*::\\s*result_of\\b)", "std::result_of" },
       { "(\\bboost\\s*::\\s*decay\\b)", "std::decay" },
-      { "(\\bboost\\s*::\\s*(is_.*?)\\b)", "std::\\2" },
-      { "(\\bboost\\s*::\\s*(.*?lock.*?)\\b)", "std::\\2" },
+//       { "(\\bboost\\s*::\\s*(is_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*lock_guard\\b)", "std::lock_guard" },
       { 0, 0 }
     };
 

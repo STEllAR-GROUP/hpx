@@ -23,8 +23,8 @@ namespace boost
     {
       { "boost/move/move\\.hpp", "utility" },
       { "boost/atomic/atomic\\.hpp", "boost/atomic.hpp" },
-      { "boost/thread/locks.hpp", "mutex" },
-      { "boost/type_traits/.*?\\.hpp", "type_traits" },
+//       { "boost/thread/locks.hpp", "mutex" },
+      { "boost/type_traits\\.hpp", "separate type-traits headers" },
       { 0, 0 }
     };
 
