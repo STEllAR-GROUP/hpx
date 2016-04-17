@@ -9,8 +9,9 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <mutex>
+#include <boost/atomic.hpp>
 
+#include <mutex>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -10,6 +10,7 @@
 #include <hpx/include/parallel_numeric.hpp>
 
 #include <boost/range/irange.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <string>

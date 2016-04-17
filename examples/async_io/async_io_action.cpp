@@ -15,6 +15,9 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/thread_executors.hpp>
 
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include <string>
 #include <vector>
 

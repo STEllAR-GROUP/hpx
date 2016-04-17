@@ -10,6 +10,8 @@
 
 #include <hpx/runtime/actions/continuation.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 namespace hpx { namespace applier
 {
 

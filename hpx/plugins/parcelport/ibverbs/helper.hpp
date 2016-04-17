@@ -11,6 +11,7 @@
 
 #include <boost/cache/entries/lru_entry.hpp>
 #include <boost/cache/local_cache.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <netdb.h>
 #include <rdma/rdma_cma.h>

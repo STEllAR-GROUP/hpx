@@ -8,6 +8,7 @@
 
 #include <hpx/include/parallel_execution_policy.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 
 #include <numeric>

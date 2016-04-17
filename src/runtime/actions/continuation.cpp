@@ -9,6 +9,8 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {

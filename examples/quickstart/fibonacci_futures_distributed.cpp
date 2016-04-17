@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 

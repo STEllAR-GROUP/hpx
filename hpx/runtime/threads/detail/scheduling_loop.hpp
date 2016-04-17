@@ -18,6 +18,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
 
 #if defined(HPX_HAVE_APEX)

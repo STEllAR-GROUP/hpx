@@ -32,6 +32,7 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_executor.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/utility/enable_if.hpp>

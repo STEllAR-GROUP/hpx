@@ -12,6 +12,8 @@
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////

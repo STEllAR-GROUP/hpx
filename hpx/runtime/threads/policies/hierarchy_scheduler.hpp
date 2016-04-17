@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/exception_ptr.hpp>
 #include <boost/mpl/bool.hpp>
 
 #include <memory>

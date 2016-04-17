@@ -13,6 +13,7 @@
 #include <hpx/parallel/util/numa_allocator.hpp>
 
 #include <boost/range/irange.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <string>

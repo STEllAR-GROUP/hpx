@@ -20,6 +20,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/placeholders.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 

@@ -24,6 +24,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <boost/detail/endian.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>

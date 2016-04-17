@@ -14,13 +14,14 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/atomic.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include <mutex>
 #include <string>

@@ -11,6 +11,8 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {

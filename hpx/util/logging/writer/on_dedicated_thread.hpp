@@ -24,9 +24,10 @@
 #include <boost/version.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
+#include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/xtime.hpp>
-#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // hpx::util::logging::manipulator
 
 #include <vector>

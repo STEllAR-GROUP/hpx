@@ -15,6 +15,8 @@
 
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 namespace hpx { namespace lcos
 {
     void base_lco::set_exception(boost::exception_ptr const& e)

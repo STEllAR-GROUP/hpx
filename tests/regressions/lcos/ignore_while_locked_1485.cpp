@@ -11,6 +11,8 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <mutex>
 
 struct wait_for_flag

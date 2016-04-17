@@ -13,7 +13,9 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/range/functions.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <stdexcept>
 #include <string>

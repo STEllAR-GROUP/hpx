@@ -29,11 +29,13 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
 #include <boost/detail/endian.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/format.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <mutex>

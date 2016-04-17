@@ -10,6 +10,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 #include <vector>
 
 namespace jacobi_smp {

@@ -8,6 +8,8 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <sstream>
 #include <string>
 

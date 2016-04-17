@@ -12,6 +12,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <string>
 #include <vector>
 

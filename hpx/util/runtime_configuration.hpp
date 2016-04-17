@@ -16,6 +16,7 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <vector>

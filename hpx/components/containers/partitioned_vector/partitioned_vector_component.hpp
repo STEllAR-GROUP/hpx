@@ -22,6 +22,7 @@
 #include <hpx/include/util.hpp>
 
 #include <boost/preprocessor/cat.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <iostream>
 #include <string>

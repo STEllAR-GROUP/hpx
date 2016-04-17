@@ -20,10 +20,11 @@
 #include <boost/make_shared.hpp>
 #endif
 
+#include <boost/exception_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

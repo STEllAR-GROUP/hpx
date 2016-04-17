@@ -41,6 +41,8 @@
 
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 #include <string>

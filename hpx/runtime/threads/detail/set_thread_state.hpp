@@ -19,7 +19,10 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/asio/basic_deadline_timer.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace threads { namespace detail
 {

@@ -20,9 +20,10 @@
 #include <hpx/runtime/threads/policies/topology.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
-#include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
+#include <boost/format.hpp>
 #include <boost/program_options.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <iostream>
 #include <string>

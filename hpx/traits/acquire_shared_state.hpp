@@ -15,11 +15,12 @@
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <boost/intrusive_ptr.hpp>
+#include <boost/range/functions.hpp>
+#include <boost/utility/enable_if.hpp>
+
 #include <iterator>
 #include <vector>
-
-#include <boost/utility/enable_if.hpp>
-#include <boost/range/functions.hpp>
 
 namespace hpx { namespace traits
 {

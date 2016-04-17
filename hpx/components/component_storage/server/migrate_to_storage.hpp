@@ -17,6 +17,8 @@
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 #include <vector>
 
 namespace hpx { namespace components { namespace server

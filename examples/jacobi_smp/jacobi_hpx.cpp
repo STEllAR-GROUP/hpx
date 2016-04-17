@@ -11,6 +11,8 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 #include <string>
 #include <vector>
 

@@ -7,6 +7,7 @@
 #include <hpx/apply.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <vector>
 

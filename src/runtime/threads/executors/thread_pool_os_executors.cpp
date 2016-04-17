@@ -19,6 +19,8 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <mutex>
 #include <string>
 
