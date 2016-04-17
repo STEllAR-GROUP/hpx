@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file parallel/algorithms/reduce_by_key.hpp
+
 #if !defined(HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015)
 #define HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015
 //
