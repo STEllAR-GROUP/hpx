@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -58,11 +58,12 @@ namespace hpx { namespace threads
         ran_exit_funcs_ = true;
     }
 
-    bool thread_data::add_thread_exit_callback(util
-        ::function_nonser<void()> const& f)
+    bool thread_data::add_thread_exit_callback(
+        util::function_nonser<void()> const& f)
     {
         mutex_type::scoped_lock l(this);
-        if (ran_exit_funcs_ || get_state() == terminated)
+
+        if (ran_exit_funcs_ || get_state().state() == terminated)
         {
             return false;
         }

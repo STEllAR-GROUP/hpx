@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Copyright (c) 2014 Hartmut Kaiser                                      -->
+<!-- Copyright (c) 2014-2016 Hartmut Kaiser                                 -->
 
 <!-- Use, modification and distribution are subject to the Boost Software   -->
 <!-- License, Version 1.0. (See accompanying file LICENSE_1_0.txt           -->
@@ -8,35 +8,21 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-    <Type Name="hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_enum&gt;">
-        <DisplayString>{{ state={(hpx::threads::thread_state_enum)((state_ &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
+    <Type Name="hpx::threads::detail::combined_tagged_state&lt;enum hpx::threads::thread_state_enum, enum hpx::threads::thread_state_ex_enum&gt;">
+        <DisplayString>{{ state={(hpx::threads::thread_state_enum)((state_ &gt;&gt; 56) &amp; 0xff)}, stateex={(hpx::threads::thread_state_ex_enum)((state_ &gt;&gt; 48) &amp; 0xff)}, tag={state_ &amp; 0xffffffffffff,d} }}</DisplayString>
         <Expand>
-            <Item Name="[state]">(hpx::threads::thread_state_enum)((state_ &gt;&gt; 24) &amp; 0xff)</Item>
-            <Item Name="[tag]">state_ &amp; 0xffffff,d</Item>
+            <Item Name="[state]">(hpx::threads::thread_state_enum)((state_ &gt;&gt; 56) &amp; 0xff)</Item>
+            <Item Name="[stateex]">(hpx::threads::thread_state_ex_enum)((state_ &gt;&gt; 48) &amp; 0xff)</Item>
+            <Item Name="[tag]">state_ &amp; 0xffffffffffff,d</Item>
         </Expand>
     </Type>
 
-    <Type Name="hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_ex_enum&gt;">
-        <DisplayString>{{ state={(hpx::threads::thread_state_ex_enum)((state_ &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
+    <Type Name="boost::atomics::atomic&lt;hpx::threads::detail::combined_tagged_state&lt;enum hpx::threads::thread_state_enum, enum hpx::threads::thread_state_ex_enum&gt;&gt;">
+        <DisplayString>{{ state={(hpx::threads::thread_state_enum)((m_storage &gt;&gt; 56) &amp; 0xff)}, stateex={(hpx::threads::thread_state_ex_enum)((m_storage &gt;&gt; 48) &amp; 0xff)}, tag={m_storage &amp; 0xffffffffffff,d} }}</DisplayString>
         <Expand>
-            <Item Name="[state]">(hpx::threads::thread_state_ex_enum)((state_ &gt;&gt; 24) &amp; 0xff)</Item>
-            <Item Name="[tag]">state_ &amp; 0xffffff,d</Item>
-        </Expand>
-    </Type>
-
-    <Type Name="boost::atomics::atomic&lt;hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_enum&gt;&gt;">
-        <DisplayString>{{ state={(hpx::threads::thread_state_enum)((m_storage &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
-        <Expand>
-            <Item Name="[state]">(hpx::threads::thread_state_enum)((m_storage &gt;&gt; 24) &amp; 0xff)</Item>
-            <Item Name="[tag]">m_storage &amp; 0xffffff,d</Item>
-        </Expand>
-    </Type>
-
-    <Type Name="boost::atomics::atomic&lt;hpx::threads::detail::tagged_thread_state&lt;enum hpx::threads::thread_state_ex_enum&gt;&gt;">
-        <DisplayString>{{ state={(hpx::threads::thread_state_ex_enum)((m_storage &gt;&gt; 24) &amp; 0xff)} }}</DisplayString>
-        <Expand>
-            <Item Name="[state]">(hpx::threads::thread_state_ex_enum)((m_storage &gt;&gt; 24) &amp; 0xff)</Item>
-            <Item Name="[tag]">m_storage &amp; 0xffffff,d</Item>
+            <Item Name="[state]">(hpx::threads::thread_state_enum)((m_storage &gt;&gt; 56) &amp; 0xff)</Item>
+            <Item Name="[stateex]">(hpx::threads::thread_state_ex_enum)((m_storage &gt;&gt; 48) &amp; 0xff)</Item>
+            <Item Name="[tag]">m_storage &amp; 0xffffffffffff,d</Item>
         </Expand>
     </Type>
 
