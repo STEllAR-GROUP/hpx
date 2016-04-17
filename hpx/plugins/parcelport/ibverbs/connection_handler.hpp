@@ -18,6 +18,8 @@
 #include <hpx/plugins/parcelport/ibverbs/locality.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/util/cache/local_cache.hpp>
+#include <hpx/util/cache/entries/lru_entry.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
@@ -115,8 +117,8 @@ namespace hpx { namespace parcelset {
             std::size_t mr_cache_size_;
 
             typedef std::pair<char *, util::memory_chunk_pool::size_type> chunk_pair;
-            typedef boost::cache::entries::lru_entry<ibverbs_mr> mr_cache_entry_type;
-            typedef boost::cache::local_cache<chunk_pair, mr_cache_entry_type>
+            typedef hpx::util::cache::entries::lru_entry<ibverbs_mr> mr_cache_entry_type;
+            typedef hpx::util::cache::local_cache<chunk_pair, mr_cache_entry_type>
                 mr_cache_type;
             /*
             typedef

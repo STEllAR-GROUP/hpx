@@ -3,21 +3,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_CACHE_LRU_CACHE_HPP
-#define BOOST_CACHE_LRU_CACHE_HPP
+#ifndef HPX_UTIL_CACHE_LRU_CACHE_HPP
+#define HPX_UTIL_CACHE_LRU_CACHE_HPP
 
-#include <boost/assert.hpp>
-#include <boost/cache/statistics/no_statistics.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/cache/statistics/no_statistics.hpp>
 
 #include <algorithm>
 #include <map>
 #include <list>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache
+namespace hpx { namespace util { namespace cache
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class lru_cache lru_cache.hpp boost/cache/lru_cache.hpp
+    /// \class lru_cache lru_cache.hpp hpx/util/cache/lru_cache.hpp
     ///
     /// \brief The \a lru_cache implements the basic functionality needed for
     ///        a local (non-distributed) LRU cache.
@@ -436,6 +436,6 @@ namespace boost { namespace cache
 
         statistics_type statistics_;
     };
-}}
+}}}
 
 #endif

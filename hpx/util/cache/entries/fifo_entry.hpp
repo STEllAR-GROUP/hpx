@@ -1,19 +1,21 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(BOOST_CACHE_FIFO_ENTRY_NOV_19_2008_0748PM)
-#define BOOST_CACHE_FIFO_ENTRY_NOV_19_2008_0748PM
+#if !defined(HPX_UTIL_CACHE_FIFO_ENTRY_NOV_19_2008_0748PM)
+#define HPX_UTIL_CACHE_FIFO_ENTRY_NOV_19_2008_0748PM
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/cache/entries/entry.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/cache/entries/entry.hpp>
+
+#include <boost/chrono/chrono.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache { namespace entries
+namespace hpx { namespace util { namespace cache { namespace entries
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class fifo_entry fifo_entry.hpp boost/cache/entries/fifo_entry.hpp
+    /// \class fifo_entry fifo_entry.hpp hpx/util/cache/entries/fifo_entry.hpp
     ///
     /// The \a fifo_entry type can be used to store arbitrary values in a cache.
     /// Using this type as the cache's entry type makes sure that the least
@@ -55,11 +57,11 @@ namespace boost { namespace cache { namespace entries
         ///           \a false.
         bool insert()
         {
-            insertion_time_ = boost::posix_time::microsec_clock::local_time();
+            insertion_time_ = boost::chrono::steady_clock::now();
             return true;
         }
 
-        boost::posix_time::ptime const& get_creation_time() const
+        boost::chrono::steady_clock::time_point const& get_creation_time() const
         {
             return insertion_time_;
         }
@@ -72,9 +74,8 @@ namespace boost { namespace cache { namespace entries
         }
 
     private:
-        boost::posix_time::ptime insertion_time_;
+        boost::chrono::steady_clock::time_point insertion_time_;
     };
-
-}}}
+}}}}
 
 #endif

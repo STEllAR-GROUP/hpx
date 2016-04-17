@@ -24,6 +24,7 @@ endif()
 
 set(subdirs
     bind
+    cache
     function
     mem_fn
    )

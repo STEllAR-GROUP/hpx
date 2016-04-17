@@ -10,9 +10,9 @@
 
 #include <hpx/hpx.hpp>
 
-#include <boost/cache/entries/lfu_entry.hpp>
-#include <boost/cache/local_cache.hpp>
-#include <boost/cache/statistics/local_full_statistics.hpp>
+#include <hpx/util/cache/entries/lfu_entry.hpp>
+#include <hpx/util/cache/local_cache.hpp>
+#include <hpx/util/cache/statistics/local_full_statistics.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
@@ -30,7 +30,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Below is a copy of the original AGAS cache
-typedef boost::cache::entries::lfu_entry<hpx::agas::gva> gva_entry_type;
+typedef hpx::util::cache::entries::lfu_entry<hpx::agas::gva> gva_entry_type;
 
 struct gva_cache_key
 {
@@ -100,11 +100,11 @@ struct gva_erase_policy
     gva_cache_key entry;
 };
 
-typedef boost::cache::local_cache<
+typedef hpx::util::cache::local_cache<
     gva_cache_key, gva_entry_type, std::less<gva_entry_type>,
-    boost::cache::policies::always<gva_entry_type>,
+    hpx::util::cache::policies::always<gva_entry_type>,
     std::map<gva_cache_key, gva_entry_type>,
-    boost::cache::statistics::local_full_statistics
+    hpx::util::cache::statistics::local_full_statistics
 > gva_cache_type;
 
 ///////////////////////////////////////////////////////////////////////////////

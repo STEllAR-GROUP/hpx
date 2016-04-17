@@ -99,7 +99,6 @@ else()
 endif()
 
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
-set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/cache)
 
 # If we compile natively for the MIC, we need some workarounds for certain
 # Boost headers

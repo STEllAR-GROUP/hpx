@@ -1,25 +1,25 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(BOOST_CACHE_LOCAL_CACHE_NOV_17_2008_1003AM)
-#define BOOST_CACHE_LOCAL_CACHE_NOV_17_2008_1003AM
+#if !defined(HPX_UTIL_CACHE_LOCAL_CACHE_NOV_17_2008_1003AM)
+#define HPX_UTIL_CACHE_LOCAL_CACHE_NOV_17_2008_1003AM
+
+#include <hpx/config.hpp>
+#include <hpx/util/cache/policies/always.hpp>
+#include <hpx/util/cache/statistics/no_statistics.hpp>
 
 #include <deque>
 #include <map>
 #include <functional>
 #include <algorithm>
 
-#include <boost/noncopyable.hpp>
-#include <boost/cache/policies/always.hpp>
-#include <boost/cache/statistics/no_statistics.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache
+namespace hpx { namespace util { namespace cache
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class local_cache local_cache.hpp boost/cache/local_cache.hpp
+    /// \class local_cache local_cache.hpp hpx/util/cache/local_cache.hpp
     ///
     /// \brief The \a local_cache implements the basic functionality needed for
     ///        a local (non-distributed) cache.
@@ -758,7 +758,6 @@ namespace boost { namespace cache
 
         statistics_type statistics_;        // embedded statistics instance
     };
-
-}}
+}}}
 
 #endif
