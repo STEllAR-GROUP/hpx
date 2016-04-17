@@ -19,7 +19,7 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/util/protect.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -86,26 +86,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
             // Issue a read operation to read the parcel data.
             void (receiver::*f)(boost::system::error_code const&,
-                    util::tuple<Handler>)
+                    Handler)
                 = &receiver::handle_read_data<Handler>;
 
             window_.async_read(buffer_->data_,
                 util::bind(f, shared_from_this(),
                     boost::asio::placeholders::error,
-                    util::make_tuple(handler)));
+                    util::protect(handler)));
         }
 
     protected:
         /// Handle a completed read of message data.
         template <typename Handler>
         void handle_read_data(boost::system::error_code const& e,
-            util::tuple<Handler> handler)
+            Handler handler)
         {
             if (e) {
-                util::get<0>(handler)(e);
+                handler(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(util::get<0>(handler));
+                async_read(handler);
             }
             else {
                 // complete data point and pass it along
@@ -114,7 +114,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
                 // now send acknowledgment message
                 void (receiver::*f)(boost::system::error_code const&,
-                          util::tuple<Handler>)
+                          Handler)
                     = &receiver::handle_write_ack<Handler>;
 
                 buffer_->data_size_ = buffer_->data_.size();
@@ -126,19 +126,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 // acknowledge to have received the parcel
                 window_.async_write_ack(
                     util::bind(f, shared_from_this(),
-                        boost::asio::placeholders::error, handler));
+                        boost::asio::placeholders::error,
+                        util::protect(handler)));
             }
         }
 
         template <typename Handler>
         void handle_write_ack(boost::system::error_code const& e,
-            util::tuple<Handler> handler)
+            Handler handler)
         {
             // Inform caller that data has been received ok.
-            util::get<0>(handler)(e);
+            handler(e);
 
             // Issue a read operation to handle the next parcel.
-            async_read(util::get<0>(handler));
+            async_read(handler);
         }
 
     private:
