@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/high_resolution_clock.hpp>

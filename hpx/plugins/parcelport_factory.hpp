@@ -13,6 +13,7 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/assign.hpp>
 #include <boost/algorithm/string/classification.hpp>

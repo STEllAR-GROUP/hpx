@@ -12,10 +12,10 @@
 #if !defined(HPX_PARCELSET_IPC_DATA_BUFFER_NOV_25_2012_0854PM)
 #define HPX_PARCELSET_IPC_DATA_BUFFER_NOV_25_2012_0854PM
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/interprocess/containers/vector.hpp>

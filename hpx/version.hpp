@@ -9,7 +9,6 @@
 #define HPX_VERSION_AUG_18_2011_0854PM
 
 #include <hpx/config.hpp>
-#include <hpx/config/export_definitions.hpp>
 #include <hpx/config/version.hpp>
 
 #include <boost/cstdint.hpp>

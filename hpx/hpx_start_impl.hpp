@@ -7,8 +7,16 @@
 #define HPX_START_IMPL_OCT_04_2012_0252PM
 
 #include <hpx/hpx_start.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/function.hpp>
+
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 #include <string>
 #include <vector>

@@ -11,7 +11,6 @@
 #include <hpx/error_code.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/config/forceinline.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_future.hpp>

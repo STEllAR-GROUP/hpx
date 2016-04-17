@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_LOCAL_REINITIALIZABLE_STATIC_JAN_20_2013_0409PM)
 #define HPX_LCOS_LOCAL_REINITIALIZABLE_STATIC_JAN_20_2013_0409PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/static_reinit.hpp>

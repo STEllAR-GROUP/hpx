@@ -8,7 +8,6 @@
 #define HPX_LCOS_MUTEX_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/config/export_definitions.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>

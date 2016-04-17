@@ -6,6 +6,7 @@
 #if !defined(HPX_TRAITS_IS_TIMED_EXECUTOR_AUG_05_2015_0840AM)
 #define HPX_TRAITS_IS_TIMED_EXECUTOR_AUG_05_2015_0840AM
 
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/config/inline_namespace.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>

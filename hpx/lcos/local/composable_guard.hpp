@@ -9,7 +9,7 @@ namespace hpx { namespace lcos { namespace local {
     struct guard_task;
 }}}
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/util/assert.hpp>
 

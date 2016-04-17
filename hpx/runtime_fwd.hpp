@@ -13,7 +13,21 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/get_colocation_id.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/get_locality_name.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/set_parcel_write_handler.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>

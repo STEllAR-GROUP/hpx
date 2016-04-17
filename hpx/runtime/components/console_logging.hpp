@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPONENTS_CONSOLE_LOGGING_DEC_16_2008_0435PM)
 #define HPX_COMPONENTS_CONSOLE_LOGGING_DEC_16_2008_0435PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/spinlock.hpp>

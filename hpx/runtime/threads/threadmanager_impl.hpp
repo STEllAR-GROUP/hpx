@@ -21,8 +21,6 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/mpl/bool.hpp>
@@ -33,6 +31,8 @@
 #include <mutex>
 #include <numeric>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads
 {

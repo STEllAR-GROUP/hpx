@@ -6,8 +6,7 @@
 #if !defined(HPX_UTIL_COMMAND_LINE_HANDLING_OCT_04_2012_0800AM)
 #define HPX_UTIL_COMMAND_LINE_HANDLING_OCT_04_2012_0800AM
 
-#include <hpx/config/defines.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/unique_function.hpp>

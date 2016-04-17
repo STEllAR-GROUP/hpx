@@ -11,10 +11,10 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/safe_bool.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  address serialization format version

@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_SECURITY_SUB_CERTIFICATE_AUTHORITY_MAY_30_2013_0415PM)
 #define HPX_UTIL_SECURITY_SUB_CERTIFICATE_AUTHORITY_MAY_30_2013_0415PM
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_SODIUM)
 

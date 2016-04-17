@@ -6,7 +6,7 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_REGISTRY_MAR_01_2009_0424PM)
 #define HPX_PERFORMANCE_COUNTERS_REGISTRY_MAR_01_2009_0424PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>

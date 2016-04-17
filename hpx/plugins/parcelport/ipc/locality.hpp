@@ -10,10 +10,10 @@
 #ifndef HPX_PARCELSET_POLICIES_IPC_LOCALITY_HPP
 #define HPX_PARCELSET_POLICIES_IPC_LOCALITY_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/safe_bool.hpp>
 

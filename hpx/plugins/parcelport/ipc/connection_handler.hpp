@@ -7,17 +7,19 @@
 #ifndef HPX_PARCELSET_POLICIES_IPC_CONNECTION_HANDLER_HPP
 #define HPX_PARCELSET_POLICIES_IPC_CONNECTION_HANDLER_HPP
 
-#include <hpx/config/defines.hpp>
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#include <hpx/config.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
 
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/plugins/parcelport/ipc/acceptor.hpp>
 #include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/shared_ptr.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace ipc

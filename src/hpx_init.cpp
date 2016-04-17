@@ -19,7 +19,10 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/query_counters.hpp>

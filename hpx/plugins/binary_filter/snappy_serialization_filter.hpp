@@ -6,10 +6,9 @@
 #if !defined(HPX_ACTION_SNAPPY_SERIALIZATION_FILTER_FEB_21_2013_0203PM)
 #define HPX_ACTION_SNAPPY_SERIALIZATION_FILTER_FEB_21_2013_0203PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_SNAPPY)
-#include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
 

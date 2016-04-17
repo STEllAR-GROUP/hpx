@@ -6,7 +6,8 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_SERVER_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_SERVER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
 #include <hpx/plugins/parcelport/ibverbs/messages.hpp>

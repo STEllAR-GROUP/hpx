@@ -6,14 +6,15 @@
 #ifndef HPX_UTIL_MPI_ENV_HPP
 #define HPX_UTIL_MPI_ENV_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <mpi.h>
 
-#include <hpx/hpx_fwd.hpp>
 #include <cstdlib>
 #include <string>
 

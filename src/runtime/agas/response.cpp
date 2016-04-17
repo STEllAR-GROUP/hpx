@@ -6,9 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_fwd.hpp>
-
-#include <hpx/hpx.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/response.hpp>

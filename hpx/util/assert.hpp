@@ -15,8 +15,7 @@
 #   define HPX_ASSERT_MSG(expr, msg) BOOST_ASSERT_MSG(expr, msg)
 #else
 
-#include <hpx/config/branch_hints.hpp>
-#include <hpx/config/compiler_specific.hpp>
+#include <hpx/config.hpp>
 
 //-------------------------------------------------------------------------- //
 //                                     HPX_ASSERT                            //

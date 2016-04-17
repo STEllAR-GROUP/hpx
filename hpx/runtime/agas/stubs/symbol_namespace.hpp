@@ -13,6 +13,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <string>

@@ -10,11 +10,14 @@
 #if !defined(HPX_INIT_OCT_04_2012_0132PM)
 #define HPX_INIT_OCT_04_2012_0132PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/util/function.hpp>
 
-#include <boost/program_options.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 #include <string>
 #include <vector>

@@ -6,11 +6,10 @@
 #if !defined(HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM)
 #define HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_ZLIB)
 
-#include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
 

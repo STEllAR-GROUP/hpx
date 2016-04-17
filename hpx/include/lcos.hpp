@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_JUN_27_2008_0820PM)
 #define HPX_LCOS_JUN_27_2008_0820PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/include/actions.hpp>
 
 #include <hpx/lcos/packaged_action.hpp>

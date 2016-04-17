@@ -7,8 +7,6 @@
 #define HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
-
 #include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 

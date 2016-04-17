@@ -10,7 +10,7 @@
 #ifndef HPX_BACKTRACE_HPP
 #define HPX_BACKTRACE_HPP
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 
 #include <iosfwd>
 #include <string>

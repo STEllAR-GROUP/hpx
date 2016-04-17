@@ -9,7 +9,7 @@
 #ifndef HPX_RUNTIME_GET_LOCALITY_ID_HPP
 #define HPX_RUNTIME_GET_LOCALITY_ID_HPP
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/exception_fwd.hpp>
 

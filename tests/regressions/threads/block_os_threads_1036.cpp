@@ -7,6 +7,7 @@
 // user code attempts to "block" OS-threads
 
 #include <hpx/config.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>

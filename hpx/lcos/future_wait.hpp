@@ -6,8 +6,7 @@
 #if !defined(HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM)
 #define HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>

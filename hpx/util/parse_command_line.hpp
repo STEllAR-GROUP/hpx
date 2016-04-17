@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_PARSE_COMMAND_LINE_NOV_30_2011_0652PM)
 #define HPX_UTIL_PARSE_COMMAND_LINE_NOV_30_2011_0652PM
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/ini.hpp>
 
