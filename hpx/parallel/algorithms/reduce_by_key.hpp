@@ -110,6 +110,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 start), fEnd(end) { }
         };
 
+        // -------------------------------------------------------------------
+        // functor that actually computes the state using the stencil iterator
+        // -------------------------------------------------------------------
         template<
             typename Transformer, typename StencilIterType,
             typename KeyStateIterType, typename Compare
@@ -152,6 +155,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
+        // -------------------------------------------------------------------
+        // helper that extracts the final output iterators from copy_if
+        // -------------------------------------------------------------------
         // Zip iterator has 3 iterators inside
         // Iter1, key type : Iter2, value type : Iter3, state type
         template<typename ZIter, typename iKey, typename iVal>
@@ -165,6 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::next(val_start, std::distance(key_start, key_end)));
         }
 
+        // async version that returns future<pair>
         template<typename ZIter, typename iKey, typename iVal>
         hpx::future<std::pair<iKey, iVal> > make_pair_result(
             hpx::future<ZIter> &&ziter, iKey key_start, iVal val_start)
@@ -181,11 +188,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 });
         }
 
+        // -------------------------------------------------------------------
         // when we are being run with an asynchronous policy, we do not want to
         // pass the policy directly to other algorithms we are using - as we
         // would have wait internally on them before proceeding.
         // Instead create a new policy from the old one which removes the async/future
-
+        // -------------------------------------------------------------------
         template<typename ExPolicy>
         struct remove_asynchronous
         {
@@ -226,38 +234,49 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     //-----------------------------------------------------------------------------
-    /// Sorts the elements in the range [first, last) in ascending order. The
-    /// order of equal elements is not guaranteed to be preserved. The function
-    /// uses the given comparison function object comp (defaults to using
-    /// operator<()).
+    /// Reduce by Key performs an inclusive scan reduction operation on elements
+    /// supplied in key/value pairs. The algorithm produces a single output
+    /// value for each set of equal consecutive keys in [key_first, key_last).
+    /// the value being the
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(op, init, *first, ..., *(first + (i - result))).
+    /// for the run of consecutive matching keys.
+    /// The number of keys supplied must match the number of values.
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
-    ///                     comparisons.
-    ///
-    /// A sequence is sorted with respect to a comparator \a comp and a
-    /// projection \a proj if for every iterator i pointing to the sequence and
-    /// every non-negative integer n such that i + n is a valid iterator
-    /// pointing to an element of the sequence, and
-    /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a op.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Iter        The type of the source iterators used (deduced).
+    /// \tparam RanIter     The type of the key iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
-    /// \tparam Comp        The type of the function/function object to use
-    ///                     (deduced).
+    /// \tparam RanIter2    The type of the value iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam OutIter     The type of the iterator representing the
+    ///                     destination key range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam OutIterw    The type of the iterator representing the
+    ///                     destination value range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam Compare     The type of the optional function/function object to use
+    ///                     to compare keys (deduced).
+    ///                     Assumed to be std::equal_to otherwise.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
+    /// \param key_first    Refers to the beginning of the sequence of key elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param key_last     Refers to the end of the sequence of key elements the
     ///                     algorithm will be applied to.
+    /// \param value_first  Refers to the beginning of the sequence of value elements
+    ///                     the algorithm will be applied to.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if
@@ -283,13 +302,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of
+    /// \returns  The \a reduce_by_key algorithm returns a
+    ///           \a hpx::future<pair<Iter1,Iter2>> if the execution policy is of
     ///           type
     ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a Iter
+    ///           \a parallel_task_execution_policy and returns \a pair<Iter1,Iter2>
     ///           otherwise.
-    ///           It returns \a last.
     //-----------------------------------------------------------------------------
 
     template<

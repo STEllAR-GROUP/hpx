@@ -15,7 +15,7 @@
 //
 #include "sort_tests.hpp"
 //
-#define EXTRA_DEBUG
+//#define EXTRA_DEBUG
 //
 namespace debug {
     template<typename T>
