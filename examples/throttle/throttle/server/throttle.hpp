@@ -6,7 +6,7 @@
 #if !defined(HPX_THROTTLE_SERVER_AUG_09_2011_0702PM)
 #define HPX_THROTTLE_SERVER_AUG_09_2011_0702PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/mutex.hpp>

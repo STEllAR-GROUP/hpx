@@ -6,7 +6,7 @@
 #if !defined(HPX_THROTTLE_STUBS_AUG_09_2011_0703PM)
 #define HPX_THROTTLE_STUBS_AUG_09_2011_0703PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 

@@ -6,7 +6,7 @@
 
 #include "jacobi.hpp"
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/util/high_resolution_timer.hpp>

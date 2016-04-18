@@ -6,7 +6,7 @@
 #if !defined(HPX_EXAMPLE_CANCELABLE_ACTION_APR_21_2012_0955AM)
 #define HPX_EXAMPLE_CANCELABLE_ACTION_APR_21_2012_0955AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/threads.hpp>

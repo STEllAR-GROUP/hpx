@@ -6,7 +6,6 @@
 // This test demonstrates the issue described in #1036: Scheduler hangs when
 // user code attempts to "block" OS-threads
 
-#include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/bind.hpp>

@@ -6,7 +6,7 @@
 #if !defined(HPX_SHENEOS_DIMENSION3D_AUG_08_2011_1222PM)
 #define HPX_SHENEOS_DIMENSION3D_AUG_08_2011_1222PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 

@@ -7,7 +7,7 @@
 #if !defined(HPX_4C46C86D_A43F_42A8_8164_C9EBA3B210CC)
 #define HPX_4C46C86D_A43F_42A8_8164_C9EBA3B210CC
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
