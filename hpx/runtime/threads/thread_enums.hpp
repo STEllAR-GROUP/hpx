@@ -69,7 +69,7 @@ namespace hpx { namespace threads
         wait_unknown = 0,
         wait_signaled = 1,  ///< The thread has been signaled
         wait_timeout = 2,   ///< The thread has been reactivated after a timeout
-        wait_terminate = 4, ///< The thread needs to be terminated
+        wait_terminate = 3, ///< The thread needs to be terminated
         wait_abort = 4      ///< The thread needs to be aborted
     };
 
