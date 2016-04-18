@@ -13,8 +13,8 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/util/protect.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/protect.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>

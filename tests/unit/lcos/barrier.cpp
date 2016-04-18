@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
@@ -45,7 +46,7 @@ void local_tests(boost::program_options::variables_map& vm)
         boost::atomic<std::size_t> c(0);
         for (std::size_t j = 0; j < pxthreads; ++j)
         {
-            hpx::async(boost::bind(&barrier_test, b.get_id(), boost::ref(c)));
+            hpx::async(hpx::util::bind(&barrier_test, b.get_id(), boost::ref(c)));
         }
 
         b.wait();       // wait for all threads to enter the barrier

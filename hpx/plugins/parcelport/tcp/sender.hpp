@@ -18,6 +18,7 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/buffer.hpp>
@@ -27,8 +28,6 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
-#include <boost/bind.hpp>
-#include <boost/bind/protect.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
@@ -145,8 +144,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             void (sender::*f)(boost::system::error_code const&, std::size_t)
                 = &sender::handle_write;
 
+            using util::placeholders::_1;
+            using util::placeholders::_2;
             boost::asio::async_write(socket_, buffers,
-                boost::bind(f, shared_from_this(), ::_1, ::_2));
+                util::bind(f, shared_from_this(), _1, _2));
         }
 
     private:
@@ -180,9 +181,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             void (sender::*f)(boost::system::error_code const&)
                 = &sender::handle_read_ack;
 
+            using util::placeholders::_1;
             boost::asio::async_read(socket_,
                 boost::asio::buffer(&ack_, sizeof(ack_)),
-                boost::bind(f, shared_from_this(), ::_1));
+                util::bind(f, shared_from_this(), _1));
         }
 
         void handle_read_ack(boost::system::error_code const& e)

@@ -9,6 +9,7 @@
 #include <hpx/performance_counters/manage_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
@@ -56,7 +57,7 @@ namespace hpx { namespace performance_counters
         p->install(id, info, ec);
 
         // Register the shutdown function which will clean up this counter.
-        get_runtime().add_shutdown_function(boost::bind(&counter_shutdown, p));
+        get_runtime().add_shutdown_function(util::bind(&counter_shutdown, p));
     }
 }}
 

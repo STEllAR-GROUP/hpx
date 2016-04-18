@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
@@ -109,7 +110,7 @@ int main(int argc, char** argv)
         boost::thread_group tg;
 
         for (boost::uint64_t i = 0; i != threads; ++i)
-            tg.create_thread(boost::bind(&worker_thread, i));
+            tg.create_thread(hpx::util::bind(&worker_thread, i));
 
         tg.join_all();
     }

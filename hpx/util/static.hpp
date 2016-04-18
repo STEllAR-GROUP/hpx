@@ -21,7 +21,6 @@
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) && \
     (_MSC_FULL_VER < 180021114)         // NovCTP_2013
 #include <boost/thread/once.hpp>
-#include <boost/bind.hpp>
 
 #include <memory>   // for placement new
 #endif

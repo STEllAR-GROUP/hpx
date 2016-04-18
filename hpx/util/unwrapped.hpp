@@ -8,7 +8,6 @@
 #define HPX_UTIL_UNWRAPPED_HPP
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
@@ -258,16 +257,12 @@ namespace hpx { namespace util
 
             template <typename This>
             struct result<This()>
-              : boost::mpl::eval_if_c<
-                    traits::is_callable<F()>::value
-                  , util::result_of<F()>
-                  , boost::mpl::identity<util::unused_type>
-                >
+              : util::result_of<F()>
             {};
 
+            template <typename Delay = unwrapped_impl>
             HPX_FORCEINLINE
-            typename result<unwrapped_impl()>::type
-            operator()()
+            typename result<Delay()>::type operator()()
             {
                 return util::invoke_fused(f_,
                     util::make_tuple());

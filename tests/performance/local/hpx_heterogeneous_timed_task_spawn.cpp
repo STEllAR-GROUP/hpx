@@ -5,8 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include "worker_timed.hpp"
 
@@ -16,7 +17,6 @@
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>
-#include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/cstdint.hpp>
 
@@ -183,8 +183,9 @@ int hpx_main(
         }
 
         // Randomly shuffle the entire sequence to deal with drift.
+        using hpx::util::placeholders::_1;
         boost::function<boost::uint64_t(boost::uint64_t)> shuffler_f =
-            boost::bind(&shuffler, boost::ref(prng), _1);
+            hpx::util::bind(&shuffler, boost::ref(prng), _1);
         std::random_shuffle(payloads.begin(), payloads.end()
                           , shuffler_f);
 

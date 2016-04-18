@@ -10,6 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/bind.hpp>
 
 #include "htts2.hpp"
 
@@ -37,7 +38,8 @@ struct hpx_driver : htts2::driver
         hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
         boost::program_options::options_description desc;
 
-        hpx::init(boost::bind(&hpx_driver::run_impl, boost::ref(*this), _1),
+        using hpx::util::placeholders::_1;
+        hpx::init(hpx::util::bind(&hpx_driver::run_impl, boost::ref(*this), _1),
             desc, argc_, argv_, cfg);
     }
 
@@ -73,7 +75,7 @@ struct hpx_driver : htts2::driver
         {
             // Reschedule in an attempt to correct.
             hpx::threads::register_work(
-                boost::bind(&hpx_driver::stage_tasks,
+                hpx::util::bind(&hpx_driver::stage_tasks,
                     boost::ref(*this), target_osthread)
               , NULL // No HPX-thread name.
               , hpx::threads::pending
@@ -84,8 +86,9 @@ struct hpx_driver : htts2::driver
 
         for (boost::uint64_t i = 0; i < this->tasks_; ++i)
         {
+            using hpx::util::placeholders::_1;
             hpx::threads::register_thread_plain(
-                boost::bind(&hpx_driver::payload_thread_function,
+                hpx::util::bind(&hpx_driver::payload_thread_function,
                     boost::ref(*this), _1)
               , NULL // No HPX-thread name.
               , hpx::threads::pending
@@ -110,7 +113,7 @@ struct hpx_driver : htts2::driver
             if (all_count != 1)
             {
                 register_work(
-                        boost::bind(&hpx_driver::wait_for_tasks
+                        hpx::util::bind(&hpx_driver::wait_for_tasks
                                   , boost::ref(*this)
                                   , boost::ref(finished)
                                    )
@@ -144,7 +147,7 @@ struct hpx_driver : htts2::driver
             if (this_osthread == i) continue;
 
             hpx::threads::register_work(
-                boost::bind(&hpx_driver::stage_tasks, boost::ref(*this), i)
+                hpx::util::bind(&hpx_driver::stage_tasks, boost::ref(*this), i)
               , NULL // No HPX-thread name.
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
@@ -171,7 +174,7 @@ struct hpx_driver : htts2::driver
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        register_work(boost::bind(&hpx_driver::wait_for_tasks
+        register_work(hpx::util::bind(&hpx_driver::wait_for_tasks
                                 , boost::ref(*this)
                                 , boost::ref(finished)
                                  )

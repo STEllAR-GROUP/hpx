@@ -17,8 +17,9 @@
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/util/protect.hpp>
 
 #include <boost/asio/placeholders.hpp>
 #include <boost/make_shared.hpp>
@@ -99,13 +100,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             // needed to keep  this sender object alive for the whole
             // write operation
             void (sender::*f)(boost::system::error_code const&, std::size_t,
-                    util::tuple<Handler, ParcelPostprocess>)
+                    Handler, ParcelPostprocess)
                 = &sender::handle_write<Handler, ParcelPostprocess>;
 
             window_.async_write(buffer_->data_,
-                boost::bind(f, shared_from_this(),
+                util::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, ::_2,
-                    util::make_tuple(handler, parcel_postprocess)));
+                    util::protect(handler), util::protect(parcel_postprocess)));
         }
 
         parcelset::locality const& destination() const
@@ -117,10 +118,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         /// handle completed write operation
         template <typename Handler, typename ParcelPostprocess>
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
-            util::tuple<Handler, ParcelPostprocess> handler)
+            Handler handler, ParcelPostprocess parcelPostprocess)
         {
             // just call initial handler
-            util::get<0>(handler)(e, bytes);
+            handler(e, bytes);
 
             // complete data point and push back onto gatherer
             buffer_->data_point_.time_ =
@@ -129,16 +130,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
             // now handle the acknowledgment byte which is sent by the receiver
             void (sender::*f)(boost::system::error_code const&,
-                      util::tuple<Handler, ParcelPostprocess>)
+                      Handler, ParcelPostprocess)
                 = &sender::handle_read_ack<Handler, ParcelPostprocess>;
 
-            window_.async_read_ack(boost::bind(f, shared_from_this(),
-                boost::asio::placeholders::error, handler));
+            window_.async_read_ack(util::bind(f, shared_from_this(),
+                boost::asio::placeholders::error, util::protect(handler)));
         }
 
         template <typename Handler, typename ParcelPostprocess>
         void handle_read_ack(boost::system::error_code const& e,
-            util::tuple<Handler, ParcelPostprocess> handler)
+            Handler handler, ParcelPostprocess parcelPostprocess)
         {
             // now we can give this connection back to the cache
             reclaim_data_buffer(buffer_->data_);
@@ -152,7 +153,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
-            util::get<1>(handler)(e, there_, shared_from_this());
+            parcelPostprocess(e, there_, shared_from_this());
         }
 
     protected:

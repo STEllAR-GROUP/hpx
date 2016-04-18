@@ -290,7 +290,6 @@ namespace hpx { namespace lcos
 
         using util::placeholders::_1;
         using util::placeholders::_2;
-
         return dataflow(
                 util::bind(&detail::gather_data<T>, _1, this_site, _2),
                 std::move(f), std::move(result)
@@ -362,7 +361,6 @@ namespace hpx { namespace lcos
 
         using util::placeholders::_1;
         using util::placeholders::_2;
-
         return dataflow(
                 util::bind(&detail::set_data<T>, _1, this_site, _2),
                 std::move(id), std::move(result)

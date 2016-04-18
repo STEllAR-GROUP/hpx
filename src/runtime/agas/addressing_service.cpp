@@ -27,11 +27,11 @@
 #include <hpx/runtime/agas/detail/bootstrap_service_client.hpp>
 #include <hpx/runtime/agas/detail/hosted_service_client.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -959,7 +959,6 @@ hpx::future<bool> addressing_service::bind_range_async(
     using util::placeholders::_1;
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
-
     return f.then(util::bind(
             util::one_shot(&addressing_service::bind_postproc),
             this, _1, id, g
@@ -2591,50 +2590,53 @@ boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 /// Install performance counter types exposing properties from the local cache.
 void addressing_service::register_counter_types()
 { // {{{
+    using util::placeholders::_1;
+    using util::placeholders::_2;
+
     // install
     util::function_nonser<boost::int64_t(bool)> cache_entries(
-        boost::bind(&addressing_service::get_cache_entries, this, ::_1));
+        util::bind(&addressing_service::get_cache_entries, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_hits(
-        boost::bind(&addressing_service::get_cache_hits, this, ::_1));
+        util::bind(&addressing_service::get_cache_hits, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_misses(
-        boost::bind(&addressing_service::get_cache_misses, this, ::_1));
+        util::bind(&addressing_service::get_cache_misses, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_evictions(
-        boost::bind(&addressing_service::get_cache_evictions, this, ::_1));
+        util::bind(&addressing_service::get_cache_evictions, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_insertions(
-        boost::bind(&addressing_service::get_cache_insertions, this, ::_1));
+        util::bind(&addressing_service::get_cache_insertions, this, _1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_count(
-        boost::bind(
-            &addressing_service::get_cache_get_entry_count, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_get_entry_count, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_insertion_count(
-        boost::bind(
-            &addressing_service::get_cache_insertion_entry_count, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_insertion_entry_count, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_count(
-        boost::bind(
-            &addressing_service::get_cache_update_entry_count, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_update_entry_count, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_count(
-        boost::bind(
-            &addressing_service::get_cache_erase_entry_count, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_erase_entry_count, this, _1));
 
     util::function_nonser<boost::int64_t(bool)> cache_get_entry_time(
-        boost::bind(
-            &addressing_service::get_cache_get_entry_time, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_get_entry_time, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_insertion_time(
-        boost::bind(
-            &addressing_service::get_cache_insertion_entry_time, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_insertion_entry_time, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_update_entry_time(
-        boost::bind(
-            &addressing_service::get_cache_update_entry_time, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_update_entry_time, this, _1));
     util::function_nonser<boost::int64_t(bool)> cache_erase_entry_time(
-        boost::bind(
-            &addressing_service::get_cache_erase_entry_time, this, ::_1));
+        util::bind(
+            &addressing_service::get_cache_erase_entry_time, this, _1));
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {
         { "/agas/count/cache/entries", performance_counters::counter_raw,
           "returns the number of cache entries in the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_entries, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2642,7 +2644,7 @@ void addressing_service::register_counter_types()
         { "/agas/count/cache/hits", performance_counters::counter_raw,
           "returns the number of cache hits while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_hits, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2650,7 +2652,7 @@ void addressing_service::register_counter_types()
         { "/agas/count/cache/misses", performance_counters::counter_raw,
           "returns the number of cache misses while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_misses, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2658,7 +2660,7 @@ void addressing_service::register_counter_types()
         { "/agas/count/cache/evictions", performance_counters::counter_raw,
           "returns the number of cache evictions from the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_evictions, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2666,7 +2668,7 @@ void addressing_service::register_counter_types()
         { "/agas/count/cache/insertions", performance_counters::counter_raw,
           "returns the number of cache insertions into the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_insertions, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2675,7 +2677,7 @@ void addressing_service::register_counter_types()
           "returns the number of invocations of get_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_get_entry_count, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2684,7 +2686,7 @@ void addressing_service::register_counter_types()
           "returns the number of invocations of insert function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_insertion_count, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2693,7 +2695,7 @@ void addressing_service::register_counter_types()
           "returns the number of invocations of update_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_update_entry_count, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2702,7 +2704,7 @@ void addressing_service::register_counter_types()
           "returns the number of invocations of erase_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_erase_entry_count, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2711,7 +2713,7 @@ void addressing_service::register_counter_types()
           "returns the the overall time spent executing of the get_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_get_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
@@ -2720,7 +2722,7 @@ void addressing_service::register_counter_types()
           "returns the the overall time spent executing of the insert_entry API "
               "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_insertion_time, _2),
           &performance_counters::locality_counter_discoverer,
           ""
@@ -2729,7 +2731,7 @@ void addressing_service::register_counter_types()
           "returns the the overall time spent executing of the update_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_update_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
@@ -2738,7 +2740,7 @@ void addressing_service::register_counter_types()
           "returns the the overall time spent executing of the erase_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::locality_raw_counter_creator,
+          util::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_erase_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           ""

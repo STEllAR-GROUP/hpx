@@ -306,9 +306,6 @@ HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action);
 stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 {
     using hpx::dataflow;
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::size_t nl = localities.size();                    // Number of localities
@@ -332,6 +329,9 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
         for (std::size_t i = 0; i != np; ++i)
         {
             // we execute the action on the locality of the middle partition
+            using hpx::util::placeholders::_1;
+            using hpx::util::placeholders::_2;
+            using hpx::util::placeholders::_3;
             auto Op = hpx::util::bind(act, localities[locidx(i, np, nl)], _1, _2, _3);
             next[i] = dataflow(
                     hpx::launch::async, Op,

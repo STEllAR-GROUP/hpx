@@ -11,12 +11,12 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <mutex>
@@ -120,7 +120,7 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
-            boost::thread thread(boost::bind(
+            boost::thread thread(util::bind(
                         &io_service_pool::thread_run, this, i));
             threads_.emplace_back(std::move(thread));
         }
