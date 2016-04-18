@@ -1,4 +1,4 @@
-//  include_check header  -------------------------------------------------------//
+//  deprecated_name_check header  -------------------------------------------//
 
 //  Copyright Beman Dawes   2002
 //  Copyright Rene Rivera   2004.
@@ -9,8 +9,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_INCLUDE_CHECK_HPP
-#define HPX_INCLUDE_CHECK_HPP
+#ifndef HPX_DEPRECATED_NAMES_CHECK_HPP
+#define HPX_DEPRECATED_NAMES_CHECK_HPP
 
 #include "inspector.hpp"
 
@@ -22,35 +22,33 @@ namespace boost
 {
   namespace inspect
   {
-
-    struct names_includes
+    struct deprecated_names
     {
       char const* name_regex;
-      char const* name;
-      char const* include;
+      char const* use_instead;
     };
 
-    struct names_regex_data
+    struct deprecated_names_regex_data
     {
-      names_regex_data(names_includes const* d, std::string const& rx)
+      deprecated_names_regex_data(deprecated_names const* d,
+            std::string const& rx)
         : data(d), pattern(rx, boost::regex::normal)
       {}
 
-      names_includes const* data;
+      deprecated_names const* data;
       boost::regex pattern;
     };
 
-    class include_check : public inspector
+    class deprecated_name_check : public inspector
     {
       long m_errors;
-      std::vector<names_regex_data> regex_data;
+      std::vector<deprecated_names_regex_data> regex_data;
 
     public:
 
-      include_check();
-      virtual const char * name() const { return "*I*"; }
-      virtual const char * desc() const { return "uses of function without "
-          "#include'ing corresponding header"; }
+      deprecated_name_check();
+      virtual const char * name() const { return "*DN*"; }
+      virtual const char * desc() const { return "uses of deprecated names"; }
 
       virtual void inspect(
         const std::string & library_name,
@@ -59,12 +57,12 @@ namespace boost
 
       virtual void print_summary(std::ostream& out)
       {
-        out << "  " << m_errors << " missing #include's" << line_break();
+        out << "  " << m_errors << " deprecated names" << line_break();
       }
 
-      virtual ~include_check() {}
+      virtual ~deprecated_name_check() {}
     };
   }
 }
 
-#endif // HPX_INCLUDE_CHECK_HPP
+#endif // HPX_DEPRECATED_NAMES_CHECK_HPP

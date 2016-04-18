@@ -138,7 +138,7 @@ namespace boost
             }
             if (errors > 0)
             {
-                string errored = "Line length limit*: " + total;
+                string errored = "*Line length limit*: " + total;
                 error(library_name, full_path, errored);
                 ++m_files_with_errors;
             }

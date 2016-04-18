@@ -9,8 +9,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_INCLUDE_CHECK_HPP
-#define HPX_INCLUDE_CHECK_HPP
+#ifndef HPX_DEPRECATED_INCLUDE_CHECK_HPP
+#define HPX_DEPRECATED_INCLUDE_CHECK_HPP
 
 #include "inspector.hpp"
 
@@ -23,34 +23,33 @@ namespace boost
   namespace inspect
   {
 
-    struct names_includes
+    struct deprecated_includes
     {
-      char const* name_regex;
-      char const* name;
-      char const* include;
+      char const* include_regex;
+      char const* use_instead;
     };
 
-    struct names_regex_data
+    struct deprecated_includes_regex_data
     {
-      names_regex_data(names_includes const* d, std::string const& rx)
+      deprecated_includes_regex_data(deprecated_includes const* d,
+            std::string const& rx)
         : data(d), pattern(rx, boost::regex::normal)
       {}
 
-      names_includes const* data;
+      deprecated_includes const* data;
       boost::regex pattern;
     };
 
-    class include_check : public inspector
+    class deprecated_include_check : public inspector
     {
       long m_errors;
-      std::vector<names_regex_data> regex_data;
+      std::vector<deprecated_includes_regex_data> regex_data;
 
     public:
 
-      include_check();
-      virtual const char * name() const { return "*I*"; }
-      virtual const char * desc() const { return "uses of function without "
-          "#include'ing corresponding header"; }
+      deprecated_include_check();
+      virtual const char * name() const { return "*DI*"; }
+      virtual const char * desc() const { return "#include'ing deprecated header"; }
 
       virtual void inspect(
         const std::string & library_name,
@@ -59,12 +58,12 @@ namespace boost
 
       virtual void print_summary(std::ostream& out)
       {
-        out << "  " << m_errors << " missing #include's" << line_break();
+        out << "  " << m_errors << " deprecated #include's" << line_break();
       }
 
-      virtual ~include_check() {}
+      virtual ~deprecated_include_check() {}
     };
   }
 }
 
-#endif // HPX_INCLUDE_CHECK_HPP
+#endif // HPX_DEPRECATED_INCLUDE_CHECK_HPP

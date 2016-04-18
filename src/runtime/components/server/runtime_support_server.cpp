@@ -1765,7 +1765,8 @@ namespace hpx { namespace components { namespace server
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = hpx::util::create_path(*it);
-                    fs::path lib_path = lib / std::string(HPX_MAKE_DLL_STRING(component));
+                    fs::path lib_path =
+                        lib / std::string(HPX_MAKE_DLL_STRING(component));
                     if(fs::exists(lib_path, fsec))
                     {
                         break;
@@ -2228,7 +2229,8 @@ namespace hpx { namespace components { namespace server
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = hpx::util::create_path(*it);
-                    fs::path lib_path = lib / std::string(HPX_MAKE_DLL_STRING(component));
+                    fs::path lib_path =
+                        lib / std::string(HPX_MAKE_DLL_STRING(component));
                     if(fs::exists(lib_path, fsec))
                     {
                         break;

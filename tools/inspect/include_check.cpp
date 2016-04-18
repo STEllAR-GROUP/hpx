@@ -64,7 +64,7 @@ namespace boost
           "|"
           "/\\*.*?\\*/"         // multi line comments (/**/)
           "|"
-          "\"(?:\\\\\\\\|\\\\\"|[^\"])*\"" // string literals
+          "\"([^\"\\\\]|\\\\.)*\"" // string literals
           ")";
         regex_data.push_back(names_regex_data(names_it, rx));
       }
