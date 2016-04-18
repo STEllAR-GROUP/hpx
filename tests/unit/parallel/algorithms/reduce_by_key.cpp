@@ -197,8 +197,8 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
     o_values = values;
     o_keys = keys;
 
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // reduce_by_key, blocking when seq, par, par_vec
+    hpx::util::high_resolution_timer t;
     auto fresult = hpx::parallel::reduce_by_key(
         std::forward<ExPolicy>(policy),
         keys.begin(), keys.end(),
@@ -206,9 +206,11 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
         keys.begin(),
         values.begin(),
         op);
+    double async_seconds = t.elapsed();
     auto result = fresult.get();
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    double sync_seconds= t.elapsed();
 
+    std::cout << "Async time " << async_seconds << " Sync time " << sync_seconds << "\n";
     bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
     if (is_equal) {
         //std::cout << "Test Passed\n";
@@ -261,7 +263,6 @@ void test_reduce_by_key1()
             );
     } while (t.elapsed() < 2);
     //
-
     hpx::util::high_resolution_timer t2;
     do {
         test_reduce_by_key_async(seq(task), int(), int(), std::equal_to<int>(),
