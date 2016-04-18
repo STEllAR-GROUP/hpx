@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 
+#include <boost/cstdint.hpp>
+
 namespace hpx { namespace performance_counters { namespace io
 {
     // returns number of bytes passed as an argument to read I/O operations

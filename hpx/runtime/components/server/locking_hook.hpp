@@ -9,8 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <mutex>

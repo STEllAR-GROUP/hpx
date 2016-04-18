@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 
+#include <boost/cstdint.hpp>
+
 namespace hpx { namespace performance_counters { namespace memory
 {
     // returns virtual memory value

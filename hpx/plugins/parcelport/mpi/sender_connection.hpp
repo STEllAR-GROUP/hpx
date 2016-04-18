@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
