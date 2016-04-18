@@ -27,6 +27,8 @@
 
 #include <limits>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 #include <apex_api.hpp>
 
@@ -66,8 +68,9 @@ void setup_counters() {
 }
 
 double get_counter_value() {
-    if (!counters_initialized) { 
-        std::cerr << "get_counter_value(): ERROR: counter was not initialized" << std::endl;
+    if (!counters_initialized) {
+        std::cerr << "get_counter_value(): ERROR: counter was not initialized"
+            << std::endl;
         return false;
     }
     try {
@@ -77,7 +80,8 @@ double get_counter_value() {
         return (double)(counter_value);
     }
     catch(hpx::exception const& e) {
-        std::cerr << "get_counter_value(): caught exception: " << e.what() << std::endl;
+        std::cerr << "get_counter_value(): caught exception: " << e.what() 
+            << std::endl;
         return (std::numeric_limits<double>::max)();
     }
 }
@@ -291,7 +295,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // Find divisors of nx
     std::vector<boost::uint64_t> divisors;
-    // Start with os_thread_count so we have at least as many 
+    // Start with os_thread_count so we have at least as many
     // partitions as we have HPX threads.
     for(boost::uint64_t i = os_thread_count; i < std::sqrt(nx); ++i) {
         if(nx % i == 0) {
@@ -305,7 +309,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::sort(divisors.begin(), divisors.end());
 
     if(divisors.size() == 0) {
-        std::cerr << "ERROR: No possible divisors for " << nx << " data elements with at least " << os_thread_count << " partitions and at least two elements per partition." << std::endl;
+        std::cerr << "ERROR: No possible divisors for " << nx 
+            << " data elements with at least " << os_thread_count 
+            << " partitions and at least two elements per partition." << std::endl;
         return hpx::finalize();
     }
 
@@ -330,7 +336,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
-    
     double * data = nullptr;
     for(boost::uint64_t i = 0; i < nr; ++i)
     {
@@ -403,7 +408,10 @@ int main(int argc, char* argv[])
         ("dx", value<double>(&dx)->default_value(1.0),
          "Local x dimension")
         ( "no-header", "do not print out the csv header row")
-        ("counter", value<std::string>(&counter_name)->default_value("/threads{locality#0/total}/idle-rate"), "HPX Counter to minimize for repartitioning")
+        ("counter", 
+           value<std::string>(&counter_name)->
+            default_value("/threads{locality#0/total}/idle-rate"), 
+            "HPX Counter to minimize for repartitioning")
     ;
 
     hpx::register_startup_function(&setup_counters);
