@@ -4,13 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// make inspect happy: hpxinspect:nodeprecatedinclude hpxinspect:nodeprecatedname
+
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
-#include <hpx/util/bind.hpp>
 
 #include <iostream>
 #include <stdexcept>
 #include <vector>
 
+#include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
@@ -134,9 +136,8 @@ int app_main(
 
     // Randomly shuffle the entire sequence to deal with drift.
     // fix for gcc 4.5:
-    using hpx::util::placeholders::_1;
     boost::function<boost::uint64_t(boost::uint64_t)> shuffler_f =
-        hpx::util::bind(&shuffler, boost::ref(prng), _1);
+        boost::bind(&shuffler, boost::ref(prng), _1);
     std::random_shuffle(payloads.begin(), payloads.end()
                       , shuffler_f);
 
