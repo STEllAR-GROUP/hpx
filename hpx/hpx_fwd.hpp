@@ -11,6 +11,12 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_MSVC)
+#  pragma message("The header hpx_fwd.hpp is deprecated")
+#else
+#  warning "The header hpx_fwd.hpp is deprecated"
+#endif
+
 #include <cstdlib>
 #include <string>
 #include <vector>
