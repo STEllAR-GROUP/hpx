@@ -225,9 +225,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         // -------------------------------------------------------------------
-        // The main algorithm is implemented here, it can be called only
-        // with a sequential or parallel policy.
-        // Async execution is handled by the wrapper code that calls this
+        // The main algorithm is implemented here, it replaces any async
+        // execution policy with a non async one so that no waits are
+        // necessry on the internal algorithms. Async execution is handled
+        // by the wrapper layer that calls this.
         // -------------------------------------------------------------------
         template<
             typename ExPolicy,
@@ -389,8 +390,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     std::forward<Compare>(comp));
                 }
 
-//std::cout << "The result type is " << type_name<result_type>().c_str() << "\n";
-
             template <
                 typename ExPolicy, typename RanIter, typename RanIter2,
                 typename Compare>
@@ -527,16 +526,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         typedef util::detail::algorithm_result<
             ExPolicy, std::pair<OutIter, OutIter2>> result;
-        typedef typename std::iterator_traits<RanIter>::iterator_category  category1;
-        typedef typename std::iterator_traits<RanIter2>::iterator_category category2;
-        typedef typename std::iterator_traits<OutIter>::iterator_category  category3;
-        typedef typename std::iterator_traits<OutIter2>::iterator_category category4;
 
         static_assert(
-            (boost::is_base_of<std::random_access_iterator_tag, category1>::value) ||
-            (boost::is_base_of<std::random_access_iterator_tag, category2>::value) ||
-            (boost::is_base_of<std::output_iterator_tag, category3>::value) ||
-            (boost::is_base_of<std::output_iterator_tag, category4>::value),
+            (hpx::traits::is_random_access_iterator<RanIter>::value) &&
+            (hpx::traits::is_random_access_iterator<RanIter2>::value) &&
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_forward_iterator<OutIter>::value) &&
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "iterators : Random_access for inputs and Output for outputs.");
 
         const uint64_t number_of_keys = std::distance(key_first, key_last);

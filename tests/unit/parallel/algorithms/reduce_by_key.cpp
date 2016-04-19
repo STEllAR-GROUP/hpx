@@ -12,7 +12,10 @@
 #include <boost/random/uniform_int_distribution.hpp>
 //
 #include <vector>
-#include <string>
+#ifdef EXTRA_DEBUG
+# include <string>
+# include <iostream>
+#endif
 //
 #define HPX_REDUCE_BY_KEY_TEST_SIZE (1 << 18)
 //
