@@ -327,8 +327,6 @@ namespace sheneos
     // bulk operation has been completed
     struct on_completed_bulk_one
     {
-        typedef void result_type;
-
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         on_completed_bulk_one(boost::shared_ptr<partitions_type> parts,
@@ -360,7 +358,6 @@ namespace sheneos
 
     struct bulk_one_context
     {
-        typedef std::vector<double> result_type;
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         bulk_one_context(boost::shared_ptr<partitions_type> parts, std::size_t s,
@@ -443,8 +440,6 @@ namespace sheneos
     // bulk operation has been completed
     struct on_completed_bulk
     {
-        typedef void result_type;
-
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         on_completed_bulk(boost::shared_ptr<partitions_type> parts,
@@ -478,7 +473,6 @@ namespace sheneos
     ///////////////////////////////////////////////////////////////////////////
     struct bulk_context
     {
-        typedef std::vector<std::vector<double> > result_type;
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         bulk_context(boost::shared_ptr<partitions_type> parts, std::size_t s,

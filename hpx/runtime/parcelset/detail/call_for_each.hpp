@@ -20,9 +20,8 @@ namespace hpx { namespace parcelset
         struct call_for_each
         {
             HPX_MOVABLE_ONLY(call_for_each);
-        public:
-            typedef void result_type;
 
+        public:
             typedef std::vector<parcelport::write_handler_type> handlers_type;
             typedef std::vector<parcel> parcels_type;
             handlers_type handlers_;
@@ -46,7 +45,7 @@ namespace hpx { namespace parcelset
                 return *this;
             }
 
-            result_type operator()(boost::system::error_code const& e) const
+            void operator()(boost::system::error_code const& e) const
             {
                 HPX_ASSERT(parcels_.size() == handlers_.size());
                 for(std::size_t i = 0; i < parcels_.size(); ++i)

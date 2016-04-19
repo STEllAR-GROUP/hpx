@@ -320,15 +320,6 @@ namespace hpx { namespace actions
     struct set_lco_value_continuation
     {
         template <typename T>
-        struct result;
-
-        template <typename F, typename T1, typename T2>
-        struct result<F(T1, T2)>
-        {
-            typedef T2 type;
-        };
-
-        template <typename T>
         HPX_FORCEINLINE T operator()(naming::id_type const& lco, T && t) const
         {
             hpx::set_lco_value(lco, std::forward<T>(t));
@@ -347,15 +338,6 @@ namespace hpx { namespace actions
         typedef typename util::decay<Cont>::type cont_type;
 
     public:
-        template <typename T>
-        struct result;
-
-        template <typename F, typename T1, typename T2>
-        struct result<F(T1, T2)>
-        {
-            typedef typename util::result_of<cont_type(T1, T2)>::type type;
-        };
-
         continuation_impl() {}
 
         template <typename Cont_>
@@ -366,15 +348,16 @@ namespace hpx { namespace actions
         virtual ~continuation_impl() {}
 
         template <typename T>
-        typename result<continuation_impl(hpx::naming::id_type, T)>::type
+        typename util::result_of<cont_type(hpx::naming::id_type, T)>::type
         operator()(hpx::naming::id_type const& lco, T && t) const
         {
             hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.
-            typedef typename result<continuation_impl(hpx::naming::id_type, T)>::type
-                result_type;
+            typedef typename util::result_of<
+                cont_type(hpx::naming::id_type, T)
+            >::type result_type;
             return result_type();
         }
 
@@ -401,20 +384,6 @@ namespace hpx { namespace actions
         typedef typename util::decay<F>::type function_type;
 
     public:
-        template <typename T>
-        struct result;
-
-        template <typename This, typename T1, typename T2>
-        struct result<This(T1, T2)>
-        {
-            typedef typename util::result_of<
-                    cont_type(T1, T2)
-                >::type result_type;
-            typedef typename util::result_of<
-                    function_type(hpx::naming::id_type, result_type)
-                >::type type;
-        };
-
         continuation2_impl() {}
 
         template <typename Cont_, typename F_>
@@ -428,8 +397,13 @@ namespace hpx { namespace actions
         virtual ~continuation2_impl() {}
 
         template <typename T>
-        typename result<continuation2_impl(hpx::naming::id_type, T)>::type
-        operator()(hpx::naming::id_type const& lco, T && t) const
+        typename util::result_of<
+            function_type(
+                hpx::naming::id_type,
+                typename util::result_of<
+                    cont_type(hpx::naming::id_type, T)
+                >::type)
+        >::type operator()(hpx::naming::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
             hpx::apply_continue(cont_, hpx::util::bind(f_, lco, _2),
@@ -437,8 +411,13 @@ namespace hpx { namespace actions
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.
-            typedef typename result<continuation2_impl(hpx::naming::id_type, T)>::type
-                result_type;
+            typedef typename util::result_of<
+                function_type(
+                    hpx::naming::id_type,
+                    typename util::result_of<
+                        cont_type(hpx::naming::id_type, T)
+                    >::type)
+            >::type result_type;
             return result_type();
         }
 

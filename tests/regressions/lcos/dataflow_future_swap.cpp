@@ -23,8 +23,6 @@ typedef hpx::lcos::shared_future< double > future_type;
 
 struct mul
 {
-    typedef double result_type;
-
     double operator()( double x1 , double x2 ) const
     {
         hpx::this_thread::sleep_for( boost::chrono::milliseconds(10000) );

@@ -80,9 +80,8 @@ namespace hpx { namespace actions
               , f_(std::move(other.f_))
             {}
 
-            typedef threads::thread_state_enum result_type;
-
-            HPX_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
+            HPX_FORCEINLINE threads::thread_state_enum
+            operator()(threads::thread_state_ex_enum)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_->get_id() << ")";
@@ -184,11 +183,9 @@ namespace hpx { namespace actions
         /// original function (given by \a func).
         struct thread_function
         {
-            typedef threads::thread_state_enum result_type;
-
             template <typename ...Ts>
-            HPX_FORCEINLINE result_type operator()(
-                naming::address::address_type lva, Ts&&... vs) const
+            HPX_FORCEINLINE threads::thread_state_enum
+            operator()(naming::address::address_type lva, Ts&&... vs) const
             {
                 try {
                     LTM_(debug) << "Executing "

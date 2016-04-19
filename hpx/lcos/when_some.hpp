@@ -435,7 +435,6 @@ namespace hpx { namespace lcos
 
         public:
             typedef Sequence argument_type;
-            typedef when_some_result<Sequence> result_type;
 
             when_some(argument_type && lazy_values, std::size_t n)
               : lazy_values_(std::move(lazy_values))
@@ -444,7 +443,7 @@ namespace hpx { namespace lcos
               , goal_reached_on_calling_thread_(false)
             {}
 
-            result_type operator()()
+            when_some_result<Sequence> operator()()
             {
                 // set callback functions to executed when future is ready
                 set_on_completed_callback(*this);
@@ -466,7 +465,7 @@ namespace hpx { namespace lcos
             }
 
             mutable mutex_type mtx_;
-            result_type lazy_values_;
+            when_some_result<Sequence> lazy_values_;
             boost::atomic<std::size_t> count_;
             std::size_t needed_count_;
             bool goal_reached_on_calling_thread_;
