@@ -8,7 +8,7 @@
 #if !defined(HPX_901997BE_9730_41F7_9DBC_AD1DC70D7819)
 #define HPX_901997BE_9730_41F7_9DBC_AD1DC70D7819
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

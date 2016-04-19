@@ -7,24 +7,26 @@
 #ifndef HPX_PARCELSET_POLICIES_IBVERBS_CONNECTION_HANDLER_HPP
 #define HPX_PARCELSET_POLICIES_IBVERBS_CONNECTION_HANDLER_HPP
 
-#include <hpx/config/defines.hpp>
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#include <hpx/config.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/plugins/parcelport/ibverbs/acceptor.hpp>
 #include <hpx/plugins/parcelport/ibverbs/locality.hpp>
 
-#include <hpx/util/memory_chunk_pool.hpp>
 #include <hpx/util/cache/local_cache.hpp>
 #include <hpx/util/cache/entries/lru_entry.hpp>
+#include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace ibverbs

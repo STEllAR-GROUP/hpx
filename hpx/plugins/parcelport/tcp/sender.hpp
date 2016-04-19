@@ -9,7 +9,8 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_TCP_SENDER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
 #include <hpx/config/asio.hpp>

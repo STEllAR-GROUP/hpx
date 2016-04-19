@@ -12,7 +12,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/config/export_definitions.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
 #include <cstring>

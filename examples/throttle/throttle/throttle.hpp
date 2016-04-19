@@ -6,7 +6,7 @@
 #if !defined(HPX_THROTTLE_AUG_09_2011_0659PM)
 #define HPX_THROTTLE_AUG_09_2011_0659PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/include/client.hpp>

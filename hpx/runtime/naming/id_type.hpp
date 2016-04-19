@@ -7,12 +7,13 @@
 #define HPX_NAMING_ID_TYPE_OCT_13_2013_0751PM
 
 #include <hpx/config.hpp>
-#include <hpx/config/warnings_prefix.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/intrusive_ptr.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming

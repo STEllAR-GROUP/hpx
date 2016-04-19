@@ -5,7 +5,8 @@
 
 #pragma once // prevent multiple inclusions of this header file.
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #include <hpx/util/thread_description.hpp>
 
 #ifdef HPX_HAVE_APEX

@@ -9,7 +9,6 @@
 #define HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM
 
 #include <hpx/config.hpp>
-#include <hpx/config/export_definitions.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/decay.hpp>

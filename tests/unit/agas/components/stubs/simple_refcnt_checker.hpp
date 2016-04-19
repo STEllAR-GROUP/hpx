@@ -8,7 +8,7 @@
 #if !defined(HPX_FCB1AFA8_8399_40D9_95DE_A68F861C0CFE)
 #define HPX_FCB1AFA8_8399_40D9_95DE_A68F861C0CFE
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <tests/unit/agas/components/server/simple_refcnt_checker.hpp>

@@ -8,7 +8,7 @@
 #ifndef HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_VTABLE_HPP
 #define HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_VTABLE_HPP
 
-#include <hpx/config/forceinline.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 

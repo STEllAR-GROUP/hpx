@@ -7,10 +7,10 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_ERRORS_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_ERRORS_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/config.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/asio/detail/throw_error.hpp>

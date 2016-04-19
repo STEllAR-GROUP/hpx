@@ -6,7 +6,7 @@
 #if !defined(HPX_SERVER_SIMPLE_CENTRAL_TUPLESPACE_MAR_29_2013_0237PM)
 #define HPX_SERVER_SIMPLE_CENTRAL_TUPLESPACE_MAR_29_2013_0237PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

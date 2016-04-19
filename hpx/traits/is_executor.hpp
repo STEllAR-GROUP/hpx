@@ -6,6 +6,7 @@
 #if !defined(HPX_TRAITS_IS_EXECUTOR_MAY_13_2015_1213PM)
 #define HPX_TRAITS_IS_EXECUTOR_MAY_13_2015_1213PM
 
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/config/inline_namespace.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>

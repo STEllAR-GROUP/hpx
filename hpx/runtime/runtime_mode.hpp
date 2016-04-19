@@ -9,7 +9,7 @@
 #ifndef HPX_RUNTIME_RUNTIME_MODE_HPP
 #define HPX_RUNTIME_RUNTIME_MODE_HPP
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 
 #include <string>
 

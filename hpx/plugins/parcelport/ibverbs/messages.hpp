@@ -6,10 +6,9 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_MESSAGES_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_MESSAGES_HPP
 
-#include <hpx/config/defines.hpp>
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
-
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
 

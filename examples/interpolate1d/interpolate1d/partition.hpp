@@ -6,7 +6,7 @@
 #if !defined(HPX_PARTITION_AUG_04_2011_0251PM)
 #define HPX_PARTITION_AUG_04_2011_0251PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/include/client.hpp>
 

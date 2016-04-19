@@ -6,7 +6,7 @@
 #if !defined(HPX_INTERPOLATE1D_AUG_04_2011_0340PM)
 #define HPX_INTERPOLATE1D_AUG_04_2011_0340PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 

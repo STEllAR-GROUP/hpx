@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM)
 #define HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

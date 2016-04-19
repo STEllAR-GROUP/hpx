@@ -6,7 +6,8 @@
 #if !defined(HPX_PARCELSET_IPC_MESSAGE_NOV_25_2012_0847PM)
 #define HPX_PARCELSET_IPC_MESSAGE_NOV_25_2012_0847PM
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
 ///////////////////////////////////////////////////////////////////////////////

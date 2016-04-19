@@ -26,6 +26,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/detail/bootstrap_service_client.hpp>
 #include <hpx/runtime/agas/detail/hosted_service_client.hpp>
+#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>

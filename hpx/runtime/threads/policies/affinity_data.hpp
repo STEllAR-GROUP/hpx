@@ -6,7 +6,7 @@
 #if !defined(HPX_THREADMANAGER_POLICIES_AFFINITY_DATA_JAN_11_2013_0922PM)
 #define HPX_THREADMANAGER_POLICIES_AFFINITY_DATA_JAN_11_2013_0922PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <string>

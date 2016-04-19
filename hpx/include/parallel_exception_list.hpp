@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_EXCEPTION_LIST_MAY_27_2014_0910PM)
 #define HPX_PARALLEL_EXCEPTION_LIST_MAY_27_2014_0910PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/exception_list.hpp>
 
 #endif

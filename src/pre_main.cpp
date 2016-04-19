@@ -10,11 +10,14 @@
 #include <hpx/version.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 
 #define HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION
 

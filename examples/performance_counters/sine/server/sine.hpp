@@ -6,7 +6,7 @@
 #if !defined(PERFORMANCE_COUNTERS_SINE_SEP_20_2011_0112PM)
 #define PERFORMANCE_COUNTERS_SINE_SEP_20_2011_0112PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>

@@ -9,7 +9,7 @@
 #if !defined(HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9)
 #define HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -20,13 +20,13 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 #include <string>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace agas
 {

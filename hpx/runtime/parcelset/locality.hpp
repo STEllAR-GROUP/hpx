@@ -18,10 +18,10 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 #include <memory>
 #include <string>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset

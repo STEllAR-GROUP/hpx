@@ -6,10 +6,10 @@
 #if !defined(HPX_PARCELSET_IPC_ACCEPTOR_NOV_25_2012_0710PM)
 #define HPX_PARCELSET_IPC_ACCEPTOR_NOV_25_2012_0710PM
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/parcelport/ipc/interprocess_errors.hpp>
 #include <hpx/plugins/parcelport/ipc/message.hpp>
 #include <hpx/plugins/parcelport/ipc/data_window.hpp>

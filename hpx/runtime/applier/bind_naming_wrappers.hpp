@@ -6,7 +6,7 @@
 #if !defined(HPX_RUNTIME_APPLIER_BIND_NAMING_WRAPPERS_MAY_26_20111234PM)
 #define HPX_RUNTIME_APPLIER_BIND_NAMING_WRAPPERS_MAY_26_20111234PM
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>

@@ -10,15 +10,15 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_CONNECTION_HANDLER_HPP
 #define HPX_PARCELSET_POLICIES_TCP_CONNECTION_HANDLER_HPP
 
-#include <hpx/config/defines.hpp>
-#if defined(HPX_HAVE_PARCELPORT_TCP)
+#include <hpx/config.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
+#if defined(HPX_HAVE_PARCELPORT_TCP)
 #include <hpx/config/asio.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/plugins/parcelport/tcp/locality.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -26,6 +26,8 @@
 
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace parcelset
 {

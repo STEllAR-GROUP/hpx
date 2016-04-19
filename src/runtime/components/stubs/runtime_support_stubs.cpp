@@ -4,12 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/get_colocation_id.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/include/async.hpp>

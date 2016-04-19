@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 // Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
@@ -14,12 +14,10 @@
 #include <mpi.h>
 #endif
 
-#include <hpx/version.hpp>
-
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>

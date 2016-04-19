@@ -6,7 +6,9 @@
 #if !defined(HPX_Sg7J0M91KTJ7FTMezA1gNjwaA2LCgq70PgnGNvX3)
 #define HPX_Sg7J0M91KTJ7FTMezA1gNjwaA2LCgq70PgnGNvX3
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace performance_counters { namespace memory
 {

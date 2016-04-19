@@ -9,11 +9,12 @@
 #ifndef HPX_RUNTIME_FIND_HERE_HPP
 #define HPX_RUNTIME_FIND_HERE_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/config/export_definitions.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
-namespace hpx {
+namespace hpx
+{
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
     ///

@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM)
 #define HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

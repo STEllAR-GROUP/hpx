@@ -6,7 +6,7 @@
 #if !defined(HPX_APPLY_APR_16_20012_0943AM)
 #define HPX_APPLY_APR_16_20012_0943AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>

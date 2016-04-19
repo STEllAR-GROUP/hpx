@@ -13,9 +13,27 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/get_colocation_id.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/get_locality_name.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/set_parcel_write_handler.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
+
+#include <cstddef>
+#include <string>
 
 namespace hpx
 {
@@ -47,6 +65,21 @@ namespace hpx
     HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
 
     /// \cond NOINTERNAL
+    namespace util
+    {
+        class HPX_EXPORT io_service_pool;
+        class HPX_EXPORT runtime_configuration;
+
+        struct binary_filter;
+
+        class HPX_EXPORT section;
+
+        /// \brief Expand INI variables in a string
+        HPX_API_EXPORT std::string expand(std::string const& expand);
+
+        /// \brief Expand INI variables in a string
+        HPX_API_EXPORT void expand(std::string& expand);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
@@ -59,6 +92,200 @@ namespace hpx
         char const* name, char const* pool_name_suffix = "");
 
     /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently being started.
+    ///
+    /// This function returns whether the runtime system is currently being
+    /// started or not, e.g. whether the current state of the runtime system is
+    /// \a hpx::state_startup
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_starting();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently running.
+    ///
+    /// This function returns whether the runtime system is currently running
+    /// or not, e.g.  whether the current state of the runtime system is
+    /// \a hpx::state_running
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_running();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently stopped.
+    ///
+    /// This function returns whether the runtime system is currently stopped
+    /// or not, e.g.  whether the current state of the runtime system is
+    /// \a hpx::state_stopped
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_stopped();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently being shut down.
+    ///
+    /// This function returns whether the runtime system is currently being
+    /// shut down or not, e.g.  whether the current state of the runtime system
+    /// is \a hpx::state_stopped or \a hpx::state_shutdown
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_stopped_or_shutting_down();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of worker OS- threads used to execute HPX
+    ///        threads
+    ///
+    /// This function returns the number of OS-threads used to execute HPX
+    /// threads. If the function is called while no HPX runtime system is active,
+    /// it will return zero.
+    HPX_API_EXPORT std::size_t get_num_worker_threads();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the system uptime measure on the thread executing this call.
+    ///
+    /// This function returns the system uptime measured in nanoseconds for the
+    /// thread executing this call. If the function is called while no HPX
+    /// runtime system is active, it will return zero.
+    HPX_API_EXPORT boost::uint64_t get_system_uptime();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Start all active performance counters, optionally naming the
+    ///        section of code
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     The active counters are those which have been specified on
+    ///           the command line while executing the application (see command
+    ///           line option \--hpx:print-counter)
+    HPX_API_EXPORT void start_active_counters(error_code& ec = throws);
+
+    /// \brief Resets all active performance counters.
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     The active counters are those which have been specified on
+    ///           the command line while executing the application (see command
+    ///           line option \--hpx:print-counter)
+    HPX_API_EXPORT void reset_active_counters(error_code& ec = throws);
+
+    /// \brief Stop all active performance counters.
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     The active counters are those which have been specified on
+    ///           the command line while executing the application (see command
+    ///           line option \--hpx:print-counter)
+    HPX_API_EXPORT void stop_active_counters(error_code& ec = throws);
+
+    /// \brief Evaluate and output all active performance counters, optionally
+    ///        naming the point in code marked by this function.
+    ///
+    /// \param reset       [in] this is an optional flag allowing to reset
+    ///                    the counter value after it has been evaluated.
+    /// \param description [in] this is an optional value naming the point in
+    ///                    the code marked by the call to this function.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     The output generated by this function is redirected to the
+    ///           destination specified by the corresponding command line
+    ///           options (see \--hpx:print-counter-destination).
+    ///
+    /// \note     The active counters are those which have been specified on
+    ///           the command line while executing the application (see command
+    ///           line option \--hpx:print-counter)
+    HPX_API_EXPORT void evaluate_active_counters(bool reset = false,
+        char const* description = 0, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a binary filter plugin
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    HPX_API_EXPORT serialization::binary_filter* create_binary_filter(
+        char const* binary_filter_type, bool compress,
+        serialization::binary_filter* next_filter = 0, error_code& ec = throws);
+
+#if defined(HPX_HAVE_SODIUM)
+    namespace components { namespace security
+    {
+        class certificate;
+        class certificate_signing_request;
+        class parcel_suffix;
+        class hash;
+
+        template <typename T> class signed_type;
+        typedef signed_type<certificate> signed_certificate;
+        typedef signed_type<certificate_signing_request>
+            signed_certificate_signing_request;
+        typedef signed_type<parcel_suffix> signed_parcel_suffix;
+    }}
+
+#if defined(HPX_HAVE_SECURITY)
+    /// \brief Return the certificate for this locality
+    ///
+    /// \returns This function returns the signed certificate for this locality.
+    HPX_API_EXPORT components::security::signed_certificate const&
+        get_locality_certificate(error_code& ec = throws);
+
+    /// \brief Return the certificate for the given locality
+    ///
+    /// \param id The id representing the locality for which to retrieve
+    ///           the signed certificate.
+    ///
+    /// \returns This function returns the signed certificate for the locality
+    ///          identified by the parameter \a id.
+    HPX_API_EXPORT components::security::signed_certificate const&
+        get_locality_certificate(boost::uint32_t locality_id, error_code& ec = throws);
+
+    /// \brief Add the given certificate to the certificate store of this locality.
+    ///
+    /// \param cert The certificate to add to the certificate store of this
+    ///             locality
+    HPX_API_EXPORT void add_locality_certificate(
+        components::security::signed_certificate const& cert,
+        error_code& ec = throws);
+#endif
+#endif
 }
 
 #endif

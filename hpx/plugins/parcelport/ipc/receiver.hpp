@@ -7,7 +7,8 @@
 #ifndef HPX_PARCELPORT_IPC_SENDER_HPP
 #define HPX_PARCELPORT_IPC_SENDER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>

@@ -6,7 +6,7 @@
 #if !defined(HPX_SERVER_TUPLES_WAREHOUSE_MAY_04_2013_0801PM)
 #define HPX_SERVER_TUPLES_WAREHOUSE_MAY_04_2013_0801PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

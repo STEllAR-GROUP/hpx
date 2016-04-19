@@ -6,7 +6,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONTINUATION_HPP)
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_HPP
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 
 namespace hpx { namespace actions
 {

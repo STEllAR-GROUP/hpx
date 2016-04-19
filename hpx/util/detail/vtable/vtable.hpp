@@ -8,7 +8,7 @@
 #ifndef HPX_UTIL_DETAIL_VTABLE_VTABLE_HPP
 #define HPX_UTIL_DETAIL_VTABLE_VTABLE_HPP
 
-#include <hpx/config/forceinline.hpp>
+#include <hpx/config.hpp>
 
 #include <memory>
 #include <typeinfo>

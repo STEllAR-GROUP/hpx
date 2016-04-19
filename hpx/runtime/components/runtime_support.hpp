@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_RUNTIME_SUPPORT_JUN_03_2008_0438PM)
 #define HPX_COMPONENTS_RUNTIME_SUPPORT_JUN_03_2008_0438PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 

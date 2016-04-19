@@ -7,7 +7,7 @@
 #if !defined(HELLO_WORLD_COMPONENT_HPP)
 #define HELLO_WORLD_COMPONENT_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>

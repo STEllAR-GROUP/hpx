@@ -11,8 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/config/export_definitions.hpp>
-
 // Needed to get potentially get _GLIBCXX_HAVE_TLS
 #include <cstdlib>
 

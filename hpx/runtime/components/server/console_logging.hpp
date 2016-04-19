@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPONENTS_CONSOLE_DEC_16_2008_0427PM)
 #define HPX_COMPONENTS_CONSOLE_DEC_16_2008_0427PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
