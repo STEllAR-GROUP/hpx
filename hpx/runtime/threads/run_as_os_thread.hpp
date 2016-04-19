@@ -20,7 +20,7 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    hpx::future<typename util::result_of<F(Ts &&...)>::type>
+    hpx::future<typename util::result_of<F&&(Ts &&...)>::type>
     run_as_os_thread(F && f, Ts &&... vs)
     {
         HPX_ASSERT(get_self_ptr() != 0);
@@ -29,9 +29,8 @@ namespace hpx { namespace threads
         typedef parallel::executor_traits<executor_type> traits;
 
         executor_type scheduler;
-        return traits::async_execute(scheduler, util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(vs)...
-            ));
+        return traits::async_execute(scheduler, std::forward<F>(f),
+            std::forward<Ts>(vs)...);
     }
 }}
 

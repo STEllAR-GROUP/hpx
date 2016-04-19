@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -64,10 +64,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
         ///
-        template <typename F>
-        static void apply_execute(executor_type& sched, F && f)
+        template <typename F, typename ... Ts>
+        static void apply_execute(executor_type& sched, F && f, Ts &&... ts)
         {
-            hpx::apply(sched, std::forward<F>(f));
+            hpx::apply(sched, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         /// \brief Singleton form of asynchronous execution agent creation.
@@ -83,14 +83,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         /// \returns f()'s result through a future
         ///
-        template <typename F>
-        static hpx::future<
-            typename hpx::util::result_of<
-                typename hpx::util::decay<F>::type()
-            >::type>
-        async_execute(executor_type& sched, F && f)
+        template <typename F, typename ... Ts>
+        static hpx::future<typename hpx::util::result_of<F(Ts &&...)>::type>
+        async_execute(executor_type& sched, F && f, Ts &&... ts)
         {
-            return hpx::async(sched, std::forward<F>(f));
+            return hpx::async(sched, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         /// \brief Singleton form of synchronous execution agent creation.
@@ -107,13 +105,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         /// \returns f()'s result through a future
         ///
-        template <typename F>
-        static typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
-        execute(executor_type& sched, F && f)
+        template <typename F, typename ... Ts>
+        static typename hpx::util::result_of<F&&(Ts&&...)>::type
+        execute(executor_type& sched, F && f, Ts &&... ts)
         {
-            return hpx::async(sched, std::forward<F>(f)).get();
+            return hpx::async(sched, std::forward<F>(f),
+                std::forward<Ts>(ts)...).get();
         }
 
         /// \brief Bulk form of asynchronous execution agent creation
@@ -139,18 +136,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///          of futures holding the returned value of each invocation
         ///          of \a f.
         ///
-        template <typename F, typename Shape>
+        template <typename F, typename Shape, typename ... Ts>
         static std::vector<hpx::future<
-            typename detail::bulk_async_execute_result<F, Shape>::type
+            typename detail::bulk_async_execute_result<F, Shape, Ts...>::type
         > >
-        async_execute(executor_type& sched, F && f, Shape const& shape)
+        bulk_async_execute(executor_type& sched, F && f, Shape const& shape,
+            Ts &&... ts)
         {
             std::vector<hpx::future<
-                    typename detail::bulk_async_execute_result<F, Shape>::type
+                    typename detail::bulk_async_execute_result<
+                        F, Shape, Ts...
+                    >::type
                 > > results;
 
             for (auto const& elem: shape)
-                results.push_back(hpx::async(sched, std::forward<F>(f), elem));
+            {
+                results.push_back(hpx::async(sched, std::forward<F>(f),
+                    elem, ts...));
+            }
 
             return results;
         }
@@ -179,16 +182,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///          returned value of each invocation of \a f except when
         ///          \a f returns void, which case void is returned.
         ///
-        template <typename F, typename Shape>
-        static typename detail::bulk_execute_result<F, Shape>::type
-        execute(executor_type& sched, F && f, Shape const& shape)
+        template <typename F, typename Shape, typename ... Ts>
+        static typename detail::bulk_execute_result<F, Shape, Ts...>::type
+        bulk_execute(executor_type& sched, F && f, Shape const& shape,
+            Ts &&... ts)
         {
             std::vector<hpx::future<
-                    typename detail::bulk_async_execute_result<F, Shape>::type
+                    typename detail::bulk_async_execute_result<
+                        F, Shape, Ts...
+                    >::type
                 > > results;
 
             for (auto const& elem: shape)
-                results.push_back(hpx::async(sched, std::forward<F>(f), elem));
+            {
+                results.push_back(hpx::async(sched, std::forward<F>(f),
+                    elem, ts...));
+            }
 
             return hpx::util::unwrapped(results);
         }

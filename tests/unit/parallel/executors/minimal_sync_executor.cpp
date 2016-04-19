@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,20 +18,24 @@
 #include <boost/type_traits/is_same.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::thread::id sync_test()
+hpx::thread::id sync_test(int passed_through)
 {
+    HPX_TEST_EQ(passed_through, 42);
     return hpx::this_thread::get_id();
 }
 
-void apply_test(hpx::lcos::local::latch& l, hpx::thread::id& id)
+void apply_test(hpx::lcos::local::latch& l, hpx::thread::id& id,
+    int passed_through)
 {
+    HPX_TEST_EQ(passed_through, 42);
     id = hpx::this_thread::get_id();
     l.count_down(1);
 }
 
-void sync_bulk_test(hpx::thread::id tid, int value)
+void sync_bulk_test(hpx::thread::id tid, int value, int passed_through)
 {
     HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(passed_through, 42);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,9 +46,7 @@ void test_apply(Executor& exec)
     hpx::thread::id id;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    traits::apply_execute(exec,
-        hpx::util::bind(&apply_test, boost::ref(l), boost::ref(id))
-    );
+    traits::apply_execute(exec, &apply_test, boost::ref(l), boost::ref(id), 42);
     l.count_down_and_wait();
 
     HPX_TEST(id == hpx::this_thread::get_id());
@@ -54,7 +56,7 @@ template <typename Executor>
 void test_sync(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
-    HPX_TEST(traits::execute(exec, &sync_test) == hpx::this_thread::get_id());
+    HPX_TEST(traits::execute(exec, &sync_test, 42) == hpx::this_thread::get_id());
 }
 
 template <typename Executor>
@@ -62,7 +64,7 @@ void test_async(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
     HPX_TEST(
-        traits::async_execute(exec, &sync_test).get() ==
+        traits::async_execute(exec, &sync_test, 42).get() ==
         hpx::this_thread::get_id());
 }
 
@@ -75,9 +77,11 @@ void test_bulk_sync(Executor& exec)
     std::iota(boost::begin(v), boost::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    traits::execute(exec, hpx::util::bind(&sync_bulk_test, tid, _1), v);
+    traits::bulk_execute(exec,
+        hpx::util::bind(&sync_bulk_test, tid, _1, _2), v, 42);
 }
 
 template <typename Executor>
@@ -89,10 +93,11 @@ void test_bulk_async(Executor& exec)
     std::iota(boost::begin(v), boost::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    hpx::when_all(traits::async_execute(
-        exec, hpx::util::bind(&sync_bulk_test, tid, _1), v)).get();
+    hpx::when_all(traits::bulk_async_execute(
+        exec, hpx::util::bind(&sync_bulk_test, tid, _1, _2), v, 42)).get();
 }
 
 template <typename Executor>
@@ -120,13 +125,12 @@ struct test_sync_executor2 : hpx::parallel::executor_tag
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
-    template <typename F>
-    hpx::future<typename hpx::util::result_of<
-        typename hpx::util::decay<F>::type()
-    >::type>
-    async_execute(F && f)
+    template <typename F, typename ... Ts>
+    hpx::future<typename hpx::util::result_of<F&&(Ts&&...)>::type>
+    async_execute(F && f, Ts &&... ts)
     {
-        return hpx::async(hpx::launch::sync, std::forward<F>(f));
+        return hpx::async(hpx::launch::sync, std::forward<F>(f),
+            std::forward<Ts>(ts)...);
     }
 
     std::size_t processing_units_count()
@@ -139,11 +143,11 @@ struct test_sync_executor1 : test_sync_executor2
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
-    template <typename F>
-    typename hpx::util::result_of<F()>::type
-    execute(F f)
+    template <typename F, typename ... Ts>
+    typename hpx::util::result_of<F&&(Ts&&...)>::type
+    execute(F && f, Ts &&... ts)
     {
-        return f();
+        return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -151,11 +155,13 @@ struct test_sync_executor3 : test_sync_executor2
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
-    template <typename F, typename Shape>
-    void bulk_execute(F f, Shape const& shape)
+    template <typename F, typename Shape, typename ... Ts>
+    void bulk_execute(F f, Shape const& shape, Ts &&... ts)
     {
         for (auto const& elem: shape)
-            f(elem);
+        {
+            hpx::util::invoke(f, elem, ts...);
+        }
     }
 };
 
@@ -163,15 +169,15 @@ struct test_sync_executor4 : test_sync_executor2
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
-    template <typename F, typename Shape>
+    template <typename F, typename Shape, typename ... Ts>
     std::vector<hpx::future<void> >
-    bulk_async_execute(F f, Shape const& shape)
+    bulk_async_execute(F f, Shape const& shape, Ts &&... ts)
     {
         std::vector<hpx::future<void> > results;
         for (auto const& elem: shape)
-            results.push_back(
-                async_execute(hpx::util::deferred_call(f, elem))
-            );
+        {
+            results.push_back(async_execute(f, elem, ts...));
+        }
         return results;
     }
 };
@@ -180,10 +186,10 @@ struct test_sync_executor5 : test_sync_executor1  // derive from sync execute
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
-    template <typename F>
-    void apply_execute(F && f)
+    template <typename F, typename ... Ts>
+    void apply_execute(F && f, Ts &&... ts)
     {
-        this->execute(std::forward<F>(f));
+        this->execute(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 

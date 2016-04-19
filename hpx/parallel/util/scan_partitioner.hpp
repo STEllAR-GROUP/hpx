@@ -127,7 +127,7 @@ namespace hpx { namespace parallel { namespace util
                                 p, f2, workitems.back(),
                                 executor_traits::async_execute(
                                     policy.executor(),
-                                    deferred_call(f1, get<0>(elem), get<1>(elem))
+                                    f1, get<0>(elem), get<1>(elem)
                                 )
                             )
                         );
@@ -136,7 +136,8 @@ namespace hpx { namespace parallel { namespace util
                             dataflow(
                                 policy.executor(),
                                 hpx::util::bind(
-                                    f3, get<0>(elem), get<1>(elem), _1),
+                                    f3, get<0>(elem), get<1>(elem), _1
+                                ),
                                 workitems[parts - 1], workitems[parts]
                             )
                         );
@@ -258,7 +259,7 @@ namespace hpx { namespace parallel { namespace util
                                 p, f2, workitems.back(),
                                 executor_traits::async_execute(
                                     policy.executor(),
-                                    deferred_call(f1, get<0>(elem), get<1>(elem))
+                                    f1, get<0>(elem), get<1>(elem)
                                 )
                             )
                         );
@@ -267,7 +268,8 @@ namespace hpx { namespace parallel { namespace util
                             dataflow(
                                 policy.executor(),
                                 hpx::util::bind(
-                                    f3, get<0>(elem), get<1>(elem), _1),
+                                    f3, get<0>(elem), get<1>(elem), _1
+                                ),
                                 workitems[parts - 1], workitems[parts]
                             )
                         );

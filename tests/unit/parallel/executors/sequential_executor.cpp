@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -57,7 +57,7 @@ void test_bulk_sync()
     using hpx::util::placeholders::_1;
 
     executor exec;
-    traits::execute(exec, hpx::util::bind(&bulk_test, tid, _1), v);
+    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, tid, _1), v);
 }
 
 void test_bulk_async()
@@ -73,7 +73,7 @@ void test_bulk_async()
     using hpx::util::placeholders::_1;
 
     executor exec;
-    hpx::when_all(traits::async_execute(
+    hpx::when_all(traits::bulk_async_execute(
         exec, hpx::util::bind(&bulk_test, tid, _1), v)).get();
 }
 
