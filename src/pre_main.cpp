@@ -131,7 +131,10 @@ inline void register_message_handlers()
 {
     runtime& rt = get_runtime();
     for (auto const& t : message_handler_registrations)
-        rt.register_message_handler(util::get<0>(t), util::get<1>(t));
+    {
+        error_code ec(lightweight);
+        rt.register_message_handler(util::get<0>(t), util::get<1>(t), ec);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
