@@ -13,8 +13,8 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/unique_function.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>

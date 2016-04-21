@@ -8,14 +8,17 @@
 #define HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/intrusive/slist.hpp>
 
+#include <cstddef>
 #include <mutex>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local { namespace detail
@@ -221,4 +224,4 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
 }}}}
 
-#endif
+#endif /*HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP*/
