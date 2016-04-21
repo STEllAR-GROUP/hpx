@@ -8,18 +8,12 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-#include <boost/mpl/list.hpp>
 
 #include <string>
 #include <vector>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
-    struct command_line_handling;
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins

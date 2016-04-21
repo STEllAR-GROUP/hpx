@@ -12,6 +12,7 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/runtime/actions/continuation.hpp>

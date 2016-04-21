@@ -16,6 +16,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>

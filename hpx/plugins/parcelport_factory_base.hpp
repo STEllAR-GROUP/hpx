@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <string>
@@ -31,14 +30,14 @@ namespace hpx { namespace plugins
 
         virtual void get_plugin_info(std::vector<std::string> & fillini) = 0;
 
-        virtual void init(int *argc, char ***argv, util::command_line_handling &cfg) = 0;
+        virtual void init(int *argc, char ***argv, util::command_line_handling& cfg) = 0;
 
         /// Create a new instance of a parcelport
         ///
         /// return Returns the newly created instance of the parcelport
         ///        supported by this factory
         virtual parcelset::parcelport* create(
-            hpx::util::runtime_configuration const & cfg,
+            hpx::util::runtime_configuration const& cfg,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread) = 0;
     };

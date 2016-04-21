@@ -21,8 +21,7 @@
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/cache/lru_cache.hpp>
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
 
@@ -36,11 +35,6 @@
 #include <set>
 #include <string>
 #include <vector>
-
-namespace hpx { namespace util
-{
-    class runtime_configuration;
-}}
 
 namespace hpx { namespace agas
 {

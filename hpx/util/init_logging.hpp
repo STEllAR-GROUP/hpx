@@ -8,6 +8,7 @@
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/ini.hpp>
 
 #include <string>
@@ -25,5 +26,3 @@ namespace hpx { namespace util { namespace detail
 }}}
 
 #endif
-
-

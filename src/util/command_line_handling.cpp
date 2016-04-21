@@ -6,6 +6,7 @@
 #include <hpx/util/command_line_handling.hpp>
 
 #include <hpx/config/asio.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
