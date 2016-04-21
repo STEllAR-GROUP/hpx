@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/include/threads.hpp>
+#include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
