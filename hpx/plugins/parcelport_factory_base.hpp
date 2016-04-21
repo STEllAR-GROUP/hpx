@@ -4,15 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP)
+#ifndef HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
 #define HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
 
 #include <hpx/config.hpp>
-
-#include <hpx/util/function.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -45,4 +44,4 @@ namespace hpx { namespace plugins
     };
 }}
 
-#endif
+#endif /*HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP*/

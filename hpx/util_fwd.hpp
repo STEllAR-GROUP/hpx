@@ -16,6 +16,8 @@ namespace hpx { namespace util
     /// \cond NOINTERNAL
     class backtrace;
 
+    struct command_line_handling;
+
     template <typename Sig, bool Serializable = true>
     class function;
 
