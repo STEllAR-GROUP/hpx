@@ -9,7 +9,7 @@
 #if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>

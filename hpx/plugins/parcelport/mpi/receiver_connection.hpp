@@ -6,7 +6,8 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_RECEIVER_CONNECTION_HPP
 #define HPX_PARCELSET_POLICIES_MPI_RECEIVER_CONNECTION_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/plugins/parcelport/mpi/header.hpp>

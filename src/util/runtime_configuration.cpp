@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/version.hpp>
 #include <hpx/config/defaults.hpp>
+#include <hpx/version.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -24,6 +24,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <boost/detail/endian.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>

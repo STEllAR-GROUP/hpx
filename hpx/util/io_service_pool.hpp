@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/config/warnings_prefix.hpp>
 
 #include <memory>
 #include <vector>
@@ -20,6 +19,8 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

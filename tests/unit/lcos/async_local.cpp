@@ -24,17 +24,6 @@ boost::int32_t increment_with_future(hpx::shared_future<boost::int32_t> fi)
 ///////////////////////////////////////////////////////////////////////////////
 struct mult2
 {
-    // implement result_of protocol
-    template <typename F>
-    struct result;
-
-    template <typename F, typename T>
-    struct result<F(T)>
-    {
-        typedef boost::int32_t type;
-    };
-
-    // actual functionality
     boost::int32_t operator()(boost::int32_t i) const
     {
         return i * 2;
@@ -57,17 +46,6 @@ void do_nothing(boost::int32_t i)
 
 struct do_nothing_obj
 {
-    // implement result_of protocol
-    template <typename F>
-    struct result;
-
-    template <typename F, typename T>
-    struct result<F(T)>
-    {
-        typedef void type;
-    };
-
-    // actual functionality
     void operator()(boost::int32_t i) const
     {
     }

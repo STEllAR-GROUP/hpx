@@ -4,22 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/config/defaults.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/config/defaults.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
@@ -30,10 +27,15 @@
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/naming/unmanaged.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include <hpx/lcos/broadcast.hpp>
@@ -53,6 +55,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tokenizer.hpp>
 
@@ -1764,7 +1767,8 @@ namespace hpx { namespace components { namespace server
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = hpx::util::create_path(*it);
-                    fs::path lib_path = lib / std::string(HPX_MAKE_DLL_STRING(component));
+                    fs::path lib_path =
+                        lib / std::string(HPX_MAKE_DLL_STRING(component));
                     if(fs::exists(lib_path, fsec))
                     {
                         break;
@@ -2227,7 +2231,8 @@ namespace hpx { namespace components { namespace server
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = hpx::util::create_path(*it);
-                    fs::path lib_path = lib / std::string(HPX_MAKE_DLL_STRING(component));
+                    fs::path lib_path =
+                        lib / std::string(HPX_MAKE_DLL_STRING(component));
                     if(fs::exists(lib_path, fsec))
                     {
                         break;

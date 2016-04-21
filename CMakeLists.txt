@@ -1616,23 +1616,6 @@ install( # Install HPX Python scripts
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
 #   install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "share")
 
-install( # Install external dependencies
-  DIRECTORY external/cache/boost
-  DESTINATION include/hpx/external
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".git" EXCLUDE)
-
-if(Boost_VERSION LESS 104900)
-  # Install Boost.Serialization patch for older Boost versions only
-  install(
-    DIRECTORY external/serialization/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-endif()
-
 if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(

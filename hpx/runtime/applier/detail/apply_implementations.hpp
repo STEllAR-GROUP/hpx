@@ -114,7 +114,8 @@ namespace hpx { namespace detail
             {
                 // apply remotely
                 return applier::detail::apply_r_p<Action>(std::move(addr),
-                    std::forward<Continuation>(c), id, priority, std::forward<Ts>(vs)...);
+                    std::forward<Continuation>(c), id, priority,
+                    std::forward<Ts>(vs)...);
             }
         }
         return

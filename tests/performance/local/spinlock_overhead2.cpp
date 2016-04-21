@@ -16,7 +16,6 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
-#include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/chrono/duration.hpp>
 

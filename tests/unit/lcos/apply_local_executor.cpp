@@ -10,6 +10,8 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,17 +33,6 @@ void increment_with_future(hpx::shared_future<boost::int32_t> fi)
 ///////////////////////////////////////////////////////////////////////////////
 struct increment_function_object
 {
-    // implement result_of protocol
-    template <typename F>
-    struct result;
-
-    template <typename F, typename T>
-    struct result<F(T)>
-    {
-        typedef void type;
-    };
-
-    // actual functionality
     void operator()(boost::int32_t i) const
     {
         accumulator += i;

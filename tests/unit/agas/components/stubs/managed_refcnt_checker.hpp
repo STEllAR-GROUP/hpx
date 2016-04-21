@@ -8,7 +8,7 @@
 #if !defined(HPX_4D9DE0AC_4362_4DAB_A061_2D3643CE4FCB)
 #define HPX_4D9DE0AC_4362_4DAB_A061_2D3643CE4FCB
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <tests/unit/agas/components/server/managed_refcnt_checker.hpp>

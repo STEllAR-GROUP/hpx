@@ -13,6 +13,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 #include <vector>
 
 const std::size_t sizeY = 256;

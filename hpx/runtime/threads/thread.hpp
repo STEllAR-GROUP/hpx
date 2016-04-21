@@ -5,10 +5,11 @@
 #if !defined(HPX_THREADS_THREAD_APR_10_2012_0145PM)
 #define HPX_THREADS_THREAD_APR_10_2012_0145PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/thread/thread.hpp>

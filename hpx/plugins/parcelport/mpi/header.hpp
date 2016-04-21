@@ -7,7 +7,8 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_HEADER_HPP
 #define HPX_PARCELSET_POLICIES_MPI_HEADER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <mpi.h>

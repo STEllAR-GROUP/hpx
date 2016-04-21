@@ -7,8 +7,9 @@
 #if !defined(HPX_LCOS_LOCAL_REINITIALIZABLE_STATIC_JAN_20_2013_0409PM)
 #define HPX_LCOS_LOCAL_REINITIALIZABLE_STATIC_JAN_20_2013_0409PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/once.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/static_reinit.hpp>
 
 #include <boost/call_traits.hpp>
@@ -87,7 +88,7 @@ namespace hpx { namespace lcos { namespace local
         static void value_constructor(U const* pv)
         {
             value_construct(*pv);
-            util::reinit_register(boost::bind(
+            util::reinit_register(util::bind(
                 &reinitializable_static::value_construct<U>, *pv), &destruct);
         }
 
@@ -107,7 +108,7 @@ namespace hpx { namespace lcos { namespace local
         {
             // do not rely on ADL to find the proper call_once
             lcos::local::call_once(constructed_,
-                boost::bind(&reinitializable_static::value_constructor<U>,
+                util::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
 

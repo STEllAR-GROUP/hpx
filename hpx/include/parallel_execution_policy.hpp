@@ -6,7 +6,7 @@
 #if !defined(HPX_EXECUTION_POLICY_MAY_27_2014_0910PM)
 #define HPX_EXECUTION_POLICY_MAY_27_2014_0910PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
 #endif

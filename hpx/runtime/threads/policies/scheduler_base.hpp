@@ -8,11 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
@@ -20,18 +21,19 @@
 #include <boost/make_shared.hpp>
 #endif
 
+#include <boost/exception_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-
-#include <hpx/config/warnings_prefix.hpp>
 
 #include <boost/atomic.hpp>
 
 #include <algorithm>
 #include <mutex>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -114,17 +116,10 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
-#if BOOST_VERSION < 105000
-            boost::posix_time::millisec period(++wait_count_);
-
-            boost::unique_lock<boost::mutex> l(mtx_);
-            cond_.timed_wait(l, period);
-#else
             boost::chrono::milliseconds period(++wait_count_);
 
             boost::unique_lock<boost::mutex> l(mtx_);
             cond_.wait_for(l, period);
-#endif
 #endif
         }
 

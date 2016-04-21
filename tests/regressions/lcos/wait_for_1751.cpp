@@ -7,6 +7,7 @@
 // hpx::future::wait_for fails a simple test
 
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <boost/chrono.hpp>
 
 int hpx_main()

@@ -10,6 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 
 #include <hpx/include/async.hpp>
@@ -18,16 +19,23 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/apex.hpp>
 
-#if !defined(HPX_WINDOWS)
-#  include <signal.h>
-#endif
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/assign/std/vector.hpp>
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #   include <cstdlib>
@@ -40,12 +48,9 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/assign/std/vector.hpp>
-#include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
+#if !defined(HPX_WINDOWS)
+#  include <signal.h>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -410,11 +415,11 @@ namespace hpx
                 {
                     // schedule to run at shutdown
                     rt.add_pre_shutdown_function(
-                        boost::bind(&util::query_counters::evaluate, qc));
+                        util::bind(&util::query_counters::evaluate, qc));
                 }
 
                 // schedule to start all counters
-                rt.add_startup_function(boost::bind(&start_counters, qc));
+                rt.add_startup_function(util::bind(&start_counters, qc));
 
                 // register the query_counters object with the runtime system
                 rt.register_query_counters(qc);
@@ -671,7 +676,7 @@ namespace hpx
 
             // Run this runtime instance using the given function f.
             if (!f.empty())
-                return rt.run(boost::bind(f, vm));
+                return rt.run(util::bind(f, vm));
 
             // Run this runtime instance without an hpx_main
             return rt.run();
@@ -688,7 +693,7 @@ namespace hpx
 
             if (!f.empty()) {
                 // Run this runtime instance using the given function f.
-                return rt.start(boost::bind(f, vm));
+                return rt.start(util::bind(f, vm));
             }
 
             // Run this runtime instance without an hpx_main

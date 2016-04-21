@@ -15,11 +15,15 @@
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/asio/basic_deadline_timer.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -129,7 +133,7 @@ namespace hpx { namespace threads { namespace detail
                         << get_thread_state_name(new_state) << ")";
 
                     thread_init_data data(
-                        boost::bind(&set_active_state,
+                        util::bind(&set_active_state,
                             thrd, new_state, new_state_ex,
                             priority, previous_state),
                         "set state for active thread", 0, priority);
@@ -286,7 +290,7 @@ namespace hpx { namespace threads { namespace detail
             boost::make_shared<boost::atomic<bool> >(false));
 
         thread_init_data data(
-            boost::bind(&wake_timer_thread,
+            util::bind(&wake_timer_thread,
                 thrd, newstate, newstate_ex, priority,
                 self_id, triggered),
             "wake_timer", 0, priority);
@@ -304,7 +308,7 @@ namespace hpx { namespace threads { namespace detail
             get_thread_pool("timer-pool")->get_io_service(), abs_time);
 
         // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait(boost::bind(&detail::set_thread_state,
+        t.async_wait(util::bind(&detail::set_thread_state,
             wake_id, pending, wait_timeout, priority,
             std::size_t(-1), boost::ref(throws)));
 
@@ -347,7 +351,7 @@ namespace hpx { namespace threads { namespace detail
         // this creates a new thread which creates the timer and handles the
         // requested actions
         thread_init_data data(
-            boost::bind(&at_timer<SchedulingPolicy>,
+            util::bind(&at_timer<SchedulingPolicy>,
                 boost::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
                 priority),
             "at_timer (expire at)", 0, priority, thread_num);

@@ -19,6 +19,8 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
+#include <boost/shared_ptr.hpp>
+
 #include <mutex>
 
 namespace hpx { namespace util

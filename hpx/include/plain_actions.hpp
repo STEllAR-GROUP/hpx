@@ -6,7 +6,7 @@
 #if !defined(HPX_3C373507_9301_4368_B718_39D25FDF06F4)
 #define HPX_3C373507_9301_4368_B718_39D25FDF06F4
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 

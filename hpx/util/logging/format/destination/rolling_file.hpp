@@ -35,6 +35,7 @@
 #include <string>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 

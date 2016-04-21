@@ -9,8 +9,6 @@
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
 #include <hpx/config.hpp>
-
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -20,10 +18,10 @@
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 // TODO: add branch prediction and function heat
 

@@ -23,6 +23,8 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 #include <algorithm>
 #include <vector>
 

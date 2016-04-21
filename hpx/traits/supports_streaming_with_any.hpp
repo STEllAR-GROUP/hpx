@@ -6,7 +6,8 @@
 #if !defined(HPX_TRAITS_SUPPORTS_STREAMING_WITH_ANY_JUL_18_2013_1005AM)
 #define HPX_TRAITS_SUPPORTS_STREAMING_WITH_ANY_JUL_18_2013_1005AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace traits

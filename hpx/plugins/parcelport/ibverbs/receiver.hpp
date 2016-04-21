@@ -7,7 +7,8 @@
 #ifndef HPX_PARCELSET_POLICIES_IBVERBS_RECEIVER_HPP
 #define HPX_PARCELSET_POLICIES_IBVERBS_RECEIVER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
 #include <hpx/util/high_resolution_timer.hpp>
@@ -21,7 +22,6 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/integer/endian.hpp>
 #include <boost/atomic.hpp>
-#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 

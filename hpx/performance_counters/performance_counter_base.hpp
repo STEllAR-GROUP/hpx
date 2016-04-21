@@ -6,7 +6,7 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_BASE_SEP_18_2014_0732PM)
 #define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_BASE_SEP_18_2014_0732PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

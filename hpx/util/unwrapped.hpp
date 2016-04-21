@@ -8,7 +8,6 @@
 #define HPX_UTIL_UNWRAPPED_HPP
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
@@ -17,7 +16,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 
-#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <type_traits>
@@ -253,43 +252,21 @@ namespace hpx { namespace util
                 return *this;
             }
 
-            template <typename Sig>
-            struct result;
-
-            template <typename This>
-            struct result<This()>
-              : boost::mpl::eval_if_c<
-                    traits::is_callable<F()>::value
-                  , util::result_of<F()>
-                  , boost::mpl::identity<util::unused_type>
-                >
-            {};
-
+            template <typename Delayed = unwrapped_impl>
             HPX_FORCEINLINE
-            typename result<unwrapped_impl()>::type
+            typename util::result_of<Delayed()>::type
             operator()()
             {
                 return util::invoke_fused(f_,
                     util::make_tuple());
             }
 
-            template <typename This, typename T, typename ...Ts>
-            struct result<This(T, Ts...)>
-              : boost::mpl::if_c<
-                    (util::detail::pack<Ts...>::size == 0)
-                  , unwrapped_impl_result<F, T>
-                  , unwrapped_impl_result<F, util::tuple<
-                        typename std::decay<T>::type
-                      , typename std::decay<Ts>::type...> >
-                >::type
-            {};
-
             // future
             template <typename T0>
             HPX_FORCEINLINE
             typename boost::lazy_enable_if_c<
                 traits::is_future<typename decay<T0>::type>::value
-              , result<unwrapped_impl(T0)>
+              , unwrapped_impl_result<F, T0>
             >::type operator()(T0&& t0)
             {
                 typedef
@@ -306,7 +283,7 @@ namespace hpx { namespace util
             typename boost::lazy_enable_if_c<
                 traits::is_future_range<typename decay<T0>::type>::value
              && !unwrap_impl<typename decay<T0>::type>::is_void::value
-              , result<unwrapped_impl(T0)>
+              , unwrapped_impl_result<F, T0>
             >::type operator()(T0&& t0)
             {
                 typedef
@@ -322,7 +299,7 @@ namespace hpx { namespace util
             typename boost::lazy_enable_if_c<
                 traits::is_future_range<typename decay<T0>::type>::value
              && unwrap_impl<typename decay<T0>::type>::is_void::value
-              , result<unwrapped_impl(T0)>
+              , unwrapped_impl_result<F, T0>
             >::type operator()(T0&& t0)
             {
                 typedef
@@ -339,7 +316,7 @@ namespace hpx { namespace util
             HPX_FORCEINLINE
             typename boost::lazy_enable_if_c<
                 traits::is_future_tuple<typename decay<T0>::type>::value
-              , result<unwrapped_impl(T0)>
+              , unwrapped_impl_result<F, T0>
             >::type operator()(T0&& t0)
             {
                 typedef
@@ -352,8 +329,10 @@ namespace hpx { namespace util
 
             template <typename ...Ts>
             HPX_FORCEINLINE
-            typename result<unwrapped_impl(Ts...)>::type
-            operator()(Ts&&... vs)
+            typename unwrapped_impl_result<
+                F,
+                util::tuple<typename std::decay<Ts>::type...>
+            >::type operator()(Ts&&... vs)
             {
                 typedef
                     unwrap_impl<util::tuple<

@@ -49,8 +49,6 @@ void test_thread_function_one_argument()
 ///////////////////////////////////////////////////////////////////////////////
 struct callable_no_args
 {
-    typedef void result_type;
-
     static bool called;
 
     void operator()() const
@@ -75,8 +73,6 @@ class callable_noncopyable_no_args
     HPX_NON_COPYABLE(callable_noncopyable_no_args);
 
 public:
-    typedef void result_type;
-
     static bool called;
 
     callable_noncopyable_no_args() {}
@@ -101,8 +97,6 @@ void test_thread_callable_object_ref_no_arguments()
 ///////////////////////////////////////////////////////////////////////////////
 struct callable_one_arg
 {
-    typedef void result_type;
-
     static bool called;
     static int called_arg;
 
@@ -128,8 +122,6 @@ void test_thread_callable_object_one_argument()
 ///////////////////////////////////////////////////////////////////////////////
 struct callable_multiple_arg
 {
-    typedef void result_type;
-
     static bool called_two;
     static int called_two_arg1;
     static double called_two_arg2;

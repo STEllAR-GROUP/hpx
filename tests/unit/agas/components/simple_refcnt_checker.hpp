@@ -8,7 +8,7 @@
 #if !defined(HPX_8E877149_A22D_4120_8C0A_BC206BBFA3B4)
 #define HPX_8E877149_A22D_4120_8C0A_BC206BBFA3B4
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

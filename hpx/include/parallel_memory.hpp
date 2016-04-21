@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_MEMORY_OCT_05_2014_0415PM)
 #define HPX_PARALLEL_MEMORY_OCT_05_2014_0415PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/memory.hpp>
 
 #endif

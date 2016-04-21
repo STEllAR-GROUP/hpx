@@ -15,13 +15,14 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -29,11 +30,13 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
 #include <boost/detail/endian.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/format.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <mutex>

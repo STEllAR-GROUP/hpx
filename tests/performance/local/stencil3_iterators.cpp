@@ -83,15 +83,6 @@ namespace hpx { namespace experimental
         template <typename IteratorBase, typename IteratorValue>
         struct previous_transformer
         {
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
-            {
-                typedef typename std::iterator_traits<Iterator>::reference type;
-            };
-
             previous_transformer() {}
 
             // at position 'begin' it will dereference 'value', otherwise 'it-1'
@@ -125,15 +116,6 @@ namespace hpx { namespace experimental
         template <typename IteratorBase, typename IteratorValue>
         struct next_transformer
         {
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
-            {
-                typedef typename std::iterator_traits<Iterator>::reference type;
-            };
-
             next_transformer() {}
 
             // at position 'end' it will dereference 'value', otherwise 'it+1'
@@ -390,11 +372,8 @@ namespace hpx { namespace experimental
     {
         struct stencil_transformer_v2
         {
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
+            template <typename Iterator>
+            struct result
             {
                 typedef typename std::iterator_traits<Iterator>::reference
                     element_type;
@@ -405,12 +384,10 @@ namespace hpx { namespace experimental
 
             // it will dereference tuple(it-1, it, it+1)
             template <typename Iterator>
-            typename result<stencil_transformer_v2(Iterator)>::type
+            typename result<Iterator>::type
             operator()(Iterator const& it) const
             {
-                typedef typename result<
-                        stencil_transformer_v2(Iterator)
-                    >::type type;
+                typedef typename result<Iterator>::type type;
                 return type(*detail::previous(it), *it, *detail::next(it));
             }
         };

@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
@@ -37,7 +38,6 @@ hpx::id_type here;
 
 struct when_all_wrapper
 {
-    typedef boost::uint64_t result_type;
     typedef hpx::util::tuple<
             hpx::lcos::future<boost::uint64_t>
           , hpx::lcos::future<boost::uint64_t> > data_type;

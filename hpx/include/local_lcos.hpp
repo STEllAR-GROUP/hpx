@@ -7,7 +7,7 @@
 #if !defined(HPX_6EB418B5_DC41_45A3_ADF4_C45A068F73D4)
 #define HPX_6EB418B5_DC41_45A3_ADF4_C45A068F73D4
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>

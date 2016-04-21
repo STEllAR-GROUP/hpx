@@ -54,8 +54,6 @@ namespace hpx { namespace lcos { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct reset_dataflow_future
     {
-        typedef void result_type;
-
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<

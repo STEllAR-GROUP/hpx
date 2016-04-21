@@ -7,7 +7,8 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_MPI_SENDER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/lcos/local/spinlock.hpp>
@@ -15,6 +16,9 @@
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
+
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <iterator>
 #include <list>

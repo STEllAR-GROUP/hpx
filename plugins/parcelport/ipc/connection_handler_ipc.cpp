@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
@@ -15,6 +15,7 @@
 #include <hpx/plugins/parcelport/ipc/receiver.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/asio/placeholders.hpp>
@@ -124,7 +125,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 acceptor_->open();
 
                 acceptor_->async_accept(conn->window(),
-                    boost::bind(&connection_handler::handle_accept,
+                    util::bind(&connection_handler::handle_accept,
                         this,
                         boost::asio::placeholders::error, conn));
             }
@@ -259,7 +260,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 io_service_pool_.get_io_service(), here(), *this));
 
             acceptor_->async_accept(receiver_conn->window(),
-                boost::bind(&connection_handler::handle_accept,
+                util::bind(&connection_handler::handle_accept,
                     this,
                     boost::asio::placeholders::error, receiver_conn));
 
@@ -271,7 +272,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
             // now accept the incoming connection by starting to read from the
             // data window
-            c->async_read(boost::bind(&connection_handler::handle_read_completion,
+            c->async_read(util::bind(&connection_handler::handle_read_completion,
                 this, boost::asio::placeholders::error, c));
         }
         else {

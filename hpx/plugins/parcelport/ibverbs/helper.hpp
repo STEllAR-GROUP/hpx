@@ -6,11 +6,14 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <boost/cache/entries/lru_entry.hpp>
-#include <boost/cache/local_cache.hpp>
+#include <hpx/util/cache/entries/lru_entry.hpp>
+#include <hpx/util/cache/local_cache.hpp>
+
+#include <boost/shared_ptr.hpp>
 
 #include <netdb.h>
 #include <rdma/rdma_cma.h>

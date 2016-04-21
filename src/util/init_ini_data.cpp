@@ -4,28 +4,30 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/plugin.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
+
+#include <boost/assign/std/vector.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/exception.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
-#include <boost/filesystem/convenience.hpp>
-#include <boost/tokenizer.hpp>
-#include <hpx/util/plugin.hpp>
-#include <boost/assign/std/vector.hpp>
-#include <boost/range/iterator_range.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

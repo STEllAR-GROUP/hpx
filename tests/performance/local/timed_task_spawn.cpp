@@ -11,19 +11,21 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/bind.hpp>
+
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/format.hpp>
+#include <boost/math/common_factor.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/format.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/math/common_factor.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
 #include "worker_timed.hpp"
 
@@ -177,7 +179,7 @@ void wait_for_tasks(
 
         if (all_count != suspended_tasks + 1)
         {
-            register_work(boost::bind(&wait_for_tasks
+            register_work(hpx::util::bind(&wait_for_tasks
                                     , boost::ref(finished)
                                     , suspended_tasks)
                 , "wait_for_tasks", hpx::threads::pending
@@ -294,7 +296,7 @@ void stage_workers(
 
     if (num_thread != target_thread)
     {
-        register_work(boost::bind(&stage_workers
+        register_work(hpx::util::bind(&stage_workers
                                 , target_thread
                                 , local_tasks
                                 , stage_worker)
@@ -445,7 +447,7 @@ int hpx_main(
         {
             if (num_thread == i) continue;
 
-            register_work(boost::bind(&stage_workers
+            register_work(hpx::util::bind(&stage_workers
                                     , i
                                     , tasks_per_feeder
                                     , stage_worker
@@ -466,7 +468,7 @@ int hpx_main(
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        register_work(boost::bind(&wait_for_tasks
+        register_work(hpx::util::bind(&wait_for_tasks
                                 , boost::ref(finished)
                                 , total_suspended_tasks
                                  )

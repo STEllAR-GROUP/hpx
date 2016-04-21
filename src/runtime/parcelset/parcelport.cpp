@@ -5,11 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This is needed to make everything work with the Intel MPI library header
-#include <hpx/config/defines.hpp>
-
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
-
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>

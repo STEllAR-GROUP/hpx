@@ -11,13 +11,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct cout_continuation
 {
-    typedef void result_type;
     typedef hpx::util::tuple<
             hpx::lcos::future<int>
           , hpx::lcos::future<int>
           , hpx::lcos::future<int> > data_type;
 
-    result_type operator()(
+    void operator()(
         hpx::lcos::future<data_type> data
     ) const
     {

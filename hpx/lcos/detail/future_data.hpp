@@ -190,8 +190,6 @@ namespace detail
           , f2_(std::move(other.f2_))
         {}
 
-        typedef void result_type;
-
         void operator()() const
         {
             f1_();

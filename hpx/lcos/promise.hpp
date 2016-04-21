@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_PROMISE_FEB_03_2009_0841AM)
 #define HPX_LCOS_PROMISE_FEB_03_2009_0841AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -26,9 +26,10 @@
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/exception_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 

@@ -16,6 +16,7 @@
 #include <hpx/util/plugin/export_plugin.hpp>
 
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 
 #include <stdexcept>

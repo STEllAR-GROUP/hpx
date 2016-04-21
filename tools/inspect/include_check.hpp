@@ -33,7 +33,7 @@ namespace boost
     struct names_regex_data
     {
       names_regex_data(names_includes const* d, std::string const& rx)
-        : data(d), pattern(rx)
+        : data(d), pattern(rx, boost::regex::normal)
       {}
 
       names_includes const* data;

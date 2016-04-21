@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/performance_counters/registry.hpp>
@@ -12,6 +12,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/util/bind.hpp>

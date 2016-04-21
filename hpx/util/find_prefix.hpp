@@ -8,8 +8,7 @@
 #if !defined(HPX_09DFB7AE_8265_4667_AA02_65BF8C0B1DFD)
 #define HPX_09DFB7AE_8265_4667_AA02_65BF8C0B1DFD
 
-#include <hpx/config/defines.hpp>
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 
 #include <string>
 

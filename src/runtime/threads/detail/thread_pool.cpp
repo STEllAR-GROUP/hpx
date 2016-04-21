@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
@@ -23,8 +23,9 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #endif
 
-#include <boost/ref.hpp>
+#include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/ref.hpp>
 
 #include <cstdint>
 #include <mutex>

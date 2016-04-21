@@ -4,27 +4,29 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime_impl.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/lcos/latch.hpp>
 
-#include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/exception_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/ref.hpp>
@@ -129,17 +131,17 @@ namespace hpx {
       : runtime(rtcfg, init_affinity),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
-            boost::bind(&runtime_impl::init_tss, This(),
-                "main-thread", ::_1, ::_2, false),
-            boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
+            util::bind(&runtime_impl::init_tss, This(), "main-thread",
+                util::placeholders::_1, util::placeholders::_2, false),
+            util::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread",
-                ::_1, ::_2, true),
-            boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
+            util::bind(&runtime_impl::init_tss, This(), "io-thread",
+                util::placeholders::_1, util::placeholders::_2, true),
+            util::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread",
-                ::_1, ::_2, true),
-            boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
+            util::bind(&runtime_impl::init_tss, This(), "timer-thread",
+                util::placeholders::_1, util::placeholders::_2, true),
+            util::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         scheduler_(init),
         notifier_(runtime_impl<SchedulingPolicy>::
             get_notification_policy("worker-thread")),
@@ -147,9 +149,9 @@ namespace hpx {
             new hpx::threads::threadmanager_impl<SchedulingPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         parcel_handler_(rtcfg, thread_manager_.get(),
-            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread",
-                ::_1, ::_2, true),
-            boost::bind(&runtime_impl::deinit_tss, This())),
+            util::bind(&runtime_impl::init_tss, This(), "parcel-thread",
+                util::placeholders::_1, util::placeholders::_2, true),
+            util::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_)
@@ -329,7 +331,7 @@ namespace hpx {
                       "HPX thread";
 
         threads::thread_init_data data(
-            boost::bind(&runtime_impl::run_helper, this, func,
+            util::bind(&runtime_impl::run_helper, this, func,
                 boost::ref(result_)),
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
@@ -395,7 +397,7 @@ namespace hpx {
         boost::condition cond;
         bool running = false;
 
-        boost::thread t (boost::bind(
+        boost::thread t (util::bind(
                 &runtime_impl<SchedulingPolicy>::wait_helper,
                 this, boost::ref(mtx), boost::ref(cond), boost::ref(running)
             ));
@@ -444,7 +446,7 @@ namespace hpx {
             boost::condition cond;
             std::unique_lock<boost::mutex> l(mtx);
 
-            boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
+            boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 boost::ref(cond), boost::ref(mtx)));
             cond.wait(l);
 
@@ -606,10 +608,16 @@ namespace hpx {
     threads::policies::callback_notifier runtime_impl<SchedulingPolicy>::
         get_notification_policy(char const* prefix)
     {
+        typedef void (runtime_impl::*report_error_t)(
+            std::size_t, boost::exception_ptr const&);
+
+        using util::placeholders::_1;
+        using util::placeholders::_2;
         return notification_policy_type(
-            boost::bind(&runtime_impl::init_tss, This(), prefix, ::_1, ::_2, false),
-            boost::bind(&runtime_impl::deinit_tss, This()),
-            boost::bind(&runtime_impl::report_error, This(), _1, _2));
+            util::bind(&runtime_impl::init_tss, This(), prefix, _1, _2, false),
+            util::bind(&runtime_impl::deinit_tss, This()),
+            util::bind(static_cast<report_error_t>(&runtime_impl::report_error),
+                This(), _1, _2));
     }
 
     template <typename SchedulingPolicy>

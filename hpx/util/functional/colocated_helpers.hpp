@@ -25,8 +25,6 @@ namespace hpx { namespace util { namespace functional
     ///////////////////////////////////////////////////////////////////////////
     struct extract_locality
     {
-        typedef naming::id_type result_type;
-
         extract_locality() {}
 
         naming::id_type operator()(agas::response const& rep,
@@ -54,14 +52,6 @@ namespace hpx { namespace util { namespace functional
             HPX_MOVABLE_ONLY(apply_continuation_impl);
         public:
             typedef typename util::decay<Bound>::type bound_type;
-
-            template <typename T>
-            struct result;
-
-            template <typename F, typename T1, typename T2>
-            struct result<F(T1, T2)>
-              : util::result_of<F(T1, T2)>
-            {};
 
             apply_continuation_impl() {}
 
@@ -163,14 +153,6 @@ namespace hpx { namespace util { namespace functional
             HPX_MOVABLE_ONLY(async_continuation_impl);
         public:
             typedef typename util::decay<Bound>::type bound_type;
-
-            template <typename T>
-            struct result;
-
-            template <typename F, typename T1, typename T2>
-            struct result<F(T1, T2)>
-              : util::result_of<F(T1, T2)>
-            {};
 
             async_continuation_impl() {}
 

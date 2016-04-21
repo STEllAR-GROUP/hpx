@@ -28,6 +28,8 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 #include <algorithm>
 #include <iterator>
 #include <type_traits>

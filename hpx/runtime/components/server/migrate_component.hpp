@@ -15,6 +15,8 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////

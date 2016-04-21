@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_PLUGIN_CONFIG_DATA_MAR_25_2013_0748AM)
 #define HPX_TRAITS_PLUGIN_CONFIG_DATA_MAR_25_2013_0748AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 namespace hpx { namespace traits
 {

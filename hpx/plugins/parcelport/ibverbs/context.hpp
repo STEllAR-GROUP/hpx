@@ -6,10 +6,10 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_CONTEXT_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_CONTEXT_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/plugins/parcelport/ibverbs/helper.hpp>
 #include <hpx/plugins/parcelport/ibverbs/client.hpp>
@@ -21,7 +21,6 @@
 #include <boost/asio/basic_io_object.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/system/system_error.hpp>

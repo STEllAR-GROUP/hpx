@@ -9,7 +9,7 @@
 #ifndef HPX_RUNTIME_PARCELSET_FWD_HPP
 #define HPX_RUNTIME_PARCELSET_FWD_HPP
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util/function.hpp>
 

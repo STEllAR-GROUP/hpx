@@ -22,6 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    typedef boost::int32_t component_type;
+
     enum component_enum_type
     {
         component_invalid = -1,

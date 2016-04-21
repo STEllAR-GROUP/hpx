@@ -6,8 +6,7 @@
 #if !defined(HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM)
 #define HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
@@ -29,8 +28,6 @@ namespace hpx { namespace lcos
         template <typename Future>
         struct wait_acquire_future
         {
-            typedef Future result_type;
-
             template <typename R>
             HPX_FORCEINLINE hpx::future<R>
             operator()(hpx::future<R>& future) const
@@ -109,7 +106,6 @@ namespace hpx { namespace lcos
 
         public:
             typedef std::vector<Future> argument_type;
-            typedef std::vector<Future> result_type;
 
             template <typename F_>
             wait_each(argument_type const& lazy_values, F_ && f,
@@ -151,7 +147,7 @@ namespace hpx { namespace lcos
                 return *this;
             }
 
-            result_type operator()()
+            std::vector<Future> operator()()
             {
                 ready_count_.store(0);
                 goal_reached_on_calling_thread_ = false;

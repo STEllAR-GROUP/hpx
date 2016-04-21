@@ -4,14 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <mpi.h>
 #endif
-
-#include <hpx/hpx_fwd.hpp>
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
@@ -33,9 +30,14 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/archive/basic_archive.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx
 {

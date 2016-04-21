@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPRESSION_FEB_26_2013_0415AM)
 #define HPX_COMPRESSION_FEB_26_2013_0415AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/plugins/binary_filter/bzip2_serialization_filter.hpp>
 #include <hpx/plugins/binary_filter/snappy_serialization_filter.hpp>
 #include <hpx/plugins/binary_filter/zlib_serialization_filter.hpp>

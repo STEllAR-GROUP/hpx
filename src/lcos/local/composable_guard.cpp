@@ -5,8 +5,10 @@
 
 #include "hpx/lcos/local/composable_guard.hpp"
 #include <hpx/apply.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <vector>
 
@@ -109,7 +111,7 @@ void stage_task(stage_data *sd,std::size_t i,std::size_t n) {
     } else {
         std::size_t k = i + 1;
         guard_task *stage = sd->stages[k];
-        stage->run = boost::bind(stage_task,sd,k,n);
+        stage->run = util::bind(stage_task,sd,k,n);
         HPX_ASSERT(!stage->single_guard);
         run_guarded(*sd->gs.get(k),stage);
     }
@@ -139,7 +141,7 @@ void run_guarded(guard_set& guards,util::function_nonser<void()> task) {
     guards.sort();
     stage_data *sd = new stage_data(task,guards.guards);
     int k = 0;
-    sd->stages[k]->run = boost::bind(stage_task,sd,k,n);
+    sd->stages[k]->run = util::bind(stage_task,sd,k,n);
     sd->gs = guards;
     guard_task *stage = sd->stages[k]; //-V108
     run_guarded(*sd->gs.get(k),stage); //-V106

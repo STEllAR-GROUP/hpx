@@ -6,7 +6,7 @@
 #if !defined(HPX_ASYNC_APR_16_20012_0225PM)
 #define HPX_ASYNC_APR_16_20012_0225PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
@@ -106,8 +106,8 @@ namespace hpx { namespace detail
         call(launch launch_policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
-                F(Ts&&...)
-            >::type result_type;
+                    F(Ts&&...)
+                >::type result_type;
 
             if (launch_policy == launch::sync) {
                 return detail::call_sync(

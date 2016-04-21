@@ -128,10 +128,12 @@ namespace hpx { namespace lcos
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/unmanaged.hpp>
+#include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
@@ -290,7 +292,6 @@ namespace hpx { namespace lcos
 
         using util::placeholders::_1;
         using util::placeholders::_2;
-
         return dataflow(
                 util::bind(&detail::gather_data<T>, _1, this_site, _2),
                 std::move(f), std::move(result)
@@ -362,7 +363,6 @@ namespace hpx { namespace lcos
 
         using util::placeholders::_1;
         using util::placeholders::_2;
-
         return dataflow(
                 util::bind(&detail::set_data<T>, _1, this_site, _2),
                 std::move(id), std::move(result)

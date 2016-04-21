@@ -27,6 +27,11 @@
 
 #include <boost/version.hpp>
 
+#if BOOST_VERSION < 105000
+// Please update your Boost installation (see www.boost.org for details).
+#error HPX cannot be compiled with a Boost version earlier than 1.50.0
+#endif
+
 #if BOOST_VERSION == 105400
 #include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
 #endif

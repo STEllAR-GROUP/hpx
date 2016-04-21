@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
@@ -19,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 boost::chrono::milliseconds const delay(1000);
 boost::chrono::milliseconds const timeout_resolution(100);
@@ -127,7 +129,7 @@ struct test_lock_times_out_if_other_thread_has_lock
         Lock lock(m,boost::defer_lock);
         lock.try_lock_for(boost::chrono::milliseconds(50));
 
-        boost::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
         locked=lock.owns_lock();
         done=true;
         done_cond.notify_one();
@@ -137,7 +139,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     {
         Lock lock(m,boost::chrono::milliseconds(50));
 
-        boost::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
         locked=lock.owns_lock();
         done=true;
         done_cond.notify_one();
@@ -164,7 +166,7 @@ struct test_lock_times_out_if_other_thread_has_lock
             {
                 boost::unique_lock<hpx::lcos::local::mutex> lk(done_mutex);
                 HPX_TEST(done_cond.wait_for(lk,boost::chrono::seconds(2),
-                                                 boost::bind(&this_type::is_done,this)));
+                    hpx::util::bind(&this_type::is_done,this)));
                 HPX_TEST(!locked);
             }
 
@@ -187,7 +189,6 @@ struct test_lock_times_out_if_other_thread_has_lock
     }
 };
 
-#if BOOST_VERSION >= 105000 // 1.49 has old timed lock interface
 template <typename M>
 struct test_timedlock
 {
@@ -263,7 +264,6 @@ struct test_timedlock
         HPX_TEST(!lock);
     }
 };
-#endif
 
 template <typename M>
 struct test_recursive_lock
@@ -287,11 +287,9 @@ void test_mutex()
 
 void test_timed_mutex()
 {
-#if BOOST_VERSION >= 105000 // 1.49 has old timed lock interface
     test_lock<hpx::lcos::local::timed_mutex>()();
     test_trylock<hpx::lcos::local::timed_mutex>()();
     test_timedlock<hpx::lcos::local::timed_mutex>()();
-#endif
 }
 
 //void test_recursive_mutex()
@@ -303,12 +301,10 @@ void test_timed_mutex()
 //
 //void test_recursive_timed_mutex()
 //{
-//#if BOOST_VERSION >= 105000 // 1.49 has old timed lock interface
 //    test_lock<hpx::lcos::local::recursive_timed_mutex()();
 //    test_trylock<hpx::lcos::local::recursive_timed_mutex()();
 //    test_timedlock<hpx::lcos::local::recursive_timed_mutex()();
 //    test_recursive_lock<hpx::lcos::local::recursive_timed_mutex()();
-//#endif
 //}
 
 ///////////////////////////////////////////////////////////////////////////////

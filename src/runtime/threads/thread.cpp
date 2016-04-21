@@ -3,8 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -13,6 +12,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
+
+#include <boost/intrusive_ptr.hpp>
 
 #include <mutex>
 

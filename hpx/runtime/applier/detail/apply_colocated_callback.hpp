@@ -7,7 +7,7 @@
 #if !defined(HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_MAR_09_2014_1213PM)
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_MAR_09_2014_1213PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/request.hpp>

@@ -267,7 +267,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     boost::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = 0;
                     //std::swap(m_type_info, tinfo);
-                    //throw abnormal_exit(tinfo ? *tinfo : typeid(unknown_exception_tag));
+                    //throw abnormal_exit(tinfo ? *tinfo :
+                    //      typeid(unknown_exception_tag));
                 }
                 else if (m_exit_status == ctx_exited_exit)
                     return false;
@@ -334,7 +335,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     boost::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = 0;
                     //std::swap(m_type_info, tinfo);
-                    //throw abnormal_exit(tinfo ? *tinfo : typeid(unknown_exception_tag));
+                    //throw abnormal_exit(tinfo ? *tinfo :
+                    //      typeid(unknown_exception_tag));
                 }
                 else if (m_exit_status == ctx_exited_exit)
                     boost::throw_exception(coroutine_exited());

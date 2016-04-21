@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENT_COMMANDLINE_JAN_09_2012_1130AM)
 #define HPX_COMPONENT_COMMANDLINE_JAN_09_2012_1130AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

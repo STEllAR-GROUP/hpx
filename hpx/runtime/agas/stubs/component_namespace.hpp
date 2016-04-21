@@ -8,7 +8,7 @@
 #if !defined(HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D)
 #define HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 //#include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/lcos/async.hpp>

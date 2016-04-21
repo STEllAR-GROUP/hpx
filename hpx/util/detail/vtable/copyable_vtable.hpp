@@ -8,7 +8,7 @@
 #ifndef HPX_UTIL_DETAIL_VTABLE_COPYABLE_VTABLE_HPP
 #define HPX_UTIL_DETAIL_VTABLE_COPYABLE_VTABLE_HPP
 
-#include <hpx/config/forceinline.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 namespace hpx { namespace util { namespace detail

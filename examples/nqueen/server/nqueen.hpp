@@ -7,7 +7,7 @@
 #if !defined(HPX_9FEC203D_0AAB_4213_BA36_456BE578ED3D)
 #define HPX_9FEC203D_0AAB_4213_BA36_456BE578ED3D
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

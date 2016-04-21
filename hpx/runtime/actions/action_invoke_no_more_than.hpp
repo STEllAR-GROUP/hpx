@@ -6,7 +6,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_INVOKE_NO_MORE_THAN_MAR_30_2014_0616PM)
 #define HPX_RUNTIME_ACTIONS_INVOKE_NO_MORE_THAN_MAR_30_2014_0616PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -16,6 +16,8 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
+
+#include <boost/exception_ptr.hpp>
 
 #include <memory>
 

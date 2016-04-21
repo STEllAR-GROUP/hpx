@@ -9,7 +9,7 @@
 #if !defined(HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1138AM)
 #define HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1138AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 

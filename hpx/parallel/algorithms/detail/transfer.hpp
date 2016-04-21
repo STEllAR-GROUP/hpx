@@ -8,13 +8,10 @@
 #if !defined(HPX_PARALLEL_ALGORITHMS_TRANSFER)
 #define HPX_PARALLEL_ALGORITHMS_TRANSFER
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/traits/is_iterator.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
 #include <hpx/parallel/traits/projected.hpp>
@@ -23,7 +20,6 @@
 #include <iterator>
 
 #include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)

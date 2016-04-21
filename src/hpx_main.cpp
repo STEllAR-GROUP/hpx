@@ -9,6 +9,7 @@
 #include <hpx/util/ini.hpp>
 
 #include <boost/scoped_array.hpp>
+#include <boost/program_options/parsers.hpp>
 
 #include <string>
 #include <vector>

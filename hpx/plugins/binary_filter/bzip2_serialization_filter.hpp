@@ -6,11 +6,10 @@
 #if !defined(HPX_ACTION_BZIP2_SERIALIZATION_FILTER_FEB_18_2013_1240AM)
 #define HPX_ACTION_BZIP2_SERIALIZATION_FILTER_FEB_18_2013_1240AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
 
-#include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
 

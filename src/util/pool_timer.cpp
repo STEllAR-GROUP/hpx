@@ -5,8 +5,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>

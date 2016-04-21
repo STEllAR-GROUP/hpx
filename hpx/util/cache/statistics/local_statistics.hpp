@@ -1,15 +1,16 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(BOOST_CACHE_LOCAL_STATISTICS_NOV_20_2008_1148AM)
-#define BOOST_CACHE_LOCAL_STATISTICS_NOV_20_2008_1148AM
+#if !defined(HPX_UTIL_CACHE_LOCAL_STATISTICS_NOV_20_2008_1148AM)
+#define HPX_UTIL_CACHE_LOCAL_STATISTICS_NOV_20_2008_1148AM
 
-#include <boost/cache/statistics/no_statistics.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/cache/statistics/no_statistics.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache { namespace statistics
+namespace hpx { namespace util { namespace cache { namespace statistics
 {
     ///////////////////////////////////////////////////////////////////////////
     class local_statistics : public no_statistics
@@ -27,19 +28,36 @@ namespace boost { namespace cache { namespace statistics
             return result;
         }
 
-        std::size_t hits(bool reset = false)
+        std::size_t hits() const
+        {
+            return hits_;
+        }
+        std::size_t misses() const
+        {
+            return misses_;
+        }
+        std::size_t insertions() const
+        {
+            return insertions_;
+        }
+        std::size_t evictions() const
+        {
+            return evictions_;
+        }
+
+        std::size_t hits(bool reset)
         {
             return get_and_reset(hits_, reset);
         }
-        std::size_t misses(bool reset = false)
+        std::size_t misses(bool reset)
         {
             return get_and_reset(misses_, reset);
         }
-        std::size_t insertions(bool reset = false)
+        std::size_t insertions(bool reset)
         {
             return get_and_reset(insertions_, reset);
         }
-        std::size_t evictions(bool reset = false)
+        std::size_t evictions(bool reset)
         {
             return get_and_reset(evictions_, reset);
         }
@@ -77,8 +95,7 @@ namespace boost { namespace cache { namespace statistics
         std::size_t insertions_;
         std::size_t evictions_;
     };
-
-}}}
+}}}}
 
 #endif
 

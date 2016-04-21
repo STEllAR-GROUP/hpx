@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
@@ -14,10 +14,12 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 
@@ -160,12 +162,14 @@ void symbol_namespace::register_counter_types(
     error_code& ec
     )
 {
+    using util::placeholders::_1;
+    using util::placeholders::_2;
     boost::format help_count(
         "returns the number of invocations of the AGAS service '%s'");
     boost::format help_time(
         "returns the overall execution time of the AGAS service '%s'");
     performance_counters::create_counter_func creator(
-        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::symbol_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -204,8 +208,10 @@ void symbol_namespace::register_global_counter_types(
     error_code& ec
     )
 {
+    using util::placeholders::_1;
+    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
-        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::symbol_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -662,28 +668,29 @@ response symbol_namespace::statistics_counter(
 
     typedef symbol_namespace::counter_data cd;
 
+    using util::placeholders::_1;
     util::function_nonser<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case symbol_ns_bind:
-            get_data_func = boost::bind(&cd::get_bind_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_bind_count, &counter_data_, _1);
             break;
         case symbol_ns_resolve:
-            get_data_func = boost::bind(&cd::get_resolve_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_resolve_count, &counter_data_, _1);
             break;
         case symbol_ns_unbind:
-            get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_unbind_count, &counter_data_, _1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_count,
-                &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_iterate_names_count,
+                &counter_data_, _1);
             break;
         case symbol_ns_on_event:
-            get_data_func = boost::bind(&cd::get_on_event_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_on_event_count, &counter_data_, _1);
             break;
         case symbol_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_overall_count, &counter_data_, _1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -696,23 +703,23 @@ response symbol_namespace::statistics_counter(
         HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case symbol_ns_bind:
-            get_data_func = boost::bind(&cd::get_bind_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_bind_time, &counter_data_, _1);
             break;
         case symbol_ns_resolve:
-            get_data_func = boost::bind(&cd::get_resolve_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_resolve_time, &counter_data_, _1);
             break;
         case symbol_ns_unbind:
-            get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_unbind_time, &counter_data_, _1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_time,
-                &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_iterate_names_time,
+                &counter_data_, _1);
             break;
         case symbol_ns_on_event:
-            get_data_func = boost::bind(&cd::get_on_event_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_on_event_time, &counter_data_, _1);
             break;
         case symbol_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
+            get_data_func = util::bind(&cd::get_overall_time, &counter_data_, _1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter

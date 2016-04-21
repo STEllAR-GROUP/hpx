@@ -85,7 +85,6 @@ struct manage_global_runtime
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
-
         hpx::util::function_nonser<int(int, char**)> start_function =
             hpx::util::bind(&manage_global_runtime::hpx_main, this, _1, _2);
 

@@ -96,7 +96,12 @@ namespace boost
       path base( base_arg );
       base.normalize();
       string::size_type pos( base.string().size() );
-      path src( src_arg.string().substr(pos) );
+      string src_arg_s(src_arg.string());
+      path src;
+      if (pos < src_arg_s.size())
+        src = path(src_arg.string().substr(pos));
+      else
+        src = path(src_arg_s);
       src.normalize();
       return src.string();
     }

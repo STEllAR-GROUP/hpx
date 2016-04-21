@@ -9,7 +9,7 @@
 #ifndef HPX_UTIL_INTEGER_INT128_HPP
 #define HPX_UTIL_INTEGER_INT128_HPP
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <exception>

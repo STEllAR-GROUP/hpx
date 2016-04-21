@@ -6,7 +6,7 @@
 #if !defined(HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FEB_04_2014_0755PM)
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FEB_04_2014_0755PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/request.hpp>

@@ -4,8 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/local/composable_guard.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/hpx_init.hpp>
+#include <boost/atomic.hpp>
+#include <boost/shared_ptr.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -61,7 +64,7 @@ int hpx_main(boost::program_options::variables_map& vm) {
         run_guarded(*l2,incr2);
     }
 
-    boost::function<void()> check_func = boost::bind(check);
+    boost::function<void()> check_func = hpx::util::bind(check);
     run_guarded(guards,check_func);
     return hpx::finalize();
 }

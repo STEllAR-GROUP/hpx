@@ -6,10 +6,10 @@
 #if !defined(HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM)
 #define HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/config.hpp>
 #include <boost/interprocess/errors.hpp>
 #include <boost/system/system_error.hpp>
 

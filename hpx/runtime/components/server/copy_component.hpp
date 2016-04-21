@@ -6,11 +6,13 @@
 #if !defined(HPX_RUNTIME_COMPONENTS_SERVER_COPY_COMPONENT_SEP_20_2013_0825PM)
 #define HPX_RUNTIME_COMPONENTS_SERVER_COPY_COMPONENT_SEP_20_2013_0825PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace components { namespace server
 {

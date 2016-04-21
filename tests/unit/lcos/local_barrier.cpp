@@ -8,6 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
@@ -58,7 +59,7 @@ int hpx_main(variables_map& vm)
 
         // create the threads which will wait on the barrier
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work(boost::bind
+            register_work(hpx::util::bind
                 (&local_barrier_test, boost::ref(b), boost::ref(c)));
 
         b.wait(); // wait for all threads to enter the barrier

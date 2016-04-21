@@ -7,7 +7,8 @@
 #ifndef HPX_PARCELSET_POLICIES_IBVERBS_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_IBVERBS_SENDER_HPP
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -20,6 +21,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/placeholders.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 

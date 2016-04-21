@@ -15,6 +15,8 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {

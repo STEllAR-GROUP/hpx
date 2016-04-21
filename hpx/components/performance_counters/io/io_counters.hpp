@@ -6,7 +6,9 @@
 #if !defined(PERFORMANCE_COUNTERS_IO_COUNTERS_IO_COUNTERS_201508111554)
 #define PERFORMANCE_COUNTERS_IO_COUNTERS_IO_COUNTERS_201508111554
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace performance_counters { namespace io
 {

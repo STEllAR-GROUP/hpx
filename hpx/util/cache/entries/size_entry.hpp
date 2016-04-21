@@ -1,15 +1,16 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(BOOST_CACHE_SIZE_ENTRY_NOV_19_2008_0800M)
-#define BOOST_CACHE_SIZE_ENTRY_NOV_19_2008_0800M
+#if !defined(HPX_UTIL_CACHE_SIZE_ENTRY_NOV_19_2008_0800M)
+#define HPX_UTIL_CACHE_SIZE_ENTRY_NOV_19_2008_0800M
 
-#include <boost/cache/entries/entry.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/cache/entries/entry.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace cache { namespace entries
+namespace hpx { namespace util { namespace cache { namespace entries
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Value, typename Derived = void>
@@ -32,7 +33,7 @@ namespace boost { namespace cache { namespace entries
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class size_entry size_entry.hpp boost/cache/entries/size_entry.hpp
+    /// \class size_entry size_entry.hpp hpx/util/cache/entries/size_entry.hpp
     ///
     /// The \a size_entry type can be used to store values in a cache which
     /// have a size associated (such as files, etc.).
@@ -86,7 +87,6 @@ namespace boost { namespace cache { namespace entries
     private:
         std::size_t size_;      // the 'size' of the entry
     };
-
-}}}
+}}}}
 
 #endif

@@ -6,10 +6,10 @@
 #if !defined(HPX_TEST_ACTION_MOVE_SEMANTICS_FEB_23_2012_0947AM)
 #define HPX_TEST_ACTION_MOVE_SEMANTICS_FEB_23_2012_0947AM
 
-#include <boost/move/move.hpp>
-#include <boost/ref.hpp>
-
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/access.hpp>
+
+#include <boost/ref.hpp>
 
 namespace hpx { namespace test
 {
@@ -19,6 +19,7 @@ namespace hpx { namespace test
     {
         virtual ~object_base() {};
     };
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT movable_object
         : object_base
