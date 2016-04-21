@@ -2,21 +2,22 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#ifndef COMPOSABLE_GUARD_HPP
-#define COMPOSABLE_GUARD_HPP
-
-namespace hpx { namespace lcos { namespace local {
-    struct guard_task;
-}}}
+#ifndef HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
+#define HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/include/actions.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <vector>
+
+namespace hpx { namespace lcos { namespace local {
+    struct guard_task;
+}}}
 
 typedef boost::atomic<hpx::lcos::local::guard_task *> guard_atomic;
 
@@ -79,11 +80,12 @@ public:
 
 /// Conceptually, a guard acts like a mutex on an asyncrhonous task. The
 /// mutex is locked before the task runs, and unlocked afterwards.
-HPX_API_EXPORT void run_guarded(guard& guard,util::function_nonser<void()> task);
+HPX_API_EXPORT void run_guarded(guard& guard, util::function_nonser<void()> task);
 
 /// Conceptually, a guard_set acts like a set of mutexes on an asyncrhonous task.
 /// The mutexes are locked before the task runs, and unlocked afterwards.
 HPX_API_EXPORT void run_guarded(guard_set& guards,
         util::function_nonser<void()> task);
 }}}
-#endif
+
+#endif /*HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP*/
