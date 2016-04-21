@@ -3,27 +3,29 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_BASE_LCO_WITH_VALUE_HPP)
+#ifndef HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
 #define HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
-#include <hpx/lcos_fwd.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_guard.hpp>
 
-#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
+#include <boost/exception_ptr.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace lcos
@@ -230,16 +232,16 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::util::unused_type, hpx_unused_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float, float)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(double, double)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int8_t, int8_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint8_t, uint8_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int16_t, int16_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint16_t, uint16_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int32_t, int32_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint32_t, uint32_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int64_t, int64_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint64_t, uint64_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int8_t, int8_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint8_t, uint8_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int16_t, int16_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint16_t, uint16_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int32_t, int32_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint32_t, uint32_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int64_t, int64_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint64_t, uint64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool, bool)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, hpx_section)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::string, std_string)
 
-#endif
+#endif /*HPX_LCOS_BASE_LCO_WITH_VALUE_HPP*/

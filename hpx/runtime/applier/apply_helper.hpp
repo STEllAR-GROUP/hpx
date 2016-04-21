@@ -34,11 +34,11 @@ namespace hpx { namespace applier { namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Action,
-        typename DirectExecute = typename Action::direct_execution>
+        bool DirectExecute = Action::direct_execution::value>
     struct apply_helper;
 
     template <typename Action>
-    struct apply_helper<Action, boost::mpl::false_>
+    struct apply_helper<Action, /*DirectExecute=*/false>
     {
         template <typename ...Ts>
         static void
@@ -117,7 +117,7 @@ namespace hpx { namespace applier { namespace detail
     };
 
     template <typename Action>
-    struct apply_helper<Action, boost::mpl::true_>
+    struct apply_helper<Action, /*DirectExecute=*/true>
     {
         // If local and to be directly executed, just call the function
         template <typename ...Ts>

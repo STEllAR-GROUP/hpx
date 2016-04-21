@@ -56,12 +56,12 @@ namespace hpx { namespace lcos
     ///                  continuation must return a value of a type convertible
     ///                  to the type as specified by the template parameter
     ///                  \a Result.
-    template <typename Action, typename Result, typename DirectExecute>
+    template <typename Action, typename Result, bool DirectExecute>
     class packaged_action;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
-    class packaged_action<Action, Result, boost::mpl::false_>
+    class packaged_action<Action, Result, /*DirectExecute=*/false>
       : public promise<Result,
             typename hpx::traits::extract_action<Action>::remote_result_type>
     {
@@ -356,11 +356,11 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
-    class packaged_action<Action, Result, boost::mpl::true_>
-      : public packaged_action<Action, Result, boost::mpl::false_>
+    class packaged_action<Action, Result, /*DirectExecute=*/true>
+      : public packaged_action<Action, Result, /*DirectExecute=*/false>
     {
         typedef typename packaged_action<
-                Action, Result, boost::mpl::false_
+                Action, Result, /*DirectExecute=*/false
             >::action_type action_type;
 
     public:
