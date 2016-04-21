@@ -54,8 +54,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
             std::true_type);
 
-        // Executes transfer algorithm on the elements in the range [first, last), to another range
-        // beginning at \a dest.
+        // Executes transfer algorithm on the elements in the range [first, last),
+        // to another range beginning at \a dest.
         //
         // \note   Complexity: Performs exactly \a last - \a first transfer assignments.
         //

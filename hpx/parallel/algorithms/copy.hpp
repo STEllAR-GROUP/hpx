@@ -103,7 +103,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct copy_iter<
             InIter, OutIter,
             typename std::enable_if<
-                hpx::traits::segmented_iterator_traits<InIter>::is_segmented_iterator::value
+                hpx::traits::segmented_iterator_traits<InIter>
+                    ::is_segmented_iterator::value
              >::type
         > : public copy<std::pair<
             typename hpx::traits::segmented_iterator_traits<InIter>::local_iterator,
@@ -115,7 +116,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct copy_iter<
             InIter, OutIter,
             typename std::enable_if<
-                !hpx::traits::segmented_iterator_traits<OutIter>::is_segmented_iterator::value
+                !hpx::traits::segmented_iterator_traits<OutIter>
+                    ::is_segmented_iterator::value
             >::type
         > : public copy<std::pair<InIter, OutIter>>
         {};
