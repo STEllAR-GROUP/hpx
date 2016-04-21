@@ -277,7 +277,7 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         VTablePtr const *vptr;
-        mutable void* object[vtable::function_storage_size];
+        mutable void* object[(vtable::function_storage_size / sizeof(void*))];
     };
 
     template <typename Sig, typename VTablePtr>
