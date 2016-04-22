@@ -3,10 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_START_IMPL_OCT_04_2012_0252PM)
-#define HPX_START_IMPL_OCT_04_2012_0252PM
+#ifndef HPX_HPX_START_IMPL_HPP
+#define HPX_HPX_START_IMPL_HPP
 
 #include <hpx/hpx_start.hpp>
+#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
@@ -31,7 +32,7 @@ namespace hpx
                 int(boost::program_options::variables_map& vm)
             > const& f,
             boost::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> && ini_config,
+            int argc, char** argv, std::vector<std::string>&& ini_config,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown, hpx::runtime_mode mode,
             bool blocking);
@@ -316,4 +317,4 @@ namespace hpx
     }
 }
 
-#endif
+#endif /*HPX_HPX_START_IMPL_HPP*/

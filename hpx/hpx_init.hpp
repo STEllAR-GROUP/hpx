@@ -7,12 +7,11 @@
 
 /// \file hpx_init.hpp
 
-#if !defined(HPX_INIT_OCT_04_2012_0132PM)
-#define HPX_INIT_OCT_04_2012_0132PM
+#ifndef HPX_HPX_INIT_HPP
+#define HPX_HPX_INIT_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
-#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/function.hpp>
 
@@ -724,5 +723,4 @@ namespace hpx
 #endif
 #endif
 
-#endif
-
+#endif /*HPX_HPX_INIT_HPP*/
