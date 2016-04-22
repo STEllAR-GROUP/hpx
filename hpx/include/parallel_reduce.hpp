@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_REDUCE_JUN_28_2014_0827AM
 
 #include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/parallel/algorithms/reduce_by_key.hpp>
 
 #endif
 
