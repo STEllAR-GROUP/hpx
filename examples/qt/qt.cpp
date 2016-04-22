@@ -43,7 +43,8 @@ void qt_main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
 
-    using namespace hpx::util::placeholders;
+    using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
     widget main(hpx::util::bind(run, _1, _2));
     main.show();
 

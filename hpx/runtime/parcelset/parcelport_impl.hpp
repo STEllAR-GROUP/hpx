@@ -881,7 +881,9 @@ namespace hpx { namespace parcelset
                     &new_gids);
 
             using hpx::parcelset::detail::call_for_each;
-            using namespace hpx::util::placeholders;
+            using hpx::util::placeholders::_1;
+            using hpx::util::placeholders::_2;
+            using hpx::util::placeholders::_3;
             if (num_parcels == parcels.size())
             {
                 ++operations_in_flight_;
