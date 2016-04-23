@@ -28,6 +28,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 

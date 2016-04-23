@@ -28,6 +28,7 @@
 #include <limits>
 #include <algorithm>
 #include <string>
+#include <memory>
 #include <vector>
 
 #include <apex_api.hpp>

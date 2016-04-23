@@ -29,6 +29,7 @@ namespace boost
     {
       { "(\\bstd\\s*::\\s*make_shared\\b)", "std::make_shared", "memory" },
       { "(\\bstd\\s*::\\s*shared_ptr\\b)", "std::shared_ptr", "memory" },
+      { "(\\bstd\\s*::\\s*unique_ptr\\b)", "std::unique_ptr", "memory" },
       { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
       { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
       { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
