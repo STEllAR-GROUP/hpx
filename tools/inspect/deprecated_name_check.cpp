@@ -34,6 +34,8 @@ namespace boost
       { "(\\bboost\\s*::\\s*lock_guard\\b)", "std::lock_guard" },
       { "(\\bboost\\s*::\\s*unordered_map\\b)", "std::unordered_map" },
       { "(\\bboost\\s*::\\s*unordered_multimap\\b)", "std::unordered_multimap" },
+      { "(\\bboost\\s*::\\s*unordered_set\\b)", "std::unordered_set" },
+      { "(\\bboost\\s*::\\s*unordered_multiset\\b)", "std::unordered_multiset" },
       { 0, 0 }
     };
 

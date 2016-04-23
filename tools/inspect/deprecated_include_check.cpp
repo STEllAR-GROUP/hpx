@@ -26,6 +26,7 @@ namespace boost
 //       { "boost/thread/locks.hpp", "mutex" },
       { "boost/type_traits\\.hpp", "separate type-traits headers" },
       { "boost/unordered_map\\.hpp", "unordered_map" },
+      { "boost/unordered_set\\.hpp", "unordered_set" },
       { 0, 0 }
     };
 
