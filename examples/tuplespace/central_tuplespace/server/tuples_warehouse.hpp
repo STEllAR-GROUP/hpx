@@ -17,9 +17,9 @@
 #include <algorithm>
 #include <map>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
-#include <boost/unordered_map.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
 // #define TS_DEBUG
@@ -271,7 +271,7 @@ namespace examples { namespace server
                 typedef examples::server::tuples_warehouse::elem_type elem_type;
                 typedef examples::server::tuples_warehouse::index_type index_type;
 
-                typedef boost::unordered_multimap<elem_type,
+                typedef std::unordered_multimap<elem_type,
                     index_type, hash_elem_functor> field_index_map_type;
                 typedef field_index_map_type::iterator
                     field_index_map_iterator_type;

@@ -25,6 +25,7 @@ namespace boost
       { "boost/atomic/atomic\\.hpp", "boost/atomic.hpp" },
 //       { "boost/thread/locks.hpp", "mutex" },
       { "boost/type_traits\\.hpp", "separate type-traits headers" },
+      { "boost/unordered_map\\.hpp", "unordered_map" },
       { 0, 0 }
     };
 

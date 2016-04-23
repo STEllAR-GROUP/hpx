@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <iterator>
 #include <numeric>
+#include <unordered_map>
 #include <vector>
 
 template <typename T>

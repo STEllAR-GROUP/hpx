@@ -34,6 +34,8 @@ namespace boost
       { "(\\bstd\\s*::\\s*set\\b)", "std::set", "set" },
       { "(\\bstd\\s*::\\s*shared_ptr\\b)", "std::shared_ptr", "memory" },
       { "(\\bstd\\s*::\\s*unique_ptr\\b)", "std::unique_ptr", "memory" },
+      { "(\\bstd\\s*::\\s*unordered_map\\b)", "std::unordered_map", "unordered_map" },
+      { "(\\bstd\\s*::\\s*unordered_multimap\\b)", "std::unordered_multimap", "unordered_map" },
       { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
       { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
       { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
