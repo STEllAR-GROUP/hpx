@@ -24,6 +24,7 @@
 #include <boost/asio/ip/host_name.hpp>
 
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 

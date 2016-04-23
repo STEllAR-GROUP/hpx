@@ -18,6 +18,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <memory>
+#include <set>
 
 #include <hpx/config/warnings_prefix.hpp>
 
