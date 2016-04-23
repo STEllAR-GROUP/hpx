@@ -19,6 +19,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
