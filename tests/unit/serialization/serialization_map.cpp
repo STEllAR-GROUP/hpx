@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <map>
 #include <numeric>
 #include <vector>
 

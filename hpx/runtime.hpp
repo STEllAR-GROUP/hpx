@@ -34,6 +34,7 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>

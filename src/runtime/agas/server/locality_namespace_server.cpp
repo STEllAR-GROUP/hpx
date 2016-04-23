@@ -18,6 +18,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <list>
+#include <map>
 #include <mutex>
 #include <string>
 #include <vector>

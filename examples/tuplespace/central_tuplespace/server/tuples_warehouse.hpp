@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <algorithm>
+#include <map>
 #include <vector>
 
 #include <boost/unordered_map.hpp>

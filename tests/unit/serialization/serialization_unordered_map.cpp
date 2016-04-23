@@ -103,7 +103,7 @@ void test_vector_as_value()
 {
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
-    std::map<size_t, std::vector<int> > os;
+    std::unordered_map<size_t, std::vector<int> > os;
     for (int k = 0; k < 10; ++k)
     {
         std::vector<int> vec(10);

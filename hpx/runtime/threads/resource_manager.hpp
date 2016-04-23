@@ -14,6 +14,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <map>
 #include <memory>
 #include <vector>
 

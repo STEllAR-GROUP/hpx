@@ -16,6 +16,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <map>
 #include <string>
 #include <vector>
 

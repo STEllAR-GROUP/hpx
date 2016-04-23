@@ -28,6 +28,8 @@ namespace boost
     names_includes const names[] =
     {
       { "(\\bstd\\s*::\\s*make_shared\\b)", "std::make_shared", "memory" },
+      { "(\\bstd\\s*::\\s*map\\b)", "std::map", "map" },
+      { "(\\bstd\\s*::\\s*multimap\\b)", "std::multimap", "map" },
       { "(\\bstd\\s*::\\s*shared_ptr\\b)", "std::shared_ptr", "memory" },
       { "(\\bstd\\s*::\\s*unique_ptr\\b)", "std::unique_ptr", "memory" },
       { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
