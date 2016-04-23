@@ -13,12 +13,12 @@
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/swap.hpp>
 
 #include <iosfwd>
-#include <utility>
+#include <memory>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace iostreams { namespace detail
@@ -90,7 +90,7 @@ namespace hpx { namespace iostreams { namespace detail
             std::unique_lock<mutex_type> l(mtx_);
             if (data_.get() && !data_->empty())
             {
-                boost::shared_ptr<std::vector<char> > data(data_);
+                std::shared_ptr<std::vector<char> > data(data_);
                 data_.reset();
                 l.unlock();
 
@@ -100,7 +100,7 @@ namespace hpx { namespace iostreams { namespace detail
         }
 
     private:
-        boost::shared_ptr<std::vector<char> > data_;
+        std::shared_ptr<std::vector<char> > data_;
 
     private:
         friend class hpx::serialization::access;

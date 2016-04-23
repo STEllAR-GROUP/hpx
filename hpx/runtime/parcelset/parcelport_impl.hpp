@@ -28,10 +28,9 @@
 #include <boost/atomic.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 #include <limits>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -201,8 +200,8 @@ namespace hpx { namespace parcelset
     protected:
         void put_parcel_await(
             locality const & dest, parcel p, write_handler_type f
-          , boost::shared_ptr<archive_type> const & archive
-          , boost::shared_ptr<future_await_container_type> const & future_await)
+          , std::shared_ptr<archive_type> const & archive
+          , std::shared_ptr<future_await_container_type> const & future_await)
         {
             future_await->reset();
 
@@ -238,10 +237,10 @@ namespace hpx { namespace parcelset
         {
             HPX_ASSERT(dest.type() == type());
 
-            boost::shared_ptr<future_await_container_type> future_await =
-                boost::make_shared<future_await_container_type>();
-            boost::shared_ptr<archive_type> archive =
-                boost::make_shared<archive_type>(*future_await);
+            std::shared_ptr<future_await_container_type> future_await =
+                std::make_shared<future_await_container_type>();
+            std::shared_ptr<archive_type> archive =
+                std::make_shared<archive_type>(*future_await);
 
             put_parcel_await(dest, std::move(p), std::move(f), archive,
                 future_await);
@@ -251,8 +250,8 @@ namespace hpx { namespace parcelset
         void put_parcels_await(
             locality const& dest, std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers
-          , boost::shared_ptr<archive_type> const& archive
-          , boost::shared_ptr<future_await_container_type> const& future_await)
+          , std::shared_ptr<archive_type> const& archive
+          , std::shared_ptr<future_await_container_type> const& future_await)
         {
             future_await->reset();
 
@@ -305,10 +304,10 @@ namespace hpx { namespace parcelset
             }
 #endif
 
-            boost::shared_ptr<future_await_container_type> future_await =
-                boost::make_shared<future_await_container_type>();
-            boost::shared_ptr<archive_type> archive =
-                boost::make_shared<archive_type>(*future_await);
+            std::shared_ptr<future_await_container_type> future_await =
+                std::make_shared<future_await_container_type>();
+            std::shared_ptr<archive_type> archive =
+                std::make_shared<archive_type>(*future_await);
 
             // enqueue the outgoing parcels ...
             put_parcels_await(
@@ -335,15 +334,15 @@ namespace hpx { namespace parcelset
         }
 
         /// support enable_shared_from_this
-        boost::shared_ptr<parcelport_impl> shared_from_this()
+        std::shared_ptr<parcelport_impl> shared_from_this()
         {
-            return boost::static_pointer_cast<parcelport_impl>(
+            return std::static_pointer_cast<parcelport_impl>(
                 parcelset::parcelport::shared_from_this());
         }
 
-        boost::shared_ptr<parcelport_impl const> shared_from_this() const
+        std::shared_ptr<parcelport_impl const> shared_from_this() const
         {
-            return boost::static_pointer_cast<parcelport_impl const>(
+            return std::static_pointer_cast<parcelport_impl const>(
                 parcelset::parcelport::shared_from_this());
         }
 
@@ -511,11 +510,11 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
-        boost::shared_ptr<connection> get_connection(
+        std::shared_ptr<connection> get_connection(
             locality const& l, bool force, error_code& ec)
         {
             // Request new connection from connection cache.
-            boost::shared_ptr<connection> sender_connection;
+            std::shared_ptr<connection> sender_connection;
 
             // Get a connection or reserve space for a new connection.
             if (!connection_cache_.get_or_reserve(l, sender_connection))
@@ -572,7 +571,7 @@ namespace hpx { namespace parcelset
             mapped_type& e = pending_parcels_[locality_id];
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
             if(!util::get<0>(e))
-                util::get<0>(e) = boost::make_shared<std::vector<parcel> >();
+                util::get<0>(e) = std::make_shared<std::vector<parcel> >();
             util::get<0>(e)->push_back(std::move(p));
 #else
             util::get<0>(e).push_back(std::move(p));
@@ -604,7 +603,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
             if(!util::get<0>(e))
             {
-                util::get<0>(e) = boost::make_shared<std::vector<parcel> >();
+                util::get<0>(e) = std::make_shared<std::vector<parcel> >();
                 HPX_ASSERT(util::get<1>(e).empty());
 #if HPX_GCC_VERSION < 40700
                 // GCC4.6 gets incredibly confused
@@ -761,7 +760,7 @@ namespace hpx { namespace parcelset
                 bool force_connection = true;
 
                 error_code ec;
-                boost::shared_ptr<connection> sender_connection =
+                std::shared_ptr<connection> sender_connection =
                     get_connection(locality_id, force_connection, ec);
 
                 if (!sender_connection)
@@ -816,7 +815,7 @@ namespace hpx { namespace parcelset
         void send_pending_parcels_trampoline(
             boost::system::error_code const& ec,
             locality const& locality_id,
-            boost::shared_ptr<connection> sender_connection)
+            std::shared_ptr<connection> sender_connection)
         {
             HPX_ASSERT(operations_in_flight_ != 0);
             --operations_in_flight_;
@@ -856,7 +855,7 @@ namespace hpx { namespace parcelset
 
         void send_pending_parcels(
             parcelset::locality const & parcel_locality_id,
-            boost::shared_ptr<connection> sender_connection,
+            std::shared_ptr<connection> sender_connection,
             std::vector<parcel>&& parcels,
             std::vector<write_handler_type>&& handlers,
             new_gids_map new_gids)

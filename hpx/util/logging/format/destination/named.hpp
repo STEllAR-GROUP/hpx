@@ -33,6 +33,7 @@
 #include <hpx/util/logging/format/array.hpp> // array
 #include <boost/type_traits/is_base_of.hpp>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <vector>
 

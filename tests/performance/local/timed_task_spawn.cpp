@@ -19,10 +19,10 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/format.hpp>
 #include <boost/math/common_factor.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -83,7 +83,7 @@ void print_results(
   , double walltime
   , double warmup_estimate
   , std::vector<std::string> const& counter_shortnames
-  , boost::shared_ptr<hpx::util::activate_counters> ac
+  , std::shared_ptr<hpx::util::activate_counters> ac
     )
 {
     std::vector<hpx::performance_counters::counter_value> counter_values;
@@ -427,7 +427,7 @@ int hpx_main(
             }
         }
 
-        boost::shared_ptr<hpx::util::activate_counters> ac;
+        std::shared_ptr<hpx::util::activate_counters> ac;
         if (!counters.empty())
             ac.reset(new hpx::util::activate_counters(counters));
 

@@ -15,8 +15,7 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/unwrapped.hpp>
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -31,7 +30,7 @@ namespace hpx { namespace serialization { namespace detail
     struct access_data;
 
     class future_await_container
-        : public boost::enable_shared_from_this<future_await_container>
+        : public std::enable_shared_from_this<future_await_container>
     {
         typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::list<naming::gid_type> new_gids_type;

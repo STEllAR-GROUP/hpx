@@ -13,10 +13,9 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include <algorithm>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -35,7 +34,7 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT interval_timer
-      : public boost::enable_shared_from_this<interval_timer>
+      : public std::enable_shared_from_this<interval_timer>
     {
     private:
         friend class util::interval_timer;
@@ -152,7 +151,7 @@ namespace hpx { namespace util
         void speed_up(util::steady_duration const& min_interval);
 
     private:
-        boost::shared_ptr<detail::interval_timer> timer_;
+        std::shared_ptr<detail::interval_timer> timer_;
     };
 }}
 

@@ -21,7 +21,6 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -187,7 +186,7 @@ namespace hpx
               : base_type(std::move(base))
             {}
 
-            boost::shared_ptr<partitioned_vector_partition_server> local_data_;
+            std::shared_ptr<partitioned_vector_partition_server> local_data_;
         };
 
         // The list of partitions belonging to this vector.
@@ -508,7 +507,7 @@ namespace hpx
 
         static void get_ptr_helper(std::size_t loc,
             partitions_vector_type& partitions,
-            future<boost::shared_ptr<partitioned_vector_partition_server> > && f)
+            future<std::shared_ptr<partitioned_vector_partition_server> > && f)
         {
             partitions[loc].local_data_ = f.get();
         }

@@ -18,11 +18,8 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <mutex>
-
 #include <string>
 #include <vector>
 
@@ -357,7 +354,7 @@ response symbol_namespace::bind(
     }
 
     if (HPX_UNLIKELY(!util::insert_checked(gids_.insert(
-            std::make_pair(key, boost::make_shared<naming::gid_type>(gid))))))
+            std::make_pair(key, std::make_shared<naming::gid_type>(gid))))))
     {
         l.unlock();
 
@@ -403,7 +400,7 @@ response symbol_namespace::bind(
             }
 
             // hold on to the gid while the map is unlocked
-            boost::shared_ptr<naming::gid_type> current_gid = gid_it->second;
+            std::shared_ptr<naming::gid_type> current_gid = gid_it->second;
 
             {
                 util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
@@ -462,7 +459,7 @@ response symbol_namespace::resolve(
         ec = make_success_code();
 
     // hold on to gid before unlocking the map
-    boost::shared_ptr<naming::gid_type> current_gid(it->second);
+    std::shared_ptr<naming::gid_type> current_gid(it->second);
 
     l.unlock();
     naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid).get();
@@ -572,7 +569,7 @@ response symbol_namespace::on_event(
         if (it != gids_.end())
         {
             // hold on to entry while map is unlocked
-            boost::shared_ptr<naming::gid_type> current_gid(it->second);
+            std::shared_ptr<naming::gid_type> current_gid(it->second);
 
             // split the credit as the receiving end will expect to keep the
             // object alive

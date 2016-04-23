@@ -11,8 +11,7 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -40,17 +39,17 @@ namespace jacobi_smp {
     {
         typedef std::vector<double> vector;
 
-        boost::shared_ptr<vector> grid_new(new vector(n * n, 1));
-        boost::shared_ptr<vector> grid_old(new vector(n * n, 1));
+        std::shared_ptr<vector> grid_new(new vector(n * n, 1));
+        std::shared_ptr<vector> grid_old(new vector(n * n, 1));
 
         typedef std::vector<hpx::shared_future<void> > deps_vector;
 
         std::size_t n_block = static_cast<std::size_t>(std::ceil(double(n)/block_size));
 
 
-        boost::shared_ptr<deps_vector> deps_new(
+        std::shared_ptr<deps_vector> deps_new(
             new deps_vector(n_block, hpx::make_ready_future()));
-        boost::shared_ptr<deps_vector> deps_old(
+        std::shared_ptr<deps_vector> deps_old(
             new deps_vector(n_block, hpx::make_ready_future()));
 
         hpx::util::high_resolution_timer t;

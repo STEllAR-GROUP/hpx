@@ -24,9 +24,9 @@
 #include <hpx/include/actions.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -469,7 +469,7 @@ namespace hpx
         {}
 
         // Return the pinned pointer to the underlying component
-        boost::shared_ptr<server::partition_unordered_map<Key, T, Hash, KeyEqual> >
+        std::shared_ptr<server::partition_unordered_map<Key, T, Hash, KeyEqual> >
         get_ptr() const
         {
             error_code ec(lightweight);

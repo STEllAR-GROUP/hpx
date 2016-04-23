@@ -8,8 +8,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,10 +47,10 @@ bool test_get_ptr1(hpx::id_type id)
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     try {
-        hpx::future<boost::shared_ptr<test_server> > f =
+        hpx::future<std::shared_ptr<test_server> > f =
             hpx::get_ptr<test_server>(t.get_id());
 
-        boost::shared_ptr<test_server> ptr = f.get();
+        std::shared_ptr<test_server> ptr = f.get();
 
         HPX_TEST_EQ(reinterpret_cast<test_server*>(t.check_ptr()), ptr.get());
         return true;
@@ -68,14 +67,14 @@ bool test_get_ptr2(hpx::id_type id)
     test_client t = test_client::create(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
-    hpx::future<boost::shared_ptr<test_server> > f =
+    hpx::future<std::shared_ptr<test_server> > f =
         hpx::get_ptr<test_server>(t.get_id());
 
     f.wait();
     bool has_exception = f.has_exception();
 
     hpx::error_code ec;
-    boost::shared_ptr<test_server> ptr = f.get(ec);
+    std::shared_ptr<test_server> ptr = f.get(ec);
 
     // Intel 13 has trouble to generate correct code for if(ec) { ... }
     if (ec || !ptr.get())

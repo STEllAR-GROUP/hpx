@@ -23,11 +23,11 @@
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <boost/format.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/atomic.hpp>
 
 namespace hpx { namespace agas
@@ -54,7 +54,7 @@ struct HPX_EXPORT symbol_namespace
         void(std::string const&, naming::gid_type const&)
     > iterate_names_function_type;
 
-    typedef std::map<std::string, boost::shared_ptr<naming::gid_type> >
+    typedef std::map<std::string, std::shared_ptr<naming::gid_type> >
         gid_table_type;
 
     typedef std::multimap<

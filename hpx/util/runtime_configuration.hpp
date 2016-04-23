@@ -16,8 +16,8 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -45,7 +45,7 @@ namespace hpx { namespace util
         // any explicit command line options
         void reconfigure(std::vector<std::string> const& ini_defs);
 
-        std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
             load_modules();
 
         void load_components_static(std::vector<

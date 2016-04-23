@@ -31,8 +31,8 @@
 
 #include <hpx/util/logging/format/op_equal.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
+#include <memory>
 // HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW
-#include <boost/shared_ptr.hpp>
 
 
 namespace hpx { namespace util { namespace logging {
@@ -534,7 +534,7 @@ template<class context_type> struct non_const_context { //-V690
     typedef non_const_context<context_type> non_const_context_base;
 private:
     typedef non_const_context<context_type> self_type;
-    typedef boost::shared_ptr<context_type> ptr_type;
+    typedef std::shared_ptr<context_type> ptr_type;
 
 protected:
     non_const_context(const non_const_context& other) : m_context(other.m_context) {}

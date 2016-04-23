@@ -21,6 +21,7 @@
 
 #include <boost/cstdint.hpp>
 
+#include <memory>
 #include <utility>
 
 namespace hpx { namespace iostreams { namespace detail

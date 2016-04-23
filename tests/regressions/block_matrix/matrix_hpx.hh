@@ -10,12 +10,12 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <cassert>
 #include <cstdlib>
 #include <initializer_list>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -27,16 +27,16 @@ struct matrix_t_client;
 struct vector_t_server:
   public hpx::components::simple_component_base<vector_t_server>
 {
-  boost::shared_ptr<vector_t> data;
+  std::shared_ptr<vector_t> data;
   
-  vector_t_server(std::ptrdiff_t N): data(boost::make_shared<vector_t>(N)) {}
+  vector_t_server(std::ptrdiff_t N): data(std::make_shared<vector_t>(N)) {}
   vector_t_server& operator=(const vector_t_server&) = delete;
   // Temporarily, to allow creating a remote object from local data
-  vector_t_server(const vector_t& x): data(boost::make_shared<vector_t>(x)) {}
+  vector_t_server(const vector_t& x): data(std::make_shared<vector_t>(x)) {}
   // We don't really want these
   vector_t_server() { assert(0); }
   
-  boost::shared_ptr<vector_t> get_data() { return data; }
+  std::shared_ptr<vector_t> get_data() { return data; }
   HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_data);
   
   double get_elt(std::ptrdiff_t i) const { return (*data)(i); }
@@ -67,11 +67,11 @@ struct vector_t_client:
   vector_t_client() {}
   vector_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
-  boost::shared_ptr<vector_t> get_ptr() const
+  std::shared_ptr<vector_t> get_ptr() const
   {
     return hpx::get_ptr<vector_t_server>(get_gid()).get()->data;
   }
-  hpx::future<boost::shared_ptr<vector_t>> get_data() const
+  hpx::future<std::shared_ptr<vector_t>> get_data() const
   {
     return hpx::async(vector_t_server::get_data_action(), get_gid());
   }
@@ -112,19 +112,19 @@ struct vector_t_client:
 struct matrix_t_server:
   public hpx::components::simple_component_base<matrix_t_server>
 {
-  boost::shared_ptr<matrix_t> data;
+  std::shared_ptr<matrix_t> data;
   
   matrix_t_server(std::ptrdiff_t NI, std::ptrdiff_t NJ):
-    data(boost::make_shared<matrix_t>(NI,NJ))
+    data(std::make_shared<matrix_t>(NI,NJ))
   {
   }
   matrix_t_server& operator=(const matrix_t_server&) = delete;
   // Temporarily, to allow creating a remote object from local data
-  matrix_t_server(const matrix_t& a): data(boost::make_shared<matrix_t>(a)) {}
+  matrix_t_server(const matrix_t& a): data(std::make_shared<matrix_t>(a)) {}
   // We don't really want these
   matrix_t_server() { assert(0); }
   
-  boost::shared_ptr<matrix_t> get_data() { return data; }
+  std::shared_ptr<matrix_t> get_data() { return data; }
   HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, get_data);
   
   double get_elt(std::ptrdiff_t i, std::ptrdiff_t j) const
@@ -163,11 +163,11 @@ struct matrix_t_client:
   matrix_t_client() {}
   matrix_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
-  boost::shared_ptr<matrix_t> get_ptr() const
+  std::shared_ptr<matrix_t> get_ptr() const
   {
     return hpx::get_ptr<matrix_t_server>(get_gid()).get()->data;
   }
-  hpx::future<boost::shared_ptr<matrix_t>> get_data() const
+  hpx::future<std::shared_ptr<matrix_t>> get_data() const
   {
     return hpx::async(matrix_t_server::get_data_action(), get_gid());
   }

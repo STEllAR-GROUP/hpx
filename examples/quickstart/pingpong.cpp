@@ -11,9 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,18 +39,18 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
 
 ///////////////////////////////////////////////////////////////////////////////
 void on_recv_ind(hpx::naming::id_type to,
-    boost::shared_ptr<std::vector<double> > const& in, std::size_t counter);
+    std::shared_ptr<std::vector<double> > const& in, std::size_t counter);
 HPX_PLAIN_ACTION(on_recv_ind, on_recv_ind_action);
 
 void on_recv_ind(hpx::naming::id_type to,
-    boost::shared_ptr<std::vector<double> > const& in, std::size_t counter)
+    std::shared_ptr<std::vector<double> > const& in, std::size_t counter)
 {
     // received vector in
     if (--counter == 0) return;
 
     // send it to remote locality (to), and wait until it is received
-    boost::shared_ptr<std::vector<double> > data(
-        boost::make_shared<std::vector<double> >(*in));
+    std::shared_ptr<std::vector<double> > data(
+        std::make_shared<std::vector<double> >(*in));
 
     on_recv_ind_action act;
     act(to, hpx::find_here(), data, counter);
@@ -116,8 +114,8 @@ int hpx_main(boost::program_options::variables_map &b_arg)
     // do the same but with a wrapped vector
     /*
     {
-        boost::shared_ptr<std::vector<double> > data(
-            boost::make_shared<std::vector<double> >(vsize, double(3.11)));
+        std::shared_ptr<std::vector<double> > data(
+            std::make_shared<std::vector<double> >(vsize, double(3.11)));
 
         hpx::util::high_resolution_timer timer1;
 

@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/high_resolution_timer.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -20,8 +20,8 @@ namespace jacobi_smp {
     {
         typedef std::vector<double> vector;
 
-        boost::shared_ptr<vector> grid_new(new vector(n * n, 1));
-        boost::shared_ptr<vector> grid_old(new vector(n * n, 1));
+        std::shared_ptr<vector> grid_new(new vector(n * n, 1));
+        std::shared_ptr<vector> grid_old(new vector(n * n, 1));
 
         hpx::util::high_resolution_timer t;
         for(std::size_t i = 0; i < iterations; ++i)

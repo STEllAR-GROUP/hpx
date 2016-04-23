@@ -20,10 +20,9 @@
 
 #include <boost/asio/placeholders.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <mutex>
-
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,7 +109,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
              it != end; ++it, ++tried)
         {
             try {
-                boost::shared_ptr<receiver> conn(
+                std::shared_ptr<receiver> conn(
                     new receiver(
                         io_service_pool_.get_io_service(), here(), *this));
 
@@ -149,7 +148,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {
             // cancel all pending read operations, close those sockets
             std::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
-            for (boost::shared_ptr<receiver> const& c : accepted_connections_)
+            for (std::shared_ptr<receiver> const& c : accepted_connections_)
             {
                 boost::system::error_code ec;
                 data_window& w = c->window();
@@ -171,11 +170,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         }
     }
 
-    boost::shared_ptr<sender> connection_handler::create_connection(
+    std::shared_ptr<sender> connection_handler::create_connection(
         parcelset::locality const& l, error_code& ec)
     {
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
-        boost::shared_ptr<sender> sender_connection(new sender(io_service,
+        std::shared_ptr<sender> sender_connection(new sender(io_service,
                 here_, l, data_buffer_cache_, parcels_sent_, ++connection_count_));
 
         // Connect to the target locality, retry if needed
@@ -249,11 +248,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
     // accepted new incoming connection
     void connection_handler::handle_accept(boost::system::error_code const & e,
-        boost::shared_ptr<receiver> receiver_conn)
+        std::shared_ptr<receiver> receiver_conn)
     {
         if (!e) {
             // handle this incoming parcel
-            boost::shared_ptr<receiver> c(receiver_conn); // hold on to receiver_conn
+            std::shared_ptr<receiver> c(receiver_conn); // hold on to receiver_conn
 
             // create new connection waiting for next incoming parcel
             receiver_conn.reset(new receiver(
@@ -285,7 +284,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     // Handle completion of a read operation.
     void connection_handler::handle_read_completion(
         boost::system::error_code const& e,
-        boost::shared_ptr<receiver> receiver_conn)
+        std::shared_ptr<receiver> receiver_conn)
     {
         if (!e) return;
 

@@ -8,9 +8,8 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <vector>
-
-#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace util {
 
@@ -19,7 +18,7 @@ namespace hpx { namespace util {
     struct buffer_pool
     {
         typedef std::vector<T, Allocator> buffer_type;
-        typedef boost::shared_ptr<buffer_type> shared_buffer_type;
+        typedef std::shared_ptr<buffer_type> shared_buffer_type;
         typedef typename buffer_type::size_type size_type;
         typedef std::map<size_type, std::list<shared_buffer_type> > buffer_map_type;
 

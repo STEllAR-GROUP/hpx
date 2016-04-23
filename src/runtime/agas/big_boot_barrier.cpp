@@ -41,11 +41,10 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/ref.hpp>
 
 #include <cstdlib>
+#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -974,7 +973,7 @@ void create_big_boot_barrier(
   , parcelset::endpoints_type const& endpoints_
   , util::runtime_configuration const& ini_
 ) {
-    util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
+    util::reinitializable_static<std::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
     if (bbb.get())
     {
         HPX_THROW_EXCEPTION(internal_server_error,
@@ -986,7 +985,7 @@ void create_big_boot_barrier(
 
 void destroy_big_boot_barrier()
 {
-    util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
+    util::reinitializable_static<std::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
     if (!bbb.get())
     {
         HPX_THROW_EXCEPTION(internal_server_error,
@@ -998,7 +997,7 @@ void destroy_big_boot_barrier()
 
 big_boot_barrier& get_big_boot_barrier()
 {
-    util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
+    util::reinitializable_static<std::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
     if (!bbb.get())
     {
         HPX_THROW_EXCEPTION(internal_server_error,

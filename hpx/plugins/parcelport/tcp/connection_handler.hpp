@@ -22,8 +22,8 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -97,7 +97,7 @@ namespace hpx { namespace parcelset
                 return boost::asio::ip::host_name();
             }
 
-            boost::shared_ptr<sender> create_connection(
+            std::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
             parcelset::locality agas_locality(util::runtime_configuration const & ini)
@@ -107,9 +107,9 @@ namespace hpx { namespace parcelset
 
         private:
             void handle_accept(boost::system::error_code const & e,
-                boost::shared_ptr<receiver> receiver_conn);
+                std::shared_ptr<receiver> receiver_conn);
             void handle_read_completion(boost::system::error_code const& e,
-                boost::shared_ptr<receiver> receiver_conn);
+                std::shared_ptr<receiver> receiver_conn);
 
             /// Acceptor used to listen for incoming connections.
             boost::asio::ip::tcp::acceptor* acceptor_;
@@ -117,7 +117,7 @@ namespace hpx { namespace parcelset
             /// The list of accepted connections
             mutable lcos::local::spinlock connections_mtx_;
 
-            typedef std::set<boost::shared_ptr<receiver> > accepted_connections_set;
+            typedef std::set<std::shared_ptr<receiver> > accepted_connections_set;
             accepted_connections_set accepted_connections_;
 
 #if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
