@@ -150,11 +150,17 @@ namespace hpx { namespace threads
             for (;;) {
                 thread_state tmp = prev_state;
 
+                // ABA prevention for state only (not for state_ex)
+                boost::int64_t tag = tmp.tag();
+                if (state != tmp.state())
+                    ++tag;
+
                 if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
-                        thread_state(state, state_ex, tmp.tag() + 1))))
+                        thread_state(state, state_ex, tag))))
                 {
                     return prev_state;
                 }
+
                 prev_state = tmp;
             }
         }
@@ -167,11 +173,12 @@ namespace hpx { namespace threads
 
             new_tagged_state = thread_state(newstate, state_ex,
                 prev_state.tag() + 1);
-            if (current_state_.compare_exchange_strong(tmp, new_tagged_state))
-                return true;
+
+            if (!current_state_.compare_exchange_strong(tmp, new_tagged_state))
+                return false;
 
             prev_state = tmp;
-            return false;
+            return true;
         }
 
         /// The restore_state function changes the state of this thread
@@ -197,15 +204,31 @@ namespace hpx { namespace threads
         ///          changed successfully
         bool restore_state(thread_state new_state, thread_state old_state)
         {
-            return current_state_.compare_exchange_strong(old_state,
-                thread_state(new_state, old_state.tag() + 1));
+            // ABA prevention for state only (not for state_ex)
+            boost::int64_t tag = old_state.tag();
+            if (new_state.state() != old_state.state())
+                ++tag;
+
+            // ignore the state_ex while compare-exchanging
+            thread_state_ex_enum state_ex =
+                current_state_.load(boost::memory_order_relaxed).state_ex();
+
+            thread_state old_tmp(old_state.state(), state_ex, old_state.tag());
+            thread_state new_tmp(new_state.state(), state_ex, tag);
+
+            return current_state_.compare_exchange_strong(old_tmp, new_tmp);
         }
 
         bool restore_state(thread_state_enum new_state,
             thread_state_ex_enum state_ex, thread_state old_state)
         {
+            // ABA prevention for state only (not for state_ex)
+            boost::int64_t tag = old_state.tag();
+            if (new_state != old_state.state())
+                ++tag;
+
             return current_state_.compare_exchange_strong(old_state,
-                thread_state(new_state, state_ex, old_state.tag() + 1));
+                thread_state(new_state, state_ex, tag));
         }
 
     private:
