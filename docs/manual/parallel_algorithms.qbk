@@ -314,6 +314,11 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algoref reduce] ]
      [Sums up a range of elements.]
      [`<hpx/include/parallel_reduce.hpp>`]]
+    [[ [algoref reduce_by_key] ]
+     [Performs an inclusive scan on consecutive elements with matching keys, with a reduction
+      to output only the final sum for each key. The key sequence {1,1,1,2,3,3,3,3,1} and value
+      sequence {2,3,4,5,6,7,8,9,10} would be reduced to keys={1,2,3,1}, values={9,5,30,10}]
+     [`<hpx/include/parallel_reduce.hpp>`]]
     [[ [algoref transform_reduce] ]
      [Sums up a range of elements after applying a function.]
      [`<hpx/include/parallel_transform_reduce.hpp>`]]

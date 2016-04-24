@@ -12,13 +12,15 @@ endif()
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
     ${Boost_ADDITIONAL_VERSIONS}
+    "1.62.0" "1.62"
+    "1.61.0" "1.61"
     "1.60.0" "1.60"
     "1.59.0" "1.59"
     "1.58.0" "1.58"
     "1.57.0" "1.57")
 
 find_package(Boost
-  1.49
+  1.50
   REQUIRED
   COMPONENTS
   chrono

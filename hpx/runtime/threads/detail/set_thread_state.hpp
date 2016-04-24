@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -50,7 +50,7 @@ namespace hpx { namespace threads { namespace detail
         // in the mean time
         thread_state current_state = thrd->get_state();
 
-        if (thread_state_enum(current_state) == thread_state_enum(previous_state) &&
+        if (current_state.state() == previous_state.state() &&
             current_state != previous_state)
         {
             LTM_(warning)
@@ -79,7 +79,7 @@ namespace hpx { namespace threads { namespace detail
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id, "threads::detail::set_thread_state",
                 "NULL thread id encountered");
-            return thread_state(unknown);
+            return thread_state(unknown, wait_unknown);
         }
 
         // set_state can't be used to force a thread into active state
@@ -88,14 +88,14 @@ namespace hpx { namespace threads { namespace detail
             strm << "invalid new state: " << get_thread_state_name(new_state);
             HPX_THROWS_IF(ec, bad_parameter, "threads::detail::set_thread_state",
                 strm.str());
-            return thread_state(unknown);
+            return thread_state(unknown, wait_unknown);
         }
 
         // we know that the id is actually the pointer to the thread
         if (!thrd) {
             if (&ec != &throws)
                 ec = make_success_code();
-            return thread_state(terminated);
+            return thread_state(terminated, wait_unknown);
             // this thread has already been terminated
         }
 
@@ -103,7 +103,7 @@ namespace hpx { namespace threads { namespace detail
         do {
             // action depends on the current state
             previous_state = thrd->get_state();
-            thread_state_enum previous_state_val = previous_state;
+            thread_state_enum previous_state_val = previous_state.state();
 
             // nothing to do here if the state doesn't change
             if (new_state == previous_state_val) {
@@ -117,7 +117,7 @@ namespace hpx { namespace threads { namespace detail
                 if (&ec != &throws)
                     ec = make_success_code();
 
-                return thread_state(new_state);
+                return thread_state(new_state, previous_state.state_ex());
             }
 
             // the thread to set the state for is currently running, so we
@@ -178,7 +178,7 @@ namespace hpx { namespace threads { namespace detail
                     HPX_THROWS_IF(ec, bad_parameter,
                         "threads::detail::set_thread_state",
                         strm.str());
-                    return thread_state(unknown);
+                    return thread_state(unknown, wait_unknown);
                 }
                 break;
             case suspended:
@@ -201,10 +201,8 @@ namespace hpx { namespace threads { namespace detail
                        << ")";
 
             // So all what we do here is to set the new state.
-            if (thrd->restore_state(new_state, previous_state)) {
-                thrd->set_state_ex(new_state_ex);
+            if (thrd->restore_state(new_state, new_state_ex, previous_state))
                 break;
-            }
 
             // state has changed since we fetched it from the thread, retry
             LTM_(error)

@@ -232,7 +232,7 @@ namespace hpx {
     int pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy>
-    threads::thread_state
+    threads::thread_state_enum
     runtime_impl<SchedulingPolicy>::run_helper(
         util::function_nonser<runtime::hpx_main_function_type> func, int& result)
     {
@@ -246,7 +246,7 @@ namespace hpx {
         if (result) {
             LBT_(info) << "runtime_impl::run_helper: bootstrap "
                           "aborted, bailing out";
-            return threads::thread_state(threads::terminated);
+            return threads::terminated;
         }
 
         LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
@@ -284,7 +284,7 @@ namespace hpx {
             // Call hpx_main
             result = func();
         }
-        return threads::thread_state(threads::terminated);
+        return threads::terminated;
     }
 
     template <typename SchedulingPolicy>

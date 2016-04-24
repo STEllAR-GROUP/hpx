@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
+#include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/spinlock_pool.hpp>
@@ -130,8 +130,6 @@ namespace hpx { namespace threads
             return current_state_.load(boost::memory_order_acquire);
         }
 
-        // REVIEW: Should this be private, and threadmanager be made a friend of
-        // thread_data?
         /// The set_state function changes the state of this thread instance.
         ///
         /// \param newstate [in] The new state to be set for the thread.
@@ -144,14 +142,16 @@ namespace hpx { namespace threads
         ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_state_enum newstate)
+        thread_state set_state(thread_state_enum state, thread_state_ex_enum state_ex)
         {
-            thread_state prev_state = current_state_.load(boost::memory_order_acquire);
+            thread_state prev_state =
+                current_state_.load(boost::memory_order_acquire);
+
             for (;;) {
                 thread_state tmp = prev_state;
 
-                if (HPX_LIKELY(current_state_.compare_exchange_strong(
-                        tmp, thread_state(newstate, tmp.get_tag() + 1))))
+                if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
+                        thread_state(state, state_ex, tmp.tag() + 1))))
                 {
                     return prev_state;
                 }
@@ -163,8 +163,10 @@ namespace hpx { namespace threads
             thread_state& prev_state, thread_state& new_tagged_state)
         {
             thread_state tmp = prev_state;
+            thread_state_ex_enum state_ex = tmp.state_ex();
 
-            new_tagged_state = thread_state(newstate, prev_state.get_tag() + 1);
+            new_tagged_state = thread_state(newstate, state_ex,
+                prev_state.tag() + 1);
             if (current_state_.compare_exchange_strong(tmp, new_tagged_state))
                 return true;
 
@@ -193,28 +195,20 @@ namespace hpx { namespace threads
         ///
         /// \returns This function returns \a true if the state has been
         ///          changed successfully
-        bool restore_state(thread_state_enum new_state, thread_state old_state)
+        bool restore_state(thread_state new_state, thread_state old_state)
         {
-            return current_state_.compare_exchange_strong(
-                old_state, thread_state(new_state, old_state.get_tag() + 1));
+            return current_state_.compare_exchange_strong(old_state,
+                thread_state(new_state, old_state.tag() + 1));
         }
 
-        /// The get_state_ex function queries the extended state of this
-        /// thread instance.
-        ///
-        /// \returns        This function returns the current extended state of
-        ///                 this thread. It will return one of the values as
-        ///                 defined by the \a thread_state_ex enumeration.
-        ///
-        /// \note           This function will be seldom used directly. Most of
-        ///                 the time the extended state of a thread will be
-        ///                 retrieved by using the function
-        ///                 \a threadmanager#get_state_ex.
-        thread_state_ex get_state_ex() const
+        bool restore_state(thread_state_enum new_state,
+            thread_state_ex_enum state_ex, thread_state old_state)
         {
-            return current_state_ex_.load(boost::memory_order_acquire);
+            return current_state_.compare_exchange_strong(old_state,
+                thread_state(new_state, state_ex, old_state.tag() + 1));
         }
 
+    private:
         /// The set_state function changes the extended state of this
         /// thread instance.
         ///
@@ -224,23 +218,25 @@ namespace hpx { namespace threads
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager.
-        thread_state_ex set_state_ex(thread_state_ex_enum new_state)
+        thread_state_ex_enum set_state_ex(thread_state_ex_enum new_state)
         {
-            thread_state_ex prev_state =
-                current_state_ex_.load(boost::memory_order_acquire);
+            thread_state prev_state =
+                current_state_.load(boost::memory_order_acquire);
 
             for (;;) {
-                thread_state_ex tmp = prev_state;
+                thread_state tmp = prev_state;
 
-                if (HPX_LIKELY(current_state_ex_.compare_exchange_strong(
-                        tmp, thread_state_ex(new_state, tmp.get_tag() + 1))))
+                if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
+                        thread_state(tmp.state(), new_state, tmp.tag()))))
                 {
-                    return prev_state;
+                    return prev_state.state_ex();
                 }
+
                 prev_state = tmp;
             }
         }
 
+    public:
         /// Return the id of the component this thread is running in
         naming::address::address_type get_component_id() const
         {
@@ -335,11 +331,11 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        void set_marked_state(thread_state mark) const
+        void set_marked_state(thread_state_enum mark) const
         {
             marked_state_ = mark;
         }
-        thread_state get_marked_state() const
+        thread_state_enum get_marked_state() const
         {
             return marked_state_;
         }
@@ -487,13 +483,8 @@ namespace hpx { namespace threads
         ///                 thread's scheduling status.
         thread_state_enum operator()()
         {
-            thread_state_ex current_state_ex = get_state_ex();
-            current_state_ex_.store(thread_state_ex(wait_signaled,
-                current_state_ex.get_tag() + 1), boost::memory_order_release);
-
             HPX_ASSERT(this_() == coroutine_.get_thread_id());
-
-            return coroutine_(current_state_ex);
+            return coroutine_(set_state_ex(wait_signaled));
         }
 
         thread_id_type get_thread_id() const
@@ -549,9 +540,8 @@ namespace hpx { namespace threads
     private:
         /// Construct a new \a thread
         thread_data(thread_init_data& init_data,
-            pool_type& pool, thread_state_enum newstate)
-          : current_state_(thread_state(newstate)),
-            current_state_ex_(thread_state_ex(wait_signaled)),
+                pool_type& pool, thread_state_enum newstate)
+          : current_state_(thread_state(newstate, wait_signaled)),
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             component_id_(init_data.lva),
 #endif
@@ -606,8 +596,8 @@ namespace hpx { namespace threads
         {
             free_thread_exit_callbacks();
 
-            current_state_.store(thread_state(newstate));
-            current_state_ex_.store(thread_state_ex(wait_signaled));
+            current_state_.store(thread_state(newstate, wait_signaled));
+
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             component_id_ = init_data.lva;
 #endif
@@ -621,7 +611,7 @@ namespace hpx { namespace threads
             parent_thread_phase_ = init_data.parent_phase;
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            set_marked_state(thread_state(unknown));
+            set_marked_state(unknown);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             backtrace_ = 0;
@@ -655,7 +645,6 @@ namespace hpx { namespace threads
         }
 
         mutable boost::atomic<thread_state> current_state_;
-        mutable boost::atomic<thread_state_ex> current_state_ex_;
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
@@ -675,7 +664,7 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        mutable thread_state marked_state_;
+        mutable thread_state_enum marked_state_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION

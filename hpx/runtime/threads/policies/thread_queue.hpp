@@ -877,7 +877,7 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::const_iterator it = thread_map_.begin();
                  it != end; ++it)
             {
-                if ((*it)->get_state() == state)
+                if ((*it)->get_state().state() == state)
                     ++num_threads;
             }
             return num_threads;
@@ -891,10 +891,9 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
             {
-                if ((*it)->get_state() == suspended)
+                if ((*it)->get_state().state() == suspended)
                 {
-                    (*it)->set_state_ex(wait_abort);
-                    (*it)->set_state(pending);
+                    (*it)->set_state(pending, wait_abort);
                     schedule_thread((*it).get());
                 }
             }

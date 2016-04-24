@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Patricia Grubel
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -68,6 +69,31 @@ namespace hpx { namespace threads
         if (state < unknown || state > staged)
             return "unknown";
         return strings::thread_state_names[state];
+    }
+
+    char const* get_thread_state_name(thread_state state)
+    {
+        return get_thread_state_name(state.state());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace strings
+    {
+        char const* const thread_state_ex_names[] =
+        {
+            "wait_unknown",
+            "wait_signaled",
+            "wait_timeout",
+            "wait_terminate",
+            "wait_abort"
+        };
+    }
+
+    char const* get_thread_state_ex_name(thread_state_ex_enum state_ex)
+    {
+        if (state_ex < wait_unknown || state_ex > wait_abort)
+            return "wait_unknown";
+        return strings::thread_state_ex_names[state_ex];
     }
 
     ///////////////////////////////////////////////////////////////////////////
