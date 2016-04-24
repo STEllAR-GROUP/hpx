@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -80,15 +80,16 @@ namespace hpx { namespace threads { namespace detail
         // execution
         thread_state operator=(thread_state_enum new_state)
         {
-            return prev_state_ = thread_state(new_state, prev_state_.get_tag() + 1);
+            return prev_state_ = thread_state(new_state,
+                prev_state_.state_ex(), prev_state_.tag() + 1);
         }
 
         // Get the state this thread was in before execution (usually pending),
         // this helps making sure no other worker-thread is started to execute this
         // HPX-thread in the meantime.
-        thread_state get_previous() const
+        thread_state_enum get_previous() const
         {
-            return prev_state_;
+            return prev_state_.state();
         }
 
         // This restores the previous state, while making sure that the
@@ -277,7 +278,7 @@ namespace hpx { namespace threads { namespace detail
                 // Any non-pending HPX threads are leftovers from a set_state()
                 // call for a previously pending HPX thread (see comments above).
                 thread_state state = thrd->get_state();
-                thread_state_enum state_val = state;
+                thread_state_enum state_val = state.state();
 
                 detail::write_old_state_log(num_thread, thrd, state_val);
 
@@ -304,15 +305,14 @@ namespace hpx { namespace threads { namespace detail
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
                                 exec_time_wrapper exec_time_collector(idle_rate);
+
 #if defined(HPX_HAVE_APEX)
                                 util::apex_wrapper apex_profiler(
                                     thrd->get_description());
 
                                 thrd_stat = (*thrd)();
 
-                                thread_state prev_state = thrd_stat.get_previous();
-                                thread_state_enum prev_state_enum = prev_state;
-                                if (prev_state_enum == terminated)
+                                if (thrd_stat.get_previous() == terminated)
                                 {
                                     apex_profiler.stop();
                                 }
@@ -348,7 +348,8 @@ namespace hpx { namespace threads { namespace detail
                                 num_thread, thrd, state_val, "no state change");
                             continue;
                         }
-                        state_val = state;
+
+                        state_val = state.state();
 
                         // any exception thrown from the thread will reset its
                         // state at this point

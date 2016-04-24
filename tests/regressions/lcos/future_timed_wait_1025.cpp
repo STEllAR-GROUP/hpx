@@ -54,7 +54,7 @@ void test_wait_for()
 
     hpx::threads::thread_state thread_state =
         hpx::threads::get_thread_state(thread.native_handle());
-    HPX_TEST(thread_state == hpx::threads::suspended);
+    HPX_TEST(thread_state.state() == hpx::threads::suspended);
 
     if (thread.joinable())
     {
@@ -78,7 +78,7 @@ void test_wait_until()
 
     hpx::threads::thread_state thread_state =
         hpx::threads::get_thread_state(thread.native_handle());
-    HPX_TEST(thread_state == hpx::threads::suspended);
+    HPX_TEST(thread_state.state() == hpx::threads::suspended);
 
     if (thread.joinable())
     {

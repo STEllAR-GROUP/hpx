@@ -63,8 +63,8 @@ namespace detail
         for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
         {
             threads::thread_data const* thrd = (*it).get();
-            threads::thread_state state = thrd->get_state();
-            threads::thread_state marked_state = thrd->get_marked_state();
+            threads::thread_state_enum state = thrd->get_state().state();
+            threads::thread_state_enum marked_state = thrd->get_marked_state();
 
             if (state != marked_state) {
                 // log each thread only once
@@ -121,7 +121,7 @@ namespace detail
 
                 // result should be true if we found only suspended threads
                 if (collect_suspended) {
-                    switch(state.get_state()) {
+                    switch(state) {
                     case threads::suspended:
                         result = true;    // at least one is suspended
                         break;

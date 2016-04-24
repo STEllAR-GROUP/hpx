@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -100,8 +100,7 @@ namespace hpx { namespace parcelset
             // We should not allow any exceptions to escape the execution of the
             // action as this would bring down the ASIO thread we execute in.
             try {
-                act->get_thread_function(0)
-                    (threads::thread_state_ex(threads::wait_signaled));
+                act->get_thread_function(0)(threads::wait_signaled);
             }
             catch (...) {
                 hpx::report_error(boost::current_exception());

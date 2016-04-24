@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //
@@ -14,6 +14,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -54,7 +55,8 @@ namespace hpx { namespace threads
         virtual boost::int64_t get_thread_count(
             thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
-            std::size_t num_thread = std::size_t(-1), bool reset = false) const = 0;
+            std::size_t num_thread = std::size_t(-1),
+            bool reset = false) const = 0;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
