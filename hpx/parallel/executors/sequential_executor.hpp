@@ -15,7 +15,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <iterator>
@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F, typename ... Ts>
-        static typename hpx::util::result_of<F&&(Ts&&...)>::type
+        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
         execute(F && f, Ts &&... ts)
         {
             try {

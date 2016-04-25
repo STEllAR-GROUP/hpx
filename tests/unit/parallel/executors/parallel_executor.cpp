@@ -43,7 +43,7 @@ void test_async()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(hpx::thread::id tid, int value, int passed_through)
+void bulk_test(int value, hpx::thread::id tid, int passed_through)
 {
     HPX_TEST(tid != hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -63,7 +63,8 @@ void test_bulk_sync()
     using hpx::util::placeholders::_2;
 
     executor exec;
-    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, tid, _1, _2), v, 42);
+    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
+    traits::bulk_execute(exec, &bulk_test, v, tid, 42);
 }
 
 void test_bulk_async()
@@ -81,7 +82,11 @@ void test_bulk_async()
 
     executor exec;
     hpx::when_all(traits::bulk_async_execute(
-        exec, hpx::util::bind(&bulk_test, tid, _1, _2), v, 42)).get();
+        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
+    ).get();
+    hpx::when_all(
+        traits::bulk_async_execute(exec, &bulk_test, v, tid, 42)
+    ).get();
 }
 
 int hpx_main(int argc, char* argv[])

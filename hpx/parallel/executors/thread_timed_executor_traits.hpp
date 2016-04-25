@@ -12,11 +12,13 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/parallel/executors/timed_executor_traits.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -69,17 +71,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             scheduled at to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This calls exec.apply_execute_at(abs_time, f), if available,
         ///       otherwise it emulates timed scheduling by delaying calling
         ///       exec.apply_execute() on the underlying non-scheduled
         ///       execution agent while discarding the returned future.
         ///
-        template <typename F>
+        template <typename F, typename ... Ts>
         static void apply_execute_at(executor_type& sched,
-            hpx::util::steady_time_point const& abs_time, F && f)
+            hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
         {
-            sched.add_at(abs_time, std::forward<F>(f), "apply_execute_at");
+            sched.add_at(abs_time,
+                hpx::util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...),
+                "apply_execute_at");
         }
 
         /// \brief Singleton form of asynchronous fire & forget execution agent
@@ -95,12 +101,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function should be scheduled to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        template <typename F>
+        template <typename F, typename ... Ts>
         static void apply_execute_after(executor_type& sched,
-            hpx::util::steady_duration const& rel_time, F && f)
+            hpx::util::steady_duration const& rel_time, F && f, Ts &&... ts)
         {
-            sched.add_after(rel_time, std::forward<F>(f), "apply_execute_at");
+            sched.add_after(rel_time,
+                hpx::util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...),
+                "apply_execute_at");
         }
 
         /// \brief Singleton form of asynchronous execution agent creation
@@ -115,19 +125,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             scheduled at to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns f()'s result through a future
+        /// \returns f(ts...)'s result through a future
         ///
-        template <typename F>
-        static hpx::future<typename hpx::util::result_of<F()>::type>
+        template <typename F, typename ... Ts>
+        static hpx::future<
+            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        >
         async_execute_at(executor_type& sched,
-                hpx::util::steady_time_point const& abs_time, F && f)
+            hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
         {
-            typedef typename hpx::util::result_of<F()>::type result_type;
+            typedef typename hpx::util::detail::deferred_result_of<
+                    F(Ts&&...)
+                >::type result_type;
 
-            lcos::local::packaged_task<result_type()> task(std::forward<F>(f));
+            lcos::local::packaged_task<result_type(Ts...)>
+                task(std::forward<F>(f));
+
             hpx::future<result_type> result = task.get_future();
-            sched.add_at(abs_time, std::move(task), "async_execute_at");
+            sched.add_at(abs_time,
+                hpx::util::deferred_call(
+                    std::move(task), std::forward<Ts>(ts)...),
+                "async_execute_at");
             return result;
         }
 
@@ -143,19 +163,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function should be scheduled to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns f()'s result through a future
+        /// \returns f(ts...)'s result through a future
         ///
-        template <typename F>
-        static hpx::future<typename hpx::util::result_of<F()>::type>
+        template <typename F, typename ... Ts>
+        static hpx::future<
+            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        >
         async_execute_after(executor_type& sched,
-                hpx::util::steady_duration const& rel_time, F && f)
+            hpx::util::steady_duration const& rel_time, F && f, Ts &&... ts)
         {
-            typedef typename hpx::util::result_of<F()>::type result_type;
+            typedef typename hpx::util::detail::deferred_result_of<
+                    F(Ts&&...)
+                >::type result_type;
 
-            lcos::local::packaged_task<result_type()> task(std::forward<F>(f));
+            lcos::local::packaged_task<result_type(Ts...)>
+                task(std::forward<F>(f));
+
             hpx::future<result_type> result = task.get_future();
-            sched.add_after(rel_time, std::move(task), "async_execute_after");
+            sched.add_after(rel_time,
+                hpx::util::deferred_call(
+                    std::move(task), std::forward<Ts>(ts)...),
+                "async_execute_after");
             return result;
         }
 
@@ -172,15 +202,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             scheduled at to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns f()'s result
+        /// \returns f(ts...)'s result
         ///
-        template <typename F>
-        static typename hpx::util::result_of<F()>::type
+        template <typename F, typename ... Ts>
+        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
         execute_at(executor_type& sched,
-                hpx::util::steady_time_point const& abs_time, F && f)
+            hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
         {
-            return async_execute_at(sched, abs_time, std::forward<F>(f)).get();
+            return async_execute_at(sched, abs_time, std::forward<F>(f),
+                std::forward<Ts>(ts)...).get();
         }
 
         /// \brief Singleton form of synchronous execution agent creation
@@ -196,15 +228,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function should be scheduled to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns f()'s result
+        /// \returns f(ts...)'s result
         ///
-        template <typename F>
-        static typename hpx::util::result_of<F()>::type
+        template <typename F, typename ... Ts>
+        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
         execute_after(executor_type& sched,
-                hpx::util::steady_duration const& rel_time, F && f)
+            hpx::util::steady_duration const& rel_time, F && f, Ts &&... ts)
         {
-            return async_execute_after(sched, rel_time, std::forward<F>(f)).get();
+            return async_execute_after(sched, rel_time, std::forward<F>(f),
+                std::forward<Ts>(ts)...).get();
         }
     };
 }}}

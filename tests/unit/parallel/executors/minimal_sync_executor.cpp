@@ -32,7 +32,7 @@ void apply_test(hpx::lcos::local::latch& l, hpx::thread::id& id,
     l.count_down(1);
 }
 
-void sync_bulk_test(hpx::thread::id tid, int value, int passed_through)
+void sync_bulk_test(int value, hpx::thread::id tid, int passed_through)
 {
     HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -81,7 +81,8 @@ void test_bulk_sync(Executor& exec)
 
     typedef hpx::parallel::executor_traits<Executor> traits;
     traits::bulk_execute(exec,
-        hpx::util::bind(&sync_bulk_test, tid, _1, _2), v, 42);
+        hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42);
+    traits::bulk_execute(exec, &sync_bulk_test, v, tid, 42);
 }
 
 template <typename Executor>
@@ -97,7 +98,11 @@ void test_bulk_async(Executor& exec)
 
     typedef hpx::parallel::executor_traits<Executor> traits;
     hpx::when_all(traits::bulk_async_execute(
-        exec, hpx::util::bind(&sync_bulk_test, tid, _1, _2), v, 42)).get();
+        exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42)
+    ).get();
+    hpx::when_all(traits::bulk_async_execute(
+        exec, &sync_bulk_test, v, tid, 42)
+    ).get();
 }
 
 template <typename Executor>
@@ -126,7 +131,7 @@ struct test_sync_executor2 : hpx::parallel::executor_tag
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::result_of<F&&(Ts&&...)>::type>
+    hpx::future<typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
     async_execute(F && f, Ts &&... ts)
     {
         return hpx::async(hpx::launch::sync, std::forward<F>(f),
@@ -144,7 +149,7 @@ struct test_sync_executor1 : test_sync_executor2
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    typename hpx::util::result_of<F&&(Ts&&...)>::type
+    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
     execute(F && f, Ts &&... ts)
     {
         return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);

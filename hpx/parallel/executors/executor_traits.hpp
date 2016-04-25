@@ -14,7 +14,6 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/invoke.hpp>
@@ -168,8 +167,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 )
             {
                 try {
-                    typedef typename hpx::util::result_of<F&&(Ts&&...)>::type
-                        result_type;
+                    typedef typename hpx::util::detail::deferred_result_of<
+                            F(Ts&&...)
+                        >::type result_type;
 
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
                     std::experimental::optional<result_type> out;
@@ -225,7 +225,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 )
             {
                 typedef std::is_void<
-                        typename hpx::util::result_of<F&&(Ts&&...)>::type
+                        typename hpx::util::detail::deferred_result_of<
+                            F(Ts&&...)
+                        >::type
                     > is_void;
                 return call_impl(exec, std::forward<F>(f), is_void(),
                     std::forward<Ts>(ts)...);
@@ -245,7 +247,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F, typename ... Ts>
         auto call_execute(Executor& exec, F && f, Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::result_of<F&&(Ts&&...)>::type
+        ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
 #else
         ->  decltype(
                 execute_helper::call(0, exec, std::forward<F>(f),
@@ -268,7 +270,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     std::iterator_traits<iterator_type>::value_type
                 value_type;
             typedef typename
-                    hpx::util::result_of<F(value_type, Ts...)>::type
+                    hpx::util::detail::deferred_result_of<
+                        F(value_type, Ts...)
+                    >::type
                 type;
         };
 
@@ -486,6 +490,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This calls exec.apply_execute(f, ts...), if available, otherwise
         ///       it calls exec.async_execute() while discarding the returned
@@ -507,6 +512,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         /// \note Executors have to implement only `async_execute()`. All other
         ///       functions will be emulated by this `executor_traits` in terms
@@ -515,13 +521,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         /// \note This calls exec.async_execute(f)
         ///
-        /// \returns f()'s result through a future
+        /// \returns f(ts...)'s result through a future
         ///
         template <typename F, typename ... Ts>
         static auto async_execute(executor_type& exec, F && f, Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
         ->  typename future<
-                typename hpx::util::result_of<F&&(Ts&&...)>::type
+                typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
             >::type
 #else
         ->  decltype(
@@ -542,8 +548,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns f()'s result
+        /// \returns f(ts...)'s result
         ///
         /// \note This calls exec.execute(f) if it exists;
         ///       otherwise hpx::async(f).get()
@@ -551,7 +558,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F, typename ... Ts>
         static auto execute(executor_type& exec, F && f, Ts &&...ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::result_of<F&&(Ts&&...)>::type
+        ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
 #else
         ->  decltype(
                 detail::call_execute(exec, std::forward<F>(f),
@@ -580,6 +587,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///              given executor.
         /// \param shape [in] The shape objects which defines the iteration
         ///              boundaries for the arguments to be passed to \a f.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns The return type of \a executor_type::async_execute if
         ///          defined by \a executor_type. Otherwise a vector
@@ -626,6 +634,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///              given executor.
         /// \param shape [in] The shape objects which defines the iteration
         ///              boundaries for the arguments to be passed to \a f.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns The return type of \a executor_type::execute if defined
         ///          by \a executor_type. Otherwise a vector holding the

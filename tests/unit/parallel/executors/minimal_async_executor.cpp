@@ -7,7 +7,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/decay.hpp>
 
 #include <algorithm>
 #include <cstdlib>
@@ -33,7 +32,7 @@ void apply_test(hpx::lcos::local::latch& l, hpx::thread::id& id,
     l.count_down(1);
 }
 
-void async_bulk_test(hpx::thread::id tid, int value, int passed_through)
+void async_bulk_test(int value, hpx::thread::id tid, int passed_through)
 {
     HPX_TEST(tid != hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -82,7 +81,8 @@ void test_bulk_sync(Executor& exec)
 
     typedef hpx::parallel::executor_traits<Executor> traits;
     traits::bulk_execute(exec,
-        hpx::util::bind(&async_bulk_test, tid, _1, _2), v, 42);
+        hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42);
+    traits::bulk_execute(exec, &async_bulk_test, v, tid, 42);
 }
 
 template <typename Executor>
@@ -97,8 +97,13 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_2;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    hpx::when_all(traits::bulk_async_execute(
-        exec, hpx::util::bind(&async_bulk_test, tid, _1, _2), v, 42)).get();
+    hpx::when_all(
+        traits::bulk_async_execute(
+            exec, hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42)
+    ).get();
+    hpx::when_all(
+        traits::bulk_async_execute(exec, &async_bulk_test, v, tid, 42)
+    ).get();
 }
 
 template <typename Executor>
@@ -136,7 +141,7 @@ struct test_async_executor2 : hpx::parallel::executor_tag
 struct test_async_executor1 : test_async_executor2
 {
     template <typename F, typename ... Ts>
-    typename hpx::util::result_of<F&&(Ts&&...)>::type
+    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
     execute(F && f, Ts &&... ts)
     {
         return hpx::async(hpx::launch::async, std::forward<F>(f),

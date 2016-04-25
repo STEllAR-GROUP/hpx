@@ -55,7 +55,7 @@ struct void_parallel_executor : parallel_executor
 ////////////////////////////////////////////////////////////////////////////////
 // Tests to void_parallel_executor behavior for the bulk executes
 
-void bulk_test(hpx::thread::id tid, int value, int passed_through)
+void bulk_test(int value, hpx::thread::id tid, int passed_through)
 {
     HPX_TEST(tid != hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -75,7 +75,8 @@ void test_void_bulk_sync()
     using hpx::util::placeholders::_2;
 
     executor exec;
-    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, tid, _1, _2), v, 42);
+    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
+    traits::bulk_execute(exec, &bulk_test, v, tid, 42);
 }
 
 void test_void_bulk_async()
@@ -89,12 +90,14 @@ void test_void_bulk_async()
     std::iota(boost::begin(v), boost::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
 
     executor exec;
     hpx::when_all(
         traits::bulk_async_execute(exec,
-            hpx::util::bind(&bulk_test, tid, _1, _2), v, 42)
+            hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
     ).get();
+    hpx::when_all(traits::bulk_async_execute(exec, &bulk_test, v, tid, 42)).get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

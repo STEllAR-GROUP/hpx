@@ -11,6 +11,7 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <type_traits>
