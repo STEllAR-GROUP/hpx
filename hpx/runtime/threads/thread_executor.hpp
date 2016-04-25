@@ -13,7 +13,6 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/safe_bool.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -250,10 +249,15 @@ namespace hpx { namespace threads
             return executor_data_->set_scheduler_mode(mode);
         }
 
-        operator util::safe_bool<executor>::result_type() const
+        explicit operator bool() const HPX_NOEXCEPT
         {
             // avoid compiler warning about conversion to bool
-            return util::safe_bool<executor>()(executor_data_.get() ? true : false);
+            return executor_data_.get() ? true : false;
+        }
+
+        bool operator==(executor const& rhs) const
+        {
+            return executor_data_ == rhs.executor_data_;
         }
 
     protected:

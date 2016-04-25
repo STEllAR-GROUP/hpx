@@ -9,7 +9,6 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
@@ -60,11 +59,10 @@ namespace hpx { namespace naming
           : type_(components::component_invalid), address_(a), offset_(0)
         {}
 
-        // safe operator bool()
-        operator util::safe_bool<address>::result_type() const
+        explicit operator bool() const HPX_NOEXCEPT
         {
-            return util::safe_bool<address>()(!!locality_ &&
-                (components::component_invalid != type_ || 0 != address_));
+            return !!locality_ &&
+                (components::component_invalid != type_ || 0 != address_);
         }
 
         friend bool operator==(address const& lhs, address const& rhs)
