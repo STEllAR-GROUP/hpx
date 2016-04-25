@@ -302,24 +302,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef zip_iterator<
                     RanIter2, std::vector<reduce_key_series_states>::iterator
-                > zip_iterator;
-                typedef typename zip_iterator::value_type zip_type;
+                > zip_iterator_in;
+                typedef typename zip_iterator_in::value_type zip_type_in;
+
+                typedef zip_iterator<
+                    OutIter2, std::vector<reduce_key_series_states>::iterator
+                > zip_iterator_vout;
+                typedef typename zip_iterator_vout::value_type zip_type_out;
+
                 typedef typename std::iterator_traits<RanIter2>::value_type value_type;
 
-                zip_iterator states_begin = make_zip_iterator(values_first,
+                zip_iterator_in states_begin = make_zip_iterator(values_first,
                     std::begin(key_state));
-                zip_iterator states_end = make_zip_iterator(
+                zip_iterator_in states_end = make_zip_iterator(
                     values_first + number_of_keys, std::end(key_state));
-                zip_iterator states_out_begin = make_zip_iterator(values_output,
+                zip_iterator_vout states_out_begin = make_zip_iterator(values_output,
                     std::begin(key_state));
                 //
-                zip_type initial = tuple<float, reduce_key_series_states>(0.0,
+                zip_type_in initial = tuple<float, reduce_key_series_states>(0.0,
                     reduce_key_series_states(true, false));
                 //
                 hpx::parallel::inclusive_scan(sync_policy, states_begin,
                     states_end, states_out_begin, initial,
                     // B is the current entry, A is the one passed in from 'previous'
-                    [](zip_type a, zip_type b)
+                    [](zip_type_in a, zip_type_in b)
                     {
                         value_type a_val = get<0>(a);
                         reduce_key_series_states a_state = get<1>(a);
@@ -354,13 +360,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             std::begin(key_state)),
                         make_zip_iterator(key_last, values_output + number_of_keys,
                             std::end(key_state)),
-                        make_zip_iterator(key_first, values_output,
+                        make_zip_iterator(keys_output, values_output,
                             std::begin(key_state)),
                         // copies to dest only when 'end' state is true
                         [](zip2_ref it)
                         {
                             return get<2>(it).end;
-                        })), key_first, values_output);
+                        })), keys_output, values_output);
             }
         }
 
