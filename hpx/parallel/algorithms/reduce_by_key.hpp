@@ -253,12 +253,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             // each key. The states are start, middle, end of a series and the special
             // state start and end of the sequence
             std::vector<reduce_key_series_states> key_state;
-            using KeyStateIterType = std::vector<reduce_key_series_states>::iterator;
-            using reducebykey_iter =
-                detail::reduce_stencil_iterator<RanIter, reduce_stencil_transformer>;
-            using element_type = typename std::iterator_traits<RanIter>::reference;
-            using zip_ref =
-                typename zip_iterator<reducebykey_iter, KeyStateIterType>::reference;
+            typedef std::vector<reduce_key_series_states>::iterator keystate_iter_type;
+            typedef detail::reduce_stencil_iterator<RanIter, reduce_stencil_transformer>
+                reducebykey_iter;
+            typedef typename std::iterator_traits<RanIter>::reference element_type;
+            typedef typename zip_iterator<reducebykey_iter, keystate_iter_type>
+              ::reference zip_ref;
             //
             const uint64_t number_of_keys = std::distance(key_first, key_last);
             //
@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     key_state[0] = reduce_key_series_states(true, elem0 != elem1);
                     // middle elements
                     reduce_stencil_generate <reduce_stencil_transformer, RanIter,
-                      KeyStateIterType, Compare> kernel;
+                    keystate_iter_type, Compare> kernel;
                     hpx::parallel::for_each(sync_policy,
                         make_zip_iterator(reduce_begin + 1, key_state.begin() + 1),
                         make_zip_iterator(reduce_end - 1, key_state.end() - 1),
@@ -344,10 +344,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 // now copy the values and keys for each element that
                 // is marked by an 'END' state to the final output
-                using zip_iterator2 = hpx::util::zip_iterator<
+                typedef typename hpx::util::zip_iterator<
                     RanIter, OutIter2, std::vector<reduce_key_series_states>::iterator
-                >;
-                using zip2_ref = typename zip_iterator2::reference;
+                >::reference zip2_ref;
 
                 return make_pair_result(std::move(
                     hpx::parallel::copy_if(sync_policy,
