@@ -319,8 +319,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 zip_iterator_vout states_out_begin = make_zip_iterator(values_output,
                     std::begin(key_state));
                 //
-                zip_type_in initial = tuple<float, reduce_key_series_states>(0.0,
-                    reduce_key_series_states(true, false));
+
+                zip_type_in initial = zip_type_in();
                 //
                 hpx::parallel::inclusive_scan(sync_policy, states_begin,
                     states_end, states_out_begin, initial,
