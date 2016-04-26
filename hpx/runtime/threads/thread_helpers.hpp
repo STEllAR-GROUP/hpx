@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREAD_HELPERS_NOV_15_2008_0504PM)
-#define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
+#ifndef HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP
+#define HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
@@ -835,4 +835,4 @@ namespace hpx { namespace threads
     using applier::register_work_nullary;
 }}
 
-#endif
+#endif /*HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP*/
