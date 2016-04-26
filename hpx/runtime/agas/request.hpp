@@ -7,25 +7,22 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685)
-#define HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
+#ifndef HPX_RUNTIME_AGAS_REQUEST_HPP
+#define HPX_RUNTIME_AGAS_REQUEST_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/util/function.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <string>
-
-// The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 13
 
 namespace hpx { namespace agas
 {
@@ -52,13 +49,13 @@ struct HPX_EXPORT request
         namespace_action_code type_
       , naming::gid_type const& lower_
       , naming::gid_type const& upper_
-      , boost::int64_t count_
+      , std::int64_t count_
         );
 
     request(
         namespace_action_code type_
       , naming::gid_type const& gid_
-      , boost::uint64_t count_
+      , std::uint64_t count_
         );
 
     // REVIEW: Should the GVA here be a resolved address?
@@ -77,8 +74,8 @@ struct HPX_EXPORT request
     request(
         namespace_action_code type_
       , parcelset::endpoints_type const & endpoints_
-      , boost::uint64_t count_
-      , boost::uint32_t num_threads_
+      , std::uint64_t count_
+      , std::uint32_t num_threads_
       , naming::gid_type prefix_ = naming::gid_type()
         );
 
@@ -90,7 +87,7 @@ struct HPX_EXPORT request
     request(
         namespace_action_code type_
       , std::string const& name_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
         );
 
     request(
@@ -152,11 +149,11 @@ struct HPX_EXPORT request
         error_code& ec = throws
         ) const;
 
-    boost::uint64_t get_count(
+    std::uint64_t get_count(
         error_code& ec = throws
         ) const;
 
-    boost::int64_t get_credit(
+    std::int64_t get_credit(
         error_code& ec = throws
         ) const;
 
@@ -164,7 +161,7 @@ struct HPX_EXPORT request
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_locality_id(
+    std::uint32_t get_locality_id(
         error_code& ec = throws
         ) const;
 
@@ -209,7 +206,7 @@ struct HPX_EXPORT request
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_num_threads(
+    std::uint32_t get_num_threads(
         error_code& ec = throws
         ) const;
 

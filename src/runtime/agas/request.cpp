@@ -6,18 +6,28 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/runtime/agas/request.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/tuple.hpp>
 
-#include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
+#include <boost/preprocessor/repeat.hpp>
+#include <boost/variant.hpp>
 
+#include <cstdint>
 #include <string>
+#include <utility>
+
+// The number of types that the request's variant can represent.
+#define HPX_AGAS_REQUEST_SUBTYPES 13
 
 namespace hpx { namespace agas
 {
@@ -88,13 +98,13 @@ namespace hpx { namespace agas
             util::tuple<
                 naming::gid_type // lower
               , naming::gid_type // upper
-              , boost::int64_t   // credit
+              , std::int64_t   // credit
             >
             // 0x1
             // primary_ns_unbind_gid
           , util::tuple<
                 naming::gid_type // gid
-              , boost::uint64_t  // count
+              , std::uint64_t  // count
             >
             // 0x2
             // primary_ns_bind_gid
@@ -117,8 +127,8 @@ namespace hpx { namespace agas
             // primary_ns_allocate
           , util::tuple<
                 parcelset::endpoints_type // endpoints
-              , boost::uint64_t           // count
-              , boost::uint32_t           // num_threads
+              , std::uint64_t           // count
+              , std::uint32_t           // num_threads
               , naming::gid_type          // suggested prefix
             >
             // 0x5
@@ -131,7 +141,7 @@ namespace hpx { namespace agas
             // component_ns_bind_prefix
           , util::tuple<
                 std::string     // name
-              , boost::uint32_t // prefix
+              , std::uint32_t // prefix
             >
             // 0x7
             // symbol_ns_bind
@@ -243,7 +253,7 @@ namespace hpx { namespace agas
         namespace_action_code type_
       , naming::gid_type const& lower_
       , naming::gid_type const& upper_
-      , boost::int64_t count_
+      , std::int64_t count_
         )
       : mc(type_)
       , data(new request_data(util::make_tuple(lower_, upper_, count_)))
@@ -254,7 +264,7 @@ namespace hpx { namespace agas
     request::request(
         namespace_action_code type_
       , naming::gid_type const& gid_
-      , boost::uint64_t count_
+      , std::uint64_t count_
         )
       : mc(type_)
       , data(new request_data(util::make_tuple(gid_, count_)))
@@ -289,8 +299,8 @@ namespace hpx { namespace agas
     request::request(
         namespace_action_code type_
       , parcelset::endpoints_type const & endpoints_
-      , boost::uint64_t count_
-      , boost::uint32_t num_threads_
+      , std::uint64_t count_
+      , std::uint32_t num_threads_
       , naming::gid_type prefix_
         )
       : mc(type_)
@@ -313,7 +323,7 @@ namespace hpx { namespace agas
     request::request(
         namespace_action_code type_
       , std::string const& name_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
         )
       : mc(type_)
       , data(new request_data(util::make_tuple(name_, prefix_)))
@@ -437,7 +447,7 @@ namespace hpx { namespace agas
         return data->get_data<request_data::subtype_gid_gva_prefix, 1>(ec);
     }
 
-    boost::uint64_t request::get_count(
+    std::uint64_t request::get_count(
         error_code& ec
         ) const
     { // {{{
@@ -458,7 +468,7 @@ namespace hpx { namespace agas
         }
     } // }}}
 
-    boost::int64_t request::get_credit(
+    std::int64_t request::get_credit(
         error_code& ec
         ) const
     {
@@ -474,7 +484,7 @@ namespace hpx { namespace agas
         return data->get_data<request_data::subtype_ctype, 0>(ec);
     }
 
-    boost::uint32_t request::get_locality_id(
+    std::uint32_t request::get_locality_id(
         error_code& ec
         ) const
     {
@@ -616,7 +626,7 @@ namespace hpx { namespace agas
         return data->get_data<request_data::subtype_name, 0>(ec);
     }
 
-    boost::uint32_t request::get_num_threads(
+    std::uint32_t request::get_num_threads(
         error_code& ec
         ) const
     {
