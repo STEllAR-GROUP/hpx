@@ -15,7 +15,6 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
