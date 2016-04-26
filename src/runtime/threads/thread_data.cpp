@@ -5,13 +5,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
+
+#include <boost/exception_ptr.hpp>
+
+#include <cstddef>
+#include <cstdint>
 
 // #if HPX_DEBUG
 // #  define HPX_DEBUG_THREAD_POOL 1
