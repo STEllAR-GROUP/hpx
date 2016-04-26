@@ -3,15 +3,27 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/state.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
+
+#include <boost/chrono/chrono.hpp>
+#include <boost/intrusive_ptr.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -39,7 +51,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Depending on the subclass implementation, this may block in some
     // situations.
     void current_executor::add(
-        closure_type && f, util::thread_description const& desc,
+        closure_type&& f, util::thread_description const& desc,
         threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -60,7 +72,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     void current_executor::add_at(
         boost::chrono::steady_clock::time_point const& abs_time,
-        closure_type && f, util::thread_description const& desc,
+        closure_type&& f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
@@ -89,7 +101,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     void current_executor::add_after(
         boost::chrono::steady_clock::duration const& rel_time,
-        closure_type && f, util::thread_description const& desc,
+        closure_type&& f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         return add_at(boost::chrono::steady_clock::now() + rel_time,
@@ -97,7 +109,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return an estimate of the number of waiting tasks.
-    boost::uint64_t current_executor::num_pending_closures(
+    std::uint64_t current_executor::num_pending_closures(
         error_code& ec) const
     {
         return scheduler_base_->get_thread_count() -

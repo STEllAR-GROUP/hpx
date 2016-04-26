@@ -3,37 +3,32 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_THREAD_EXECUTOR_JAN_11_2013_0700PM)
-#define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_JAN_11_2013_0700PM
+#ifndef HPX_RUNTIME_THREADS_THREAD_EXECUTOR_HPP
+#define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <boost/chrono/chrono.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/cstdint.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    namespace threads
-    {
-        class HPX_EXPORT executor;
-    }
-
-    HPX_EXPORT std::size_t get_os_thread_count(threads::executor const&);
-}
-
 namespace hpx { namespace threads
 {
     /// \brief Data structure which stores statistics collected by an
@@ -44,9 +39,9 @@ namespace hpx { namespace threads
           : tasks_scheduled_(0), tasks_completed_(0), queue_length_(0)
         {}
 
-        boost::uint64_t tasks_scheduled_;
-        boost::uint64_t tasks_completed_;
-        boost::uint64_t queue_length_;
+        std::uint64_t tasks_scheduled_;
+        std::uint64_t tasks_completed_;
+        std::uint64_t queue_length_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -168,13 +163,13 @@ namespace hpx { namespace threads
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            virtual void add(closure_type && f,
+            virtual void add(closure_type&& f,
                 util::thread_description const& desc,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             // Return an estimate of the number of waiting closures.
-            virtual boost::uint64_t num_pending_closures(error_code& ec) const = 0;
+            virtual std::uint64_t num_pending_closures(error_code& ec) const = 0;
 
             // Reset internal (round robin) thread distribution scheme
             virtual void reset_thread_distribution() {}
@@ -232,11 +227,11 @@ namespace hpx { namespace threads
             // bounds on the executor's queue size.
             virtual void add_at(
                 boost::chrono::steady_clock::time_point const& abs_time,
-                closure_type && f, util::thread_description const& desc,
+                closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             void add_at(util::steady_time_point const& abs_time,
-                closure_type && f, util::thread_description const& desc,
+                closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
                 return add_at(abs_time.value(), std::move(f), desc,
@@ -248,11 +243,11 @@ namespace hpx { namespace threads
             // violate bounds on the executor's queue size.
             virtual void add_after(
                 boost::chrono::steady_clock::duration const& rel_time,
-                closure_type && f, util::thread_description const& desc,
+                closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             void add_after(util::steady_duration const& rel_time,
-                closure_type && f, util::thread_description const& desc,
+                closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
                 return add_after(rel_time.value(), std::move(f), desc,
@@ -304,7 +299,7 @@ namespace hpx { namespace threads
         }
 
         /// Return an estimate of the number of waiting closures.
-        boost::uint64_t num_pending_closures(error_code& ec = throws) const
+        std::uint64_t num_pending_closures(error_code& ec = throws) const
         {
             return executor_data_->num_pending_closures(ec);
         }
@@ -451,4 +446,4 @@ namespace hpx { namespace threads
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
+#endif /*HPX_RUNTIME_THREADS_THREAD_EXECUTOR_HPP*/
