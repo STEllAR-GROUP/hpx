@@ -146,9 +146,9 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
 
 ////////////////////////////////////////////////////////////////////////////////
 template<typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
-void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark, const Op &op,
-    const HelperOp &ho)
-    {
+void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
+    const Op &op, const HelperOp &ho)
+{
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::is_execution_policy<ExPolicy>::value");
