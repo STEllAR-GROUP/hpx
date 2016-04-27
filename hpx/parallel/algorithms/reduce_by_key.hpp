@@ -233,12 +233,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template<
             typename ExPolicy,
             typename RanIter, typename RanIter2, typename OutIter, typename OutIter2,
-            typename Compare
+            typename Compare, typename Func
             >
         static std::pair<OutIter, OutIter2>
         reduce_by_key_impl(ExPolicy &&policy, RanIter key_first, RanIter key_last,
             RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
-            Compare &&comp)
+            Compare &&comp, Func &&func)
         {
             using namespace hpx::parallel::v1::detail;
             using namespace hpx::util;
@@ -253,12 +253,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             // each key. The states are start, middle, end of a series and the special
             // state start and end of the sequence
             std::vector<reduce_key_series_states> key_state;
-            using KeyStateIterType = std::vector<reduce_key_series_states>::iterator;
-            using reducebykey_iter =
-                detail::reduce_stencil_iterator<RanIter, reduce_stencil_transformer>;
-            using element_type = typename std::iterator_traits<RanIter>::reference;
-            using zip_ref =
-                typename zip_iterator<reducebykey_iter, KeyStateIterType>::reference;
+            typedef std::vector<reduce_key_series_states>::iterator keystate_iter_type;
+            typedef detail::reduce_stencil_iterator<RanIter, reduce_stencil_transformer>
+                reducebykey_iter;
+            typedef typename std::iterator_traits<RanIter>::reference element_type;
+            typedef typename zip_iterator<reducebykey_iter, keystate_iter_type>
+              ::reference zip_ref;
             //
             const uint64_t number_of_keys = std::distance(key_first, key_last);
             //
@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     key_state[0] = reduce_key_series_states(true, elem0 != elem1);
                     // middle elements
                     reduce_stencil_generate <reduce_stencil_transformer, RanIter,
-                      KeyStateIterType, Compare> kernel;
+                    keystate_iter_type, Compare> kernel;
                     hpx::parallel::for_each(sync_policy,
                         make_zip_iterator(reduce_begin + 1, key_state.begin() + 1),
                         make_zip_iterator(reduce_end - 1, key_state.end() - 1),
@@ -302,24 +302,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef zip_iterator<
                     RanIter2, std::vector<reduce_key_series_states>::iterator
-                > zip_iterator;
-                typedef typename zip_iterator::value_type zip_type;
+                > zip_iterator_in;
+                typedef typename zip_iterator_in::value_type zip_type_in;
+
+                typedef zip_iterator<
+                    OutIter2, std::vector<reduce_key_series_states>::iterator
+                > zip_iterator_vout;
+                typedef typename zip_iterator_vout::value_type zip_type_out;
+
                 typedef typename std::iterator_traits<RanIter2>::value_type value_type;
 
-                zip_iterator states_begin = make_zip_iterator(values_first,
+                zip_iterator_in states_begin = make_zip_iterator(values_first,
                     std::begin(key_state));
-                zip_iterator states_end = make_zip_iterator(
+                zip_iterator_in states_end = make_zip_iterator(
                     values_first + number_of_keys, std::end(key_state));
-                zip_iterator states_out_begin = make_zip_iterator(values_output,
+                zip_iterator_vout states_out_begin = make_zip_iterator(values_output,
                     std::begin(key_state));
                 //
-                zip_type initial = tuple<float, reduce_key_series_states>(0.0,
-                    reduce_key_series_states(true, false));
+
+                zip_type_in initial = zip_type_in();
                 //
                 hpx::parallel::inclusive_scan(sync_policy, states_begin,
                     states_end, states_out_begin, initial,
                     // B is the current entry, A is the one passed in from 'previous'
-                    [](zip_type a, zip_type b)
+                    [&func](zip_type_in a, zip_type_in b)
                     {
                         value_type a_val = get<0>(a);
                         reduce_key_series_states a_state = get<1>(a);
@@ -331,23 +337,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         // if carrying a start flag, then copy - don't add
                         if (b_state.start) {
                             debug_reduce_by_key(" = " << b_val << std::endl);
-                            return make_tuple(b_val, reduce_key_series_states(
+                            return make_tuple(
+                                b_val,
+                                reduce_key_series_states(
                                     a_state.start || b_state.start, b_state.end));
                         }
                             // normal add of previous + this
                         else {
-                            debug_reduce_by_key(" = " << a_val + b_val << std::endl);
-                            return make_tuple(a_val + b_val, reduce_key_series_states(
+                            debug_reduce_by_key(" = " << func(a_val, b_val) << std::endl);
+                            return make_tuple(
+                                func(a_val, b_val),
+                                reduce_key_series_states(
                                     a_state.start || b_state.start, b_state.end));
                         }
                     });
 
                 // now copy the values and keys for each element that
                 // is marked by an 'END' state to the final output
-                using zip_iterator2 = hpx::util::zip_iterator<
+                typedef typename hpx::util::zip_iterator<
                     RanIter, OutIter2, std::vector<reduce_key_series_states>::iterator
-                >;
-                using zip2_ref = typename zip_iterator2::reference;
+                >::reference zip2_ref;
 
                 return make_pair_result(std::move(
                     hpx::parallel::copy_if(sync_policy,
@@ -355,13 +364,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             std::begin(key_state)),
                         make_zip_iterator(key_last, values_output + number_of_keys,
                             std::end(key_state)),
-                        make_zip_iterator(key_first, values_output,
+                        make_zip_iterator(keys_output, values_output,
                             std::begin(key_state)),
                         // copies to dest only when 'end' state is true
                         [](zip2_ref it)
                         {
                             return get<2>(it).end;
-                        })), key_first, values_output);
+                        })), keys_output, values_output);
             }
         }
 
@@ -378,27 +387,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <
                 typename ExPolicy, typename RanIter, typename RanIter2,
-                typename Compare>
+                typename Compare, typename Func>
             static std::pair<OutIter, OutIter2>
             sequential(ExPolicy &&policy, RanIter key_first, RanIter key_last,
                 RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
-                Compare && comp)
+                Compare && comp, Func &&func)
                 {
                 return reduce_by_key_impl(
                     policy, key_first, key_last,
                     values_first, keys_output, values_output,
-                    std::forward<Compare>(comp));
+                    std::forward<Compare>(comp), std::forward<Func>(func));
                 }
 
             template <
                 typename ExPolicy, typename RanIter, typename RanIter2,
-                typename Compare>
+                typename Compare, typename Func>
             static typename
                 util::detail::algorithm_result<ExPolicy,
                 std::pair<OutIter, OutIter2>>::type
             parallel(ExPolicy &&policy, RanIter key_first, RanIter key_last,
                 RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
-                Compare && comp)
+                Compare && comp, Func &&func)
             {
                 typedef typename hpx::util::decay<ExPolicy>::type::executor_type
                     executor_type;
@@ -413,10 +422,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::util::deferred_call(
                             &hpx::parallel::v1::detail::reduce_by_key_impl<
                                 ExPolicy&, RanIter, RanIter2,
-                                OutIter, OutIter2, Compare&>,
-                            std::ref(policy), key_first, key_last,
-                            values_first, keys_output, values_output,
-                            std::ref(comp))));
+                                OutIter, OutIter2, Compare&, Func&>,
+                                  std::ref(policy), key_first, key_last,
+                                  values_first, keys_output, values_output,
+                                  std::ref(comp), std::ref(func))));
             }
         };
         /// \endcond
@@ -511,6 +520,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename RanIter, typename RanIter2, typename OutIter, typename OutIter2,
         typename Compare =
             std::equal_to<typename std::iterator_traits<RanIter>::value_type>,
+        typename Func = std::plus<
+            typename std::iterator_traits<RanIter2>::value_type>,
         HPX_CONCEPT_REQUIRES_(is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RanIter>::value &&
             hpx::traits::is_iterator<RanIter2>::value &&
@@ -522,7 +533,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     typename util::detail::algorithm_result<ExPolicy, std::pair<OutIter, OutIter2>>::type
         reduce_by_key(ExPolicy &&policy, RanIter key_first, RanIter key_last,
             RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
-            Compare &&comp = Compare())
+            Compare &&comp = Compare(),
+            Func &&func = Func()
+            )
     {
         typedef util::detail::algorithm_result<
             ExPolicy, std::pair<OutIter, OutIter2>> result;
@@ -550,7 +563,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         return detail::reduce_by_key<OutIter,OutIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), key_first, key_last,
             values_first, keys_output, values_output,
-            std::forward<Compare>(comp));
+            std::forward<Compare>(comp),
+            std::forward<Func>(func));
     }
 
 }}}
