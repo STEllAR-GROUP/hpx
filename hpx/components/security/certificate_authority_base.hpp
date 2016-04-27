@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
+#include <hpx/runtime/components/client_base.hpp>
 
-#include <hpx/include/components.hpp>
 #include <hpx/components/security/stubs/certificate_authority_base.hpp>
 
 namespace hpx { namespace components { namespace security

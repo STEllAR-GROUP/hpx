@@ -8,9 +8,10 @@
 #if !defined(HPX_MIGRATE_FROM_STORAGE_FEB_09_2015_0329PM)
 #define HPX_MIGRATE_FROM_STORAGE_FEB_09_2015_0329PM
 
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/naming.hpp>
-#include <hpx/include/traits.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/is_component.hpp>
 
 #include <hpx/components/component_storage/server/migrate_from_storage.hpp>
 

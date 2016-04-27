@@ -8,7 +8,8 @@
 /// This file defines the necessary component boilerplate code which is
 /// required for proper functioning of components in the context of HPX.
 
-#include <hpx/include/components.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/components/component_factory.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 #include <hpx/components/containers/unordered/unordered_map.hpp>

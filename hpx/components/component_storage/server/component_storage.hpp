@@ -6,11 +6,15 @@
 #if !defined(HPX_COMPONENT_STORAGE_SERVER_FEB_04_2015_0143PM)
 #define HPX_COMPONENT_STORAGE_SERVER_FEB_04_2015_0143PM
 
-#include <hpx/include/actions.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/include/naming.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/include/unordered_map.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+
+#include <hpx/components/containers/unordered/unordered_map.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 

@@ -15,11 +15,12 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
-#include <hpx/hpx.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
+#include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

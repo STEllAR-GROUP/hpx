@@ -27,8 +27,9 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 

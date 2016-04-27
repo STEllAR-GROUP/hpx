@@ -13,7 +13,7 @@
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>

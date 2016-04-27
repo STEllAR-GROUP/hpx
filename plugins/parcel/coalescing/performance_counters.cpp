@@ -6,10 +6,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
-#include <hpx/include/components.hpp>
-#include <hpx/include/naming.hpp>
-#include <hpx/include/performance_counters.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/runtime/components/component_startup_shutdown.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/function.hpp>
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 

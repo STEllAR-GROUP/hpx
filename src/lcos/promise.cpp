@@ -5,6 +5,7 @@
 
 #include <hpx/lcos/promise.hpp>
 
+#include <hpx/runtime/components/base_lco_factory.hpp> // EXPORTS create_promise_heap
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/atomic_count.hpp>

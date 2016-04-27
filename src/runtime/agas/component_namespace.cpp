@@ -6,8 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-
-#include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>

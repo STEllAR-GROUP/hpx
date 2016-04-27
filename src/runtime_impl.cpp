@@ -7,8 +7,6 @@
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/include/performance_counters.hpp>
-#include <hpx/include/runtime.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
@@ -22,6 +20,7 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/lcos/latch.hpp>
 
