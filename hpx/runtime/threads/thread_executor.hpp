@@ -21,6 +21,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#include <iosfwd>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -46,6 +48,73 @@ namespace hpx { namespace threads
         boost::uint64_t tasks_completed_;
         boost::uint64_t queue_length_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        class HPX_EXPORT executor_base;
+    }
+
+    class executor_id
+    {
+    private:
+        std::size_t id_;
+
+        friend bool operator== (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
+        friend bool operator!= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
+        friend bool operator< (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
+        friend bool operator> (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
+        friend bool operator<= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
+        friend bool operator>= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
+
+        template <typename Char, typename Traits>
+        friend std::basic_ostream<Char, Traits>&
+        operator<< (std::basic_ostream<Char, Traits>&, executor_id const&);
+
+        friend class detail::executor_base;
+
+    public:
+        executor_id() HPX_NOEXCEPT : id_(0) {}
+        explicit executor_id(std::size_t i) HPX_NOEXCEPT : id_(i) {}
+    };
+
+    inline bool operator== (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    {
+        return x.id_ == y.id_;
+    }
+
+    inline bool operator!= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    {
+        return !(x == y);
+    }
+
+    inline bool operator< (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    {
+        return x.id_ < y.id_;
+    }
+
+    inline bool operator> (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    {
+        return x.id_ > y.id_;
+    }
+
+    inline bool operator<= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    {
+        return !(x.id_ > y.id_);
+    }
+
+    inline bool operator>= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    {
+        return !(x.id_ < y.id_);
+    }
+
+    template <typename Char, typename Traits>
+    std::basic_ostream<Char, Traits>&
+    operator<< (std::basic_ostream<Char, Traits>& out, executor_id const& id)
+    {
+        out << id.id_;
+        return out;
+    }
 
     namespace detail
     {
@@ -83,12 +152,10 @@ namespace hpx { namespace threads
 
         ///////////////////////////////////////////////////////////////////////
         // Main executor interface
-        class executor_base;
-
         void intrusive_ptr_add_ref(executor_base* p);
         void intrusive_ptr_release(executor_base* p);
 
-        class HPX_EXPORT executor_base
+        class executor_base
         {
         public:
             typedef util::unique_function_nonser<void()> closure_type;
@@ -116,14 +183,26 @@ namespace hpx { namespace threads
             virtual std::size_t get_policy_element(
                 threads::detail::executor_parameter p, error_code& ec) const = 0;
 
-            /// Return the mask for processing units the given thread is allowed
-            /// to run on.
+            // Return the mask for processing units the given thread is allowed
+            // to run on.
             virtual mask_cref_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const;
 
-            /// Set the new scheduler mode
+            // Set the new scheduler mode
             virtual void set_scheduler_mode(
                 threads::policies::scheduler_mode mode) {}
+
+            // retrieve executor id
+            virtual executor_id get_id() const
+            {
+                return create_id(reinterpret_cast<std::size_t>(this));
+            }
+
+        protected:
+            static executor_id create_id(std::size_t id)
+            {
+                return executor_id(id);
+            }
 
         private:
             // reference counting
@@ -205,6 +284,7 @@ namespace hpx { namespace threads
 
     public:
         typedef detail::executor_base::closure_type closure_type;
+        typedef executor_id id;
 
         // default constructor creates invalid (non-usable) executor
         executor() {}
@@ -257,7 +337,12 @@ namespace hpx { namespace threads
 
         bool operator==(executor const& rhs) const
         {
-            return executor_data_ == rhs.executor_data_;
+            return get_id() == rhs.get_id();
+        }
+
+        id get_id() const
+        {
+            return executor_data_->get_id();
         }
 
     protected:
