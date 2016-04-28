@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -87,7 +86,7 @@ namespace hpx { namespace naming
         id_type& operator++();
         id_type operator++(int);
 
-        operator util::safe_bool<id_type>::result_type() const;
+        explicit operator bool() const HPX_NOEXCEPT;
 
         // comparison is required as well
         friend bool operator== (id_type const& lhs, id_type const& rhs);

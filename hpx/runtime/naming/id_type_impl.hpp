@@ -61,9 +61,9 @@ namespace hpx { namespace naming
         return id_type((*gid_)++, unmanaged);
     }
 
-    inline id_type::operator util::safe_bool<id_type>::result_type() const
+    inline id_type::operator bool() const HPX_NOEXCEPT
     {
-        return util::safe_bool<id_type>()(gid_ && *gid_);
+        return gid_ && *gid_;
     }
 
     // comparison is required as well

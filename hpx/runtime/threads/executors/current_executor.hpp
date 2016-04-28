@@ -58,11 +58,17 @@ namespace hpx { namespace threads { namespace executors
             // Reset internal (round robin) thread distribution scheme
             void reset_thread_distribution();
 
-            /// Set the new scheduler mode
+            // Set the new scheduler mode
             void set_scheduler_mode(threads::policies::scheduler_mode mode);
 
             // Return the runtime status of the underlying scheduler
             hpx::state get_state() const;
+
+            // retrieve executor id
+            executor_id get_id() const
+            {
+                return create_id(reinterpret_cast<std::size_t>(scheduler_base_));
+            }
 
         protected:
             static threads::thread_state_enum thread_function_nullary(

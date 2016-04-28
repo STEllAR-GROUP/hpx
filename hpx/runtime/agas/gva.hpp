@@ -13,7 +13,6 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>

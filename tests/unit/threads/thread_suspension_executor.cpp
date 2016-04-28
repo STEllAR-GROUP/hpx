@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015 Hartmut Kaiser
+// Copyright (C) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,10 +12,20 @@
 
 #include <boost/assign/std/vector.hpp>
 
+#include <iostream>
 #include <vector>
 
 #define NUM_SUSPEND_TESTS 1000
 #define NUM_YIELD_TESTS 1000
+
+namespace hpx { namespace threads
+{
+    std::ostream& operator<<(std::ostream& os, executor const& exec)
+    {
+        os << exec.get_id();
+        return os;
+    }
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_executor_association_yield()

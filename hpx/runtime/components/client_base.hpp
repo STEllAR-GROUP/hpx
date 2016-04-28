@@ -18,7 +18,6 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -322,18 +321,10 @@ namespace hpx { namespace components
         }
 
         // check whether the embedded shared state is valid
-#ifdef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
         explicit operator bool() const HPX_NOEXCEPT
         {
             return valid();
         }
-#else
-        operator typename util::safe_bool<client_base>::
-            result_type() const HPX_NOEXCEPT
-        {
-            return util::safe_bool<client_base>()(valid());
-        }
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an object on the locality as

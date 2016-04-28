@@ -12,7 +12,6 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/serialization/map.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/bool.hpp>
@@ -124,9 +123,9 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
-        operator util::safe_bool<locality>::result_type() const
+        explicit operator bool() const HPX_NOEXCEPT
         {
-            return util::safe_bool<locality>()(impl_ ? impl_->valid(): false);
+            return impl_ ? impl_->valid(): false;
         }
 
         const char *type() const

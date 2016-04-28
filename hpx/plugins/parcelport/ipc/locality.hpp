@@ -15,7 +15,6 @@
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -52,9 +51,9 @@ namespace hpx { namespace parcelset
                 return "ipc";
             }
 
-            operator util::safe_bool<locality>::result_type() const
+            explicit operator bool() const HPX_NOEXCEPT
             {
-                return util::safe_bool<locality>()(port_ != boost::uint16_t(-1));
+                return port_ != boost::uint16_t(-1);
             }
 
             void save(serialization::output_archive & ar) const
