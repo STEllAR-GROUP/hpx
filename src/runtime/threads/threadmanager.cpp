@@ -26,7 +26,6 @@
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/make_shared.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 

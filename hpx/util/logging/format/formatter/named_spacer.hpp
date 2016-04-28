@@ -28,6 +28,7 @@
 #include <hpx/util/logging/format/formatter/convert_format.hpp> // do_convert_format
 #include <hpx/util/logging/format/array.hpp> // array
 
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {

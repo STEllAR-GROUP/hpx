@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
-#include <boost/enable_shared_from_this.hpp>
+#include <memory>
 
 namespace hpx { namespace parcelset {
 
@@ -22,7 +22,7 @@ namespace hpx { namespace parcelset {
     template <typename Connection, typename BufferType,
         typename ChunkType = serialization::serialization_chunk>
     struct parcelport_connection
-      : boost::enable_shared_from_this<Connection>
+      : std::enable_shared_from_this<Connection>
     {
     private:
         HPX_NON_COPYABLE(parcelport_connection);

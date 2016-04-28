@@ -24,13 +24,13 @@
 #include <boost/tokenizer.hpp>
 
 #include <boost/detail/endian.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -347,10 +347,10 @@ namespace hpx { namespace util
     }
 
     // load information about dynamically discovered plugins
-    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     runtime_configuration::load_modules()
     {
-        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base> >
             plugin_list_type;
 
         namespace fs = boost::filesystem;

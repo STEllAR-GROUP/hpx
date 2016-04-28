@@ -19,8 +19,6 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 

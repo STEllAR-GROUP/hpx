@@ -94,6 +94,7 @@ to a different compute node).
   `std::unique_lock`. Additionally, `condition_variable` no longer aliases
   `condition_variable_any`; its interface now only works with
   `std::unique_lock<local::mutex>`.
+* Uses of `boost::shared_ptr` have been replaced with `std::shared_ptr`.
 
 [heading Bug Fixes (Closed Tickets)]
 

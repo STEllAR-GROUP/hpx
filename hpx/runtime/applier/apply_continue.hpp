@@ -12,8 +12,6 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 
-#include <boost/make_shared.hpp>
-
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////

@@ -19,7 +19,6 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/has_trivial_assign.hpp>
 
@@ -27,6 +26,8 @@
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
+
+#include <memory>
 
 namespace boost {
 namespace lockfree {
@@ -436,7 +437,7 @@ public:
         return pop(reinterpret_cast<T*&>(ret));
     }
 
-    /** Dequeue object from queue to boost::shared_ptr
+    /** Dequeue object from queue to std::shared_ptr
      *
      * if pop operation is successful,
      *  object is written to memory location denoted by ret.
@@ -446,7 +447,7 @@ public:
      * \note Thread-safe and non-blocking
      *
      * */
-    bool pop (boost::shared_ptr<T> & ret)
+    bool pop (std::shared_ptr<T> & ret)
     {
         return pop_smart_ptr(ret);
     }

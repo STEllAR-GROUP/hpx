@@ -8,11 +8,10 @@
 
 #include <hpx/config.hpp>
 
-#include <algorithm>
-
 #include <boost/atomic.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+
+#include <algorithm>
+#include <memory>
 
 namespace hpx { namespace parallel { namespace util
 {
@@ -31,11 +30,11 @@ namespace hpx { namespace parallel { namespace util
     {
     private:
         typedef boost::atomic<T> flag_type;
-        boost::shared_ptr<flag_type> was_cancelled_;
+        std::shared_ptr<flag_type> was_cancelled_;
 
     public:
         cancellation_token(T data)
-          : was_cancelled_(boost::make_shared<flag_type>(data))
+          : was_cancelled_(std::make_shared<flag_type>(data))
         {}
 
         bool was_cancelled(T data) const HPX_NOEXCEPT
@@ -68,11 +67,11 @@ namespace hpx { namespace parallel { namespace util
     {
     private:
         typedef boost::atomic<bool> flag_type;
-        boost::shared_ptr<flag_type> was_cancelled_;
+        std::shared_ptr<flag_type> was_cancelled_;
 
     public:
         cancellation_token()
-          : was_cancelled_(boost::make_shared<flag_type>(false))
+          : was_cancelled_(std::make_shared<flag_type>(false))
         {}
 
         bool was_cancelled() const HPX_NOEXCEPT

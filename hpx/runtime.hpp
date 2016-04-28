@@ -32,7 +32,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
 #include <memory>
@@ -306,13 +305,13 @@ namespace hpx
         /// for the given type yet), registers this factory with the
         /// runtime_support object and asks the factory for it's heap object
         // which can be used to create new promises of the given type.
-        boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
             components::component_type type);
 
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
-            boost::shared_ptr<util::query_counters> const& active_counters);
+            std::shared_ptr<util::query_counters> const& active_counters);
 
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);
@@ -390,8 +389,8 @@ namespace hpx
         mutable boost::mutex mtx_;
 
         util::runtime_configuration ini_;
-        boost::shared_ptr<performance_counters::registry> counters_;
-        boost::shared_ptr<util::query_counters> active_counters_;
+        std::shared_ptr<performance_counters::registry> counters_;
+        std::shared_ptr<util::query_counters> active_counters_;
 
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;

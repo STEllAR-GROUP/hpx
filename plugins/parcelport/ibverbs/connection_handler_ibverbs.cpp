@@ -24,10 +24,9 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <mutex>
-
 #include <string>
 
 #if (defined(__linux) || defined(linux) || defined(__linux__))
@@ -284,11 +283,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         }
     }
 
-    boost::shared_ptr<sender> connection_handler::create_connection(
+    std::shared_ptr<sender> connection_handler::create_connection(
         parcelset::locality const& l, error_code& ec)
     {
         boost::asio::io_service& io_service = io_service_pool_.get_io_service(0);
-        boost::shared_ptr<sender> sender_connection(new sender(*this, memory_pool_,
+        std::shared_ptr<sender> sender_connection(new sender(*this, memory_pool_,
             l, parcels_sent_));
 
         // Connect to the target locality, retry if needed
@@ -367,14 +366,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     }
 
     void connection_handler::add_sender(
-        boost::shared_ptr<sender> const& sender_connection)
+        std::shared_ptr<sender> const& sender_connection)
     {
         std::lock_guard<hpx::lcos::local::spinlock> l(senders_mtx_);
         senders_.push_back(sender_connection);
     }
 
     void add_sender(connection_handler & handler,
-        boost::shared_ptr<sender> const& sender_connection)
+        std::shared_ptr<sender> const& sender_connection)
     {
         handler.add_sender(sender_connection);
     }
@@ -558,7 +557,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         while(!stopped_)
         {
             hpx::util::high_resolution_timer t;
-            boost::shared_ptr<receiver> rcv = acceptor_.accept(
+            std::shared_ptr<receiver> rcv = acceptor_.accept(
                 *this, memory_pool_, boost::system::throws);
             if(rcv)
             {

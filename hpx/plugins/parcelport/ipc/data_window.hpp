@@ -17,8 +17,6 @@
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_io_object.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
 #include <boost/scope_exit.hpp>
@@ -26,6 +24,7 @@
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 
+#include <memory>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,7 +165,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         template <typename Handler, typename Implementation>
         class connect_operation
         {
-            typedef boost::shared_ptr<Implementation> implementation_type;
+            typedef std::shared_ptr<Implementation> implementation_type;
 
         public:
             connect_operation(implementation_type &impl,
@@ -205,10 +204,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         ///////////////////////////////////////////////////////////////////////
         template <typename Handler, typename Implementation>
         class read_operation
-          : public boost::enable_shared_from_this<
+          : public std::enable_shared_from_this<
                 read_operation<Handler, Implementation> >
         {
-            typedef boost::shared_ptr<Implementation> implementation_type;
+            typedef std::shared_ptr<Implementation> implementation_type;
 
         public:
             read_operation(implementation_type &impl,
@@ -256,7 +255,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         template <typename Handler, typename Implementation>
         class read_ack_operation
         {
-            typedef boost::shared_ptr<Implementation> implementation_type;
+            typedef std::shared_ptr<Implementation> implementation_type;
 
         public:
             read_ack_operation(implementation_type &impl,
@@ -301,7 +300,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         template <typename Handler, typename Implementation>
         class write_operation
         {
-            typedef boost::shared_ptr<Implementation> implementation_type;
+            typedef std::shared_ptr<Implementation> implementation_type;
 
         public:
             write_operation(implementation_type &impl,
@@ -340,7 +339,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         template <typename Handler, typename Implementation>
         class write_ack_operation
         {
-            typedef boost::shared_ptr<Implementation> implementation_type;
+            typedef std::shared_ptr<Implementation> implementation_type;
 
         public:
             write_ack_operation(implementation_type &impl,
@@ -389,7 +388,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         ~basic_data_window_service()
         {}
 
-        typedef boost::shared_ptr<Implementation> implementation_type;
+        typedef std::shared_ptr<Implementation> implementation_type;
 
         ///////////////////////////////////////////////////////////////////////
         void construct(implementation_type &impl)
@@ -479,8 +478,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {
             typedef detail::read_operation<Handler, Implementation> operation_type;
 
-            boost::shared_ptr<operation_type> op(
-                boost::make_shared<operation_type>(
+            std::shared_ptr<operation_type> op(
+                std::make_shared<operation_type>(
                     impl, this->get_io_service(), data, handler));
 
             this->get_io_service().post(util::bind(&operation_type::call, op));
@@ -553,7 +552,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         }
 
     protected:
-        boost::shared_ptr<boost::interprocess::message_queue>
+        std::shared_ptr<boost::interprocess::message_queue>
         open_helper(bool open_queue_only, std::string const& name,
             boost::system::error_code &ec)
         {
@@ -565,19 +564,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                     if (manage_lifetime_)
                         message_queue::remove(name.c_str());
 
-                    return boost::make_shared<message_queue>(
+                    return std::make_shared<message_queue>(
                         open_or_create, name.c_str(), msg_num_, sizeof(message));
                 }
                 else {
                     using namespace boost::interprocess;
-                    return boost::make_shared<message_queue>(
+                    return std::make_shared<message_queue>(
                         open_only, name.c_str());
                 }
             }
             catch(boost::interprocess::interprocess_exception const& e) {
                 HPX_IPC_THROWS_IF(ec, make_error_code(e.get_error_code()));
             }
-            return boost::shared_ptr<boost::interprocess::message_queue>();
+            return std::shared_ptr<boost::interprocess::message_queue>();
         }
 
         void open(bool open_only, std::string const& read_name,
@@ -910,9 +909,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     private:
         std::size_t msg_num_;
         std::string there_;
-        boost::shared_ptr<boost::interprocess::message_queue> read_mq_;
+        std::shared_ptr<boost::interprocess::message_queue> read_mq_;
         std::string here_;
-        boost::shared_ptr<boost::interprocess::message_queue> write_mq_;
+        std::shared_ptr<boost::interprocess::message_queue> write_mq_;
         boost::atomic<boost::uint16_t> executing_operation_;
         boost::atomic<bool> aborted_;
         boost::atomic<bool> close_operation_;

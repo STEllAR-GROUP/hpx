@@ -13,8 +13,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <vector>
 
 /**
@@ -118,12 +117,12 @@ void test_delegate()
 {
     std::vector<char> buffer;
     {
-        boost::shared_ptr<A> struct_a(new A(4711));
+        std::shared_ptr<A> struct_a(new A(4711));
         hpx::serialization::output_archive oarchive(buffer);
         oarchive << struct_a;
     }
     {
-        boost::shared_ptr<A> struct_b;
+        std::shared_ptr<A> struct_b;
         hpx::serialization::input_archive iarchive(buffer);
         iarchive >> struct_b;
         HPX_TEST_EQ(struct_b->a, 4711);
@@ -135,12 +134,12 @@ void test_custom_factory()
     std::vector<char> buffer;
 
     {
-        boost::shared_ptr<B> struct_a(new B(1981, false));
+        std::shared_ptr<B> struct_a(new B(1981, false));
         hpx::serialization::output_archive oarchive(buffer);
         oarchive << struct_a;
     }
     {
-        boost::shared_ptr<B> struct_b;
+        std::shared_ptr<B> struct_b;
         hpx::serialization::input_archive iarchive(buffer);
         iarchive >> struct_b;
         HPX_TEST_EQ(struct_b->b, 1981);
@@ -151,12 +150,12 @@ void test_template()
 {
     std::vector<char> buffer;
     {
-        boost::shared_ptr<C<float> > struct_a(new C<float>(777));
+        std::shared_ptr<C<float> > struct_a(new C<float>(777));
         hpx::serialization::output_archive oarchive(buffer);
         oarchive << struct_a;
     }
     {
-        boost::shared_ptr<C<float> > struct_b;
+        std::shared_ptr<C<float> > struct_b;
         hpx::serialization::input_archive iarchive(buffer);
         iarchive >> struct_b;
         HPX_TEST_EQ(struct_b->c, 777);

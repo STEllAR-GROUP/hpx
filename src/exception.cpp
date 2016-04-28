@@ -32,15 +32,14 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 
-#include <stdexcept>
 #include <algorithm>
 #if defined(_POSIX_VERSION)
 #include <iostream>
 #endif
+#include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -213,11 +212,11 @@ namespace hpx { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    inline boost::shared_ptr<boost::exception>
+    inline std::shared_ptr<boost::exception>
     make_exception_ptr(Exception const& e)
     {
-        return boost::static_pointer_cast<boost::exception>(
-            boost::make_shared<Exception>(e));
+        return std::static_pointer_cast<boost::exception>(
+            std::make_shared<Exception>(e));
     }
 
     ///////////////////////////////////////////////////////////////////////////

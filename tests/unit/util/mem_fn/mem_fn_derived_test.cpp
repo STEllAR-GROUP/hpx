@@ -21,9 +21,9 @@
 //
 
 #include <hpx/util/mem_fn.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <iostream>
+#include <memory>
 
 #include <hpx/util/lightweight_test.hpp>
 
@@ -80,7 +80,7 @@ int main()
     X const & rcx = x;
     X const * pcx = &x;
 
-    boost::shared_ptr<X> sp(new X);
+    std::shared_ptr<X> sp(new X);
 
     hpx::util::mem_fn(&X::f0)(x);
     hpx::util::mem_fn(&X::f0)(&x);

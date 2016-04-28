@@ -22,11 +22,10 @@
 #include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <deque>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <set>
 #include <string>
@@ -52,7 +51,7 @@ namespace hpx { namespace parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
     class HPX_EXPORT parcelport
-      : public boost::enable_shared_from_this<parcelport>
+      : public std::enable_shared_from_this<parcelport>
     {
         HPX_NON_COPYABLE(parcelport);
 
@@ -68,7 +67,7 @@ namespace hpx { namespace parcelset
         > write_handler_type;
 
         typedef util::function_nonser<
-            void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
+            void(parcelport& pp, std::shared_ptr<std::vector<char> >,
                  threads::thread_priority)
         > read_handler_type;
 
@@ -368,7 +367,7 @@ namespace hpx { namespace parcelset
         typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
         typedef util::tuple<
-            boost::shared_ptr<std::vector<parcel> >
+            std::shared_ptr<std::vector<parcel> >
           , std::vector<write_handler_type>
           , new_gids_map
         >

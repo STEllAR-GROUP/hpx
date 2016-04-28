@@ -8,8 +8,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <boost/regex.hpp>
-#include <boost/make_shared.hpp>
 
+#include <memory>
 #include <string>
 
 namespace hpx { namespace util
@@ -92,7 +92,7 @@ sed_transform::sed_transform(
     std::string const& search
   , std::string const& replace
     )
-  : command_(boost::make_shared<command>(search, replace))
+  : command_(std::make_shared<command>(search, replace))
 {}
 
 sed_transform::sed_transform(
@@ -102,7 +102,7 @@ sed_transform::sed_transform(
     std::string search, replace;
 
     if (parse_sed_expression(expression, search, replace))
-        command_ = boost::make_shared<command>(search, replace);
+        command_ = std::make_shared<command>(search, replace);
 }
 
 std::string sed_transform::operator()(

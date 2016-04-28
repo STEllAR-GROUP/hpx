@@ -27,9 +27,9 @@
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/xtime.hpp>
-#include <boost/shared_ptr.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // hpx::util::logging::manipulator
 
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace writer {
@@ -55,11 +55,11 @@ namespace detail {
         hpx::util::logging::threading::mutex cs;
 
         // the thread doing the write
-        typedef boost::shared_ptr<boost::thread> thread_ptr;
+        typedef std::shared_ptr<boost::thread> thread_ptr;
         thread_ptr writer;
 
         // ... so that reallocations are fast
-        typedef boost::shared_ptr<msg_type> ptr;
+        typedef std::shared_ptr<msg_type> ptr;
         typedef std::vector<ptr> array;
         array msgs;
     };
@@ -150,7 +150,7 @@ struct on_dedicated_thread
     }
 
     ~on_dedicated_thread() {
-        boost::shared_ptr<boost::thread> writer;
+        std::shared_ptr<boost::thread> writer;
         { scoped_lock lk( non_const_context_base::context().cs);
           non_const_context_base::context().is_working = false;
           writer = non_const_context_base::context().writer;
