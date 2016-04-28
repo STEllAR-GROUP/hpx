@@ -169,6 +169,41 @@ namespace hpx { namespace traits
 
 /// \endcond
 
+///////////////////////////////////////////////////////////////////////////////
+/// \def HPX_DECLARE_PLAIN_ACTION(func, name)
+/// \brief Declares a plain action type
+///
+#define HPX_DECLARE_PLAIN_ACTION(...)                                         \
+    HPX_DECLARE_PLAIN_ACTION_(__VA_ARGS__)                                    \
+    /**/
+
+/// \cond NOINTERNAL
+
+#define HPX_DECLARE_PLAIN_DIRECT_ACTION(...)                                  \
+    HPX_DECLARE_PLAIN_DIRECT_ACTION_(__VA_ARGS__)                             \
+    /**/
+
+#define HPX_DECLARE_PLAIN_ACTION_(...)                                        \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DECLARE_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)              \
+    )(__VA_ARGS__))                                                           \
+    /**/
+
+#define HPX_DECLARE_PLAIN_DIRECT_ACTION_(...)                                 \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DECLARE_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
+    )(__VA_ARGS__))                                                           \
+    /**/
+
+#define HPX_DECLARE_PLAIN_ACTION_1(func)                                      \
+    HPX_DECLARE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))             \
+    /**/
+
+#define HPX_DECLARE_PLAIN_ACTION_2(func, name) struct name;                   \
+    /**/
+
+/// \endcond
+
 /// \def HPX_PLAIN_ACTION(func, name)
 ///
 /// \brief Defines a plain action type based on the given function
