@@ -67,12 +67,7 @@ namespace hpx
     /// \cond NOINTERNAL
     namespace util
     {
-        class HPX_EXPORT io_service_pool;
-        class HPX_EXPORT runtime_configuration;
-
         struct binary_filter;
-
-        class HPX_EXPORT section;
 
         /// \brief Expand INI variables in a string
         HPX_API_EXPORT std::string expand(std::string const& expand);

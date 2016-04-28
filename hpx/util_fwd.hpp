@@ -16,6 +16,7 @@ namespace hpx { namespace util
     /// \cond NOINTERNAL
     class HPX_EXPORT io_service_pool;
     class HPX_EXPORT runtime_configuration;
+    class HPX_EXPORT section;
     /// \endcond
 }}
 
