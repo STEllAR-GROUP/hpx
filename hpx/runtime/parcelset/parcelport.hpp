@@ -282,6 +282,12 @@ namespace hpx { namespace parcelset
             return parcels_received_.total_bytes(reset);
         }
 
+        /// total data (uncompressed) received (bytes)
+        boost::uint64_t get_raw_data_received(bool reset)
+        {
+            return parcels_received_.total_raw_bytes(reset);
+        }
+
         boost::int64_t get_buffer_allocate_time_sent(bool reset)
         {
             return parcels_sent_.total_buffer_allocate_time(reset);
@@ -292,19 +298,13 @@ namespace hpx { namespace parcelset
             return parcels_received_.total_buffer_allocate_time(reset);
         }
 
-        /// total data (uncompressed) received (bytes)
-        boost::uint64_t get_raw_data_received(bool reset)
-        {
-            return parcels_received_.total_raw_bytes(reset);
-        }
-
         boost::uint64_t get_pending_parcels_count(bool /*reset*/)
         {
             std::lock_guard<lcos::local::spinlock> l(mtx_);
             return pending_parcels_.size();
         }
 
-
+        ///////////////////////////////////////////////////////////////////////
         void set_applier(applier::applier * applier)
         {
             applier_ = applier;

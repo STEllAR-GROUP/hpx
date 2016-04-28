@@ -180,18 +180,12 @@ namespace hpx { namespace traits
 /// \cond NOINTERNAL
 
 #define HPX_DECLARE_PLAIN_DIRECT_ACTION(...)                                  \
-    HPX_DECLARE_PLAIN_DIRECT_ACTION_(__VA_ARGS__)                             \
+    HPX_DECLARE_PLAIN_ACTION(__VA_ARGS__)                                     \
     /**/
 
 #define HPX_DECLARE_PLAIN_ACTION_(...)                                        \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_DECLARE_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)              \
-    )(__VA_ARGS__))                                                           \
-    /**/
-
-#define HPX_DECLARE_PLAIN_DIRECT_ACTION_(...)                                 \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DECLARE_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
     )(__VA_ARGS__))                                                           \
     /**/
 

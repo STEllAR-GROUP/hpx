@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2016 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,8 +22,11 @@ macro(add_snappy_module)
 
     add_hpx_library(compress_snappy
       PLUGIN
-      SOURCES "${PROJECT_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"
-      HEADERS "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
+      SOURCES
+        "${PROJECT_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"
+      HEADERS
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter_registration.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${SNAPPY_LIBRARY})
 
