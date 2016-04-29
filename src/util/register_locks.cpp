@@ -12,9 +12,9 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/ptr_container/ptr_map.hpp>
-
+#include <map>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -57,7 +57,7 @@ namespace hpx { namespace util
         struct register_locks
         {
             typedef lcos::local::spinlock mutex_type;
-            typedef boost::ptr_map<void const*, lock_data> held_locks_map;
+            typedef std::map<void const*, lock_data> held_locks_map;
 
             struct held_locks_data
             {
@@ -188,10 +188,10 @@ namespace hpx { namespace util
 
             std::pair<register_locks::held_locks_map::iterator, bool> p;
             if (!data) {
-                p = held_locks.insert(lock, new detail::lock_data);
+                p = held_locks.insert(std::make_pair(lock, detail::lock_data()));
             }
             else {
-                p = held_locks.insert(lock, new detail::lock_data(data));
+                p = held_locks.insert(std::make_pair(lock, detail::lock_data(data)));
             }
             return p.second;
         }
@@ -230,7 +230,7 @@ namespace hpx { namespace util
             for (iterator it = held_locks.begin(); it != end; ++it)
             {
                 //lock_data const& data = *(*it).second;
-                if (!(*it).second->ignore_)
+                if (!it->second.ignore_)
                     return true;
             }
 
@@ -342,7 +342,7 @@ namespace hpx { namespace util
                     return;
                 }
 
-                it->second->ignore_ = status;
+                it->second.ignore_ = status;
             }
         }
     }
@@ -412,5 +412,3 @@ namespace hpx { namespace util
     }
 #endif
 }}
-
-
