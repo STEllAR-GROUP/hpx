@@ -76,8 +76,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
             parallel(ExPolicy && policy, Iter first, Iter last, Pred && pred)
             {
-                typedef typename std::iterator_traits<Iter>::reference
-                    reference;
                 typedef typename std::iterator_traits<Iter>::difference_type
                     difference_type;
                 typedef typename util::detail::algorithm_result<ExPolicy, bool>
