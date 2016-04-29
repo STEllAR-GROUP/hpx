@@ -64,6 +64,7 @@ namespace hpx { namespace util
                 !traits::is_action<F>::value
             >::type>
         explicit thread_description(F const& f, char const* altname = 0) HPX_NOEXCEPT
+          : type_(data_type_description)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
             type_ = data_type_address;
