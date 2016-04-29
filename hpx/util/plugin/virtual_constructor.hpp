@@ -11,10 +11,10 @@
 #include <hpx/util/plugin/config.hpp>
 #include <hpx/util/detail/pack.hpp>
 
+#include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
 
 #include <map>
-#include <memory>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ namespace hpx { namespace util { namespace plugin {
     typedef std::map<std::string, boost::any> exported_plugins_type;
     typedef exported_plugins_type* (HPX_PLUGIN_API *get_plugins_list_type)();
     typedef exported_plugins_type* (HPX_PLUGIN_API get_plugins_list_np)();
-    typedef std::shared_ptr<get_plugins_list_np> dll_handle;
+    typedef boost::shared_ptr<get_plugins_list_np> dll_handle;
 
     ///////////////////////////////////////////////////////////////////////////
     template<typename BasePlugin>

@@ -13,6 +13,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/filesystem/path.hpp>
