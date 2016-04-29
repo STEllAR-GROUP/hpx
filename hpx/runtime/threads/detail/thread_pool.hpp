@@ -17,7 +17,6 @@
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/thread/mutex.hpp>
@@ -154,7 +153,7 @@ namespace hpx { namespace threads { namespace detail
 
     private:
         // this thread manager has exactly as many OS-threads as requested
-        boost::ptr_vector<boost::thread> threads_;
+        std::vector<boost::thread> threads_;
 
         // refer to used scheduler
         Scheduler& sched_;
