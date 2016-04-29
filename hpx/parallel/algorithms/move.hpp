@@ -83,6 +83,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template<typename InIter, typename OutIter, typename Enable = void>
         struct move;
 
@@ -90,23 +91,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct move<
             InIter, OutIter,
             typename std::enable_if<
-                hpx::traits::segmented_iterator_traits<InIter>
-                    ::is_segmented_iterator::value
-            >::type
-        > : public move_pair<std::pair<
-            typename hpx::traits::segmented_iterator_traits<InIter>::local_iterator,
-            typename hpx::traits::segmented_iterator_traits<OutIter>::local_iterator
-        >>
+                iterators_are_segmented<InIter, OutIter>::value
+            >::type>
+          : public move_pair<std::pair<
+                typename hpx::traits::segmented_iterator_traits<InIter>
+                    ::local_iterator,
+                typename hpx::traits::segmented_iterator_traits<OutIter>
+                    ::local_iterator
+            > >
         {};
 
         template<typename InIter, typename OutIter>
         struct move<
             InIter, OutIter,
             typename std::enable_if<
-                !hpx::traits::segmented_iterator_traits<OutIter>
-                    ::is_segmented_iterator::value
-            >::type
-        > : public move_pair<std::pair<InIter, OutIter>>
+                iterators_are_not_segmented<InIter, OutIter>::value
+            >::type>
+          : public move_pair<std::pair<InIter, OutIter> >
         {};
         /// \endcond
     }

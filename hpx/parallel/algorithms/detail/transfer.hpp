@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/transfer.hpp
-
 #if !defined(HPX_PARALLEL_ALGORITHMS_TRANSFER)
 #define HPX_PARALLEL_ALGORITHMS_TRANSFER
 
@@ -18,9 +16,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include <boost/static_assert.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -34,7 +30,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, std::pair<InIter, OutIter>
         >::type
         transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-              std::false_type)
+            std::false_type)
         {
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
@@ -93,14 +89,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //           transfered.
         //
 
-        /// \endcond
         template <typename Algo, typename ExPolicy, typename InIter, typename OutIter,
         HPX_CONCEPT_REQUIRES_(
             hpx::parallel::v1::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_iterator<OutIter>::value)>
         typename util::detail::algorithm_result<
-            ExPolicy, hpx::util::tagged_pair<tag::in(InIter),tag::out(OutIter)>
+            ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
         >::type
         transfer(ExPolicy && policy, InIter first, InIter last, OutIter dest)
         {
@@ -114,7 +109,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-            return hpx::util::make_tagged_pair<tag::in,tag::out>(
+            return hpx::util::make_tagged_pair<tag::in, tag::out>(
                     transfer_<Algo>(
                         std::forward<ExPolicy>(policy), first, last, dest,
                         is_segmented()));
