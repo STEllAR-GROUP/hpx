@@ -30,6 +30,11 @@ namespace hpx { namespace traits
       : boost::is_placeholder<T>
 #endif
     {};
+
+    template <typename T>
+    struct is_placeholder<T const>
+      : is_placeholder<T>
+    {};
 }}
 
-#endif
+#endif /*HPX_TRAITS_IS_PLACEHOLDER_HPP*/

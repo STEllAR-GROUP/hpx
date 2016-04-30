@@ -4,26 +4,15 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-#    bind_and_or_test
-#    bind_cdecl_mf_test
     bind_const_test
     bind_cv_test
     bind_dm2_test
     bind_dm3_test
     bind_dm_test
-#    bind_eq2_test
-#    bind_eq3_test
-#    bind_eq_test
-#    bind_fastcall_mf_test
-#    bind_fastcall_test
-#    bind_not_test
     bind_placeholder_test
-#    bind_rel_test
     bind_rv_sp_test
     bind_rvalue_test
     bind_stateful_test
-#    bind_stdcall_mf_test
-#    bind_stdcall_test
     bind_test
     protect_test
    )
@@ -55,5 +44,3 @@ foreach(test ${tests})
   add_hpx_pseudo_dependencies(tests.unit.util.binddir.${test}
                               ${test}_test_exe)
 endforeach()
-
-

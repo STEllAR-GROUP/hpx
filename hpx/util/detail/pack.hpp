@@ -76,7 +76,7 @@ namespace hpx { namespace util { namespace detail
 
     template <typename ...Ts>
     struct all_of
-      : all_of<pack_c<bool, (Ts::value)...> >
+      : all_of<pack_c<bool, ((bool)Ts::value)...> >
     {};
 
     template <>
@@ -96,12 +96,30 @@ namespace hpx { namespace util { namespace detail
 
     template <typename ...Ts>
     struct any_of
-      : any_of<pack_c<bool, (Ts::value)...> >
+      : any_of<pack_c<bool, ((bool)Ts::value)...> >
     {};
 
     template <>
     struct any_of<> // <fake-type>
       : boost::mpl::false_
+    {};
+
+    template <typename ...Ts>
+    struct none_of;
+
+    template <bool ...Vs>
+    struct none_of<pack_c<bool, Vs...> >
+      : all_of<pack_c<bool, !Vs...> >
+    {};
+
+    template <typename ...Ts>
+    struct none_of
+      : none_of<pack_c<bool, ((bool)Ts::value)...> >
+    {};
+
+    template <>
+    struct none_of<> // <fake-type>
+      : boost::mpl::true_
     {};
 
     template <typename T, typename ...Ts>
