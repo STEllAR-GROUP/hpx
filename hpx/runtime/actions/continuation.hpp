@@ -33,11 +33,10 @@
 #include <hpx/traits/is_executor.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -287,8 +286,11 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ...Ts>
-    typename boost::disable_if_c<
-        boost::is_void<typename util::result_of<F(Ts...)>::type>::value
+    typename std::enable_if<
+        !std::is_same<
+            typename util::result_of<F(Ts...)>::type,
+            util::unused_type
+        >::value
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
         try {
@@ -302,8 +304,11 @@ namespace hpx { namespace actions
     }
 
     template <typename F, typename ...Ts>
-    typename boost::enable_if_c<
-        boost::is_void<typename util::result_of<F(Ts...)>::type>::value
+    typename std::enable_if<
+        std::is_same<
+            typename util::result_of<F(Ts...)>::type,
+            util::unused_type
+        >::value
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
         try {
@@ -698,11 +703,11 @@ namespace hpx
     }
 
     template <typename Cont, typename F>
-    inline typename boost::disable_if<
-        boost::is_same<
+    inline typename std::enable_if<
+        !std::is_same<
             typename util::decay<F>::type,
             hpx::naming::id_type
-        >,
+        >::value,
         hpx::actions::continuation2_impl<
             typename util::decay<Cont>::type,
             typename util::decay<F>::type
@@ -736,7 +741,7 @@ namespace hpx
 namespace hpx { namespace traits {
     template <>
     struct is_continuation<std::unique_ptr<actions::continuation> >
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 
@@ -756,7 +761,7 @@ namespace hpx { namespace traits {
         template <>                                                           \
         struct needs_automatic_registration<                                  \
                 hpx::actions::typed_continuation<Result> >                    \
-          : boost::mpl::false_                                                \
+          : std::false_type                                                   \
         {};                                                                   \
     }}                                                                        \
 /**/
