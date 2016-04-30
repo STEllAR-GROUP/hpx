@@ -7,6 +7,7 @@
 
 #include <hpx/components/component_storage/component_storage.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components
@@ -16,7 +17,11 @@ namespace hpx { namespace components
     {}
 
     component_storage::component_storage(hpx::future<naming::id_type> && f)
-      : base_type(hpx::new_<server::component_storage>(f.get()))
+      : base_type(std::move(f))
+    {}
+
+    component_storage::component_storage(hpx::future<component_storage> && f)
+      : base_type(std::move(f))
     {}
 
     ///////////////////////////////////////////////////////////////////////////
