@@ -34,6 +34,8 @@
 
 #include "print_time_results.hpp"
 
+#include <boost/shared_array.hpp>
+
 using hpx::naming::id_type;
 using hpx::performance_counters::get_counter;
 using hpx::performance_counters::stubs::performance_counter;
@@ -147,7 +149,6 @@ public:
         }
     }
 
-
     std::size_t size() const { return size_; }
 
 private:
@@ -210,7 +211,7 @@ struct stepper
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        double * data)
+        boost::shared_array<double> data)
     {
         using hpx::dataflow;
         using hpx::util::unwrapped;
@@ -220,7 +221,7 @@ struct stepper
         for (space& s: U)
             s.resize(np);
 
-        if (data == nullptr) {
+        if (!data) {
             // Initial conditions: f(0, i) = i
             std::size_t b = 0;
             auto range = boost::irange(b, np);
@@ -229,7 +230,8 @@ struct stepper
                 par, boost::begin(range), boost::end(range),
                 [&U, nx](std::size_t i)
                 {
-                    U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
+                    U[0][i] = hpx::make_ready_future(
+                        partition_data(nx, double(i)));
                 }
             );
         }
@@ -242,7 +244,8 @@ struct stepper
                 par, boost::begin(range), boost::end(range),
                 [&U, nx, data](std::size_t i)
                 {
-                    U[0][i] = hpx::make_ready_future(partition_data(nx, data+(i*nx)));
+                    U[0][i] = hpx::make_ready_future(
+                        partition_data(nx, data.get()+(i*nx)));
                 }
             );
         }
@@ -311,7 +314,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(divisors.size() == 0) {
         std::cerr << "ERROR: No possible divisors for " << nx
             << " data elements with at least " << os_thread_count
-            << " partitions and at least two elements per partition." << std::endl;
+            << " partitions and at least two elements per partition."
+            << std::endl;
         return hpx::finalize();
     }
 
@@ -336,7 +340,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
-    double * data = nullptr;
+    boost::shared_array<double> data;
     for(boost::uint64_t i = 0; i < nr; ++i)
     {
         boost::uint64_t parts = divisors[np_index];
@@ -362,11 +366,13 @@ int hpx_main(boost::program_options::variables_map& vm)
         apex::custom_event(end_iteration_event, 0);
 
         // Gather data together
-        if(data == nullptr) {
-            data = new double[total_size];
-        }
-        for(boost::uint64_t partition = 0; partition != parts; ++partition) {
-            solution[partition].get().copy_into_array(data+(partition*size_per_part));
+        if (!data)
+            data.reset(new double[total_size]);
+
+        for(boost::uint64_t partition = 0; partition != parts; ++partition)
+        {
+            solution[partition].get()
+                .copy_into_array(data.get() + (partition*size_per_part));
         }
 
         // Print the final solution
@@ -378,9 +384,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         print_time_results(os_thread_count, elapsed, size_per_part, parts, nt, header);
         header = false; // only print header once
-    }
-    if(data != nullptr) {
-        delete[] data;
     }
 
     return hpx::finalize();
