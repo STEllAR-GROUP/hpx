@@ -15,7 +15,7 @@ HPX on Fedora 22].]
 
 * Install all packages for minimal installation
 ``
-   sudo dnf gcc-c++ install cmake boost-build boost boost-devel hwloc-devel \
+   sudo dnf install gcc-c++ cmake boost-build boost boost-devel hwloc-devel \
      hwloc gcc-gfortran papi-devel gperftools-devel docbook-dtds \
      docbook-style-xsl libsodium-devel doxygen boost-doc hdf5-devel \
      fop boost-devel boost-openmpi-devel boost-mpich-devel
@@ -32,7 +32,7 @@ HPX on Fedora 22].]
    mkdir build
    cd build
    cmake -DCMAKE_INSTALL_PREFIX=/opt/hpx ..
-   make -j 
+   make -j
    make install
 ``
 
@@ -44,7 +44,7 @@ HPX on Fedora 22].]
 
 * Add the library path of HPX to ldconfig
 ``
-   sudo echo /opt/hpx/lib > /etc/ld.so.conf.d/hpx.conf  
+   sudo echo /opt/hpx/lib > /etc/ld.so.conf.d/hpx.conf
    sudo ldconfig
 ``
 
