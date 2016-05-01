@@ -23,6 +23,7 @@
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
 
+#include <map>
 #include <memory>
 #include <numeric>
 #include <string>

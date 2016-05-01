@@ -19,6 +19,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <set>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {

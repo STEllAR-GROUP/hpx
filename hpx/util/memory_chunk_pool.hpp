@@ -15,6 +15,7 @@
 #include <boost/atomic.hpp>
 
 #include <cstdlib>
+#include <map>
 #include <mutex>
 #include <vector>
 

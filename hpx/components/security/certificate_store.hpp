@@ -19,6 +19,7 @@
 #include "public_key.hpp"
 #include "signed_type.hpp"
 
+#include <map>
 #include <sstream>
 
 namespace hpx { namespace components { namespace security

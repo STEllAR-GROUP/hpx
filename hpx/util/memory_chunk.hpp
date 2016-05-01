@@ -19,6 +19,7 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
+#include <map>
 #include <memory>
 #include <mutex>
 

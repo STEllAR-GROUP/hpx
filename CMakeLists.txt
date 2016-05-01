@@ -875,6 +875,9 @@ hpx_check_for_cxx11_std_unique_ptr(
 hpx_check_for_cxx11_std_unordered_map(
   REQUIRED "HPX needs support for C++11 std::unordered_map")
 
+hpx_check_for_cxx11_std_unordered_set(
+  REQUIRED "HPX needs support for C++11 std::unordered_set")
+
 hpx_check_for_cxx11_std_type_traits(
   DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
 

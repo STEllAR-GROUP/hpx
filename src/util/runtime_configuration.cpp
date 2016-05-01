@@ -30,7 +30,9 @@
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
+#include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 

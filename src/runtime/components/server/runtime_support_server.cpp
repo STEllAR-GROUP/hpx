@@ -58,6 +58,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <set>

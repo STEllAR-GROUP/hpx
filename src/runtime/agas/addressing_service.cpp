@@ -43,6 +43,7 @@
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
 
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
