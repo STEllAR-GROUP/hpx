@@ -8,6 +8,8 @@
 #if !defined(HPX_UTIL_SECTION_SEP_17_2008_022PM)
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
+#include <hpx/config.hpp>
+#include <hpx/util_fwd.hpp> // this needs to go first
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <boost/lexical_cast.hpp>
