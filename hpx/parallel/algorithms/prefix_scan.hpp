@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_ALGORITHM_PREFIX_SCAN_NOV_2015
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -36,7 +35,32 @@ HPX_INLINE_NAMESPACE(v1)
     {
     /// \cond NOINTERNAL
 
-    //---------------------------------------------------------------------
+        // when we are being run with an asynchronous policy, we do not want to
+        // pass the policy directly to other algorithms we are using - as we
+        // would have wait internally on them before proceeding.
+        // Instead create a new policy from the old one which removes the async/future
+
+        template <typename ExPolicy>
+        struct remove_asynchronous {
+            typedef ExPolicy type;
+        };
+
+        template <>
+        struct remove_asynchronous<hpx::parallel::parallel_vector_execution_policy> {
+            typedef hpx::parallel::parallel_execution_policy type;
+        };
+
+        template <>
+        struct remove_asynchronous<hpx::parallel::sequential_task_execution_policy> {
+            typedef hpx::parallel::sequential_execution_policy type;
+        };
+
+        template <>
+        struct remove_asynchronous<hpx::parallel::parallel_task_execution_policy> {
+            typedef hpx::parallel::parallel_execution_policy type;
+        };
+
+        //---------------------------------------------------------------------
     // sequential exclusive_scan using count instead of end
     // used as first step in upsweep for both inclusive/exclusive scans
     // NB : does not write any output, only sums from input array
@@ -127,6 +151,197 @@ HPX_INLINE_NAMESPACE(v1)
     };
 
     ///////////////////////////////////////////////////////////////////////
+    template<typename Result>
+    struct parallel_scan_struct_lambda
+        : public hpx::parallel::v1::detail::algorithm<
+            parallel_scan_struct_lambda<Result>, Result>
+    {
+        parallel_scan_struct_lambda()
+            :
+            parallel_scan_struct_lambda::algorithm("parallel_scan_struct_lambda")
+        {
+        }
+
+        template<typename ExPolicy, typename FwdIter, typename OutIter, typename T, typename Op,
+                 typename Lambda1, typename Lambda2 >
+        static Result
+        sequential(ExPolicy,
+            FwdIter first,
+            FwdIter last,
+            OutIter dest,
+            T && init,
+            Lambda1 && f1,
+            Op && op,
+            Lambda2 && f2,
+            Lambda1 && f3)
+        {
+//            return TagType::sequential_scan(first, last, dest,
+//                std::forward<T>(init), std::forward<Op>(op));
+            return Result(); // std::make_pair(last, dest);
+        }
+
+        template<typename ExPolicy, typename FwdIter, typename OutIter, typename T, typename Op,
+            typename Lambda1, typename Lambda2, typename Lambda3 >
+        static typename util::detail::algorithm_result<
+            ExPolicy, Result
+        >::type
+        parallel(ExPolicy policy,
+            FwdIter first,
+            FwdIter last,
+            OutIter dest,
+            T && init,
+            Lambda1 && f1,
+            Op && op,
+            Lambda2 && f2,
+            Lambda3 && f3)
+        {
+            typedef util::detail::algorithm_result<ExPolicy, Result> result;
+            typedef typename std::iterator_traits<FwdIter>::difference_type difference_type;
+            typedef typename std::iterator_traits<FwdIter>::value_type  value_type;
+            typedef typename std::decay<T>::type T_type;
+
+            if (first == last)
+                return Result(); // std::make_pair(last, dest);
+
+
+            // --------------------------------------------------------------------------
+            // Parallel prefix sum /scan algorithm, after algorithm described in [1]
+            // available here
+            // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch39.html
+            //
+            // 1. Hubert Nguyen. 2007. Gpu Gems 3 (First ed.).
+            // Addison-Wesley Professional.
+            // --------------------------------------------------------------------------
+
+            difference_type count = std::distance(first, last);
+
+            std::size_t cores = std::min((std::size_t)count,
+                executor_information_traits<typename ExPolicy::executor_type>::
+                processing_units_count(policy.executor(), policy.parameters()));
+
+            int n_chunks, log2N;
+            std::size_t chunk_size;
+            if (cores>1) {
+                const std::size_t sequential_scan_limit = 1;
+                // we want 2^N chunks of data, so find a good N
+                log2N = 0;
+                while (cores >>= 1) ++log2N;
+                n_chunks = (1 << log2N);
+                chunk_size = std::max(1, int(count / n_chunks));
+                while (n_chunks > 0 && chunk_size < sequential_scan_limit) {
+                    chunk_size <<= 1;
+                    n_chunks >>= 1;
+                    log2N -= 1;
+                }
+            }
+            if (n_chunks < 2 || cores == 1) {
+//                return result::get(sequential(policy, first, last, dest, std::forward < T >(init),
+//                    std::forward < Op >(op)));
+            }
+
+            // --------------------------
+            // Upsweep:
+            // --------------------------
+            // because our list might not be an exact power of 2 and we wish to run
+            // 2^N tasks/chunks we will first create a list of iterator start/end points
+            // for a 2^N list as indices into our original input data.
+            // Then we will do the scan algorithm using the 2^N items as our base input.
+            // This first loop spawns 2^N sequential scans on the initial lists
+
+            // result type of lambda_1
+            typedef typename std::result_of<Lambda1(FwdIter, std::size_t, T)>::type f1_type;
+            typedef typename std::result_of<Lambda2(FwdIter, std::size_t, OutIter, T)>::type f2_type;
+            // intermediate store for partial results after lambda_1
+            typedef std::tuple<FwdIter, std::size_t, OutIter, f1_type> chunk_info;
+            // from each of the scan chunks from lambda_1
+            std::vector < chunk_info > work_chunks;
+            // the future result of each scan chunk lambda_1
+            std::vector<hpx::future<f1_type> > work_items;
+            std::vector<hpx::future<f2_type> > work_items_2;
+            //
+            work_chunks.reserve(n_chunks);
+            work_items.reserve(n_chunks);
+            work_items_2.reserve(n_chunks);
+            FwdIter it2, it1 = first;
+            for (int k = 0; k < n_chunks; ++k) {
+                if (k < n_chunks - 1) {
+                    it2 = it1 + chunk_size;
+                }
+                else { // last chunk might not be exactly the right size
+                    chunk_size = std::distance(it2, last);
+                    it2 = last;
+                }
+                // start and end of chunk of our input array
+                work_chunks.push_back(
+                    std::make_tuple(it1, chunk_size, dest, f1_type()));
+                // spawn a task to do a sequential scan on this chunk
+                work_items.push_back(
+                    std::move(
+                        hpx::async(f1,
+                            it1, chunk_size, T_type())));
+                it1 = it2;
+                std::advance(dest, chunk_size);
+            }
+            //
+            // do a tree of combine operations on the result of the 2^N sequence results
+            //
+            using hpx::lcos::local::dataflow;
+            //
+            hpx::when_all(std::move(work_items)).then(
+                [=, &work_chunks](hpx::future<std::vector<hpx::future<f1_type> > > fv) {
+                    // move the items into a local vector
+                    std::vector<hpx::future<f1_type> > items(fv.get());
+                    for (int c = 0; c < n_chunks; ++c) {
+                        std::get<3>(work_chunks[c]) = items[c].get();
+                    }
+                    for (int d = 0; d < log2N; ++d) {
+                        int d_2 = (1 << d);
+                        int dp1_2 = (2 << d);
+                        for (int k = 0, f = 0; k < n_chunks; k += dp1_2, f += 2) {
+                            int i1 = k + d_2 - 1;
+                            int i2 = k + dp1_2 - 1;
+                            f1_type sum_left = std::get<3>(work_chunks[i1]);
+                            f1_type sum_right = std::get<3>(work_chunks[i2]);
+                            std::get<3>(work_chunks[k + dp1_2 - 1]) = op(sum_left, sum_right);
+                        }
+                    }
+                }
+            ).get();
+
+            // --------------------------
+            // Downsweep:
+            // --------------------------
+            //
+            std::get < 3 > (work_chunks.back()) = f1_type();
+            for (int d = log2N - 1; d >= 0; --d) {
+                int d_2 = (1 << d);
+                int dp1_2 = (2 << d);
+                for (int k = 0; k < n_chunks - 1; k += dp1_2) {
+                    f1_type temp = std::get < 3 > (work_chunks[k + d_2 - 1]);
+                    std::get < 3 > (work_chunks[k + d_2 - 1]) =
+                        std::get < 3 > (work_chunks[k + dp1_2 - 1]);
+                    std::get < 3 > (work_chunks[k + dp1_2 - 1]) =
+                        op(std::get < 3 > (work_chunks[k + dp1_2 - 1]), temp);
+                }
+            }
+            // now combine the partial sums back into the initial chunks
+            for (int c = 0; c < n_chunks; ++c) {
+                // spawn a task to do a sequential update on this chunk
+                hpx::future<f2_type> w1 = hpx::async(
+                    f2,
+                    std::get < 0 > (work_chunks[c]),
+                    std::get < 1 > (work_chunks[c]),
+                    std::get < 2 > (work_chunks[c]),
+                    std::get < 3 > (work_chunks[c]));
+                work_items_2.push_back(std::move(w1));
+            }
+            hpx::wait_all(work_items_2);
+            //
+            return f3(work_items_2.back().get());
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////
     template<typename OutIter, typename TagType>
     struct parallel_scan_struct
         : public hpx::parallel::v1::detail::algorithm<
@@ -208,7 +423,6 @@ HPX_INLINE_NAMESPACE(v1)
             typedef std::tuple<FwdIter, OutIter, std::size_t, T> chunk_info;
             std::vector < chunk_info > work_chunks;
             std::vector<hpx::future<T> > work_items;
-            std::vector<hpx::future<void> > work_partials;
             work_chunks.reserve(n_chunks);
             work_items.reserve(n_chunks);
             FwdIter it2, it1 = first;
@@ -265,7 +479,6 @@ HPX_INLINE_NAMESPACE(v1)
             for (int d = log2N - 1; d >= 0; --d) {
                 int d_2 = (1 << d);
                 int dp1_2 = (2 << d);
-                int steps = n_chunks >> (d + 1);
                 for (int k = 0; k < n_chunks - 1; k += dp1_2) {
                     T temp = std::get < 3 > (work_chunks[k + d_2 - 1]);
                     std::get < 3 > (work_chunks[k + d_2 - 1]) =
