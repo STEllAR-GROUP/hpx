@@ -25,7 +25,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename ExPolicy>
     struct handle_local_exceptions
     {
+        ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
+        HPX_ATTRIBUTE_NORETURN static void call(boost::exception_ptr const& e)
+        {
+            try {
+                boost::rethrow_exception(e);
+            }
+            catch (std::bad_alloc const& ba) {
+                boost::throw_exception(ba);
+            }
+            catch (...) {
+                throw;
+            }
+        }
+
         static void call(boost::exception_ptr const& e,
             std::list<boost::exception_ptr>& errors)
         {
@@ -54,6 +68,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 boost::throw_exception(exception_list(std::move(errors)));
         }
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename T>
         static void call(std::vector<hpx::shared_future<T> > const& workitems,
             std::list<boost::exception_ptr>& errors)
@@ -115,6 +130,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <>
     struct handle_local_exceptions<parallel_vector_execution_policy>
     {
+        ///////////////////////////////////////////////////////////////////////
+        HPX_ATTRIBUTE_NORETURN static void call(boost::exception_ptr const&)
+        {
+            hpx::terminate();
+        }
+
         HPX_ATTRIBUTE_NORETURN static void call(
             boost::exception_ptr const&, std::list<boost::exception_ptr>&)
         {

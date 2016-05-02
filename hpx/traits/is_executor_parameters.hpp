@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,6 @@
 #endif
 
 #include <boost/ref.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -30,7 +29,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \cond NOINTERNAL
         template <typename T>
         struct is_executor_parameters
-          : boost::is_base_of<executor_parameters_tag, T>
+          : std::is_base_of<executor_parameters_tag, T>
         {};
 
         template <>
