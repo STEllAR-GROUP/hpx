@@ -34,39 +34,13 @@ HPX_INLINE_NAMESPACE(v1)
     {
     /// \cond NOINTERNAL
 
-        // when we are being run with an asynchronous policy, we do not want to
-        // pass the policy directly to other algorithms we are using - as we
-        // would have wait internally on them before proceeding.
-        // Instead create a new policy from the old one which removes the async/future
-
-        template <typename ExPolicy>
-        struct remove_asynchronous {
-            typedef ExPolicy type;
-        };
-
-        template <>
-        struct remove_asynchronous<hpx::parallel::parallel_vector_execution_policy> {
-            typedef hpx::parallel::parallel_execution_policy type;
-        };
-
-        template <>
-        struct remove_asynchronous<hpx::parallel::sequential_task_execution_policy> {
-            typedef hpx::parallel::sequential_execution_policy type;
-        };
-
-        template <>
-        struct remove_asynchronous<hpx::parallel::parallel_task_execution_policy> {
-            typedef hpx::parallel::parallel_execution_policy type;
-        };
-
-        //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     // sequential exclusive_scan using count instead of end
     // used as first step in upsweep for both inclusive/exclusive scans
     // NB : does not write any output, only sums from input array
     //---------------------------------------------------------------------
     template<typename InIter, typename T, typename Op>
-    T accumulate_scan_n(InIter first, std::size_t count,
-        T init, Op && op)
+    T accumulate_scan_n(InIter first, std::size_t count, T init, Op &&op)
     {
         for (/* */; count-- != 0; (void) ++first) {
             init = op(init, *first);
@@ -264,7 +238,7 @@ HPX_INLINE_NAMESPACE(v1)
             FwdIter it2, it1 = first;
             for (int k = 0; k < n_chunks; ++k) {
                 if (k < n_chunks - 1) {
-                    it2 = it1 + chunk_size;
+                    it2 = std::next(it1, chunk_size);
                 }
                 else { // last chunk might not be exactly the right size
                     chunk_size = std::distance(it2, last);
@@ -427,20 +401,31 @@ HPX_INLINE_NAMESPACE(v1)
             FwdIter it2, it1 = first;
             for (int k = 0; k < n_chunks; ++k) {
                 if (k < n_chunks - 1) {
-                    it2 = it1 + chunk_size;
+                    it2 = std::next(it1, chunk_size);
                 }
                 else { // last chunk might not be exactly the right size
                     chunk_size = std::distance(it2, last);
                     it2 = last;
                 }
                 // start and end of chunk of our input array
+                auto ept = std::next(it1, chunk_size-1);
                 work_chunks.push_back(
-                    std::make_tuple(it1, dest, chunk_size, *(it1 + chunk_size - 1)));
+                    std::make_tuple(it1, dest, chunk_size, *ept));
                 // spawn a task to do a sequential scan on this chunk
+
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
+
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+
                 work_items.push_back(
                     std::move(
-                        hpx::async(&accumulate_scan_n<FwdIter, T, Op>,
-                            it1, chunk_size, (T()), std::forward < Op > (op))));
+                        executor_traits::async_execute(
+                            policy.executor(),
+                            hpx::util::deferred_call(
+                                &accumulate_scan_n<FwdIter, T, Op&>,
+                                it1, chunk_size, T(), std::ref(op)))));
                 it1 = it2;
                 std::advance(dest, chunk_size);
             }
@@ -490,12 +475,12 @@ HPX_INLINE_NAMESPACE(v1)
             for (int c = 0; c < n_chunks; ++c) {
                 // spawn a task to do a sequential update on this chunk
                 hpx::future<T> w1 = hpx::async(
-                    &TagType::template sequential_update_n<FwdIter, OutIter, T, Op>,
+                    &TagType::template sequential_update_n<FwdIter, OutIter, T, Op&>,
                     std::get < 0 > (work_chunks[c]),
                     std::get < 1 > (work_chunks[c]),
                     std::get < 2 > (work_chunks[c]),
                     std::get < 3 > (work_chunks[c]),
-                    std::forward < Op > (op));
+                    std::ref(op));
                 work_items.push_back(std::move(w1));
             }
             hpx::wait_all(work_items);
