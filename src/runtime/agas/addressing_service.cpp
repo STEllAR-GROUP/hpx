@@ -3180,8 +3180,8 @@ namespace hpx
 {
     namespace detail
     {
-        std::string name_from_basename(std::string const& basename,
-            std::size_t idx)
+        inline std::string
+        name_from_basename(std::string const& basename, std::size_t idx)
         {
             HPX_ASSERT(!basename.empty());
 

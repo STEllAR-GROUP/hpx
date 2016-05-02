@@ -470,7 +470,7 @@ namespace hpx
         }
 
         // Register this unordered_map with AGAS using the given symbolic name
-        unordered_map register_as(std::string const& symbolic_name)
+        future<void> register_as(std::string const& symbolic_name)
         {
             server::unordered_map_config_data data(partitions_);
 

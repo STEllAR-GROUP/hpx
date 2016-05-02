@@ -43,20 +43,14 @@ namespace hpx { namespace lcos
 
         /// Extension: Create a client side representation for the existing
         /// \a server#latch instance with the given global id \a id.
-        latch(hpx::future<naming::id_type> && f)
-          : base_type(std::move(f))
+        latch(hpx::future<naming::id_type> && id)
+          : base_type(id.share())
         {}
 
         /// Extension: Create a client side representation for the existing
         /// \a server#latch instance with the given global id \a id.
-        latch(hpx::shared_future<naming::id_type> const& latch)
-          : base_type(latch)
-        {}
-
-        /// Extension: Create a client side representation for the existing
-        /// \a server#latch instance with the given global id \a id.
-        latch(hpx::future<latch> && f)
-          : base_type(std::move(f))
+        latch(hpx::shared_future<naming::id_type> const& id)
+          : base_type(id)
         {}
 
         ///////////////////////////////////////////////////////////////////////

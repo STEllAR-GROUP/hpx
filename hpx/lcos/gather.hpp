@@ -148,8 +148,6 @@ namespace hpx { namespace lcos
 
 namespace hpx { namespace lcos
 {
-    template <typename T> struct gather_client;
-
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -182,10 +180,6 @@ namespace hpx { namespace lcos
             gather_server(std::size_t num_sites)
               : num_sites_(num_sites), data_(num_sites), gate_(num_sites)
             {}
-
-            ~gather_server()
-            {
-            }
 
             hpx::future<std::vector<T> > get_result(std::size_t which, T && t)
             {
@@ -228,64 +222,38 @@ namespace hpx { namespace lcos
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        gather_client<T> register_gather_name(gather_client<T> && c,
+        inline hpx::id_type register_gather_name(hpx::future<hpx::id_type> f,
             std::string const& basename, std::size_t site)
         {
-            hpx::future<void> f = c.register_as(
-                hpx::detail::name_from_basename(basename, site));
-
-            return f.then(
-                [c](hpx::future<void> && f)
-                {
-                    f.get();       // propagate exceptions
-                    return c;
-                });
+            hpx::id_type target = f.get();
+            hpx::register_with_basename(basename, hpx::unmanaged(target), site);
+            return target;
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         hpx::future<std::vector<T> >
-        gather_data(gather_client<T> c, std::size_t site,
+        gather_data(hpx::future<hpx::id_type> f, std::size_t site,
             hpx::future<T> result)
         {
             typedef typename gather_server<T>::get_result_action action_type;
-            return async(action_type(), c, site, result.get());
+            return async(action_type(), f.get(), site, result.get());
         }
 
         template <typename T>
         hpx::future<void>
-        set_data(gather_client<T> c, std::size_t which,
+        set_data(hpx::future<hpx::id_type> f, std::size_t which,
             hpx::future<T> result)
         {
             typedef typename gather_server<T>::set_result_action action_type;
-            return async(action_type(), c, which, result.get());
+            return async(action_type(), f.get(), which, result.get());
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct gather_client
-      : components::client_base<gather_client<T>, detail::gather_server<T> >
-    {
-        typedef components::client_base<
-                gather_client<T>, detail::gather_server<T>
-            > base_type;
-
-        gather_client() {}
-
-        gather_client(hpx::future<id_type> && f)
-          : base_type(std::move(f))
-        {}
-
-        gather_client(hpx::future<gather_client> && f)
-          : base_type(std::move(f))
-        {}
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    gather_client<T> create_gatherer(char const* basename,
+    hpx::future<hpx::id_type>
+    create_gatherer(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
@@ -296,8 +264,10 @@ namespace hpx { namespace lcos
             this_site = hpx::get_locality_id();
 
         // create a new gather_server
-        gather_client<T> c = hpx::new_<detail::gather_server<T> >(
-            hpx::find_here(), num_sites);
+        typedef typename util::decay<T>::type result_type;
+        hpx::future<hpx::id_type> id =
+            hpx::new_<detail::gather_server<result_type> >(
+                hpx::find_here(), num_sites);
 
         std::string name(basename);
         if (generation != std::size_t(-1))
@@ -305,9 +275,8 @@ namespace hpx { namespace lcos
 
         // register the gatherer's id using the given basename
         using util::placeholders::_1;
-        return c.then(
-                util::bind(util::one_shot(&detail::register_gather_name<T>),
-                    _1, name, this_site)
+        return id.then(
+                util::bind(&detail::register_gather_name, _1, name, this_site)
             );
     }
 
@@ -315,7 +284,7 @@ namespace hpx { namespace lcos
     // destination site needs to be handled differently
     template <typename T>
     hpx::future<std::vector<T> >
-    gather_here(gather_client<T> c, hpx::future<T> result,
+    gather_here(hpx::future<hpx::id_type> f, hpx::future<T> result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -323,9 +292,9 @@ namespace hpx { namespace lcos
 
         using util::placeholders::_1;
         using util::placeholders::_2;
-        return dataflow(launch::sync,
+        return dataflow(
                 util::bind(&detail::gather_data<T>, _1, this_site, _2),
-                std::move(c), std::move(result)
+                std::move(f), std::move(result)
             );
     }
 
@@ -341,10 +310,8 @@ namespace hpx { namespace lcos
         if (this_site == std::size_t(-1))
             this_site = hpx::get_locality_id();
 
-        typedef typename util::decay<T>::type result_type;
         return gather_here(
-            create_gatherer<result_type>(
-                basename, num_sites, generation, this_site),
+            create_gatherer<T>(basename, num_sites, generation, this_site),
             std::move(result), this_site);
     }
 
@@ -352,7 +319,7 @@ namespace hpx { namespace lcos
     // gather plain values
     template <typename T>
     hpx::future<std::vector<typename util::decay<T>::type> >
-    gather_here(gather_client<T> c, T && result,
+    gather_here(hpx::future<hpx::id_type> f, T && result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -362,9 +329,9 @@ namespace hpx { namespace lcos
         using util::placeholders::_2;
 
         typedef typename util::decay<T>::type result_type;
-        return dataflow(launch::sync,
+        return dataflow(
                 util::bind(&detail::gather_data<result_type>, _1, this_site, _2),
-                std::move(c), std::forward<T>(result)
+                std::move(f), std::forward<T>(result)
             );
     }
 
@@ -380,17 +347,15 @@ namespace hpx { namespace lcos
         if (this_site == std::size_t(-1))
             this_site = hpx::get_locality_id();
 
-        typedef typename util::decay<T>::type result_type;
         return gather_here(
-            create_gatherer<result_type>(
-                basename, num_sites, generation, this_site),
+            create_gatherer<T>(basename, num_sites, generation, this_site),
             std::forward<T>(result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<void>
-    gather_there(gather_client<T> c, hpx::future<T> result,
+    gather_there(hpx::future<hpx::id_type> id, hpx::future<T> result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -398,9 +363,9 @@ namespace hpx { namespace lcos
 
         using util::placeholders::_1;
         using util::placeholders::_2;
-        return dataflow(launch::sync,
+        return dataflow(
                 util::bind(&detail::set_data<T>, _1, this_site, _2),
-                std::move(c), std::move(result)
+                std::move(id), std::move(result)
             );
     }
 
@@ -417,17 +382,16 @@ namespace hpx { namespace lcos
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
-        gather_client<T> c;
-        c.connect_to(hpx::detail::name_from_basename(name, root_site));
-
-        return gather_there(c, std::move(result), this_site);
+        return gather_there(
+            hpx::find_from_basename(name, root_site),
+            std::move(result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // gather plain values
     template <typename T>
     hpx::future<void>
-    gather_there(gather_client<T> c, T && result,
+    gather_there(hpx::future<hpx::id_type> id, T && result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -437,9 +401,9 @@ namespace hpx { namespace lcos
         using util::placeholders::_2;
 
         typedef typename util::decay<T>::type result_type;
-        return dataflow(launch::sync,
+        return dataflow(
                 util::bind(&detail::set_data<result_type>, _1, this_site, _2),
-                std::move(c), std::forward<T>(result)
+                std::move(id), std::forward<T>(result)
             );
     }
 
@@ -456,10 +420,9 @@ namespace hpx { namespace lcos
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
-        gather_client<T> c;
-        c.connect_to(hpx::detail::name_from_basename(name, root_site));
-
-        return gather_there(c, std::forward<T>(result), this_site);
+        return gather_there(
+            hpx::find_from_basename(name, root_site),
+            std::forward<T>(result), this_site);
     }
 }}
 
