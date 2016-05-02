@@ -124,10 +124,10 @@ HPX_INLINE_NAMESPACE(v1)
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template<typename Result>
+    template<typename OutIter, typename TagType >
     struct parallel_scan_struct_lambda
         : public hpx::parallel::v1::detail::algorithm<
-            parallel_scan_struct_lambda<Result>, Result>
+            parallel_scan_struct_lambda<OutIter, TagType>, OutIter>
     {
         parallel_scan_struct_lambda()
             :
@@ -135,28 +135,28 @@ HPX_INLINE_NAMESPACE(v1)
         {
         }
 
-        template<typename ExPolicy, typename FwdIter, typename OutIter, typename T, typename Op,
-                 typename Lambda1, typename Lambda2 >
-        static Result
+        template<typename ExPolicy, typename FwdIter,
+            typename T, typename Op,
+            typename Lambda1, typename Lambda2 >
+        static OutIter
         sequential(ExPolicy,
             FwdIter first,
             FwdIter last,
             OutIter dest,
-            T && init,
+            T       && init,
             Lambda1 && f1,
-            Op && op,
+            Op      && op,
             Lambda2 && f2,
             Lambda1 && f3)
         {
-//            return TagType::sequential_scan(first, last, dest,
-//                std::forward<T>(init), std::forward<Op>(op));
-            return Result(); // std::make_pair(last, dest);
+            return TagType::sequential_scan(first, last, dest,
+                std::forward<T>(init), std::forward<Op>(op));
         }
 
-        template<typename ExPolicy, typename FwdIter, typename OutIter, typename T, typename Op,
+        template<typename ExPolicy, typename FwdIter, typename T, typename Op,
             typename Lambda1, typename Lambda2, typename Lambda3 >
-        static typename util::detail::algorithm_result<
-            ExPolicy, Result
+        static typename hpx::parallel::util::detail::algorithm_result<
+                ExPolicy, OutIter
         >::type
         parallel(ExPolicy policy,
             FwdIter first,
@@ -168,14 +168,13 @@ HPX_INLINE_NAMESPACE(v1)
             Lambda2 && f2,
             Lambda3 && f3)
         {
-            typedef util::detail::algorithm_result<ExPolicy, Result> result;
+            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
             typedef typename std::iterator_traits<FwdIter>::difference_type difference_type;
             typedef typename std::iterator_traits<FwdIter>::value_type  value_type;
             typedef typename std::decay<T>::type T_type;
 
             if (first == last)
-                return Result(); // std::make_pair(last, dest);
-
+                return result::get(std::move(dest));
 
             // --------------------------------------------------------------------------
             // Parallel prefix sum /scan algorithm, after algorithm described in [1]
@@ -208,8 +207,8 @@ HPX_INLINE_NAMESPACE(v1)
                 }
             }
             if (n_chunks < 2 || cores == 1) {
-//                return result::get(sequential(policy, first, last, dest, std::forward < T >(init),
-//                    std::forward < Op >(op)));
+                return result::get(sequential(policy, first, last, dest,
+                  std::forward < T >(init), std::forward < Op >(op)));
             }
 
             // --------------------------
@@ -381,8 +380,8 @@ HPX_INLINE_NAMESPACE(v1)
               }
             }
             if (n_chunks < 2 || cores == 1) {
-              return result::get(sequential(policy, first, last, dest, std::forward < T >(init),
-                std::forward < Op >(op)));
+              return result::get(sequential(policy, first, last, dest,
+                std::forward < T >(init), std::forward < Op >(op)));
             }
 
             // --------------------------
