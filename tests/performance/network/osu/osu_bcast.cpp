@@ -14,8 +14,8 @@
 #include <hpx/util/any.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <vector>
 
 #include <benchmarks/network/osu_coll.hpp>

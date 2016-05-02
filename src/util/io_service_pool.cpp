@@ -17,7 +17,6 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <mutex>
 #include <stdexcept>

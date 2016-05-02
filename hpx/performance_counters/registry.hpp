@@ -11,6 +11,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>
 
+#include <map>
 #include <string>
 #include <vector>
 

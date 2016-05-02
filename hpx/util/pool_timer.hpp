@@ -10,8 +10,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 
 namespace hpx { namespace util { namespace detail
@@ -49,7 +48,7 @@ namespace hpx { namespace util
         bool is_terminated() const;
 
     private:
-        boost::shared_ptr<detail::pool_timer> timer_;
+        std::shared_ptr<detail::pool_timer> timer_;
     };
 }}
 

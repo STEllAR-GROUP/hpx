@@ -10,8 +10,7 @@
 
 #include "stencil_iterator.hpp"
 
-#include <boost/make_shared.hpp>
-
+#include <memory>
 #include <vector>
 
 namespace jacobi

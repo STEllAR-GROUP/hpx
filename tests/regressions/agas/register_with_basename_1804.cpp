@@ -11,10 +11,9 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
-
-#include <boost/shared_ptr.hpp>
 
 static std::string itoa(int i)
 {

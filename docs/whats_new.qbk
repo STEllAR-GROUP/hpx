@@ -59,6 +59,8 @@ to a different compute node).
   depending on it. We have further decreased the dependency of __hpx__ on the
   Boost libraries by replacing part of those with facilities available from the
   standard libraries.
+* Whereever possible we have removed dependencies of our API on Boost by
+  replacing those with the equivalent facility from the C++11 standard library.
 * We have added new performance counters for parcel coalescing, file-IO, the
   AGAS cache, and overall scheduler time. Resetting performance counters has
   been overhauled and fixed.
@@ -94,19 +96,39 @@ to a different compute node).
   `std::unique_lock`. Additionally, `condition_variable` no longer aliases
   `condition_variable_any`; its interface now only works with
   `std::unique_lock<local::mutex>`.
+* Uses of `boost::shared_ptr` have been replaced with `std::shared_ptr`.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2132] - Removing unused typedef
+* [pr    2129] - Fix invalid attribute warnings
+* [pr    2126] - GCC 4.6 fails to deduce the correct type in lambda
+* [pr    2125] - Making parcel coalescing test actually test something
+* [issue 2123] - hpx/hpx/runtime/applier_fwd.hpp - Multiple defined types
+* [pr    2120] - Fixing 2119
+* [issue 2119] - reduce_by_key compilation problems
+* [issue 2118] - Premature unwrapping of boost::ref'ed arguments
+* [pr    2117] - Added missing initializer on last constructor for
+                 thread_description
+* [pr    2116] - Use a lightweight bind implementation when no placeholders are
+                 given
+* [pr    2115] - Replace boost::shared_ptr with std::shared_ptr
+* [issue 2110] - Compilation error with gcc version 4.9.3 (MacPorts gcc49 4.9.3_0)
+* [pr    2112] - Replace uses of safe_bool with explicit operator bool
+* [issue 2111] - Compilation error on QT example
 * [issue 2110] - Compilation error when passing non-future argument to unwrapped
                  continuation in dataflow
+* [issue 2109] - Warning while compiling hpx
 * [pr    2107] - Making sure that a missing parcel_coalescing module does not
                  cause startup exceptions
 * [pr    2106] - Stop using hpx_fwd.hpp
 * [issue 2105] - coalescing plugin handler is not optional any more
 * [issue 2103] - Build error with octotiger and hpx commit e657426d
 * [pr    2102] - Combining thread data storage
+* [pr    2101] - Added repartition version of 1d stencil that uses any
+                 performance counter
 * [pr    2100] - Drop obsolete TR1 result_of protocol
 * [pr    2099] - Replace uses of boost::bind with util::bind
 * [pr    2098] - Deprecated inspect checks
@@ -121,6 +143,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2089] - Fix #2088
 * [issue 2088] - More verbose output from cmake configuration
 * [pr    2087] - Making sure init_globally always executes hpx_main
+* [issue 2086] - Race condition with recent HPX
 * [pr    2085] - Adding #include checker
 * [pr    2084] - Replace boost lock types with standard library ones
 * [pr    2083] - Simplify packaged task
@@ -382,6 +405,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1856] - fix return in packaged_task_base::reset()
 * [issue 1842] - Install error: file INSTALL cannot find
                  libhpx_parcel_coalescing.so.0.9.11
+* [pr    1839] - Adding fedora docs
 * [pr    1824] - Changing version on master to V0.9.12
 * [pr    1818] - Fixing #1748
 * [issue 1815] - seg fault in AGAS
@@ -394,6 +418,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1658] - Add serialization for std::set (as there is for std::vector
                  and std::map)
 * [pr    1641] - Generic client
+* [issue 1632] - heartbeat example fails on separate nodes
 * [pr    1603] - Adds preferred namespace check to inspect tool
 * [issue 1523] - Remote async with deferred launch policy never executes
 * [issue 1472] - Serialization issues

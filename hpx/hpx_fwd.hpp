@@ -32,7 +32,6 @@
 #include <windows.h>
 #endif
 
-#include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>

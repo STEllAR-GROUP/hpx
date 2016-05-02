@@ -21,7 +21,7 @@
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging {
@@ -45,7 +45,7 @@ namespace hpx { namespace util { namespace logging {
         typedef typename mutex::scoped_lock scoped_lock;
     public:
         typedef base_type value_type;
-        typedef boost::shared_ptr<value_type> ptr_type;
+        typedef std::shared_ptr<value_type> ptr_type;
         typedef std::vector<ptr_type> array_type;
 
         template<class derived> base_type* append(derived val) {

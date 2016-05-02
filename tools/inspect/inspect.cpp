@@ -22,16 +22,16 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 //  Files that contain the hpx_no_inspect value are not inspected.
 
 
-#include <vector>
-#include <list>
 #include <algorithm>
 #include <cstring>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <limits>
+#include <list>
+#include <memory>
 #include <string>
+#include <vector>
 
-#include "boost/shared_ptr.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
 #include "boost/program_options.hpp"
@@ -90,7 +90,7 @@ namespace
 
   class inspector_element
   {
-    typedef boost::shared_ptr< boost::inspect::inspector > inspector_ptr;
+    typedef std::shared_ptr< boost::inspect::inspector > inspector_ptr;
 
   public:
     inspector_ptr  inspector;

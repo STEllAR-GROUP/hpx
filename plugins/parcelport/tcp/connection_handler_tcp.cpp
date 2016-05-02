@@ -20,10 +20,9 @@
 
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <mutex>
-
 #include <string>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
@@ -86,7 +85,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
              it != end; ++it, ++tried)
         {
             try {
-                boost::shared_ptr<receiver> receiver_conn(
+                std::shared_ptr<receiver> receiver_conn(
                     new receiver(io_service, get_max_inbound_message_size(), *this));
 
                 tcp::endpoint ep = *it;
@@ -119,7 +118,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         {
             // cancel all pending read operations, close those sockets
             std::lock_guard<lcos::local::spinlock> l(connections_mtx_);
-            for (boost::shared_ptr<receiver> const& c : accepted_connections_)
+            for (std::shared_ptr<receiver> const& c : accepted_connections_)
             {
                 c->shutdown();
             }
@@ -138,14 +137,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
     }
 
-    boost::shared_ptr<sender> connection_handler::create_connection(
+    std::shared_ptr<sender> connection_handler::create_connection(
         parcelset::locality const& l, error_code& ec)
     {
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
 
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
-        boost::shared_ptr<sender> sender_connection(new sender(
+        std::shared_ptr<sender> sender_connection(new sender(
             io_service, l, this->parcels_sent_));
 
         // Connect to the target locality, retry if needed
@@ -156,7 +155,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // An exit here, avoids hangs when late parcels are in flight (those are
             // mainly decref requests).
             if(acceptor_ == NULL)
-                return boost::shared_ptr<sender>();
+                return std::shared_ptr<sender>();
             try {
                 util::endpoint_iterator_type end = util::connect_end();
                 for (util::endpoint_iterator_type it =
@@ -268,12 +267,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
     // accepted new incoming connection
     void connection_handler::handle_accept(boost::system::error_code const & e,
-        boost::shared_ptr<receiver> receiver_conn)
+        std::shared_ptr<receiver> receiver_conn)
     {
         if(!e)
         {
             // handle this incoming connection
-            boost::shared_ptr<receiver> c(receiver_conn);
+            std::shared_ptr<receiver> c(receiver_conn);
 
             boost::asio::io_service& io_service = io_service_pool_.get_io_service();
             receiver_conn.reset(new receiver(io_service, get_max_inbound_message_size(),
@@ -312,7 +311,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     // Handle completion of a read operation.
     void connection_handler::handle_read_completion(
         boost::system::error_code const& e,
-        boost::shared_ptr<receiver> receiver_conn)
+        std::shared_ptr<receiver> receiver_conn)
     {
         if (!e) return;
 

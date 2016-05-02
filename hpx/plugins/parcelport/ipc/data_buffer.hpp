@@ -25,9 +25,8 @@
 #else
 #include <boost/interprocess/managed_shared_memory.hpp>
 #endif
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
+#include <memory>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,12 +318,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {}
 
         data_buffer(char const* segment_name, std::size_t size)
-          : data_(boost::make_shared<data>(segment_name, size))
+          : data_(std::make_shared<data>(segment_name, size))
         {
         }
 
         data_buffer(char const* segment_name)
-          : data_(boost::make_shared<data>(segment_name))
+          : data_(std::make_shared<data>(segment_name))
         {
         }
 
@@ -404,7 +403,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         }
 
     private:
-        boost::shared_ptr<data> data_;
+        std::shared_ptr<data> data_;
     };
 }}}}
 

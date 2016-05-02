@@ -13,8 +13,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <vector>
 
 struct A
@@ -168,12 +167,12 @@ void test_member()
 {
     std::vector<char> buffer;
     {
-        boost::shared_ptr<A> struct_a(new E<float>(1, 2.3f));
+        std::shared_ptr<A> struct_a(new E<float>(1, 2.3f));
         hpx::serialization::output_archive oarchive(buffer);
         oarchive << struct_a;
     }
     {
-        boost::shared_ptr<A> struct_b;
+        std::shared_ptr<A> struct_b;
         hpx::serialization::input_archive iarchive(buffer);
         iarchive >> struct_b;
         HPX_TEST_EQ(struct_b->a, 1);

@@ -9,10 +9,8 @@
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
 #include <iostream>
+#include <memory>
 #include <vector>
 
 template <class T>
@@ -107,19 +105,19 @@ int main()
   std::vector<char> vector;
   {
       hpx::serialization::output_archive archive{vector};
-      boost::shared_ptr<A<int> > b = boost::make_shared<B<int> >(-4);
-      boost::shared_ptr<A<char> > c = boost::make_shared<B<char> >(44);
-      boost::shared_ptr<A<double> > d = boost::make_shared<B<double> >(99);
-      boost::shared_ptr<A<float> > e = boost::make_shared<C<short, float> >(222);
+      std::shared_ptr<A<int> > b = std::make_shared<B<int> >(-4);
+      std::shared_ptr<A<char> > c = std::make_shared<B<char> >(44);
+      std::shared_ptr<A<double> > d = std::make_shared<B<double> >(99);
+      std::shared_ptr<A<float> > e = std::make_shared<C<short, float> >(222);
       archive << b << c << d << e;
   }
 
   {
       hpx::serialization::input_archive archive{vector};
-      boost::shared_ptr<A<int> > b;
-      boost::shared_ptr<A<char> > c;
-      boost::shared_ptr<A<double> > d;
-      boost::shared_ptr<A<float> > e;
+      std::shared_ptr<A<int> > b;
+      std::shared_ptr<A<char> > c;
+      std::shared_ptr<A<double> > d;
+      std::shared_ptr<A<float> > e;
 
       archive >> b;
       archive >> c;
@@ -127,17 +125,17 @@ int main()
       archive >> e;
 
       HPX_TEST_EQ(b->a, -5);
-      HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, -4);
+      HPX_TEST_EQ(std::static_pointer_cast<B<int> >(b)->b, -4);
 
       HPX_TEST_EQ(c->a, 43);
-      HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->b, 44);
+      HPX_TEST_EQ(std::static_pointer_cast<B<char> >(c)->b, 44);
 
       HPX_TEST_EQ(d->a, 98);
-      HPX_TEST_EQ(boost::static_pointer_cast<B<double> >(d)->b, 99);
+      HPX_TEST_EQ(std::static_pointer_cast<B<double> >(d)->b, 99);
 
       HPX_TEST_EQ(e->a, 221);
-      HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->b), 222);
-      HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->c), 223);
+      HPX_TEST_EQ((std::static_pointer_cast<C<short, float> >(e)->b), 222);
+      HPX_TEST_EQ((std::static_pointer_cast<C<short, float> >(e)->c), 223);
   }
 
 }

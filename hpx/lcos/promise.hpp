@@ -29,8 +29,8 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ namespace hpx { namespace components
         struct heap_factory;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+        HPX_EXPORT std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
             components::component_type type);
 
         ///////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ namespace hpx { namespace components
             struct wrapper_heap_tag {};
 
         private:
-            static boost::shared_ptr<util::one_size_heap_list_base> heap_;
+            static std::shared_ptr<util::one_size_heap_list_base> heap_;
             static boost::once_flag constructed_;
 
             static void destruct_heap()
@@ -129,7 +129,7 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Promise>
-        boost::shared_ptr<util::one_size_heap_list_base>
+        std::shared_ptr<util::one_size_heap_list_base>
             promise_heap_factory<Promise>::heap_;
 
         template <typename Promise>

@@ -24,11 +24,11 @@
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/filter_iterator.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <cstdint>
 #include <iterator>
 #include <limits>
+#include <memory>
 #include <type_traits>
 #include <vector>
 
@@ -82,7 +82,7 @@ namespace hpx
         local_raw_vector_iterator() {}
 
         local_raw_vector_iterator(base_iterator const& it,
-                boost::shared_ptr<server::partitioned_vector<T> > const& data)
+                std::shared_ptr<server::partitioned_vector<T> > const& data)
           : base_type(it), data_(data)
         {}
 
@@ -104,7 +104,7 @@ namespace hpx
         }
 
     private:
-        boost::shared_ptr<server::partitioned_vector<T> > data_;
+        std::shared_ptr<server::partitioned_vector<T> > data_;
     };
 
     template <typename T, typename BaseIter>
@@ -126,7 +126,7 @@ namespace hpx
         const_local_raw_vector_iterator() {}
 
         const_local_raw_vector_iterator(base_iterator const& it,
-                boost::shared_ptr<server::partitioned_vector<T> > const& data)
+                std::shared_ptr<server::partitioned_vector<T> > const& data)
           : base_type(it), data_(data)
         {}
 
@@ -148,7 +148,7 @@ namespace hpx
         }
 
     private:
-        boost::shared_ptr<server::partitioned_vector<T> > data_;
+        std::shared_ptr<server::partitioned_vector<T> > data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -263,7 +263,7 @@ namespace hpx
 
         local_vector_iterator(partitioned_vector_partition<T> partition,
                 size_type local_index,
-                boost::shared_ptr<server::partitioned_vector<T> > const& data)
+                std::shared_ptr<server::partitioned_vector<T> > const& data)
           : partition_(partition),
             local_index_(local_index),
             data_(data)
@@ -347,11 +347,11 @@ namespace hpx
 
         size_type get_local_index() const { return local_index_; }
 
-        boost::shared_ptr<server::partitioned_vector<T> >& get_data()
+        std::shared_ptr<server::partitioned_vector<T> >& get_data()
         {
             return data_;
         }
-        boost::shared_ptr<server::partitioned_vector<T> > const& get_data() const
+        std::shared_ptr<server::partitioned_vector<T> > const& get_data() const
         {
             return data_;
         }
@@ -364,7 +364,7 @@ namespace hpx
         size_type local_index_;
 
         // caching address of component
-        boost::shared_ptr<server::partitioned_vector<T> > data_;
+        std::shared_ptr<server::partitioned_vector<T> > data_;
     };
 
     template <typename T>
@@ -392,7 +392,7 @@ namespace hpx
 
         const_local_vector_iterator(partitioned_vector_partition<T> partition,
                 size_type local_index,
-                boost::shared_ptr<server::partitioned_vector<T> > const& data)
+                std::shared_ptr<server::partitioned_vector<T> > const& data)
           : partition_(partition),
             local_index_(local_index),
             data_(data)
@@ -481,11 +481,11 @@ namespace hpx
         }
         size_type get_local_index() const { return local_index_; }
 
-        boost::shared_ptr<server::partitioned_vector<T> >& get_data()
+        std::shared_ptr<server::partitioned_vector<T> >& get_data()
         {
             return data_;
         }
-        boost::shared_ptr<server::partitioned_vector<T> > const& get_data() const
+        std::shared_ptr<server::partitioned_vector<T> > const& get_data() const
         {
             return data_;
         }
@@ -498,7 +498,7 @@ namespace hpx
         size_type local_index_;
 
         // caching address of component
-        boost::shared_ptr<server::partitioned_vector<T> > data_;
+        std::shared_ptr<server::partitioned_vector<T> > data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -656,7 +656,7 @@ namespace hpx
         }
 
     private:
-        boost::shared_ptr<server::partitioned_vector<T> > data_;
+        std::shared_ptr<server::partitioned_vector<T> > data_;
         predicate predicate_;
         BaseIter end_;
     };

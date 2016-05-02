@@ -24,6 +24,11 @@ namespace hpx { namespace traits
       : boost::false_type
 #endif
     {};
+
+    template <typename T>
+    struct is_bind_expression<T const>
+      : is_bind_expression<T>
+    {};
 }}
 
-#endif
+#endif /*HPX_TRAITS_IS_BIND_EXPRESSION_HPP*/

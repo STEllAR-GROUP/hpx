@@ -860,6 +860,9 @@ hpx_check_for_cxx11_std_lock_guard(
 hpx_check_for_cxx11_std_reference_wrapper(
   DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 
+hpx_check_for_cxx11_std_shared_ptr(
+  REQUIRED "HPX needs support for C++11 std::shared_ptr")
+
 hpx_check_for_cxx11_std_to_string(
   REQUIRED "HPX needs support for C++11 std::to_string")
 
@@ -871,6 +874,9 @@ hpx_check_for_cxx11_std_unique_ptr(
 
 hpx_check_for_cxx11_std_unordered_map(
   REQUIRED "HPX needs support for C++11 std::unordered_map")
+
+hpx_check_for_cxx11_std_unordered_set(
+  REQUIRED "HPX needs support for C++11 std::unordered_set")
 
 hpx_check_for_cxx11_std_type_traits(
   DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
@@ -1235,7 +1241,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v0.5-rc0
+    v0.5
     VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
@@ -1431,12 +1437,6 @@ if(HPX_WITH_EXAMPLES)
 endif()
 
 ###############################################################################
-# Activate plugins
-###############################################################################
-add_plugin_modules()
-###############################################################################
-
-###############################################################################
 # Tests
 ###############################################################################
 if(HPX_WITH_TESTS)
@@ -1468,6 +1468,11 @@ endif()
 if(HPX_WITH_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
+
+###############################################################################
+# Activate plugins
+###############################################################################
+add_plugin_modules()
 
 ################################################################################
 # Configure the header to include all compile definitions

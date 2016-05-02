@@ -6,12 +6,11 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/shared_ptr.hpp>
-
-#include "jacobi_nonuniform.hpp"
-
+#include <memory>
 #include <string>
 #include <vector>
+
+#include "jacobi_nonuniform.hpp"
 
 namespace jacobi_smp {
     void jacobi(
@@ -23,8 +22,8 @@ namespace jacobi_smp {
     {
         typedef std::vector<double> vector_type;
 
-        boost::shared_ptr<vector_type> dst(new vector_type(b));
-        boost::shared_ptr<vector_type> src(new vector_type(b));
+        std::shared_ptr<vector_type> dst(new vector_type(b));
+        std::shared_ptr<vector_type> src(new vector_type(b));
 
         hpx::util::high_resolution_timer t;
         for(std::size_t i = 0; i < iterations; ++i)

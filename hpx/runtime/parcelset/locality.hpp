@@ -17,6 +17,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
 
+#include <map>
 #include <memory>
 #include <string>
 

@@ -7,6 +7,7 @@
 #define HPX_COMPONENT_FACTORY_BASE_SEP_26_2008_0446PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/components_fwd.hpp> // this needs to go first
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>

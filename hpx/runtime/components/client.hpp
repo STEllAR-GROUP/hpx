@@ -37,7 +37,7 @@ namespace hpx { namespace components
         explicit client(future_type && f)
           : base_type(std::move(f))
         {}
-        explicit client(future<naming::id_type> && f)
+        client(future<naming::id_type> && f)
           : base_type(std::move(f))
         {}
 

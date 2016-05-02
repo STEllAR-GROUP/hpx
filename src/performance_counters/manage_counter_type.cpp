@@ -15,14 +15,12 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 
 namespace hpx { namespace performance_counters
 {
-    void counter_type_shutdown(boost::shared_ptr<manage_counter_type> const& p)
+    void counter_type_shutdown(std::shared_ptr<manage_counter_type> const& p)
     {
         error_code ec(lightweight);
         p->uninstall(ec);
@@ -35,8 +33,8 @@ namespace hpx { namespace performance_counters
     {
         counter_info info(type, name, helptext,
             version ? version : HPX_PERFORMANCE_COUNTER_V1, uom);
-        boost::shared_ptr<manage_counter_type> p =
-            boost::make_shared<manage_counter_type>(info);
+        std::shared_ptr<manage_counter_type> p =
+            std::make_shared<manage_counter_type>(info);
 
         // Install the counter type.
         p->install(ec);
@@ -58,8 +56,8 @@ namespace hpx { namespace performance_counters
     {
         counter_info info(type, name, helptext,
             version ? version : HPX_PERFORMANCE_COUNTER_V1, uom);
-        boost::shared_ptr<manage_counter_type> p =
-            boost::make_shared<manage_counter_type>(info);
+        std::shared_ptr<manage_counter_type> p =
+            std::make_shared<manage_counter_type>(info);
 
         // Install the counter type.
         p->install(create_counter, discover_counters, ec);

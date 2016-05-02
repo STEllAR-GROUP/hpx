@@ -15,11 +15,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/format.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/format.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -29,7 +28,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-void stop_monitor(boost::shared_ptr<hpx::promise<void> > p)
+void stop_monitor(std::shared_ptr<hpx::promise<void> > p)
 {
     p->set_value();      // Kill the monitor.
 }
@@ -60,8 +59,8 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
         return 1;
     }
 
-    boost::shared_ptr<hpx::promise<void> > stop_flag =
-        boost::make_shared<hpx::promise<void> >();
+    std::shared_ptr<hpx::promise<void> > stop_flag =
+        std::make_shared<hpx::promise<void> >();
     hpx::future<void> f = stop_flag->get_future();
 
     hpx::register_shutdown_function(

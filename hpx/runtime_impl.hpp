@@ -27,7 +27,6 @@
 #include <hpx/util/init_logging.hpp>
 
 #include <boost/detail/atomic_count.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/exception_ptr.hpp>

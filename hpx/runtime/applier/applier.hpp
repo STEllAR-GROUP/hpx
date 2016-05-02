@@ -9,6 +9,7 @@
 #define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/applier_fwd.hpp> // this needs to go first
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>

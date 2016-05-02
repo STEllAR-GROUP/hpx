@@ -21,9 +21,9 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/format.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <list>
+#include <memory>
 #include <mutex>
 #include <string>
 
@@ -39,7 +39,7 @@ namespace hpx { namespace util
         typedef typename heap_type::allocator_type allocator_type;
         typedef typename heap_type::value_type value_type;
 
-        typedef std::list<boost::shared_ptr<heap_type> > list_type;
+        typedef std::list<std::shared_ptr<heap_type> > list_type;
         typedef typename list_type::iterator iterator;
         typedef typename list_type::const_iterator const_iterator;
 

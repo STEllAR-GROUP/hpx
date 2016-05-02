@@ -13,8 +13,9 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <map>
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace  threads
@@ -136,7 +137,7 @@ namespace hpx { namespace  threads
             }
 
             // hold on to proxy
-            boost::shared_ptr<detail::manage_executor> proxy_;
+            std::shared_ptr<detail::manage_executor> proxy_;
 
             // map physical to logical puinit ids
             std::vector<coreids_type> core_ids_;
@@ -159,7 +160,7 @@ namespace hpx { namespace  threads
             {}
 
             // The scheduler proxy this allocation data is for.
-            boost::shared_ptr<detail::manage_executor> proxy_;  // hold on to proxy
+            std::shared_ptr<detail::manage_executor> proxy_;  // hold on to proxy
 
             // Additional allocation to give to a scheduler after proportional
             // allocation decisions are made.

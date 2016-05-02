@@ -238,13 +238,11 @@ namespace hpx
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -404,7 +402,7 @@ namespace hpx { namespace lcos
         }
 
         template <typename Sequence>
-        struct when_some : boost::enable_shared_from_this<when_some<Sequence> > //-V690
+        struct when_some : std::enable_shared_from_this<when_some<Sequence> > //-V690
         {
             typedef lcos::local::spinlock mutex_type;
 
@@ -500,8 +498,8 @@ namespace hpx { namespace lcos
         result_type lazy_values_ =
             traits::acquire_future<result_type>()(lazy_values);
 
-        boost::shared_ptr<detail::when_some<result_type> > f =
-            boost::make_shared<detail::when_some<result_type> >(
+        std::shared_ptr<detail::when_some<result_type> > f =
+            std::make_shared<detail::when_some<result_type> >(
                 std::move(lazy_values_), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
@@ -604,8 +602,8 @@ namespace hpx { namespace lcos
             return lcos::make_ready_future(when_some_result<result_type>());
         }
 
-        boost::shared_ptr<detail::when_some<result_type> > f =
-            boost::make_shared<detail::when_some<result_type> >(
+        std::shared_ptr<detail::when_some<result_type> > f =
+            std::make_shared<detail::when_some<result_type> >(
                 std::move(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
@@ -642,8 +640,8 @@ namespace hpx { namespace lcos
             return lcos::make_ready_future(when_some_result<result_type>());
         }
 
-        boost::shared_ptr<detail::when_some<result_type> > f =
-            boost::make_shared<detail::when_some<result_type> >(
+        std::shared_ptr<detail::when_some<result_type> > f =
+            std::make_shared<detail::when_some<result_type> >(
                 std::move(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(

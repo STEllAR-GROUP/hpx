@@ -322,10 +322,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 zip_type_in initial = zip_type_in();
                 //
+                typedef hpx::util::tuple<value_type, reduce_key_series_states>
+                    lambda_type;
                 hpx::parallel::inclusive_scan(sync_policy, states_begin,
                     states_end, states_out_begin, initial,
                     // B is the current entry, A is the one passed in from 'previous'
-                    [&func](zip_type_in a, zip_type_in b)
+                    [&func](zip_type_in a, zip_type_in b)->lambda_type
                     {
                         value_type a_val = get<0>(a);
                         reduce_key_series_states a_state = get<1>(a);
@@ -345,8 +347,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             // normal add of previous + this
                         else {
                             debug_reduce_by_key(" = " << func(a_val, b_val) << std::endl);
+                            value_type temp = func(a_val, b_val);
                             return make_tuple(
-                                func(a_val, b_val),
+                                temp,
                                 reduce_key_series_states(
                                     a_state.start || b_state.start, b_state.end));
                         }

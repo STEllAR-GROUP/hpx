@@ -21,8 +21,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace components { namespace stubs
@@ -157,7 +156,7 @@ namespace hpx { namespace components { namespace stubs
         template <typename Component>
         static lcos::future<naming::id_type>
         copy_create_component_async(naming::id_type const& gid,
-            boost::shared_ptr<Component> const& p, bool local_op)
+            std::shared_ptr<Component> const& p, bool local_op)
         {
             if (!naming::is_locality(gid))
             {
@@ -175,7 +174,7 @@ namespace hpx { namespace components { namespace stubs
 
         template <typename Component>
         static naming::id_type copy_create_component(naming::id_type const& gid,
-            boost::shared_ptr<Component> const& p, bool local_op)
+            std::shared_ptr<Component> const& p, bool local_op)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future
@@ -187,7 +186,7 @@ namespace hpx { namespace components { namespace stubs
         template <typename Component>
         static lcos::future<naming::id_type>
         migrate_component_async(naming::id_type const& target_locality,
-            boost::shared_ptr<Component> const& p,
+            std::shared_ptr<Component> const& p,
             naming::id_type const& to_migrate)
         {
             if (!naming::is_locality(target_locality))
@@ -207,7 +206,7 @@ namespace hpx { namespace components { namespace stubs
         template <typename Component, typename DistPolicy>
         static lcos::future<naming::id_type>
         migrate_component_async(DistPolicy const& policy,
-            boost::shared_ptr<Component> const& p,
+            std::shared_ptr<Component> const& p,
             naming::id_type const& to_migrate)
         {
             typedef typename server::migrate_component_here_action<Component>
@@ -218,7 +217,7 @@ namespace hpx { namespace components { namespace stubs
         template <typename Component, typename Target>
         static naming::id_type migrate_component(
             Target const& target, naming::id_type const& to_migrate,
-            boost::shared_ptr<Component> const& p)
+            std::shared_ptr<Component> const& p)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future

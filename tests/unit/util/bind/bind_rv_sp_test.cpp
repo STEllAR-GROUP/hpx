@@ -24,9 +24,9 @@
 namespace placeholders = hpx::util::placeholders;
 
 #include <iostream>
+#include <memory>
 
 #include <hpx/util/lightweight_test.hpp>
-#include <boost/shared_ptr.hpp>
 
 struct X
 {
@@ -44,9 +44,9 @@ struct X
 
 struct Y
 {
-    boost::shared_ptr<X> f()
+    std::shared_ptr<X> f()
     {
-        return boost::shared_ptr<X>( new X( 42 ) );
+        return std::shared_ptr<X>( new X( 42 ) );
     }
 };
 

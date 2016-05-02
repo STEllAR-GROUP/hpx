@@ -26,6 +26,7 @@
 
 #include <boost/mpl/bool.hpp>
 
+#include <memory>
 #include <mutex>
 #include <utility>
 

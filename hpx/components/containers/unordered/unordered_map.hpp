@@ -20,7 +20,6 @@
 #include <hpx/components/containers/unordered/unordered_map_segmented_iterator.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -283,7 +282,7 @@ namespace hpx
                 return hpx::async<action_type>(this->partition_.get(), std::move(d));
             }
 
-            boost::shared_ptr<partition_unordered_map_server> local_data_;
+            std::shared_ptr<partition_unordered_map_server> local_data_;
         };
 
         // The list of partitions belonging to this unordered_map.
@@ -340,7 +339,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         static void get_ptr_helper(std::size_t loc,
             partitions_vector_type& partitions,
-            future<boost::shared_ptr<partition_unordered_map_server> > && f)
+            future<std::shared_ptr<partition_unordered_map_server> > && f)
         {
             partitions[loc].local_data_ = f.get();
         }

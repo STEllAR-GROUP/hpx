@@ -37,9 +37,9 @@
 #include <boost/detail/endian.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
+#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -102,7 +102,7 @@ namespace hpx { namespace parcelset
     {
         for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
-            boost::shared_ptr<parcelport> pp;
+            std::shared_ptr<parcelport> pp;
             pp.reset(
                 factory->create(
                     cfg
@@ -114,7 +114,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    boost::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
+    std::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
     {
         if(!pports_.empty())
         {
@@ -128,7 +128,7 @@ namespace hpx { namespace parcelset
             if(pp.first > 0 && pp.second->can_bootstrap())
                 return pp.second;
         }
-        return boost::shared_ptr<parcelport>();
+        return std::shared_ptr<parcelport>();
     }
 
 
@@ -182,7 +182,7 @@ namespace hpx { namespace parcelset
         strm << '\n';
     }
 
-    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> const& pp)
+    void parcelhandler::attach_parcelport(std::shared_ptr<parcelport> const& pp)
     {
         using util::placeholders::_1;
 
@@ -248,7 +248,7 @@ namespace hpx { namespace parcelset
                 {
                     if ((*it).second)
                     {
-                        boost::shared_ptr<policies::message_handler> p((*it).second);
+                        std::shared_ptr<policies::message_handler> p((*it).second);
                         util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                         did_some_work =
                             p->flush(mode, stop_buffering) || did_some_work;
@@ -317,7 +317,7 @@ namespace hpx { namespace parcelset
         return !locality_ids.empty();
     }
 
-    std::pair<boost::shared_ptr<parcelport>, locality>
+    std::pair<std::shared_ptr<parcelport>, locality>
     parcelhandler::find_appropriate_destination(
         naming::gid_type const& dest_gid)
     {
@@ -339,7 +339,7 @@ namespace hpx { namespace parcelset
             "parcelhandler::find_appropriate_destination",
             "The locality gid cannot be resolved to a valid endpoint. "
             "No valid parcelport configured.");
-        return std::pair<boost::shared_ptr<parcelport>, locality>();
+        return std::pair<std::shared_ptr<parcelport>, locality>();
     }
 
     locality parcelhandler::find_endpoint(endpoints_type const & eps,
@@ -452,7 +452,7 @@ namespace hpx { namespace parcelset
         {
             // dispatch to the message handler which is associated with the
             // encapsulated action
-            typedef std::pair<boost::shared_ptr<parcelport>, locality> destination_pair;
+            typedef std::pair<std::shared_ptr<parcelport>, locality> destination_pair;
             destination_pair dest = find_appropriate_destination(addrs[0].locality_);
 
             if (load_message_handlers_ && !hpx::is_stopped_or_shutting_down())
@@ -522,7 +522,7 @@ namespace hpx { namespace parcelset
         std::vector<write_handler_type> resolved_handlers;
         resolved_handlers.reserve(num_parcels);
 
-        typedef std::pair<boost::shared_ptr<parcelport>, locality>
+        typedef std::pair<std::shared_ptr<parcelport>, locality>
             destination_pair;
 
         destination_pair resolved_dest;
@@ -673,7 +673,7 @@ namespace hpx { namespace parcelset
         message_handler_map::iterator it = handlers_.find(key);
 
         if (it == handlers_.end()) {
-            boost::shared_ptr<policies::message_handler> p;
+            std::shared_ptr<policies::message_handler> p;
 
             {
                 util::unlock_guard<std::unique_lock<mutex_type> > ul(l);

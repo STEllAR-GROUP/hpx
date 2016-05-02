@@ -21,8 +21,8 @@
 #include <boost/detail/atomic_count.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -172,14 +172,14 @@ namespace hpx { namespace components
         }
 #endif
 
-        boost::shared_ptr<util::one_size_heap_list_base> get_heap() const
+        std::shared_ptr<util::one_size_heap_list_base> get_heap() const
         {
             return heap_;
         }
 
     protected:
         component_type type_;
-        boost::shared_ptr<util::one_size_heap_list_base> heap_;
+        std::shared_ptr<util::one_size_heap_list_base> heap_;
     };
 }}
 

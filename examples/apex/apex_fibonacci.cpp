@@ -14,6 +14,7 @@
 #include <apex_api.hpp>
 
 #include <iostream>
+#include <set>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
