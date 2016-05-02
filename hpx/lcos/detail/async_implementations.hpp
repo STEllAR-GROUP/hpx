@@ -209,6 +209,7 @@ namespace hpx { namespace detail
         if (policy == launch::sync || hpx::detail::has_async_policy(policy))
         {
             lcos::packaged_action<action_type, result_type> p;
+
             p.apply(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Ts>(vs)...);
             f = p.get_future();

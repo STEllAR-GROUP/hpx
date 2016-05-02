@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/runtime/actions/detail/remote_action_result.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/lcos/future.hpp>
@@ -20,13 +21,6 @@
 
 namespace hpx
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace actions { namespace detail
-    {
-        template <typename Result>
-        struct remote_action_result;
-    }}
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {

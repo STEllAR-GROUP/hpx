@@ -14,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/detail/remote_action_result.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -112,12 +113,6 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         // If an action returns a future, we need to do special things
-        template <typename Result>
-        struct remote_action_result
-        {
-            typedef Result type;
-        };
-
         template <>
         struct remote_action_result<void>
         {
