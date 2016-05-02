@@ -257,11 +257,10 @@ namespace hpx { namespace components
         template <typename Component>
         struct simple_heap_factory
         {
-            static Component* alloc(std::size_t count)
+            static void* alloc(std::size_t count)
             {
                 HPX_ASSERT(1 == count);
-                return static_cast<Component*>
-                    (::operator new(sizeof(Component)));
+                return ::operator new(sizeof(Component));
             }
             static void free(void* p, std::size_t count)
             {
