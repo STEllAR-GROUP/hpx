@@ -11,12 +11,12 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <cassert>
 #include <cstdlib>
 #include <initializer_list>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>

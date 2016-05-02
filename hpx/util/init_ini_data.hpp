@@ -13,8 +13,9 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -46,7 +47,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
-    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     init_ini_data_default(std::string const& libs, section& ini,
         std::map<std::string, boost::filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules);

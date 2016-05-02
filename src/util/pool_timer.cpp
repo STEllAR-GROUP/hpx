@@ -16,19 +16,18 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/make_shared.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/chrono/chrono.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
-#include <string>
+#include <memory>
 #include <mutex>
+#include <string>
 
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     class pool_timer
-      : public boost::enable_shared_from_this<pool_timer>
+      : public std::enable_shared_from_this<pool_timer>
     {
     private:
         friend class util::pool_timer;
@@ -199,7 +198,7 @@ namespace hpx { namespace util
             hpx::util::steady_time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown)
-      : timer_(boost::make_shared<detail::pool_timer>(
+      : timer_(std::make_shared<detail::pool_timer>(
             f, on_term, abs_time.value(), description, pre_shutdown))
     {}
 
@@ -208,7 +207,7 @@ namespace hpx { namespace util
             hpx::util::steady_duration const& rel_time,
             std::string const& description,
             bool pre_shutdown)
-      : timer_(boost::make_shared<detail::pool_timer>(
+      : timer_(std::make_shared<detail::pool_timer>(
             f, on_term, rel_time.from_now(), description, pre_shutdown))
     {}
 

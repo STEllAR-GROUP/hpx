@@ -14,8 +14,8 @@ namespace hpx { namespace lcos { namespace local {
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <vector>
 
 typedef boost::atomic<hpx::lcos::local::guard_task *> guard_atomic;
@@ -58,7 +58,7 @@ struct guard : DebugObject {
 };
 
 class guard_set : DebugObject {
-    std::vector<boost::shared_ptr<guard> > guards;
+    std::vector<std::shared_ptr<guard> > guards;
     // the guards need to be sorted, but we don't
     // want to sort them more often than necessary
     bool sorted;
@@ -67,14 +67,14 @@ public:
     guard_set() : guards(), sorted(true) {}
     ~guard_set() {}
 
-    void add(boost::shared_ptr<guard> const& guard_ptr) {
+    void add(std::shared_ptr<guard> const& guard_ptr) {
         guards.push_back(guard_ptr);
         sorted = false;
     }
 
     friend HPX_API_EXPORT void run_guarded(guard_set& guards,
         util::function_nonser<void()> task);
-    boost::shared_ptr<guard> get(std::size_t i) { return guards[i]; }
+    std::shared_ptr<guard> get(std::size_t i) { return guards[i]; }
 };
 
 /// Conceptually, a guard acts like a mutex on an asyncrhonous task. The

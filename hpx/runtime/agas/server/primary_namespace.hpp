@@ -27,10 +27,11 @@
 #include <boost/format.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
-#include <boost/shared_ptr.hpp>
+#  include <memory>
 #endif
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -147,7 +148,7 @@ struct HPX_EXPORT primary_namespace
             naming::gid_type,
             hpx::util::tuple<
                 bool, std::size_t,
-                boost::shared_ptr<lcos::local::condition_variable_any>
+                std::shared_ptr<lcos::local::condition_variable_any>
             >
         > migration_table_type;
 #endif

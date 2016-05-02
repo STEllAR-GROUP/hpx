@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <boost/shared_array.hpp>
@@ -95,7 +96,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-
+        ///////////////////////////////////////////////////////////////////////
         template<typename InIter, typename OutIter, typename Enable = void>
         struct copy_iter;
 
@@ -103,23 +104,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct copy_iter<
             InIter, OutIter,
             typename std::enable_if<
-                hpx::traits::segmented_iterator_traits<InIter>
-                    ::is_segmented_iterator::value
-             >::type
-        > : public copy<std::pair<
-            typename hpx::traits::segmented_iterator_traits<InIter>::local_iterator,
-            typename hpx::traits::segmented_iterator_traits<OutIter>::local_iterator
-        >>
+                iterators_are_segmented<InIter, OutIter>::value
+            >::type>
+          : public copy<std::pair<
+                typename hpx::traits::segmented_iterator_traits<InIter>
+                    ::local_iterator,
+                typename hpx::traits::segmented_iterator_traits<OutIter>
+                    ::local_iterator
+            > >
         {};
 
         template<typename InIter, typename OutIter>
         struct copy_iter<
             InIter, OutIter,
             typename std::enable_if<
-                !hpx::traits::segmented_iterator_traits<OutIter>
-                    ::is_segmented_iterator::value
-            >::type
-        > : public copy<std::pair<InIter, OutIter>>
+                iterators_are_not_segmented<InIter, OutIter>::value
+            >::type>
+          : public copy<std::pair<InIter, OutIter> >
         {};
 
         /// \endcond

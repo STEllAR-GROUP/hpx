@@ -26,24 +26,28 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/unordered_set.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <unordered_set>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost
+namespace std
 {
     template <>
-    struct hash<hpx::threads::thread_id_type>
+    struct hash< ::hpx::threads::thread_id_type>
     {
-        std::size_t operator()(hpx::threads::thread_id_type const& v) const
+        typedef ::hpx::threads::thread_id_type argument_type;
+        typedef std::size_t result_type;
+
+        std::size_t operator()(::hpx::threads::thread_id_type const& v) const
         {
+            std::hash<std::size_t> hasher_;
             return hasher_(reinterpret_cast<std::size_t>(v.get()));
         }
-
-        boost::hash<std::size_t> hasher_;
     };
 }
 
@@ -116,7 +120,7 @@ namespace hpx { namespace threads { namespace policies
         };
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef boost::unordered_set<thread_id_type> thread_map_type;
+        typedef std::unordered_set<thread_id_type> thread_map_type;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         typedef
@@ -877,7 +881,7 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::const_iterator it = thread_map_.begin();
                  it != end; ++it)
             {
-                if ((*it)->get_state() == state)
+                if ((*it)->get_state().state() == state)
                     ++num_threads;
             }
             return num_threads;
@@ -891,10 +895,9 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
             {
-                if ((*it)->get_state() == suspended)
+                if ((*it)->get_state().state() == suspended)
                 {
-                    (*it)->set_state_ex(wait_abort);
-                    (*it)->set_state(pending);
+                    (*it)->set_state(pending, wait_abort);
                     schedule_thread((*it).get());
                 }
             }

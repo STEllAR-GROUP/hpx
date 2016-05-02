@@ -354,6 +354,13 @@ macro(hpx_check_for_cxx11_std_reference_wrapper)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_shared_ptr)
+  add_hpx_config_test(HPX_WITH_CXX11_SHARED_PTR
+    SOURCE cmake/tests/cxx11_std_shared_ptr.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_to_string)
   add_hpx_config_test(HPX_WITH_CXX11_TO_STRING
     SOURCE cmake/tests/cxx11_std_to_string.cpp
@@ -385,6 +392,13 @@ endmacro()
 macro(hpx_check_for_cxx11_std_unordered_map)
   add_hpx_config_test(HPX_WITH_CXX11_UNORDERED_MAP
     SOURCE cmake/tests/cxx11_std_unordered_map.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_unordered_set)
+  add_hpx_config_test(HPX_WITH_CXX11_UNORDERED_SET
+    SOURCE cmake/tests/cxx11_std_unordered_set.cpp
     FILE ${ARGN})
 endmacro()
 

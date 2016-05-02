@@ -32,9 +32,8 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <mutex>
 #include <sstream>
 #include <vector>
@@ -352,13 +351,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         mutex_type mtx_;
     };
-
-    // this makes sure we can store our connections in a set
-    inline bool operator<(boost::shared_ptr<receiver> const& lhs,
-        boost::shared_ptr<receiver> const& rhs)
-    {
-        return lhs.get() < rhs.get();
-    }
 }}}}
 
 #endif

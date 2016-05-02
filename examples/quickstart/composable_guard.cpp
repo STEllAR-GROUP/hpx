@@ -5,8 +5,8 @@
 #include <hpx/lcos/local/composable_guard.hpp>
 #include <hpx/hpx_init.hpp>
 #include <boost/atomic.hpp>
-#include <boost/shared_ptr.hpp>
 #include <iostream>
+#include <memory>
 
 // This program illustrates the use of composable guards to perform
 // a computation that might otherwise rely on mutexes. In fact, guards
@@ -30,8 +30,8 @@
 typedef boost::atomic<int> int_atomic;
 int_atomic i1(0), i2(0);
 hpx::lcos::local::guard_set guards;
-boost::shared_ptr<hpx::lcos::local::guard> l1(new hpx::lcos::local::guard());
-boost::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
+std::shared_ptr<hpx::lcos::local::guard> l1(new hpx::lcos::local::guard());
+std::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
 
 void incr1() {
     // implicitly lock l1

@@ -32,7 +32,6 @@
 #include <windows.h>
 #endif
 
-#include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
@@ -59,7 +58,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
+#include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 
 #include <hpx/runtime/find_localities.hpp>

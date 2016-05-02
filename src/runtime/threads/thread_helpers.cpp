@@ -1,10 +1,11 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -47,7 +48,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     thread_state get_thread_state(thread_id_type const& id, error_code& ec)
     {
-        return id ? id->get_state() : thread_state(terminated);
+        return id ? id->get_state() : thread_state(terminated, wait_unknown);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -291,6 +292,7 @@ namespace hpx { namespace threads
 
         return id ? id->get_lco_description() : "<unknown>";
     }
+
     util::thread_description set_thread_lco_description(
         thread_id_type const& id, util::thread_description const& desc,
         error_code& ec)
@@ -545,8 +547,7 @@ namespace hpx { namespace this_thread
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::executors::current_executor
-        get_executor(error_code& ec)
+    threads::executors::current_executor get_executor(error_code& ec)
     {
         return threads::get_executor(threads::get_self_id(), ec);
     }

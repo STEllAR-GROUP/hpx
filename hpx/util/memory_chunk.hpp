@@ -19,8 +19,8 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/shared_ptr.hpp>
-
+#include <map>
+#include <memory>
 #include <mutex>
 
 namespace hpx { namespace util
@@ -274,7 +274,7 @@ namespace hpx { namespace util
         }
 
         mutable mutex_type mtx_;
-        boost::shared_ptr<data_type> data_;
+        std::shared_ptr<data_type> data_;
         size_type const chunk_size_;
         size_type allocated_;
         iterator current_;

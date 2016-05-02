@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/segmented_algorithms/detail/transfer.hpp
-
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFER)
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFER
 
@@ -24,6 +22,7 @@
 #include <iterator>
 #include <list>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -35,6 +34,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename InIter, typename OutIter>
+        struct iterators_are_segmented
+          : std::integral_constant<bool,
+                hpx::traits::segmented_iterator_traits<InIter>
+                    ::is_segmented_iterator::value &&
+                hpx::traits::segmented_iterator_traits<OutIter>
+                    ::is_segmented_iterator::value>
+        {};
+
+        template <typename InIter, typename OutIter>
+        struct iterators_are_not_segmented
+          : std::integral_constant<bool,
+                !hpx::traits::segmented_iterator_traits<InIter>
+                    ::is_segmented_iterator::value &&
+                !hpx::traits::segmented_iterator_traits<OutIter>
+                    ::is_segmented_iterator::value>
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename SegOutIter>

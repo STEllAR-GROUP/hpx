@@ -55,11 +55,11 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
+#include <map>
+#include <memory>
 #include <mutex>
 #include <set>
 #include <sstream>
@@ -305,7 +305,7 @@ namespace hpx { namespace components { namespace server
         l.unlock();
 
     // create new component instance
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        std::shared_ptr<component_factory_base> factory((*it).second.first);
 
         ids.reserve(count);
         for (std::size_t i = 0; i < count; ++i)
@@ -319,7 +319,7 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::shared_ptr<util::one_size_heap_list_base>
+    std::shared_ptr<util::one_size_heap_list_base>
         runtime_support::get_promise_heap(components::component_type type)
     {
         // locate the factory for the requested component type
@@ -329,7 +329,7 @@ namespace hpx { namespace components { namespace server
         if (it == components_.end())
         {
             // we don't know anything about this promise type yet
-            boost::shared_ptr<components::base_lco_factory> factory(
+            std::shared_ptr<components::base_lco_factory> factory(
                 new components::base_lco_factory(type));
 
             component_factory_type data(factory);
@@ -347,7 +347,7 @@ namespace hpx { namespace components { namespace server
             it = p.first;
         }
 
-        return boost::static_pointer_cast<components::base_lco_factory>(
+        return std::static_pointer_cast<components::base_lco_factory>(
             (*it).second.first)->get_heap();
     }
 
@@ -422,7 +422,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // locate the factory for the requested component type
-        boost::shared_ptr<component_factory_base> factory;
+        std::shared_ptr<component_factory_base> factory;
 
         {
             std::unique_lock<component_map_mutex_type> l(cm_mtx_);
@@ -1359,7 +1359,7 @@ namespace hpx { namespace components { namespace server
         typedef lcos::local::packaged_task<write_handler_type> packaged_task_type;
 
         indirect_packaged_task()
-          : pt(boost::make_shared<packaged_task_type>(
+          : pt(std::make_shared<packaged_task_type>(
                 &parcelset::default_write_handler))
         {}
 
@@ -1374,7 +1374,7 @@ namespace hpx { namespace components { namespace server
             (*pt)(std::forward<Ts>(vs)...);
         }
 
-        boost::shared_ptr<packaged_task_type> pt;
+        std::shared_ptr<packaged_task_type> pt;
     };
 
     void runtime_support::remove_here_from_connection_cache()
@@ -1437,8 +1437,8 @@ namespace hpx { namespace components { namespace server
         l.unlock();
 
         // create new component instance
-        boost::shared_ptr<plugins::message_handler_factory_base> factory(
-            boost::static_pointer_cast<plugins::message_handler_factory_base>(
+        std::shared_ptr<plugins::message_handler_factory_base> factory(
+            std::static_pointer_cast<plugins::message_handler_factory_base>(
                 (*it).second.first));
 
         factory->register_action(action, ec);
@@ -1500,8 +1500,8 @@ namespace hpx { namespace components { namespace server
         l.unlock();
 
         // create new component instance
-        boost::shared_ptr<plugins::message_handler_factory_base> factory(
-            boost::static_pointer_cast<plugins::message_handler_factory_base>(
+        std::shared_ptr<plugins::message_handler_factory_base> factory(
+            std::static_pointer_cast<plugins::message_handler_factory_base>(
                 (*it).second.first));
 
         parcelset::policies::message_handler* mh = factory->create(action,
@@ -1548,8 +1548,8 @@ namespace hpx { namespace components { namespace server
         l.unlock();
 
         // create new component instance
-        boost::shared_ptr<plugins::binary_filter_factory_base> factory(
-            boost::static_pointer_cast<plugins::binary_filter_factory_base>(
+        std::shared_ptr<plugins::binary_filter_factory_base> factory(
+            std::static_pointer_cast<plugins::binary_filter_factory_base>(
                 (*it).second.first));
 
         serialization::binary_filter* bf = factory->create(compress, next_filter);
@@ -1610,7 +1610,7 @@ namespace hpx { namespace components { namespace server
                     component_factory_base> pf (f);
 
                 // create the component factory object, if not disabled
-                boost::shared_ptr<component_factory_base> factory (
+                std::shared_ptr<component_factory_base> factory (
                     pf.create(instance, ec, glob_ini, component_ini, isenabled));
                 if (ec) {
                     LRT_(warning) << "static loading failed: " << lib.string()
@@ -1830,7 +1830,7 @@ namespace hpx { namespace components { namespace server
                 component_startup_shutdown_base> pf (f);
 
             // create the startup_shutdown object
-            boost::shared_ptr<component_startup_shutdown_base>
+            std::shared_ptr<component_startup_shutdown_base>
                 startup_shutdown(pf.create("startup_shutdown", ec));
             if (ec) {
                 LRT_(debug) << "static loading of startup/shutdown functions "
@@ -1894,7 +1894,7 @@ namespace hpx { namespace components { namespace server
                 component_commandline_base> pf (f);
 
             // create the startup_shutdown object
-            boost::shared_ptr<component_commandline_base>
+            std::shared_ptr<component_commandline_base>
                 commandline_options(pf.create("commandline_options", ec));
             if (ec) {
                 LRT_(debug) << "static loading of command-line options failed: "
@@ -1975,7 +1975,7 @@ namespace hpx { namespace components { namespace server
                 "startup_shutdown");
 
             // create the startup_shutdown object
-            boost::shared_ptr<component_startup_shutdown_base>
+            std::shared_ptr<component_startup_shutdown_base>
                 startup_shutdown(pf.create("startup_shutdown", ec));
             if (ec) {
                 LRT_(debug) << "loading of startup/shutdown functions failed: "
@@ -2028,7 +2028,7 @@ namespace hpx { namespace components { namespace server
                 "commandline_options");
 
             // create the startup_shutdown object
-            boost::shared_ptr<component_commandline_base>
+            std::shared_ptr<component_commandline_base>
                 commandline_options(pf.create("commandline_options", ec));
             if (ec) {
                 LRT_(debug) << "loading of command-line options failed: "
@@ -2084,7 +2084,7 @@ namespace hpx { namespace components { namespace server
                     "factory");
 
                 // create the component factory object, if not disabled
-                boost::shared_ptr<component_factory_base> factory (
+                std::shared_ptr<component_factory_base> factory (
                     pf.create(instance, ec, glob_ini, component_ini, isenabled));
                 if (ec) {
                     LRT_(warning) << "dynamic loading failed: " << lib.string()
@@ -2305,7 +2305,7 @@ namespace hpx { namespace components { namespace server
                     pf (d, "factory");
 
                 // create the component factory object, if not disabled
-                boost::shared_ptr<plugins::plugin_factory_base> factory (
+                std::shared_ptr<plugins::plugin_factory_base> factory (
                     pf.create(instance, ec, glob_ini, plugin_ini, isenabled));
                 if (!ec)
                 {
@@ -2433,7 +2433,7 @@ namespace hpx { namespace components { namespace server
             return caps;
         }
 
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        std::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::unlock_guard<std::unique_lock<component_map_mutex_type> > ul(l);
             caps = factory->get_required_capabilities();

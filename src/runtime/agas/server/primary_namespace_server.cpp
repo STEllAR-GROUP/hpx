@@ -22,10 +22,11 @@
 #include <hpx/lcos/wait_all.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
-#include <boost/make_shared.hpp>
+#  include <memory>
 #endif
 
 #include <list>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -401,7 +402,7 @@ response primary_namespace::begin_migration(
                 id,
                 hpx::util::make_tuple(
                     false, 0,
-                    boost::make_shared<lcos::local::condition_variable_any>()
+                    std::make_shared<lcos::local::condition_variable_any>()
                 )
             ));
 #endif

@@ -13,12 +13,11 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write,
-    boost::shared_ptr<hpx::lcos::local::promise<int> > p)
+    std::shared_ptr<hpx::lcos::local::promise<int> > p)
 {
     // This IO operation will possibly block the IO thread in the
     // kernel.
@@ -30,8 +29,8 @@ void do_async_io(char const* string_to_write,
 // This function will be executed by an HPX thread
 hpx::lcos::future<int> async_io(char const* string_to_write)
 {
-    boost::shared_ptr<hpx::lcos::local::promise<int> > p =
-        boost::make_shared<hpx::lcos::local::promise<int> >();
+    std::shared_ptr<hpx::lcos::local::promise<int> > p =
+        std::make_shared<hpx::lcos::local::promise<int> >();
 
     // Get a reference to one of the IO specific HPX io_service objects ...
     hpx::util::io_service_pool* pool =

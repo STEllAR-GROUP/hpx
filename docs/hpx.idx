@@ -228,6 +228,9 @@ parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 # hpx/parallel/algorithms/reduce.hpp
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
 
+# hpx/parallel/algorithms/reduce_by_key.hpp
+parallel::reduce_by_key               "reduce_by_key" "hpx\.parallel\.v1\.reduce_by_key.*"
+
 # hpx/parallel/algorithms/for_loop_reduction.hpp
 parallel::reduction                   "reduction" "hpx\.parallel\.v2\.reduction"
 parallel::reduction_plus              "reduction_plus" "hpx\.parallel\.v2\.reduction_plus"

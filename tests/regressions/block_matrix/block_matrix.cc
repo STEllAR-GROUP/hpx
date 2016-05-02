@@ -75,7 +75,7 @@ std::ostream& operator<<(std::ostream& os, const structure_t& str)
 
 
 
-block_vector_t::block_vector_t(boost::shared_ptr<structure_t> str):
+block_vector_t::block_vector_t(std::shared_ptr<structure_t> str):
   str(str), elts(str->B)
 {
   for (std::ptrdiff_t b=0; b<str->B; ++b) {
@@ -83,7 +83,7 @@ block_vector_t::block_vector_t(boost::shared_ptr<structure_t> str):
   }
 }
 
-block_vector_t::block_vector_t(boost::shared_ptr<structure_t> str,
+block_vector_t::block_vector_t(std::shared_ptr<structure_t> str,
                                IL<P<int, IL<double>>> x):
   block_vector_t(str)
 {
@@ -115,8 +115,8 @@ std::ostream& operator<<(std::ostream& os, const block_vector_t& x)
 
 
 
-block_matrix_t::block_matrix_t(boost::shared_ptr<structure_t> istr,
-                               boost::shared_ptr<structure_t> jstr):
+block_matrix_t::block_matrix_t(std::shared_ptr<structure_t> istr,
+                               std::shared_ptr<structure_t> jstr):
   istr(istr), jstr(jstr), elts(istr->B*jstr->B)
 {
   for (std::ptrdiff_t jb=0; jb<jstr->B; ++jb) {
@@ -127,8 +127,8 @@ block_matrix_t::block_matrix_t(boost::shared_ptr<structure_t> istr,
   }
 }
 
-block_matrix_t::block_matrix_t(boost::shared_ptr<structure_t> istr,
-                               boost::shared_ptr<structure_t> jstr,
+block_matrix_t::block_matrix_t(std::shared_ptr<structure_t> istr,
+                               std::shared_ptr<structure_t> jstr,
                                IL<IL<P<P<int,int>, IL<IL<double>>>>> a):
   block_matrix_t(istr, jstr)
 {

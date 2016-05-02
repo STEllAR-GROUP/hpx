@@ -13,9 +13,9 @@
 #include <hpx/parallel/util/numa_allocator.hpp>
 
 #include <boost/range/irange.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -354,9 +354,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         for_each(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t b)
             {
-                boost::shared_ptr<block_component> A_ptr =
+                std::shared_ptr<block_component> A_ptr =
                     hpx::get_ptr<block_component>(A[b].get_id()).get();
-                boost::shared_ptr<block_component> B_ptr =
+                std::shared_ptr<block_component> B_ptr =
                     hpx::get_ptr<block_component>(B[b].get_id()).get();
 
                 for(boost::uint64_t i = 0; i != order; ++i)

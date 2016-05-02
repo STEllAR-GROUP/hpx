@@ -23,6 +23,7 @@
 
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
+#include <memory>
 
 namespace hpx { namespace util { namespace logging {
 

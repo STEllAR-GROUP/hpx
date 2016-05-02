@@ -113,7 +113,7 @@ void test_blocked()
   const ptrdiff_t istr1[BI] = {2, 6, 10};
   hpx::id_type ilocs[BI];
   for (std::ptrdiff_t i=0; i<BI; ++i) ilocs[i] = locs[i % nlocs];
-  auto istr = boost::make_shared<structure_t>(NI, BI, istr0, istr1, ilocs);
+  auto istr = std::make_shared<structure_t>(NI, BI, istr0, istr1, ilocs);
   std::cout << "istr=" << *istr << std::endl;
   
   const ptrdiff_t BJ = 2;
@@ -121,7 +121,7 @@ void test_blocked()
   const ptrdiff_t jstr1[BJ] = {2, 5};
   hpx::id_type jlocs[BJ];
   for (std::ptrdiff_t j=0; j<BJ; ++j) jlocs[j] = locs[(j+1) % nlocs];
-  auto jstr = boost::make_shared<structure_t>(NJ, BJ, jstr0, jstr1, jlocs);
+  auto jstr = std::make_shared<structure_t>(NJ, BJ, jstr0, jstr1, jlocs);
   std::cout << "jstr=" << *jstr << std::endl;
   
   const ptrdiff_t BK = 1;
@@ -129,7 +129,7 @@ void test_blocked()
   const ptrdiff_t kstr1[BK] = {3};
   hpx::id_type klocs[BK];
   for (std::ptrdiff_t k=0; k<BK; ++k) klocs[k] = locs[(k+2) % nlocs];
-  auto kstr = boost::make_shared<structure_t>(NK, BK, kstr0, kstr1, klocs);
+  auto kstr = std::make_shared<structure_t>(NK, BK, kstr0, kstr1, klocs);
   std::cout << "kstr=" << *kstr << std::endl;
   
   block_vector_t x(jstr);

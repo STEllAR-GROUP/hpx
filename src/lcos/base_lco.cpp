@@ -13,8 +13,6 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
-#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
-
 #include <boost/exception_ptr.hpp>
 
 namespace hpx { namespace lcos
@@ -78,10 +76,10 @@ HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::disconnect_action,
     base_disconnect_action, hpx::actions::base_disconnect_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(
+HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(
     hpx::lcos::base_lco::set_event_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(
+HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(
     hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 

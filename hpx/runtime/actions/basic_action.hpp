@@ -45,6 +45,7 @@
 #include <boost/atomic.hpp>
 
 #include <exception>
+#include <memory>
 #include <sstream>
 #include <string>
 

@@ -16,7 +16,6 @@
 #include <hpx/util/detail/get_table.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 #include <boost/mpl/bool.hpp>
 
@@ -208,18 +207,10 @@ namespace hpx { namespace util { namespace detail
             return vptr->empty;
         }
 
-#       ifdef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
         explicit operator bool() const HPX_NOEXCEPT
         {
             return !empty();
         }
-#       else
-        operator typename util::safe_bool<function_base>
-            ::result_type() const HPX_NOEXCEPT
-        {
-            return util::safe_bool<function_base>()(!empty());
-        }
-#       endif
 
         std::type_info const& target_type() const HPX_NOEXCEPT
         {
@@ -277,7 +268,7 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         VTablePtr const *vptr;
-        mutable void* object[vtable::function_storage_size];
+        mutable void* object[(vtable::function_storage_size / sizeof(void*))];
     };
 
     template <typename Sig, typename VTablePtr>

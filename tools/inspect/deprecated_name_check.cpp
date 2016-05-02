@@ -32,6 +32,10 @@ namespace boost
       { "(\\bboost\\s*::\\s*decay\\b)", "std::decay" },
 //       { "(\\bboost\\s*::\\s*(is_[^\\s]*?\\b))", "std::\\2" },
       { "(\\bboost\\s*::\\s*lock_guard\\b)", "std::lock_guard" },
+      { "(\\bboost\\s*::\\s*unordered_map\\b)", "std::unordered_map" },
+      { "(\\bboost\\s*::\\s*unordered_multimap\\b)", "std::unordered_multimap" },
+      { "(\\bboost\\s*::\\s*unordered_set\\b)", "std::unordered_set" },
+      { "(\\bboost\\s*::\\s*unordered_multiset\\b)", "std::unordered_multiset" },
       { 0, 0 }
     };
 

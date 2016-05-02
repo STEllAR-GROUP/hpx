@@ -52,10 +52,10 @@ std::ostream& operator<<(std::ostream& os, const structure_t& str);
 struct block_vector_t {
   template<typename T> using IL = std::initializer_list<T>;
   template<typename S, typename T> using P = std::pair<S,T>;
-  boost::shared_ptr<structure_t> str;
+  std::shared_ptr<structure_t> str;
   std::vector<vector_t_client> elts;
-  block_vector_t(boost::shared_ptr<structure_t> str);
-  block_vector_t(boost::shared_ptr<structure_t> str, IL<P<int, IL<double>>> x);
+  block_vector_t(std::shared_ptr<structure_t> str);
+  block_vector_t(std::shared_ptr<structure_t> str, IL<P<int, IL<double>>> x);
   operator std::string() const { return mkstr(*this); }
   const vector_t_client& block(std::ptrdiff_t b) const
   {
@@ -86,12 +86,12 @@ std::ostream& operator<<(std::ostream& os, const block_vector_t& x);
 struct block_matrix_t {
   template<typename T> using IL = std::initializer_list<T>;
   template<typename S, typename T> using P = std::pair<S,T>;
-  boost::shared_ptr<structure_t> istr, jstr; // interpretation: row, column
+  std::shared_ptr<structure_t> istr, jstr; // interpretation: row, column
   std::vector<matrix_t_client> elts;
-  block_matrix_t(boost::shared_ptr<structure_t> istr,
-                 boost::shared_ptr<structure_t> jstr);
-  block_matrix_t(boost::shared_ptr<structure_t> istr,
-                 boost::shared_ptr<structure_t> jstr,
+  block_matrix_t(std::shared_ptr<structure_t> istr,
+                 std::shared_ptr<structure_t> jstr);
+  block_matrix_t(std::shared_ptr<structure_t> istr,
+                 std::shared_ptr<structure_t> jstr,
                  IL<IL<P<P<int,int>, IL<IL<double>>>>> a);
   operator std::string() const { return mkstr(*this); }
   const matrix_t_client& block(std::ptrdiff_t ib, std::ptrdiff_t jb) const

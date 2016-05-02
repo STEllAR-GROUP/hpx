@@ -19,6 +19,7 @@ HPX_REGISTER_PARTITIONED_VECTOR(double);
 HPX_REGISTER_PARTITIONED_VECTOR(int);
 typedef typename std::string string;
 HPX_REGISTER_PARTITIONED_VECTOR(string);
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void fill_vector(hpx::partitioned_vector<T>& v, T const& val)

@@ -9,6 +9,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <set>
 #include <string>
 #include <vector>
 

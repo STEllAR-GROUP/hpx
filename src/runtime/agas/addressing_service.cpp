@@ -42,9 +42,9 @@
 
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -137,7 +137,7 @@ addressing_service::addressing_service(
   , state_(state_starting)
   , locality_()
 { // {{{
-    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+    std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     create_big_boot_barrier(pp ? pp.get() : 0, ph.endpoints(), ini_);
 
     if (caching_)
@@ -156,7 +156,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
     mem_lva_ = mem_lva;
 
     // now, boot the parcel port
-    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+    std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     if(pp)
         pp->run(false);
 
@@ -223,15 +223,15 @@ namespace detail
 }
 
 void addressing_service::launch_bootstrap(
-    boost::shared_ptr<parcelset::parcelport> const& pp
+    std::shared_ptr<parcelset::parcelport> const& pp
   , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
 { // {{{
-    boost::shared_ptr<detail::bootstrap_service_client> bootstrap_client =
-        boost::make_shared<detail::bootstrap_service_client>();
+    std::shared_ptr<detail::bootstrap_service_client> bootstrap_client =
+        std::make_shared<detail::bootstrap_service_client>();
 
-    client_ = boost::static_pointer_cast<detail::agas_service_client>(
+    client_ = std::static_pointer_cast<detail::agas_service_client>(
         bootstrap_client);
 
     runtime& rt = get_runtime();
@@ -326,10 +326,10 @@ void addressing_service::launch_bootstrap(
 
 void addressing_service::launch_hosted()
 {
-    boost::shared_ptr<detail::hosted_service_client> booststrap_hosted =
-        boost::make_shared<detail::hosted_service_client>();
+    std::shared_ptr<detail::hosted_service_client> booststrap_hosted =
+        std::make_shared<detail::hosted_service_client>();
 
-    client_ = boost::static_pointer_cast<detail::agas_service_client>(
+    client_ = std::static_pointer_cast<detail::agas_service_client>(
             booststrap_hosted);
 }
 
@@ -2844,7 +2844,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
             return;
         }
 
-        boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+        std::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
 
         p.swap(refcnt_requests_);
         refcnt_requests_count_ = 0;
@@ -2910,7 +2910,7 @@ addressing_service::send_refcnt_requests_async(
         return std::vector<hpx::future<std::vector<response> > >();
     }
 
-    boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+    std::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
 
     p.swap(refcnt_requests_);
     refcnt_requests_count_ = 0;

@@ -25,10 +25,10 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -52,7 +52,7 @@ namespace hpx { namespace parcelset
         void parcel_sink(parcel const& p);
 
         threads::thread_state_enum decode_parcel(
-            parcelport& pp, boost::shared_ptr<std::vector<char> > parcel_data,
+            parcelport& pp, std::shared_ptr<std::vector<char> > parcel_data,
             performance_counters::parcels::data_point receive_data);
 
         // make sure the parcel has been properly initialized
@@ -73,7 +73,7 @@ namespace hpx { namespace parcelset
 
         typedef std::pair<locality, std::string> handler_key_type;
         typedef std::map<
-            handler_key_type, boost::shared_ptr<policies::message_handler> >
+            handler_key_type, std::shared_ptr<policies::message_handler> >
         message_handler_map;
 
         typedef parcelport::read_handler_type read_handler_type;
@@ -98,7 +98,7 @@ namespace hpx { namespace parcelset
 
         ~parcelhandler() {}
 
-        boost::shared_ptr<parcelport> get_bootstrap_parcelport() const;
+        std::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
         void initialize(naming::resolver_client &resolver, applier::applier *applier);
 
@@ -389,7 +389,7 @@ namespace hpx { namespace parcelset
 
         boost::int64_t get_outgoing_queue_length(bool reset) const;
 
-        std::pair<boost::shared_ptr<parcelport>, locality>
+        std::pair<std::shared_ptr<parcelport>, locality>
         find_appropriate_destination(naming::gid_type const & dest_gid);
         locality find_endpoint(endpoints_type const & eps, std::string const & name);
 
@@ -412,13 +412,13 @@ namespace hpx { namespace parcelset
         }
 
         /// \brief Attach the given parcel port to this handler
-        void attach_parcelport(boost::shared_ptr<parcelport> const& pp);
+        void attach_parcelport(std::shared_ptr<parcelport> const& pp);
 
         /// The AGAS client
         naming::resolver_client *resolver_;
 
         /// the parcelport this handler is associated with
-        typedef std::map<int, boost::shared_ptr<parcelport>,
+        typedef std::map<int, std::shared_ptr<parcelport>,
             std::greater<int> > pports_type;
         pports_type pports_;
 

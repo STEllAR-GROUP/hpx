@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,7 +27,6 @@
 #include <hpx/util/init_logging.hpp>
 
 #include <boost/detail/atomic_count.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/exception_ptr.hpp>
@@ -52,7 +51,7 @@ namespace hpx
         static void default_errorsink(std::string const&);
 
         //
-        threads::thread_state run_helper(
+        threads::thread_state_enum run_helper(
             util::function_nonser<runtime::hpx_main_function_type> func,
             int& result);
 

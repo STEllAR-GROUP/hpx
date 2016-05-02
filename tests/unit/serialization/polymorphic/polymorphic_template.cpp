@@ -8,11 +8,10 @@
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/current_function.hpp>
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 template <class T>
@@ -67,22 +66,22 @@ int main()
   std::vector<char> vector;
   {
     hpx::serialization::output_archive archive{vector};
-    boost::shared_ptr<A<int> > b = boost::make_shared<B<int> >(2);
-    boost::shared_ptr<A<char> > c = boost::make_shared<B<char> >(8);
+    std::shared_ptr<A<int> > b = std::make_shared<B<int> >(2);
+    std::shared_ptr<A<char> > c = std::make_shared<B<char> >(8);
     archive << b << c;
   }
 
   {
     hpx::serialization::input_archive archive{vector};
-    boost::shared_ptr<A<int> > b;
-    boost::shared_ptr<A<char> > c;
+    std::shared_ptr<A<int> > b;
+    std::shared_ptr<A<char> > c;
     archive >> b >> c;
 
-    HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->a, 1);
-    HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, 2);
+    HPX_TEST_EQ(std::static_pointer_cast<B<int> >(b)->a, 1);
+    HPX_TEST_EQ(std::static_pointer_cast<B<int> >(b)->b, 2);
 
-    HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->a, 7);
-    HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->b, 8);
+    HPX_TEST_EQ(std::static_pointer_cast<B<char> >(c)->a, 7);
+    HPX_TEST_EQ(std::static_pointer_cast<B<char> >(c)->b, 8);
   }
 
 }

@@ -133,14 +133,12 @@ namespace hpx
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -308,7 +306,7 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
-        struct when_any : boost::enable_shared_from_this<when_any<Sequence> > //-V690
+        struct when_any : std::enable_shared_from_this<when_any<Sequence> > //-V690
         {
         public:
             void on_future_ready(std::size_t idx, threads::thread_id_type const& id)
@@ -376,8 +374,8 @@ namespace hpx { namespace lcos
         typedef Range result_type;
         result_type lazy_values_ = traits::acquire_future<result_type>()(lazy_values);
 
-        boost::shared_ptr<detail::when_any<result_type> > f =
-            boost::make_shared<detail::when_any<result_type> >(
+        std::shared_ptr<detail::when_any<result_type> > f =
+            std::make_shared<detail::when_any<result_type> >(
                 std::move(lazy_values_));
 
         lcos::local::futures_factory<when_any_result<result_type>()> p(
@@ -452,8 +450,8 @@ namespace hpx { namespace lcos
         traits::acquire_future_disp func;
         result_type lazy_values(func(std::forward<Ts>(ts))...);
 
-        boost::shared_ptr<detail::when_any<result_type> > f =
-            boost::make_shared<detail::when_any<result_type> >(
+        std::shared_ptr<detail::when_any<result_type> > f =
+            std::make_shared<detail::when_any<result_type> >(
                 std::move(lazy_values));
 
         lcos::local::futures_factory<when_any_result<result_type>()> p(

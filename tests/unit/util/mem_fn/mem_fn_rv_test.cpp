@@ -22,9 +22,9 @@
 //
 
 #include <hpx/util/mem_fn.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <iostream>
+#include <memory>
 
 #include <hpx/util/lightweight_test.hpp>
 
@@ -68,9 +68,9 @@ struct X
         const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); return 0; }
 };
 
-boost::shared_ptr<X> make()
+std::shared_ptr<X> make()
 {
-    return boost::shared_ptr<X>(new X);
+    return std::shared_ptr<X>(new X);
 }
 
 int main()
