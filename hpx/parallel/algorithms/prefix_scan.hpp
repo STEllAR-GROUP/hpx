@@ -8,7 +8,6 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_PREFIX_SCAN_NOV_2015)
 #define HPX_PARALLEL_ALGORITHM_PREFIX_SCAN_NOV_2015
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -614,11 +613,11 @@ HPX_INLINE_NAMESPACE(v1)
         >::value),
         "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
             std::forward < ExPolicy > (policy), is_seq(),
@@ -651,11 +650,11 @@ HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return detail::parallel_scan_struct<OutIter, detail::inclusive_scan_tag>().call(
             std::forward < ExPolicy > (policy),
@@ -690,11 +689,11 @@ HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
@@ -790,11 +789,11 @@ HPX_INLINE_NAMESPACE(v1)
         >::value),
         "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return detail::parallel_scan_struct<OutIter, detail::exclusive_scan_tag>().call(
             std::forward < ExPolicy > (policy), is_seq(),
@@ -827,11 +826,11 @@ HPX_INLINE_NAMESPACE(v1)
                 >::value),
                 "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-                is_sequential_execution_policy<ExPolicy>,
-                boost::is_same<std::input_iterator_tag, iterator_category>,
-                boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
 
         return detail::parallel_scan_struct<OutIter, detail::exclusive_scan_tag>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
