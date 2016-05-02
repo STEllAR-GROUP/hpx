@@ -104,7 +104,7 @@ namespace hpx { namespace serialization { namespace detail
       const_cast<Class*>(this)->                                              \
           serialize<hpx::serialization::output_archive>(ar, n);               \
   }                                                                           \
-  HPX_SERIALIZATION_SPLIT_MEMBER();                                           \
+  HPX_SERIALIZATION_SPLIT_MEMBER()                                            \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(Class, Name)         \
