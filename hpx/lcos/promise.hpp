@@ -16,7 +16,6 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/lcos/detail/future_data.hpp>

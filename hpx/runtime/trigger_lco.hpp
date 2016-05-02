@@ -85,9 +85,9 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    template <typename T>
+    template <typename Result, typename RemoteResult>
     void set_lco_value(naming::id_type const& id,
-        naming::address && addr, T && t, bool move_credits = true);
+        naming::address && addr, RemoteResult && t, bool move_credits = true);
 
     /// \brief Set the result value for the LCO referenced by the given id
     ///
@@ -97,14 +97,15 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    template <typename T>
+    template <typename Result, typename RemoteResult>
     typename std::enable_if<
-        !std::is_same<typename util::decay<T>::type, naming::address>::value
+        !std::is_same<typename util::decay<RemoteResult>::type, naming::address>::value
     >::type
     set_lco_value(naming::id_type const& id,
-        T && t, bool move_credits = true)
+        RemoteResult && t, bool move_credits = true)
     {
-        set_lco_value(id, naming::address(), std::forward<T>(t), move_credits);
+        set_lco_value<Result, RemoteResult>(
+            id, naming::address(), std::forward<RemoteResult>(t), move_credits);
     }
 
     /// \brief Set the result value for the LCO referenced by the given id
@@ -118,9 +119,9 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    template <typename T>
+    template <typename Result, typename RemoteResult>
     void set_lco_value(naming::id_type const& id,
-        naming::address && addr, T && t, naming::id_type const& cont,
+        naming::address && addr, RemoteResult && t, naming::id_type const& cont,
         bool move_credits = true);
 
     /// \brief Set the result value for the LCO referenced by the given id
@@ -132,12 +133,12 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t,
+    template <typename Result, typename RemoteResult>
+    void set_lco_value(naming::id_type const& id, RemoteResult && t,
         naming::id_type const& cont, bool move_credits = true)
     {
-        set_lco_value(
-            id, naming::address(), std::forward<T>(t), cont, move_credits);
+        set_lco_value<Result, RemoteResult>(
+            id, naming::address(), std::forward<RemoteResult>(t), cont, move_credits);
     }
 
     /// \brief Set the error state for the LCO referenced by the given id

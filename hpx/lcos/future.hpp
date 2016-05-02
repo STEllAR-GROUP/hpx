@@ -1383,7 +1383,7 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_id(), this->get_addr(), result.get());
+                hpx::set_lco_value<R>(this->get_id(), this->get_addr(), result.get());
             }
             else {
                 f_(this->get_id(), result.get());
@@ -1655,7 +1655,7 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_id(), this->get_addr(), result.get());
+                hpx::set_lco_value<R>(this->get_id(), this->get_addr(), result.get());
             }
             else {
                 f_(this->get_id(), result.get());
