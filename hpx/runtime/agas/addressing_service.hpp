@@ -14,7 +14,12 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/runtime/agas/detail/agas_service_client.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/agas/component_namespace.hpp>
+#include <hpx/runtime/agas/locality_namespace.hpp>
+#include <hpx/runtime/agas/symbol_namespace.hpp>
+#include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -103,15 +108,13 @@ public:
     std::uint64_t rts_lva_;
     std::uint64_t mem_lva_;
 
-    std::shared_ptr<detail::agas_service_client> client_;
+    std::unique_ptr<component_namespace> component_ns_;
+    std::unique_ptr<locality_namespace> locality_ns_;
+    symbol_namespace symbol_ns_;
+    primary_namespace primary_ns_;
 
     boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
-
-    naming::address locality_ns_addr_;
-    naming::address primary_ns_addr_;
-    naming::address component_ns_addr_;
-    naming::address symbol_ns_addr_;
 
     mutable mutex_type resolved_localities_mtx_;
     typedef
@@ -139,8 +142,6 @@ public:
 
     state get_status() const
     {
-        if (!client_)
-            return state_stopping;
         return state_.load();
     }
 
@@ -195,14 +196,6 @@ public:
         error_code& ec = throws
         );
 
-    naming::address::address_type get_hosted_primary_ns_ptr() const;
-    naming::address::address_type get_hosted_symbol_ns_ptr() const;
-
-    naming::address::address_type get_bootstrap_locality_ns_ptr() const;
-    naming::address::address_type get_bootstrap_primary_ns_ptr() const;
-    naming::address::address_type get_bootstrap_component_ns_ptr() const;
-    naming::address::address_type get_bootstrap_symbol_ns_ptr() const;
-
     std::int64_t synchronize_with_async_incref(
         hpx::future<std::int64_t> fut
       , naming::id_type const& id
@@ -211,12 +204,12 @@ public:
 
     naming::address::address_type get_primary_ns_lva() const
     {
-        return client_->get_primary_ns_ptr();
+        return primary_ns_.ptr();
     }
 
     naming::address::address_type get_symbol_ns_lva() const
     {
-        return client_->get_symbol_ns_ptr();
+        return symbol_ns_.ptr();
     }
 
 protected:
@@ -229,11 +222,11 @@ protected:
     void launch_hosted();
 
     naming::address resolve_full_postproc(
-        future<response> f
+        future<primary_namespace::resolved_type> f
       , naming::gid_type const& id
         );
     bool bind_postproc(
-        future<response> f
+        future<bool> f
       , naming::gid_type const& id
       , gva const& g
         );
@@ -257,7 +250,7 @@ private:
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
-    std::vector<hpx::future<std::vector<response> > >
+    std::vector<hpx::future<std::vector<std::int64_t> > >
     send_refcnt_requests_async(
         std::unique_lock<mutex_type>& l
         );
@@ -286,16 +279,6 @@ private:
     std::uint64_t get_cache_erase_entry_time(bool reset);
 
 public:
-    response service(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    std::vector<response> bulk_service(
-        std::vector<request> const& reqs
-      , error_code& ec = throws
-        );
-
     /// \brief Add a locality to the runtime.
     bool register_locality(
         parcelset::endpoints_type const & endpoints
@@ -389,18 +372,6 @@ public:
     {
         return get_localities(locality_ids, components::component_invalid, ec);
     }
-
-    /// \brief Query the resolved addresses for all know localities
-    ///
-    /// This function returns the resolved addresses for all localities known
-    /// to the AGAS server.
-    ///
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    std::map<naming::gid_type, parcelset::endpoints_type>
-    get_resolved_localities(error_code& ec = throws);
 
     /// \brief Query for the number of all known localities.
     ///
@@ -1294,12 +1265,6 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool unregister_name(
-        std::string const& name
-      , naming::gid_type& id
-      , error_code& ec = throws
-        );
-
     lcos::future<naming::id_type> unregister_name_async(
         std::string const& name
         );
@@ -1307,10 +1272,7 @@ public:
     naming::id_type unregister_name(
         std::string const& name
       , error_code& ec = throws
-        )
-    {
-        return unregister_name_async(name).get(ec);
-    }
+        );
 
     /// \brief Query for the global address associated with a given global name.
     ///
@@ -1320,12 +1282,12 @@ public:
     /// \param name       [in] The global name (string) for which the
     ///                   currently associated global address has to be
     ///                   retrieved.
-    /// \param id         [out] The id currently associated with the given
-    ///                   global name (valid only if the return value is
-    ///                   true).
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
+    /// \returns          [out] The id currently associated with the given
+    ///                   global name (valid only if the return value is
+    ///                   true).
     ///
     /// This function returns true if it returned global address (id),
     /// which is currently associated with the given global name, and it
@@ -1337,12 +1299,6 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool resolve_name(
-        std::string const& name
-      , naming::gid_type& id
-      , error_code& ec = throws
-        );
-
     lcos::future<naming::id_type> resolve_name_async(
         std::string const& name
         );
@@ -1350,10 +1306,7 @@ public:
     naming::id_type resolve_name(
         std::string const& name
       , error_code& ec = throws
-        )
-    {
-        return resolve_name_async(name).get(ec);
-    }
+        );
 
     /// \brief Install a listener for a given symbol namespace event.
     ///
@@ -1377,7 +1330,7 @@ public:
     ///          global id is registered with the given name.
     ///
     future<hpx::id_type> on_symbol_namespace_event(std::string const& name,
-        namespace_action_code evt, bool call_for_past_events = false);
+        bool call_for_past_events = false);
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
@@ -1426,13 +1379,6 @@ public:
     // Disable refcnt caching during shutdown
     void start_shutdown(
         error_code& ec = throws
-        );
-
-    /// \brief Retrieve statistics performance counter
-    bool retrieve_statistics_counter(
-        std::string const& counter_name
-      , naming::gid_type& counter
-      , error_code& ec = throws
         );
 
     /// start/stop migration of an object

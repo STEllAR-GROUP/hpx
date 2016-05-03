@@ -51,11 +51,12 @@ std::vector<hpx::id_type> test_binpacking_multiple()
     std::vector<std::vector<hpx::id_type> > targets;
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
+
     for (std::size_t i = 0; i != localities.size(); ++i)
     {
         hpx::id_type const& loc = localities[i];
 
-        targets.push_back(hpx::new_<test_server[]>(loc, i+1).get());
+        targets.push_back(hpx::new_<test_server[]>(loc, i + 1).get());
         for (hpx::id_type const& id: targets.back())
         {
             HPX_TEST(hpx::async<call_action>(id).get() == loc);
@@ -72,8 +73,12 @@ std::vector<hpx::id_type> test_binpacking_multiple()
         hpx::performance_counters::performance_counter instances(
             counter_name, localities[i]);
 
-        count += instances.get_value<std::uint64_t>(hpx::launch::sync);
+        std::uint64_t c = instances.get_value<std::uint64_t>(hpx::launch::sync);
+        count += c;
+        HPX_TEST_EQ(c, i + 1);
     }
+
+    HPX_TEST_EQ(count, keep_alive.size());
 
     // now use bin-packing policy to fill up the number of instances
     std::vector<hpx::id_type> filled_targets =
@@ -89,8 +94,7 @@ std::vector<hpx::id_type> test_binpacking_multiple()
         std::uint64_t c =
             instances.get_value<std::uint64_t>(hpx::launch::sync);
         new_count += c;
-
-        HPX_TEST_EQ(c, localities.size()+1);
+        HPX_TEST_EQ(c, localities.size() + 1);
     }
 
     HPX_TEST_EQ(2*count, new_count);
@@ -143,6 +147,6 @@ int main()
     std::vector<hpx::id_type> ids = test_binpacking_multiple();
     test_binpacking_single();
 
-    return 0;
+    return hpx::util::report_errors();
 }
 

@@ -13,7 +13,6 @@
 
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -497,8 +496,7 @@ inline naming::id_type get_colocation_id_sync(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
-    std::string const& name, agas::namespace_action_code evt,
-    bool call_for_past_events);
+    std::string const& name, bool call_for_past_events);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >

@@ -7,7 +7,6 @@
 #define HPX_RUNTIME_APPLIER_REGISTER_APPLY_COLOCATED_MAR_09_2014_1214PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
 #include <hpx/util/tuple.hpp>
@@ -35,6 +34,11 @@ namespace hpx { namespace detail
     };
 }}
 
+#define HPX_REGISTER_APPLY_COLOCATED_DECLARATION(Action, Name)                \
+    /**/
+#define HPX_REGISTER_APPLY_COLOCATED(action, name)                            \
+    /**/
+#if 0
 #define HPX_REGISTER_APPLY_COLOCATED_DECLARATION(Action, Name)                \
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                            \
         void (hpx::naming::id_type, hpx::agas::response)                      \
@@ -64,5 +68,6 @@ namespace hpx { namespace detail
       , name                                                                  \
     );                                                                        \
 /**/
+#endif
 
 #endif

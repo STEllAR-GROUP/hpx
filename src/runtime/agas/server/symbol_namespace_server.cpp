@@ -1,24 +1,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/insert_checked.hpp>
+#include <hpx/util/scoped_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
+
+#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -44,120 +49,6 @@ naming::id_type bootstrap_symbol_namespace_id()
 
 namespace server
 {
-
-// TODO: This isn't scalable, we have to update it every time we add a new
-// AGAS request/response type.
-response symbol_namespace::service(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{
-    switch (req.get_action_code())
-    {
-        case symbol_ns_bind:
-            {
-                update_time_on_exit update(
-                    counter_data_.bind_.time_
-                );
-                counter_data_.increment_bind_count();
-                return bind(req, ec);
-            }
-        case symbol_ns_resolve:
-            {
-                update_time_on_exit update(
-                    counter_data_.resolve_.time_
-                );
-                counter_data_.increment_resolve_count();
-                return resolve(req, ec);
-            }
-        case symbol_ns_unbind:
-            {
-                update_time_on_exit update(
-                    counter_data_.unbind_.time_
-                );
-                counter_data_.increment_unbind_count();
-                return unbind(req, ec);
-            }
-        case symbol_ns_iterate_names:
-            {
-                update_time_on_exit update(
-                    counter_data_.iterate_names_.time_
-                );
-                counter_data_.increment_iterate_names_count();
-                return iterate(req, ec);
-            }
-        case symbol_ns_on_event:
-            {
-                update_time_on_exit update(
-                    counter_data_.on_event_.time_
-                );
-                counter_data_.increment_on_event_count();
-                return on_event(req, ec);
-            }
-        case symbol_ns_statistics_counter:
-            return statistics_counter(req, ec);
-
-        case locality_ns_allocate:
-        case locality_ns_free:
-        case locality_ns_localities:
-        case locality_ns_num_localities:
-        case locality_ns_num_threads:
-        case locality_ns_resolve_locality:
-        case locality_ns_resolved_localities:
-        {
-            LAGAS_(warning) <<
-                "symbol_namespace::service, redirecting request to "
-                "locality_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        case primary_ns_route:
-        case primary_ns_bind_gid:
-        case primary_ns_resolve_gid:
-        case primary_ns_unbind_gid:
-        case primary_ns_increment_credit:
-        case primary_ns_decrement_credit:
-        case primary_ns_allocate:
-        case primary_ns_begin_migration:
-        case primary_ns_end_migration:
-        {
-            LAGAS_(warning) <<
-                "symbol_namespace::service, redirecting request to "
-                "primary_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        case component_ns_bind_prefix:
-        case component_ns_bind_name:
-        case component_ns_resolve_id:
-        case component_ns_unbind_name:
-        case component_ns_iterate_types:
-        case component_ns_get_component_type_name:
-        case component_ns_num_localities:
-        {
-            LAGAS_(warning) <<
-                "symbol_namespace::service, redirecting request to "
-                "component_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        default:
-        case locality_ns_service:
-        case component_ns_service:
-        case primary_ns_service:
-        case symbol_ns_service:
-        case invalid_request:
-        {
-            HPX_THROWS_IF(ec, bad_action_code
-              , "symbol_namespace::service"
-              , boost::str(boost::format(
-                    "invalid action code encountered in request, "
-                    "action_code(%x)")
-                    % std::uint16_t(req.get_action_code())));
-            return response();
-        }
-    };
-} // }}}
 
 // register all performance counter types exposed by this component
 void symbol_namespace::register_counter_types(
@@ -286,32 +177,16 @@ void symbol_namespace::finalize()
     }
 }
 
-// TODO: do/undo semantics (e.g. transactions)
-std::vector<response> symbol_namespace::bulk_service(
-    std::vector<request> const& reqs
-  , error_code& ec
-    )
-{
-    std::vector<response> r;
-    r.reserve(reqs.size());
-
-    for (request const& req : reqs)
-    {
-        error_code ign;
-        r.push_back(service(req, ign));
-    }
-
-    return r;
-}
-
-response symbol_namespace::bind(
-    request const& req
-  , error_code& ec
+bool symbol_namespace::bind(
+    std::string key
+  , naming::gid_type gid
     )
 { // {{{ bind implementation
     // parameters
-    std::string key = req.get_name();
-    naming::gid_type gid = req.get_gid();
+    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+        counter_data_.bind_.time_
+    );
+    counter_data_.increment_bind_count();
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -339,10 +214,7 @@ response symbol_namespace::bind(
             // REVIEW: do we need to add the credit of the argument to the table?
             naming::detail::add_credit_to_gid(*(it->second), credits);
 
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(symbol_ns_bind);
+            return true;
         }
 
         if (LAGAS_ENABLED(info))
@@ -353,10 +225,7 @@ response symbol_namespace::bind(
                 % key % gid);
         }
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(symbol_ns_bind, no_success);
+        return false;
     }
 
     if (HPX_UNLIKELY(!util::insert_checked(gids_.insert(
@@ -364,17 +233,15 @@ response symbol_namespace::bind(
     {
         l.unlock();
 
-        HPX_THROWS_IF(ec, lock_error
+        HPX_THROW_EXCEPTION(lock_error
           , "symbol_namespace::bind"
           , "GID table insertion failed due to a locking error or "
             "memory corruption");
-        return response();
     }
 
     // handle registered events
     typedef on_event_data_map_type::iterator iterator;
-    std::pair<std::string, namespace_action_code> evtkey(key, symbol_ns_bind);
-    std::pair<iterator, iterator> p = on_event_data_.equal_range(evtkey);
+    std::pair<iterator, iterator> p = on_event_data_.equal_range(key);
 
     std::vector<hpx::id_type> lcos;
     if (p.first != p.second)
@@ -399,10 +266,9 @@ response symbol_namespace::bind(
             {
                 l.unlock();
 
-                HPX_THROWS_IF(ec, invalid_status
+                HPX_THROW_EXCEPTION(invalid_status
                   , "symbol_namespace::bind"
                   , "unable to re-locate the entry in the GID table");
-                return response();
             }
 
             // hold on to the gid while the map is unlocked
@@ -428,19 +294,16 @@ response symbol_namespace::bind(
         "symbol_namespace::bind, key(%1%), gid(%2%)")
         % key % gid);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(symbol_ns_bind);
+    return true;
 } // }}}
 
-response symbol_namespace::resolve(
-    request const& req
-  , error_code& ec
-    )
+naming::gid_type symbol_namespace::resolve(std::string const& key)
 { // {{{ resolve implementation
     // parameters
-    std::string key = req.get_name();
+    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+        counter_data_.resolve_.time_
+    );
+    counter_data_.increment_resolve_count();
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -453,16 +316,8 @@ response symbol_namespace::resolve(
             "symbol_namespace::resolve, key(%1%), response(no_success)")
             % key);
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(symbol_ns_resolve
-                      , naming::invalid_gid
-                      , no_success);
+        return naming::invalid_gid;
     }
-
-    if (&ec != &throws)
-        ec = make_success_code();
 
     // hold on to gid before unlocking the map
     std::shared_ptr<naming::gid_type> current_gid(it->second);
@@ -474,16 +329,15 @@ response symbol_namespace::resolve(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")
         % key % gid);
 
-    return response(symbol_ns_resolve, gid);
+    return gid;
 } // }}}
 
-response symbol_namespace::unbind(
-    request const& req
-  , error_code& ec
-    )
+naming::gid_type symbol_namespace::unbind(std::string const& key)
 { // {{{ unbind implementation
-    // parameters
-    std::string key = req.get_name();
+    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+        counter_data_.unbind_.time_
+    );
+    counter_data_.increment_unbind_count();
 
     std::lock_guard<mutex_type> l(mutex_);
 
@@ -496,10 +350,7 @@ response symbol_namespace::unbind(
             "symbol_namespace::unbind, key(%1%), response(no_success)")
             % key);
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(symbol_ns_unbind, naming::invalid_gid, no_success);
+        return naming::invalid_gid;
     }
 
     naming::gid_type const gid = *(it->second);
@@ -510,20 +361,18 @@ response symbol_namespace::unbind(
         "symbol_namespace::unbind, key(%1%), gid(%2%)")
         % key % gid);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(symbol_ns_unbind, gid);
+    return gid;
 } // }}}
 
 // TODO: catch exceptions
-response symbol_namespace::iterate(
-    request const& req
-  , error_code& ec
+void symbol_namespace::iterate(
+    symbol_namespace::iterate_names_function_type const& f
     )
 { // {{{ iterate implementation
-    iterate_names_function_type f = req.get_iterate_names_function();
-
+    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+        counter_data_.iterate_names_.time_
+    );
+    counter_data_.increment_iterate_names_count();
     std::unique_lock<mutex_type> l(mutex_);
 
     for (gid_table_type::iterator it = gids_.begin(); it != gids_.end(); ++it)
@@ -541,30 +390,18 @@ response symbol_namespace::iterate(
     }
 
     LAGAS_(info) << "symbol_namespace::iterate";
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(symbol_ns_iterate_names);
 } // }}}
 
-response symbol_namespace::on_event(
-    request const& req
-  , error_code& ec
+bool symbol_namespace::on_event(
+    std::string const& name
+  , bool call_for_past_events
+  , hpx::id_type lco
     )
 { // {{{ on_event implementation
-    std::string name = req.get_name();
-    namespace_action_code evt = req.get_on_event_event();
-    bool call_for_past_events = req.get_on_event_call_for_past_event();
-    hpx::id_type lco = req.get_on_event_result_lco();
-
-    if (evt != symbol_ns_bind)
-    {
-        HPX_THROWS_IF(ec, bad_parameter,
-            "addressing_service::on_symbol_namespace_event",
-            "invalid event type");
-        return response(symbol_ns_on_event, no_success);
-    }
+    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+        counter_data_.on_event_.time_
+    );
+    counter_data_.increment_on_event_count();
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -595,9 +432,8 @@ response symbol_namespace::on_event(
 
     if (!handled)
     {
-        std::pair<std::string, namespace_action_code> key(name, evt);
         on_event_data_map_type::iterator it = on_event_data_.insert(
-            on_event_data_map_type::value_type(std::move(key), lco));
+            on_event_data_map_type::value_type(std::move(name), lco));
 
         l.unlock();
 
@@ -607,10 +443,7 @@ response symbol_namespace::on_event(
                 "symbol_namespace::on_event, name(%1%), response(no_success)")
                 % name);
 
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(symbol_ns_on_event, no_success);
+            return false;
         }
     }
     else
@@ -620,31 +453,21 @@ response symbol_namespace::on_event(
 
     LAGAS_(info) << "symbol_namespace::on_event";
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(symbol_ns_on_event);
+    return true;
 } // }}}
 
-response symbol_namespace::statistics_counter(
-    request const& req
-  , error_code& ec
-    )
+naming::gid_type symbol_namespace::statistics_counter(std::string const& name)
 { // {{{ statistics_counter implementation
     LAGAS_(info) << "symbol_namespace::statistics_counter";
 
-    std::string name(req.get_statistics_counter_name());
-
     performance_counters::counter_path_elements p;
-    performance_counters::get_counter_path_elements(name, p, ec);
-    if (ec) return response();
+    performance_counters::get_counter_path_elements(name, p);
 
     if (p.objectname_ != "agas")
     {
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROW_EXCEPTION(bad_parameter,
             "symbol_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
-        return response();
     }
 
     namespace_action_code code = invalid_request;
@@ -663,10 +486,9 @@ response symbol_namespace::statistics_counter(
 
     if (code == invalid_request || target == detail::counter_target_invalid)
     {
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROW_EXCEPTION(bad_parameter,
             "symbol_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
-        return response();
     }
 
     typedef symbol_namespace::counter_data cd;
@@ -696,10 +518,9 @@ response symbol_namespace::statistics_counter(
             get_data_func = util::bind(&cd::get_overall_count, &counter_data_, _1);
             break;
         default:
-            HPX_THROWS_IF(ec, bad_parameter
+            HPX_THROW_EXCEPTION(bad_parameter
               , "symbol_namespace::statistics"
               , "bad action code while querying statistics");
-            return response();
         }
     }
     else {
@@ -725,28 +546,20 @@ response symbol_namespace::statistics_counter(
             get_data_func = util::bind(&cd::get_overall_time, &counter_data_, _1);
             break;
         default:
-            HPX_THROWS_IF(ec, bad_parameter
+            HPX_THROW_EXCEPTION(bad_parameter
               , "symbol_namespace::statistics"
               , "bad action code while querying statistics");
-            return response();
         }
     }
 
     performance_counters::counter_info info;
-    performance_counters::get_counter_type(name, info, ec);
-    if (ec) return response();
+    performance_counters::get_counter_type(name, info);
 
-    performance_counters::complement_counter_info(info, ec);
-    if (ec) return response();
+    performance_counters::complement_counter_info(info);
 
     using performance_counters::detail::create_raw_counter;
-    naming::gid_type gid = create_raw_counter(info, get_data_func, ec);
-    if (ec) return response();
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(symbol_ns_statistics_counter, gid);
+    naming::gid_type gid = create_raw_counter(info, get_data_func, hpx::throws);
+    return naming::detail::strip_credits_from_gid(gid);
 } // }}}
 
 // access current counter values
