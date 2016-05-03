@@ -156,21 +156,25 @@ namespace hpx
             Result, typename util::decay<RemoteResult>::type
         >::set_value_action set_value_action;
         typedef
-            typename hpx::actions::extract_action<set_value_action>::result_type
+            typename hpx::traits::extract_action<set_value_action>::result_type
             result_type;
+        typedef
+            typename hpx::traits::extract_action<set_value_action>::local_result_type
+            local_result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), naming::id_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_value_action>(
-                actions::typed_continuation<result_type>(cont), target, std::move(addr),
+                actions::typed_continuation<
+                    local_result_type, result_type>(cont), target, std::move(addr),
                 detail::make_rvalue<RemoteResult>(t));
         }
         else
         {
             detail::apply_impl<set_value_action>(
-                actions::typed_continuation<result_type>(cont), id, std::move(addr),
+                actions::typed_continuation<local_result_type, result_type>(cont), id, std::move(addr),
                 detail::make_rvalue<RemoteResult>(t));
         }
     }
@@ -289,7 +293,7 @@ namespace hpx { namespace actions
     namespace detail
     {
         // Overload when return type is "void" aka util::unused_type
-        template <typename R, typename F, typename ...Ts>
+        template <typename Result, typename RemoteResult, typename F, typename ...Ts>
         void trigger_impl(std::true_type, std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             try {
@@ -330,7 +334,7 @@ namespace hpx { namespace actions
             }
         }
 
-        template <typename Future, typename F, typename ...Ts>
+        template <typename Result, typename Future, typename F, typename ...Ts>
         void trigger_impl_future(boost::mpl::true_,
             std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
@@ -348,13 +352,13 @@ namespace hpx { namespace actions
 
             if(result.is_ready())
             {
-                detail::deferred_trigger<type, remote_result_type>(
+                detail::deferred_trigger<Result, remote_result_type>(
                     is_void(), std::move(cont), std::move(result));
                 return;
             }
 
             void (*fun)(is_void, std::unique_ptr<continuation>, Future)
-                = detail::deferred_trigger<type, remote_result_type, Future>;
+                = detail::deferred_trigger<Result, remote_result_type, Future>;
 
             result.then(
                 hpx::util::bind(
@@ -366,12 +370,13 @@ namespace hpx { namespace actions
             );
         }
 
-        template <typename R, typename F, typename ...Ts>
+        template <typename Result, typename RemoteResult, typename F, typename ...Ts>
         void trigger_impl_future(boost::mpl::false_,
             std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             try {
-                cont->trigger(util::invoke(std::forward<F>(f),
+                static_cast<typed_continuation<Result, RemoteResult>*>(cont.get())->
+                    trigger(util::invoke(std::forward<F>(f),
                     std::forward<Ts>(vs)...));
             }
             catch (...) {
@@ -380,19 +385,19 @@ namespace hpx { namespace actions
             }
         }
 
-        template <typename R, typename F, typename ...Ts>
+        template <typename Result, typename RemoteResult, typename F, typename ...Ts>
         void trigger_impl(std::false_type, std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             typedef
-                typename traits::is_future<R>::type
+                typename traits::is_future<RemoteResult>::type
                 is_future;
 
-            trigger_impl_future<R>(is_future(),
+            trigger_impl_future<Result, RemoteResult>(is_future(),
                 std::move(cont), std::forward<F>(f), std::forward<Ts>(vs)...);
         }
     }
 
-    template <typename F, typename ...Ts>
+    template <typename Result, typename F, typename ...Ts>
     void trigger(std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
     {
         typedef typename util::result_of<F(Ts...)>::type
@@ -401,7 +406,7 @@ namespace hpx { namespace actions
         typedef
             typename std::is_same<result_type, util::unused_type>::type
             is_void;
-        detail::trigger_impl<result_type>(
+        detail::trigger_impl<Result, result_type>(
             is_void(), std::move(cont), std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 

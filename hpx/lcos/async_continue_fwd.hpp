@@ -29,7 +29,7 @@ namespace hpx
             : actions::detail::remote_action_result<
                 typename util::result_of<typename util::decay<Cont>::type(
                     naming::id_type,
-                    typename hpx::actions::extract_action<
+                    typename hpx::traits::extract_action<
                         Action
                     >::remote_result_type
                 )>::type

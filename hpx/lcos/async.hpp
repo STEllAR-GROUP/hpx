@@ -60,7 +60,7 @@ namespace hpx { namespace detail
         HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
@@ -111,7 +111,7 @@ namespace hpx { namespace detail
             traits::is_distribution_policy<DistPolicy>::value,
             lcos::future<
                 typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<
+                    typename hpx::traits::extract_action<
                         Action
                     >::remote_result_type
                 >::type
@@ -133,7 +133,7 @@ namespace hpx { namespace detail
         HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
@@ -179,7 +179,7 @@ namespace hpx { namespace detail
         HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
@@ -199,7 +199,7 @@ namespace hpx { namespace detail
         >::type>
     {
         typedef typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type result_type;
@@ -245,7 +245,7 @@ namespace hpx { namespace detail
             typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Derived
                 >::remote_result_type
             >::type>
@@ -284,7 +284,7 @@ namespace hpx { namespace detail
             typename DistPolicy, typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Derived
                 >::remote_result_type
             >::type>

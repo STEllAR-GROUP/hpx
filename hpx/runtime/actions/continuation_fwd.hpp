@@ -13,7 +13,7 @@ namespace hpx { namespace actions
 {
     class HPX_EXPORT continuation;
 
-    template <typename F, typename ...Ts>
+    template <typename Result, typename F, typename ...Ts>
     void trigger(std::unique_ptr<continuation> cont, F&& f, Ts&&... vs);
 }}
 

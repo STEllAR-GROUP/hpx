@@ -19,6 +19,7 @@ namespace hpx { namespace traits
     {
         typedef typename Action::derived_type type;
         typedef typename type::result_type result_type;
+        typedef typename type::local_result_type local_result_type;
         typedef typename type::remote_result_type remote_result_type;
     };
 

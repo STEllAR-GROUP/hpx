@@ -83,7 +83,9 @@ namespace hpx { namespace actions
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_->get_id() << ")";
 
-                actions::trigger(std::move(cont_), f_);
+                typedef typename Action::local_result_type local_result_type;
+
+                actions::trigger<local_result_type>(std::move(cont_), f_);
                 return threads::terminated;
             }
 
@@ -128,13 +130,19 @@ namespace hpx { namespace actions
         typedef Component component_type;
         typedef Derived derived_type;
 
+        // result_type represents the type returned when invoking operator()
         typedef
-            typename std::conditional<
-                std::is_void<R>::value, util::unused_type, R
+            typename traits::promise_local_result<
+                R
             >::type
             result_type;
-        typedef typename traits::promise_local_result<R>::type local_result_type;
+        // The remote_result_type is the remote type for the type_continuation
         typedef typename detail::remote_action_result<R>::type remote_result_type;
+        // The remote_result_type is the local type for the type_continuation
+        typedef
+            typename traits::promise_local_result<
+                remote_result_type
+            >::type local_result_type;
 
         static const std::size_t arity = sizeof...(Args);
         typedef util::tuple<typename util::decay<Args>::type...> arguments_type;
@@ -155,6 +163,11 @@ namespace hpx { namespace actions
     protected:
         struct invoker
         {
+            typedef
+                typename std::conditional<
+                    std::is_void<R>::value, util::unused_type, R
+                >::type
+                result_type;
             template <typename ...Ts>
             result_type operator()(
                 naming::address::address_type lva, Ts&&... vs) const
@@ -258,7 +271,8 @@ namespace hpx { namespace actions
 
         // direct execution
         template <typename ...Ts>
-        static HPX_FORCEINLINE result_type
+        static HPX_FORCEINLINE
+        typename invoker::result_type
         execute_function(naming::address::address_type lva, Ts&&... vs)
         {
             LTM_(debug)
@@ -269,12 +283,12 @@ namespace hpx { namespace actions
         }
 
         ///////////////////////////////////////////////////////////////////////
-        typedef typename traits::is_future<local_result_type>::type is_future_pred;
+        typedef typename traits::is_future<result_type>::type is_future_pred;
 
         struct sync_invoke
         {
             template <typename IdOrPolicy, typename ...Ts>
-            HPX_FORCEINLINE static local_result_type call(
+            HPX_FORCEINLINE static result_type call(
                 boost::mpl::false_, launch policy,
                 IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
@@ -283,7 +297,7 @@ namespace hpx { namespace actions
             }
 
             template <typename IdOrPolicy, typename ...Ts>
-            HPX_FORCEINLINE static local_result_type call(
+            HPX_FORCEINLINE static result_type call(
                 boost::mpl::true_, launch policy,
                 IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
@@ -294,24 +308,24 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
-        HPX_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE result_type operator()(
             launch policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<local_result_type>(),
+            return util::void_guard<result_type>(),
                 sync_invoke::call(
                     is_future_pred(), policy, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
-        HPX_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
             return (*this)(launch::all, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
-        HPX_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE result_type operator()(
             launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
@@ -319,7 +333,7 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        HPX_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
             return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
@@ -330,12 +344,12 @@ namespace hpx { namespace actions
         HPX_FORCEINLINE
         typename std::enable_if<
             traits::is_distribution_policy<DistPolicy>::value,
-            local_result_type
+            result_type
         >::type
         operator()(launch policy,
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<local_result_type>(),
+            return util::void_guard<result_type>(),
                 sync_invoke::call(
                     is_future_pred(), policy, dist_policy, ec,
                     std::forward<Ts>(vs)...
@@ -346,7 +360,7 @@ namespace hpx { namespace actions
         HPX_FORCEINLINE
         typename std::enable_if<
             traits::is_distribution_policy<DistPolicy>::value,
-            local_result_type
+            result_type
         >::type
         operator()(DistPolicy const& dist_policy, error_code& ec,
             Ts&&... vs) const
@@ -359,7 +373,7 @@ namespace hpx { namespace actions
         HPX_FORCEINLINE
         typename std::enable_if<
             traits::is_distribution_policy<DistPolicy>::value,
-            local_result_type
+            result_type
         >::type
         operator()(launch policy,
             DistPolicy const& dist_policy, Ts&&... vs) const
@@ -372,7 +386,7 @@ namespace hpx { namespace actions
         HPX_FORCEINLINE
         typename std::enable_if<
             traits::is_distribution_policy<DistPolicy>::value,
-            local_result_type
+            result_type
         >::type
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const
         {

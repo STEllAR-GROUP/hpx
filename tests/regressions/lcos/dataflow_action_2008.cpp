@@ -19,7 +19,7 @@ HPX_DEFINE_PLAIN_ACTION(foo);
 
 int hpx_main(int argc, char* argv[])
 {
-    hpx::future<hpx::future<double> > f =
+    hpx::future<hpx::future<double>> f =
         hpx::dataflow(foo_action(), hpx::find_here());
 
     HPX_TEST_EQ(f.get().get(), 42.);

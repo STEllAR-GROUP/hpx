@@ -41,14 +41,14 @@ namespace hpx
             result_type;
 
             typedef
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
-                >::result_type
+                >::remote_result_type
             continuation_result_type;
 
             lcos::promise<result_type, RemoteResult> p;
             apply<Action>(
-                hpx::actions::typed_continuation<continuation_result_type>(
+                hpx::actions::typed_continuation<result_type, continuation_result_type>(
                     p.get_id(), std::forward<Cont>(cont))
               , target, std::forward<Ts>(vs)...);
             return p.get_future();

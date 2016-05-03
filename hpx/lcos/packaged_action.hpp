@@ -15,9 +15,10 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/protect.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/traits/extract_action.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -62,10 +63,10 @@ namespace hpx { namespace lcos
     template <typename Action, typename Result>
     class packaged_action<Action, Result, boost::mpl::false_>
       : public promise<Result,
-            typename hpx::actions::extract_action<Action>::remote_result_type>
+            typename hpx::traits::extract_action<Action>::remote_result_type>
     {
     protected:
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::remote_result_type remote_result_type;
         typedef promise<Result, remote_result_type> base_type;
 
