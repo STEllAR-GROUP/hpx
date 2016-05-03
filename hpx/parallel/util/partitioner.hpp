@@ -316,9 +316,12 @@ namespace hpx { namespace parallel { namespace util
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<R>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
                 // wait for all tasks to finish
@@ -402,9 +405,12 @@ namespace hpx { namespace parallel { namespace util
                         bind(invoke_fused(), std::forward<F1>(f1), _1),
                         std::move(shape));
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<R>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
                 // wait for all tasks to finish
@@ -468,9 +474,12 @@ namespace hpx { namespace parallel { namespace util
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<R>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
                 // wait for all tasks to finish
