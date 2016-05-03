@@ -11,12 +11,13 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/parallel/algorithms/detail/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -29,23 +30,37 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename OutIter>
-        struct move : public detail::algorithm<move<OutIter>, OutIter>
+
+        // sequential move
+        template <typename InIter, typename OutIter>
+        inline std::pair<InIter, OutIter>
+        sequential_move(InIter first, InIter last, OutIter dest)
         {
-            move()
-              : move::algorithm("move")
+            while (first != last)
+            {
+                *dest++ = std::move(*first++);
+            }
+            return std::make_pair(first, dest);
+        }
+
+        template <typename IterPair>
+        struct move_pair :
+            public detail::algorithm<detail::move_pair<IterPair>, IterPair>
+        {
+            move_pair()
+              : move_pair::algorithm("move")
             {}
 
-            template <typename ExPolicy, typename InIter>
-            static OutIter
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
-                return std::move(first, last, dest);
+                return sequential_move(first, last, dest);
             }
 
-            template <typename ExPolicy, typename FwdIter>
+            template <typename ExPolicy, typename FwdIter, typename OutIter>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, std::pair<FwdIter, OutIter>
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest)
@@ -53,10 +68,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef typename util::detail::algorithm_result<
-                        ExPolicy, OutIter
+                        ExPolicy, std::pair<FwdIter, OutIter>
                     >::type result_type;
 
-                return get_iter<1, result_type>(
+                return get_iter_pair(
                     for_each_n<zip_iterator>().call(
                         std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first, dest),
@@ -67,6 +82,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template<typename InIter, typename OutIter, typename Enable = void>
+        struct move;
+
+        template <typename InIter, typename OutIter>
+        struct move<
+            InIter, OutIter,
+            typename std::enable_if<
+                iterators_are_segmented<InIter, OutIter>::value
+            >::type>
+          : public move_pair<std::pair<
+                typename hpx::traits::segmented_iterator_traits<InIter>
+                    ::local_iterator,
+                typename hpx::traits::segmented_iterator_traits<OutIter>
+                    ::local_iterator
+            > >
+        {};
+
+        template<typename InIter, typename OutIter>
+        struct move<
+            InIter, OutIter,
+            typename std::enable_if<
+                iterators_are_not_segmented<InIter, OutIter>::value
+            >::type>
+          : public move_pair<std::pair<InIter, OutIter> >
+        {};
         /// \endcond
     }
 
@@ -108,39 +150,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a move algorithm returns a \a hpx::future<OutIter> if
-    ///           the execution policy is of type
+    /// \returns  The \a move algorithm returns a
+    ///           \a  hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
+    ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a move algorithm returns the output iterator to the
+    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           otherwise.
+    ///           The \a move algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
-    ///           copied.
+    ///           moved.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    template <typename ExPolicy, typename InIter, typename OutIter,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     move(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_input_iterator<OutIter>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
-        return detail::move<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest);
+        return detail::transfer<
+                detail::move<InIter, OutIter>
+            >(std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}
 

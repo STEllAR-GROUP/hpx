@@ -5,16 +5,20 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/parallel_move.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
 #include <vector>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
 HPX_REGISTER_PARTITIONED_VECTOR(int);
+typedef typename std::string string;
+HPX_REGISTER_PARTITIONED_VECTOR(string);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
@@ -50,7 +54,7 @@ void compare_vectors(hpx::partitioned_vector<T> const& v1,
 }
 
 template <typename T>
-void move_tests(hpx::partitioned_vector<T> const& v1)
+void move_tests(hpx::partitioned_vector<T> const& v1, T value)
 {
     hpx::partitioned_vector<T> v2(v1);
     compare_vectors(v1, v2);
@@ -58,7 +62,7 @@ void move_tests(hpx::partitioned_vector<T> const& v1)
     hpx::partitioned_vector<T> v3(std::move(v2));
     compare_vectors(v1, v3);
 
-    fill_vector(v3, T(43));
+    fill_vector(v3, T(value));
     compare_vectors(v1, v3, false);
 
     hpx::partitioned_vector<T> v4;
@@ -69,14 +73,49 @@ void move_tests(hpx::partitioned_vector<T> const& v1)
     v5 = std::move(v4);
     compare_vectors(v1, v5);
 
-    fill_vector(v5, T(43));
+    fill_vector(v5, T(value));
     compare_vectors(v1, v5, false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename T, typename DistPolicy, typename ExPolicy>
+void move_algo_tests_with_policy(std::size_t size, std::size_t localities,
+    DistPolicy const& policy, ExPolicy const& move_policy, T value)
+{
+    hpx::partitioned_vector<T> v1(size, policy);
+    fill_vector(v1, T(value));
+
+    hpx::partitioned_vector<T> v2(v1);
+    compare_vectors(v1, v2);
+
+    hpx::partitioned_vector<T> v3(size, policy);
+    auto p = hpx::parallel::move(move_policy, v2.begin(), v2.end(), v3.begin());
+    HPX_TEST(p.out() == v3.end());
+    compare_vectors(v1, v3);
+}
+
+template <typename T, typename DistPolicy, typename ExPolicy>
+void move_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
+    DistPolicy const& policy, ExPolicy const& move_policy, T value)
+{
+    hpx::partitioned_vector<T> v1(size, policy);
+    fill_vector(v1, T(value));
+
+    hpx::partitioned_vector<T> v2(v1);
+    compare_vectors(v1, v2);
+
+    using hpx::parallel::task;
+
+    hpx::partitioned_vector<T> v3(size, policy);
+    auto f = hpx::parallel::move(move_policy(task), v2.begin(), v2.end(), v3.begin());
+
+    HPX_TEST(f.get().out() == v3.end());
+    compare_vectors(v1, v3);
+}
+
 template <typename T, typename DistPolicy>
 void move_tests_with_policy(std::size_t size, std::size_t localities,
-    DistPolicy const& policy)
+    DistPolicy const& policy, T value)
 {
     hpx::partitioned_vector<T> v1(size, policy);
 
@@ -86,7 +125,7 @@ void move_tests_with_policy(std::size_t size, std::size_t localities,
     hpx::partitioned_vector<T> v3(std::move(v2));
     compare_vectors(v1, v3);
 
-    fill_vector(v3, T(43));
+    fill_vector(v3, T(value));
     compare_vectors(v1, v3, false);
 
     hpx::partitioned_vector<T> v4;
@@ -97,44 +136,53 @@ void move_tests_with_policy(std::size_t size, std::size_t localities,
     v5 = std::move(v4);
     compare_vectors(v1, v5);
 
-    fill_vector(v5, T(43));
+    fill_vector(v5, T(value));
     compare_vectors(v1, v5, false);
+
+    using namespace hpx::parallel;
+
+    move_algo_tests_with_policy<T>(size, localities, policy, seq, value);
+    move_algo_tests_with_policy<T>(size, localities, policy, par, value);
+
+    move_algo_tests_with_policy_async<T>(size, localities, policy, seq, value);
+    move_algo_tests_with_policy_async<T>(size, localities, policy, par, value);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void move_tests()
+void move_tests(T value, T other_value)
 {
     std::size_t const length = 12;
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     {
         hpx::partitioned_vector<T> v;
-        move_tests(v);
+        move_tests(v, value);
     }
 
     {
         hpx::partitioned_vector<T> v(length);
-        move_tests(v);
+        move_tests(v, value);
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(42));
-        move_tests(v);
+        hpx::partitioned_vector<T> v(length, T(other_value));
+        move_tests(v, value);
     }
 
-    move_tests_with_policy<T>(length, 1, hpx::container_layout);
-    move_tests_with_policy<T>(length, 3, hpx::container_layout(3));
-    move_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
+    move_tests_with_policy<T>(length, 1, hpx::container_layout, value);
+    move_tests_with_policy<T>(length, 3, hpx::container_layout(3), value);
+    move_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities), value);
     move_tests_with_policy<T>(length, localities.size(),
-        hpx::container_layout(localities));
+    hpx::container_layout(localities), value);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    move_tests<double>();
-    move_tests<int>();
+    move_tests<double>(43, 42);
+    move_tests<int>(43, 42);
+    move_tests<std::string>("test", "not_test");
 
     return 0;
 }

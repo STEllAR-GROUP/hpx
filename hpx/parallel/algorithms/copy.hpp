@@ -28,10 +28,12 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/traits/projected.hpp>
+#include <hpx/parallel/algorithms/detail/transfer.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <boost/shared_array.hpp>
@@ -94,31 +96,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
-        >::type
-        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            std::false_type)
-        {
-            typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value ||
-                   !hpx::traits::is_forward_iterator<OutIter>::value
-                > is_seq;
+        ///////////////////////////////////////////////////////////////////////
+        template<typename InIter, typename OutIter, typename Enable = void>
+        struct copy_iter;
 
-            return detail::copy<std::pair<InIter, OutIter> >().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest);
-        }
+        template <typename InIter, typename OutIter>
+        struct copy_iter<
+            InIter, OutIter,
+            typename std::enable_if<
+                iterators_are_segmented<InIter, OutIter>::value
+            >::type>
+          : public copy<std::pair<
+                typename hpx::traits::segmented_iterator_traits<InIter>
+                    ::local_iterator,
+                typename hpx::traits::segmented_iterator_traits<OutIter>
+                    ::local_iterator
+            > >
+        {};
 
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename OutIter>
-        typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
-        >::type
-        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            std::true_type);
+        template<typename InIter, typename OutIter>
+        struct copy_iter<
+            InIter, OutIter,
+            typename std::enable_if<
+                iterators_are_not_segmented<InIter, OutIter>::value
+            >::type>
+          : public copy<std::pair<InIter, OutIter> >
+        {};
 
         /// \endcond
     }
@@ -180,21 +183,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
-            "Required at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_forward_iterator<OutIter>::value),
-            "Requires at least output iterator.");
-
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
-
-        return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::copy_(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                is_segmented()));
+           return detail::transfer<
+//                detail::copy<std::pair<InIter, OutIter>>
+                detail::copy_iter<InIter, OutIter>
+            >(std::forward<ExPolicy>(policy), first, last, dest);
     }
+
 
     /////////////////////////////////////////////////////////////////////////////
     // copy_n

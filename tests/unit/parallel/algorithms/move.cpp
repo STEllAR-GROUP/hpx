@@ -56,7 +56,7 @@ void test_move_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<base_iterator> f =
+    auto f =
         hpx::parallel::move(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d));
@@ -121,7 +121,7 @@ void test_outiter_move_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(0);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<outiterator> f =
+    auto f =
         hpx::parallel::move(p,
         iterator(boost::begin(c)), iterator(boost::end(c)),
         std::back_inserter(d));
@@ -242,7 +242,7 @@ void test_move_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::move(p,
                 decorated_iterator(
                     boost::begin(c),
@@ -348,7 +348,7 @@ void test_move_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        auto f =
             hpx::parallel::move(p,
                 decorated_iterator(
                     boost::begin(c),

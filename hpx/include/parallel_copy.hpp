@@ -8,7 +8,6 @@
 #define HPX_PARALLEL_COPY_JUN_28_2014_0827AM
 
 #include <hpx/parallel/algorithms/copy.hpp>
-#include <hpx/parallel/segmented_algorithms/copy.hpp>
 #include <hpx/parallel/container_algorithms/copy.hpp>
 
 #endif
