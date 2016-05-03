@@ -136,7 +136,7 @@ HPX_INLINE_NAMESPACE(v1)
 
         template<typename ExPolicy, typename FwdIter,
             typename T, typename Op,
-            typename Lambda1, typename Lambda2 >
+            typename Lambda1, typename Lambda2, typename Lambda3>
         static OutIter
         sequential(ExPolicy,
             FwdIter first,
@@ -146,10 +146,12 @@ HPX_INLINE_NAMESPACE(v1)
             Lambda1 && f1,
             Op      && op,
             Lambda2 && f2,
-            Lambda1 && f3)
+            Lambda3 && f3)
         {
-            return TagType::sequential_scan(first, last, dest,
-                std::forward<T>(init), std::forward<Op>(op));
+            auto f1_res = f1(first, std::distance(first,last), std::forward<T>(init));
+            // op not needed for a single chunk
+            auto f2_res = f2(first, std::distance(first,last), dest, 0);
+            return f3(f2_res);
         }
 
         template<typename ExPolicy, typename FwdIter, typename T, typename Op,
@@ -207,7 +209,12 @@ HPX_INLINE_NAMESPACE(v1)
             }
             if (n_chunks < 2 || cores == 1) {
                 return result::get(sequential(policy, first, last, dest,
-                  std::forward < T >(init), std::forward < Op >(op)));
+                  std::forward < T >(init),
+                  std::forward < Lambda1 >(f1),
+                  std::forward < Op >(op),
+                  std::forward < Lambda2 >(f2),
+                  std::forward < Lambda3 >(f3)
+                  ));
             }
 
             // --------------------------
@@ -219,7 +226,7 @@ HPX_INLINE_NAMESPACE(v1)
             // Then we will do the scan algorithm using the 2^N items as our base input.
             // This first loop spawns 2^N sequential scans on the initial lists
 
-            // result type of lambda_1
+            // result type of lambdas
             typedef typename std::result_of<Lambda1(FwdIter, std::size_t, T)>::type f1_type;
             typedef typename std::result_of<Lambda2(FwdIter, std::size_t, OutIter, T)>::type f2_type;
             // intermediate store for partial results after lambda_1
@@ -246,10 +253,20 @@ HPX_INLINE_NAMESPACE(v1)
                 work_chunks.push_back(
                     std::make_tuple(it1, chunk_size, dest, f1_type()));
                 // spawn a task to do a sequential scan on this chunk
+
+                // spawn a task to do a sequential scan on this chunk
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+
                 work_items.push_back(
                     std::move(
-                        hpx::async(f1,
-                            it1, chunk_size, T_type())));
+                        executor_traits::async_execute(
+                            policy.executor(),
+                            hpx::util::deferred_call(
+                                f1, it1, chunk_size, T_type()))));
+
                 it1 = it2;
                 std::advance(dest, chunk_size);
             }
@@ -308,7 +325,7 @@ HPX_INLINE_NAMESPACE(v1)
             }
             hpx::wait_all(work_items_2);
             //
-            return f3(work_items_2.back().get());
+            return result::get(f3(work_items_2.back().get()));
         }
     };
 
