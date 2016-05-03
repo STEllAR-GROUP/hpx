@@ -63,7 +63,6 @@ HPX_INLINE_NAMESPACE(v1)
         static OutIter sequential_scan(InIter first, InIter last,
                                        OutIter dest, T init, Op && op)
         {
-            T temp = init;
             for (/* */; first != last; (void) ++first, ++dest) {
                 init = op(init, *first);
                 *dest = init;
@@ -379,7 +378,7 @@ HPX_INLINE_NAMESPACE(v1)
                 log2N -= 1;
               }
             }
-            if (n_chunks < 2 || cores == 1) {
+            if (cores == 1 || n_chunks < 2) {
               return result::get(sequential(policy, first, last, dest,
                 std::forward < T >(init), std::forward < Op >(op)));
             }
@@ -397,8 +396,9 @@ HPX_INLINE_NAMESPACE(v1)
             std::vector<hpx::future<T> > work_items;
             work_chunks.reserve(n_chunks);
             work_items.reserve(n_chunks);
-            FwdIter it2, it1 = first;
+            FwdIter e_it, it2, it1 = first;
             for (int k = 0; k < n_chunks; ++k) {
+                // end position and size of chunk N
                 if (k < n_chunks - 1) {
                     it2 = std::next(it1, chunk_size);
                 }
@@ -406,15 +406,14 @@ HPX_INLINE_NAMESPACE(v1)
                     chunk_size = std::distance(it2, last);
                     it2 = last;
                 }
-                // start and end of chunk of our input array
-                auto ept = std::next(it1, chunk_size-1);
+                // put the chunk info on the work queue. Final value is overwritten
+                // tuple<start of chunk, dest start, size, summed result>
                 work_chunks.push_back(
-                    std::make_tuple(it1, dest, chunk_size, *ept));
-                // spawn a task to do a sequential scan on this chunk
+                    std::make_tuple(it1, dest, chunk_size, T()));
 
+                // spawn a task to do a sequential scan on this chunk
                 typedef typename hpx::util::decay<ExPolicy>::type::executor_type
                     executor_type;
-
                 typedef typename hpx::parallel::executor_traits<executor_type>
                     executor_traits;
 
