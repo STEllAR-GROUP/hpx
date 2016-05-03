@@ -535,8 +535,11 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         U_[0][i] = partition(here, nx, double(i));
 
     // send initial values to neighbors
-    send_left(0, U_[0][0]);
-    send_right(0, U_[0][local_np-1]);
+    if (nt != 0)
+    {
+        send_left(0, U_[0][0]);
+        send_right(0, U_[0][local_np-1]);
+    }
 
     for (std::size_t t = 0; t != nt; ++t)
     {
