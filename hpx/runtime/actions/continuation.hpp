@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -88,6 +88,18 @@ namespace hpx
         };
 
         template <typename T>
+        struct make_rvalue_impl<T const>
+        {
+            typedef T type;
+
+            template <typename U>
+            HPX_FORCEINLINE static T call(U const& u)
+            {
+                return u;
+            }
+        };
+
+        template <typename T>
         struct make_rvalue_impl<T&>
         {
             typedef T type;
@@ -124,58 +136,67 @@ namespace hpx
         }
     }
 
-    template <typename Result, typename RemoteResult>
-    void set_lco_value(naming::id_type const& id, naming::address && addr, RemoteResult && t,
-        bool move_credits)
+    template <typename Result>
+    void set_lco_value(naming::id_type const& id, naming::address && addr,
+        Result && t, bool move_credits)
     {
+        typedef typename util::decay<Result>::type remote_result_type;
+        typedef typename traits::promise_local_result<
+                remote_result_type
+            >::type local_result_type;
         typedef typename lcos::base_lco_with_value<
-            Result, typename util::decay<RemoteResult>::type
-        >::set_value_action set_value_action;
+                local_result_type, remote_result_type
+            >::set_value_action set_value_action;
+
         if (move_credits)
         {
-            naming::id_type target(id.get_gid(), naming::id_type::managed_move_credit);
+            naming::id_type target(id.get_gid(),
+                naming::id_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_value_action>(
-                target, std::move(addr), actions::action_priority<set_value_action>(),
-                detail::make_rvalue<RemoteResult>(t));
+            detail::apply_impl<set_value_action>(target, std::move(addr),
+                actions::action_priority<set_value_action>(),
+                detail::make_rvalue<Result>(t));
         }
         else
         {
-            detail::apply_impl<set_value_action>(
-                id, std::move(addr), actions::action_priority<set_value_action>(),
-                detail::make_rvalue<RemoteResult>(t));
+            detail::apply_impl<set_value_action>(id, std::move(addr),
+                actions::action_priority<set_value_action>(),
+                detail::make_rvalue<Result>(t));
         }
     }
 
-    template <typename Result, typename RemoteResult>
-    void set_lco_value(naming::id_type const& id, naming::address && addr, RemoteResult && t,
-        naming::id_type const& cont, bool move_credits)
+    template <typename Result>
+    void set_lco_value(naming::id_type const& id, naming::address && addr,
+        Result && t, naming::id_type const& cont, bool move_credits)
     {
+        typedef typename util::decay<Result>::type remote_result_type;
+        typedef typename traits::promise_local_result<
+                remote_result_type
+            >::type local_result_type;
         typedef typename lcos::base_lco_with_value<
-            Result, typename util::decay<RemoteResult>::type
-        >::set_value_action set_value_action;
-        typedef
-            typename hpx::traits::extract_action<set_value_action>::result_type
-            result_type;
-        typedef
-            typename hpx::traits::extract_action<set_value_action>::local_result_type
-            local_result_type;
+                local_result_type, remote_result_type
+            >::set_value_action set_value_action;
+
         if (move_credits)
         {
-            naming::id_type target(id.get_gid(), naming::id_type::managed_move_credit);
+            naming::id_type target(id.get_gid(),
+                naming::id_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_value_action>(
                 actions::typed_continuation<
-                    local_result_type, result_type>(cont), target, std::move(addr),
-                detail::make_rvalue<RemoteResult>(t));
+                    local_result_type, remote_result_type>(cont),
+                target, std::move(addr),
+                detail::make_rvalue<Result>(t));
         }
         else
         {
             detail::apply_impl<set_value_action>(
-                actions::typed_continuation<local_result_type, result_type>(cont), id, std::move(addr),
-                detail::make_rvalue<RemoteResult>(t));
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont),
+                id, std::move(addr),
+                detail::make_rvalue<Result>(t));
         }
     }
 }
@@ -416,7 +437,7 @@ namespace hpx { namespace actions
         template <typename T>
         HPX_FORCEINLINE T operator()(naming::id_type const& lco, T && t) const
         {
-            hpx::set_lco_value<T>(lco, std::forward<T>(t));
+            hpx::set_lco_value(lco, std::forward<T>(t));
 
             // Yep, 't' is a zombie, however we don't use the returned value
             // anyways. We need it for result type calculation, though.
@@ -614,7 +635,7 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value<Result, Result>(this->get_id(), this->get_addr(), std::move(result));
+                hpx::set_lco_value(this->get_id(), this->get_addr(), std::move(result));
             }
             else {
                 f_(this->get_id(), std::move(result));
@@ -730,8 +751,8 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value<Result, RemoteResult>(
-                    this->get_id(), this->get_addr(), std::move(result));
+                hpx::set_lco_value(this->get_id(), this->get_addr(),
+                    std::move(result));
             }
             else {
                 this->f_(this->get_id(), std::move(result));

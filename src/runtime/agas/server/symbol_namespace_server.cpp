@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2014 Hartmut Kaiser
+//  Copyright (c) 2012-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -411,7 +411,7 @@ response symbol_namespace::bind(
                     naming::detail::split_gid_if_needed(*current_gid).get();
 
                 // trigger the lco
-                set_lco_value<naming::id_type, naming::gid_type>(id, std::move(new_gid));
+                set_lco_value(id, std::move(new_gid));
             }
         }
     }
@@ -582,7 +582,7 @@ response symbol_namespace::on_event(
                 handled = true;
 
                 // trigger LCO as name is already bound to an id
-                set_lco_value<naming::id_type, naming::gid_type>(lco, std::move(new_gid));
+                set_lco_value(lco, std::move(new_gid));
             }
         }
     }

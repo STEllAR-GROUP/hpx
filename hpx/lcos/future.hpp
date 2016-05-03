@@ -940,16 +940,18 @@ namespace hpx { namespace lcos
         typename std::enable_if<
             std::is_convertible<Future, hpx::future<T> >::value,
             hpx::future<T>
-        >::type make_future_helper(Future && f)
+        >::type
+        make_future_helper(Future && f)
         {
             return std::move(f);
         };
 
         template <typename T, typename Future>
         typename std::enable_if<
-            !std::is_convertible<Future, hpx::future<T> >::value,
+           !std::is_convertible<Future, hpx::future<T> >::value,
             hpx::future<T>
-        >::type make_future_helper(Future && f)
+        >::type
+        make_future_helper(Future && f)
         {
             return f.then(
                 [](Future && f) -> T
@@ -973,22 +975,41 @@ namespace hpx { namespace lcos
         return detail::make_future_helper<R>(std::move(f));
     }
 
+    namespace detail
+    {
+        template <typename T, typename Future, typename Conv>
+        typename std::enable_if<
+            std::is_convertible<Future, hpx::future<T> >::value,
+            hpx::future<T>
+        >::type
+        convert_future_helper(Future && f, Conv && conv)
+        {
+            return std::move(f);
+        };
+
+        template <typename T, typename Future, typename Conv>
+        typename std::enable_if<
+           !std::is_convertible<Future, hpx::future<T> >::value,
+            hpx::future<T>
+        >::type
+        convert_future_helper(Future && f, Conv && conv)
+        {
+            return f.then(
+                [conv](Future && f) -> T
+                {
+                    return hpx::util::invoke(conv, f.get());
+                });
+        }
+    }
+
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
     template <typename R, typename U, typename Conv>
     hpx::future<R>
     make_future(hpx::future<U> && f, Conv && conv)
     {
-        static_assert(
-            hpx::traits::is_callable<Conv(U), R>::value,
-            "the argument type must be convertible to the requested "
-            "result type by using the supplied conversion function");
-
-        return f.then(
-            [conv](hpx::future<U> && f)
-            {
-                return hpx::util::invoke(conv, f.get());
-            });
+        return detail::convert_future_helper<R>(
+            std::move(f), std::forward<Conv>(conv));
     }
 }}
 
