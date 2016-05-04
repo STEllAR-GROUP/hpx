@@ -50,7 +50,7 @@ namespace hpx { namespace serialization
             }
 
             static bool flush(binary_filter* filter, Container& cont,
-                std::size_t current, std::size_t size, std::size_t written)
+                std::size_t current, std::size_t size, std::size_t& written)
             {
                 return filter->flush(&cont[current], size, written);
             }

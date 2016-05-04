@@ -78,8 +78,8 @@ namespace hpx
                 LPT_(debug) << binary_archive_content(buffer);
 
                 performance_counters::parcels::data_point& data = buffer.data_point_;
-                data.bytes_ = arg_size;
-                data.raw_bytes_ = buffer.data_.size();
+                data.bytes_ = buffer.data_.size();
+                data.raw_bytes_ = arg_size;
 
                 // prepare chunk data for transmission, the transmission_chunks data
                 // first holds all zero-copy, then all non-zero-copy chunk infos

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2016 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,8 +26,11 @@ macro(add_bzip2_module)
 
     add_hpx_library(compress_bzip2
       PLUGIN
-      SOURCES "${PROJECT_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
-      HEADERS "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
+      SOURCES
+        "${PROJECT_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
+      HEADERS
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARIES})
 
