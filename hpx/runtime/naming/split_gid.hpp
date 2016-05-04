@@ -8,8 +8,8 @@
 #ifndef HPX_NAMING_SPLIT_GID_HPP
 #define HPX_NAMING_SPLIT_GID_HPP
 
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 #include <mutex>
 

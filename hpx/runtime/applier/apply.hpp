@@ -64,7 +64,7 @@ namespace hpx
             threads::thread_priority priority, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::type
+                typename hpx::traits::extract_action<Action>::type
                 action_type;
             action_type act;
 
@@ -86,7 +86,7 @@ namespace hpx
             Continuation && cont, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::type
+                typename hpx::traits::extract_action<Action>::type
                 action_type;
 
             parcelset::parcelhandler& ph =
@@ -108,7 +108,7 @@ namespace hpx
             parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::type
+                typename hpx::traits::extract_action<Action>::type
                 action_type;
 
             parcelset::parcelhandler& ph =
@@ -129,7 +129,7 @@ namespace hpx
             parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::type
+                typename hpx::traits::extract_action<Action>::type
                 action_type;
 
             parcelset::parcelhandler& ph =
@@ -151,7 +151,7 @@ namespace hpx
             parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::type
+                typename hpx::traits::extract_action<Action>::type
                 action_type;
 
             parcelset::parcelhandler& ph =
@@ -174,7 +174,7 @@ namespace hpx
             parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::type
+                typename hpx::traits::extract_action<Action>::type
                 action_type;
 
             parcelset::parcelhandler& ph =
@@ -235,7 +235,7 @@ namespace hpx
             std::vector<naming::gid_type> const& gids,
             threads::thread_priority priority, Ts&&... vs)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::traits::extract_action<Action>::type action_type;
 
             // sort destinations
             std::map<parcelset::locality, destinations> dests;
@@ -278,7 +278,7 @@ namespace hpx
         apply_l_p(naming::id_type const& target, naming::address&& addr,
             threads::thread_priority priority, Ts&&... vs)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::traits::extract_action<Action>::type action_type;
 
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
@@ -294,7 +294,7 @@ namespace hpx
         apply_l_p_val(naming::id_type const& target, naming::address&& addr,
             threads::thread_priority priority, Ts... vs)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::traits::extract_action<Action>::type action_type;
 
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
@@ -543,7 +543,7 @@ namespace hpx
         apply_r_sync_p(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type_;
+            typedef typename hpx::traits::extract_action<Action>::type action_type_;
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
@@ -571,7 +571,7 @@ namespace hpx
             naming::id_type const& target, naming::address&& addr,
             threads::thread_priority priority, Ts&&... vs)
         {
-            typedef typename hpx::actions::extract_action<
+            typedef typename hpx::traits::extract_action<
                     Action
                 >::type action_type;
 
@@ -759,11 +759,15 @@ namespace hpx
             Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
+                typename hpx::traits::extract_action<Action>::local_result_type
+                local_result_type;
+            typedef
+                typename hpx::traits::extract_action<Action>::remote_result_type
+                remote_result_type;
 
             return apply_r_p<Action>(std::move(addr),
-                actions::typed_continuation<result_type>(contgid),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(contgid),
                 gid, priority, std::forward<Ts>(vs)...);
         }
 
@@ -773,11 +777,15 @@ namespace hpx
             naming::id_type const& gid, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
+                typename hpx::traits::extract_action<Action>::local_result_type
+                local_result_type;
+            typedef
+                typename hpx::traits::extract_action<Action>::remote_result_type
+                remote_result_type;
 
             return apply_r_p<Action>(std::move(addr),
-                actions::typed_continuation<result_type>(contgid),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 std::forward<Ts>(vs)...);
         }
@@ -790,11 +798,14 @@ namespace hpx
         threads::thread_priority priority, Ts&&... vs)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
-            result_type;
+            typename hpx::traits::extract_action<Action>::local_result_type
+            local_result_type;
+        typedef
+            typename hpx::traits::extract_action<Action>::remote_result_type
+            remote_result_type;
 
         return apply_p<Action>(
-            actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
             gid, priority, std::forward<Ts>(vs)...);
     }
 
@@ -804,11 +815,14 @@ namespace hpx
         Ts&&... vs)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
-            result_type;
+            typename hpx::traits::extract_action<Action>::local_result_type
+            local_result_type;
+        typedef
+            typename hpx::traits::extract_action<Action>::remote_result_type
+            remote_result_type;
 
         return apply_p<Action>(
-            actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
             gid, actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
     }
@@ -822,11 +836,14 @@ namespace hpx
         Ts&&... vs)
     {
         typedef
-            typename hpx::actions::extract_action<Derived>::result_type
-            result_type;
+            typename hpx::traits::extract_action<Derived>::local_result_type
+            local_result_type;
+        typedef
+            typename hpx::traits::extract_action<Derived>::remote_result_type
+            remote_result_type;
 
         return apply_p<Derived>(
-            actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
             gid, actions::action_priority<Derived>(),
             std::forward<Ts>(vs)...);
     }

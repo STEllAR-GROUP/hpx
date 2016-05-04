@@ -63,6 +63,7 @@ namespace hpx { namespace util
             {
                 held_locks_data()
                   : enabled_(true)
+                  , ignore_all_locks_(false)
                 {}
 
                 held_locks_map data_;

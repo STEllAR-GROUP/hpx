@@ -115,7 +115,7 @@ namespace hpx { namespace lcos
         template <typename Action>
         struct reduce_result
           : traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type>
         {};

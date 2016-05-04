@@ -13,21 +13,6 @@
 #include <hpx/util/decay.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
-    // This template meta function can be used to extract the action type, no
-    // matter whether it got specified directly or by passing the
-    // corresponding make_action<> specialization.
-    template <typename Action, typename Enable = void>
-    struct extract_action
-    {
-        typedef typename Action::derived_type type;
-        typedef typename type::result_type result_type;
-        typedef typename type::remote_result_type remote_result_type;
-    };
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////

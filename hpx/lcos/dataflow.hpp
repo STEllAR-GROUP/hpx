@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -93,10 +94,10 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Action, typename Args>
     struct dataflow_return<Action, Args,
         typename std::enable_if<traits::is_action<Action>::value>::type
-    > : traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >
-    {};
+    >
+    {
+        typedef typename Action::result_type type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
@@ -495,7 +496,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
@@ -512,7 +513,7 @@ namespace hpx { namespace lcos { namespace detail
 //             traits::is_distribution_policy<DistPolicy>::value,
 //             lcos::future<
 //                 typename traits::promise_local_result<
-//                     typename hpx::actions::extract_action<
+//                     typename hpx::traits::extract_action<
 //                         Action
 //                     >::remote_result_type
 //                 >::type
@@ -534,7 +535,7 @@ namespace hpx { namespace lcos { namespace detail
         HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
@@ -557,7 +558,7 @@ namespace hpx { namespace lcos { namespace detail
 //         HPX_FORCEINLINE static
 //         lcos::future<
 //             typename traits::promise_local_result<
-//                 typename hpx::actions::extract_action<
+//                 typename hpx::traits::extract_action<
 //                     Action
 //                 >::remote_result_type
 //             >::type>
@@ -575,7 +576,7 @@ namespace hpx { namespace lcos { namespace detail
         typename std::enable_if<traits::is_action<Action>::value>::type>
     {
         typedef typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
+                typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type result_type;

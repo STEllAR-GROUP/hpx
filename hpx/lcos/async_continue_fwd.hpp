@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/runtime/actions/detail/remote_action_result.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/lcos/future.hpp>
@@ -21,13 +22,6 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    namespace actions { namespace detail
-    {
-        template <typename Result>
-        struct remote_action_result;
-    }}
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename Action, typename Cont>
@@ -35,7 +29,7 @@ namespace hpx
             : actions::detail::remote_action_result<
                 typename util::result_of<typename util::decay<Cont>::type(
                     naming::id_type,
-                    typename hpx::actions::extract_action<
+                    typename hpx::traits::extract_action<
                         Action
                     >::remote_result_type
                 )>::type

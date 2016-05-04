@@ -15,9 +15,10 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/protect.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/traits/extract_action.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -62,11 +63,12 @@ namespace hpx { namespace lcos
     template <typename Action, typename Result>
     class packaged_action<Action, Result, boost::mpl::false_>
       : public promise<Result,
-            typename hpx::actions::extract_action<Action>::remote_result_type>
+            typename hpx::traits::extract_action<Action>::remote_result_type>
     {
     protected:
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef promise<Result, typename action_type::remote_result_type> base_type;
+        typedef typename hpx::traits::extract_action<Action>::type action_type;
+        typedef typename action_type::remote_result_type remote_result_type;
+        typedef promise<Result, remote_result_type> base_type;
 
         static void parcel_write_handler(
             boost::intrusive_ptr<typename base_type::wrapping_type> impl,
@@ -107,10 +109,6 @@ namespace hpx { namespace lcos
         void do_apply(naming::address && addr, naming::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
             LLCO_(info) << "packaged_action::do_apply(" //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -127,7 +125,7 @@ namespace hpx { namespace lcos
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(
-                    actions::typed_continuation<result_type>(
+                    actions::typed_continuation<Result, remote_result_type>(
                         std::move(cont_id), this->resolve()),
                     std::move(addr), id, priority, std::move(f),
                     std::forward<Ts>(vs)...);
@@ -135,7 +133,7 @@ namespace hpx { namespace lcos
             else
             {
                 hpx::apply_p_cb<action_type>(
-                    actions::typed_continuation<result_type>(
+                    actions::typed_continuation<Result, remote_result_type>(
                         std::move(cont_id), this->resolve()),
                     id, priority, std::move(f),
                     std::forward<Ts>(vs)...);
@@ -146,10 +144,6 @@ namespace hpx { namespace lcos
         void do_apply(naming::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
             LLCO_(info) << "packaged_action::do_apply(" //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -161,7 +155,7 @@ namespace hpx { namespace lcos
             using util::placeholders::_2;
 
             hpx::apply_p_cb<action_type>(
-                actions::typed_continuation<result_type>(
+                actions::typed_continuation<Result, remote_result_type>(
                     std::move(cont_id), this->resolve()),
                 id, priority,
                 util::bind(
@@ -174,10 +168,6 @@ namespace hpx { namespace lcos
         void do_apply_cb(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority, Callback && cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
             LLCO_(info) << "packaged_action::do_apply_cb(" //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -197,7 +187,7 @@ namespace hpx { namespace lcos
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(
-                    actions::typed_continuation<result_type>(
+                    actions::typed_continuation<Result, remote_result_type>(
                         std::move(cont_id), this->resolve()),
                     std::move(addr), id, priority, std::move(cb),
                     std::forward<Ts>(vs)...);
@@ -205,7 +195,7 @@ namespace hpx { namespace lcos
             else
             {
                 hpx::apply_p_cb<action_type>(
-                    actions::typed_continuation<result_type>(
+                    actions::typed_continuation<Result, remote_result_type>(
                         std::move(cont_id), this->resolve()),
                     id, priority, std::move(cb),
                     std::forward<Ts>(vs)...);
@@ -216,10 +206,6 @@ namespace hpx { namespace lcos
         void do_apply_cb(naming::id_type const& id,
             threads::thread_priority priority, Callback && cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
             LLCO_(info) << "packaged_action::do_apply_cb(" //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -233,7 +219,7 @@ namespace hpx { namespace lcos
             typedef typename util::decay<Callback>::type callback_type;
 
             hpx::apply_p_cb<action_type>(
-                actions::typed_continuation<result_type>(
+                actions::typed_continuation<Result, remote_result_type>(
                     std::move(cont_id), this->resolve()),
                 id, priority,
                 util::bind(

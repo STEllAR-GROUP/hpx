@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -229,14 +228,18 @@ struct HPX_EXPORT response
     std::unique_ptr<response_data> data;
 };
 
-}
-
-namespace traits
+template <typename Result>
+struct get_response_result
 {
+    static agas::response const& call(agas::response const& rep)
+    {
+        return rep;
+    }
+};
 
 // TODO: verification of namespace_action_code
 template <>
-struct get_remote_result<naming::id_type, agas::response>
+struct get_response_result<naming::id_type>
 {
     static naming::id_type call(
         agas::response const& rep
@@ -263,14 +266,14 @@ struct get_remote_result<naming::id_type, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<naming::id_type, agas::response>::call",
+            "get_response_result<naming::id_type, agas::response>::call",
             "unexpected action code in result conversion");
         return naming::invalid_id;
     }
 };
 
 template <>
-struct get_remote_result<boost::uint32_t, agas::response>
+struct get_response_result<boost::uint32_t>
 {
     static boost::uint32_t call(
         agas::response const& rep
@@ -288,14 +291,14 @@ struct get_remote_result<boost::uint32_t, agas::response>
             break;
         }
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<boost::uint32_t, agas::response>::call",
+            "get_response_result<boost::uint32_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
     }
 };
 
 template <>
-struct get_remote_result<boost::int64_t, agas::response>
+struct get_response_result<boost::int64_t>
 {
     static boost::int64_t call(
         agas::response const& rep
@@ -310,14 +313,14 @@ struct get_remote_result<boost::int64_t, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<boost::int64_t, agas::response>::call",
+            "get_response_result<boost::int64_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
     }
 };
 
 template <>
-struct get_remote_result<bool, agas::response>
+struct get_response_result<bool>
 {
     static bool call(
         agas::response const& rep
@@ -334,14 +337,14 @@ struct get_remote_result<bool, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<void, agas::response>::call",
+            "get_response_result<void, agas::response>::call",
             "unexpected action code in result conversion");
         return false;
     }
 };
 
 template <>
-struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
+struct get_response_result<std::vector<boost::uint32_t>>
 {
     static std::vector<boost::uint32_t> call(
         agas::response const& rep
@@ -356,14 +359,14 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call",
+            "get_response_result<std::vector<boost::uint32_t>, agas::response>::call",
             "unexpected action code in result conversion");
         return std::vector<boost::uint32_t>();
     }
 };
 
 template <>
-struct get_remote_result<naming::address, agas::response>
+struct get_response_result<naming::address>
 {
     static naming::address call(
         agas::response const& rep
@@ -381,14 +384,14 @@ struct get_remote_result<naming::address, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<naming::address>, agas::response>::call",
+            "get_response_result<naming::address>, agas::response>::call",
             "unexpected action code in result conversion");
         return naming::address();
     }
 };
 
 template <>
-struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>
+struct get_response_result<std::pair<naming::id_type, naming::address> >
 {
     static std::pair<naming::id_type, naming::address> call(
         agas::response const& rep
@@ -409,7 +412,7 @@ struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::resp
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<std::pair<naming::id_type, naming::address>,"
+            "get_response_result<std::pair<naming::id_type, naming::address>,"
             " agas::response>::call",
             "unexpected action code in result conversion");
         return std::pair<naming::id_type, naming::address>();
@@ -417,8 +420,7 @@ struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::resp
 };
 
 template <>
-struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>,
-    agas::response>
+struct get_response_result<std::map<naming::gid_type, parcelset::endpoints_type> >
 {
     static std::map<naming::gid_type, parcelset::endpoints_type> call(
         agas::response const& rep
@@ -429,7 +431,7 @@ struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>,
 };
 
 template <>
-struct get_remote_result<parcelset::endpoints_type, agas::response>
+struct get_response_result<parcelset::endpoints_type>
 {
     static parcelset::endpoints_type call(
         agas::response const& rep
@@ -446,23 +448,6 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::agas::response>, hpx_agas_response_vector_type)
-
-namespace hpx { namespace agas { namespace create_result_ns {
-    typedef
-        hpx::lcos::base_lco_with_value<bool, hpx::agas::response>
-        base_lco_bool_response_type;
-    typedef
-        hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::agas::response>
-        base_lco_id_type_response_type;
-}}}
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::create_result_ns::base_lco_bool_response_type::set_value_action,
-    set_value_action_agas_bool_response_type)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::create_result_ns::base_lco_id_type_response_type::set_value_action,
-    set_value_action_agas_id_type_response_type)
 
 #endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 

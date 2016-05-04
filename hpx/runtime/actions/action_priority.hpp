@@ -16,7 +16,7 @@ namespace hpx { namespace actions
     template <typename Action>
     threads::thread_priority action_priority()
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type_;
+        typedef typename hpx::traits::extract_action<Action>::type action_type_;
         threads::thread_priority priority =
             static_cast<threads::thread_priority>(
                 traits::action_priority<action_type_>::value);

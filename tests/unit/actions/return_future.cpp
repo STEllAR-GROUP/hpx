@@ -51,7 +51,7 @@ void test_component_call_future_void()
 
     // test async
     std::vector<hpx::future<void> > calls;
-    for (std::size_t i = 0; i != 100; ++i)
+    for (std::size_t i = 0; i != 1; ++i)
     {
         calls.push_back(hpx::async<call_future_void_action>(id));
     }

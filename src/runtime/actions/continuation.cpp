@@ -6,8 +6,9 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/traits/extract_action.hpp>
 
 #include <boost/exception_ptr.hpp>
 
@@ -38,21 +39,26 @@ namespace hpx
     {
         typedef lcos::base_lco::set_event_action set_action;
         typedef
-            hpx::actions::extract_action<set_action>::result_type
-            result_type;
+            hpx::traits::extract_action<set_action>::local_result_type
+            local_result_type;
+        typedef
+            hpx::traits::extract_action<set_action>::remote_result_type
+            remote_result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), target, std::move(addr),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont), target, std::move(addr),
                 actions::action_priority<set_action>());
         }
         else
         {
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), id, std::move(addr),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont), id, std::move(addr),
                 actions::action_priority<set_action>());
         }
     }
@@ -102,21 +108,26 @@ namespace hpx
     {
         typedef lcos::base_lco::set_exception_action set_action;
         typedef
-            hpx::actions::extract_action<set_action>::result_type
-            result_type;
+            hpx::traits::extract_action<set_action>::local_result_type
+            local_result_type;
+        typedef
+            hpx::traits::extract_action<set_action>::remote_result_type
+            remote_result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), target, std::move(addr),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont), target, std::move(addr),
                 actions::action_priority<set_action>(), e);
         }
         else
         {
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), id, std::move(addr),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont), id, std::move(addr),
                 actions::action_priority<set_action>(), e);
         }
     }
@@ -127,21 +138,26 @@ namespace hpx
     {
         typedef lcos::base_lco::set_exception_action set_action;
         typedef
-            hpx::actions::extract_action<set_action>::result_type
-            result_type;
+            hpx::traits::extract_action<set_action>::local_result_type
+            local_result_type;
+        typedef
+            hpx::traits::extract_action<set_action>::remote_result_type
+            remote_result_type;
         if (move_credits)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), target, std::move(addr),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont), target, std::move(addr),
                 actions::action_priority<set_action>(), std::move(e));
         }
         else
         {
             detail::apply_impl<set_action>(
-                actions::typed_continuation<result_type>(cont), id, std::move(addr),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont), id, std::move(addr),
                 actions::action_priority<set_action>(), std::move(e));
         }
     }

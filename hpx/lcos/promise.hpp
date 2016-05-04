@@ -16,7 +16,6 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
@@ -158,9 +157,6 @@ namespace hpx { namespace lcos { namespace detail
         friend class lcos::promise;
 
     public:
-        virtual void add_ref() = 0;
-        virtual void release() = 0;
-        virtual long count() const = 0;
 
         // retrieve the gid of this promise
         naming::id_type get_id() const
@@ -392,9 +388,6 @@ namespace hpx { namespace components
         struct tag {};
         typedef lcos::local::spinlock_pool<tag> mutex_type;
 
-        typedef lcos::detail::promise_base<void, util::unused_type>
-            promise_base_type;
-
     public:
         managed_promise()
           : promise_(0)
@@ -422,7 +415,7 @@ namespace hpx { namespace components
             p->promise_->release();
         }
 
-        promise_base_type* promise_;
+        lcos::base_lco* promise_;
     };
 }}
 
