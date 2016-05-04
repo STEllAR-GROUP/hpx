@@ -766,7 +766,8 @@ namespace hpx
                 remote_result_type;
 
             return apply_r_p<Action>(std::move(addr),
-                actions::typed_continuation<local_result_type, remote_result_type>(contgid),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(contgid),
                 gid, priority, std::forward<Ts>(vs)...);
         }
 
@@ -783,7 +784,8 @@ namespace hpx
                 remote_result_type;
 
             return apply_r_p<Action>(std::move(addr),
-                actions::typed_continuation<local_result_type, remote_result_type>(contgid),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 std::forward<Ts>(vs)...);
         }

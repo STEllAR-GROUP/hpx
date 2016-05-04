@@ -315,7 +315,8 @@ namespace hpx { namespace actions
     {
         // Overload when return type is "void" aka util::unused_type
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::true_type, std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
+        void trigger_impl(
+            std::true_type, std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             try {
                 util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
@@ -329,7 +330,8 @@ namespace hpx { namespace actions
 
         // special handling of actions returning a future
         template <typename Result, typename RemoteResult, typename Future>
-        void deferred_trigger(std::false_type, std::unique_ptr<continuation> cont, Future result)
+        void deferred_trigger(
+            std::false_type, std::unique_ptr<continuation> cont, Future result)
         {
             try {
                 HPX_ASSERT(result.is_ready());
@@ -343,7 +345,8 @@ namespace hpx { namespace actions
         }
 
         template <typename Result, typename RemoteResult, typename Future>
-        void deferred_trigger(std::true_type, std::unique_ptr<continuation> cont, Future result)
+        void deferred_trigger(
+            std::true_type, std::unique_ptr<continuation> cont, Future result)
         {
             try {
                 HPX_ASSERT(result.is_ready());
@@ -407,7 +410,8 @@ namespace hpx { namespace actions
         }
 
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::false_type, std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
+        void trigger_impl(
+                std::false_type, std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             typedef
                 typename traits::is_future<RemoteResult>::type
@@ -772,7 +776,8 @@ namespace hpx { namespace actions
         void serialize(Archive & ar, unsigned)
         {
             // serialize base class
-            ar & hpx::serialization::base_object<typed_continuation<RemoteResult> >(*this);
+            ar & hpx::serialization::base_object<
+                typed_continuation<RemoteResult> >(*this);
         }
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             typed_continuation
