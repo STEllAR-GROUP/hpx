@@ -7,6 +7,14 @@
 #if !defined(HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM)
 #define HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM
 
+#if defined(__CUDACC__)
+# define HPX_SYMBOL_EXPORT
+# define HPX_SYMBOL_IMPORT
+# define HPX_SYMBOL_INTERNAL
+# define HPX_APISYMBOL_EXPORT
+# define HPX_APISYMBOL_IMPORT
+#else
+
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 # define HPX_SYMBOL_EXPORT      __declspec(dllexport)
 # define HPX_SYMBOL_IMPORT      __declspec(dllimport)
@@ -19,6 +27,8 @@
 # define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
 # define HPX_APISYMBOL_EXPORT   __attribute__((visibility("default")))
 # define HPX_APISYMBOL_IMPORT   __attribute__((visibility("default")))
+#endif
+
 #endif
 
 // make sure we have reasonable defaults

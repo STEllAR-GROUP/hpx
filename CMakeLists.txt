@@ -223,6 +223,22 @@ hpx_option(HPX_WITH_FULL_RPATH BOOL
   OFF ADVANCED)
 
 ################################################################################
+# HPX Compute configuration
+################################################################################
+hpx_option(HPX_WITH_CUDA BOOL
+  "Enable CUDA support (default: OFF)" OFF ADVANCED)
+if(HPX_WITH_CUDA)
+  find_package(CUDA REQUIRED)
+  set(HPX_WITH_COMPUTE On)
+  hpx_add_config_define(HPX_HAVE_CUDA)
+  hpx_add_config_define(HPX_HAVE_COMPUTE)
+endif()
+hpx_option(HPX_WITH_HCC BOOL
+  "Enable hcc support (default: OFF)" ADVANCED)
+hpx_option(HPX_WITH_SYCL BOOL
+  "Enable sycl support (default: OFF)" ADVANCED)
+
+################################################################################
 # Native TLS configuration
 ################################################################################
 set(HPX_WITH_NATIVE_TLS_DEFAULT ON)
@@ -727,31 +743,35 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
 
 # Make sure we compile in C++11 mode (MSVC uses it automatically)
 if(NOT MSVC)
-  # Try -std=c++14 first
-  check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
-  if(HPX_WITH_CXX14)
-    set(CXX_FLAG -std=c++14)
+  if(HPX_WITH_CUDA)
+    hpx_add_target_compile_option(-std=c++11)
   else()
-    # ... otherwise try -std=c++0y
-    check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
-    if(HPX_WITH_CXX0Y)
-      set(CXX_FLAG -std=c++0y)
+    # Try -std=c++14 first
+    check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+    if(HPX_WITH_CXX14)
+      set(CXX_FLAG -std=c++14)
     else()
-      # ... otherwise try -std=c++11
-      check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
-      if(HPX_WITH_CXX11)
-        set(CXX_FLAG -std=c++11)
+      # ... otherwise try -std=c++0y
+      check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
+      if(HPX_WITH_CXX0Y)
+        set(CXX_FLAG -std=c++0y)
       else()
-        # ... otherwise try -std=c++0x
-        check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
-        if(HPX_WITH_CXX0X)
-          set(CXX_FLAG -std=c++0x)
+        # ... otherwise try -std=c++11
+        check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
+        if(HPX_WITH_CXX11)
+          set(CXX_FLAG -std=c++11)
+        else()
+          # ... otherwise try -std=c++0x
+          check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
+          if(HPX_WITH_CXX0X)
+            set(CXX_FLAG -std=c++0x)
+          endif()
         endif()
       endif()
     endif()
-  endif()
 
-  hpx_add_target_compile_option(${CXX_FLAG})
+    hpx_add_target_compile_option(${CXX_FLAG})
+  endif()
 endif()
 
 ################################################################################
