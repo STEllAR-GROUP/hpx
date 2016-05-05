@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 // reset futures
                 reset_dataflow_future reset;
-                int const _sequencer[]= {
+                int const _sequencer[] = {
                     ((reset(util::get<Is>(futures_))), 0)...
                 };
                 (void)_sequencer;
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 // reset futures
                 reset_dataflow_future reset;
-                int const _sequencer[]= {
+                int const _sequencer[] = {
                     ((reset(util::get<Is>(futures_))), 0)...
                 };
                 (void)_sequencer;
@@ -234,8 +234,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
             parallel::executor_traits<Executor>::apply_execute(exec,
-                util::deferred_call(
-                    f, std::move(this_), indices_type(), is_void()));
+                f, std::move(this_), indices_type(), is_void());
         }
 
         ///////////////////////////////////////////////////////////////////////

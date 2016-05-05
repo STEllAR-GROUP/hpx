@@ -240,8 +240,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// \throw This function may throw \a task_canceled_exception, as
         ///        described in Exception Handling.
         ///
-        template <typename F>
-        void run(F && f)
+        template <typename F, typename ... Ts>
+        void run(F && f, Ts &&... ts)
         {
             // The proposal requires that the task_block should be
             // 'active' to be usable.
@@ -256,7 +256,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             hpx::future<void> result =
                 executor_traits<executor_type>::async_execute(
-                    policy_.executor(), std::forward<F>(f));
+                    policy_.executor(), std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
 
             std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));
@@ -295,8 +296,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// \throw This function may throw \a task_canceled_exception, as
         ///        described in Exception Handling.
         ///
-        template <typename Executor, typename F>
-        void run(Executor& exec, F && f)
+        template <typename Executor, typename F, typename ... Ts>
+        void run(Executor& exec, F && f, Ts &&... ts)
         {
             // The proposal requires that the task_block should be
             // 'active' to be usable.
@@ -311,7 +312,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             hpx::future<void> result =
                 executor_traits<Executor>::async_execute(
-                    exec, std::forward<F>(f));
+                    exec, std::forward<F>(f), std::forward<Ts>(ts)...);
 
             std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));

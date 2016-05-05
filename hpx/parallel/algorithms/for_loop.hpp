@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t part_index)
         {
-            int _sequencer[] =
+            int const _sequencer[] =
             {
                 0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...
             };
@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         HPX_FORCEINLINE void next_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
-            int _sequencer[] =
+            int const _sequencer[] =
             {
                 0, (hpx::util::get<Is>(args).next_iteration(), 0)...
             };
@@ -76,7 +76,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t size)
         {
-            int _sequencer[] =
+            int const _sequencer[] =
             {
                 0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...
             };
@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             sequential(ExPolicy policy, B first, Size size, S stride, F && f,
                 Args &&... args)
             {
-                int init_sequencer[] = {
+                int const init_sequencer[] = {
                     0, (args.init_iteration(0), 0)...
                 };
                 (void)init_sequencer;
@@ -106,7 +106,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
-                    int next_sequencer[] = {
+                    int const next_sequencer[] = {
                         0, (args.next_iteration(), 0)...
                     };
                     (void)next_sequencer;
@@ -120,7 +120,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
                 // make sure live-out variables are properly set on
                 // return
-                int exit_sequencer[] = {
+                int const exit_sequencer[] = {
                     0, (args.exit_iteration(size), 0)...
                 };
                 (void)exit_sequencer;
