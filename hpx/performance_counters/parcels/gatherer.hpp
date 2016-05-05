@@ -35,7 +35,8 @@ namespace hpx { namespace performance_counters { namespace parcels
             num_parcels_(0),
             num_messages_(0),
             overall_raw_bytes_(0),
-            buffer_allocate_time_(0)
+            buffer_allocate_time_(0),
+            acc_mtx()
         {}
 
         void add_data(data_point const& x);

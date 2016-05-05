@@ -28,12 +28,13 @@ namespace hpx { namespace components
         component_storage(hpx::future<naming::id_type> && f);
 
         hpx::future<naming::id_type> migrate_to_here(std::vector<char> const&,
-            naming::id_type, naming::address const&);
-        hpx::future<std::vector<char> > migrate_from_here(naming::gid_type);
+            naming::id_type const&, naming::address const&);
+        hpx::future<std::vector<char> > migrate_from_here(
+            naming::gid_type const&);
 
         naming::id_type migrate_to_here_sync(std::vector<char> const&,
-            naming::id_type, naming::address const&);
-        std::vector<char> migrate_from_here_sync(naming::gid_type);
+            naming::id_type const&, naming::address const&);
+        std::vector<char> migrate_from_here_sync(naming::gid_type const&);
 
         future<std::size_t> size() const;
         std::size_t size_sync() const;

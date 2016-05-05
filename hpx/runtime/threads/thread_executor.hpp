@@ -112,7 +112,7 @@ namespace hpx { namespace threads
     std::basic_ostream<Char, Traits>&
     operator<< (std::basic_ostream<Char, Traits>& out, executor_id const& id)
     {
-        out << id.id_;
+        out << id.id_; //-V128
         return out;
     }
 

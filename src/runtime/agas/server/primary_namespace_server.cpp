@@ -411,7 +411,7 @@ response primary_namespace::begin_migration(
     }
 
     // flag this id as being migrated
-    hpx::util::get<0>(it->second) = true;
+    hpx::util::get<0>(it->second) = true; //-V601
 
     return response(primary_ns_begin_migration, get<0>(r), get<1>(r), get<2>(r));
 }
@@ -852,9 +852,12 @@ response primary_namespace::allocate(
     // Check for overflow.
     if (upper.get_msb() != lower.get_msb())
     {
-        // Check for address space exhaustion (we currently use 80 bits of
+        // Check for address space exhaustion (we currently use 86 bits of
         // the gid for the actual id)
-        if (HPX_UNLIKELY((lower.get_msb() & ~0xFF) == 0xFF))
+        if (HPX_UNLIKELY(
+            (lower.get_msb() & naming::gid_type::virtual_memory_mask) ==
+                naming::gid_type::virtual_memory_mask)
+           )
         {
             HPX_THROWS_IF(ec, internal_server_error
                 , "locality_namespace::allocate"

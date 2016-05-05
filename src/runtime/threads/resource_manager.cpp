@@ -296,7 +296,7 @@ namespace hpx { namespace threads
                 while (true)
                 {
                     // scaling factor
-                    scaling = total_allocated/total_desired;
+                    scaling = double(total_allocated) / total_desired;
 
                     for (allocation_data_map_type::iterator it =
                             scaled_static_allocation_data.begin();
@@ -377,7 +377,8 @@ namespace hpx { namespace threads
 
                         if (st.min_proxy_cores_ > st.allocation_)
                         {
-                            double new_desired = st.min_proxy_cores_/scaling;
+                            double new_desired =
+                                double(st.min_proxy_cores_) / scaling;
 
                             // Bias desired to get allocation closer to min.
                             total_desired += new_desired - st.adjusted_desired_;

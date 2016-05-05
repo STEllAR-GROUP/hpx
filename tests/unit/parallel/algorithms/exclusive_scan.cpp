@@ -48,7 +48,9 @@ void exclusive_scan_benchmark()
               << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
       }
     }
-    catch (...) {}
+    catch (...) {
+      HPX_TEST(false);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

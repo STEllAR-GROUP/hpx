@@ -55,7 +55,7 @@ struct void_parallel_executor : parallel_executor
 ////////////////////////////////////////////////////////////////////////////////
 // Tests to void_parallel_executor behavior for the bulk executes
 
-void bulk_test(int value, hpx::thread::id tid, int passed_through)
+void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
 {
     HPX_TEST(tid != hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -163,12 +163,12 @@ int void_parallel_sum(iter first, iter last, int num_parts)
     std::vector<hpx::future<void> > f = traits::bulk_async_execute(exec,
         [&](const int& i)
         {
-            iter b = first + i*section_size;
+            iter b = first + i*section_size; //-V104
             iter e = first + (std::min)(
                     std::distance(first, last),
-                    static_cast<std::ptrdiff_t>((i+1)*section_size)
+                    static_cast<std::ptrdiff_t>((i+1)*section_size) //-V104
                 );
-            temp[i] = std::accumulate(b, e, 0);
+            temp[i] = std::accumulate(b, e, 0); //-V108
         },
         temp);
 

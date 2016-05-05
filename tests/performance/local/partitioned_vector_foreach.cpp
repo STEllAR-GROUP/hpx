@@ -54,7 +54,8 @@ boost::uint64_t foreach_vector(Policy && policy, Vector const& v)
     for (int i = 0; i != test_count; ++i)
     {
         hpx::parallel::for_each(
-            policy, boost::begin(v), boost::end(v), wait_op<Vector>()
+            std::forward<Policy>(policy),
+            boost::begin(v), boost::end(v), wait_op<Vector>()
         );
     }
 

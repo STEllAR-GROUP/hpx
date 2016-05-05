@@ -43,23 +43,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : for_each_n::algorithm("for_each_n")
             {}
 
-            template <typename ExPolicy, typename F,
+            template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            static Iter
-            sequential(ExPolicy, Iter first, std::size_t count, F && f,
+            static InIter
+            sequential(ExPolicy, InIter first, std::size_t count, F && f,
                 Proj && proj = Proj())
             {
                 return util::loop_n(first, count,
-                    [&f, &proj](Iter curr)
+                    [&f, &proj](InIter curr)
                     {
                         hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
             }
 
-            template <typename ExPolicy, typename F,
+            template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy && policy, Iter first, std::size_t count,
+            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            parallel(ExPolicy && policy, InIter first, std::size_t count,
                 F && f, Proj && proj = Proj())
             {
                 if (count != 0)
@@ -67,13 +67,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy), first, count,
                         [f, proj](std::size_t /*part_index*/,
-                            Iter part_begin, std::size_t part_size)
+                            InIter part_begin, std::size_t part_size)
                         {
                             // VS2015 bails out when proj or f are captured by
                             // ref
                             util::loop_n(
                                 part_begin, part_size,
-                                [=](Iter curr) mutable
+                                [=](InIter curr) mutable
                                 {
                                     hpx::util::invoke(
                                         f, hpx::util::invoke(proj, *curr));
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         });
                 }
 
-                return util::detail::algorithm_result<ExPolicy, Iter>::get(
+                return util::detail::algorithm_result<ExPolicy, InIter>::get(
                     std::move(first));
             }
         };

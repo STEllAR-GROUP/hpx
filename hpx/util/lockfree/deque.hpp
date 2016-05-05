@@ -169,8 +169,8 @@ struct deque
     anchor anchor_;
     pool pool_;
 
-    HPX_STATIC_CONSTEXPR int //-V103
-        padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor);
+    HPX_STATIC_CONSTEXPR int
+        padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor); //-V103
     char padding[padding_size];
 
     node* alloc_node(node* lptr, node* rptr, T const& v,

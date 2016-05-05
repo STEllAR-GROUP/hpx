@@ -519,10 +519,10 @@ namespace hpx { namespace this_thread
 
             if (statex != threads::wait_timeout)
             {
-                error_code ec(lightweight);    // do not throw
+                error_code ec1(lightweight);    // do not throw
                 threads::set_thread_state(timer_id,
                     threads::pending, threads::wait_abort,
-                    threads::thread_priority_boost, ec);
+                    threads::thread_priority_boost, ec1);
             }
         }
 

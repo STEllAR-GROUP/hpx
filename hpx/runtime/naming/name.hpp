@@ -79,7 +79,7 @@ namespace hpx { namespace naming
         static boost::uint64_t const is_locked_mask = 0x20000000ull; //-V112
 
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
-        static boost::uint16_t const locality_id_shift = 32;
+        static boost::uint16_t const locality_id_shift = 32; //-V112
 
         static boost::uint64_t const virtual_memory_mask = 0x7fffffull;
 

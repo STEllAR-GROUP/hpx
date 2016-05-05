@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace server
 
         naming::gid_type migrate_to_here(std::vector<char> const&,
             naming::id_type, naming::address const&);
-        std::vector<char> migrate_from_here(naming::gid_type);
+        std::vector<char> migrate_from_here(naming::gid_type const&);
         std::size_t size() const { return data_.size(); }
 
         HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_to_here);

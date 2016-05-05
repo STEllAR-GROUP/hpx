@@ -130,7 +130,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         naming::id_type get_unmanaged_id() const;
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-        naming::id_type get_gid() const
+        naming::id_type get_gid() const //-V659
         {
             return get_unmanaged_id();
         }

@@ -422,8 +422,8 @@ namespace hpx
             if (part == partitions_.size())
             {
                 // return an iterator to the end of the last partition
-                return local_iterator(partitions_.back().partition_,
-                    partitions_.back().size_, partitions_.back().local_data_);
+                auto const& back = partitions_.back();
+                return local_iterator(back.partition_, back.size_, back.local_data_);
             }
 
             std::size_t local_index = get_local_index(global_index);
@@ -441,8 +441,8 @@ namespace hpx
             if (part == partitions_.size())
             {
                 // return an iterator to the end of the last partition
-                return const_local_iterator(partitions_.back().partition_,
-                    partitions_.back().size_, partitions_.back().local_data_);
+                auto const& back = partitions_.back();
+                return local_iterator(back.partition_, back.size_, back.local_data_);
             }
 
             std::size_t local_index = get_local_index(global_index);

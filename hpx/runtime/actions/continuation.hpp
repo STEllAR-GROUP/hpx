@@ -386,7 +386,7 @@ namespace hpx { namespace actions
                 hpx::util::bind(
                     hpx::util::one_shot(fun)
                   , is_void()
-                  , std::move(cont)
+                  , std::move(cont) //-V575
                   , util::placeholders::_1
                 )
             );
