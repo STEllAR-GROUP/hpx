@@ -182,7 +182,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                         [&]() mutable
                         {
                             out.emplace(hpx::util::invoke_fused(
-                                std::forward<F>(f), std::move(args));
+                                std::forward<F>(f), std::move(args)));
                         };
 #else
                     boost::optional<result_type> out;
