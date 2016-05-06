@@ -171,25 +171,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                             F(Ts&&...)
                         >::type result_type;
 
+                    // older versions of gcc are not able to capture parameter
+                    // packs (gcc < 4.9)
+                    auto && args =
+                        util::forward_as_tuple(std::forward<Ts>(ts)...);
+
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
                     std::experimental::optional<result_type> out;
                     auto && wrapper =
-                        [&]()
+                        [&]() mutable
                         {
-                            out.emplace(hpx::util::invoke(std::forward<F>(f),
-                                std::forward<Ts>(ts)...));
+                            out.emplace(hpx::util::invoke_fused(
+                                std::forward<F>(f), std::move(args)));
                         };
 #else
                     boost::optional<result_type> out;
                     auto && wrapper =
-                        [&]()
+                        [&]() mutable
                         {
 #if BOOST_VERSION < 105600
-                            out = boost::in_place(hpx::util::invoke(
-                                std::forward<F>(f), std::forward<Ts>(ts)...));
+                            out = boost::in_place(hpx::util::invoke_fused(
+                                std::forward<F>(f), std::move(args)));
 #else
-                            out.emplace(hpx::util::invoke(std::forward<F>(f),
-                                std::forward<Ts>(ts)...));
+                            out.emplace(hpx::util::invoke_fused(
+                                std::forward<F>(f), std::move(args)));
 #endif
                         };
 #endif

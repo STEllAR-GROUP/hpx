@@ -34,6 +34,7 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/scoped_array.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #   include <cstdlib>
