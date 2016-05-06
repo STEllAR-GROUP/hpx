@@ -62,5 +62,14 @@
 #   define HPX_WINDOWS
 #endif
 
+#if defined(__CUDACC__)
+#define HPX_CUDA_DEVICE __device__
+#define HPX_CUDA_HOST __host__
+#else
+#define HPX_CUDA_DEVICE
+#define HPX_CUDA_HOST
+#endif
+#define HPX_CUDA_HOST_DEVICE HPX_CUDA_HOST HPX_CUDA_DEVICE
+
 #endif
 
