@@ -12,7 +12,6 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/atomic.hpp>
 #include <boost/chrono.hpp>
 

@@ -20,7 +20,6 @@
 #endif
 
 #include <boost/exception_ptr.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -31,6 +30,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -76,9 +76,9 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
+          , states_(num_threads)
           , description_(description)
         {
-            states_.resize(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
                 states_[i].store(state_initialized);
         }
@@ -304,7 +304,7 @@ namespace hpx { namespace threads { namespace policies
         boost::atomic<boost::uint32_t> wait_count_;
 #endif
 
-        boost::ptr_vector<boost::atomic<hpx::state> > states_;
+        std::vector<boost::atomic<hpx::state> > states_;
         char const* description_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
