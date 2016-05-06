@@ -63,13 +63,13 @@
 #endif
 
 #if defined(__CUDACC__)
-#define HPX_CUDA_DEVICE __device__
-#define HPX_CUDA_HOST __host__
+#define HPX_DEVICE __device__
+#define HPX_HOST __host__
 #else
-#define HPX_CUDA_DEVICE
-#define HPX_CUDA_HOST
+#define HPX_DEVICE
+#define HPX_HOST
 #endif
-#define HPX_CUDA_HOST_DEVICE HPX_CUDA_HOST HPX_CUDA_DEVICE
+#define HPX_HOST_DEVICE HPX_HOST HPX_DEVICE
 
 #endif
 

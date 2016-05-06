@@ -75,7 +75,7 @@ namespace hpx { namespace util
             HPX_DELETE_MOVE_ASSIGN(deferred);
 
             inline typename deferred_result_of<F(Ts...)>::type
-            HPX_CUDA_HOST_DEVICE operator()()
+            HPX_HOST_DEVICE operator()()
             {
                 return util::invoke_fused(std::move(_f), std::move(_args));
             }
