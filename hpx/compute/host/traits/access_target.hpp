@@ -9,11 +9,13 @@
 #define HPX_COMPUTE_HOST_TARGET_TRAITS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/host/target.hpp>
 
-namespace hpx { namespace compute {
+namespace hpx { namespace compute { namespace traits
+{
     template <>
-    struct target_traits<host::target>
+    struct access_target<host::target>
     {
         typedef host::target target_type;
 
@@ -23,6 +25,6 @@ namespace hpx { namespace compute {
             return *(t + pos);
         }
     };
-}}
+}}}
 
 #endif

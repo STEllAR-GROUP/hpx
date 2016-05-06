@@ -9,14 +9,14 @@
 #define HPX_COMPUTE_ALLOCATOR_TRAITS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compute/target_traits.hpp>
-#include <hpx/compute/host/target_traits.hpp>
+#include <hpx/compute/traits/access_target.hpp>
+#include <hpx/compute/host/traits/access_target.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/util/always_void.hpp>
 
 #include <memory>
 
-namespace hpx { namespace compute
+namespace hpx { namespace compute { namespace traits
 {
     template <typename Allocator>
     struct allocator_traits;
@@ -27,7 +27,7 @@ namespace hpx { namespace compute
         struct get_target_traits
         {
             typedef
-                compute::target_traits<compute::host::target> type;
+                compute::traits::access_target<compute::host::target> type;
         };
 
         template <typename Allocator>
@@ -37,7 +37,7 @@ namespace hpx { namespace compute
             >::type>
         {
             typedef
-                target_traits<typename Allocator::target_type>
+                compute::traits::access_target<typename Allocator::target_type>
                 type;
         };
 
@@ -63,7 +63,8 @@ namespace hpx { namespace compute
         {
             template <typename Allocator, typename T, typename ...Ts>
             static void call(hpx::traits::detail::wrap_int,
-                Allocator& alloc, T* p, typename Allocator::size_type count, Ts&&... vs)
+                Allocator& alloc, T* p, typename Allocator::size_type count,
+                Ts const&... vs)
             {
                 T* end = p + count;
                 typename Allocator::size_type allocated = 0;
@@ -71,10 +72,11 @@ namespace hpx { namespace compute
                 {
                     try
                     {
-                        allocator_traits<Allocator>::construct(alloc, it, std::forward<Ts>(vs)...);
+                        allocator_traits<Allocator>::construct(alloc, it, vs...);
                     } catch(...)
                     {
-                        allocator_traits<Allocator>::bulk_destroy(alloc, p, allocated);
+                        allocator_traits<Allocator>::bulk_destroy(alloc, p,
+                            allocated);
                         throw;
                     }
                     ++allocated;
@@ -84,17 +86,19 @@ namespace hpx { namespace compute
 
             template <typename Allocator, typename T, typename ...Ts>
             static auto call(int,
-                Allocator& alloc, T* p, typename Allocator::size_type count, Ts&&... vs)
-              -> decltype(alloc.bulk_construct(p, count, std::forward<Ts>(vs)...))
+                Allocator& alloc, T* p, typename Allocator::size_type count,
+                    Ts const&... vs)
+              -> decltype(alloc.bulk_construct(p, count, vs...))
             {
-                alloc.bulk_construct(p, count, std::forward<Ts>(vs)...);
+                alloc.bulk_construct(p, count, vs...);
             }
         };
 
         template <typename Allocator, typename T, typename ...Ts>
-        void call_bulk_construct(Allocator& alloc, T* p, typename Allocator::size_type count, Ts&&... vs)
+        void call_bulk_construct(Allocator& alloc, T* p,
+            typename Allocator::size_type count, Ts const&... vs)
         {
-            bulk_construct::call(0, alloc, p, count, std::forward<Ts>(vs)...);
+            bulk_construct::call(0, alloc, p, count, vs...);
         }
 
         struct bulk_destroy
@@ -108,7 +112,6 @@ namespace hpx { namespace compute
                 {
                     allocator_traits<Allocator>::destroy(alloc, it);
                 }
-
             }
 
             template <typename Allocator, typename T>
@@ -121,7 +124,8 @@ namespace hpx { namespace compute
         };
 
         template <typename Allocator, typename T>
-        void call_bulk_destroy(Allocator& alloc, T* p, typename Allocator::size_type count)
+        void call_bulk_destroy(Allocator& alloc, T* p,
+            typename Allocator::size_type count)
         {
             bulk_destroy::call(0, alloc, p, count);
         }
@@ -133,6 +137,7 @@ namespace hpx { namespace compute
     {
     private:
         typedef std::allocator_traits<Allocator> base_type;
+
     public:
         using typename base_type::size_type;
         using typename base_type::value_type;
@@ -141,8 +146,8 @@ namespace hpx { namespace compute
         typedef value_type const& const_reference;
 
         typedef
-            typename detail::get_target_traits<Allocator>::type target_traits;
-        typedef typename target_traits::target_type target_type;
+            typename detail::get_target_traits<Allocator>::type access_target;
+        typedef typename access_target::target_type target_type;
 
         static target_type& target(Allocator& alloc)
         {
@@ -150,9 +155,10 @@ namespace hpx { namespace compute
         }
 
         template <typename T, typename ...Ts>
-        static void bulk_construct(Allocator& alloc, T* p, size_type count, Ts&&... vs)
+        static void bulk_construct(Allocator& alloc, T* p, size_type count,
+            Ts const&... vs)
         {
-            detail::call_bulk_construct(alloc, p, count, std::forward<Ts>(vs)...);
+            detail::call_bulk_construct(alloc, p, count, vs...);
         }
 
         template <typename T>
@@ -161,6 +167,6 @@ namespace hpx { namespace compute
             detail::call_bulk_destroy(alloc, p, count);
         }
     };
-}}
+}}}
 
 #endif

@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAS_CUDA) && defined(__CUDA_ARCH__)
 #include <cuda_runtime.h>
 
 namespace hpx { namespace compute { namespace cuda
@@ -49,4 +50,5 @@ namespace hpx { namespace compute { namespace cuda
     };
 }}}
 
+#endif
 #endif
