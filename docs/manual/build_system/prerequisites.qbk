@@ -69,8 +69,8 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
         [Used for OS-thread pinning and NUMA awareness. This library is optional on Mac OSX.]]
 ]
 
-[important Due to lack of Thread Local Storage support it is advised to 
-        use Boost V1.59.0 when compiling __hpx__ over OSX platform.]
+[important When compiling __hpx__ using clang/libc++ on OSX platform it is advised not 
+        to use Boost V1.58 and V1.60.]
       
 [important Because of a problem in Boost V1.54.0 this version can't be used
       for compiling __hpx__ if you use gcc V4.6.x. Please use either
