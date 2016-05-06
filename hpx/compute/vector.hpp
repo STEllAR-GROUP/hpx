@@ -180,7 +180,7 @@ namespace hpx { namespace compute
         /// Member types (FIXME: add reference to std
         typedef T value_type;
         typedef Allocator allocator_type;
-        typedef typename alloc_traits::access_target access_target;
+        typedef typename alloc_traits::access_target target_type;
         typedef std::size_t size_type;
         typedef std::ptrdiff_t difference_type;
         typedef typename alloc_traits::reference reference;
@@ -319,13 +319,13 @@ namespace hpx { namespace compute
         reference operator[](size_type pos)
         {
             HPX_ASSERT(pos < size_);
-            return access_target::access(target_, data_, pos);
+            return target_type::access(target_, data_, pos);
         }
 
         const_reference operator[](size_type pos) const
         {
             HPX_ASSERT(pos < size_);
-            return access_target::access(target_, data_, pos);
+            return target_type::access(target_, data_, pos);
         }
 
         // TODO: implement front()
