@@ -9,6 +9,8 @@
 #define HPX_COMPUTE_CUDA_DETAIL_SCOPED_ACTIVE_TARGET_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -58,4 +60,5 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
     };
 }}}}
 
+#endif
 #endif

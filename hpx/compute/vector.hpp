@@ -9,8 +9,9 @@
 #define HPX_COMPUTE_VECTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compute/allocator_traits.hpp>
+#include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <initializer_list>
 #include <iterator>
@@ -27,21 +28,22 @@ namespace hpx { namespace compute
                 std::random_access_iterator_tag,
                 T,
                 std::ptrdiff_t,
-                typename allocator_traits<Allocator>::pointer,
-                typename allocator_traits<Allocator>::reference
+                typename traits::allocator_traits<Allocator>::pointer,
+                typename traits::allocator_traits<Allocator>::reference
             >
         {
             typedef
-                typename allocator_traits<Allocator>::pointer
+                typename traits::allocator_traits<Allocator>::pointer
                 pointer;
             typedef
-                typename allocator_traits<Allocator>::reference
+                typename traits::allocator_traits<Allocator>::reference
                 reference;
 
             iterator()
               : p_(nullptr)
             {}
 
+            // FIXME: should be private
             iterator(pointer p, std::size_t pos)
               : p_(p + pos)
             {}
@@ -63,14 +65,16 @@ namespace hpx { namespace compute
             iterator operator++(int)
             {
                 iterator tmp(*this);
-                ++tmp;
+                HPX_ASSERT(p_);
+                ++p_;
                 return tmp;
             }
 
             iterator operator--(int)
             {
                 iterator tmp(*this);
-                --tmp;
+                HPX_ASSERT(p_);
+                --p_;
                 return tmp;
             }
 
@@ -106,12 +110,14 @@ namespace hpx { namespace compute
 
             iterator& operator+=(std::ptrdiff_t offset) const
             {
+                HPX_ASSERT(p_);
                 p_ += offset;
                 return *this;
             }
 
             iterator& operator-=(std::ptrdiff_t offset) const
             {
+                HPX_ASSERT(p_);
                 p_ -= offset;
                 return *this;
             }
@@ -132,13 +138,17 @@ namespace hpx { namespace compute
 
             reference operator*() const
             {
+                HPX_ASSERT(p_);
                 return *p_;
             }
 
             pointer operator->() const
             {
+                HPX_ASSERT(p_);
                 return p_;
             }
+
+            // FIXME: operator[] is missing
 
         private:
             pointer p_;
@@ -164,14 +174,13 @@ namespace hpx { namespace compute
     class vector
     {
     private:
-        typedef allocator_traits<Allocator> alloc_traits;
-        typedef typename alloc_traits::target_traits target_traits;
+        typedef traits::allocator_traits<Allocator> alloc_traits;
 
     public:
         /// Member types (FIXME: add reference to std
         typedef T value_type;
         typedef Allocator allocator_type;
-        typedef typename alloc_traits::target_type target_type;
+        typedef typename alloc_traits::access_target access_target;
         typedef std::size_t size_type;
         typedef std::ptrdiff_t difference_type;
         typedef typename alloc_traits::reference reference;
@@ -206,7 +215,8 @@ namespace hpx { namespace compute
             alloc_traits::bulk_construct(alloc_, data_, size_, value);
         }
 
-        // Constructs the container with count default-inserted instances of T. No copies are made.
+        // Constructs the container with count default-inserted instances of T.
+        // No copies are made.
         explicit vector(size_type count, Allocator const& alloc = Allocator())
           : size_(count)
           , capacity_(count)
@@ -218,7 +228,8 @@ namespace hpx { namespace compute
         }
 
         template <typename InIter,
-            typename Enable = typename std::enable_if<hpx::traits::is_input_iterator<InIter>::value>::type>
+            typename Enable = typename std::enable_if<
+                hpx::traits::is_input_iterator<InIter>::value>::type>
         vector(InIter first, InIter last, Allocator const& alloc)
           : size_(std::distance(first, last))
           , capacity_(size_)
@@ -308,13 +319,13 @@ namespace hpx { namespace compute
         reference operator[](size_type pos)
         {
             HPX_ASSERT(pos < size_);
-            return target_traits::access(target_, data_, pos);
+            return access_target::access(target_, data_, pos);
         }
 
         const_reference operator[](size_type pos) const
         {
             HPX_ASSERT(pos < size_);
-            return target_traits::access(target_, data_, pos);
+            return access_target::access(target_, data_, pos);
         }
 
         // TODO: implement front()

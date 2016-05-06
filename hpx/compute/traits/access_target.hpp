@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace compute
+namespace hpx { namespace compute { namespace traits
 {
-    template <typename Target>
-    struct target_traits;
-}}
+    template <typename Target, typename Enable = void>
+    struct access_target;
+}}}
 
 #endif
