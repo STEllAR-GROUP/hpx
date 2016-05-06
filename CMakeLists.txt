@@ -923,6 +923,13 @@ hpx_check_for_cxx_experimental_std_optional(
   DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
 
 ################################################################################
+# CUDA features
+################################################################################
+if(HPX_WITH_CUDA)
+  set(CUDA_NVCC_FLAGS --expt-relaxed-constexpr;--expt-extended-lambda)
+endif()
+
+################################################################################
 # Check for misc system headers
 ################################################################################
 
