@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Copyright (c) 2016 Hartmut Kaiser                                      -->
+
+<!-- Use, modification and distribution are subject to the Boost Software   -->
+<!-- License, Version 1.0. (See accompanying file LICENSE_1_0.txt           -->
+<!-- or copy at http://www.boost.org/LICENSE_1_0.txt)                       -->
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="hpx::components::client_base&lt;*,*&gt;">
+        <DisplayString Condition="shared_state_.px == 0">empty</DisplayString>
+        <DisplayString Condition="shared_state_.px != 0 &amp;&amp; shared_state_.px->state_ == 0">empty</DisplayString>
+        <DisplayString Condition="shared_state_.px != 0 &amp;&amp; shared_state_.px->state_ == 3">ready(value)</DisplayString>
+        <DisplayString Condition="shared_state_.px != 0 &amp;&amp; shared_state_.px->state_ == 5">ready(exception)</DisplayString>
+        <Expand>
+            <Item Name="[value]" Condition="shared_state_.px != 0 &amp;&amp; shared_state_.px->state_ == 3">*((hpx::naming::id_type*)(shared_state_.px->storage_.data_.buf))</Item>
+            <Item Name="[exception]" Condition="shared_state_.px != 0 &amp;&amp; shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_.data_.buf))</Item>
+            <Item Name="[count]" Condition="shared_state_.px != 0">shared_state_.px->count_</Item>
+        </Expand>
+    </Type>
+
+</AutoVisualizer>
