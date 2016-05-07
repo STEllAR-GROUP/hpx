@@ -169,7 +169,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 for (/* */; count-- != 0; ++first) {
                     if (hpx::util::get<1>(*first)) {
                         *out_iter++ = hpx::util::get<0>(*first);
-//                        std::cout << "writing " << hpx::util::get<0>(*first) << "\n";
                     }
                 }
                 return out_iter;
@@ -226,7 +225,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //
         auto result = detail::parallel_scan_struct_lambda< OutIter,
           detail::exclusive_scan_tag>().call(
-            std::forward < ExPolicy > (policy),
+            sync_policy,
             std::false_type(), // is_seq(),
             s_begin,
             s_end,
@@ -309,7 +308,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //
         auto result = detail::parallel_scan_struct_lambda< OutIter,
           detail::exclusive_scan_tag>().call(
-            std::forward < ExPolicy > (policy),
+            sync_policy,
             std::false_type(), // is_seq(),
             s_begin,
             s_end,
@@ -320,9 +319,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             [](zip_iterator first, std::size_t count, std::size_t init) {
                 std::size_t offset = 0;
                 for (/* */; count-- != 0; ++first) {
-                    bool temp = static_cast<bool>(hpx::util::get<1>(*first));
                     // if stencil true increment count
-                    if (temp) offset++;
+                    if (hpx::util::get<1>(*first) != 0) offset++;
                 }
                 return offset;
             },
@@ -341,6 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
                 return out_iter;
             },
+
             // f3 : generate a return value
             [](OutIter dest) {
                 //std::advance(out_iter, offset);

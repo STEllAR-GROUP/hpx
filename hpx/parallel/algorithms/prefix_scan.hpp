@@ -217,6 +217,12 @@ HPX_INLINE_NAMESPACE(v1)
                   ));
             }
 
+            // spawn a task to do a sequential scan on this chunk
+            typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+              executor_type;
+            typedef typename hpx::parallel::executor_traits<executor_type>
+              executor_traits;
+
             // --------------------------
             // Upsweep:
             // --------------------------
@@ -252,14 +258,8 @@ HPX_INLINE_NAMESPACE(v1)
                 // start and end of chunk of our input array
                 work_chunks.push_back(
                     std::make_tuple(it1, chunk_size, dest, f1_type()));
-                // spawn a task to do a sequential scan on this chunk
 
                 // spawn a task to do a sequential scan on this chunk
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 work_items.push_back(
                     std::move(
                         executor_traits::async_execute(
@@ -315,13 +315,15 @@ HPX_INLINE_NAMESPACE(v1)
             // now combine the partial sums back into the initial chunks
             for (int c = 0; c < n_chunks; ++c) {
                 // spawn a task to do a sequential update on this chunk
-                hpx::future<f2_type> w1 = hpx::async(
-                    f2,
-                    std::get < 0 > (work_chunks[c]),
-                    std::get < 1 > (work_chunks[c]),
-                    std::get < 2 > (work_chunks[c]),
-                    std::get < 3 > (work_chunks[c]));
-                work_items_2.push_back(std::move(w1));
+                hpx::future<f2_type> w2 = executor_traits::async_execute(
+                    policy.executor(),
+                    hpx::util::deferred_call(
+                        f2,
+                        std::get < 0 > (work_chunks[c]),
+                        std::get < 1 > (work_chunks[c]),
+                        std::get < 2 > (work_chunks[c]),
+                        std::get < 3 > (work_chunks[c])));
+                work_items_2.push_back(std::move(w2));
             }
             hpx::wait_all(work_items_2);
             //
@@ -377,7 +379,7 @@ HPX_INLINE_NAMESPACE(v1)
             OutIter final_dest = dest;
             std::advance(final_dest, count);
 
-            int cores = executor_information_traits<typename ExPolicy::executor_type>::
+            std::size_t cores = executor_information_traits<typename ExPolicy::executor_type>::
               processing_units_count(policy.executor(), policy.parameters());
 
             int n_chunks, log2N;

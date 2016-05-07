@@ -168,32 +168,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             //
             std::vector<value_type> temp_buffer_to_be_removed(N);
             key_state.assign(N, 0);
-            {
-                unique_stencil_transformer u_s_t;
-                uniquebykey_iter unique_begin =
-                    make_unique_stencil_iterator(first, u_s_t);
-                uniquebykey_iter unique_end =
-                    make_unique_stencil_iterator(last, u_s_t);
 
-                key_state[0] = 1;
-                if (N == 2) {
-                    element_type left = *first;
-                    element_type right = *std::next(first);
-                    key_state[1] = !comp(left, right);
-                } else {
-                    // skip first element to make iterator traversal easier
-                    unique_stencil_generate <unique_stencil_transformer, RanIter,
-                        state_iter_type, Compare> kernel;
+            unique_stencil_transformer u_s_t;
+            uniquebykey_iter unique_begin =
+                make_unique_stencil_iterator(first, u_s_t);
+            uniquebykey_iter unique_end =
+                make_unique_stencil_iterator(last, u_s_t);
 
-                    hpx::parallel::for_each(sync_policy,
-                        make_zip_iterator(std::next(unique_begin,1), &key_state[1]),
-                        make_zip_iterator(unique_end, &key_state[N]),
-                        [&kernel, &comp](zip_ref ref)
-                        {
-                            kernel.operator()(get<0>(ref), get<1>(ref), comp);
-                        });
+            key_state[0] = 1;
+            if (N == 2) {
+                element_type left = *first;
+                element_type right = *std::next(first);
+                key_state[1] = !comp(left, right);
+            } else {
+                // skip first element to make iterator traversal easier
+                unique_stencil_generate <unique_stencil_transformer, RanIter,
+                    state_iter_type, Compare> kernel;
 
-                }
+                hpx::parallel::for_each(sync_policy,
+                    make_zip_iterator(
+                        std::next(unique_begin,1),
+                        std::next(key_state.begin(),1)),
+                    make_zip_iterator(
+                        unique_end,
+                        key_state.end()),
+                    [&kernel, &comp](zip_ref ref)
+                    {
+                        kernel.operator()(get<0>(ref), get<1>(ref), comp);
+                    });
+
             }
 
             auto new_end = hpx::parallel::prefix_copy_if_stencil(
