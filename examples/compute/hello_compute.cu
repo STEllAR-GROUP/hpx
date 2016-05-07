@@ -15,7 +15,7 @@
 #include <iostream>
 #include <vector>
 
-HPX_CUDA_HOST_DEVICE
+HPX_HOST_DEVICE
 void cuda_main(unsigned int seed)
 {
     hpx::compute::cuda::target target;
@@ -34,9 +34,9 @@ void cuda_main(unsigned int seed)
 
     {
         hpx::compute::cuda::detail::scoped_active_target active(target);
-        int *d_A;
-        int *d_B;
-        int *d_C;
+        int *d_A = 0;
+        int *d_B = 0;
+        int *d_C = 0;
 
         cudaMalloc(&d_A, N * sizeof(int));
         cudaMalloc(&d_B, N * sizeof(int));

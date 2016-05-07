@@ -18,7 +18,7 @@
 namespace hpx { namespace compute { namespace host
 {
 #if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
-    using compute::nvidia::target;
+    using compute::cuda::target;
 #else
     struct target
     {

@@ -1,0 +1,37 @@
+///////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2016 Thomas Heller
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+///////////////////////////////////////////////////////////////////////////////
+
+#ifndef HPX_COMPUTE_CUDA_TARGET_TRAITS_HPP
+#define HPX_COMPUTE_CUDA_TARGET_TRAITS_HPP
+
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+#include <hpx/compute/traits/access_target.hpp>
+#include <hpx/compute/cuda/target.hpp>
+
+#include <cuda_runtime.h>
+
+namespace hpx { namespace compute { namespace traits
+{
+    template <>
+    struct access_target<cuda::target>
+    {
+        typedef cuda::target target_type;
+
+        template <typename T>
+        static T access(cuda::target const&, T * t, std::size_t pos)
+        {
+            T tmp;
+            cudaMemcpy(&tmp, t + p, sizeof(T), cudaMemcpyDeviceToHost);
+            return tmp;
+        }
+    };
+}}}
+
+#endif
+#endif
