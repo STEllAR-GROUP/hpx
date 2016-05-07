@@ -1410,6 +1410,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : std::true_type
         {};
 
+        template <typename Executor, typename Parameters>
+        struct is_parallel_execution_policy<
+            parallel_execution_policy_shim<Executor, Parameters>>
+          : std::true_type
+        {};
+
         template <>
         struct is_parallel_execution_policy<parallel_vector_execution_policy>
           : std::true_type
@@ -1417,6 +1423,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         template <>
         struct is_parallel_execution_policy<parallel_task_execution_policy>
+          : std::true_type
+        {};
+
+        template <typename Executor, typename Parameters>
+        struct is_parallel_execution_policy<
+            parallel_task_execution_policy_shim<Executor, Parameters>>
           : std::true_type
         {};
         /// \endcond
@@ -1508,8 +1520,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : std::true_type
         {};
 
+        template <typename Executor, typename Parameters>
+        struct is_async_execution_policy<
+                sequential_task_execution_policy_shim<Executor, Parameters> >
+          : std::true_type
+        {};
+
         template <>
         struct is_async_execution_policy<parallel_task_execution_policy>
+          : std::true_type
+        {};
+
+        template <typename Executor, typename Parameters>
+        struct is_async_execution_policy<
+                parallel_task_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
         /// \endcond
