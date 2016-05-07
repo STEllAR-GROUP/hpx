@@ -19,11 +19,18 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // We know that we can optimize copy operations if the iterators are
-        // pointers and if the value_type is trivially copyable and trivially
-        // assignable.
-
         struct general_pointer_tag {};
+
+        template <typename Source, typename Dest>
+        inline general_pointer_tag
+        get_pointer_category(Source const&, Dest const&)
+        {
+            return general_pointer_tag();
+        }
+
+#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+        // We know that we can optimize copy operations if the iterators are
+        // pointers and if the value_type is layout compatible.
         struct trivially_copyable_pointer_tag : general_pointer_tag {};
 
         template <typename Source, typename Dest>
@@ -33,10 +40,10 @@ namespace hpx { namespace parallel { namespace util
                 std::integral_constant<bool,
                         sizeof(Source) == sizeof(Dest)
                     >::value &&
-               !std::is_volatile<Source>::value &&
-               !std::is_volatile<Dest>::value &&
                 std::is_integral<Source>::value &&
                 std::is_integral<Dest>::value &&
+               !std::is_volatile<Source>::value &&
+               !std::is_volatile<Dest>::value &&
                 (std::is_same<bool, Source>::value ==
                     std::is_same<bool, Dest>::value),
                 trivially_copyable_pointer_tag,
@@ -44,6 +51,7 @@ namespace hpx { namespace parallel { namespace util
             >::type type;
         };
 
+        // every type is layout-compatible with itself
         template <typename T>
         struct pointer_category<T, T>
         {
@@ -54,22 +62,18 @@ namespace hpx { namespace parallel { namespace util
             >::type type;
         };
 
+        // pointers are layout compatible
         template <typename T>
         struct pointer_category<T*, T const*>
         {
             typedef trivially_copyable_pointer_tag type;
         };
 
-        template <typename Source, typename Dest>
-        inline general_pointer_tag
-        get_pointer_category(Source const&, Dest const&)
-        {
-            return general_pointer_tag();
-        }
-
+        // isolate iterators which are pointers and their value_types are
+        // assignable
         template <typename Source, typename Dest>
         inline typename std::conditional<
-            std::is_trivially_assignable<Dest&, Source&>::value,
+            std::is_assignable<Dest&, Source&>::value,
             typename pointer_category<
                 typename std::remove_reference<Source>::type, Dest
             >::type,
@@ -78,7 +82,7 @@ namespace hpx { namespace parallel { namespace util
         get_pointer_category(Source* const&, Dest* const&)
         {
             typedef typename std::conditional<
-                    std::is_trivially_assignable<Dest&, Source&>::value,
+                    std::is_assignable<Dest&, Source&>::value,
                     typename pointer_category<
                         typename std::remove_reference<Source>::type, Dest
                     >::type,
@@ -106,6 +110,7 @@ namespace hpx { namespace parallel { namespace util
             std::advance(dest, count);
             return std::make_pair(first, dest);
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Customization point for optimizing copy operations
@@ -122,6 +127,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
         template <>
         struct copy_helper<trivially_copyable_pointer_tag>
         {
@@ -132,6 +138,7 @@ namespace hpx { namespace parallel { namespace util
                 return copy_memmove(first, std::distance(first, last), dest);
             }
         };
+#endif
     }
 
     template <typename InIter, typename OutIter>
@@ -159,6 +166,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
         template <>
         struct copy_n_helper<trivially_copyable_pointer_tag>
         {
@@ -169,6 +177,7 @@ namespace hpx { namespace parallel { namespace util
                 return copy_memmove(first, count, dest);
             }
         };
+#endif
     }
 
     template <typename InIter, typename OutIter>
@@ -196,6 +205,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
         template <>
         struct move_helper<trivially_copyable_pointer_tag>
         {
@@ -206,6 +216,7 @@ namespace hpx { namespace parallel { namespace util
                 return copy_memmove(first, std::distance(first, last), dest);
             }
         };
+#endif
     }
 
     template <typename InIter, typename OutIter>
@@ -233,6 +244,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
         template <>
         struct move_n_helper<trivially_copyable_pointer_tag>
         {
@@ -243,6 +255,7 @@ namespace hpx { namespace parallel { namespace util
                 return copy_memmove(first, count, dest);
             }
         };
+#endif
     }
 
     template <typename InIter, typename OutIter>

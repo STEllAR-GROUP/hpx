@@ -83,7 +83,7 @@ macro(add_hpx_config_test variable)
         OUTPUT_VARIABLE ${variable}_OUTPUT
         COPY_FILE ${test_binary})
        hpx_debug("Compile test: ${variable}")
-       hpx_debug("Compilation output: \n\n${${variable}_OUTPUT}") 
+       hpx_debug("Compilation output: \n\n${${variable}_OUTPUT}")
     endif()
 
     set(_run_msg "Success")
@@ -406,6 +406,13 @@ endmacro()
 macro(hpx_check_for_cxx11_extended_friend_declarations)
   add_hpx_config_test(HPX_WITH_CXX11_EXTENDED_FRIEND_DECLARATIONS
     SOURCE cmake/tests/cxx11_extended_friend_declarations.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_is_trivially_copyable)
+  add_hpx_config_test(HPX_WITH_CXX11_WITH_IS_TRIVIALLY_COPYABLE
+    SOURCE cmake/tests/cxx11_std_is_trivially_copyable.cpp
     FILE ${ARGN})
 endmacro()
 
