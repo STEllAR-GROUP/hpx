@@ -431,7 +431,11 @@
 
 #if !defined(HPX_THREADS_STACK_OVERHEAD)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREADS_STACK_OVERHEAD 0x2800
+#    if defined(HPX_GCC_VERSION)
+#      define HPX_THREADS_STACK_OVERHEAD 0x3000
+#    else
+#      define HPX_THREADS_STACK_OVERHEAD 0x2800
+#    endif
 #  else
 #    if defined(HPX_INTEL_VERSION)
 #      define HPX_THREADS_STACK_OVERHEAD 0x2800
