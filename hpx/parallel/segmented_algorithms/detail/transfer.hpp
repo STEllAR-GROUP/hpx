@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/lcos/local/dataflow.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -238,8 +239,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             HPX_ASSERT(!segments.empty());
 
             return util::detail::algorithm_result<
-                    ExPolicy, std::pair<SegIter, SegOutIter> >::get(
-                lcos::local::dataflow(
+                    ExPolicy, std::pair<SegIter, SegOutIter>
+                >::get(hpx::dataflow(
                     [=](std::vector<shared_future<local_iterator_pair> > && r)
                         ->  std::pair<SegIter, SegOutIter>
                     {
