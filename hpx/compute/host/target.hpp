@@ -9,6 +9,7 @@
 #define HPX_COMPUTE_HOST_TARGET_HPP
 
 #include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
 #include <hpx/compute/cuda/target.hpp>
 #else

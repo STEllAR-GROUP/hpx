@@ -5,8 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/cuda/detail/launch.hpp>
+#include <hpx/compute/cuda.hpp>
 #include <hpx/compute/vector.hpp>
 
 #include <hpx/hpx_init.hpp>
@@ -21,10 +20,10 @@ void cuda_main(unsigned int seed)
     hpx::compute::cuda::target target;
 
     int N = 100;
-    hpx::compute::vector<int> h_A(N);
-    hpx::compute::vector<int> h_B(N);
-    hpx::compute::vector<int> h_C_ref(N);
-    hpx::compute::vector<int> h_C(N);
+    std::vector<int> h_A(N);
+    std::vector<int> h_B(N);
+    std::vector<int> h_C_ref(N);
+    std::vector<int> h_C(N);
 
     std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
     std::iota(h_B.begin(), h_B.end(), (std::rand() % 100) + 2);

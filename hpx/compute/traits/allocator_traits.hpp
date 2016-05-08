@@ -9,10 +9,12 @@
 #define HPX_COMPUTE_ALLOCATOR_TRAITS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compute/traits/access_target.hpp>
-#include <hpx/compute/host/traits/access_target.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/util/always_void.hpp>
+
+#include <hpx/compute/traits/access_target.hpp>
+#include <hpx/compute/host/traits/access_target.hpp>
+#include <hpx/compute/host/target.hpp>
 
 #include <memory>
 

@@ -10,9 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
-#include <hpx/compute/cuda/traits/access_target.hpp>
-
+#if defined(HPX_HAVE_CUDA)
 #include <cuda_runtime.h>
 
 namespace hpx { namespace compute { namespace cuda

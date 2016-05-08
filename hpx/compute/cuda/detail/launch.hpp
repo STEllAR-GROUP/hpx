@@ -39,7 +39,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
         typedef decltype(closure) closure_type;
 
         void (*launch_function)(closure_type) = launch_helper<closure_type>;
-        launch_function<<<gridDim, blockDim, 0, active.stream()> > >(
+        launch_function<<<gridDim, blockDim, 0, active.stream()>>>(
             std::move(closure));
 #endif
     }
