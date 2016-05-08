@@ -29,6 +29,7 @@
 #include <hpx/parallel/algorithms/prefix_copy_if.hpp>
 #include <hpx/util/tuple.hpp>
 //
+#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -128,7 +129,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-
         // -------------------------------------------------------------------
         // The main algorithm is implemented here, it replaces any async
         // execution policy with a non async one so that no waits are
@@ -153,9 +153,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sync_policy_type sync_policy = sync_policy_type().on(policy.executor())
                 .with(policy.parameters());
 
+            //
+            const uint64_t N = std::distance(first, last);
+
             // we need to determine the state for a given element
-            std::vector<unsigned char> key_state;
-            typedef std::vector<unsigned char>::iterator state_iter_type;
+            boost::shared_array<unsigned char> key_state(new unsigned char[N]);
+            typedef unsigned char* state_iter_type;
             typedef detail::unique_stencil_iterator<RanIter, unique_stencil_transformer>
                 uniquebykey_iter;
 
@@ -164,48 +167,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename zip_iterator<uniquebykey_iter, state_iter_type>
               ::reference zip_ref;
             //
-            const uint64_t N = std::distance(first, last);
+            boost::shared_array<value_type> temp_buffer_to_be_removed(new value_type[N]);
+            std::fill_n(key_state.get(), N, 0);
             //
-            std::vector<value_type> temp_buffer_to_be_removed(N);
-            key_state.assign(N, 0);
-
             unique_stencil_transformer u_s_t;
             uniquebykey_iter unique_begin =
                 make_unique_stencil_iterator(first, u_s_t);
             uniquebykey_iter unique_end =
                 make_unique_stencil_iterator(last, u_s_t);
-
+            //
             key_state[0] = 1;
             if (N == 2) {
                 element_type left = *first;
                 element_type right = *std::next(first);
                 key_state[1] = !comp(left, right);
             } else {
-                // skip first element to make iterator traversal easier
+                // skip first element to make stencil iterator traversal easier
                 unique_stencil_generate <unique_stencil_transformer, RanIter,
                     state_iter_type, Compare> kernel;
 
                 hpx::parallel::for_each(sync_policy,
                     make_zip_iterator(
                         std::next(unique_begin,1),
-                        std::next(key_state.begin(),1)),
+                        std::next(key_state.get(),1)),
                     make_zip_iterator(
                         unique_end,
-                        key_state.end()),
+                        key_state.get()+N),
                     [&kernel, &comp](zip_ref ref)
                     {
                         kernel.operator()(get<0>(ref), get<1>(ref), comp);
-                    });
-
+                    }
+                );
             }
-
+            auto fbegin = temp_buffer_to_be_removed.get();
             auto new_end = hpx::parallel::prefix_copy_if_stencil(
-                sync_policy,
-                first, last, key_state.begin(),
-                temp_buffer_to_be_removed.begin());
-
+              sync_policy,
+                first, last, 
+                key_state.get(),
+                fbegin);
+            //
             return hpx::util::get<1>(hpx::parallel::copy(sync_policy,
-                temp_buffer_to_be_removed.begin(), new_end, first));
+              fbegin, new_end, first));
         }
         /// \endcond
     }
@@ -296,93 +298,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
-        typedef typename std::iterator_traits<InIter>::value_type value_type;
-
-        typedef typename detail::remove_asynchronous<
-                    typename std::decay< ExPolicy >::type >::type sync_policy_type;
-
-        sync_policy_type sync_policy =
-            sync_policy_type().on(policy.executor()).with(policy.parameters());
-
-        return detail::unique_impl(sync_policy, first, last, comp);
-
-/*
-        typedef detail::unique_stencil_iterator<InIter, detail::unique_stencil_transformer>
-            uniquebykey_iter;
-        typedef typename std::iterator_traits<InIter>::value_type value_type;
-        typedef typename std::iterator_traits<InIter>::reference element_type;
-        typedef typename hpx::util::zip_iterator<uniquebykey_iter, bool*>
-          ::reference zip_ref;
-
-        typedef hpx::util::zip_iterator<InIter, bool*> zip_iterator;
-        std::size_t N = std::distance(first,last);
-        boost::shared_array<bool> flags(new bool[N]);
-        std::size_t init = 0;
-        //
-        {
-            detail::unique_stencil_transformer u_s_t;
-            uniquebykey_iter unique_begin =
-                make_unique_stencil_iterator(first, u_s_t);
-            uniquebykey_iter unique_end =
-                make_unique_stencil_iterator(last, u_s_t);
-
-            // do first element to make iterator traversal simple
-            flags[0] = true;
-            if (N == 2) {
-                element_type left = *first;
-                element_type right = *std::next(first);
-                flags[1] = !comp(left, right);
-            } else {
-                detail::unique_stencil_generate
-                    <detail::unique_stencil_transformer, InIter, bool*, Compare> kernel;
-
-                // first element skipped already
-                zip_iterator s_begin = hpx::util::make_zip_iterator(unique_begin + 1, flags.get() + 1);
-                zip_iterator s_end   = hpx::util::make_zip_iterator(unique_end, flags.get()+N);
-                std::size_t total = 0;
-
-                auto result = detail::parallel_scan_struct_lambda< std::size_t, detail::exclusive_scan_tag>().call(
-                    sync_policy,
-                    is_seq(),
-                    s_begin,
-                    s_end,
-                    total,
-                    init,
-                    // stage 1 : initial pass of each section of the input
-                    [&kernel, &comp](zip_ref ref, std::size_t count, value_type init) {
-                        std::size_t offset = 0;
-                        for (; count-- != 0; ++first) {
-                            kernel.operator()(get<0>(ref), get<1>(ref), comp);
-                            // assign bool to final stencil, if true increment count
-                            if (get<1>(ref)) offset++;
-                        }
-                        return offset;
-                    },
-                    // stage 2 operator to use to combine intermediate results
-                    std::plus<std::size_t>(),
-                    // stage 3 lambda to apply results to each section
-                    [out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) mutable {
-                        std::advance(out_iter, offset);
-                        for (; count-- != 0; ++first) {
-                            if (hpx::util::get<1>(*first)) {
-                                *out_iter++ = hpx::util::get<0>(*first);
-        //                        std::cout << "writing " << hpx::util::get<0>(*first) << "\n";
-                            }
-                        }
-                        return out_iter;
-                    },
-                    // stage 4 : generate a return value
-                    [last](OutIter dest) mutable ->  std::pair<InIter, OutIter> {
-                        //std::advance(out_iter, offset);
-                        return std::make_pair(last, dest);
-                    }
-                );
-
-            }
-
-        }
-        //
-*/
+        return detail::unique_impl(policy, first, last, comp);
     }
 
 }}}
