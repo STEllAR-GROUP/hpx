@@ -16,6 +16,7 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <memory>
 #include <vector>

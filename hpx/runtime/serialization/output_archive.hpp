@@ -21,6 +21,7 @@
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <list>
 #include <map>
 #include <memory>
 #include <type_traits>

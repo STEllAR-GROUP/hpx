@@ -9,6 +9,7 @@
 #define HPX_THREADMANAGER_SCHEDULING_STATIC_PRIOTITY_QUEUE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 
 #include <string>

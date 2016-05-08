@@ -21,6 +21,7 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
