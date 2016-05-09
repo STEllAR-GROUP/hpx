@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #include <algorithm>
+#include <cstring> // for std::memmove
 #include <iterator>
 #include <memory>
 #include <type_traits>
