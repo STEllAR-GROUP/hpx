@@ -926,7 +926,7 @@ hpx_check_for_cxx_experimental_std_optional(
 # CUDA features
 ################################################################################
 if(HPX_WITH_CUDA)
-  set(CUDA_NVCC_FLAGS --expt-relaxed-constexpr;--expt-extended-lambda)
+  set(CUDA_NVCC_FLAGS --expt-relaxed-constexpr;--expt-extended-lambda;--gpu-architecture=sm_35)
 endif()
 
 ################################################################################

@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && !defined(__CUDA_ARCH__)
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/host/target.hpp>
 
@@ -29,5 +28,4 @@ namespace hpx { namespace compute { namespace traits
     };
 }}}
 
-#endif
 #endif

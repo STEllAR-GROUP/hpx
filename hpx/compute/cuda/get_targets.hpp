@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+#if defined(HPX_HAVE_CUDA)
 #include <hpx/exception.hpp>
 #include <hpx/compute/cuda/target.hpp>
 

@@ -76,21 +76,26 @@ namespace hpx { namespace compute { namespace traits
             template <typename Allocator, typename T, typename ...Ts>
             static void call(hpx::traits::detail::wrap_int,
                 Allocator& alloc, T* p, typename Allocator::size_type count,
-                Ts const&... vs)
+                Ts &&... vs)
             {
+                T init_value(std::forward<Ts>(vs)...);
                 T* end = p + count;
                 typename Allocator::size_type allocated = 0;
                 for(T* it = p; it != end; ++it)
                 {
+#if defined(__CUDA_ARCH__)
+                    allocator_traits<Allocator>::construct(alloc, it, init_value);
+#else
                     try
                     {
-                        allocator_traits<Allocator>::construct(alloc, it, vs...);
+                        allocator_traits<Allocator>::construct(alloc, it, init_value);
                     } catch(...)
                     {
                         allocator_traits<Allocator>::bulk_destroy(alloc, p,
                             allocated);
                         throw;
                     }
+#endif
                     ++allocated;
                 }
 
@@ -99,18 +104,18 @@ namespace hpx { namespace compute { namespace traits
             template <typename Allocator, typename T, typename ...Ts>
             static auto call(int,
                 Allocator& alloc, T* p, typename Allocator::size_type count,
-                    Ts const&... vs)
-              -> decltype(alloc.bulk_construct(p, count, vs...))
+                    Ts &&... vs)
+              -> decltype(alloc.bulk_construct(p, count, std::forward<Ts>(vs)...))
             {
-                alloc.bulk_construct(p, count, vs...);
+                alloc.bulk_construct(p, count, std::forward<Ts>(vs)...);
             }
         };
 
         template <typename Allocator, typename T, typename ...Ts>
         void call_bulk_construct(Allocator& alloc, T* p,
-            typename Allocator::size_type count, Ts const&... vs)
+            typename Allocator::size_type count, Ts &&... vs)
         {
-            bulk_construct::call(0, alloc, p, count, vs...);
+            bulk_construct::call(0, alloc, p, count, std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -169,9 +174,9 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename T, typename ...Ts>
         static void bulk_construct(Allocator& alloc, T* p, size_type count,
-            Ts const&... vs)
+            Ts &&... vs)
         {
-            detail::call_bulk_construct(alloc, p, count, vs...);
+            detail::call_bulk_construct(alloc, p, count, std::forward<Ts>(vs)...);
         }
 
         template <typename T>

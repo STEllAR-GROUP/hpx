@@ -11,6 +11,9 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/exception.hpp>
 #include <hpx/compute/cuda/target.hpp>
+#include <hpx/compute/cuda/detail/scoped_active_target.hpp>
+#include <hpx/compute/cuda/detail/launch.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <cuda_runtime.h>
 
@@ -73,15 +76,9 @@ namespace hpx { namespace compute { namespace cuda
         {
             pointer result = 0;
 #if !defined(__CUDA_ARCH__)
-            cudaError_t error = cudaSetDevice(target_.native_handle().device_);
-            if (error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::allocator<T>::allocate()",
-                    "cudaSetDevice failed");
-            }
+            detail::scoped_active_target active(target_);
 
-            error = cudaMalloc(&result, n*sizeof(T));
+            cudaError_t error = cudaMalloc(&result, n*sizeof(T));
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
@@ -99,15 +96,9 @@ namespace hpx { namespace compute { namespace cuda
         void deallocate(pointer p, size_type n)
         {
 #if !defined(__CUDA_ARCH__)
-            cudaError_t error = cudaSetDevice(target_.native_handle().device_);
-            if (error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::allocator<T>::deallocate()",
-                    "cudaSetDevice failed");
-            }
+            detail::scoped_active_target active(target_);
 
-            error = cudaFree(p);
+            cudaError_t error = cudaFree(p);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
@@ -122,26 +113,86 @@ namespace hpx { namespace compute { namespace cuda
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
         size_type max_size() const HPX_NOEXCEPT
         {
-            return (std::numeric_limits<size_type>::max)() / sizeof(value_type);
+            detail::scoped_active_target active(target_);
+            std::size_t free = 0;
+            std::size_t total = 0;
+            cudaError_t error = cudaMemGetInfo(&free, &total);
+            if (error != cudaSuccess)
+            {
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "cuda::allocator<T>::max_size()",
+                    "cudaMemGetInfo failed");
+            }
+
+            return total / sizeof(value_type);
         }
+
+        template <typename U, typename ...Args>
+        struct construct_helper;
+
+        template <typename U, typename Arg0>
+        struct construct_helper<U, Arg0>
+        {
+            typedef typename util::decay<Arg0>::type arg0_type;
+            construct_helper(U* p, std::size_t count, arg0_type const& arg0)
+              : p_(p)
+              , count_(count)
+              , arg0_(arg0)
+            {}
+
+            __device__ void operator()()
+            {
+                U* end = p_ + count_;
+                for(U* it=p_; p_ != end; ++p_)
+                {
+                    ::new (it) U(arg0_);
+                }
+            }
+            U* p_;
+            std::size_t count_;
+            arg0_type arg0_;
+        };
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
         template <typename U, typename ... Args>
+        void bulk_construct(U* p, std::size_t count, Args&&... args)
+        {
+            // FIXME: cuda has problems expanding parameter packs in lambdas ...
+            construct_helper<U, Args...> closure(p, count, std::forward<Args>(args)...);
+
+            detail::launch(
+                target_, 1, 1,
+                closure);
+            target_.synchronize();
+        }
+
+        template <typename U, typename ... Args>
         void construct(U* p, Args &&... args)
         {
-#if defined(__CUDA_ARCH__)
-            ::new ((void*)p) U(std::forward<Args>(args)...);
-#endif
+            build_construct(p, 1, std::forward<Args>(args)...);
         }
 
         // Calls the destructor of the object pointed to by p
         template <typename U>
+        void bulk_destroy(U* p, std::size_t count)
+        {
+            detail::launch(
+                target_, 1, 1,
+                [p, count] __device__ () mutable
+                {
+                    U* end = p + count;
+                    for(U* it=p; p != end; ++p)
+                    {
+                        it->~U();
+                    }
+                });
+            target_.synchronize();
+        }
+        template <typename U>
         void destroy(U* p)
         {
-#if defined(__CUDA_ARCH__)
-            p->~U();
-#endif
+            bulk_destroy(p, 1);
         }
 
         // Access the underlying target (device)

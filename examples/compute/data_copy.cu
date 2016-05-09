@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 
-HPX_HOST_DEVICE
 void cuda_main()
 {
     // create data vector on host
@@ -27,7 +26,9 @@ void cuda_main()
     typedef hpx::compute::cuda::allocator<double> allocator_type;
     allocator_type alloc(target);
 
-//     hpx::compute::vector<double, allocator_type> d_A(N, alloc);
+    hpx::compute::vector<double, allocator_type> d_A(N, 42.1337, alloc);
+
+    std::cout << d_A[0] << '\n';
 
     // copy data from host to device
 //     hpx::parallel::copy(

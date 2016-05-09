@@ -14,8 +14,11 @@
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <cuda_runtime.h>
+
+#include <iostream>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail
 {
@@ -27,21 +30,36 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 
     // Launch any given function F with the given parameters. This function does
     // not involve any device synchronization.
-    template <typename F, typename DimType, typename ...Ts>
-    void launch(target const& t, DimType gridDim, DimType blockDim, F && f,
-        Ts &&... vs)
+    // FIXME: support n-ary closures ...
+    template <typename F, typename DimType>//, typename ...Ts>
+    void launch(target const& t, DimType gridDim, DimType blockDim, F && f)//,
+        //Ts &&... vs)
     {
-#if !defined(__CUDA_ARCH__)
         detail::scoped_active_target active(t);
 
-        auto closure = util::deferred_call(std::forward<F>(f),
-            std::forward<Ts>(vs)...);
-        typedef decltype(closure) closure_type;
+//         auto closure = util::deferred_call(std::forward<F>(f),
+//             std::forward<Ts>(vs)...);
+//         typedef decltype(closure) closure_type;
 
+        typedef typename util::decay<F>::type closure_type;
         void (*launch_function)(closure_type) = launch_helper<closure_type>;
+
+        closure_type closure = std::forward<F>(f);
+
         launch_function<<<gridDim, blockDim, 0, active.stream()>>>(
             std::move(closure));
-#endif
+
+        cudaError_t error = cudaGetLastError();
+        if(error != cudaSuccess)
+        {
+            if (error != cudaSuccess)
+            {
+                std::cout << cudaGetErrorString(error);
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "cuda::detail::launch()",
+                    "kernel launch failed");
+            }
+        }
     }
 }}}}
 

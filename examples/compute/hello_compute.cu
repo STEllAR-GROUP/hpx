@@ -14,7 +14,6 @@
 #include <iostream>
 #include <vector>
 
-HPX_HOST_DEVICE
 void cuda_main(unsigned int seed)
 {
     hpx::compute::cuda::target target;
@@ -48,20 +47,20 @@ void cuda_main(unsigned int seed)
         int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
         hpx::compute::cuda::detail::launch(target, blocksPerGrid, threadsPerBlock,
-            [](int * A, int *B, int *C, int N) -> void
+            [=] __device__ ()
             {
                 int i = blockDim.x * blockIdx.x + threadIdx.x;
                 if(i < N)
-                    C[i] = A[i] + B[i];
-            },
-            d_A, d_B, d_C, N);
+                    d_C[i] = d_A[i] + d_B[i];
+            });
 
         cudaMemcpy(h_C.data(), d_C, N * sizeof(int), cudaMemcpyDeviceToHost);
         cudaStreamSynchronize(active.stream());
+#if !defined(__CUDA_ARCH__)
         cudaFree(d_A);
         cudaFree(d_B);
         cudaFree(d_C);
-
+#endif
     }
 
     for(int i = 0; i < N; ++i)

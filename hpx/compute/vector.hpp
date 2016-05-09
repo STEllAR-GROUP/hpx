@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
+#include <hpx/compute/traits/access_target.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -180,7 +181,8 @@ namespace hpx { namespace compute
         /// Member types (FIXME: add reference to std
         typedef T value_type;
         typedef Allocator allocator_type;
-        typedef typename alloc_traits::access_target target_type;
+        typedef typename alloc_traits::access_target access_target;
+        typedef typename access_target::target_type target_type;
         typedef std::size_t size_type;
         typedef std::ptrdiff_t difference_type;
         typedef typename alloc_traits::reference reference;
@@ -319,13 +321,13 @@ namespace hpx { namespace compute
         reference operator[](size_type pos)
         {
             HPX_ASSERT(pos < size_);
-            return target_type::access(target_, data_, pos);
+            return access_target::access(target_, data_, pos);
         }
 
         const_reference operator[](size_type pos) const
         {
             HPX_ASSERT(pos < size_);
-            return target_type::access(target_, data_, pos);
+            return access_target::access(target_, data_, pos);
         }
 
         // TODO: implement front()

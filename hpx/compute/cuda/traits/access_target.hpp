@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+#if defined(HPX_HAVE_CUDA)
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/cuda/target.hpp>
 
@@ -24,11 +24,16 @@ namespace hpx { namespace compute { namespace traits
         typedef cuda::target target_type;
 
         template <typename T>
-        static T access(cuda::target const&, T * t, std::size_t pos)
+        HPX_HOST_DEVICE
+        static T& access(cuda::target const&, T * t, std::size_t pos)
         {
-            T tmp;
-            cudaMemcpy(&tmp, t + p, sizeof(T), cudaMemcpyDeviceToHost);
+#if defined(__CUDA_ARCH__)
+            return *(t + pos);
+#else
+            static T tmp;
+            cudaMemcpy(&tmp, t + pos, sizeof(T), cudaMemcpyDeviceToHost);
             return tmp;
+#endif
         }
     };
 }}}

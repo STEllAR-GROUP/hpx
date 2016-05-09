@@ -10,17 +10,10 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
-#include <hpx/compute/cuda/target.hpp>
-#else
 #include <hpx/runtime/threads/topology.hpp>
-#endif
 
 namespace hpx { namespace compute { namespace host
 {
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
-    using compute::cuda::target;
-#else
     struct target
     {
         typedef hpx::threads::mask_type native_handle_type;
@@ -45,7 +38,6 @@ namespace hpx { namespace compute { namespace host
     private:
         native_handle_type mask_;
     };
-#endif
 }}}
 
 #endif

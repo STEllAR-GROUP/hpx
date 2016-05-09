@@ -110,6 +110,17 @@ namespace hpx { namespace compute { namespace cuda
             return handle_;
         }
 
+        void synchronize() const
+        {
+            cudaError_t error = cudaStreamSynchronize(handle_.stream_);
+            if(error != cudaSuccess)
+            {
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "cuda::target::synchronize",
+                    "cudaStreamSynchronize failed");
+            }
+        }
+
     private:
         native_handle_type handle_;
     };

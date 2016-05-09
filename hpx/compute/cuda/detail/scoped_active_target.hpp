@@ -24,28 +24,50 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
           : previous_device_(-1)
           , target_(t)
         {
-            // FIXME: check for error
-            cudaGetDevice(&previous_device_);
+            cudaError_t error = cudaGetDevice(&previous_device_);
+            if(error != cudaSuccess)
+            {
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "scoped_active_target::scoped_active_target(target const&)",
+                    "cudaGetDevice failed");
+            }
             if(previous_device_ == target_.native_handle().device_)
             {
                 previous_device_ = -1;
                 return;
             }
 
-            cudaSetDevice(target_.native_handle().device_);
+            error = cudaSetDevice(target_.native_handle().device_);
+            if(error != cudaSuccess)
+            {
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "scoped_active_target::scoped_active_target(target const&)",
+                    "cudaSetDevice failed");
+            }
         }
 
         ~scoped_active_target()
         {
 #if defined(HPX_DEBUG)
             int current_device = -1;
-            cudaGetDevice(&current_device);
+            cudaError_t error = cudaGetDevice(&current_device);
+            if(error != cudaSuccess)
+            {
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "scoped_active_target::~scoped_active_target()",
+                    "cudaGetDevice failed");
+            }
             HPX_ASSERT(current_device == target_.native_handle().device_);
 #endif
             if(previous_device_ != -1)
             {
-                // FIXME: check for error
-                cudaSetDevice(previous_device_);
+                error = cudaSetDevice(previous_device_);
+                if(error != cudaSuccess)
+                {
+                    HPX_THROW_EXCEPTION(kernel_error,
+                        "scoped_active_target::~scoped_active_target()",
+                        "cudaSetDevice failed");
+                }
             }
         }
 
