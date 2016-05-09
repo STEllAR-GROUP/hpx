@@ -184,92 +184,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     template <typename ExPolicy, typename InIter, typename StencilIter,
-        typename OutIter, typename StencilUnary,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<InIter>::value &&
-            hpx::traits::is_iterator<OutIter>::value)
-        >
-    typename util::detail::algorithm_result<
-        ExPolicy, OutIter
-    >::type
-    prefix_copy_if_stencil_pred(ExPolicy&& policy, InIter first, InIter last,
-        StencilIter stencil, OutIter dest,
-        StencilUnary && unary,
-        Proj && proj = Proj())
-    {
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value ||
-               !hpx::traits::is_forward_iterator<StencilIter>::value ||
-               !hpx::traits::is_output_iterator<OutIter>::value
-            > is_seq;
-
-        typedef typename std::iterator_traits<InIter>::value_type value_type;
-
-        typedef typename detail::remove_asynchronous<
-                    typename std::decay< ExPolicy >::type >::type sync_policy_type;
-
-        sync_policy_type sync_policy = sync_policy_type().on(policy.executor()).with(policy.parameters());
-
-        typedef hpx::util::zip_iterator<InIter, bool*, StencilIter> zip_iterator;
-        std::size_t N = std::distance(first,last);
-        boost::shared_array<bool> flags(new bool[N]);
-        std::size_t init = 0;
-        //
-        zip_iterator s_begin = hpx::util::make_zip_iterator(first, flags.get(),   stencil);
-        zip_iterator s_end   = hpx::util::make_zip_iterator(last,  flags.get()+N, stencil+N);
-        OutIter out_iter = dest;
-        //
-        auto result = detail::parallel_scan_struct_lambda< OutIter,
-          detail::exclusive_scan_tag>().call(
-            sync_policy,
-            std::false_type(), // is_seq(),
-            s_begin,
-            s_end,
-            dest,
-            init,
-
-            // f1 : initial pass of each section of the input
-            [&unary](zip_iterator first, std::size_t count, std::size_t init) {
-                std::size_t offset = 0;
-                for (/* */; count-- != 0; ++first) {
-                    bool temp = unary(hpx::util::get<2>(*first));
-                    // assign bool to final stencil, if true increment count
-                    if ((hpx::util::get<1>(*first) = temp)) offset++;
-                }
-                return offset;
-            },
-
-            // operator to use to combine intermediate results
-            std::plus<std::size_t>(),
-
-            // f2 lambda to apply results to each section
-            [out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) mutable {
-                //std::cout << "Offset at start is " << offset <<"\n";
-                std::advance(out_iter, offset);
-                for (/* */; count-- != 0; ++first) {
-                    if (hpx::util::get<1>(*first)) {
-                        *out_iter++ = hpx::util::get<0>(*first);
-                    }
-                }
-                return out_iter;
-            },
-            // f3 : generate a return value
-            [](OutIter dest) {
-                //std::advance(out_iter, offset);
-                return dest;
-            }
-        );
-
-        return result;
-    }
-
-
-    template <typename ExPolicy, typename InIter, typename StencilIter,
         typename OutIter,
+        typename StencilUnary = util::projection_identity,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
             is_execution_policy<ExPolicy>::value &&
@@ -281,6 +197,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     prefix_copy_if_stencil(ExPolicy&& policy, InIter first, InIter last,
         StencilIter stencil, OutIter dest,
+        StencilUnary && unary = StencilUnary(),
         Proj && proj = Proj())
     {
         typedef std::integral_constant<bool,
@@ -296,7 +213,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename detail::remove_asynchronous<
                     typename std::decay< ExPolicy >::type >::type sync_policy_type;
 
-        sync_policy_type sync_policy = sync_policy_type().on(policy.executor()).with(policy.parameters());
+        sync_policy_type sync_policy =
+            sync_policy_type().on(policy.executor()).with(policy.parameters());
 
         typedef hpx::util::zip_iterator<InIter, StencilIter> zip_iterator;
         std::size_t N = std::distance(first,last);
@@ -316,11 +234,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             init,
 
             // f1 : initial pass of each section of the input
-            [](zip_iterator first, std::size_t count, std::size_t init) {
+            [&unary](zip_iterator first, std::size_t count, std::size_t init) {
                 std::size_t offset = 0;
                 for (/* */; count-- != 0; ++first) {
                     // if stencil true increment count
-                    if (hpx::util::get<1>(*first) != 0) offset++;
+                    if (unary(hpx::util::get<1>(*first))) offset++;
                 }
                 return offset;
             },
@@ -329,11 +247,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::plus<std::size_t>(),
 
             // f2 lambda to apply results to each section
-            [out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) mutable {
+            [&unary,out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) mutable {
                 //std::cout << "Offset at start is " << offset <<"\n";
                 std::advance(out_iter, offset);
                 for (/* */; count-- != 0; ++first) {
-                    if (hpx::util::get<1>(*first)) {
+                    if (unary(hpx::util::get<1>(*first)))  {
                         *out_iter++ = hpx::util::get<0>(*first);
                     }
                 }
