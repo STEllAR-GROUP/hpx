@@ -18,7 +18,7 @@
 
 #include <cuda_runtime.h>
 
-#include <iostream>
+#include <string>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail
 {
@@ -54,10 +54,10 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
         {
             if (error != cudaSuccess)
             {
-                std::cout << cudaGetErrorString(error);
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::detail::launch()",
-                    "kernel launch failed");
+                    std::string("kernel launch failed: ") +
+                        cudaGetErrorString(error));
             }
         }
     }

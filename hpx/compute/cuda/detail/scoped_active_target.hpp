@@ -11,10 +11,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/compute/cuda/target.hpp>
 
 #include <cuda_runtime.h>
+
+#include <string>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail
 {
@@ -29,7 +32,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "scoped_active_target::scoped_active_target(target const&)",
-                    "cudaGetDevice failed");
+                    std::string("cudaGetDevice failed: ") +
+                        cudaGetErrorString(error));
             }
             if(previous_device_ == target_.native_handle().device_)
             {
@@ -42,7 +46,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "scoped_active_target::scoped_active_target(target const&)",
-                    "cudaSetDevice failed");
+                    std::string("cudaSetDevice failed: ") +
+                        cudaGetErrorString(error));
             }
         }
 
@@ -55,7 +60,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "scoped_active_target::~scoped_active_target()",
-                    "cudaGetDevice failed");
+                    std::string("cudaGetDevice failed: ") +
+                        cudaGetErrorString(error));
             }
             HPX_ASSERT(current_device == target_.native_handle().device_);
 #endif
@@ -66,7 +72,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
                 {
                     HPX_THROW_EXCEPTION(kernel_error,
                         "scoped_active_target::~scoped_active_target()",
-                        "cudaSetDevice failed");
+                        std::string("cudaSetDevice failed: ") +
+                            cudaGetErrorString(error));
                 }
             }
         }

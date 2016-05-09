@@ -16,6 +16,7 @@
 
 #include <cuda_runtime.h>
 
+#include <string>
 #include <vector>
 
 namespace hpx { namespace compute { namespace cuda
@@ -28,7 +29,8 @@ namespace hpx { namespace compute { namespace cuda
         {
             HPX_THROW_EXCEPTION(kernel_error,
                 "cuda::get_targets()",
-                "cudaGetDeviceCount failed");
+                std::string("cudaGetDeviceCount failed: ") +
+                    cudaGetErrorString(error));
         }
 
         std::vector<target> targets;

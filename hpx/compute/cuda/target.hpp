@@ -15,6 +15,7 @@
 
 #include <cuda_runtime.h>
 
+#include <string>
 #include <utility>
 
 namespace hpx { namespace compute { namespace cuda
@@ -64,14 +65,16 @@ namespace hpx { namespace compute { namespace cuda
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::target()",
-                    "cudaSetDevice failed");
+                    std::string("cudaSetDevice failed: ") +
+                        cudaGetErrorString(error));
             }
             error = cudaStreamCreate(&handle_.stream_);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::target()",
-                    "cudaStreamCreate failed");
+                    std::string("cudaStreamCreate failed: ") +
+                        cudaGetErrorString(error));
             }
         }
 
@@ -84,14 +87,16 @@ namespace hpx { namespace compute { namespace cuda
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::target()",
-                    "cudaSetDevice failed");
+                    std::string("cudaSetDevice failed: ") +
+                        cudaGetErrorString(error));
             }
             error = cudaStreamCreate(&handle_.stream_);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::target()",
-                    "cudaStreamCreate failed");
+                    std::string("cudaStreamCreate failed: ") +
+                        cudaGetErrorString(error));
             }
         }
 
@@ -117,7 +122,8 @@ namespace hpx { namespace compute { namespace cuda
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::target::synchronize",
-                    "cudaStreamSynchronize failed");
+                    std::string("cudaStreamSynchronize failed: ") +
+                        cudaGetErrorString(error));
             }
         }
 

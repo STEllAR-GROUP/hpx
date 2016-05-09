@@ -20,6 +20,8 @@
 #include <cstdlib>
 #include <limits>
 #include <memory>
+#include <string>
+#include <type_traits>
 
 namespace hpx { namespace compute { namespace cuda
 {
@@ -83,7 +85,8 @@ namespace hpx { namespace compute { namespace cuda
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
                     "cuda::allocator<T>::allocate()",
-                    "cudaMalloc failed");
+                    std::string("cudaMalloc failed: ") +
+                        cudaGetErrorString(error));
             }
 #endif
             return result;
@@ -103,7 +106,8 @@ namespace hpx { namespace compute { namespace cuda
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::allocator<T>::deallocate()",
-                    "cudaFree failed");
+                    std::string("cudaFree failed: ") +
+                        cudaGetErrorString(error));
             }
 #endif
         }
@@ -121,7 +125,8 @@ namespace hpx { namespace compute { namespace cuda
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "cuda::allocator<T>::max_size()",
-                    "cudaMemGetInfo failed");
+                    std::string("cudaMemGetInfo failed: ") +
+                        cudaGetErrorString(error));
             }
 
             return total / sizeof(value_type);
@@ -143,11 +148,12 @@ namespace hpx { namespace compute { namespace cuda
             __device__ void operator()()
             {
                 U* end = p_ + count_;
-                for(U* it=p_; p_ != end; ++p_)
+                for(U* it = p_; p_ != end; ++p_)
                 {
                     ::new (it) U(arg0_);
                 }
             }
+
             U* p_;
             std::size_t count_;
             arg0_type arg0_;
@@ -182,7 +188,7 @@ namespace hpx { namespace compute { namespace cuda
                 [p, count] __device__ () mutable
                 {
                     U* end = p + count;
-                    for(U* it=p; p != end; ++p)
+                    for(U* it = p; p != end; ++p)
                     {
                         it->~U();
                     }

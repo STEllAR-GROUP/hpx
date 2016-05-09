@@ -48,7 +48,7 @@ namespace hpx { namespace compute { namespace traits
         struct target_helper
         {
             template <typename Allocator>
-            static compute::host::target& //typename get_target_traits<Allocator>::type::target_type&
+            static compute::host::target&
             call(hpx::traits::detail::wrap_int, Allocator const& alloc)
             {
                 static compute::host::target t;
