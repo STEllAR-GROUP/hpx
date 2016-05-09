@@ -16,7 +16,7 @@ namespace hpx { namespace components
     {}
 
     component_storage::component_storage(hpx::future<naming::id_type> && f)
-      : base_type(hpx::new_<server::component_storage>(f.get()))
+      : base_type(std::move(f))
     {}
 
     ///////////////////////////////////////////////////////////////////////////

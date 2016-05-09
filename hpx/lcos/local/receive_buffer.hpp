@@ -88,6 +88,11 @@ namespace hpx { namespace lcos { namespace local
           : buffer_map_(std::move(other.buffer_map_))
         {}
 
+        ~receive_buffer()
+        {
+            HPX_ASSERT(buffer_map_.empty());
+        }
+
         receive_buffer& operator=(receive_buffer && other)
         {
             if(this != &other)
@@ -237,6 +242,11 @@ namespace hpx { namespace lcos { namespace local
         receive_buffer(receive_buffer && other)
           : buffer_map_(std::move(other.buffer_map_))
         {}
+
+        ~receive_buffer()
+        {
+            HPX_ASSERT(buffer_map_.empty());
+        }
 
         receive_buffer& operator=(receive_buffer && other)
         {

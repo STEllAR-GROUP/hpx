@@ -381,9 +381,9 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
                 // create a new thread
-                threads_.push_back(new boost::thread(
-                        util::bind(&thread_pool::thread_func, this, thread_num,
-                            boost::ref(topology_), boost::ref(*startup_))
+                threads_.push_back(boost::thread(
+                        &thread_pool::thread_func, this, thread_num,
+                        boost::ref(topology_), boost::ref(*startup_)
                     ));
 
                 // set the new threads affinity (on Windows systems)

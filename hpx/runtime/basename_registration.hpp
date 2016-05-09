@@ -18,6 +18,14 @@
 
 namespace hpx
 {
+    /// \cond NOINTERNAL
+    namespace detail
+    {
+        HPX_API_EXPORT std::string name_from_basename(
+            std::string const& basename, std::size_t idx);
+    }
+    /// \endcond
+
     ///////////////////////////////////////////////////////////////////////////
     /// Return all registered ids from all localities from the given base
     /// name.
@@ -220,8 +228,7 @@ namespace hpx
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    template <typename Client, typename Stub>
-    hpx::future<bool> register_with_basename(std::string const& base_name,
+    inline hpx::future<bool> register_with_basename(std::string const& base_name,
         hpx::future<hpx::id_type> f, std::size_t sequence_nr = ~0U)
     {
         return f.then(
