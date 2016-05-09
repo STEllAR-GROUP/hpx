@@ -25,6 +25,7 @@ namespace hpx { namespace compute { namespace traits
 
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         template <typename Allocator, typename Enable = void>
         struct get_target_traits
         {
@@ -43,24 +44,33 @@ namespace hpx { namespace compute { namespace traits
                 type;
         };
 
+        ///////////////////////////////////////////////////////////////////////
         struct target_helper
         {
             template <typename Allocator>
-            static typename get_target_traits<Allocator>::type::target_type&
-            call(hpx::traits::detail::wrap_int, Allocator& alloc)
+            static compute::host::target& //typename get_target_traits<Allocator>::type::target_type&
+            call(hpx::traits::detail::wrap_int, Allocator const& alloc)
             {
                 static compute::host::target t;
                 return t;
             }
 
             template <typename Allocator>
-            static auto call(int, Allocator& alloc)
+            static auto call(int, Allocator const& alloc)
               -> decltype(alloc.target())
             {
                 return alloc.target();
             }
         };
 
+        template <typename Allocator>
+        auto call_target_helper(Allocator const& alloc)
+        ->  decltype(target_helper::call(0, alloc))
+        {
+            return target_helper::call(0, alloc);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         struct bulk_construct
         {
             template <typename Allocator, typename T, typename ...Ts>
@@ -103,6 +113,7 @@ namespace hpx { namespace compute { namespace traits
             bulk_construct::call(0, alloc, p, count, vs...);
         }
 
+        ///////////////////////////////////////////////////////////////////////
         struct bulk_destroy
         {
             template <typename Allocator, typename T>
@@ -151,9 +162,9 @@ namespace hpx { namespace compute { namespace traits
             typename detail::get_target_traits<Allocator>::type access_target;
         typedef typename access_target::target_type target_type;
 
-        static target_type& target(Allocator& alloc)
+        static target_type& target(Allocator const& alloc)
         {
-            return detail::target_helper::call(0, alloc);
+            return detail::call_target_helper(alloc);
         }
 
         template <typename T, typename ...Ts>

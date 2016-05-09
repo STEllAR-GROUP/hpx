@@ -19,7 +19,7 @@ void cuda_main(unsigned int seed)
 {
     hpx::compute::cuda::target target;
 
-    int N = 100;
+    int const N = 100;
     std::vector<int> h_A(N);
     std::vector<int> h_B(N);
     std::vector<int> h_C_ref(N);

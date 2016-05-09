@@ -26,13 +26,13 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
         {
             // FIXME: check for error
             cudaGetDevice(&previous_device_);
-            if(previous_device_ == target_.native_handle().device)
+            if(previous_device_ == target_.native_handle().device_)
             {
                 previous_device_ = -1;
                 return;
             }
 
-            cudaSetDevice(target_.native_handle().device);
+            cudaSetDevice(target_.native_handle().device_);
         }
 
         ~scoped_active_target()
@@ -40,7 +40,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 #if defined(HPX_DEBUG)
             int current_device = -1;
             cudaGetDevice(&current_device);
-            HPX_ASSERT(current_device == target_.native_handle().device);
+            HPX_ASSERT(current_device == target_.native_handle().device_);
 #endif
             if(previous_device_ != -1)
             {
@@ -51,7 +51,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 
         cudaStream_t stream()
         {
-            return target_.native_handle().stream;
+            return target_.native_handle().stream_;
         }
 
     private:

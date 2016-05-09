@@ -11,6 +11,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+#include <hpx/exception.hpp>
+#include <hpx/compute/cuda/target.hpp>
+
 #include <cuda_runtime.h>
 
 #include <vector>
@@ -20,14 +23,20 @@ namespace hpx { namespace compute { namespace cuda
     std::vector<target> get_targets()
     {
         int device_count = 0;
-        // FIXME: check for error
-        cudaGetDeviceCount(&device_count);
+        cudaError_t error = cudaGetDeviceCount(&device_count);
+        if (error != cudaSuccess)
+        {
+            HPX_THROW_EXCEPTION(kernel_error,
+                "cuda::get_targets()",
+                "cudaGetDeviceCount failed");
+        }
+
         std::vector<target> targets;
         targets.reserve(device_count);
 
         for(int i = 0; i < device_count; ++i)
         {
-            targets.push_back(target(i));
+            targets.emplace_back(target(i));
         }
 
         return targets;
