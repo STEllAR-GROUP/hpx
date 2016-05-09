@@ -13,6 +13,7 @@
 #include <hpx/util/cache/entries/lru_entry.hpp>
 #include <hpx/util/cache/local_cache.hpp>
 
+#include <cstring>
 #include <memory>
 
 #include <netdb.h>

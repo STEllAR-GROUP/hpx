@@ -9,6 +9,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cmath>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <vector>

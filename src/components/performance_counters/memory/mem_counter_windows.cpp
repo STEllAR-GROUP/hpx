@@ -10,6 +10,7 @@
 #include <hpx/exception.hpp>
 #include <boost/format.hpp>
 
+#include <cstring>
 #include <string>
 
 #include <psapi.h>

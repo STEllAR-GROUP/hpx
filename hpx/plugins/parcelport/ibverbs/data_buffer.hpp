@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
+#include <cstring>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
