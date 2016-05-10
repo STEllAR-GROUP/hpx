@@ -7,6 +7,7 @@
 
 #include <hpx/compute/cuda.hpp>
 #include <hpx/compute/vector.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
 
 #include <hpx/hpx_init.hpp>
 
@@ -23,8 +24,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    hpx::compute::cuda::target target;
-
     int const N = 100;
     std::vector<int> h_A(N);
     std::vector<int> h_B(N);
@@ -37,44 +36,44 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::transform(h_A.begin(), h_A.end(), h_B.begin(), h_C_ref.begin(),
         [](int a, int b) { return a + b; });
 
-    {
-        hpx::compute::cuda::detail::scoped_active_target active(target);
-        int *d_A = 0;
-        int *d_B = 0;
-        int *d_C = 0;
+    typedef hpx::compute::cuda::allocator<int> allocator_type;
 
-        cudaMalloc(&d_A, N * sizeof(int));
-        cudaMalloc(&d_B, N * sizeof(int));
-        cudaMalloc(&d_C, N * sizeof(int));
+    hpx::compute::cuda::target target;
+    allocator_type alloc(target);
+    hpx::compute::vector<int, allocator_type> d_A(N, alloc);
+    hpx::compute::vector<int, allocator_type> d_B(N, alloc);
+    hpx::compute::vector<int, allocator_type> d_C(N, alloc);
 
-        cudaMemcpy(d_A, h_A.data(), N * sizeof(int), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_B, h_B.data(), N * sizeof(int), cudaMemcpyHostToDevice);
+    hpx::parallel::copy(
+        hpx::parallel::seq,
+        h_A.begin(), h_A.end(), d_A.begin());
+    hpx::parallel::copy(
+        hpx::parallel::seq,
+        h_B.begin(), h_B.end(), d_B.begin());
 
-        int threadsPerBlock = 256;
-        int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
+    int threadsPerBlock = 256;
+    int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
-        hpx::compute::cuda::detail::launch(target, blocksPerGrid, threadsPerBlock,
-            [=] __device__ ()
-            {
-                int i = blockDim.x * blockIdx.x + threadIdx.x;
-                if(i < N)
-                    d_C[i] = d_A[i] + d_B[i];
-            });
+    hpx::compute::cuda::detail::launch(target, blocksPerGrid, threadsPerBlock,
+        [=] __device__ (int* A, int* B, int* C) mutable
+        {
+            int i = blockDim.x * blockIdx.x + threadIdx.x;
+            if(i < N)
+                C[i] = A[i] + B[i];
+        }, d_A.data(), d_B.data(), d_C.data());
 
-        cudaMemcpy(h_C.data(), d_C, N * sizeof(int), cudaMemcpyDeviceToHost);
-        cudaStreamSynchronize(active.stream());
-#if !defined(__CUDA_ARCH__)
-        cudaFree(d_A);
-        cudaFree(d_B);
-        cudaFree(d_C);
-#endif
-    }
+
+    hpx::parallel::copy(
+        hpx::parallel::seq,
+        d_C.begin(), d_C.end(), h_C.begin());
 
     for(int i = 0; i < N; ++i)
     {
         if(h_C[i] != h_C_ref[i] || h_C[i] != h_A[i] + h_B[i])
         {
             std::cout << "Error at " << i << "\n";
+            std::cout << h_C[i] << " != " << h_C_ref[i] << "\n";
+            std::cout << h_C[i] << " != " << h_A[i] + h_B[i] << "\n";
         }
     }
 

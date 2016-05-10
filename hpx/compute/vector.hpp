@@ -169,15 +169,21 @@ namespace hpx { namespace compute
         // Element access
         // TODO: implement at()
 
+        HPX_HOST_DEVICE
         reference operator[](size_type pos)
         {
+#if !defined(__CUDA_ARCH__)
             HPX_ASSERT(pos < size_);
+#endif
             return access_target::access(target_, data_, pos);
         }
 
+        HPX_HOST_DEVICE
         const_reference operator[](size_type pos) const
         {
+#if !defined(__CUDA_ARCH__)
             HPX_ASSERT(pos < size_);
+#endif
             return access_target::access(target_, data_, pos);
         }
 
