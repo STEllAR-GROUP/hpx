@@ -34,7 +34,9 @@ namespace hpx { namespace performance_counters { namespace server
         typedef arithmetics_counter type_holder;
         typedef base_performance_counter base_type_holder;
 
-        arithmetics_counter() {}
+        arithmetics_counter()
+          : mtx_(), invocation_count_(0)
+        {}
 
         arithmetics_counter(counter_info const& info,
             std::vector<std::string> const& base_counter_names);

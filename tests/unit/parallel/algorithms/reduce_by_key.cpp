@@ -342,15 +342,15 @@ void test_reduce_by_key1()
         //
         //
         test_reduce_by_key1(seq, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);},
+            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
         test_reduce_by_key1(par, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);},
+            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
         test_reduce_by_key1(par_vec, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);},
+            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
     } while (t.elapsed() < 2);
@@ -365,7 +365,7 @@ void test_reduce_by_key1()
             [](int key) {return key;});
         //
         test_reduce_by_key_const(seq, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);},
+            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
     } while (t3.elapsed() < 0.5);
@@ -385,7 +385,7 @@ void test_reduce_by_key1()
 
     // one last test with timing output enabled
     test_reduce_by_key1(par, double(), double(), true,
-        [](double a, double b) {return std::floor(a)==std::floor(b);},
+        [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
         [](double a) {return std::floor(a);}
         );
 }

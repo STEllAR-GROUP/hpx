@@ -73,7 +73,7 @@ namespace hpx
 
         id get_id() const HPX_NOEXCEPT;
 
-        native_handle_type native_handle() const
+        native_handle_type native_handle() const //-V659
         {
             std::lock_guard<mutex_type> l(mtx_);
             return id_;

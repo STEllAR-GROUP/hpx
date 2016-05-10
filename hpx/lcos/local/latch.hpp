@@ -49,7 +49,7 @@ namespace hpx { namespace lcos { namespace local
         /// Postconditions: counter_ == count.
         ///
         explicit latch(std::ptrdiff_t count)
-          : counter_(count)
+          : counter_(count), mtx_(), cond_()
         {}
 
         /// Requires: No threads are blocked at the synchronization point.

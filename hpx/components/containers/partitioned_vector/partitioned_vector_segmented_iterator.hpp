@@ -889,8 +889,8 @@ namespace hpx { namespace traits
             if (seg_iter.is_at_end())
                 --seg_iter;     // return iterator to the end of last segment
 
-            return local_iterator(seg_iter.base()->partition_,
-                seg_iter.base()->size_, seg_iter.base()->local_data_);
+            auto& base = seg_iter.base();
+            return local_iterator(base->partition_, base->size_, base->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
@@ -976,8 +976,8 @@ namespace hpx { namespace traits
             if (seg_iter.is_at_end())
                 --seg_iter;     // return iterator to the end of last segment
 
-            return local_iterator(seg_iter.base()->partition_,
-                seg_iter.base()->size_, seg_iter.base()->local_data_);
+            auto& base = seg_iter.base();
+            return local_iterator(base->partition_, base->size_, base->local_data_);
         }
 
         //  This function should specify the local iterator which is at the

@@ -172,7 +172,7 @@ namespace hpx { namespace lcos
             }
 
         public:
-            gather_server()
+            gather_server() //-V730
             {
                 HPX_ASSERT(false);  // shouldn't ever be called
             }
@@ -261,7 +261,7 @@ namespace hpx { namespace lcos
         if (num_sites == std::size_t(-1))
             num_sites = hpx::get_num_localities_sync();
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         // create a new gather_server
         typedef typename util::decay<T>::type result_type;
@@ -288,7 +288,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -308,7 +308,7 @@ namespace hpx { namespace lcos
         if (num_sites == std::size_t(-1))
             num_sites = hpx::get_num_localities_sync();
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         return gather_here(
             create_gatherer<T>(basename, num_sites, generation, this_site),
@@ -323,7 +323,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -345,7 +345,7 @@ namespace hpx { namespace lcos
         if (num_sites == std::size_t(-1))
             num_sites = hpx::get_num_localities_sync();
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         return gather_here(
             create_gatherer<T>(basename, num_sites, generation, this_site),
@@ -359,7 +359,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -376,7 +376,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         std::string name(basename);
         if (generation != std::size_t(-1))
@@ -395,7 +395,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -414,7 +414,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
-            this_site = hpx::get_locality_id();
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         std::string name(basename);
         if (generation != std::size_t(-1))

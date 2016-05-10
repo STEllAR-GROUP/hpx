@@ -50,7 +50,10 @@ void inclusive_scan_benchmark()
               << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
       }
     }
-    catch (...) {}
+    catch (...)
+    {
+      HPX_TEST(false);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -404,7 +407,7 @@ void test_inclusive_scan_validate(ExPolicy p, std::vector<int> &a, std::vector<i
     //
     for (int i=0; i<static_cast<int>(b.size()); ++i) {
         // counting from zero,
-        int value = b[i];
+        int value = b[i]; //-V108
         int expected_value  = check_n_triangle(i);
         if (!HPX_TEST(value == expected_value)) break;
     }
@@ -419,7 +422,7 @@ void test_inclusive_scan_validate(ExPolicy p, std::vector<int> &a, std::vector<i
     //
     for (int i=0; i<static_cast<int>(b.size()); ++i) {
         // counting from 1, use i+1
-        int value = b[i];
+        int value = b[i]; //-V108
         int expected_value  = check_n_triangle(i+1);
         if (!HPX_TEST(value == expected_value)) break;
     }
@@ -432,7 +435,7 @@ void test_inclusive_scan_validate(ExPolicy p, std::vector<int> &a, std::vector<i
                                   [](int bar, int baz){ return bar+baz; });
     //
     for (int i=0; i<static_cast<int>(b.size()); ++i) {
-        int value = b[i];
+        int value = b[i]; //-V108
         int expected_value  = check_n_const(i+1, FILL_VALUE);
         if (!HPX_TEST(value == expected_value)) break;
     }

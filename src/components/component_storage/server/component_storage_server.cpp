@@ -42,7 +42,8 @@ namespace hpx { namespace components { namespace server
         return naming::invalid_gid;
     }
 
-    std::vector<char> component_storage::migrate_from_here(naming::gid_type id)
+    std::vector<char> component_storage::migrate_from_here(
+        naming::gid_type const& id)
     {
         // return the stored data and erase it from the map
         return data_.get_value_sync(naming::detail::get_stripped_gid(id), true);

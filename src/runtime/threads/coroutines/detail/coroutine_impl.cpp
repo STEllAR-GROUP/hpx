@@ -94,8 +94,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
                     this->m_result_last = m_fun(*this->args());
 
-                    // if this thread returned 'terminated' we need to reset the functor
-                    // and the bound arguments
+                    // if this thread returned 'terminated' we need to reset
+                    // the functor and the bound arguments
                     if (this->m_result_last == terminated)
                         this->reset();
                 }

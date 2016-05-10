@@ -29,7 +29,7 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         barrier(std::size_t number_of_threads)
-          : number_of_threads_(number_of_threads)
+          : number_of_threads_(number_of_threads), mtx_(), cond_()
         {}
 
         /// The function \a wait will block the number of entering \a threads

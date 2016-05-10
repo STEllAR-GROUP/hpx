@@ -24,7 +24,7 @@ namespace hpx { namespace util
         else
         {
             HPX_ASSERT(d.kind() == thread_description::data_type_address);
-            os << d.get_address();
+            os << d.get_address(); //-V128
         }
 #else
         os << "<unknown>";

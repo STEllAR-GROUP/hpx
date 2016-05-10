@@ -66,7 +66,6 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::future<Result> > inititems;
                 std::list<boost::exception_ptr> errors;
-                std::vector<tuple_type> shape;
 
                 try {
                     // estimate a chunk size based on number of cores used

@@ -364,7 +364,7 @@ namespace hpx { namespace parcelset
 
     namespace detail
     {
-        void parcel_sent_handler(parcelhandler::write_handler_type & f,
+        void parcel_sent_handler(parcelhandler::write_handler_type & f, //-V669
             boost::system::error_code const & ec, parcel const & p)
         {
             // inform termination detection of a sent message

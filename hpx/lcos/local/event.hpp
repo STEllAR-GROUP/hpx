@@ -30,7 +30,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         /// \brief Construct a new event semaphore
         event()
-          : event_(false)
+          : mtx_(), cond_(), event_(false)
         {}
 
         /// \brief Check if the event has occurred.

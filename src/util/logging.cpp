@@ -612,8 +612,8 @@ namespace hpx { namespace util
             hpx_level()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
-            error_writer.add_destination("console", console(lvl, destination_hpx));
-            //-V106
+            error_writer.add_destination("console",
+                console(lvl, destination_hpx)); //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
                 error_writer.write(logformat, logdest + " cerr");
@@ -626,8 +626,8 @@ namespace hpx { namespace util
         else {
             // errors are always logged to cerr
             if (!isconsole) {
-                error_writer.add_destination("console", console(lvl,
-                    destination_hpx)); //-V106
+                error_writer.add_destination("console",
+                    console(lvl, destination_hpx)); //-V106
                 error_writer.write(logformat, "console");
             }
             else {
@@ -742,8 +742,8 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_debuglog));
-            //-V106
+            writer.add_destination("console",
+                console(lvl, destination_debuglog)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 

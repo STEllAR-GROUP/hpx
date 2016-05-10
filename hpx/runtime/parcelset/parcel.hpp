@@ -56,7 +56,7 @@ namespace hpx { namespace parcelset
         bool is_valid() const
         {
             // empty parcels are always valid
-            if (0 == data_.creation_time_)
+            if (0 == data_.creation_time_) //-V550
                 return true;
 
             if (data_.has_source_id_ && !source_id_)
@@ -100,7 +100,7 @@ namespace hpx { namespace parcelset
         bool is_valid() const
         {
             // empty parcels are always valid
-            if (0 == data_.creation_time_)
+            if (0 == data_.creation_time_) //-V550
                 return true;
 
             if (data_.has_source_id_ && !source_id_)

@@ -91,14 +91,16 @@ void sort_by_key_benchmark()
         double elapsed = t.elapsed();
 
         // after sorting by key, the values should be equal to the original keys
-        bool is_equal = std::equal(keys.begin(), keys.begin(), o_values.begin());
+        bool is_equal = std::equal(keys.begin(), keys.end(), o_values.begin());
         HPX_TEST(is_equal);
         if (is_equal) {
             std::cout << "<DartMeasurement name=\"SortByKeyTime\" \n"
             << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
         }
     }
-    catch (...) {}
+    catch (...) {
+        HPX_TEST(false);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +138,7 @@ void test_sort_by_key1(ExPolicy &&policy, Tkey, Tval, const Op &op, const Helper
         values.begin());
 
     // after sorting by key, the values should be equal to the original keys
-    bool is_equal = std::equal(keys.begin(), keys.begin(), o_values.begin());
+    bool is_equal = std::equal(keys.begin(), keys.end(), o_values.begin());
     if (is_equal) {
         //std::cout << "Test Passed\n";
     } else {
@@ -186,7 +188,7 @@ void test_sort_by_key_async(ExPolicy &&policy, Tkey, Tval, const Op &op,
     fresult.get();
 
     // after sorting by key, the values should be equal to the original keys
-    bool is_equal = std::equal(keys.begin(), keys.begin(), o_values.begin());
+    bool is_equal = std::equal(keys.begin(), keys.end(), o_values.begin());
     if (is_equal) {
         //std::cout << "Test Passed\n";
     } else {
@@ -226,13 +228,13 @@ void test_sort_by_key1()
             [](int key) { return key; });
         // custom compare
         test_sort_by_key1(seq, double(), double(),
-            [](double a, double b) { return std::floor(a) == std::floor(b); },
+            [](double a, double b) { return std::floor(a) == std::floor(b); }, //-V550
             [](double a) { return std::floor(a); });
         test_sort_by_key1(par, double(), double(),
-            [](double a, double b) { return std::floor(a) == std::floor(b); },
+            [](double a, double b) { return std::floor(a) == std::floor(b); }, //-V550
             [](double a) { return std::floor(a); });
         test_sort_by_key1(par_vec, double(), double(),
-            [](double a, double b) { return std::floor(a) == std::floor(b); },
+            [](double a, double b) { return std::floor(a) == std::floor(b); }, //-V550
             [](double a) { return std::floor(a); });
     } while (t.elapsed() < seconds);
     //

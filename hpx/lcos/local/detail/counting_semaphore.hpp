@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     public:
         counting_semaphore(boost::int64_t value = 0)
-          : value_(value)
+          : value_(value), cond_()
         {}
 
         void wait(std::unique_lock<mutex_type>& l, boost::int64_t count)

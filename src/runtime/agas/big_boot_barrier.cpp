@@ -184,7 +184,12 @@ namespace hpx { namespace agas
 // (first round trip)
 struct registration_header
 {
-    registration_header() {}
+    registration_header()
+      : primary_ns_ptr(0)
+      , symbol_ns_ptr(0)
+      , cores_needed(0)
+      , num_threads(0)
+    {}
 
     // TODO: pass head address as a GVA
     registration_header(
@@ -234,7 +239,10 @@ struct registration_header
 // is trying to register (first roundtrip).
 struct notification_header
 {
-    notification_header() {}
+    notification_header()
+      : num_localities(0)
+      , used_cores(0)
+    {}
 
     notification_header(
         naming::gid_type const& prefix_

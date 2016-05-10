@@ -79,7 +79,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         using hpx::util::get;
                         T part_sum = op2(
                             get<0>(*part_begin), get<1>(*part_begin));
-                        part_begin++;
+                        ++part_begin;
 
                         // VS2015RC bails out when op is captured by ref
                         util::loop_n(part_begin, part_size - 1,

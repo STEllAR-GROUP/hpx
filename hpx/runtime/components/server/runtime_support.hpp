@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace server
 
         struct component_factory
         {
-            component_factory() : isenabled(false) {}
+            component_factory() : second(), isenabled(false) {}
 
             component_factory(
                   std::shared_ptr<component_factory_base> const& f,
@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace server
             component_factory(
                   std::shared_ptr<component_factory_base> const& f,
                   bool enabled = true)
-              : first(f), isenabled(enabled)
+              : first(f), second(), isenabled(enabled)
             {};
 
             std::shared_ptr<component_factory_base> first;

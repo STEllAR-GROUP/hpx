@@ -36,7 +36,7 @@ namespace hpx { namespace util
 
     public:
         unique_id_ranges()
-          : lower_(0), upper_(0)
+          : mtx_(), lower_(0), upper_(0)
         {}
 
         /// Generate next unique component id

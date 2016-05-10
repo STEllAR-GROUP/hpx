@@ -278,6 +278,9 @@ struct HPX_EXPORT primary_namespace
   public:
     primary_namespace()
       : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
+      , mutex_()
+      , instance_name_()
+      , next_id_(naming::invalid_gid)
       , locality_(naming::invalid_gid)
     {}
 

@@ -368,7 +368,7 @@ namespace hpx { namespace threads
             {
                 int const pu_depth =
                     hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
-                for (unsigned int j = 0; j != num_of_pus_; ++j)
+                for (unsigned int j = 0; std::size_t(j) != num_of_pus_; ++j)
                 {
                     hwloc_obj_t const pu_obj =
                         hwloc_get_obj_by_depth(topo, pu_depth, j);
@@ -450,7 +450,7 @@ namespace hpx { namespace threads
 
                 int const pu_depth =
                     hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
-                for (unsigned int i = 0; i != num_of_pus_; ++i)
+                for (unsigned int i = 0; std::size_t(i) != num_of_pus_; ++i)
                 {
                     hwloc_obj_t const pu_obj =
                         hwloc_get_obj_by_depth(topo, pu_depth, i);
