@@ -10,5 +10,6 @@
 
 #include <hpx/compute/host/target.hpp>
 #include <hpx/compute/host/traits/access_target.hpp>
+#include <hpx/compute/host/default_executor.hpp>
 
 #endif

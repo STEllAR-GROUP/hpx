@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -122,8 +123,6 @@ namespace hpx { namespace compute { namespace cuda
     private:
         HPX_MOVABLE_ONLY(target);
 
-        typedef detail::future_data shared_state_type;
-
     public:
         struct native_handle_type
         {
@@ -231,6 +230,7 @@ namespace hpx { namespace compute { namespace cuda
 
         hpx::future<void> get_future() const
         {
+            typedef detail::future_data shared_state_type;
             shared_state_type* p = new shared_state_type(handle_.stream_);
             return hpx::traits::future_access<hpx::future<void> >::create(p);
         }
