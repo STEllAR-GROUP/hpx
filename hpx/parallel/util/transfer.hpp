@@ -102,10 +102,12 @@ namespace hpx { namespace parallel { namespace util
                     std::is_pointer<OutIter>::value,
                 "optimized copy is possible for pointer-iterators only");
 
+            typedef typename std::iterator_traits<InIter>::value_type data_type;
+
             const char* const first_ch = reinterpret_cast<const char*>(first);
             char* const dest_ch = reinterpret_cast<char*>(dest);
 
-            std::memmove(dest_ch, first_ch, count);
+            std::memmove(dest_ch, first_ch, count * sizeof(data_type));
 
             std::advance(first, count);
             std::advance(dest, count);
