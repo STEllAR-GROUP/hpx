@@ -6,35 +6,14 @@
 #include <hpx/compute/cuda.hpp>
 #include <hpx/compute/vector.hpp>
 
+#include <hpx/parallel/algorithms/copy.hpp>
+
 #include <hpx/hpx_init.hpp>
 
 #include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
-
-void cuda_main()
-{
-    // create data vector on host
-    int const N = 100;
-    std::vector<int> h_A(N);
-    std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
-
-    hpx::compute::cuda::target target;
-
-    // create data vector on device
-    typedef hpx::compute::cuda::allocator<double> allocator_type;
-    allocator_type alloc(target);
-
-    hpx::compute::vector<double, allocator_type> d_A(N, 42.1337, alloc);
-
-    std::cout << d_A[1] << '\n';
-
-    // copy data from host to device
-//     hpx::parallel::copy(
-//         hpx::parallel::par,
-//         h_A.begin(), h_A.end(), d_A.begin());
-}
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -45,7 +24,34 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    cuda_main();
+    // create data vector on host
+    int const N = 100;
+    std::vector<int> h_A(N);
+    std::vector<int> h_B(N);
+    std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
+
+    hpx::compute::cuda::target target;
+
+    // create data vector on device
+    typedef hpx::compute::cuda::allocator<int> allocator_type;
+    allocator_type alloc(target);
+
+    hpx::compute::vector<int, allocator_type> d_A(N, alloc);
+
+    // copy data from host to device
+    hpx::parallel::copy(
+        hpx::parallel::par,
+        h_A.begin(), h_A.end(), d_A.begin());
+
+    // copy data from device to host
+    hpx::parallel::copy(
+        hpx::parallel::par,
+        d_A.begin(), d_A.end(), h_B.begin());
+
+    if(std::equal(h_A.begin(), h_A.end(), h_B.begin()))
+        std::cout << "Copy succeeded!\n";
+    else
+        std::cout << "Copy not successful :(\n";
 
     return hpx::finalize();
 }

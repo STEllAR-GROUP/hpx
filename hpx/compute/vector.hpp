@@ -9,168 +9,19 @@
 #define HPX_COMPUTE_VECTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compute/detail/iterator.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/compute/traits/access_target.hpp>
+#include <hpx/parallel/util/transfer.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <initializer_list>
-#include <iterator>
 #include <memory>
 #include <utility>
 
 namespace hpx { namespace compute
 {
-    namespace detail
-    {
-        template <typename T, typename Allocator>
-        struct iterator
-          : std::iterator<
-                std::random_access_iterator_tag,
-                T,
-                std::ptrdiff_t,
-                typename traits::allocator_traits<Allocator>::pointer,
-                typename traits::allocator_traits<Allocator>::reference
-            >
-        {
-            typedef
-                typename traits::allocator_traits<Allocator>::pointer
-                pointer;
-            typedef
-                typename traits::allocator_traits<Allocator>::reference
-                reference;
-
-            iterator()
-              : p_(nullptr)
-            {}
-
-            // FIXME: should be private
-            iterator(pointer p, std::size_t pos)
-              : p_(p + pos)
-            {}
-
-            iterator const& operator++()
-            {
-                HPX_ASSERT(p_);
-                ++p_;
-                return *this;
-            }
-
-            iterator const& operator--()
-            {
-                HPX_ASSERT(p_);
-                --p_;
-                return *this;
-            }
-
-            iterator operator++(int)
-            {
-                iterator tmp(*this);
-                HPX_ASSERT(p_);
-                ++p_;
-                return tmp;
-            }
-
-            iterator operator--(int)
-            {
-                iterator tmp(*this);
-                HPX_ASSERT(p_);
-                --p_;
-                return tmp;
-            }
-
-            bool operator==(iterator const& other) const
-            {
-                return p_ == other.p_;
-            }
-
-            bool operator!=(iterator const& other) const
-            {
-                return p_ != other.p_;
-            }
-
-            bool operator<(iterator const& other) const
-            {
-                return p_ < other.p_;
-            }
-
-            bool operator>(iterator const& other) const
-            {
-                return p_ > other.p_;
-            }
-
-            bool operator<=(iterator const& other) const
-            {
-                return p_ <= other.p_;
-            }
-
-            bool operator>=(iterator const& other) const
-            {
-                return p_ >= other.p_;
-            }
-
-            iterator& operator+=(std::ptrdiff_t offset) const
-            {
-                HPX_ASSERT(p_);
-                p_ += offset;
-                return *this;
-            }
-
-            iterator& operator-=(std::ptrdiff_t offset) const
-            {
-                HPX_ASSERT(p_);
-                p_ -= offset;
-                return *this;
-            }
-
-            iterator operator+(std::ptrdiff_t offset) const
-            {
-                iterator tmp(*this);
-                tmp += offset;
-                return *this;
-            }
-
-            iterator operator-(std::ptrdiff_t offset) const
-            {
-                iterator tmp(*this);
-                tmp -= offset;
-                return *this;
-            }
-
-            reference operator*() const
-            {
-                HPX_ASSERT(p_);
-                return *p_;
-            }
-
-            pointer operator->() const
-            {
-                HPX_ASSERT(p_);
-                return p_;
-            }
-
-            // FIXME: operator[] is missing
-
-        private:
-            pointer p_;
-        };
-
-        template <typename T, typename Allocator>
-        struct const_iterator
-        {
-        };
-
-        template <typename T, typename Allocator>
-        struct reverse_iterator
-        {
-        };
-
-        template <typename T, typename Allocator>
-        struct const_reverse_iterator
-        {
-        };
-    }
-
     template <typename T, typename Allocator = std::allocator<T> >
     class vector
     {
@@ -226,7 +77,7 @@ namespace hpx { namespace compute
           , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, count))
         {
-            alloc_traits::bulk_construct(alloc_, data_, size_, value_type{});
+            alloc_traits::bulk_construct(alloc_, data_, size_);
         }
 
         template <typename InIter,
@@ -239,7 +90,7 @@ namespace hpx { namespace compute
           , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, size_))
         {
-            // FIXME: copy from iterators...
+            hpx::parallel::util::copy_helper(first, last, begin());
         }
 
         vector(vector const& other)
@@ -249,7 +100,7 @@ namespace hpx { namespace compute
           , target_(other.target_)
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            // FIXME: copy from other...
+            //hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
         }
 
         vector(vector const& other, Allocator const& alloc)
@@ -259,7 +110,7 @@ namespace hpx { namespace compute
           , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            // FIXME: copy from other...
+            //hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
         }
 
         vector(vector && other)
@@ -293,7 +144,7 @@ namespace hpx { namespace compute
           , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            // FIXME: copy from init...
+            hpx::parallel::util::copy_helper(init.begin(), init.end(), begin());
         }
 
         ~vector()
@@ -354,14 +205,13 @@ namespace hpx { namespace compute
         // TODO: debug support
         iterator begin()
         {
-            return iterator(data_, 0);
+            return iterator(data_, 0, target_);
         }
 
         iterator end()
         {
-            return iterator(data_, size_);
+            return iterator(data_, size_, target_);
         }
-
 
         size_type size_;
         size_type capacity_;

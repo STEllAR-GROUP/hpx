@@ -20,8 +20,24 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        struct general_pointer_tag {};
+        template <typename Source, typename Dest>
+        struct pointer_category;
 
+        template <typename Category, typename Enable = void>
+        struct copy_helper;
+        template <typename Category, typename Enable = void>
+        struct copy_n_helper;
+
+        struct general_pointer_tag {};
+    }
+}}}
+
+#include <hpx/parallel/util/compute/transfer.hpp>
+
+namespace hpx { namespace parallel { namespace util
+{
+    namespace detail
+    {
         template <typename Source, typename Dest>
         inline general_pointer_tag
         get_pointer_category(Source const&, Dest const&)
@@ -117,7 +133,7 @@ namespace hpx { namespace parallel { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         // Customization point for optimizing copy operations
-        template <typename Category, typename Enable = void>
+        template <typename Category, typename Enable>
         struct copy_helper
         {
             template <typename InIter, typename OutIter>
@@ -156,7 +172,7 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
         // Customization point for optimizing copy_n operations
-        template <typename Category, typename Enable = void>
+        template <typename Category, typename Enable>
         struct copy_n_helper
         {
             template <typename InIter, typename OutIter>

@@ -14,8 +14,15 @@
 #include <iostream>
 #include <vector>
 
-void cuda_main(unsigned int seed)
+int hpx_main(boost::program_options::variables_map& vm)
 {
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
+
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
+
     hpx::compute::cuda::target target;
 
     int const N = 100;
@@ -70,18 +77,6 @@ void cuda_main(unsigned int seed)
             std::cout << "Error at " << i << "\n";
         }
     }
-}
-
-int hpx_main(boost::program_options::variables_map& vm)
-{
-    unsigned int seed = (unsigned int)std::time(0);
-    if (vm.count("seed"))
-        seed = vm["seed"].as<unsigned int>();
-
-    std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
-
-    cuda_main(seed);
 
     return hpx::finalize();
 }

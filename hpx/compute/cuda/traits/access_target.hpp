@@ -25,13 +25,14 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename T>
         HPX_HOST_DEVICE
-        static T& access(cuda::target const&, T * t, std::size_t pos)
+        static T& access(cuda::target const& tgt, T * t, std::size_t pos)
         {
 #if defined(__CUDA_ARCH__)
             return *(t + pos);
 #else
             static T tmp;
-            cudaMemcpy(&tmp, t + pos, sizeof(T), cudaMemcpyDeviceToHost);
+            cudaMemcpyAsync(&tmp, t + pos, sizeof(T), cudaMemcpyDeviceToHost,
+                tgt.native_handle().stream_);
             return tmp;
 #endif
         }
