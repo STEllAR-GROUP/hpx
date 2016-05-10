@@ -76,7 +76,8 @@ namespace hpx { namespace parallel { namespace util
         inline typename std::conditional<
             std::is_assignable<Dest&, Source&>::value,
             typename pointer_category<
-                typename std::remove_reference<Source>::type, Dest
+                typename std::remove_const<Source>::type,
+                Dest
             >::type,
             general_pointer_tag
         >::type
@@ -85,7 +86,8 @@ namespace hpx { namespace parallel { namespace util
             typedef typename std::conditional<
                     std::is_assignable<Dest&, Source&>::value,
                     typename pointer_category<
-                        typename std::remove_reference<Source>::type, Dest
+                        typename std::remove_const<Source>::type,
+                        Dest
                     >::type,
                     general_pointer_tag
                 >::type category_type;
