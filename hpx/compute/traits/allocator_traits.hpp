@@ -44,10 +44,43 @@ namespace hpx { namespace compute { namespace traits
                 type;
         };
 
+        template <typename Allocator, typename Enable = void>
+        struct get_reference_type
+        {
+            typedef
+                typename std::allocator_traits<Allocator>::value_type& type;
+        };
+
+        template <typename Allocator>
+        struct get_reference_type<Allocator,
+            typename util::always_void<
+                typename Allocator::reference
+            >::type>
+        {
+            typedef typename Allocator::reference type;
+        };
+
+        template <typename Allocator, typename Enable = void>
+        struct get_const_reference_type
+        {
+            typedef
+                typename std::allocator_traits<Allocator>::value_type const& type;
+        };
+
+        template <typename Allocator>
+        struct get_const_reference_type<Allocator,
+            typename util::always_void<
+                typename Allocator::const_reference
+            >::type>
+        {
+            typedef typename Allocator::const_reference type;
+        };
+
         ///////////////////////////////////////////////////////////////////////
         struct target_helper
         {
             template <typename Allocator>
+            HPX_HOST_DEVICE
             static compute::host::target&
             call(hpx::traits::detail::wrap_int, Allocator const& alloc)
             {
@@ -56,6 +89,7 @@ namespace hpx { namespace compute { namespace traits
             }
 
             template <typename Allocator>
+            HPX_HOST_DEVICE
             static auto call(int, Allocator const& alloc)
               -> decltype(alloc.target())
             {
@@ -64,6 +98,7 @@ namespace hpx { namespace compute { namespace traits
         };
 
         template <typename Allocator>
+        HPX_HOST_DEVICE
         auto call_target_helper(Allocator const& alloc)
         ->  decltype(target_helper::call(0, alloc))
         {
@@ -74,6 +109,7 @@ namespace hpx { namespace compute { namespace traits
         struct bulk_construct
         {
             template <typename Allocator, typename T, typename ...Ts>
+            HPX_HOST_DEVICE
             static void call(hpx::traits::detail::wrap_int,
                 Allocator& alloc, T* p, typename Allocator::size_type count,
                 Ts &&... vs)
@@ -102,6 +138,7 @@ namespace hpx { namespace compute { namespace traits
             }
 
             template <typename Allocator, typename T, typename ...Ts>
+            HPX_HOST_DEVICE
             static auto call(int,
                 Allocator& alloc, T* p, typename Allocator::size_type count,
                     Ts &&... vs)
@@ -112,6 +149,7 @@ namespace hpx { namespace compute { namespace traits
         };
 
         template <typename Allocator, typename T, typename ...Ts>
+        HPX_HOST_DEVICE
         void call_bulk_construct(Allocator& alloc, T* p,
             typename Allocator::size_type count, Ts &&... vs)
         {
@@ -122,6 +160,7 @@ namespace hpx { namespace compute { namespace traits
         struct bulk_destroy
         {
             template <typename Allocator, typename T>
+            HPX_HOST_DEVICE
             static void call(hpx::traits::detail::wrap_int,
                 Allocator& alloc, T* p, typename Allocator::size_type count)
             {
@@ -133,6 +172,7 @@ namespace hpx { namespace compute { namespace traits
             }
 
             template <typename Allocator, typename T>
+            HPX_HOST_DEVICE
             static auto call(int,
                 Allocator& alloc, T* p, typename Allocator::size_type count)
               -> decltype(alloc.bulk_destroy(p, count))
@@ -142,6 +182,7 @@ namespace hpx { namespace compute { namespace traits
         };
 
         template <typename Allocator, typename T>
+        HPX_HOST_DEVICE
         void call_bulk_destroy(Allocator& alloc, T* p,
             typename Allocator::size_type count)
         {
@@ -160,19 +201,23 @@ namespace hpx { namespace compute { namespace traits
         using typename base_type::size_type;
         using typename base_type::value_type;
 
-        typedef value_type& reference;
-        typedef value_type const& const_reference;
+        typedef
+            typename detail::get_reference_type<Allocator>::type reference;
+        typedef
+            typename detail::get_const_reference_type<Allocator>::type const_reference;
 
         typedef
             typename detail::get_target_traits<Allocator>::type access_target;
         typedef typename access_target::target_type target_type;
 
+        HPX_HOST_DEVICE
         static target_type& target(Allocator const& alloc)
         {
             return detail::call_target_helper(alloc);
         }
 
         template <typename T, typename ...Ts>
+        HPX_HOST_DEVICE
         static void bulk_construct(Allocator& alloc, T* p, size_type count,
             Ts &&... vs)
         {
@@ -180,6 +225,7 @@ namespace hpx { namespace compute { namespace traits
         }
 
         template <typename T>
+        HPX_HOST_DEVICE
         static void bulk_destroy(Allocator& alloc, T* p, size_type count)
         {
             detail::call_bulk_destroy(alloc, p, count);

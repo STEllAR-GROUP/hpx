@@ -67,6 +67,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::parallel::seq,
         d_C.begin(), d_C.end(), h_C.begin());
 
+    bool success = true;
     for(int i = 0; i < N; ++i)
     {
         if(h_C[i] != h_C_ref[i] || h_C[i] != h_A[i] + h_B[i])
@@ -74,7 +75,12 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "Error at " << i << "\n";
             std::cout << h_C[i] << " != " << h_C_ref[i] << "\n";
             std::cout << h_C[i] << " != " << h_A[i] + h_B[i] << "\n";
+            success = false;
         }
+    }
+    if(success)
+    {
+        std::cout << "Yay!\n";
     }
 
     return hpx::finalize();

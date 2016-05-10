@@ -30,6 +30,9 @@ namespace hpx { namespace compute { namespace detail {
             typename traits::allocator_traits<Allocator>::reference
             reference;
         typedef
+            typename traits::allocator_traits<Allocator>::const_reference
+            const_reference;
+        typedef
             typename traits::allocator_traits<Allocator>::target_type
             target_type;
 
@@ -137,7 +140,13 @@ namespace hpx { namespace compute { namespace detail {
             return p_ - other.p_;
         }
 
-        reference operator*() const
+        const_reference operator*() const
+        {
+            HPX_ASSERT(p_);
+            return *p_;
+        }
+
+        reference operator*()
         {
             HPX_ASSERT(p_);
             return *p_;

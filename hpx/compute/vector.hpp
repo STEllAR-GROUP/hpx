@@ -65,7 +65,7 @@ namespace hpx { namespace compute
           , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, count))
         {
-            alloc_traits::bulk_construct(alloc_, data_, size_, value);
+            alloc_traits::bulk_construct(alloc_, static_cast<T*>(data_), size_, value);
         }
 
         // Constructs the container with count default-inserted instances of T.
@@ -77,7 +77,7 @@ namespace hpx { namespace compute
           , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, count))
         {
-            alloc_traits::bulk_construct(alloc_, data_, size_);
+            alloc_traits::bulk_construct(alloc_, static_cast<T*>(data_), size_);
         }
 
         template <typename InIter,
@@ -151,7 +151,7 @@ namespace hpx { namespace compute
         {
             if(data_ != nullptr)
             {
-                alloc_traits::bulk_destroy(alloc_, data_, size_);
+                alloc_traits::bulk_destroy(alloc_, static_cast<T*>(data_), size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
             }
         }
@@ -175,7 +175,7 @@ namespace hpx { namespace compute
 #if !defined(__CUDA_ARCH__)
             HPX_ASSERT(pos < size_);
 #endif
-            return access_target::access(target_, data_, pos);
+            return *(data_ + pos);
         }
 
         HPX_HOST_DEVICE
@@ -184,7 +184,7 @@ namespace hpx { namespace compute
 #if !defined(__CUDA_ARCH__)
             HPX_ASSERT(pos < size_);
 #endif
-            return access_target::access(target_, data_, pos);
+            return *(data_ + pos);
         }
 
         // TODO: implement front()

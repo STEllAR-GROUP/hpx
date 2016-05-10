@@ -25,10 +25,15 @@ namespace hpx { namespace parallel { namespace util
             static std::pair<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest)
             {
-                std::size_t count = std::distance(first, last)
+                std::size_t count = std::distance(first, last);
+                std::size_t bytes = count
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), count,
+#if defined(__CUDA_ARCH__)
+                cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr, bytes,
                     cudaMemcpyDeviceToDevice,
+#else
+                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyDeviceToDevice,
+#endif
                     dest.target().native_handle().stream_);
 
                 std::advance(dest, count);
@@ -44,10 +49,15 @@ namespace hpx { namespace parallel { namespace util
             static std::pair<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest)
             {
-                std::size_t count = std::distance(first, last)
+                std::size_t count = std::distance(first, last);
+                std::size_t bytes = count
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), count,
+#if defined(__CUDA_ARCH__)
+                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyDeviceToHost,
+#else
+                cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
                     cudaMemcpyDeviceToHost,
+#endif
                     first.target().native_handle().stream_);
 
                 std::advance(dest, count);
@@ -63,10 +73,15 @@ namespace hpx { namespace parallel { namespace util
             static std::pair<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest)
             {
-                std::size_t count = std::distance(first, last)
+                std::size_t count = std::distance(first, last);
+                std::size_t bytes = count
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), count,
+#if defined(__CUDA_ARCH__)
+                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyHostToDevice,
+#else
+                cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                     cudaMemcpyHostToDevice,
+#endif
                     dest.target().native_handle().stream_);
 
                 std::advance(dest, count);
@@ -84,8 +99,12 @@ namespace hpx { namespace parallel { namespace util
             {
                 std::size_t bytes = count
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpy/*Async*/(&(*dest), &(*first), bytes,
+#if defined(__CUDA_ARCH__)
+                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyDeviceToDevice,
+#else
+                cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(), bytes,
                     cudaMemcpyDeviceToDevice,
+#endif
                     dest.target().native_handle().stream_);
 
                 std::advance(first, count);
@@ -104,8 +123,12 @@ namespace hpx { namespace parallel { namespace util
             {
                 std::size_t bytes = count
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), bytes,
+#if defined(__CUDA_ARCH__)
+                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyDeviceToHost,
+#else
+                cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
                     cudaMemcpyDeviceToHost,
+#endif
                     first.target().native_handle().stream_);
 
                 std::advance(first, count);
@@ -122,10 +145,13 @@ namespace hpx { namespace parallel { namespace util
             static std::pair<InIter, OutIter>
             call(InIter first, std::size_t count, OutIter dest)
             {
-                std::size_t bytes = count *
-                    sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), bytes,
+                std::size_t bytes = count * sizeof(typename std::iterator_traits<InIter>::value_type);
+#if defined(__CUDA_ARCH__)
+                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyHostToDevice,
+#else
+                cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                     cudaMemcpyHostToDevice,
+#endif
                     dest.target().native_handle().stream_);
 
                 std::advance(first, count);

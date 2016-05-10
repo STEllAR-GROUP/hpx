@@ -12,6 +12,8 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/exception.hpp>
 #include <hpx/compute/cuda/target.hpp>
+#include <hpx/compute/cuda/target_ptr.hpp>
+#include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/util/unused.hpp>
@@ -32,10 +34,19 @@ namespace hpx { namespace compute { namespace cuda
     {
     public:
         typedef T value_type;
-        typedef T* pointer;
-        typedef T const* const_pointer;
+        typedef target_ptr<T> pointer;
+        typedef target_ptr<T const> const_pointer;
+#if defined(__CUDA_ARCH__)
+//         typedef T* pointer;
+//         typedef T const* const_pointer;
         typedef T& reference;
         typedef T const& const_reference;
+#else
+//         typedef target_ptr<T> pointer;
+//         typedef target_ptr<T const> const_pointer;
+        typedef value_proxy<T> reference;
+        typedef value_proxy<T const> const_reference;
+#endif
         typedef std::size_t size_type;
         typedef std::ptrdiff_t difference_type;
 
@@ -63,12 +74,20 @@ namespace hpx { namespace compute { namespace cuda
         // operator&
         pointer address(reference x) const HPX_NOEXCEPT
         {
+#if defined(__CUDA_ARCH__)
             return &x;
+#else
+            return pointer(x.device_ptr(), target_);
+#endif
         }
 
         const_pointer address(const_reference x) const HPX_NOEXCEPT
         {
+#if defined(__CUDA_ARCH__)
             return &x;
+#else
+            return pointer(x.device_ptr(), target_);
+#endif
         }
 
         // Allocates n * sizeof(T) bytes of uninitialized storage by calling
@@ -78,11 +97,15 @@ namespace hpx { namespace compute { namespace cuda
         // attempt to allocate the new memory block as close as possible to hint.
         pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
         {
-            pointer result = 0;
-#if !defined(__CUDA_ARCH__)
+#if defined(__CUDA_ARCH__)
+            pointer result(nullptr);
+#else
+            value_type *p = 0;
             detail::scoped_active_target active(target_);
 
-            cudaError_t error = cudaMalloc(&result, n*sizeof(T));
+            cudaError_t error = cudaMalloc(&p, n*sizeof(T));
+
+            pointer result(p, target_);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
@@ -103,7 +126,7 @@ namespace hpx { namespace compute { namespace cuda
 #if !defined(__CUDA_ARCH__)
             detail::scoped_active_target active(target_);
 
-            cudaError_t error = cudaFree(p);
+            cudaError_t error = cudaFree(p.device_ptr());
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
