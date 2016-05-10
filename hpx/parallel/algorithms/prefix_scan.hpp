@@ -192,12 +192,11 @@ HPX_INLINE_NAMESPACE(v1)
                 executor_information_traits<typename ExPolicy::executor_type>::
                 processing_units_count(policy.executor(), policy.parameters()));
 
-            int n_chunks, log2N;
+            int n_chunks=1, log2N=0;
             std::size_t chunk_size;
             if (cores>1) {
                 const std::size_t sequential_scan_limit = 1;
                 // we want 2^N chunks of data, so find a good N
-                log2N = 0;
                 while (cores >>= 1) ++log2N;
                 n_chunks = (1 << log2N);
                 chunk_size = std::max(1, int(count / n_chunks));
@@ -207,7 +206,7 @@ HPX_INLINE_NAMESPACE(v1)
                     log2N -= 1;
                 }
             }
-            if (n_chunks < 2 || cores == 1) {
+            if (cores == 1 || n_chunks < 2) {
                 return result::get(sequential(policy, first, last, dest,
                   std::forward < T >(init),
                   std::forward < Lambda1 >(f1),
@@ -382,12 +381,11 @@ HPX_INLINE_NAMESPACE(v1)
             std::size_t cores = executor_information_traits<typename ExPolicy::executor_type>::
               processing_units_count(policy.executor(), policy.parameters());
 
-            int n_chunks, log2N;
+            int n_chunks=1, log2N=0;
             std::size_t chunk_size;
             if (cores>1) {
               const std::size_t sequential_scan_limit = 16384;
               // we want 2^N chunks of data, so find a good N
-              log2N = 0;
               while (cores >>= 1) ++log2N;
               n_chunks = (1 << log2N);
               chunk_size = std::max(1, int(count / n_chunks));
