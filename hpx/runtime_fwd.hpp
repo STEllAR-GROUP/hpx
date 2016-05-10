@@ -49,6 +49,16 @@ namespace hpx
     HPX_API_EXPORT runtime& get_runtime();
     HPX_API_EXPORT runtime* get_runtime_ptr();
 
+    /// Register the current kernel thread with HPX, this should be done once
+    /// for each external OS-thread intended to invoke HPX functionality.
+    /// Calling this function more than once will silently fail
+    /// (will return false).
+    HPX_API_EXPORT bool register_thread(runtime* rt, char const* name);
+
+    /// Unregister the thread from HPX, this should be done once in
+    /// the end before the external thread exists.
+    HPX_API_EXPORT void unregister_thread(runtime* rt);
+
     /// The function \a get_locality returns a reference to the locality prefix
     HPX_API_EXPORT naming::gid_type const& get_locality();
 

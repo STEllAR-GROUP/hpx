@@ -25,14 +25,15 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
     template <typename F, typename Args>
     __global__ void launch_helper(F f, Args args)
     {
-        hpx::util::invoke_fused(
-            f, args);
+        // FIXME: is it possible to move tha arguments?
+        hpx::util::invoke_fused(f, args);
     }
 
-    // Launch any given function F with the given parameters. This function does
-    // not involve any device synchronization.
+    // Launch any given function F with the given parameters. This function
+    // does not involve any device synchronization.
     template <typename F, typename DimType, typename ...Ts>
-    void launch(target const& t, DimType gridDim, DimType blockDim, F && f, Ts&&... vs)
+    void launch(target const& t, DimType gridDim, DimType blockDim, F && f,
+        Ts&&... vs)
     {
         detail::scoped_active_target active(t);
 
@@ -46,7 +47,6 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 
         void (*launch_function)(fun_type, args_type)
             = launch_helper<fun_type, args_type>;
-
 
         launch_function<<<gridDim, blockDim, 0, active.stream()>>>(
             std::move(f_), std::move(args));

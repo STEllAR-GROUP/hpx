@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/lcos/future.hpp>
 
 namespace hpx { namespace compute { namespace host
 {
@@ -33,6 +34,16 @@ namespace hpx { namespace compute { namespace host
         native_handle_type const& native_handle() const
         {
             return mask_;
+        }
+
+        void synchronize() const
+        {
+            // nothing to do here...
+        }
+
+        hpx::future<void> get_future() const
+        {
+            return hpx::make_ready_future();
         }
 
     private:

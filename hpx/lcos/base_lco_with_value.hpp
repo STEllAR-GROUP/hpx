@@ -24,6 +24,7 @@
 
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace lcos
@@ -49,7 +50,8 @@ namespace hpx { namespace lcos
 
         virtual void set_event()
         {
-            set_value(RemoteResult());
+            RemoteResult result;
+            set_value(std::move(result));
         }
 
         virtual void set_value (RemoteResult && result) = 0;

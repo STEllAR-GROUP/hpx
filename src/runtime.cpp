@@ -865,6 +865,24 @@ namespace hpx
         return get_runtime().get_agas_client().get_local_locality();
     }
 
+    /// Register the current kernel thread with HPX, this should be done once
+    /// for each external OS-thread intended to invoke HPX functionality.
+    /// Calling this function more than once will silently fail
+    /// (will return false).
+    bool register_thread(runtime* rt, char const* name)
+    {
+        HPX_ASSERT(rt);
+        return rt->register_thread(name);
+    }
+
+    /// Unregister the thread from HPX, this should be done once in
+    /// the end before the external thread exists.
+    void unregister_thread(runtime* rt)
+    {
+        HPX_ASSERT(rt);
+        rt->unregister_thread();
+    }
+
     void report_error(std::size_t num_thread, boost::exception_ptr const& e)
     {
         // Early and late exceptions

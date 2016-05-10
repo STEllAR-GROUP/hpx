@@ -21,12 +21,14 @@ namespace hpx { namespace parallel { namespace util
         struct copy_helper<trivially_cuda_copyable_pointer_tag>
         {
             template <typename InIter, typename OutIter>
-            __host__ __device__ HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest)
             {
                 std::size_t count = std::distance(first, last)
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), count, cudaMemcpyDeviceToDevice,
+                cudaMemcpyAsync(&(*dest), &(*first), count,
+                    cudaMemcpyDeviceToDevice,
                     dest.target().native_handle().stream_);
 
                 std::advance(dest, count);
@@ -38,12 +40,14 @@ namespace hpx { namespace parallel { namespace util
         struct copy_helper<trivially_cuda_copyable_pointer_tag_to_host>
         {
             template <typename InIter, typename OutIter>
-            __host__ __device__ HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest)
             {
                 std::size_t count = std::distance(first, last)
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), count, cudaMemcpyDeviceToHost,
+                cudaMemcpyAsync(&(*dest), &(*first), count,
+                    cudaMemcpyDeviceToHost,
                     first.target().native_handle().stream_);
 
                 std::advance(dest, count);
@@ -55,12 +59,14 @@ namespace hpx { namespace parallel { namespace util
         struct copy_helper<trivially_cuda_copyable_pointer_tag_to_device>
         {
             template <typename InIter, typename OutIter>
-            __host__ __device__ HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest)
             {
                 std::size_t count = std::distance(first, last)
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), count, cudaMemcpyHostToDevice,
+                cudaMemcpyAsync(&(*dest), &(*first), count,
+                    cudaMemcpyHostToDevice,
                     dest.target().native_handle().stream_);
 
                 std::advance(dest, count);
@@ -72,12 +78,14 @@ namespace hpx { namespace parallel { namespace util
         struct copy_n_helper<trivially_cuda_copyable_pointer_tag>
         {
             template <typename InIter, typename OutIter>
-            __host__ __device__ HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<InIter, OutIter>
             call(InIter first, std::size_t count, OutIter dest)
             {
                 std::size_t bytes = count
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpy/*Async*/(&(*dest), &(*first), bytes, cudaMemcpyDeviceToDevice,
+                cudaMemcpy/*Async*/(&(*dest), &(*first), bytes,
+                    cudaMemcpyDeviceToDevice,
                     dest.target().native_handle().stream_);
 
                 std::advance(first, count);
@@ -90,12 +98,14 @@ namespace hpx { namespace parallel { namespace util
         struct copy_n_helper<trivially_cuda_copyable_pointer_tag_to_host>
         {
             template <typename InIter, typename OutIter>
-            __host__ __device__ HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<InIter, OutIter>
             call(InIter first, std::size_t count, OutIter dest)
             {
                 std::size_t bytes = count
                     * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyDeviceToHost,
+                cudaMemcpyAsync(&(*dest), &(*first), bytes,
+                    cudaMemcpyDeviceToHost,
                     first.target().native_handle().stream_);
 
                 std::advance(first, count);
@@ -108,11 +118,14 @@ namespace hpx { namespace parallel { namespace util
         struct copy_n_helper<trivially_cuda_copyable_pointer_tag_to_device>
         {
             template <typename InIter, typename OutIter>
-            __host__ __device__ HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<InIter, OutIter>
             call(InIter first, std::size_t count, OutIter dest)
             {
-                std::size_t bytes = count * sizeof(typename std::iterator_traits<InIter>::value_type);
-                cudaMemcpyAsync(&(*dest), &(*first), bytes, cudaMemcpyHostToDevice,
+                std::size_t bytes = count *
+                    sizeof(typename std::iterator_traits<InIter>::value_type);
+                cudaMemcpyAsync(&(*dest), &(*first), bytes,
+                    cudaMemcpyHostToDevice,
                     dest.target().native_handle().stream_);
 
                 std::advance(first, count);
@@ -124,8 +137,8 @@ namespace hpx { namespace parallel { namespace util
         template <typename Source, typename T>
         inline trivially_cuda_copyable_pointer_tag
         get_pointer_category(
-            compute::detail::iterator<T, compute::cuda::allocator<T>> const&,
-            compute::detail::iterator<T, compute::cuda::allocator<T>> const&)
+            compute::detail::iterator<T, compute::cuda::allocator<T> > const&,
+            compute::detail::iterator<T, compute::cuda::allocator<T> > const&)
         {
             // FIXME: turn into proper pointer category
 #if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
@@ -138,12 +151,13 @@ namespace hpx { namespace parallel { namespace util
         template <typename Source, typename T>
         inline trivially_cuda_copyable_pointer_tag_to_device
         get_pointer_category(Source const&,
-            compute::detail::iterator<T, compute::cuda::allocator<T>> const&)
+            compute::detail::iterator<T, compute::cuda::allocator<T> > const&)
         {
             // FIXME: turn into proper pointer category
-            static_assert(
-                std::is_same<T, typename std::iterator_traits<Source>::value_type>::value,
-                "The value types of the iterators must match");
+            static_assert(std::is_same<
+                    T, typename std::iterator_traits<Source>::value_type
+                >::value, "The value types of the iterators must match");
+
 #if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
             static_assert(std::is_trivially_copyable<T>::value,
                 "T must be trivially copyable");
@@ -154,13 +168,14 @@ namespace hpx { namespace parallel { namespace util
         template <typename T, typename Dest>
         inline trivially_cuda_copyable_pointer_tag_to_host
         get_pointer_category(
-            compute::detail::iterator<T, compute::cuda::allocator<T>> const&,
+            compute::detail::iterator<T, compute::cuda::allocator<T> > const&,
             Dest const&)
         {
             // FIXME: turn into proper pointer category
-            static_assert(
-                std::is_same<T, typename std::iterator_traits<Dest>::value_type>::value,
-                "The value types of the iterators must match");
+            static_assert(std::is_same<
+                    T, typename std::iterator_traits<Dest>::value_type
+                >::value, "The value types of the iterators must match");
+
 #if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
             static_assert(std::is_trivially_copyable<T>::value,
                 "T must be trivially copyable");

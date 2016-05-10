@@ -135,7 +135,7 @@ namespace hpx { namespace compute { namespace traits
             template <typename Allocator, typename T>
             static auto call(int,
                 Allocator& alloc, T* p, typename Allocator::size_type count)
-              -> decltype(alloc.destroy(p, count))
+              -> decltype(alloc.bulk_destroy(p, count))
             {
                 alloc.bulk_destroy(p, count);
             }

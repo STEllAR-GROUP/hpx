@@ -12,6 +12,9 @@
 
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/exception.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cuda_runtime.h>
 
@@ -20,9 +23,106 @@
 
 namespace hpx { namespace compute { namespace cuda
 {
+    namespace detail
+    {
+        struct runtime_registration_wrapper
+        {
+            runtime_registration_wrapper(hpx::runtime* rt)
+              : rt_(rt)
+            {
+                HPX_ASSERT(rt);
+
+                // Register this thread with HPX, this should be done once for
+                // each external OS-thread intended to invoke HPX functionality.
+                // Calling this function more than once will silently fail
+                // (will return false).
+                hpx::register_thread(rt_, "cuda");
+            }
+            ~runtime_registration_wrapper()
+            {
+                // Unregister the thread from HPX, this should be done once in
+                // the end before the external thread exists.
+                hpx::unregister_thread(rt_);
+            }
+
+            hpx::runtime* rt_;
+        };
+
+        struct future_data;
+
+        struct release_on_exit
+        {
+            release_on_exit(future_data* data)
+              : data_(data)
+            {}
+
+            ~release_on_exit();
+
+            future_data* data_;
+        };
+
+        struct future_data : lcos::detail::future_data<void>
+        {
+        private:
+            static void CUDART_CB stream_callback(cudaStream_t stream,
+                cudaError_t error, void* user_data)
+            {
+                future_data* this_ = static_cast<future_data*>(user_data);
+
+                release_on_exit on_exit(this_);
+                runtime_registration_wrapper wrap(this_->rt_);
+
+                if (error != cudaSuccess)
+                {
+                    this_->set_exception(
+                        HPX_GET_EXCEPTION(kernel_error,
+                            "cuda::detail::future_data::stream_callback()",
+                            std::string("cudaStreamAddCallback failed: ") +
+                                cudaGetErrorString(error))
+                    );
+                    return;
+                }
+
+                this_->set_data(hpx::util::unused);
+            }
+
+        public:
+            future_data(cudaStream_t stream)
+              : rt_(hpx::get_runtime_ptr())
+            {
+                cudaError_t error = cudaStreamAddCallback(
+                    stream, stream_callback, this, 0);
+                if (error != cudaSuccess)
+                {
+                    HPX_THROW_EXCEPTION(kernel_error,
+                        "cuda::detail::future_data::future_data()",
+                        std::string("cudaStreamAddCallback failed: ") +
+                            cudaGetErrorString(error));
+                }
+
+                // hold on to the shared state on behalf of the cuda runtime
+                lcos::detail::intrusive_ptr_add_ref(this);
+            }
+
+        private:
+            hpx::runtime* rt_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        release_on_exit::~release_on_exit()
+        {
+            // release the shared state
+            lcos::detail::intrusive_ptr_release(data_);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct target
     {
+    private:
         HPX_MOVABLE_ONLY(target);
+
+        typedef detail::future_data shared_state_type;
 
     public:
         struct native_handle_type
@@ -68,7 +168,8 @@ namespace hpx { namespace compute { namespace cuda
                     std::string("cudaSetDevice failed: ") +
                         cudaGetErrorString(error));
             }
-            error = cudaStreamCreate(&handle_.stream_);
+            error = cudaStreamCreateWithFlags(&handle_.stream_,
+                cudaStreamNonBlocking);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
@@ -90,7 +191,8 @@ namespace hpx { namespace compute { namespace cuda
                     std::string("cudaSetDevice failed: ") +
                         cudaGetErrorString(error));
             }
-            error = cudaStreamCreate(&handle_.stream_);
+            error = cudaStreamCreateWithFlags(&handle_.stream_,
+                cudaStreamNonBlocking);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
@@ -125,6 +227,12 @@ namespace hpx { namespace compute { namespace cuda
                     std::string("cudaStreamSynchronize failed: ") +
                         cudaGetErrorString(error));
             }
+        }
+
+        hpx::future<void> get_future() const
+        {
+            shared_state_type* p = new shared_state_type(handle_.stream_);
+            return hpx::traits::future_access<hpx::future<void> >::create(p);
         }
 
     private:

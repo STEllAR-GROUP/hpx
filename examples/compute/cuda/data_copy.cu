@@ -38,6 +38,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     hpx::compute::vector<int, allocator_type> d_A(N, alloc);
 
+    hpx::future<void> f = target.get_future();
+
+    f.get();
+
     // copy data from host to device
     hpx::parallel::copy(
         hpx::parallel::par,

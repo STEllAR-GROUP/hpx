@@ -33,6 +33,7 @@ namespace hpx { namespace compute { namespace traits
             static T tmp;
             cudaMemcpyAsync(&tmp, t + pos, sizeof(T), cudaMemcpyDeviceToHost,
                 tgt.native_handle().stream_);
+            tgt.synchronize();
             return tmp;
 #endif
         }
