@@ -28,7 +28,7 @@ void cuda_main()
 
     hpx::compute::vector<double, allocator_type> d_A(N, 42.1337, alloc);
 
-    std::cout << d_A[0] << '\n';
+    std::cout << d_A[1] << '\n';
 
     // copy data from host to device
 //     hpx::parallel::copy(

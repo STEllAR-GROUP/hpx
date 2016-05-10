@@ -13,8 +13,8 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/invoke_fused.hpp>
 
 #include <cuda_runtime.h>
 
@@ -22,43 +22,42 @@
 
 namespace hpx { namespace compute { namespace cuda { namespace detail
 {
-    template <typename Closure>
-    __global__ void launch_helper(Closure deferred)
+    template <typename F, typename Args>
+    __global__ void launch_helper(F f, Args args)
     {
-        deferred();
+        hpx::util::invoke_fused(
+            f, args);
     }
 
     // Launch any given function F with the given parameters. This function does
     // not involve any device synchronization.
-    // FIXME: support n-ary closures ...
-    template <typename F, typename DimType>//, typename ...Ts>
-    void launch(target const& t, DimType gridDim, DimType blockDim, F && f)//,
-        //Ts &&... vs)
+    template <typename F, typename DimType, typename ...Ts>
+    void launch(target const& t, DimType gridDim, DimType blockDim, F && f, Ts&&... vs)
     {
         detail::scoped_active_target active(t);
 
-//         auto closure = util::deferred_call(std::forward<F>(f),
-//             std::forward<Ts>(vs)...);
-//         typedef decltype(closure) closure_type;
+        typedef
+            hpx::util::tuple<typename util::decay<Ts>::type...>
+            args_type;
+        typedef typename util::decay<F>::type fun_type;
 
-        typedef typename util::decay<F>::type closure_type;
-        void (*launch_function)(closure_type) = launch_helper<closure_type>;
+        fun_type f_ = std::forward<F>(f);
+        args_type args(std::forward<Ts>(vs)...);
 
-        closure_type closure = std::forward<F>(f);
+        void (*launch_function)(fun_type, args_type)
+            = launch_helper<fun_type, args_type>;
+
 
         launch_function<<<gridDim, blockDim, 0, active.stream()>>>(
-            std::move(closure));
+            std::move(f_), std::move(args));
 
         cudaError_t error = cudaGetLastError();
         if(error != cudaSuccess)
         {
-            if (error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::detail::launch()",
-                    std::string("kernel launch failed: ") +
-                        cudaGetErrorString(error));
-            }
+            HPX_THROW_EXCEPTION(kernel_error,
+                "cuda::detail::launch()",
+                std::string("kernel launch failed: ") +
+                    cudaGetErrorString(error));
         }
     }
 }}}}

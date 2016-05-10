@@ -17,6 +17,7 @@
 
 #include <cuda_runtime.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <limits>
 #include <memory>
@@ -132,69 +133,67 @@ namespace hpx { namespace compute { namespace cuda
             return total / sizeof(value_type);
         }
 
-        template <typename U, typename ...Args>
-        struct construct_helper;
-
-        template <typename U, typename Arg0>
-        struct construct_helper<U, Arg0>
+    public:
+        // Constructs count objects of type T in allocated uninitialized
+        // storage pointed to by p, using placement-new
+        template <typename U, typename ... Args>
+        void bulk_construct(U* p, std::size_t count, Args &&... args)
         {
-            typedef typename util::decay<Arg0>::type arg0_type;
-            construct_helper(U* p, std::size_t count, arg0_type const& arg0)
-              : p_(p)
-              , count_(count)
-              , arg0_(arg0)
-            {}
+            int threads_per_block = (std::min)(1024, int(count));
+            int num_blocks =
+                int((count + threads_per_block - 1) / threads_per_block);
 
-            __device__ void operator()()
-            {
-                U* end = p_ + count_;
-                for(U* it = p_; p_ != end; ++p_)
+            detail::launch(
+                target_, num_blocks, threads_per_block,
+                [] __device__ (U* p, std::size_t count, Args&&... args) mutable
                 {
-                    ::new (it) U(arg0_);
-                }
-            }
-
-            U* p_;
-            std::size_t count_;
-            arg0_type arg0_;
-        };
+                    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                    if (idx < count)
+                    {
+                        ::new (p) U (std::forward<Args>(args)...);
+                    }
+                },
+                p, count, std::forward<Args>(args)...);
+            target_.synchronize();
+        }
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
         template <typename U, typename ... Args>
-        void bulk_construct(U* p, std::size_t count, Args&&... args)
+        void construct(U* p, Args &&... args)
         {
-            // FIXME: cuda has problems expanding parameter packs in lambdas ...
-            construct_helper<U, Args...> closure(p, count, std::forward<Args>(args)...);
-
             detail::launch(
                 target_, 1, 1,
-                closure);
+                [] __device__ (U* p, Args&&... args) mutable
+                {
+                    ::new (p) U (std::forward<Args>(args)...);
+                },
+                p, std::forward<Args>(args)...);
             target_.synchronize();
         }
 
-        template <typename U, typename ... Args>
-        void construct(U* p, Args &&... args)
-        {
-            build_construct(p, 1, std::forward<Args>(args)...);
-        }
-
-        // Calls the destructor of the object pointed to by p
+        // Calls the destructor of count objects pointed to by p
         template <typename U>
         void bulk_destroy(U* p, std::size_t count)
         {
+            int threads_per_block = (std::min)(1024, int(count));
+            int num_blocks =
+                int((count + threads_per_block) / threads_per_block) - 1;
+
             detail::launch(
-                target_, 1, 1,
+                target_, num_blocks, threads_per_block,
                 [p, count] __device__ () mutable
                 {
-                    U* end = p + count;
-                    for(U* it = p; p != end; ++p)
+                    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                    if (idx < count)
                     {
-                        it->~U();
+                        (p + idx)->~U();
                     }
                 });
             target_.synchronize();
         }
+
+        // Calls the destructor of the object pointed to by p
         template <typename U>
         void destroy(U* p)
         {

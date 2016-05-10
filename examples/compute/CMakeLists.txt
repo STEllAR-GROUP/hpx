@@ -13,8 +13,8 @@ if(HPX_WITH_CUDA)
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(examples.${subdir})
+  add_hpx_pseudo_target(examples.compute.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(examples examples.${subdir})
+  add_hpx_pseudo_dependencies(examples examples.compute.${subdir})
 endforeach()
 
