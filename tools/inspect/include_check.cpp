@@ -20,16 +20,16 @@ namespace boost
   namespace inspect
   {
     boost::regex include_regex(
-      "^\\s*#\\s*include\\s*<([^\n>]*)>\\s*$"     // # include <foobar>
+      "^\\s*#\\s*include\\s*<([^\n>]*)>(\\s|//[^\\n]*|/\\*.*?\\*/)*$"     // # include <foobar>
       "|"
-      "^\\s*#\\s*include\\s*\"([^\n\"]*)\"\\s*$"  // # include "foobar"
+      "^\\s*#\\s*include\\s*\"([^\n\"]*)\"(\\s|//[^\\n]*|/\\*.*?\\*/)*$"  // # include "foobar"
       , boost::regex::normal);
 
     names_includes const names[] =
     {
       { "(\\bstd\\s*::\\s*make_shared\\b)", "std::make_shared", "memory" },
       { "(\\bstd\\s*::\\s*((map)|(set))\\b)", "std::\\2", "\\2" },
-      { "(\\bstd\\s*::\\s*(multi((map)|(set)))\\b)", "std::\\2", "\\2" },
+      { "(\\bstd\\s*::\\s*(multi((map)|(set)))\\b)", "std::\\2", "\\3" },
       { "(\\bstd\\s*::\\s*((shared|unique)_ptr)\\b)", "std::\\2", "memory" },
       { "(\\bstd\\s*::\\s*(unordered_((map|set)))\\b)", "std::\\2", "unordered_\\3" },
       { "(\\bstd\\s*::\\s*(unordered_multi((map)|(set)))\\b)", "std::\\2", "unordered_\\3" },
@@ -102,17 +102,18 @@ namespace boost
       std::set<std::string> found_names;
       for (names_regex_data const& d : regex_data)
       {
-        // avoid checking the same include twice
-        auto checked_includes_it = checked_includes.find(d.data->include);
-        if (checked_includes_it != checked_includes.end())
-           continue;
-
         boost::sregex_iterator cur(contents.begin(), contents.end(), d.pattern), end;
         for(/**/; cur != end; ++cur)
         {
           auto m = *cur;
           if (m[1].matched)
           {
+            // avoid checking the same include twice
+            auto checked_includes_it =
+                checked_includes.find(m.format(d.data->include));
+            if (checked_includes_it != checked_includes.end())
+               continue;
+
             // avoid errors to be reported twice
             std::string found_name(m[1].first, m[1].second);
             if (found_names.find(found_name) != found_names.end())

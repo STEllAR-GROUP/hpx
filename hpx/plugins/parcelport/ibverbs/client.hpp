@@ -14,6 +14,8 @@
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/util/spinlock.hpp>
 
+#include <cstring>
+
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
     namespace detail {
     struct client
