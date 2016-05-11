@@ -151,6 +151,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             s_end,
             dest,
             init,
+
             // stage 1 : initial pass of each section of the input
             [&op](zip_iterator first, std::size_t count, value_type init) {
                 std::size_t offset = 0;
@@ -161,8 +162,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
                 return offset;
             },
+
             // stage 2 operator to use to combine intermediate results
             std::plus<std::size_t>(),
+
             // stage 3 lambda to apply results to each section
             [out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) mutable {
                 std::advance(out_iter, offset);
@@ -173,10 +176,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
                 return out_iter;
             },
+
             // stage 4 : generate a return value
-            [last](OutIter dest) mutable ->  std::pair<InIter, OutIter> {
-                //std::advance(out_iter, offset);
-                return std::make_pair(last, dest);
+            [](OutIter dest) -> OutIter {
+                return dest;
             }
         );
 
