@@ -31,14 +31,8 @@ namespace hpx { namespace compute { namespace cuda
         template <typename F, typename ... Ts>
         void apply_execute(F && f, Ts &&... ts)
         {
-            detail::launch(
-                target_, 1, 1,
-                [] __device__ (F const& f, Ts const&... ts)
-                {
-                    hpx::util::invoke(f, ts...);
-                },
-                std::forward<F>(f), std::forward<Ts>(ts)...
-            );
+            detail::launch(target_, 1, 1,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename ... Ts>

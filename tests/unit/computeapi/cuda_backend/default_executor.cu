@@ -18,9 +18,10 @@
 #include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-__device__ void test()
+struct test
 {
-}
+    __device__ void operator()() {}
+};
 
 void test_sync()
 {
@@ -29,18 +30,18 @@ void test_sync()
 
     hpx::compute::cuda::target target;
     executor exec(target);
-    traits::execute(exec, &test);
+    traits::execute(exec, test());
 }
 
-// void test_async()
-// {
-//     typedef hpx::compute::cuda::default_executor executor;
-//     typedef hpx::parallel::executor_traits<executor> traits;
-//
-//     hpx::compute::cuda::target target;
-//     executor exec(target);
-//     traits::async_execute(exec, &test).get();
-// }
+void test_async()
+{
+    typedef hpx::compute::cuda::default_executor executor;
+    typedef hpx::parallel::executor_traits<executor> traits;
+
+    hpx::compute::cuda::target target;
+    executor exec(target);
+    traits::async_execute(exec, test()).get();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /*
@@ -89,7 +90,7 @@ void test_bulk_async()
 int hpx_main(int argc, char* argv[])
 {
     test_sync();
-//     test_async();
+    test_async();
 //     test_bulk_sync();
 //     test_bulk_async();
 
