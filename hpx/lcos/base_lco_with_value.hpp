@@ -50,8 +50,12 @@ namespace hpx { namespace lcos
 
         virtual void set_event()
         {
+#if defined(HPX_MSVC) && defined(__NVCC__)
             RemoteResult result;
             set_value(std::move(result));
+#else
+            set_value(RemoteResult());
+#endif
         }
 
         virtual void set_value (RemoteResult && result) = 0;
