@@ -168,7 +168,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               ::reference zip_ref;
             //
             boost::shared_array<value_type> temp_buffer_to_be_removed(new value_type[N]);
-            std::fill_n(key_state.get(), N, 0);
+            // std::fill_n(key_state.get(), N, 0);
             //
             unique_stencil_transformer u_s_t;
             uniquebykey_iter unique_begin =
