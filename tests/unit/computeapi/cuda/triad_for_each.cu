@@ -44,7 +44,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     // define execution target (here device 0)
     hpx::compute::cuda::target target;
 
-    // allocate data
+    // allocate data on the device
     typedef hpx::compute::cuda::allocator<int> allocator_type;
     allocator_type alloc(target);
 
@@ -69,7 +69,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         d_A.data(), d_A.size(),
         hpx::parallel::induction(d_B.data()),
         hpx::parallel::induction(d_C.data()),
-        [] __device__ (int* A, int* B, int* C)
+        [] HPX_DEVICE (int* A, int* B, int* C)
         {
             *C = *A + *B;
         });
