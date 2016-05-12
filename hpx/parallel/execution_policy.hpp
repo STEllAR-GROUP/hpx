@@ -20,6 +20,9 @@
 
 #include <memory>
 #include <type_traits>
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
+#include <typeinfo>
+#endif
 #include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
