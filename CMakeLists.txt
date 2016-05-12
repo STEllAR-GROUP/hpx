@@ -926,7 +926,15 @@ hpx_check_for_cxx_experimental_std_optional(
 # CUDA features
 ################################################################################
 if(HPX_WITH_CUDA)
-  set(CUDA_NVCC_FLAGS --expt-relaxed-constexpr;--expt-extended-lambda;--gpu-architecture=sm_30)
+  hpx_libraries(cudadevrt)
+  link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+  set(CUDA_SEPARABLE_COMPILATION ON)
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=\"sm_30,compute_30\")
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_35,code=\"sm_35,compute_35\")
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
 endif()
 
 ################################################################################
