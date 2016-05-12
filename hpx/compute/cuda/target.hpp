@@ -35,9 +35,10 @@ namespace hpx { namespace compute { namespace cuda
 
                 // Register this thread with HPX, this should be done once for
                 // each external OS-thread intended to invoke HPX functionality.
-                // Calling this function more than once will silently fail
-                // (will return false).
-                hpx::register_thread(rt_, "cuda");
+                // Calling this function more than once on the same thread will
+                // report an error.
+                hpx::error_code ec(hpx::lightweight);       // ignore errors
+                hpx::register_thread(rt_, "cuda", ec);
             }
             ~runtime_registration_wrapper()
             {

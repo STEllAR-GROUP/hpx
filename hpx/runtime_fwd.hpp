@@ -51,9 +51,9 @@ namespace hpx
 
     /// Register the current kernel thread with HPX, this should be done once
     /// for each external OS-thread intended to invoke HPX functionality.
-    /// Calling this function more than once will silently fail
-    /// (will return false).
-    HPX_API_EXPORT bool register_thread(runtime* rt, char const* name);
+    /// Calling this function more than once will silently fail.
+    HPX_API_EXPORT bool register_thread(runtime* rt, char const* name,
+        error_code& ec = throws);
 
     /// Unregister the thread from HPX, this should be done once in
     /// the end before the external thread exists.

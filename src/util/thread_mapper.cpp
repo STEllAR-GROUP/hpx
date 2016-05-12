@@ -55,26 +55,37 @@ namespace hpx { namespace util
             thread_info_[i].cleanup_(i); //-V108
     }
 
-    boost::uint32_t thread_mapper::register_thread(char const *l)
+    boost::uint32_t thread_mapper::register_thread(char const *l, error_code& ec)
     {
         std::lock_guard<mutex_type> m(mtx_);
 
         boost::thread::id id = boost::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         if (it != thread_map_.end())
-        {   // collision on boost thread ID (perhaps previous thread wasn't
+        {
+            // collision on boost thread ID (perhaps previous thread wasn't
             // unregistered correctly)
             unmap_thread(it);
         }
+
         // create mappings
         boost::uint32_t tix = thread_map_[id] =
             static_cast<boost::uint32_t>(thread_info_.size());
         thread_info_.push_back(thread_data(get_system_thread_id()));
+
         if (label_map_.left.find(l) != label_map_.left.end())
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+        {
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "hpx::thread_mapper::register_thread",
                 "attempted to register thread with a duplicate label");
+            return boost::uint32_t(-1);
+        }
+
         label_map_.left.insert(label_map_type::left_value_type(l, tix));
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return tix;
     }
 
@@ -84,7 +95,7 @@ namespace hpx { namespace util
 
         boost::thread::id id = boost::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
-        return (it == thread_map_.end())? false: unmap_thread(it);
+        return (it == thread_map_.end()) ? false : unmap_thread(it);
     }
 
     bool thread_mapper::register_callback(boost::uint32_t tix,

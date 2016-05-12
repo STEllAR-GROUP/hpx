@@ -149,7 +149,7 @@ namespace hpx { namespace compute
 
         ~vector()
         {
-            if(data_ != nullptr)
+            if(static_cast<T*>(data_) != nullptr)
             {
                 alloc_traits::bulk_destroy(alloc_, static_cast<T*>(data_), size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
@@ -205,6 +205,16 @@ namespace hpx { namespace compute
             return data_;
         }
 
+        std::size_t size() const
+        {
+            return size_;
+        }
+
+        std::size_t capacity() const
+        {
+            return capacity_;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Iterators
         // TODO: implement cbegin, cend, rbegin, crbegin, rend, crend
@@ -219,6 +229,7 @@ namespace hpx { namespace compute
             return iterator(data_, size_, target_);
         }
 
+    private:
         size_type size_;
         size_type capacity_;
         allocator_type alloc_;

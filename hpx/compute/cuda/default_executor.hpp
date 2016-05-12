@@ -49,53 +49,53 @@ namespace hpx { namespace compute { namespace cuda
             target_.synchronize();
         }
 
-        template <typename F, typename Shape, typename ... Ts>
-        void bulk_launch(F && f, Shape const& shape, Ts &&... ts)
-        {
-            std::size_t count = boost::size(shape);
-
-            int threads_per_block = (std::min)(1024, int(count));
-            int num_blocks =
-                int((count + threads_per_block - 1) / threads_per_block);
-
-            typedef typename boost::range_const_iterator<Shape>::type
-                iterator_type;
-            typedef typename std::iterator_traits<iterator_type>::value_type
-                value_type;
-
-            value_type const* p = &(*boost::begin(shape));
-            detail::launch(
-                target_, num_blocks, threads_per_block,
-                [] __device__ (F const& f, value_type const* p,
-                    std::size_t count, Ts const&... ts)
-                {
-                    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-                    if (idx < count)
-                    {
-//                         std::advance(it, idx);
-                        hpx::util::invoke(f, *(p + idx), ts...);
-                    }
-                },
-                std::forward<F>(f), p, count, std::forward<Ts>(ts)...);
-        }
-
-        template <typename F, typename Shape, typename ... Ts>
-        std::vector<hpx::future<void> >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
-        {
-            bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
-
-            std::vector<hpx::future<void> > result;
-            result.push_back(target_.get_future());
-            return result;
-        }
-
-        template <typename F, typename Shape, typename ... Ts>
-        void bulk_execute(F && f, Shape const& shape, Ts &&... ts)
-        {
-            bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
-            target_.synchronize();
-        }
+//         template <typename F, typename Shape, typename ... Ts>
+//         void bulk_launch(F && f, Shape const& shape, Ts &&... ts)
+//         {
+//             std::size_t count = boost::size(shape);
+//
+//             int threads_per_block = (std::min)(1024, int(count));
+//             int num_blocks =
+//                 int((count + threads_per_block - 1) / threads_per_block);
+//
+//             typedef typename boost::range_const_iterator<Shape>::type
+//                 iterator_type;
+//             typedef typename std::iterator_traits<iterator_type>::value_type
+//                 value_type;
+//
+//             value_type const* p = &(*boost::begin(shape));
+//             detail::launch(
+//                 target_, num_blocks, threads_per_block,
+//                 [] __device__ (F const& f, value_type const* p,
+//                     std::size_t count, Ts const&... ts)
+//                 {
+//                     int idx = blockIdx.x * blockDim.x + threadIdx.x;
+//                     if (idx < count)
+//                     {
+// //                         std::advance(it, idx);
+//                         hpx::util::invoke(f, *(p + idx), ts...);
+//                     }
+//                 },
+//                 std::forward<F>(f), p, count, std::forward<Ts>(ts)...);
+//         }
+//
+//         template <typename F, typename Shape, typename ... Ts>
+//         std::vector<hpx::future<void> >
+//         bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
+//         {
+//             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+//
+//             std::vector<hpx::future<void> > result;
+//             result.push_back(target_.get_future());
+//             return result;
+//         }
+//
+//         template <typename F, typename Shape, typename ... Ts>
+//         void bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+//         {
+//             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+//             target_.synchronize();
+//         }
 
     private:
         cuda::target& target_;

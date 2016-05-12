@@ -44,10 +44,10 @@ void test_async()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/*
-void bulk_test(int value)
+struct bulk_test
 {
-}
+    __device__ void operator()(int) {}
+};
 
 void test_bulk_sync()
 {
@@ -62,8 +62,8 @@ void test_bulk_sync()
 
     hpx::compute::cuda::target target;
     executor exec(target);
-    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1), v);
-    traits::bulk_execute(exec, &bulk_test, v);
+//    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1), v);
+    traits::bulk_execute(exec, bulk_test(), v);
 }
 
 void test_bulk_async()
@@ -79,20 +79,20 @@ void test_bulk_async()
 
     hpx::compute::cuda::target target;
     executor exec(target);
-    hpx::when_all(traits::bulk_async_execute(
-        exec, hpx::util::bind(&bulk_test, _1), v)
-    ).get();
+//    hpx::when_all(traits::bulk_async_execute(
+//        exec, hpx::util::bind(&bulk_test, _1), v)
+//    ).get();
     hpx::when_all(
-        traits::bulk_async_execute(exec, &bulk_test, v)
+        traits::bulk_async_execute(exec, bulk_test(), v)
     ).get();
 }
-*/
+
 int hpx_main(int argc, char* argv[])
 {
     test_sync();
     test_async();
-//     test_bulk_sync();
-//     test_bulk_async();
+    test_bulk_sync();
+    test_bulk_async();
 
     return hpx::finalize();
 }

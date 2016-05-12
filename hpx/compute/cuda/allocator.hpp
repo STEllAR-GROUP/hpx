@@ -37,13 +37,9 @@ namespace hpx { namespace compute { namespace cuda
         typedef target_ptr<T> pointer;
         typedef target_ptr<T const> const_pointer;
 #if defined(__CUDA_ARCH__)
-//         typedef T* pointer;
-//         typedef T const* const_pointer;
         typedef T& reference;
         typedef T const& const_reference;
 #else
-//         typedef target_ptr<T> pointer;
-//         typedef target_ptr<T const> const_pointer;
         typedef value_proxy<T> reference;
         typedef value_proxy<T const> const_reference;
 #endif
@@ -98,7 +94,7 @@ namespace hpx { namespace compute { namespace cuda
         pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
         {
 #if defined(__CUDA_ARCH__)
-            pointer result(nullptr);
+            pointer result;
 #else
             value_type *p = 0;
             detail::scoped_active_target active(target_);

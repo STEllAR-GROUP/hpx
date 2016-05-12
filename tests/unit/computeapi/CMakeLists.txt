@@ -8,13 +8,13 @@ set(subdirs
 
 if(HPX_WITH_CUDA)
   set(subdirs ${subdirs}
-      cuda_backend
+      cuda
      )
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.computeapi.${subdir})
+  add_hpx_pseudo_target(tests.unit.computeapi.${subdir}_)
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.computeapi tests.unit.computeapi.${subdir})
+  add_hpx_pseudo_dependencies(tests.unit.computeapi tests.unit.computeapi.${subdir}_)
 endforeach()
 

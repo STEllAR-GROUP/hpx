@@ -9,10 +9,10 @@
 #define HPX_COMPUTE_CUDA_HPP
 
 #include <hpx/compute/cuda/allocator.hpp>
+#include <hpx/compute/cuda/default_executor.hpp>
 #include <hpx/compute/cuda/get_targets.hpp>
 #include <hpx/compute/cuda/target.hpp>
+#include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
-#include <hpx/compute/cuda/default_executor.hpp>
-#include <hpx/compute/cuda/detail/launch.hpp>
 
 #endif

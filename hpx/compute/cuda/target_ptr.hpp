@@ -19,7 +19,19 @@ namespace hpx { namespace compute { namespace cuda
     class target_ptr
     {
     public:
-        explicit target_ptr(std::nullptr_t)
+        typedef typename std::random_access_iterator_tag iterator_category;
+#if defined(__CUDA_ARCH__)
+        typedef T value_type;
+        typedef T* pointer;
+        typedef T& reference;
+#else
+        typedef value_proxy<T> value_type;
+        typedef T* pointer;
+        typedef value_proxy<T> reference;
+#endif
+        typedef std::ptrdiff_t difference_type;
+
+        target_ptr()
           : p_(nullptr)
           , tgt_(nullptr)
         {}
@@ -143,6 +155,16 @@ namespace hpx { namespace compute { namespace cuda
         {
             return *(p_ + offset);
         }
+
+        operator T*() const
+        {
+            return p_;
+        }
+
+        T* operator->() const
+        {
+            return p_;
+        }
 #else
         value_proxy<T> operator*() const
         {
@@ -153,15 +175,19 @@ namespace hpx { namespace compute { namespace cuda
         {
             return value_proxy<T>(p_ + offset, *tgt_);
         }
-#endif
 
-        HPX_HOST_DEVICE
-        operator T*()
+        explicit operator T*() const
         {
             return p_;
         }
 
-        T* device_ptr()
+        T* operator->() const
+        {
+            return p_;
+        }
+#endif
+
+        T* device_ptr() const
         {
             return p_;
         }

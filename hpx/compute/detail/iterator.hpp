@@ -24,11 +24,18 @@ namespace hpx { namespace compute { namespace detail {
         >
     {
         typedef
+            typename traits::allocator_traits<Allocator>::value_type
+            value_type;
+        typedef
             typename traits::allocator_traits<Allocator>::pointer
             pointer;
         typedef
             typename traits::allocator_traits<Allocator>::reference
             reference;
+
+        typedef std::random_access_iterator_tag iterator_category;
+        typedef std::ptrdiff_t difference_type;
+
         typedef
             typename traits::allocator_traits<Allocator>::const_reference
             const_reference;
@@ -164,6 +171,7 @@ namespace hpx { namespace compute { namespace detail {
         {
             return *target_;
         }
+
     private:
         pointer p_;
         target_type* target_;

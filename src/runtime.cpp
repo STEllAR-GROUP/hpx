@@ -869,10 +869,10 @@ namespace hpx
     /// for each external OS-thread intended to invoke HPX functionality.
     /// Calling this function more than once will silently fail
     /// (will return false).
-    bool register_thread(runtime* rt, char const* name)
+    bool register_thread(runtime* rt, char const* name, error_code& ec)
     {
         HPX_ASSERT(rt);
-        return rt->register_thread(name);
+        return rt->register_thread(name, 0, true, ec);
     }
 
     /// Unregister the thread from HPX, this should be done once in
