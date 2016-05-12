@@ -211,8 +211,7 @@ namespace hpx { namespace util
                 "get_executable_filename",
                 "unable to find executable filename");
         }
-
-        exe_path[len] = '\0';
+        exe_path[len-1] = '\0';
         r = exe_path;
 
 #elif defined(__FreeBSD__)
