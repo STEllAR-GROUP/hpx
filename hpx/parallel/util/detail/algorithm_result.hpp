@@ -25,6 +25,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         typedef T type;
 
         // Obtain initiating function's return type.
+        static type get()
+        {
+            return T();
+        }
+
         static type get(T && t)
         {
             return t;

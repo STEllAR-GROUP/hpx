@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/exception_list.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -22,11 +23,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename Result = void>
-        struct handle_exception
+        struct handle_exception_impl
         {
-            typedef void type;
+            typedef Result type;
 
-            HPX_ATTRIBUTE_NORETURN static void call()
+            HPX_ATTRIBUTE_NORETURN static Result call()
             {
                 try {
                     throw; //-V667
@@ -43,7 +44,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename Result>
-        struct handle_exception<sequential_task_execution_policy, Result>
+        struct handle_exception_impl<sequential_task_execution_policy, Result>
         {
             typedef future<Result> type;
 
@@ -70,15 +71,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename Executor, typename Parameters, typename Result>
-        struct handle_exception<
+        struct handle_exception_impl<
                 sequential_task_execution_policy_shim<
                     Executor, Parameters>, Result>
-          : handle_exception<sequential_task_execution_policy, Result>
+          : handle_exception_impl<sequential_task_execution_policy, Result>
         {};
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception<parallel_task_execution_policy, Result>
+        struct handle_exception_impl<parallel_task_execution_policy, Result>
         {
             typedef future<Result> type;
 
@@ -105,25 +106,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename Executor, typename Parameters, typename Result>
-        struct handle_exception<
+        struct handle_exception_impl<
                 parallel_task_execution_policy_shim<
                     Executor, Parameters>, Result>
-          : handle_exception<parallel_task_execution_policy, Result>
+          : handle_exception_impl<parallel_task_execution_policy, Result>
         {};
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception<parallel_vector_execution_policy, Result>
+        struct handle_exception_impl<parallel_vector_execution_policy, Result>
         {
-            typedef void type;
+            typedef Result type;
 
-            HPX_ATTRIBUTE_NORETURN static void call()
+            HPX_ATTRIBUTE_NORETURN static Result call()
             {
                 // any exceptions thrown by algorithms executed with the
                 // parallel_vector_execution_policy are to call terminate.
                 hpx::terminate();
             }
         };
+
+        template <typename ExPolicy, typename Result = void>
+        struct handle_exception
+          : handle_exception_impl<
+                typename hpx::util::decay<ExPolicy>::type, Result
+            >
+        {};
         /// \endcond
     }
 
