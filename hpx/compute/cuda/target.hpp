@@ -14,6 +14,7 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/exception.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -71,27 +72,38 @@ namespace hpx { namespace compute { namespace cuda
             {
                 future_data* this_ = static_cast<future_data*>(user_data);
 
-                release_on_exit on_exit(this_);
                 runtime_registration_wrapper wrap(this_->rt_);
 
-                if (error != cudaSuccess)
-                {
-                    this_->set_exception(
-                        HPX_GET_EXCEPTION(kernel_error,
-                            "cuda::detail::future_data::stream_callback()",
-                            std::string("cudaStreamAddCallback failed: ") +
-                                cudaGetErrorString(error))
-                    );
-                    return;
-                }
+                // We need to run this as an HPX thread ...
+                hpx::applier::register_thread_nullary(
+                    [this_, error] ()
+                    {
+                        release_on_exit on_exit(this_);
 
-                this_->set_data(hpx::util::unused);
+                        if (error != cudaSuccess)
+                        {
+                            this_->set_exception(
+                                HPX_GET_EXCEPTION(kernel_error,
+                                    "cuda::detail::future_data::stream_callback()",
+                                    std::string("cudaStreamAddCallback failed: ") +
+                                        cudaGetErrorString(error))
+                            );
+                            return;
+                        }
+
+                        this_->set_data(hpx::util::unused);
+                    },
+                    "hpx::compute::cuda::future_data::stream_callback"
+                );
             }
 
         public:
             future_data(cudaStream_t stream)
               : rt_(hpx::get_runtime_ptr())
             {
+                // hold on to the shared state on behalf of the cuda runtime
+                lcos::detail::intrusive_ptr_add_ref(this);
+
                 cudaError_t error = cudaStreamAddCallback(
                     stream, stream_callback, this, 0);
                 if (error != cudaSuccess)
@@ -101,9 +113,6 @@ namespace hpx { namespace compute { namespace cuda
                         std::string("cudaStreamAddCallback failed: ") +
                             cudaGetErrorString(error));
                 }
-
-                // hold on to the shared state on behalf of the cuda runtime
-                lcos::detail::intrusive_ptr_add_ref(this);
             }
 
         private:
