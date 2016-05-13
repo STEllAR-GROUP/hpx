@@ -77,12 +77,11 @@ namespace hpx { namespace parallel { namespace util
 
                     workitems.reserve(shape.size());
 
-                    using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
+                        hpx::util::bind(invoke_fused(), std::forward<F1>(f1), _1),
                         std::move(shape));
                 }
                 catch (...) {

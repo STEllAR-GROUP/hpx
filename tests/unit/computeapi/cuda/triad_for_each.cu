@@ -8,7 +8,10 @@
 
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
+#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_copy.hpp>
+
+#include <hpx/util/lightweight_test.hpp>
 
 #include <hpx/hpx_init.hpp>
 
@@ -18,6 +21,61 @@
 #include <vector>
 
 #include <boost/program_options.hpp>
+
+typedef hpx::compute::cuda::default_executor executor_type;
+typedef hpx::compute::cuda::allocator<int> target_allocator;
+typedef hpx::compute::vector<int, target_allocator> target_vector;
+
+void test_for_loop(executor_type& exec,
+    target_vector& d_A, target_vector& d_B, target_vector& d_C, std::vector<int> const& ref)
+{
+    hpx::parallel::for_loop_n(
+        hpx::parallel::par.on(exec),
+        d_A.data(), d_A.size(),
+        hpx::parallel::induction(d_B.data()),
+        hpx::parallel::induction(d_C.data()),
+        [] HPX_DEVICE (int* A, int* B, int* C)
+        {
+            *C = *A + *B;
+        });
+
+    std::vector<int> h_C(d_C.size());
+    hpx::parallel::copy(
+        hpx::parallel::par,
+        d_C.begin(), d_C.end(), h_C.begin());
+
+    HPX_TEST_EQ(h_C.size(), ref.size());
+    HPX_TEST_EQ(d_C.size(), ref.size());
+    for(std::size_t i = 0; i < ref.size(); ++i)
+    {
+        HPX_TEST_EQ(h_C[i], ref[i]);
+        HPX_TEST_EQ(d_C[i], ref[i]);
+    }
+}
+
+void test_for_each(executor_type& exec,
+    target_vector& d_A, target_vector& d_B, target_vector& d_C, std::vector<int> const& ref)
+{
+    std::vector<int> h_C(d_C.size());
+    hpx::parallel::copy(
+        hpx::parallel::par,
+        d_A.begin(), d_A.end(), h_C.begin());
+
+    hpx::parallel::for_each(
+        hpx::parallel::par.on(exec),
+        d_A.data(), d_A.data() + d_A.size(),
+        [] HPX_DEVICE (int & i) mutable
+        {
+             i += 5;
+        });
+
+    HPX_TEST_EQ(h_C.size(), ref.size());
+    HPX_TEST_EQ(d_C.size(), ref.size());
+    for(std::size_t i = 0; i < ref.size(); ++i)
+    {
+        HPX_TEST_EQ(h_C[i] + 5, d_A[i]);
+    }
+}
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -45,12 +103,11 @@ int hpx_main(boost::program_options::variables_map& vm)
     hpx::compute::cuda::target target;
 
     // allocate data on the device
-    typedef hpx::compute::cuda::allocator<int> allocator_type;
-    allocator_type alloc(target);
+    target_allocator alloc(target);
 
-    hpx::compute::vector<int, allocator_type> d_A(N, alloc);
-    hpx::compute::vector<int, allocator_type> d_B(N, alloc);
-    hpx::compute::vector<int, allocator_type> d_C(N, alloc);
+    target_vector d_A(N, alloc);
+    target_vector d_B(N, alloc);
+    target_vector d_C(N, alloc);
 
     // copy data to device
     hpx::parallel::copy(
@@ -61,38 +118,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         h_B.begin(), h_B.end(), d_B.begin());
 
     // create executor
-    typedef hpx::compute::cuda::default_executor executor_type;
     executor_type exec(target);
 
-    hpx::parallel::for_loop_n(
-        hpx::parallel::par.on(exec),
-        d_A.data(), d_A.size(),
-        hpx::parallel::induction(d_B.data()),
-        hpx::parallel::induction(d_C.data()),
-        [] HPX_DEVICE (int* A, int* B, int* C)
-        {
-            *C = *A + *B;
-        });
-
-    hpx::parallel::copy(
-        hpx::parallel::par,
-        d_C.begin(), d_C.end(), h_C.begin());
-
-    bool success = true;
-    for(int i = 0; i < N; ++i)
-    {
-        if(h_C[i] != h_C_ref[i] || h_C[i] != h_A[i] + h_B[i])
-        {
-            std::cout << "Error at " << i << "\n";
-            std::cout << h_C[i] << " != " << h_C_ref[i] << "\n";
-            std::cout << h_C[i] << " != " << h_A[i] + h_B[i] << "\n";
-            success = false;
-        }
-    }
-    if(success)
-    {
-        std::cout << "Yay!\n";
-    }
+    // Run tests:
+    test_for_loop(exec, d_A, d_B, d_C, h_C_ref);
+    test_for_each(exec, d_A, d_B, d_C, h_C_ref);
 
     return hpx::finalize();
 }
@@ -110,5 +140,7 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    hpx::init(desc_commandline, argc, argv);
+
+    return hpx::util::report_errors();
 }

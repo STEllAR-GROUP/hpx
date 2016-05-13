@@ -40,7 +40,7 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename T>
         HPX_HOST_DEVICE
-        static void write(cuda::target const& tgt, T* dst, T* src)
+        static void write(cuda::target const& tgt, T* dst, const T* src)
         {
 #if defined(__CUDA_ARCH__)
             *dst = *src;
