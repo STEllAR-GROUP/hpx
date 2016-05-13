@@ -20,6 +20,7 @@
 #include <boost/range/numeric.hpp>
 
 #include <cstddef>
+#include <cstring>
 #include <iterator>
 #include <vector>
 #include <windows.h>

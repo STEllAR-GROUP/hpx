@@ -23,6 +23,7 @@
 #include <boost/scope_exit.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstring>
 #include <memory>
 #include <string>
 

@@ -13,6 +13,7 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstring>
 #include <map>
 #include <memory>
 #include <string>
