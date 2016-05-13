@@ -148,7 +148,7 @@ HPX_INLINE_NAMESPACE(v1)
             Lambda2 && f2,
             Lambda3 && f3)
         {
-            auto f1_res = f1(first, std::distance(first,last), std::forward<T>(init));
+            f1(first, std::distance(first,last), std::forward<T>(init));
             // op not needed for a single chunk
             auto f2_res = f2(first, std::distance(first,last), dest, 0);
             return f3(f2_res);
@@ -195,7 +195,7 @@ HPX_INLINE_NAMESPACE(v1)
             int n_chunks=1, log2N=0;
             std::size_t chunk_size;
             if (cores>1) {
-                const std::size_t sequential_scan_limit = 1;
+                const std::size_t sequential_scan_limit = 4096;
                 // we want 2^N chunks of data, so find a good N
                 while (cores >>= 1) ++log2N;
                 n_chunks = (1 << log2N);
@@ -234,6 +234,8 @@ HPX_INLINE_NAMESPACE(v1)
             // result type of lambdas
             typedef typename std::result_of<Lambda1(FwdIter, std::size_t, T)>::type f1_type;
             typedef typename std::result_of<Lambda2(FwdIter, std::size_t, OutIter, T)>::type f2_type;
+            typedef typename std::result_of<Lambda3(f2_type)>::type f3_type;
+
             // intermediate store for partial results after lambda_1
             typedef std::tuple<FwdIter, std::size_t, OutIter, f1_type> chunk_info;
             // from each of the scan chunks from lambda_1
@@ -319,7 +321,9 @@ HPX_INLINE_NAMESPACE(v1)
             }
             hpx::wait_all(work_items_2);
             //
-            return result::get(f3(work_items_2.back().get()));
+            f2_type resf2 = std::move(work_items_2.back().get());
+            f3_type resf3 = f3(resf2);
+            return result::get(std::move(resf3));
         }
     };
 
@@ -377,7 +381,7 @@ HPX_INLINE_NAMESPACE(v1)
             int n_chunks=1, log2N=0;
             std::size_t chunk_size;
             if (cores>1) {
-              const std::size_t sequential_scan_limit = 16384;
+              const std::size_t sequential_scan_limit = 4096;
               // we want 2^N chunks of data, so find a good N
               while (cores >>= 1) ++log2N;
               n_chunks = (1 << log2N);

@@ -167,14 +167,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::plus<std::size_t>(),
 
             // stage 3 lambda to apply results to each section
-            [out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) mutable {
-                std::advance(out_iter, offset);
+            [out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) {
+                OutIter new_dest = std::next(out_iter, offset);
                 for (/* */; count-- != 0; ++first) {
                     if (hpx::util::get<1>(*first)) {
-                        *out_iter++ = hpx::util::get<0>(*first);
+                        *new_dest++ = hpx::util::get<0>(*first);
                     }
                 }
-                return out_iter;
+                return new_dest;
             },
 
             // stage 4 : generate a return value
@@ -250,19 +250,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::plus<std::size_t>(),
 
             // f2 lambda to apply results to each section
-            [&unary,out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) mutable {
+            [&unary,out_iter](zip_iterator first, std::size_t count, OutIter dest, std::size_t offset) {
                 //std::cout << "Offset at start is " << offset <<"\n";
-                std::advance(out_iter, offset);
+                OutIter new_dest = std::next(out_iter, offset);
                 for (/* */; count-- != 0; ++first) {
                     if (unary(hpx::util::get<1>(*first)))  {
-                        *out_iter++ = hpx::util::get<0>(*first);
+                        *new_dest++ = hpx::util::get<0>(*first);
                     }
                 }
-                return out_iter;
+                return new_dest;
             },
 
             // f3 : generate a return value
-            [](OutIter dest) {
+            [](OutIter dest) -> OutIter{
                 //std::advance(out_iter, offset);
                 return dest;
             }
