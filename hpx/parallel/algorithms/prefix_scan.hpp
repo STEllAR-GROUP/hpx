@@ -272,28 +272,21 @@ HPX_INLINE_NAMESPACE(v1)
             //
             // do a tree of combine operations on the result of the 2^N sequence results
             //
-            using hpx::lcos::local::dataflow;
-            //
-            hpx::when_all(std::move(work_items)).then(
-                [=, &work_chunks](hpx::future<std::vector<hpx::future<f1_type> > > fv) {
-                    // move the items into a local vector
-                    std::vector<hpx::future<f1_type> > items(fv.get());
-                    for (int c = 0; c < n_chunks; ++c) {
-                        std::get<3>(work_chunks[c]) = items[c].get();
-                    }
-                    for (int d = 0; d < log2N; ++d) {
-                        int d_2 = (1 << d);
-                        int dp1_2 = (2 << d);
-                        for (int k = 0, f = 0; k < n_chunks; k += dp1_2, f += 2) {
-                            int i1 = k + d_2 - 1;
-                            int i2 = k + dp1_2 - 1;
-                            f1_type sum_left = std::get<3>(work_chunks[i1]);
-                            f1_type sum_right = std::get<3>(work_chunks[i2]);
-                            std::get<3>(work_chunks[k + dp1_2 - 1]) = op(sum_left, sum_right);
-                        }
-                    }
+            hpx::wait_all(work_items);
+            for (int c = 0; c < n_chunks; ++c) {
+                std::get<3>(work_chunks[c]) = work_items[c].get();
+            }
+            for (int d = 0; d < log2N; ++d) {
+                int d_2 = (1 << d);
+                int dp1_2 = (2 << d);
+                for (int k = 0, f = 0; k < n_chunks; k += dp1_2, f += 2) {
+                    int i1 = k + d_2 - 1;
+                    int i2 = k + dp1_2 - 1;
+                    f1_type sum_left = std::get<3>(work_chunks[i1]);
+                    f1_type sum_right = std::get<3>(work_chunks[i2]);
+                    std::get<3>(work_chunks[k + dp1_2 - 1]) = op(sum_left, sum_right);
                 }
-            ).get();
+            }
 
             // --------------------------
             // Downsweep:
