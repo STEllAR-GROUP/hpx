@@ -31,21 +31,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
               : var_(var), curr_(var)
             {}
 
+            HPX_HOST_DEVICE
             void init_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(var_, index);
             }
 
+            HPX_HOST_DEVICE
             T const& iteration_value() const HPX_NOEXCEPT
             {
                 return curr_;
             }
 
+            HPX_HOST_DEVICE
             void next_iteration() HPX_NOEXCEPT
             {
                 ++curr_;
             }
 
+            HPX_HOST_DEVICE
             void exit_iteration(std::size_t /*index*/) HPX_NOEXCEPT
             {
             }
@@ -58,25 +62,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename T>
         struct induction_helper<T&>
         {
+            HPX_HOST_DEVICE
             induction_helper(T& var) HPX_NOEXCEPT
               : live_out_var_(var), var_(var), curr_(var)
             {}
 
+            HPX_HOST_DEVICE
             void init_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 curr_ = parallel::v1::detail::next(var_, index);
             }
 
+            HPX_HOST_DEVICE
             T const& iteration_value() const HPX_NOEXCEPT
             {
                 return curr_;
             }
 
+            HPX_HOST_DEVICE
             void next_iteration() HPX_NOEXCEPT
             {
                 ++curr_;
             }
 
+            HPX_HOST_DEVICE
             void exit_iteration(std::size_t index) HPX_NOEXCEPT
             {
                 live_out_var_ = parallel::v1::detail::next(

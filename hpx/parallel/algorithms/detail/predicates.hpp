@@ -138,6 +138,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         >::type>
     {
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static Iter call(Iter iter, Stride offset)
         {
             std::advance(iter, offset);
@@ -145,6 +146,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
 
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         Iter call(Iter iter, std::size_t max_count, Stride& offset, std::true_type)
         {
@@ -167,6 +169,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
 
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         Iter call(Iter iter, std::size_t max_count, Stride& offset, std::false_type)
         {
@@ -178,6 +181,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
 
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         Iter call(Iter iter, std::size_t max_count, Stride& offset)
         {
@@ -187,6 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     template <typename Iterable>
+    HPX_HOST_DEVICE
     HPX_FORCEINLINE Iterable next(Iterable iter, std::size_t offset)
     {
         return calculate_next<
@@ -195,6 +200,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     }
 
     template <typename Iterable, typename Stride>
+    HPX_HOST_DEVICE
     HPX_FORCEINLINE
     Iterable next(Iterable iter, std::size_t max_count, Stride& offset)
     {

@@ -48,10 +48,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename executor_traits<executor_type>::execution_category
             category2;
 
-        static_assert(
-            (parallel::v3::detail::is_not_weaker<category2, category1>::value),
-            "parallel::v3::detail::is_not_weaker<category2, category1>::value"
-        );
+//         FIXME: Do we really need to assert on this?
+//         static_assert(
+//             (parallel::v3::detail::is_not_weaker<category2, category1>::value),
+//             "parallel::v3::detail::is_not_weaker<category2, category1>::value"
+//         );
         /// \endcond
 
         /// The type of the rebound execution policy

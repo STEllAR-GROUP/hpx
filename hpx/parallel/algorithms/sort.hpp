@@ -13,7 +13,6 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/dataflow.hpp>
 

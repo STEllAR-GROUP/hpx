@@ -227,6 +227,8 @@ hpx_option(HPX_WITH_FULL_RPATH BOOL
 ################################################################################
 hpx_option(HPX_WITH_CUDA BOOL
   "Enable CUDA support (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_WITH_CUDA_CLANG BOOL
+  "Use clang to compile CUDA code (default: OFF)" OFF ADVANCED)
 if(HPX_WITH_CUDA)
   find_package(CUDA REQUIRED)
   set(HPX_WITH_COMPUTE On)
@@ -743,7 +745,7 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
 
 # Make sure we compile in C++11 mode (MSVC uses it automatically)
 if(NOT MSVC)
-  if(HPX_WITH_CUDA)
+  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     hpx_add_target_compile_option(-std=c++11)
   else()
     # Try -std=c++14 first
@@ -925,13 +927,17 @@ hpx_check_for_cxx_experimental_std_optional(
 ################################################################################
 # CUDA features
 ################################################################################
-if(HPX_WITH_CUDA)
+if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
   hpx_libraries(cudadevrt)
   if(NOT MSVC)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+#     set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-std=c++11;-Xcompiler=-g,-O0)
+#     set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O3;-std=c++11;-g;-Xcompiler=-g,-O3)
+#     set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1-std=c++11;;-Xcompiler=-g,-O1)
+#     set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O3;-std=c++11;-Xcompiler=-O3)
   else()
-    link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
     set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+    link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
     set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;--keep;-Xcompiler=-MDd,-Od,-Zi)
     set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi)
     set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1)
@@ -946,6 +952,11 @@ if(HPX_WITH_CUDA)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
+endif()
+if(HPX_WITH_CUDA AND HPX_WITH_CUDA_CLANG)
+  hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR})
+  hpx_libraries(cudart)
+  link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 endif()
 
 ################################################################################
