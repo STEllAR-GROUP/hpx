@@ -33,31 +33,34 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
     }
 
     template <typename F, typename ...Ts>
-    struct launch_helper
+    struct closure
     {
         typedef
             hpx::util::tuple<typename util::decay<Ts>::type...>
             args_type;
         typedef typename util::decay<F>::type fun_type;
 
-        struct closure
+        fun_type f_;
+        args_type args_;
+
+        HPX_HOST_DEVICE void operator()()
         {
-            fun_type f_;
-            args_type args_;
+            // FIXME: is it possible to move the arguments?
+            hpx::util::invoke_fused(f_, args_);
+        }
+    };
 
-            HPX_DEVICE void operator()()
-            {
-                // FIXME: is it possible to move the arguments?
-                hpx::util::invoke_fused(f_, args_);
-            }
-        };
-
-        typedef void (*launch_function_type)(closure);
+    template <typename Closure>
+    struct launch_helper
+    {
+        typedef typename Closure::fun_type fun_type;
+        typedef typename Closure::args_type args_type;
+        typedef void (*launch_function_type)(Closure);
 
         HPX_HOST_DEVICE
         static launch_function_type get_launch_function()
         {
-            return launch_function<closure>;
+            return launch_function<Closure>;
         }
 
         template <typename DimType>
@@ -68,7 +71,10 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
             launch_function_type launcher = get_launch_function();
-            closure c{std::move(f), std::move(args)};
+            Closure c{std::move(f), std::move(args)};
+
+            static_assert(sizeof(Closure) < 256,
+                "We currently require the closure to be less than 256 bytes");
 
 #if !defined(__CUDA_ARCH__)
             detail::scoped_active_target active(tgt);
@@ -86,8 +92,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             }
 #elif __CUDA_ARCH__ >= 350
             void *param_buffer = cudaGetParameterBuffer(
-                std::alignment_of<closure>::value, sizeof(closure));
-            std::memcpy(param_buffer, &c, sizeof(closure));
+                std::alignment_of<Closure>::value, sizeof(Closure));
+            std::memcpy(param_buffer, &c, sizeof(Closure));
             cudaLaunchDevice(reinterpret_cast<void*>(launcher), param_buffer,
                 dim3(gridDim), dim3(blockDim), 0, tgt.native_handle().stream_);
 #endif
@@ -102,10 +108,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
     void launch(target const& t, DimType gridDim, DimType blockDim, F && f,
         Ts&&... vs)
     {
-        typedef
-            hpx::util::tuple<typename util::decay<Ts>::type...>
-            args_type;
-        launch_helper<F, Ts...>::call(t, gridDim, blockDim, std::forward<F>(f),
+        typedef closure<F, Ts...> closure_type;
+        launch_helper<closure_type>::call(t, gridDim, blockDim, std::forward<F>(f),
             util::forward_as_tuple(std::forward<Ts>(vs)...));
     }
 }}}}

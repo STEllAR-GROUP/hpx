@@ -49,6 +49,26 @@ namespace hpx { namespace compute { namespace cuda
             target_.synchronize();
         }
 
+        std::size_t processing_units_count()
+        {
+            cudaDeviceProp props;
+            cudaGetDeviceProperties(&props, target_.native_handle().device_);
+
+            std::size_t mp = props.multiProcessorCount;
+            switch(props.major)
+            {
+                case 2:
+                    if(props.minor == 1) return mp * 48;
+                    return mp * 32;
+                case 3:
+                    return mp * 192;
+                case 5:
+                    return mp * 128;
+                default:
+                    return mp;
+            }
+        }
+
 //         template <typename F, typename Shape, typename ... Ts>
 //         void bulk_launch(F && f, Shape const& shape, Ts &&... ts)
 //         {

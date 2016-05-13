@@ -68,12 +68,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             if (is_negative(offset))
             {
                 offset = Stride(negate(
-                        (std::min)(max_count, std::size_t(negate(offset)))
+                        //(std::min)(max_count, std::size_t(negate(offset)))
+                        max_count < std::size_t(negate(offset)) ? max_count : negate(offset)
                     ));
                 return T(t + offset);
             }
 
-            offset = Stride((std::min)(max_count, std::size_t(offset)));
+            //offset = Stride((std::min)(max_count, std::size_t(offset)));
+            offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
             return T(t + offset);
         }
 
@@ -81,7 +83,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         HPX_FORCEINLINE static
         T call(T t, std::size_t max_count, Stride& offset, std::false_type)
         {
-            offset = (std::min)(max_count, offset);
+            //offset = (std::min)(max_count, offset);
+            offset = max_count < offset ? max_count : offset;
             return T(t + offset);
         }
 
@@ -116,7 +119,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             // negative offsets
             HPX_ASSERT(!std::is_signed<Stride>::value || !is_negative(offset));
 
-            Stride count = Stride((std::min)(max_count, std::size_t(offset)));
+            //Stride count = Stride((std::min)(max_count, std::size_t(offset)));
+            Stride count = Stride(max_count < std::size_t(offset) ? max_count : offset);
 
             // advance through the end or max number of elements
             for (/**/; count != 0; (void)++iter, --count)
@@ -147,13 +151,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             // advance through the end or max number of elements
             if (!is_negative(offset))
             {
-                offset = Stride((std::min)(max_count, std::size_t(offset)));
+                //offset = Stride((std::min)(max_count, std::size_t(offset)));
+                offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
                 std::advance(iter, offset);
             }
             else
             {
                 offset = negate(Stride(
-                        (std::min)(max_count, std::size_t(negate(offset)))
+                        //(std::min)(max_count, std::size_t(negate(offset)))
+                        max_count < negate(offset) ? max_count : negate(offset)
                     ));
                 std::advance(iter, offset);
             }
@@ -165,7 +171,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         Iter call(Iter iter, std::size_t max_count, Stride& offset, std::false_type)
         {
             // advance through the end or max number of elements
-            offset = Stride((std::min)(max_count, std::size_t(offset)));
+            //offset = Stride((std::min)(max_count, std::size_t(offset)));
+            offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
             std::advance(iter, offset);
             return iter;
         }
@@ -222,7 +229,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     {
         T operator()(T const& t1, T const& t2) const
         {
-            return (std::min)(t1, t2);
+            //return (std::min)(t1, t2);
+            return t1 < t2 ? t1 : t2;
         }
     };
 
