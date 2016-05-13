@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -87,17 +88,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             (void)_sequencer;
         }
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename F, typename S, typename Tuple>
         struct part_iterations;
 
         template <typename F, typename S, typename ...Ts>
-        struct part_iterations<F, S, hpx::util::tuple<Ts...>>
+        struct part_iterations<F, S, hpx::util::tuple<Ts...> >
         {
             typename hpx::util::decay<F>::type f_;
             S stride_;
             hpx::util::tuple<Ts...> args_;
+
             template <typename B>
-            HPX_HOST_DEVICE void operator()(std::size_t part_index, B part_begin, std::size_t part_steps)
+            HPX_HOST_DEVICE
+            void operator()(std::size_t part_index, B part_begin,
+                std::size_t part_steps)
             {
                 auto pack = typename hpx::util::detail::make_index_pack<
                     sizeof...(Ts)>::type();
@@ -109,8 +114,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
                     detail::next_iteration(args_, pack);
 
-                    //std::size_t chunk = (std::min)(S(part_steps), stride_);
-                    std::size_t chunk = S(part_steps) < stride_ ? part_steps : stride_;
+                    // NVCC seems to have a bug with std::min...
+                    std::size_t chunk =
+                        S(part_steps) < stride_ ? part_steps : stride_;
 
                     // modifies 'chunk'
                     part_begin = parallel::v1::detail::next(
@@ -119,7 +125,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 }
             }
         };
-
 
         ///////////////////////////////////////////////////////////////////////
         struct for_loop_algo : public v1::detail::algorithm<for_loop_algo>
@@ -151,16 +156,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     (void)next_sequencer;
 
                     // NVCC seems to have a bug with std::min...
-                    std::size_t chunk = S(count) < stride ? count : stride;
-                    //std::size_t chunk = (std::min)(S(count), stride);
+                    std::size_t chunk = (S(count) < stride) ? count : stride;
 
-                    // modifies stride
+                    // modifies 'chunk'
                     first = parallel::v1::detail::next(first, count, chunk);
                     count -= chunk;
                 }
 
-                // make sure live-out variables are properly set on
-                // return
+                // make sure live-out variables are properly set on return
                 int const exit_sequencer[] = {
                     0, (args.exit_iteration(size), 0)...
                 };
@@ -178,36 +181,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 if (size == 0)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                // gcc does not support binding parameter packs as lambda closures
+                auto && args =
+                    hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
+
                 // we need to decay copy here to properly transport everything
                 // to a GPU device
                 typedef
                     hpx::util::tuple<typename hpx::util::decay<Ts>::type...>
                     args_type;
-                args_type args(std::forward<Ts>(ts)...);
 
                 return util::partitioner<ExPolicy>::call_with_index(
                     policy, first, size, stride,
-                    part_iterations<F, S, args_type>{f, stride, args},
-//                     [=] HPX_HOST_DEVICE (std::size_t part_index,
-//                         B part_begin, std::size_t part_steps) mutable
-//                     {
-//                         detail::init_iteration(args, pack, part_index);
-//
-//                         while (part_steps != 0)
-//                         {
-//                             detail::invoke_iteration(args, pack, f, part_begin);
-//
-//                             detail::next_iteration(args, pack);
-//
-//                             std::size_t chunk = (std::min)(S(part_steps), stride);
-//
-//                             // modifies 'chunk'
-//                             part_begin = parallel::v1::detail::next(
-//                                 part_begin, part_steps, chunk);
-//                             part_steps -= chunk;
-//                         }
-//                     },
+                    part_iterations<F, S, args_type>{
+                        std::forward<F>(f), stride, std::move(args)
+                    },
                     [=] (std::vector<hpx::future<void> > &&) mutable -> void
                     {
                         auto pack = typename hpx::util::detail::make_index_pack<

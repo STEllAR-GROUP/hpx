@@ -90,7 +90,6 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
                     std::string("kernel launch failed: ") +
                         cudaGetErrorString(error));
             }
-            tgt.synchronize();
 #elif __CUDA_ARCH__ >= 350
             void *param_buffer = cudaGetParameterBuffer(
                 std::alignment_of<Closure>::value, sizeof(Closure));
