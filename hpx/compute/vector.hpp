@@ -41,7 +41,7 @@ namespace hpx { namespace compute
         typedef typename alloc_traits::pointer pointer;
         typedef typename alloc_traits::const_pointer const_pointer;
         typedef detail::iterator<T, Allocator> iterator;
-        typedef detail::const_iterator<T, Allocator> const_iterator;
+        typedef detail::iterator<T const, Allocator> const_iterator;
         typedef detail::reverse_iterator<T, Allocator> reverse_iterator;
         typedef detail::const_reverse_iterator<T, Allocator> const_reverse_iterator;
 
@@ -100,7 +100,7 @@ namespace hpx { namespace compute
           , target_(other.target_)
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            //hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
+            hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
         }
 
         vector(vector const& other, Allocator const& alloc)
@@ -110,7 +110,7 @@ namespace hpx { namespace compute
           , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            //hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
+            hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
         }
 
         vector(vector && other)
@@ -227,6 +227,16 @@ namespace hpx { namespace compute
         iterator end()
         {
             return iterator(data_, size_, target_);
+        }
+
+        const_iterator begin() const
+        {
+            return const_iterator(data_, 0, target_);
+        }
+
+        const_iterator end() const
+        {
+            return const_iterator(data_, size_, target_);
         }
 
     private:
