@@ -17,6 +17,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
 #include <string>
 #include <type_traits>
@@ -82,12 +83,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         operator()(ExPolicy && policy, Args&&... args) const
         {
             try {
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                    parameters_type;
+
+                parallel::util::detail::scoped_executor_parameters<
+                        parameters_type
+                    > scoped_param(policy.parameters());
+
                 return parallel::util::detail::algorithm_result<
-                    ExPolicy, local_result_type
-                >::get(
-                    Derived::sequential(std::forward<ExPolicy>(policy),
-                        std::forward<Args>(args)...)
-                );
+                        ExPolicy, local_result_type
+                    >::get(
+                        Derived::sequential(std::forward<ExPolicy>(policy),
+                            std::forward<Args>(args)...)
+                    );
             }
             catch(...) {
                 // this does not return
