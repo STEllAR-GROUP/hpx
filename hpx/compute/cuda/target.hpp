@@ -101,13 +101,18 @@ namespace hpx { namespace compute { namespace cuda
             future_data(cudaStream_t stream)
               : rt_(hpx::get_runtime_ptr())
             {
-                // hold on to the shared state on behalf of the cuda runtime
+                // Hold on to the shared state on behalf of the cuda runtime
+                // right away as the callback could be called immediately.
                 lcos::detail::intrusive_ptr_add_ref(this);
 
                 cudaError_t error = cudaStreamAddCallback(
                     stream, stream_callback, this, 0);
                 if (error != cudaSuccess)
                 {
+                    // callback was not called, release object
+                    lcos::detail::intrusive_ptr_release(this);
+
+                    // report error
                     HPX_THROW_EXCEPTION(kernel_error,
                         "cuda::detail::future_data::future_data()",
                         std::string("cudaStreamAddCallback failed: ") +

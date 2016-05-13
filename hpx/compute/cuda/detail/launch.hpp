@@ -19,6 +19,9 @@
 
 #include <cuda_runtime.h>
 
+#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 350
+#include <cstring>
+#endif
 #include <string>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail
@@ -37,14 +40,14 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             args_type;
         typedef typename util::decay<F>::type fun_type;
 
-
         struct closure
         {
             fun_type f_;
             args_type args_;
+
             HPX_DEVICE void operator()()
             {
-                // FIXME: is it possible to move tha arguments?
+                // FIXME: is it possible to move the arguments?
                 hpx::util::invoke_fused(f_, args_);
             }
         };
@@ -82,13 +85,11 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
                         cudaGetErrorString(error));
             }
 #elif __CUDA_ARCH__ >= 350
-            void *param_buffer
-                = cudaGetParameterBuffer(std::alignment_of<closure>::value, sizeof(closure));
+            void *param_buffer = cudaGetParameterBuffer(
+                std::alignment_of<closure>::value, sizeof(closure));
             std::memcpy(param_buffer, &c, sizeof(closure));
             cudaLaunchDevice(reinterpret_cast<void*>(launcher), param_buffer,
                 dim3(gridDim), dim3(blockDim), 0, tgt.native_handle().stream_);
-#else
-
 #endif
         }
     };

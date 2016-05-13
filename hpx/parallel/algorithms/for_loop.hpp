@@ -130,6 +130,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             template <typename ExPolicy, typename B, typename Size, typename S,
                 typename F, typename... Ts>
+            HPX_HOST_DEVICE
             static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy policy, B first, Size size, S stride, F && f,
                 Ts &&... ts)
@@ -144,7 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
                 return util::partitioner<ExPolicy>::call_with_index(
                     policy, first, size, stride,
-                    [=](std::size_t part_index,
+                    [=] HPX_HOST_DEVICE (std::size_t part_index,
                         B part_begin, std::size_t part_steps) mutable
                     {
                         detail::init_iteration(args, pack, part_index);
@@ -163,7 +164,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                             part_steps -= chunk;
                         }
                     },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> void
+                    [=] HPX_HOST_DEVICE (
+                        std::vector<hpx::future<void> > &&) mutable -> void
                     {
                         // make sure live-out variables are properly set on
                         // return

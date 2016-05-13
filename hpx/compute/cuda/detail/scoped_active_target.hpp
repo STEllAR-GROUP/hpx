@@ -53,9 +53,10 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 
         ~scoped_active_target()
         {
+            cudaError_t error = cudaSuccess;
 #if defined(HPX_DEBUG)
             int current_device = -1;
-            cudaError_t error = cudaGetDevice(&current_device);
+            error = cudaGetDevice(&current_device);
             if(error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
