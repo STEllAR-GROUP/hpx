@@ -33,16 +33,7 @@ namespace hpx { namespace parallel { namespace util
         struct move_helper;
         template <typename Category, typename Enable = void>
         struct move_n_helper;
-    }
-}}}
 
-#include <hpx/parallel/util/compute/transfer.hpp>
-
-namespace hpx { namespace parallel { namespace util
-{
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
 #if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>

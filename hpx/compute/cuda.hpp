@@ -13,6 +13,7 @@
 #include <hpx/compute/cuda/get_targets.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
+#include <hpx/compute/cuda/transfer.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
 
 #endif

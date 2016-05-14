@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 
 #include <hpx/traits/pointer_category.hpp>
+#include <hpx/parallel/util/transfer.hpp>
 
 #include <hpx/compute/detail/iterator.hpp>
 #include <hpx/compute/cuda/allocator.hpp>
