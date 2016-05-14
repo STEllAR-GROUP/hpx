@@ -9,10 +9,12 @@ set(tests
 if(HPX_WITH_CUDA)
   set(tests ${tests}
       default_executor
-      triad_for_each
+      for_each_compute
+      for_loop_compute
      )
   set(default_executor_CUDA On)
-  set(triad_for_each_CUDA On)
+  set(for_each_compute_CUDA On)
+  set(for_loop_compute_CUDA On)
 endif()
 
 foreach(test ${tests})

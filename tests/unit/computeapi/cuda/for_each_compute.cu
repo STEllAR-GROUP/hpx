@@ -26,34 +26,6 @@ typedef hpx::compute::cuda::default_executor executor_type;
 typedef hpx::compute::cuda::allocator<int> target_allocator;
 typedef hpx::compute::vector<int, target_allocator> target_vector;
 
-void test_for_loop(executor_type& exec,
-    target_vector& d_A, target_vector& d_B, target_vector& d_C,
-    std::vector<int> const& ref)
-{
-    hpx::parallel::for_loop_n(
-        hpx::parallel::par.on(exec),
-        d_A.data(), d_A.size(),
-        hpx::parallel::induction(d_B.data()),
-        hpx::parallel::induction(d_C.data()),
-        [] HPX_DEVICE (int* A, int* B, int* C)
-        {
-            *C = *A + 3.0 * *B;
-        });
-
-    std::vector<int> h_C(d_C.size());
-    hpx::parallel::copy(
-        hpx::parallel::par,
-        d_C.begin(), d_C.end(), h_C.begin());
-
-    HPX_TEST_EQ(h_C.size(), ref.size());
-    HPX_TEST_EQ(d_C.size(), ref.size());
-    for(std::size_t i = 0; i < ref.size(); ++i)
-    {
-        HPX_TEST_EQ(h_C[i], ref[i]);
-        HPX_TEST_EQ(d_C[i], ref[i]);
-    }
-}
-
 void test_for_each(executor_type& exec,
     target_vector& d_A, target_vector& d_B, target_vector& d_C,
     std::vector<int> const& ref)
@@ -73,7 +45,7 @@ void test_for_each(executor_type& exec,
 
     HPX_TEST_EQ(h_C.size(), ref.size());
     HPX_TEST_EQ(d_C.size(), ref.size());
-    for(std::size_t i = 0; i < ref.size(); ++i)
+    for(std::size_t i = 0; i != ref.size(); ++i)
     {
         HPX_TEST_EQ(h_C[i] + 5, d_A[i]);
     }
@@ -96,10 +68,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
     std::iota(h_B.begin(), h_B.end(), (std::rand() % 100) + 2);
-
-    std::transform(
-        h_A.begin(), h_A.end(), h_B.begin(), h_C_ref.begin(),
-        [](int a, int b) { return a + 3.0 * b; });
 
     // define execution targets (here device 0), allows overlapping operations
     hpx::compute::cuda::target targetA, targetB;
@@ -129,7 +97,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     executor_type exec(targetB);
 
     // Run tests:
-    test_for_loop(exec, d_A, d_B, d_C, h_C_ref);
     test_for_each(exec, d_A, d_B, d_C, h_C_ref);
 
     return hpx::finalize();
