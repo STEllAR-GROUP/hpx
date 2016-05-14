@@ -8,11 +8,15 @@
 #ifndef HPX_COMPUTE_DETAIL_ITERATOR_HPP
 #define HPX_COMPUTE_DETAIL_ITERATOR_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
+
 #include <hpx/compute/traits/allocator_traits.hpp>
 
 #include <iterator>
 
-namespace hpx { namespace compute { namespace detail {
+namespace hpx { namespace compute { namespace detail
+{
     template <typename T, typename Allocator>
     struct iterator
       : std::iterator<
@@ -172,14 +176,14 @@ namespace hpx { namespace compute { namespace detail {
             return *target_;
         }
 
+        target_type const& target() const
+        {
+            return *target_;
+        }
+
     private:
         pointer p_;
         target_type* target_;
-    };
-
-    template <typename T, typename Allocator>
-    struct const_iterator
-    {
     };
 
     template <typename T, typename Allocator>

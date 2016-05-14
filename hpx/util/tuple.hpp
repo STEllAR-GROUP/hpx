@@ -77,10 +77,12 @@ namespace hpx { namespace util
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
+            HPX_HOST_DEVICE
             HPX_CONSTEXPR tuple_member(tuple_member const& other)
               : _value(other.value())
             {}
 
+            HPX_HOST_DEVICE
             HPX_CONSTEXPR tuple_member(tuple_member&& other)
               : _value(std::forward<T>(other.value()))
             {}
@@ -117,10 +119,12 @@ namespace hpx { namespace util
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
+            HPX_HOST_DEVICE
             HPX_CONSTEXPR tuple_member(tuple_member const& other)
               : T(other.value())
             {}
 
+            HPX_HOST_DEVICE
             HPX_CONSTEXPR tuple_member(tuple_member&& other)
               : T(std::forward<T>(other.value()))
             {}
@@ -208,10 +212,12 @@ namespace hpx { namespace util
             tuple_impl(tuple_impl const&) = default;
             tuple_impl(tuple_impl&&) = default;
 #else
+            HPX_HOST_DEVICE
             HPX_CONSTEXPR tuple_impl(tuple_impl const& other)
               : tuple_member<Is, Ts>(static_cast<tuple_member<Is, Ts> const&>(other))...
             {}
 
+            HPX_HOST_DEVICE
             HPX_CONSTEXPR tuple_impl(tuple_impl&& other)
               : tuple_member<Is, Ts>(static_cast<tuple_member<Is, Ts>&&>(other))...
             {}

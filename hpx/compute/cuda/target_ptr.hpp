@@ -8,10 +8,11 @@
 #ifndef HPX_COMPUTE_CUDA_TARGET_PTR_HPP
 #define HPX_COMPUTE_CUDA_TARGET_PTR_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
+
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
-
-#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace compute { namespace cuda
 {

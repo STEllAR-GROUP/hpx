@@ -181,6 +181,41 @@ namespace hpx { namespace parallel { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
+        // Customization point for copy-synchronize operations
+        template <>
+        struct copy_synchronize_helper<trivially_cuda_copyable_pointer_tag>
+        {
+            template <typename InIter, typename OutIter>
+            HPX_FORCEINLINE static void
+            call(InIter const&, OutIter const& dest)
+            {
+                dest.target().synchronize();
+            }
+        };
+
+        template <>
+        struct copy_synchronize_helper<trivially_cuda_copyable_pointer_tag_to_host>
+        {
+            template <typename InIter, typename OutIter>
+            HPX_FORCEINLINE static void
+            call(InIter const& first, OutIter const&)
+            {
+                first.target().synchronize();
+            }
+        };
+
+        template <>
+        struct copy_synchronize_helper<trivially_cuda_copyable_pointer_tag_to_device>
+        {
+            template <typename InIter, typename OutIter>
+            HPX_FORCEINLINE static void
+            call(InIter const&, OutIter const& dest)
+            {
+                dest.target().synchronize();
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Source, typename T>
         inline trivially_cuda_copyable_pointer_tag
         get_pointer_category(

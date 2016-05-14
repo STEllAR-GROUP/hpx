@@ -185,7 +185,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
-        traits::is_projected_range<util::projection_identity, Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_indirect_callable<
             F, traits::projected_range<util::projection_identity, Rng>
