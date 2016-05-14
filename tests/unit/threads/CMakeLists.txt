@@ -6,6 +6,7 @@
 set(tests
     lockfree_fifo
     set_thread_state
+    stack_check
     thread
     thread_affinity
     thread_id
