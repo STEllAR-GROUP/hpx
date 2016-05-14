@@ -4,16 +4,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/util/atomic_count.hpp>
 
 #include <vector>
 
 namespace hpx { namespace traits { namespace detail
 {
-    boost::detail::atomic_count unique_type(
+    util::atomic_count unique_type(
         static_cast<long>(components::component_last));
 }}}
 

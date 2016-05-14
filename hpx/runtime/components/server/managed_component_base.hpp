@@ -27,7 +27,6 @@
 #include <boost/throw_exception.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/detail/atomic_count.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/intrusive_ptr.hpp>
 

@@ -11,12 +11,12 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
 #include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -209,7 +209,7 @@ namespace hpx { namespace threads
             friend void intrusive_ptr_add_ref(executor_base* p);
             friend void intrusive_ptr_release(executor_base* p);
 
-            boost::detail::atomic_count count_;
+            util::atomic_count count_;
         };
 
         /// support functions for boost::intrusive_ptr

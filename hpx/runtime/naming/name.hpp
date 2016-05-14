@@ -9,17 +9,17 @@
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/register_locks_globally.hpp>
+#include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/lcos/local/spinlock_pool.hpp>
+#include <hpx/util/atomic_count.hpp>
+#include <hpx/util/register_locks_globally.hpp>
 
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <cstddef>
 #include <ios>
@@ -755,7 +755,7 @@ namespace hpx { namespace naming
             friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
             friend HPX_EXPORT void intrusive_ptr_release(id_type_impl* p);
 
-            boost::detail::atomic_count count_;
+            util::atomic_count count_;
             id_type_management type_;
         };
     }
