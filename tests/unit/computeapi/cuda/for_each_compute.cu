@@ -25,11 +25,9 @@ typedef hpx::compute::cuda::default_executor executor_type;
 typedef hpx::compute::cuda::allocator<int> target_allocator;
 typedef hpx::compute::vector<int, target_allocator> target_vector;
 
-void test_for_each(executor_type& exec,
-    target_vector& d_A, target_vector& d_B, target_vector& d_C,
-    std::vector<int> const& ref)
+void test_for_each(executor_type& exec, target_vector& d_A)
 {
-    std::vector<int> h_C(d_C.size());
+    std::vector<int> h_C(d_A.size());
     hpx::parallel::copy(
         hpx::parallel::par,
         d_A.begin(), d_A.end(), h_C.begin());
@@ -42,9 +40,7 @@ void test_for_each(executor_type& exec,
              i += 5;
         });
 
-    HPX_TEST_EQ(h_C.size(), ref.size());
-    HPX_TEST_EQ(d_C.size(), ref.size());
-    for(std::size_t i = 0; i != ref.size(); ++i)
+    for(std::size_t i = 0; i != h_C.size(); ++i)
     {
         HPX_TEST_EQ(h_C[i] + 5, d_A[i]);
     }
@@ -61,41 +57,26 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     int const N = 100;
     std::vector<int> h_A(N);
-    std::vector<int> h_B(N);
-    std::vector<int> h_C_ref(N);
-    std::vector<int> h_C(N);
 
     std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
-    std::iota(h_B.begin(), h_B.end(), (std::rand() % 100) + 2);
 
-    // define execution targets (here device 0), allows overlapping operations
-    hpx::compute::cuda::target targetA, targetB;
+    // define execution target (here device 0)
+    hpx::compute::cuda::target target;
 
     // allocate data on the device
-    target_allocator allocA(targetA);
-    target_allocator allocB(targetB);
-
-    target_vector d_A(N, allocA);
-    target_vector d_B(N, allocB);
-    target_vector d_C(N, allocA);
+    target_allocator alloc(target);
+    target_vector d_A(N, alloc);
 
     // copy data to device
-    hpx::future<void> f =
-        hpx::parallel::copy(
-            hpx::parallel::par(hpx::parallel::task),
-            h_A.begin(), h_A.end(), d_A.begin());
     hpx::parallel::copy(
         hpx::parallel::par,
-        h_B.begin(), h_B.end(), d_B.begin());
-
-    // synchronize with copy operation to A
-    f.get();
+        h_A.begin(), h_A.end(), d_A.begin());
 
     // create executor
-    executor_type exec(targetB);
+    executor_type exec(target);
 
     // Run tests:
-    test_for_each(exec, d_A, d_B, d_C, h_C_ref);
+    test_for_each(exec, d_A);
 
     return hpx::finalize();
 }

@@ -66,7 +66,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::vector<int> h_A(N);
     std::vector<int> h_B(N);
     std::vector<int> h_C_ref(N);
-    std::vector<int> h_C(N);
 
     std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
     std::iota(h_B.begin(), h_B.end(), (std::rand() % 100) + 2);
@@ -91,9 +90,10 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::parallel::copy(
             hpx::parallel::par(hpx::parallel::task),
             h_A.begin(), h_A.end(), d_A.begin());
-    hpx::parallel::copy(
-        hpx::parallel::par,
-        h_B.begin(), h_B.end(), d_B.begin());
+
+        hpx::parallel::copy(
+            hpx::parallel::par,
+            h_B.begin(), h_B.end(), d_B.begin());
 
     // synchronize with copy operation to A
     f.get();
