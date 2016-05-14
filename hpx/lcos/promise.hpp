@@ -22,6 +22,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
 
@@ -765,7 +766,7 @@ namespace hpx { namespace traits
 {
     namespace detail
     {
-        HPX_EXPORT extern boost::detail::atomic_count unique_type;
+        HPX_EXPORT extern util::atomic_count unique_type;
     }
 
     template <typename Result, typename RemoteResult>

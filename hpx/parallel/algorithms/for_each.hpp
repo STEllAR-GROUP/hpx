@@ -64,40 +64,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : for_each_n::algorithm("for_each_n")
             {}
 
-            template <typename ExPolicy, typename F,
+            template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
             HPX_HOST_DEVICE
             static Iter
-            sequential(ExPolicy, Iter first, std::size_t count, F && f,
+            sequential(ExPolicy, InIter first, std::size_t count, F && f,
                 Proj && proj/* = Proj()*/)
             {
                 return util::loop_n(first, count,
-                    [&f, &proj](Iter curr)
+                    [&f, &proj](InIter curr)
                     {
                         hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
             }
 
-            template <typename ExPolicy, typename F,
+            template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy && policy, Iter first, std::size_t count,
+            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            parallel(ExPolicy && policy, InIter first, std::size_t count,
                 F && f, Proj && proj/* = Proj()*/)
             {
                 if (count != 0)
                 {
+                    // Some compilers complain about loosing const type
+                    // modifiers if the lambdas below are not mutable.
                     return util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy), first, count,
                         for_each_iteration<F, Proj>{
                             std::forward<F>(f), std::forward<Proj>(proj)
                         },
-                        [](Iter && last) -> Iter
+                        [](InIter && last) -> InIter
                         {
                             return std::move(last);
                         });
                 }
 
-                return util::detail::algorithm_result<ExPolicy, Iter>::get(
+                return util::detail::algorithm_result<ExPolicy, InIter>::get(
                     std::move(first));
             }
         };

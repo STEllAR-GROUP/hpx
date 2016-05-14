@@ -571,7 +571,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     {
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
-        define_task_block(parallel::par, std::forward<F>(f));
+        define_task_block_restore_thread(parallel::par, std::forward<F>(f));
     }
 }}}
 

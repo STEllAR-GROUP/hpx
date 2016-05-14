@@ -182,7 +182,7 @@ void test_lexicographical_compare3(ExPolicy policy, IteratorTag)
     // element being less than D
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
-    c[(std::rand() % 5000) + 1] = 0;
+    c[(std::rand() % 5000) + 1] = 0; //-V108
 
     std::vector<std::size_t> d(10007);
     std::iota(boost::begin(d), boost::end(d), 0);
@@ -202,7 +202,7 @@ void test_lexicographical_compare3_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
-    c[(std::rand() % 10006) + 1] = 0;
+    c[(std::rand() % 10006) + 1] = 0; //-V108
 
     std::vector<std::size_t> d(10007);
     std::iota(boost::begin(d), boost::end(d), 0);

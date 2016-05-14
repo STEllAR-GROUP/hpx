@@ -38,7 +38,7 @@ namespace hpx { namespace util { namespace integer
 
     public:
         // Constructors
-        inline int128 () throw () {};
+        inline int128 () throw () : lo(0ull), hi(0ull) {};
 
         inline int128 (const unsigned int & a) throw () : lo (a), hi (0ll) {};
         inline int128 (const signed int & a) throw () : lo (a), hi (0ll) {

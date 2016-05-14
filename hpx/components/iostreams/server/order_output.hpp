@@ -30,7 +30,7 @@ namespace hpx { namespace iostreams { namespace detail
             detail::buffer in, F const& write_f, Mutex& mtx)
         {
             std::unique_lock<Mutex> l(mtx);
-            data_type& data = output_data_map_[locality_id];
+            data_type& data = output_data_map_[locality_id]; //-V108
 
             if (count == data.first)
             {

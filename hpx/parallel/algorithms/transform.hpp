@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             using hpx::util::get;
                             using hpx::util::invoke;
-                            get<1>(t) = invoke(f, invoke(proj, get<0>(t)));
+                            get<1>(t) = invoke(f, invoke(proj, get<0>(t))); //-V573
                         }));
             }
         };
@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             using hpx::util::get;
                             using hpx::util::invoke;
-                            get<2>(t) =
+                            get<2>(t) = //-V573
                                 invoke(f,
                                     invoke(proj1, get<0>(t)),
                                     invoke(proj2, get<1>(t)));
@@ -492,7 +492,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             using hpx::util::get;
                             using hpx::util::invoke;
-                            get<2>(t) =
+                            get<2>(t) = //-V573
                                 invoke(f,
                                     invoke(proj1, get<0>(t)),
                                     invoke(proj2, get<1>(t)));

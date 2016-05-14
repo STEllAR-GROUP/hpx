@@ -34,8 +34,8 @@ namespace hpx { namespace util
     private:
         union data
         {
-            char const* desc_;
-            std::size_t addr_;
+            char const* desc_; //-V117
+            std::size_t addr_; //-V117
         };
 
         data_type type_;

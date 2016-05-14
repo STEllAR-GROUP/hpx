@@ -53,6 +53,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
           , max_inbound_size_(max_inbound_size)
           , ack_(0)
           , parcelport_(parcelport)
+          , timer_()
+          , mtx_()
         {}
 
         ~receiver()

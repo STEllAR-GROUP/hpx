@@ -703,7 +703,7 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
                               << "  [TM] " //-V128
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";

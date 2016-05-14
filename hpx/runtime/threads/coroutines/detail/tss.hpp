@@ -170,7 +170,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         void insert(void const* key, void* tss_data)
         {
             std::shared_ptr<tss_cleanup_function> func;
-            insert(key, func, tss_data);
+            insert(key, func, tss_data); //-V614
         }
 
         void erase(void const* key, bool cleanup_existing)

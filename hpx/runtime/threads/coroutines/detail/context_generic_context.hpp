@@ -34,7 +34,6 @@
 #endif
 
 #include <boost/atomic.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>
 

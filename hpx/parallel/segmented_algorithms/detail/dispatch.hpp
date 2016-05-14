@@ -145,54 +145,66 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename Algo, typename ExPolicy, typename... Args>
+    template <typename R, typename Algo>
     struct dispatcher_helper
     {
+        template <typename ExPolicy, typename ... Args>
         static HPX_FORCEINLINE R sequential(Algo const& algo,
-            ExPolicy const& policy, Args const&... args)
+            ExPolicy && policy, Args &&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
             return
                 detail::algorithm_result_helper<R>::call(
-                    algo.call(policy, std::true_type(),
-                        segmented_local_iterator_traits<Args>::local(args)...
+                    algo.call(std::forward<ExPolicy>(policy), std::true_type(),
+                        segmented_local_iterator_traits<
+                            typename hpx::util::decay<Args>::type
+                        >::local(std::forward<Args>(args))...
                     )
                 );
         }
 
+        template <typename ExPolicy, typename ... Args>
         static HPX_FORCEINLINE R parallel(Algo const& algo,
-            ExPolicy const& policy, Args const&... args)
+            ExPolicy && policy, Args &&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
             return
                 detail::algorithm_result_helper<R>::call(
-                    algo.call(policy, std::false_type(),
-                        segmented_local_iterator_traits<Args>::local(args)...
+                    algo.call(std::forward<ExPolicy>(policy), std::false_type(),
+                        segmented_local_iterator_traits<
+                            typename hpx::util::decay<Args>::type
+                        >::local(std::forward<Args>(args))...
                     )
                 );
         }
     };
 
-    template <typename Algo, typename ExPolicy, typename... Args>
-    struct dispatcher_helper<void, Algo, ExPolicy, Args...>
+    template <typename Algo>
+    struct dispatcher_helper<void, Algo>
     {
+        template <typename ExPolicy, typename ... Args>
         static HPX_FORCEINLINE
         typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        sequential(Algo const& algo, ExPolicy const& policy, Args const&... args)
+        sequential(Algo const& algo, ExPolicy && policy, Args &&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
-            algo.call(policy, std::true_type(),
-                    segmented_local_iterator_traits<Args>::local(args)...
+            return algo.call(std::forward<ExPolicy>(policy), std::true_type(),
+                        segmented_local_iterator_traits<
+                            typename hpx::util::decay<Args>::type
+                        >::local(std::forward<Args>(args))...
                 );
         }
 
+        template <typename ExPolicy, typename ... Args>
         static HPX_FORCEINLINE
         typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        parallel(Algo const& algo, ExPolicy const& policy, Args const&... args)
+        parallel(Algo const& algo, ExPolicy && policy, Args &&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
-            algo.call(policy, std::false_type(),
-                    segmented_local_iterator_traits<Args>::local(args)...
+            return algo.call(std::forward<ExPolicy>(policy), std::false_type(),
+                        segmented_local_iterator_traits<
+                            typename hpx::util::decay<Args>::type
+                        >::local(std::forward<Args>(args))...
                 );
         }
     };
@@ -205,20 +217,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 ExPolicy, typename hpx::util::decay<Algo>::type::result_type
             >::type result_type;
 
-        typedef dispatcher_helper<
-                result_type, Algo, ExPolicy, Args...
-            > base_dispatcher;
+        typedef dispatcher_helper<result_type, Algo> base_dispatcher;
 
         static HPX_FORCEINLINE result_type sequential(Algo const& algo,
-            ExPolicy const& policy, Args const&... args)
+            ExPolicy policy, Args... args)
         {
-            return base_dispatcher::sequential(algo, policy, args...);
+            return base_dispatcher::sequential(algo, std::move(policy),
+                std::move(args)...);
         }
 
         static HPX_FORCEINLINE result_type parallel(Algo const& algo,
-            ExPolicy const& policy, Args const&... args)
+            ExPolicy policy, Args ... args)
         {
-            return base_dispatcher::sequential(algo, policy, args...);
+            return base_dispatcher::parallel(algo, std::move(policy),
+                std::move(args)...);
         }
     };
 
@@ -228,25 +240,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
     // sequential
     template <typename Algo, typename ExPolicy, typename R, typename... Args>
-    struct algorithm_invoker_action<
-                Algo, ExPolicy, std::true_type, R(Args const& ...)>
+    struct algorithm_invoker_action<Algo, ExPolicy, std::true_type, R(Args...)>
       : hpx::actions::make_action<
-            R (*)(Algo const&, ExPolicy const&, Args const&...),
+            R (*)(Algo const&, ExPolicy, Args...),
             &dispatcher<Algo, ExPolicy, Args...>::sequential,
-            algorithm_invoker_action<
-                Algo, ExPolicy, std::true_type, R(Args const& ...)>
+            algorithm_invoker_action<Algo, ExPolicy, std::true_type, R(Args...)>
         >::type
     {};
 
     // parallel
     template <typename Algo, typename ExPolicy, typename R, typename... Args>
-    struct algorithm_invoker_action<
-                Algo, ExPolicy, std::false_type, R(Args const& ...)>
+    struct algorithm_invoker_action<Algo, ExPolicy, std::false_type, R(Args...)>
       : hpx::actions::make_action<
-            R (*)(Algo const&, ExPolicy const&, Args const&...),
+            R (*)(Algo const&, ExPolicy, Args...),
             &dispatcher<Algo, ExPolicy, Args...>::parallel,
-            algorithm_invoker_action<
-                Algo, ExPolicy, std::false_type, R(Args const& ...)>
+            algorithm_invoker_action<Algo, ExPolicy, std::false_type, R(Args...)>
         >::type
     {};
 
@@ -264,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
         algorithm_invoker_action<
             algo_type, ExPolicy, typename IsSeq::type,
-            result_type(typename hpx::util::decay<Args>::type const&...)
+            result_type(typename hpx::util::decay<Args>::type...)
         > act;
 
         return hpx::async(act, hpx::colocated(id), std::forward<Algo>(algo),

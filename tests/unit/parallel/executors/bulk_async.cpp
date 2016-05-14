@@ -17,7 +17,7 @@
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
-int bulk_test(hpx::thread::id tid, int value, bool is_par, int passed_through)
+int bulk_test(hpx::thread::id tid, int value, bool is_par, int passed_through) //-V813
 {
     HPX_TEST(is_par == (tid != hpx::this_thread::get_id()));
     HPX_TEST_EQ(passed_through, 42);

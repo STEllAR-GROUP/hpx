@@ -32,7 +32,7 @@ void apply_test(hpx::lcos::local::latch& l, hpx::thread::id& id,
     l.count_down(1);
 }
 
-void sync_bulk_test(int value, hpx::thread::id tid, int passed_through)
+void sync_bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
 {
     HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);

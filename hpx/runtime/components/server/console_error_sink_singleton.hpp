@@ -30,7 +30,9 @@ namespace hpx { namespace components { namespace server
 
         typedef boost::signals2::scoped_connection scoped_connection_type;
 
-        console_error_dispatcher() {}
+        console_error_dispatcher()
+          : mtx_()
+        {}
 
         template <typename F, typename Connection>
         bool register_error_sink(F sink, Connection& conn)

@@ -377,7 +377,7 @@ namespace hpx { namespace naming
         }
 
         gid_type move_gid_locked(
-            std::unique_lock<gid_type::mutex_type> l, gid_type& gid)
+            std::unique_lock<gid_type::mutex_type> l, gid_type& gid) //-V813
         {
             HPX_ASSERT_OWNS_LOCK(l);
 

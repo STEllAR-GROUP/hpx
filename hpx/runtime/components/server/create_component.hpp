@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace server
         }
         catch(...)
         {
-            Component::heap_type::free(cv, 1);
+            Component::heap_type::free(cv, 1); //-V107
             throw;
         }
         Component *c = static_cast<Component *>(cv);
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace server
             return gid;
         }
 
-        Component::heap_type::free(c, 1);
+        Component::heap_type::free(c, 1); //-V107
 
         std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
@@ -93,7 +93,7 @@ namespace hpx { namespace components { namespace server
         }
         catch(...)
         {
-            Component::heap_type::free(cv, 1);
+            Component::heap_type::free(cv, 1); //-V107
             throw;
         }
         Component *c = static_cast<Component *>(cv);
@@ -105,7 +105,7 @@ namespace hpx { namespace components { namespace server
             return gid;
         }
 
-        Component::heap_type::free(c, 1);
+        Component::heap_type::free(c, 1); //-V107
 
         std::ostringstream strm;
         strm << "global id " << assigned_gid <<

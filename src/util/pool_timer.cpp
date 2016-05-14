@@ -77,7 +77,9 @@ namespace hpx { namespace util { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     pool_timer::pool_timer()
-      : timer_(new deadline_timer(
+      : pre_shutdown_(), is_started_(false), first_start_(true),
+        is_terminated_(false), is_stopped_(false),
+        timer_(new deadline_timer(
             hpx::get_runtime().get_thread_pool("timer_pool")->get_io_service())
         )
     {}

@@ -29,7 +29,7 @@ void test_inner_product_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d = test::random_iota(10007);
-    std::size_t init = std::rand() % 1007;
+    std::size_t init = std::rand() % 1007; //-V101
 
     bool caught_exception = false;
     try {
@@ -60,7 +60,7 @@ void test_inner_product_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d = test::random_iota(10007);
-    std::size_t init = std::rand() % 1007;
+    std::size_t init = std::rand() % 1007; //-V101
 
     bool returned_from_algorithm = false;
     bool caught_exception = false;

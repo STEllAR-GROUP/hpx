@@ -46,13 +46,13 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <string>
 
@@ -278,7 +278,7 @@ namespace hpx { namespace components
         bool isenabled_;
 
         // count outstanding instances to avoid premature unloading
-        boost::detail::atomic_count refcnt_;
+        util::atomic_count refcnt_;
     };
 }}
 

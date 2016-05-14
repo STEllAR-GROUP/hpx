@@ -11,25 +11,19 @@
 #include <hpx/config.hpp>
 
 #include <hpx/exception.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/runtime/serialization/map.hpp>
-
-#include <boost/mpl/has_xxx.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/or.hpp>
 
 #include <map>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    namespace detail {
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(iterator_category);
-    };
-
     class HPX_EXPORT locality
     {
         template <typename Impl>
@@ -69,15 +63,13 @@ namespace hpx { namespace parcelset
         locality()
         {}
 
-        template <typename Impl>
-        locality(Impl && i
-          , typename boost::disable_if<
-                boost::mpl::or_<
-                    boost::is_same<locality, typename util::decay<Impl>::type>
-                  , detail::has_iterator_category<typename util::decay<Impl>::type>
-                >
-            >::type* = 0
-        )
+        template <typename Impl, typename Enable =
+            typename std::enable_if<
+               !std::is_same<locality, typename util::decay<Impl>::type>::value &&
+               !traits::is_iterator<Impl>::value
+            >::type
+        >
+        locality(Impl && i)
           : impl_(new impl<typename util::decay<Impl>::type>(std::forward<Impl>(i)))
         {}
 

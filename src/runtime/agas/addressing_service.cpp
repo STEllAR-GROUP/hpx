@@ -2995,7 +2995,7 @@ void addressing_service::send_refcnt_requests_sync(
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<void> addressing_service::mark_as_migrated(
     naming::gid_type const& gid_
-  , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f
+  , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f //-V669
     )
 {
     if (!gid_)
@@ -3144,7 +3144,7 @@ bool addressing_service::was_object_migrated_locked(
 std::pair<bool, components::pinned_ptr>
     addressing_service::was_object_migrated(
         naming::gid_type const& gid
-      , util::unique_function_nonser<components::pinned_ptr()> && f
+      , util::unique_function_nonser<components::pinned_ptr()> && f //-V669
         )
 {
     if (!gid)
@@ -3201,7 +3201,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<hpx::future<hpx::id_type> >
-        find_all_from_basename(std::string basename, std::size_t num_ids)
+        find_all_from_basename(std::string const& basename, std::size_t num_ids)
     {
         if (basename.empty())
         {
@@ -3221,7 +3221,7 @@ namespace hpx
     }
 
     std::vector<hpx::future<hpx::id_type> >
-        find_from_basename(std::string basename,
+        find_from_basename(std::string const& basename,
             std::vector<std::size_t> const& ids)
     {
         if (basename.empty())
@@ -3234,14 +3234,14 @@ namespace hpx
         std::vector<hpx::future<hpx::id_type> > results;
         for (std::size_t i : ids)
         {
-            std::string name = detail::name_from_basename(basename, i);
+            std::string name = detail::name_from_basename(basename, i); //-V106
             results.push_back(agas::on_symbol_namespace_event(
                 std::move(name), agas::symbol_ns_bind, true));
         }
         return results;
     }
 
-    hpx::future<hpx::id_type> find_from_basename(std::string basename,
+    hpx::future<hpx::id_type> find_from_basename(std::string const& basename,
         std::size_t sequence_nr)
     {
         if (basename.empty())
@@ -3259,7 +3259,7 @@ namespace hpx
             agas::symbol_ns_bind, true);
     }
 
-    hpx::future<bool> register_with_basename(std::string basename,
+    hpx::future<bool> register_with_basename(std::string const& basename,
         hpx::id_type id, std::size_t sequence_nr)
     {
         if (basename.empty())
@@ -3277,7 +3277,7 @@ namespace hpx
     }
 
     hpx::future<hpx::id_type> unregister_with_basename(
-        std::string basename, std::size_t sequence_nr)
+        std::string const& basename, std::size_t sequence_nr)
     {
         if (basename.empty())
         {

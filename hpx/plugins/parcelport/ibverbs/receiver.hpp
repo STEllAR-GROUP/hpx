@@ -23,6 +23,7 @@
 #include <boost/integer/endian.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstring>
 #include <memory>
 #include <mutex>
 #include <vector>

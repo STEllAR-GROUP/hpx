@@ -16,13 +16,13 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/util/unique_function.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/unique_function.hpp>
+#include <hpx/util/unused.hpp>
 
-#include <boost/detail/atomic_count.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/math/common_factor_ct.hpp>
@@ -86,7 +86,7 @@ namespace detail
         friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
         friend void intrusive_ptr_release(future_data_refcnt_base* p);
 
-        boost::detail::atomic_count count_;
+        util::atomic_count count_;
     };
 
     /// support functions for boost::intrusive_ptr

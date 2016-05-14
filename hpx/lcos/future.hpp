@@ -141,7 +141,7 @@ namespace hpx { namespace lcos { namespace detail
                     value_type const & value =
                         *hpx::traits::future_access<Future>::
                             get_shared_state(f)->get_result();
-                    ar << value;
+                    ar << value; //-V128
                 }
             }
             return;
@@ -161,14 +161,14 @@ namespace hpx { namespace lcos { namespace detail
             if(ar.is_saving())
             {
                 value_type value = const_cast<Future &>(f).get();
-                ar << state << value;
+                ar << state << value; //-V128
             }
             else
             {
                 value_type const & value =
                     *hpx::traits::future_access<Future>::
                         get_shared_state(f)->get_result();
-                ar << state << value;
+                ar << state << value; //-V128
             }
         } else if (f.has_exception()) {
             state = future_state::has_exception;

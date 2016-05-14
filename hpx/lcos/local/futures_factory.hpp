@@ -228,7 +228,9 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         // construction and destruction
-        futures_factory() {}
+        futures_factory()
+          : future_obtained_(false)
+        {}
 
         template <typename F>
         explicit futures_factory(threads::executor& sched, F&& f)

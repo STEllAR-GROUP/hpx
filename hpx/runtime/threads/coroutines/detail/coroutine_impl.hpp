@@ -74,6 +74,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         coroutine_impl(functor_type&& f, naming::id_type&& target,
             thread_id_repr_type id, std::ptrdiff_t stack_size)
           : context_base(*this, stack_size, id)
+          , m_result_last(thread_state_enum::unknown)
           , m_arg(0)
           , m_result(0)
           , m_fun(std::move(f))

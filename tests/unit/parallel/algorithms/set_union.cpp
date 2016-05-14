@@ -32,7 +32,7 @@ void test_set_union1(ExPolicy policy, IteratorTag)
     std::sort(boost::begin(c1), boost::end(c1));
     std::sort(boost::begin(c2), boost::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size());
+    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::parallel::set_union(policy,
         iterator(boost::begin(c1)), iterator(boost::end(c1)),
@@ -57,7 +57,7 @@ void test_set_union1_async(ExPolicy p, IteratorTag)
     std::sort(boost::begin(c1), boost::end(c1));
     std::sort(boost::begin(c2), boost::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size());
+    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::future<void> result =
         hpx::parallel::set_union(p,
@@ -120,7 +120,7 @@ void test_set_union2(ExPolicy policy, IteratorTag)
     std::sort(boost::begin(c1), boost::end(c1), comp);
     std::sort(boost::begin(c2), boost::end(c2), comp);
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size());
+    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::parallel::set_union(policy,
         iterator(boost::begin(c1)), iterator(boost::end(c1)),
@@ -151,7 +151,7 @@ void test_set_union2_async(ExPolicy p, IteratorTag)
     std::sort(boost::begin(c1), boost::end(c1), comp);
     std::sort(boost::begin(c2), boost::end(c2), comp);
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size());
+    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::future<void> result =
         hpx::parallel::set_union(p,

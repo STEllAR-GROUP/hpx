@@ -74,13 +74,13 @@ int hpx_main (int argc, char *argv[])
         numBlocks = atoi(argv[2]);
     printf("size = %d, numBlocks = %d\n", size, numBlocks);
 
-    A.resize(size*size, 0);
-    L.resize(size*size, 0);
-    U.resize(size*size, 0);
+    A.resize(size*size, 0); //-V106
+    L.resize(size*size, 0); //-V106
+    U.resize(size*size, 0); //-V106
     t1 = get_tick_count();
     InitMatrix3();
     t2 = get_tick_count();
-    originalA.resize(size*size);
+    originalA.resize(size*size); //-V106
     for(int i = 0; i < size * size; i++)
         originalA[i] = A[i];
     printf("init done, time = %f\n", (t2-t1)/1000000.0);

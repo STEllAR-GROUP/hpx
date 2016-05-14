@@ -37,6 +37,7 @@ namespace hpx { namespace threads
             priority(thread_priority_normal),
             num_os_thread(std::size_t(-1)),
             stacksize(get_default_stack_size()),
+            target(),
             scheduler_base(0)
         {}
 
