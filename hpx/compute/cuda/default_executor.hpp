@@ -54,7 +54,16 @@ namespace hpx { namespace compute { namespace cuda
         std::size_t processing_units_count()
         {
             cudaDeviceProp props;
-            cudaGetDeviceProperties(&props, target_.native_handle().device_);
+            cudaError_t error = cudaGetDeviceProperties(&props,
+                target_.native_handle().device_);
+            if (error != cudaSuccess)
+            {
+                // report error
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "cuda::default_executor::processing_units_count()",
+                    std::string("cudaGetDeviceProperties failed: ") +
+                        cudaGetErrorString(error));
+            }
 
             std::size_t mp = props.multiProcessorCount;
             switch(props.major)
@@ -67,8 +76,9 @@ namespace hpx { namespace compute { namespace cuda
                 case 5:
                     return mp * 128;
                 default:
-                    return mp;
+                    break;
             }
+            return mp;
         }
 
         template <typename F, typename Shape, typename ... Ts>
