@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
@@ -61,9 +62,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     for_each_n<FwdIter>().call(
                         std::forward<ExPolicy>(policy), std::false_type(),
                         first, std::distance(first, last),
-                        [val](type& v) {
+                        [val](type& v)
+                        {
                             v = val;
-                        });
+                        },
+                        util::projection_identity());
             }
         };
         /// \endcond
@@ -160,7 +163,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [val](type& v) -> void
                         {
                             v = val;
-                        });
+                        },
+                        util::projection_identity());
             }
         };
         /// \endcond
