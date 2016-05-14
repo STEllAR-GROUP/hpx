@@ -72,7 +72,7 @@ int hpx_main(int argc, char *argv[])
         current_stack = stack_now;
         my_stack_info.pop();
     }
-    return 0;
+    return hpx::finalize();
 }
 
 int main(int argc, char *argv[])
