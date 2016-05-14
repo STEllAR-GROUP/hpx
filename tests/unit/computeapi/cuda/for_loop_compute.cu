@@ -8,7 +8,6 @@
 
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_copy.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -80,13 +79,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     hpx::compute::cuda::target targetA, targetB;
 
     // allocate data on the device
-    typedef hpx::compute::cuda::allocator<int> allocator_type;
     target_allocator allocA(targetA);
     target_allocator allocB(targetB);
 
-    hpx::compute::vector<int, allocator_type> d_A(N, allocA);
-    hpx::compute::vector<int, allocator_type> d_B(N, allocB);
-    hpx::compute::vector<int, allocator_type> d_C(N, allocA);
+    target_vector d_A(N, allocA);
+    target_vector d_B(N, allocB);
+    target_vector d_C(N, allocA);
 
     // copy data to device
     hpx::future<void> f =
