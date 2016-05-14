@@ -32,9 +32,9 @@
 
 #include <algorithm>
 #include <iterator>
+#include <list>
 #include <type_traits>
 #include <utility>
-#include <list>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {

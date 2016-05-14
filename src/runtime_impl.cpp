@@ -31,6 +31,7 @@
 #include <boost/ref.hpp>
 
 #include <iostream>
+#include <list>
 #include <mutex>
 #include <sstream>
 #include <string>

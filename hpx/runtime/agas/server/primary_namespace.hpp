@@ -31,6 +31,7 @@
 #endif
 
 #include <cstdint>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>

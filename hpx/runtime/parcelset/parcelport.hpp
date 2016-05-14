@@ -23,6 +23,7 @@
 #include <boost/cstdint.hpp>
 
 #include <deque>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>

@@ -30,6 +30,7 @@
 #include <boost/range/functions.hpp>
 
 #include <iterator>
+#include <list>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
