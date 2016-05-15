@@ -12,6 +12,9 @@
 
 #include <hpx/compute/host/block_executor.hpp>
 #include <hpx/compute/host/target.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 #include <hpx/util/functional/new.hpp>
 
@@ -137,14 +140,15 @@ namespace hpx { namespace compute { namespace host
         {
             // first touch policy, distribute evenly onto targets
             auto irange = boost::irange(std::size_t(0), count);
-            executor_.bulk_execute(
-                [p](std::size_t i, Args... args)
+            using namespace hpx::parallel;
+            for_each(
+                par.on(executor_).with(static_chunk_size()),
+                boost::begin(irange), boost::end(irange),
+                [p, args...](std::size_t i)
                 {
-                    // touch first by calling ctor ...
                     ::new (p + i) U (std::move(args)...);
-                },
-                boost::irange(std::size_t(0), count),
-                std::forward<Args>(args)...);
+                }
+            );
         }
 
         // Constructs an object of type T in allocated uninitialized storage
@@ -158,16 +162,21 @@ namespace hpx { namespace compute { namespace host
         }
 
         // Calls the destructor of count objects pointed to by p
-//         template <typename U>
-//         void bulk_destroy(U* p, std::size_t count)
-//         {
-//             // keep memory locality, use executor...
-// //             executor_.bulk_execute(
-// //                 [](U& val)
-// //                 {
-// //                     val.~U();
-// //                 }, boost::make_iterator_range(p, p + count));
-//         }
+        template <typename U>
+        void bulk_destroy(U* p, std::size_t count)
+        {
+            // keep memory locality, use executor...
+            auto irange = boost::irange(std::size_t(0), count);
+            using namespace hpx::parallel;
+            for_each(
+                par.on(executor_).with(static_chunk_size()),
+                boost::begin(irange), boost::end(irange),
+                [p](std::size_t i)
+                {
+                    (p + i)->~U();
+                }
+            );
+        }
 
         // Calls the destructor of the object pointed to by p
         template <typename U>

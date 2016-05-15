@@ -287,7 +287,7 @@ run_benchmark(
         timing[1][iteration] = mysecond();
         hpx::parallel::transform(policy,
             c.begin(), c.end(), b.begin(),
-            [scalar](STREAM_TYPE val)
+            [scalar] HPX_HOST_DEVICE (STREAM_TYPE val)
             {
                 return scalar * val;
             }
@@ -298,7 +298,7 @@ run_benchmark(
         timing[2][iteration] = mysecond();
         hpx::parallel::transform(policy,
             a.begin(), a.end(), b.begin(), b.end(), c.begin(),
-            [](STREAM_TYPE val1, STREAM_TYPE val2)
+            [] HPX_HOST_DEVICE (STREAM_TYPE val1, STREAM_TYPE val2)
             {
                 return val1 + val2;
             }
@@ -309,7 +309,7 @@ run_benchmark(
         timing[3][iteration] = mysecond();
         hpx::parallel::transform(policy,
             b.begin(), b.end(), c.begin(), c.end(), a.begin(),
-            [scalar](STREAM_TYPE val1, STREAM_TYPE val2)
+            [scalar] HPX_HOST_DEVICE (STREAM_TYPE val1, STREAM_TYPE val2)
             {
                 return val1 + scalar * val2;
             }
@@ -363,38 +363,95 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "-------------------------------------------------------------\n"
         ;
 
-    typedef hpx::compute::host::block_executor<>
-        executor_type;
+    bool use_accel = false;
+    if(vm.count("use-accelerator"))
+#if defined(HPX_HAVE_COMPUTE)
+        use_accel = true;
+#else
+#error "This version of HPX was built without accelerator support"
+#endif
 
-    using namespace hpx::parallel;
-
-    // Get the targets we want to run on
-    auto numa_nodes = hpx::compute::host::numa_domains();
-
-    typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
-
-    std::vector<std::vector<double> > timing;
     double time_total = mysecond();
-    // perform benchmark
-    if(chunker == "auto")
+    std::vector<std::vector<double> > timing;
+    if(use_accel)
     {
-        timing =
-            run_benchmark<allocator_type, executor_type>(
-                iterations, vector_size, numa_nodes, auto_chunk_size());
-    }
-    else if(chunker == "guided")
-    {
-        timing =
-            run_benchmark<allocator_type, executor_type>(
-                iterations, vector_size, numa_nodes, guided_chunk_size());
-    }
-    else //if(chunker == "dynamic")
-    {
-        timing =
-            run_benchmark<allocator_type, executor_type>(
-                iterations, vector_size, numa_nodes, dynamic_chunk_size());
-    }
+        using namespace hpx::parallel;
+#if defined(HPX_HAVE_CUDA)
+        typedef hpx::compute::cuda::default_executor
+            executor_type;
 
+        // Get the targets we want to run on
+        hpx::compute::cuda::target target;
+
+        typedef hpx::compute::cuda::allocator<STREAM_TYPE> allocator_type;
+#else
+#error "The STREAM benchmark currently requires CUDA to run on an accelerator"
+#endif
+
+        // perform benchmark
+//         if(chunker == "auto")
+//         {
+//             timing =
+//                 run_benchmark<allocator_type, executor_type>(
+//                     iterations, vector_size, std::move(target), auto_chunk_size());
+//         }
+//         else if(chunker == "guided")
+//         {
+//             timing =
+//                 run_benchmark<allocator_type, executor_type>(
+//                     iterations, vector_size, std::move(target), guided_chunk_size());
+//         }
+//         else if(chunker == "dynamic")
+//         {
+//             timing =
+//                 run_benchmark<allocator_type, executor_type>(
+//                     iterations, vector_size, std::move(target), dynamic_chunk_size());
+//         }
+//         else
+        {
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, std::move(target), static_chunk_size());
+        }
+    }
+    else
+    {
+        typedef hpx::compute::host::block_executor<>
+            executor_type;
+
+        using namespace hpx::parallel;
+
+        // Get the targets we want to run on
+        auto numa_nodes = hpx::compute::host::numa_domains();
+
+        typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
+
+        // perform benchmark
+        if(chunker == "auto")
+        {
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes, auto_chunk_size());
+        }
+        else if(chunker == "guided")
+        {
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes, guided_chunk_size());
+        }
+        else if(chunker == "dynamic")
+        {
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes, dynamic_chunk_size());
+        }
+        else
+        {
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes, static_chunk_size());
+        }
+    }
     time_total = mysecond() - time_total;
 
     /* --- SUMMARY --- */
@@ -518,6 +575,8 @@ int main(int argc, char* argv[])
             boost::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
             "possible values: dynamic, auto, guided. (default: default)")
+        (   "use-accelerator",
+            "Use this flag to run the stream benchmark on the GPU")
         ;
 
     // parse command line here to extract the necessary settings for HPX

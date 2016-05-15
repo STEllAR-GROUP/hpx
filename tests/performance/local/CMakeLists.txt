@@ -133,6 +133,10 @@ if(HPX_WITH_CXX11_LAMBDAS)
   set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
   set(partitioned_vector_foreach_FLAGS
     DEPENDENCIES iostreams_component partitioned_vector_component)
+
+  if(HPX_WITH_CUDA)
+    set_source_files_properties( stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ )
+  endif()
 endif()
 
 

@@ -30,6 +30,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // fill
     namespace detail
     {
+        template <typename T>
+        struct fill_iteration
+        {
+            typename hpx::util::decay<T>::type val_;
+            template <typename U>
+            HPX_HOST_DEVICE
+            void operator()(U &u)
+            {
+                u = val_;
+            }
+        };
+
         /// \cond NOINTERNAL
         struct fill : public detail::algorithm<fill>
         {
@@ -38,6 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {}
 
             template <typename ExPolicy, typename InIter, typename T>
+            HPX_HOST_DEVICE
             static hpx::util::unused_type
             sequential(ExPolicy, InIter first, InIter last,
                 T const& val)
@@ -62,10 +75,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     for_each_n<FwdIter>().call(
                         std::forward<ExPolicy>(policy), std::false_type(),
                         first, std::distance(first, last),
-                        [val](type& v)
-                        {
-                            v = val;
-                        },
+                        fill_iteration<T>{val},
                         util::projection_identity());
             }
         };

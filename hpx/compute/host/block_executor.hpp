@@ -10,6 +10,7 @@
 #include <hpx/compute/host/target.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -99,7 +100,6 @@ namespace hpx { namespace compute { namespace host
 
             try {
                 auto begin = boost::begin(shape);
-                std::size_t tmp = 0;
                 for (std::size_t i = 0; i != executors_.size(); ++i)
                 {
                     using namespace hpx::parallel;
@@ -116,7 +116,6 @@ namespace hpx { namespace compute { namespace host
                         std::make_move_iterator(futures.begin()),
                         std::make_move_iterator(futures.end()));
                     begin = part_end;
-                    tmp += part_size;
                 }
                 return results;
             }
@@ -134,8 +133,42 @@ namespace hpx { namespace compute { namespace host
         typename hpx::parallel::v3::detail::bulk_execute_result<F, Shape, Ts...>::type
         bulk_execute(F && f, Shape const& shape, Ts &&... ts)
         {
-            return hpx::util::unwrapped(bulk_async_execute(
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+            typename hpx::parallel::v3::detail::bulk_execute_result<F, Shape, Ts...>::type
+                results;
+            std::size_t cnt = boost::size(shape);
+            std::size_t part_size = cnt / executors_.size();
+
+            results.reserve(cnt);
+
+            try {
+                auto begin = boost::begin(shape);
+                for (std::size_t i = 0; i != executors_.size(); ++i)
+                {
+                    using namespace hpx::parallel;
+                    auto part_end = begin;
+                    std::advance(part_end, part_size);
+                    auto part_results =
+                        executor_traits::bulk_execute(
+                            executors_[i],
+                            std::forward<F>(f),
+                            boost::make_iterator_range(begin, part_end),
+                            std::forward<Ts>(ts)...);
+                    results.insert(
+                        results.end(),
+                        std::make_move_iterator(part_results.begin()),
+                        std::make_move_iterator(part_results.end()));
+                    begin = part_end;
+                }
+                return results;
+            }
+            catch (std::bad_alloc const& ba) {
+                boost::throw_exception(ba);
+            }
+            catch (...) {
+                boost::throw_exception(
+                    exception_list(boost::current_exception())
+                );
+            }
         }
 
         std::vector<host::target> const& targets() const
