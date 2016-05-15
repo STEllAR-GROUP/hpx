@@ -5,14 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_HOST_HPP
-#define HPX_COMPUTE_HOST_HPP
+#ifndef HPX_COMPUTE_HOST_NUMA_DOMAINS_HPP
+#define HPX_COMPUTE_HOST_NUMA_DOMAINS_HPP
 
-#include <hpx/compute/host/block_allocator.hpp>
-#include <hpx/compute/host/block_executor.hpp>
-#include <hpx/compute/host/default_executor.hpp>
 #include <hpx/compute/host/target.hpp>
-#include <hpx/compute/host/numa_domains.hpp>
-#include <hpx/compute/host/traits/access_target.hpp>
+
+#include <vector>
+
+namespace hpx { namespace compute { namespace host
+{
+    HPX_EXPORT std::vector<target> numa_domains();
+}}}
 
 #endif

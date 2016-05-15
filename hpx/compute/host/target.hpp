@@ -13,9 +13,11 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <utility>
+
 namespace hpx { namespace compute { namespace host
 {
-    struct target
+    struct HPX_EXPORT target
     {
         typedef hpx::threads::mask_type native_handle_type;
 
@@ -35,6 +37,13 @@ namespace hpx { namespace compute { namespace host
         {
             return mask_;
         }
+
+        native_handle_type & native_handle()
+        {
+            return mask_;
+        }
+
+        std::pair<std::size_t, std::size_t> num_pus() const;
 
         void synchronize() const
         {

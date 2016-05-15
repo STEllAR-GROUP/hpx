@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if !defined(__CUDA_ARCH__)
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__) && !defined(__CUDA_ARCH__)
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>

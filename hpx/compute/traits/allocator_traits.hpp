@@ -213,7 +213,8 @@ namespace hpx { namespace compute { namespace traits
         typedef typename access_target::target_type target_type;
 
         HPX_HOST_DEVICE
-        static target_type& target(Allocator const& alloc)
+        static auto target(Allocator const& alloc)
+         -> decltype(detail::call_target_helper(alloc))
         {
             return detail::call_target_helper(alloc);
         }

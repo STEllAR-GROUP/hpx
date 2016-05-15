@@ -13,6 +13,8 @@
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/host/target.hpp>
 
+#include <vector>
+
 namespace hpx { namespace compute { namespace traits
 {
     template <>
@@ -21,9 +23,33 @@ namespace hpx { namespace compute { namespace traits
         typedef host::target target_type;
 
         template <typename T>
-        static T & access(host::target const&, T * t, std::size_t pos)
+        static T const& read(target_type const& tgt, T const* t)
         {
-            return *(t + pos);
+            return *t;
+        }
+
+        template <typename T>
+        static void write(target_type const& tgt, T* dst, T const* src)
+        {
+            *dst = *src;
+        }
+    };
+
+    template <>
+    struct access_target<std::vector<host::target>>
+    {
+        typedef std::vector<host::target> target_type;
+
+        template <typename T>
+        static T const& read(target_type const& tgt, T const* t)
+        {
+            return *t;
+        }
+
+        template <typename T>
+        static void write(target_type const& tgt, T* dst, T const* src)
+        {
+            *dst = *src;
         }
     };
 }}}

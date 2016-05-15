@@ -107,6 +107,18 @@ namespace hpx { namespace threads
         return (lhs & rhs) != 0;
     }
 
+    // returns the number of bits set
+    // taken from https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
+    inline std::size_t count(mask_cref_type mask)
+    {
+        std::size_t c; // c accumulates the total bits set in v
+        for (c = 0; mask; c++)
+        {
+              mask &= mask - 1; // clear the least significant bit set
+        }
+        return c;
+    }
+
 #define HPX_CPU_MASK_PREFIX "0x"
 
 #else
@@ -211,6 +223,12 @@ namespace hpx { namespace threads
             }
         }
         return false;
+    }
+
+    // returns the number of bits set
+    inline std::size_t count(mask_cref_type mask)
+    {
+        return mask.count();
     }
 #endif
     /// \endcond

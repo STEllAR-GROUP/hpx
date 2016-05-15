@@ -58,7 +58,7 @@ namespace hpx { namespace compute { namespace detail
         {}
 
         // FIXME: should be private
-        iterator(pointer p, std::size_t pos, target_type& target)
+        iterator(pointer p, std::size_t pos, target_type const& target)
           : p_(p + pos)
           , target_(&target)
         {}
@@ -188,7 +188,7 @@ namespace hpx { namespace compute { namespace detail
 
     private:
         pointer p_;
-        target_type* target_;
+        const target_type* target_;
     };
 
     template <typename T, typename Allocator>

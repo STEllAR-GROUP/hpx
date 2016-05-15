@@ -7,6 +7,8 @@
 #define HPX_COMPUTE_CUDA_DEFAULT_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/decay.hpp>
@@ -140,4 +142,5 @@ namespace hpx { namespace compute { namespace cuda
     };
 }}}
 
+#endif
 #endif

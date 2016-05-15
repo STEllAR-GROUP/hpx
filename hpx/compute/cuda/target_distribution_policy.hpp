@@ -9,6 +9,8 @@
 #define HPX_COMPUTE_CUDA_TARGET_DISTRIBUTION_POLICY
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>

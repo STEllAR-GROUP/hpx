@@ -8,6 +8,10 @@
 #ifndef HPX_COMPUTE_CUDA_VALUE_PROXY_HPP
 #define HPX_COMPUTE_CUDA_VALUE_PROXY_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
 
@@ -92,4 +96,5 @@ namespace hpx { namespace compute { namespace cuda
     };
 }}}
 
+#endif
 #endif

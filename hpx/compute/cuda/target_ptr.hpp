@@ -9,6 +9,9 @@
 #define HPX_COMPUTE_CUDA_TARGET_PTR_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+
 #include <hpx/util/assert.hpp>
 
 #include <hpx/compute/cuda/target.hpp>
@@ -203,4 +206,5 @@ namespace hpx { namespace compute { namespace cuda
     };
 }}}
 
+#endif
 #endif
