@@ -146,7 +146,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //
         auto result = detail::parallel_scan_struct_lambda< OutIter, detail::exclusive_scan_tag>().call(
             std::forward < ExPolicy > (policy),
-            is_seq(),
+            std::false_type(), // is_seq(),
             s_begin,
             s_end,
             dest,
