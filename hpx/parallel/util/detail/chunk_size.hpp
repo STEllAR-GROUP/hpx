@@ -100,8 +100,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 traits::get_chunk_size(policy.parameters(),
                     policy.executor(), test_function, count);
 
-            if (chunk_size == 0)
-                chunk_size = (count + cores - 1) / cores;
+            if (chunk_size < (count/(cores*4)) )
+                chunk_size = (count + 4*cores - 1) / cores;
 
             if (stride != 1)
             {
@@ -129,8 +129,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     traits::get_chunk_size(policy.parameters(),
                         policy.executor(), [](){ return 0; }, count);
 
-                if (chunk_size == 0)
-                    chunk_size = (count + cores - 1) / cores;
+                if (chunk_size < (count/(cores*4)) )
+                    chunk_size = (count + 4*cores - 1) / cores;
 
                 if (stride != 1)
                 {
@@ -234,7 +234,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 traits::get_chunk_size(policy.parameters(),
                     policy.executor(), test_function, count);
 
-            if (chunk_size == 0)
+            if (chunk_size < (count/(cores*4)) )
                 chunk_size = (count + cores - 1) / cores;
 
             if (stride != 1)
@@ -265,8 +265,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     traits::get_chunk_size(policy.parameters(),
                         policy.executor(), [](){ return 0; }, count);
 
-                if (chunk_size == 0)
-                    chunk_size = (count + cores - 1) / cores;
+                if (chunk_size < (count/(cores*4)) )
+                    chunk_size = (count + 4*cores - 1) / cores;
 
                 if (stride != 1)
                 {
