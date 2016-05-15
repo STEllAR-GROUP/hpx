@@ -40,11 +40,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #endif
 
             std::advance(dest, count);
@@ -68,11 +68,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyDeviceToHost,
-                first.target().native_handle().stream_);
+                first.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToHost,
-                first.target().native_handle().stream_);
+                first.target().native_handle().get_stream());
 #endif
 
             std::advance(dest, count);
@@ -96,11 +96,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyHostToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #endif
 
             std::advance(dest, count);
@@ -124,11 +124,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #endif
 
             std::advance(first, count);
@@ -152,11 +152,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyDeviceToHost,
-                first.target().native_handle().stream_);
+                first.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
                 cudaMemcpyDeviceToHost,
-                first.target().native_handle().stream_);
+                first.target().native_handle().get_stream());
 #endif
 
             std::advance(first, count);
@@ -180,11 +180,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyHostToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
-                dest.target().native_handle().stream_);
+                dest.target().native_handle().get_stream());
 #endif
 
             std::advance(first, count);

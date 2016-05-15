@@ -37,6 +37,9 @@ add_hpx_library_sources(hpx
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/lcos/*.cpp"
   APPEND)
+add_hpx_library_sources(hpx
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compute/*.cpp"
+  APPEND)
 
 
 # libhpx_init sources

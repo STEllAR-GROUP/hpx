@@ -55,7 +55,7 @@ namespace hpx { namespace compute { namespace cuda
         {
             cudaDeviceProp props;
             cudaError_t error = cudaGetDeviceProperties(&props,
-                target_.native_handle().device_);
+                target_.native_handle().get_device());
             if (error != cudaSuccess)
             {
                 // report error

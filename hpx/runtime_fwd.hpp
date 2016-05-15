@@ -13,6 +13,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
@@ -37,18 +38,6 @@
 
 namespace hpx
 {
-    class HPX_API_EXPORT runtime;
-    class HPX_API_EXPORT thread;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
-    class HPX_API_EXPORT runtime_impl;
-
-    /// The function \a get_runtime returns a reference to the (thread
-    /// specific) runtime instance.
-    HPX_API_EXPORT runtime& get_runtime();
-    HPX_API_EXPORT runtime* get_runtime_ptr();
-
     /// Register the current kernel thread with HPX, this should be done once
     /// for each external OS-thread intended to invoke HPX functionality.
     /// Calling this function more than once will silently fail.

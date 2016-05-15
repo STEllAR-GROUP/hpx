@@ -163,6 +163,7 @@ namespace hpx { namespace compute { namespace traits
             HPX_HOST_DEVICE
             static void call(hpx::traits::detail::wrap_int,
                 Allocator& alloc, T* p, typename Allocator::size_type count)
+                HPX_NOEXCEPT
             {
                 T* end = p + count;
                 for(T* it = p; it != end; ++it)
@@ -174,8 +175,9 @@ namespace hpx { namespace compute { namespace traits
             template <typename Allocator, typename T>
             HPX_HOST_DEVICE
             static auto call(int,
-                Allocator& alloc, T* p, typename Allocator::size_type count)
-              -> decltype(alloc.bulk_destroy(p, count))
+                    Allocator& alloc, T* p, typename Allocator::size_type count)
+                    HPX_NOEXCEPT
+            ->  decltype(alloc.bulk_destroy(p, count))
             {
                 alloc.bulk_destroy(p, count);
             }
@@ -184,7 +186,7 @@ namespace hpx { namespace compute { namespace traits
         template <typename Allocator, typename T>
         HPX_HOST_DEVICE
         void call_bulk_destroy(Allocator& alloc, T* p,
-            typename Allocator::size_type count)
+            typename Allocator::size_type count) HPX_NOEXCEPT
         {
             bulk_destroy::call(0, alloc, p, count);
         }
@@ -226,9 +228,9 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename T>
         HPX_HOST_DEVICE
-        static void bulk_destroy(Allocator& alloc, T* p, size_type count)
+        static void bulk_destroy(Allocator& alloc, T* p, size_type count) HPX_NOEXCEPT
         {
-            detail::call_bulk_destroy(alloc, p, count);
+            if (p != 0) detail::call_bulk_destroy(alloc, p, count);
         }
     };
 }}}

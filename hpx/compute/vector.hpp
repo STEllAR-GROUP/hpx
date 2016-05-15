@@ -33,7 +33,6 @@ namespace hpx { namespace compute
         typedef T value_type;
         typedef Allocator allocator_type;
         typedef typename alloc_traits::access_target access_target;
-        typedef typename access_target::target_type target_type;
         typedef std::size_t size_type;
         typedef std::ptrdiff_t difference_type;
         typedef typename alloc_traits::reference reference;
@@ -53,8 +52,7 @@ namespace hpx { namespace compute
           : size_(0)
           , capacity_(0)
           , alloc_(alloc)
-          , target_(alloc_traits::target(alloc_))
-          , data_(nullptr)
+          , data_()
         {}
 
         // Constructs the container with count copies of elements with value value
@@ -62,7 +60,6 @@ namespace hpx { namespace compute
           : size_(count)
           , capacity_(count)
           , alloc_(alloc)
-          , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, count))
         {
             alloc_traits::bulk_construct(alloc_, static_cast<T*>(data_), size_, value);
@@ -74,7 +71,6 @@ namespace hpx { namespace compute
           : size_(count)
           , capacity_(count)
           , alloc_(alloc)
-          , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, count))
         {
             alloc_traits::bulk_construct(alloc_, static_cast<T*>(data_), size_);
@@ -87,7 +83,6 @@ namespace hpx { namespace compute
           : size_(std::distance(first, last))
           , capacity_(size_)
           , alloc_(alloc)
-          , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, size_))
         {
             hpx::parallel::util::copy_helper(first, last, begin());
@@ -97,7 +92,6 @@ namespace hpx { namespace compute
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(other.alloc_)
-          , target_(other.target_)
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
             hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
@@ -107,7 +101,6 @@ namespace hpx { namespace compute
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(alloc)
-          , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
             hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
@@ -117,31 +110,26 @@ namespace hpx { namespace compute
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(std::move(other.alloc_))
-          , target_(other.target_)
-          , data_(other.data_)
+          , data_(std::move(other.data_))
         {
             other.size_ = 0;
             other.capacity_ = 0;
-            other.data_ = nullptr;
         }
 
         vector(vector && other, Allocator const& alloc)
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(alloc)
-          , target_(alloc_traits::target(alloc_))
-          , data_(other.data_)
+          , data_(std::move(other.data_))
         {
             other.size_ = 0;
             other.capacity_ = 0;
-            other.data_ = nullptr;
         }
 
         vector(std::initializer_list<T> init, Allocator const& alloc)
           : size_(init.size())
           , capacity_(init.size())
           , alloc_(alloc)
-          , target_(alloc_traits::target(alloc_))
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
             hpx::parallel::util::copy_helper(init.begin(), init.end(), begin());
@@ -156,11 +144,49 @@ namespace hpx { namespace compute
             }
         }
 
-        // TODO: implement operator=
+        vector& operator=(vector const& other)
+        {
+            if (this == &other)
+                return *this;
+
+            pointer data = alloc_traits::allocate(other.alloc_, other.capacity_);
+            hpx::parallel::util::copy_helper(other.begin(), other.end(),
+                iterator(data, 0, alloc_traits::target(other.alloc_)));
+
+            if(static_cast<T*>(data_) != nullptr)
+            {
+                alloc_traits::bulk_destroy(alloc_, static_cast<T*>(data_), size_);
+                alloc_traits::deallocate(alloc_, data_, capacity_);
+            }
+
+            size_ = other.size_;
+            capacity_ = other.capacity_;
+            alloc_ = other.alloc_;
+            data_ = std::move(data);
+
+            return *this;
+        }
+
+        vector& operator=(vector && other)
+        {
+            if (this == &other)
+                return *this;
+
+            size_ = other.size_;
+            capacity_ = other.capacity_;
+            alloc_ = std::move(other.alloc_);
+            data_ = std::move(other.data_);
+
+            other.size_ = 0;
+            other.capacity_ = 0;
+
+            return *this;
+        }
+
         // TODO: implement assign
 
         /// Returns the allocator associated with the container
-        allocator_type get_allocator() const
+        allocator_type get_allocator() const HPX_NOEXCEPT
         {
             return alloc_;
         }
@@ -205,47 +231,125 @@ namespace hpx { namespace compute
             return data_;
         }
 
-        std::size_t size() const
+        //
+        std::size_t size() const HPX_NOEXCEPT
         {
             return size_;
         }
 
-        std::size_t capacity() const
+        std::size_t capacity() const HPX_NOEXCEPT
         {
             return capacity_;
+        }
+
+        /// Returns: size() == 0
+        bool empty() const HPX_NOEXCEPT
+        {
+            return size_ == 0;
+        }
+
+        /// Effects: If size <= size(), equivalent to calling pop_back()
+        /// size() - size times. If size() < size, appends size - size()
+        /// default-inserted elements to the sequence.
+        ///
+        /// Requires: T shall be MoveInsertable and DefaultInsertable into *this.
+        ///
+        /// Remarks: If an exception is thrown other than by the move constructor
+        /// of a non-CopyInsertable T there are no effects.
+        ///
+        void resize(size_type size)
+        {
+            // TODO: implement this
+        }
+
+        /// Effects: If size <= size(), equivalent to calling pop_back()
+        /// size() - size times. If size() < size, appends size - size()
+        /// copies of val to the sequence.
+        ///
+        /// Requires: T shall be CopyInsertable into *this.
+        ///
+        /// Remarks: If an exception is thrown there are no effects.
+        ///
+        void resize(size_type size, T const& val)
+        {
+            // TODO: implement this
         }
 
         ///////////////////////////////////////////////////////////////////////
         // Iterators
         // TODO: implement cbegin, cend, rbegin, crbegin, rend, crend
         // TODO: debug support
-        iterator begin()
+        iterator begin() HPX_NOEXCEPT
         {
-            return iterator(data_, 0, target_);
+            return iterator(data_, 0, alloc_traits::target(alloc_));
         }
 
-        iterator end()
+        iterator end() HPX_NOEXCEPT
         {
-            return iterator(data_, size_, target_);
+            return iterator(data_, size_, alloc_traits::target(alloc_));
         }
 
-        const_iterator begin() const
+        const_iterator cbegin() const HPX_NOEXCEPT
         {
-            return const_iterator(data_, 0, target_);
+            return const_iterator(data_, 0, alloc_traits::target(alloc_));
         }
 
-        const_iterator end() const
+        const_iterator cend() const HPX_NOEXCEPT
         {
-            return const_iterator(data_, size_, target_);
+            return const_iterator(data_, size_, alloc_traits::target(alloc_));
+        }
+
+        const_iterator begin() const HPX_NOEXCEPT
+        {
+            return const_iterator(data_, 0, alloc_traits::target(alloc_));
+        }
+
+        const_iterator end() const HPX_NOEXCEPT
+        {
+            return const_iterator(data_, size_, alloc_traits::target(alloc_));
+        }
+
+        /// Effects: Exchanges the contents and capacity() of *this with that
+        /// of x.
+        ///
+        /// Complexity: Constant time.
+        ///
+        void swap(vector& other)
+        {
+            vector tmp = std::move(other);
+            other = std::move(*this);
+            *this = std::move(tmp);
+        }
+
+        /// Effects: Erases all elements in the range [begin(),end()).
+        /// Destroys all elements in a. Invalidates all references, pointers,
+        /// and iterators referring to the elements of a and may invalidate the
+        /// past-the-end iterator.
+        ///
+        /// Post: a.empty() returns true.
+        ///
+        /// Complexity: Linear.
+        ///
+        void clear() HPX_NOEXCEPT
+        {
+            alloc_traits::bulk_destroy(alloc_, static_cast<T*>(data_), size_);
+            size_ = 0;
         }
 
     private:
         size_type size_;
         size_type capacity_;
         allocator_type alloc_;
-        target_type& target_;
         pointer data_;
     };
+
+    /// Effects: x.swap(y);
+    template <typename T, typename Allocator>
+    HPX_FORCEINLINE
+    void swap(vector<T, Allocator>& x, vector<T, Allocator>& y)
+    {
+        x.swap(y);
+    }
 }}
 
 #endif

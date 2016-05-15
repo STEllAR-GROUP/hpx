@@ -12,14 +12,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/exception.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
+#if !defined(__CUDA_ARCH__)
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#endif
 #include <cuda_runtime.h>
 
+#include <mutex>
 #include <string>
 #include <utility>
 
@@ -27,200 +29,70 @@ namespace hpx { namespace compute { namespace cuda
 {
     namespace detail
     {
-        struct runtime_registration_wrapper
+        struct HPX_EXPORT runtime_registration_wrapper
         {
-            runtime_registration_wrapper(hpx::runtime* rt)
-              : rt_(rt)
-            {
-                HPX_ASSERT(rt);
-
-                // Register this thread with HPX, this should be done once for
-                // each external OS-thread intended to invoke HPX functionality.
-                // Calling this function more than once on the same thread will
-                // report an error.
-                hpx::error_code ec(hpx::lightweight);       // ignore errors
-                hpx::register_thread(rt_, "cuda", ec);
-            }
-            ~runtime_registration_wrapper()
-            {
-                // Unregister the thread from HPX, this should be done once in
-                // the end before the external thread exists.
-                hpx::unregister_thread(rt_);
-            }
+            runtime_registration_wrapper(hpx::runtime* rt);
+            ~runtime_registration_wrapper();
 
             hpx::runtime* rt_;
         };
-
-        struct future_data;
-
-        struct release_on_exit
-        {
-            release_on_exit(future_data* data)
-              : data_(data)
-            {}
-
-            ~release_on_exit();
-
-            future_data* data_;
-        };
-
-        struct future_data : lcos::detail::future_data<void>
-        {
-        private:
-            static void CUDART_CB stream_callback(cudaStream_t stream,
-                cudaError_t error, void* user_data)
-            {
-                future_data* this_ = static_cast<future_data*>(user_data);
-
-                runtime_registration_wrapper wrap(this_->rt_);
-
-                // We need to run this as an HPX thread ...
-                hpx::applier::register_thread_nullary(
-                    [this_, error] ()
-                    {
-                        release_on_exit on_exit(this_);
-
-                        if (error != cudaSuccess)
-                        {
-                            this_->set_exception(
-                                HPX_GET_EXCEPTION(kernel_error,
-                                    "cuda::detail::future_data::stream_callback()",
-                                    std::string("cudaStreamAddCallback failed: ") +
-                                        cudaGetErrorString(error))
-                            );
-                            return;
-                        }
-
-                        this_->set_data(hpx::util::unused);
-                    },
-                    "hpx::compute::cuda::future_data::stream_callback"
-                );
-            }
-
-        public:
-            future_data(cudaStream_t stream)
-              : rt_(hpx::get_runtime_ptr())
-            {
-                // Hold on to the shared state on behalf of the cuda runtime
-                // right away as the callback could be called immediately.
-                lcos::detail::intrusive_ptr_add_ref(this);
-
-                cudaError_t error = cudaStreamAddCallback(
-                    stream, stream_callback, this, 0);
-                if (error != cudaSuccess)
-                {
-                    // callback was not called, release object
-                    lcos::detail::intrusive_ptr_release(this);
-
-                    // report error
-                    HPX_THROW_EXCEPTION(kernel_error,
-                        "cuda::detail::future_data::future_data()",
-                        std::string("cudaStreamAddCallback failed: ") +
-                            cudaGetErrorString(error));
-                }
-            }
-
-        private:
-            hpx::runtime* rt_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        release_on_exit::~release_on_exit()
-        {
-            // release the shared state
-            lcos::detail::intrusive_ptr_release(data_);
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct target
+    struct HPX_EXPORT target
     {
     private:
         HPX_MOVABLE_ONLY(target);
 
     public:
-        struct native_handle_type
+        struct HPX_EXPORT native_handle_type
         {
+            typedef hpx::lcos::local::spinlock mutex_type;
+
             HPX_MOVABLE_ONLY(native_handle_type);
 
-            native_handle_type(int device = 0)
-              : device_(device), stream_(0)
-            {}
+            native_handle_type(int device = 0);
 
-            ~native_handle_type()
+            ~native_handle_type();
+
+            native_handle_type(native_handle_type && rhs) HPX_NOEXCEPT;
+
+            native_handle_type& operator=(native_handle_type && rhs) HPX_NOEXCEPT;
+
+            cudaStream_t get_stream() const;
+
+            int get_device() const HPX_NOEXCEPT
             {
-                if (stream_)
-                    cudaStreamDestroy(stream_);     // ignore error
+                return device_;
             }
 
-            native_handle_type(native_handle_type && rhs)
-              : device_(rhs.device_), stream_(rhs.stream_)
+            hpx::id_type const& get_locality() const HPX_NOEXCEPT
             {
-                rhs.stream_ = 0;
+                return locality_;
             }
 
-            native_handle_type& operator=(native_handle_type && rhs)
-            {
-                device_ = rhs.device_;
-                stream_ = rhs.stream_;
-                rhs.stream_ = 0;
-                return *this;
-            }
+        private:
+            friend struct target;
 
+            mutable mutex_type mtx_;
             int device_;
-            cudaStream_t stream_;
+            mutable cudaStream_t stream_;
+            hpx::id_type locality_;
         };
 
         // Constructs default target
-        target()
-        {
-            cudaError_t error = cudaSetDevice(handle_.device_);
-            if (error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::target()",
-                    std::string("cudaSetDevice failed: ") +
-                        cudaGetErrorString(error));
-            }
-            error = cudaStreamCreateWithFlags(&handle_.stream_,
-                cudaStreamNonBlocking);
-            if (error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::target()",
-                    std::string("cudaStreamCreate failed: ") +
-                        cudaGetErrorString(error));
-            }
-        }
+        target() HPX_NOEXCEPT {}
 
         // Constructs target from a given device ID
         explicit target(int device)
           : handle_(device)
-        {
-            cudaError_t error = cudaSetDevice(handle_.device_);
-            if (error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::target()",
-                    std::string("cudaSetDevice failed: ") +
-                        cudaGetErrorString(error));
-            }
-            error = cudaStreamCreateWithFlags(&handle_.stream_,
-                cudaStreamNonBlocking);
-            if (error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::target()",
-                    std::string("cudaStreamCreate failed: ") +
-                        cudaGetErrorString(error));
-            }
-        }
+        {}
 
-        target(target && rhs)
+        target(target && rhs) HPX_NOEXCEPT
           : handle_(std::move(rhs.handle_))
         {}
 
-        target& operator=(target && rhs)
+        target& operator=(target && rhs) HPX_NOEXCEPT
         {
             handle_ = std::move(rhs.handle_);
             return *this;
@@ -231,28 +103,24 @@ namespace hpx { namespace compute { namespace cuda
             return handle_;
         }
 
-        void synchronize() const
-        {
-            cudaError_t error = cudaStreamSynchronize(handle_.stream_);
-            if(error != cudaSuccess)
-            {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::target::synchronize",
-                    std::string("cudaStreamSynchronize failed: ") +
-                        cudaGetErrorString(error));
-            }
-        }
+        void synchronize() const;
 
-        hpx::future<void> get_future() const
-        {
-            typedef detail::future_data shared_state_type;
-            shared_state_type* p = new shared_state_type(handle_.stream_);
-            return hpx::traits::future_access<hpx::future<void> >::create(p);
-        }
+        hpx::future<void> get_future() const;
 
     private:
+#if !defined(__CUDA_ARCH__)
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & handle_.device_ & handle_.locality_;
+        }
+#endif
         native_handle_type handle_;
     };
+
+    HPX_API_EXPORT target& get_default_target();
 }}}
 
 #endif

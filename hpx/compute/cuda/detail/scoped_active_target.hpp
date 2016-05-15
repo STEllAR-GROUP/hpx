@@ -35,13 +35,13 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
                     std::string("cudaGetDevice failed: ") +
                         cudaGetErrorString(error));
             }
-            if(previous_device_ == target_.native_handle().device_)
+            if(previous_device_ == target_.native_handle().get_device())
             {
                 previous_device_ = -1;
                 return;
             }
 
-            error = cudaSetDevice(target_.native_handle().device_);
+            error = cudaSetDevice(target_.native_handle().get_device());
             if(error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
@@ -64,7 +64,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
                     std::string("cudaGetDevice failed: ") +
                         cudaGetErrorString(error));
             }
-            HPX_ASSERT(current_device == target_.native_handle().device_);
+            HPX_ASSERT(current_device == target_.native_handle().get_device());
 #endif
             if(previous_device_ != -1)
             {
@@ -81,7 +81,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 
         cudaStream_t stream()
         {
-            return target_.native_handle().stream_;
+            return target_.native_handle().get_stream();
         }
 
     private:

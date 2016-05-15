@@ -95,7 +95,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
                 std::alignment_of<Closure>::value, sizeof(Closure));
             std::memcpy(param_buffer, &c, sizeof(Closure));
             cudaLaunchDevice(reinterpret_cast<void*>(launcher), param_buffer,
-                dim3(gridDim), dim3(blockDim), 0, tgt.native_handle().stream_);
+                dim3(gridDim), dim3(blockDim), 0, tgt.native_handle().get_stream());
 #endif
         }
     };

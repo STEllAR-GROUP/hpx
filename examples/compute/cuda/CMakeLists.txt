@@ -10,9 +10,11 @@ if(HPX_WITH_CUDA)
   set(example_programs ${example_programs}
       data_copy
       hello_compute
+      partitioned_vector
     )
   set(data_copy_CUDA On)
   set(hello_compute_CUDA On)
+  set(partitioned_vector_CUDA ON)
 endif()
 
 foreach(example_program ${example_programs})
