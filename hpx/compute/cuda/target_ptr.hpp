@@ -13,6 +13,7 @@
 
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
+#include <hpx/compute/detail/get_proxy_type.hpp>
 
 namespace hpx { namespace compute { namespace cuda
 {
@@ -20,6 +21,9 @@ namespace hpx { namespace compute { namespace cuda
     class target_ptr
     {
     public:
+        typedef
+            typename compute::detail::get_proxy_type<T>::type *
+            proxy_type;
         typedef std::random_access_iterator_tag iterator_category;
 #if defined(__CUDA_ARCH__)
         typedef T value_type;
@@ -137,10 +141,10 @@ namespace hpx { namespace compute { namespace cuda
         }
 
 #if defined(__CUDA_ARCH__)
-        T const& operator*() const
-        {
-            return *p_;
-        }
+//         T const& operator*() const
+//         {
+//             return *p_;
+//         }
 
         T& operator*()
         {

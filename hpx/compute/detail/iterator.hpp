@@ -12,6 +12,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <hpx/compute/traits/allocator_traits.hpp>
+#include <hpx/compute/detail/get_proxy_type.hpp>
 
 #include <iterator>
 
@@ -27,6 +28,10 @@ namespace hpx { namespace compute { namespace detail
             typename traits::allocator_traits<Allocator>::reference
         >
     {
+        typedef
+            typename get_proxy_type<T>::type *
+            proxy_type;
+
         typedef
             typename traits::allocator_traits<Allocator>::value_type
             value_type;
@@ -151,17 +156,17 @@ namespace hpx { namespace compute { namespace detail
             return p_ - other.p_;
         }
 
-        const_reference operator*() const
+        reference operator*() const
         {
             HPX_ASSERT(p_);
             return *p_;
         }
 
-        reference operator*()
-        {
-            HPX_ASSERT(p_);
-            return *p_;
-        }
+//         reference operator*()
+//         {
+//             HPX_ASSERT(p_);
+//             return *p_;
+//         }
 
         pointer operator->() const
         {

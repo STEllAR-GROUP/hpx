@@ -20,6 +20,7 @@ namespace hpx { namespace compute { namespace cuda
             traits::access_target<cuda::target> access_target;
 
     public:
+
         value_proxy(T *p, cuda::target & tgt) HPX_NOEXCEPT
           : p_(p)
           , target_(tgt)
@@ -58,6 +59,8 @@ namespace hpx { namespace compute { namespace cuda
             traits::access_target<cuda::target> access_target;
 
     public:
+        typedef T const proxy_type;
+
         value_proxy(T *p, cuda::target & tgt) HPX_NOEXCEPT
           : p_(p)
           , target_(tgt)

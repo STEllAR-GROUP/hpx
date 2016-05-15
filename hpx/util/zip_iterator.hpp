@@ -237,6 +237,7 @@ namespace hpx { namespace util
         struct dereference_iterator<tuple<Ts...> >
         {
             template <std::size_t ...Is>
+            HPX_HOST_DEVICE
             static typename zip_iterator_reference<
                 tuple<Ts...>
             >::type call(detail::pack_c<std::size_t, Is...>,
@@ -249,6 +250,7 @@ namespace hpx { namespace util
         struct increment_iterator
         {
             template <typename T>
+            HPX_HOST_DEVICE
             void operator()(T& iter) const
             {
                 ++iter;
@@ -258,6 +260,7 @@ namespace hpx { namespace util
         struct decrement_iterator
         {
             template <typename T>
+            HPX_HOST_DEVICE
             void operator()(T& iter) const
             {
                 --iter;
@@ -269,6 +272,7 @@ namespace hpx { namespace util
             explicit advance_iterator(std::ptrdiff_t n) : n_(n) {}
 
             template <typename T>
+            HPX_HOST_DEVICE
             void operator()(T& iter) const
             {
                 iter += n_;

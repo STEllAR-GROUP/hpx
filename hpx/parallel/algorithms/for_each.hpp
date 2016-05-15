@@ -221,10 +221,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename Size, typename F,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value)> // &&
-//         parallel::traits::is_indirect_callable<
-//             F, traits::projected<util::projection_identity, InIter>
-//         >::value)>
+        hpx::traits::is_iterator<InIter>::value &&
+        parallel::traits::is_indirect_callable<
+            F, traits::projected<util::projection_identity, InIter>
+        >::value)>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each_n(ExPolicy && policy, InIter first, Size count, F && f)
     {
@@ -411,10 +411,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value)> //  &&
-//         parallel::traits::is_indirect_callable<
-//             F, traits::projected<util::projection_identity, InIter>
-//         >::value)>
+        hpx::traits::is_iterator<InIter>::value &&
+        parallel::traits::is_indirect_callable<
+            F, traits::projected<util::projection_identity, InIter>
+        >::value)>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f)
     {

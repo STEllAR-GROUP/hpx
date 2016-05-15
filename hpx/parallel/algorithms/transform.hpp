@@ -40,6 +40,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename InIter1, typename OutIter, typename F,
             typename Proj>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE std::pair<InIter1, OutIter>
         sequential_transform(InIter1 first1, InIter1 last1,
             OutIter dest, F && f, Proj && proj)
@@ -52,6 +53,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return std::make_pair(first1, dest);
         }
 
+        template <typename F, typename Proj>
+        struct transform_iteration
+        {
+            typename hpx::util::decay<F>::type f_;
+            typename hpx::util::decay<Proj>::type proj_;
+
+            template <typename Tuple>
+            HPX_HOST_DEVICE
+            void operator()(Tuple && t)
+            {
+                using hpx::util::get;
+                using hpx::util::invoke;
+                get<1>(t) = invoke(f_, invoke(proj_, get<0>(t))); //-V573
+            }
+        };
+
         template <typename IterPair>
         struct transform
           : public detail::algorithm<transform<IterPair>, IterPair>
@@ -62,6 +79,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename OutIter,
                 typename F, typename Proj>
+            HPX_HOST_DEVICE
             static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, F && f, Proj && proj)
@@ -87,12 +105,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
-                        [f, proj](reference t)
-                        {
-                            using hpx::util::get;
-                            using hpx::util::invoke;
-                            get<1>(t) = invoke(f, invoke(proj, get<0>(t))); //-V573
-                        },
+                        transform_iteration<F, Proj>{std::forward<F>(f),
+                            std::forward<Proj>(proj)},
                         util::projection_identity()));
             }
         };
@@ -211,9 +225,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // transform binary predicate
     namespace detail
     {
+        template <typename F, typename Proj1, typename Proj2>
+        struct transform_binary_iteration
+        {
+            typename hpx::util::decay<F>::type f_;
+            typename hpx::util::decay<Proj1>::type proj1_;
+            typename hpx::util::decay<Proj2>::type proj2_;
+
+            template <typename Tuple>
+            HPX_HOST_DEVICE
+            void operator()(Tuple && t)
+            {
+                using hpx::util::get;
+                using hpx::util::invoke;
+                get<2>(t) = invoke(f_, //-V573
+                        invoke(proj1_, get<0>(t)),
+                        invoke(proj2_, get<1>(t)));
+            }
+        };
+
         /// \cond NOINTERNAL
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F, typename Proj1, typename Proj2>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE hpx::util::tuple<InIter1, InIter2, OutIter>
         sequential_transform(InIter1 first1, InIter1 last1,
             InIter2 first2,  OutIter dest, F && f,
@@ -268,15 +302,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first1, first2, dest),
                         std::distance(first1, last1),
-                        [f, proj1, proj2](reference t)
-                        {
-                            using hpx::util::get;
-                            using hpx::util::invoke;
-                            get<2>(t) = //-V573
-                                invoke(f,
-                                    invoke(proj1, get<0>(t)),
-                                    invoke(proj2, get<1>(t)));
-                        },
+                        transform_binary_iteration<F, Proj1, Proj2>{
+                            std::forward<F>(f), std::forward<Proj1>(proj1),
+                            std::forward<Proj2>(proj2)},
                         util::projection_identity()));
             }
         };
@@ -490,15 +518,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         (std::min)(
                             std::distance(first1, last1),
                             std::distance(first2, last2)),
-                        [f, proj1, proj2](reference t)
-                        {
-                            using hpx::util::get;
-                            using hpx::util::invoke;
-                            get<2>(t) = //-V573
-                                invoke(f,
-                                    invoke(proj1, get<0>(t)),
-                                    invoke(proj2, get<1>(t)));
-                        },
+                        transform_binary_iteration<F, Proj1, Proj2>{
+                            std::forward<F>(f), std::forward<Proj1>(proj1),
+                            std::forward<Proj2>(proj2)},
                         util::projection_identity()));
             }
         };
