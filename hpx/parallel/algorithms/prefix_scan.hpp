@@ -243,6 +243,8 @@ HPX_INLINE_NAMESPACE(v1)
             // the future result of each scan chunk lambda_1
             std::vector<hpx::future<f1_type> > work_items;
             std::vector<hpx::future<f2_type> > work_items_2;
+            std::list<boost::exception_ptr> errors1;
+            std::list<boost::exception_ptr> errors2;
             //
             work_chunks.reserve(n_chunks);
             work_items.reserve(n_chunks);
@@ -282,6 +284,8 @@ HPX_INLINE_NAMESPACE(v1)
             // do a tree of combine operations on the result of the 2^N sequence results
             //
             hpx::wait_all(work_items);
+            util::detail::handle_local_exceptions<ExPolicy>::call(work_items, errors1);
+
             for (int c = 0; c < n_chunks; ++c) {
                 std::get<2>(work_chunks[c]) = work_items[c].get();
             }
@@ -328,6 +332,7 @@ HPX_INLINE_NAMESPACE(v1)
                 work_items_2.push_back(std::move(w2));
             }
             hpx::wait_all(work_items_2);
+            util::detail::handle_local_exceptions<ExPolicy>::call(work_items_2, errors2);
             //
             f2_type resf2 = std::move(work_items_2.back().get());
             f3_type resf3 = f3(resf2);
