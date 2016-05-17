@@ -27,7 +27,6 @@
 #include <boost/throw_exception.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/detail/atomic_count.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/intrusive_ptr.hpp>
 
@@ -633,7 +632,7 @@ namespace hpx { namespace components
         }
 #endif
 
-#if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
+#if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS) && !defined(__CUDACC__)
     private:
         // declare friends which are allowed to access get_base_gid()
         friend Component;
