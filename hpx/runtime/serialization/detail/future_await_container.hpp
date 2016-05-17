@@ -69,10 +69,11 @@ namespace hpx { namespace serialization { namespace detail
                 std::lock_guard<mutex_type> l(mtx_);
                 ++num_futures_;
             }
+            std::shared_ptr<future_await_container> this_(this->shared_from_this());
             future_data.set_on_completed(
-                [this]()
+                [this_]()
                 {
-                    trigger();
+                    this_->trigger();
                 }
             );
         }
