@@ -213,9 +213,10 @@ namespace hpx { namespace lcos
                             // Attach a continuation to this future which will
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
+                            boost::intrusive_ptr<wait_all_frame> this_(this);
                             next_future_data->set_on_completed(
                                 util::deferred_call(
-                                    f, this, std::move(next), std::move(end)));
+                                    f, std::move(this_), std::move(next), std::move(end)));
                             return;
                         }
                     }
@@ -269,8 +270,9 @@ namespace hpx { namespace lcos
                         void (wait_all_frame::*f)(true_, false_) =
                             &wait_all_frame::await_next<I>;
 
+                        boost::intrusive_ptr<wait_all_frame> this_(this);
                         next_future_data->set_on_completed(util::deferred_call(
-                            f, this, true_(), false_()));
+                            f, std::move(this_), true_(), false_()));
                         return;
                     }
                 }
@@ -319,8 +321,8 @@ namespace hpx { namespace lcos
         typedef detail::wait_all_frame<result_type> frame_type;
 
         result_type data(values);
-        frame_type frame(data);
-        frame.wait_all();
+        boost::intrusive_ptr<frame_type> frame(new frame_type(data));
+        frame->wait_all();
     }
 
     template <typename Future>
@@ -392,8 +394,8 @@ namespace hpx { namespace lcos
         result_type values =
             result_type(traits::detail::get_shared_state(ts)...);
 
-        frame_type frame(values);
-        frame.wait_all();
+        boost::intrusive_ptr<frame_type> frame(new frame_type(values));
+        frame->wait_all();
     }
 }}
 
