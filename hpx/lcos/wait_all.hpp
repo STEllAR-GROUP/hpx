@@ -157,6 +157,7 @@ namespace hpx { namespace lcos
           : hpx::lcos::detail::future_data<void>
         {
         private:
+            typedef hpx::lcos::detail::future_data<void> base_type;
             // workaround gcc regression wrongly instantiating constructors
             wait_all_frame();
             wait_all_frame(wait_all_frame const&);
@@ -213,9 +214,10 @@ namespace hpx { namespace lcos
                             // Attach a continuation to this future which will
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
+                            boost::intrusive_ptr<base_type> this_(this);
                             next_future_data->set_on_completed(
                                 util::deferred_call(
-                                    f, this, std::move(next), std::move(end)));
+                                    f, std::move(this_), std::move(next), std::move(end)));
                             return;
                         }
                     }
@@ -269,8 +271,9 @@ namespace hpx { namespace lcos
                         void (wait_all_frame::*f)(true_, false_) =
                             &wait_all_frame::await_next<I>;
 
+                        boost::intrusive_ptr<base_type> this_(this);
                         next_future_data->set_on_completed(util::deferred_call(
-                            f, this, true_(), false_()));
+                            f, std::move(this_), true_(), false_()));
                         return;
                     }
                 }
