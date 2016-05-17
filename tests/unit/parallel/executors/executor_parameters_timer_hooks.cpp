@@ -74,10 +74,10 @@ void test_timer_hooks()
     timer_hooks_parameters pacs("time_hooks");
 
     chunk_size_test_seq(pacs);
-    HPX_TEST_EQ(pacs.count_, std::size_t(0));
+    HPX_TEST_EQ(pacs.count_, std::size_t(8));
 
     chunk_size_test_par(pacs);
-    HPX_TEST_EQ(pacs.count_, std::size_t(8));
+    HPX_TEST_EQ(pacs.count_, std::size_t(16));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
