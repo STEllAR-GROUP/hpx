@@ -174,7 +174,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     // older versions of gcc are not able to capture parameter
                     // packs (gcc < 4.9)
                     auto && args =
-                        util::forward_as_tuple(std::forward<Ts>(ts)...);
+                        hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
 
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
                     std::experimental::optional<result_type> out;
