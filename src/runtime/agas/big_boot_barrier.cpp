@@ -44,6 +44,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/ref.hpp>
 
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <mutex>
@@ -644,7 +645,7 @@ void notify_worker(notification_header const& header)
       , rt.get_runtime_support_lva());
     agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
-    runtime_support_gid.set_lsb(boost::uint64_t(0));
+    runtime_support_gid.set_lsb(std::uint64_t(0));
     agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
     naming::gid_type const memory_gid(header.prefix.get_msb()

@@ -10,6 +10,8 @@
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
@@ -85,7 +87,7 @@ namespace hpx { namespace performance_counters
                 }
 
                 // ask registry
-                hpx::util::function_nonser<boost::int64_t(bool)> f =
+                hpx::util::function_nonser<std::int64_t(bool)> f =
                     registry.get_invocation_counter(paths.parameters_);
 
                 return detail::create_raw_counter(info, std::move(f), ec);

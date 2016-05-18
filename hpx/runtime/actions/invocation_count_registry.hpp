@@ -12,9 +12,10 @@
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/preprocessor/cat.hpp>
 #include <boost/atomic.hpp>
+#include <boost/preprocessor/cat.hpp>
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -27,7 +28,7 @@ namespace hpx { namespace actions { namespace detail
         HPX_NON_COPYABLE(invocation_count_registry);
 
     public:
-        typedef boost::int64_t (*get_invocation_count_type)(bool);
+        typedef std::int64_t (*get_invocation_count_type)(bool);
         typedef std::unordered_map<
                 std::string, get_invocation_count_type, hpx::util::jenkins_hash
             > map_type;
