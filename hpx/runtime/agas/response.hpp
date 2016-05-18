@@ -6,26 +6,30 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
-#define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
+#ifndef HPX_RUNTIME_AGAS_RESPONSE_HPP
+#define HPX_RUNTIME_AGAS_RESPONSE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
-#include <boost/variant.hpp>
-#include <boost/mpl/at.hpp>
-
+#include <cstdint>
+#include <map>
 #include <map>
 #include <memory>
-#include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas
@@ -44,7 +48,7 @@ struct HPX_EXPORT response
         namespace_action_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
       , error status_ = success
         );
 
@@ -71,7 +75,7 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , std::vector<boost::uint32_t> const& prefixes_
+      , std::vector<std::uint32_t> const& prefixes_
       , error status_ = success
         );
 
@@ -83,7 +87,7 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
       , error status_ = success
         );
 
@@ -106,7 +110,7 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , boost::int64_t added_credits_
+      , std::int64_t added_credits_
       , error status_ = success
         );
 
@@ -133,7 +137,7 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    std::vector<boost::uint32_t> get_localities(
+    std::vector<std::uint32_t> get_localities(
         error_code& ec = throws
         ) const;
 
@@ -145,15 +149,15 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_num_localities(
+    std::uint32_t get_num_localities(
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_num_overall_threads(
+    std::uint32_t get_num_overall_threads(
         error_code& ec = throws
         ) const;
 
-    std::vector<boost::uint32_t> get_num_threads(
+    std::vector<std::uint32_t> get_num_threads(
         error_code& ec = throws
         ) const;
 
@@ -161,7 +165,7 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_locality_id(
+    std::uint32_t get_locality_id(
         error_code& ec = throws
         ) const;
 
@@ -170,7 +174,7 @@ struct HPX_EXPORT response
         ) const;
 
     // primary_ns_change_credit_one
-    boost::int64_t get_added_credits(
+    std::int64_t get_added_credits(
         error_code& ec = throws
         ) const;
 
@@ -273,9 +277,9 @@ struct get_response_result<naming::id_type>
 };
 
 template <>
-struct get_response_result<boost::uint32_t>
+struct get_response_result<std::uint32_t>
 {
-    static boost::uint32_t call(
+    static std::uint32_t call(
         agas::response const& rep
         )
     {
@@ -291,16 +295,16 @@ struct get_response_result<boost::uint32_t>
             break;
         }
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_response_result<boost::uint32_t, agas::response>::call",
+            "get_response_result<std::uint32_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
     }
 };
 
 template <>
-struct get_response_result<boost::int64_t>
+struct get_response_result<std::int64_t>
 {
-    static boost::int64_t call(
+    static std::int64_t call(
         agas::response const& rep
         )
     {
@@ -313,7 +317,7 @@ struct get_response_result<boost::int64_t>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_response_result<boost::int64_t, agas::response>::call",
+            "get_response_result<std::int64_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
     }
@@ -344,9 +348,9 @@ struct get_response_result<bool>
 };
 
 template <>
-struct get_response_result<std::vector<boost::uint32_t>>
+struct get_response_result<std::vector<std::uint32_t>>
 {
-    static std::vector<boost::uint32_t> call(
+    static std::vector<std::uint32_t> call(
         agas::response const& rep
         )
     {
@@ -359,9 +363,9 @@ struct get_response_result<std::vector<boost::uint32_t>>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_response_result<std::vector<boost::uint32_t>, agas::response>::call",
+            "get_response_result<std::vector<std::uint32_t>, agas::response>::call",
             "unexpected action code in result conversion");
-        return std::vector<boost::uint32_t>();
+        return std::vector<std::uint32_t>();
     }
 };
 
@@ -449,5 +453,4 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::agas::response>, hpx_agas_response_vector_type)
 
-#endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
-
+#endif /*HPX_RUNTIME_AGAS_RESPONSE_HPP*/

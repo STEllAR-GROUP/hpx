@@ -3,29 +3,42 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
-#include <hpx/version.hpp>
-#include <hpx/util/asio_util.hpp>
-#include <hpx/util/batch_environment.hpp>
-#include <hpx/util/map_hostnames.hpp>
-#include <hpx/util/sed_transform.hpp>
-#include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/manage_config.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/detail/reset_function.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+
+#include <hpx/config/asio.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/util/asio_util.hpp>
+#include <hpx/util/batch_environment.hpp>
+#include <hpx/util/detail/reset_function.hpp>
+#include <hpx/util/manage_config.hpp>
+#include <hpx/util/map_hostnames.hpp>
+#include <hpx/util/parse_command_line.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/sed_transform.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/format.hpp>
-#include <boost/program_options.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -408,9 +421,9 @@ namespace hpx { namespace util
         std::string agas_host =
             cfgmap.get_value<std::string>("hpx.agas.address",
                 rtcfg_.get_entry("hpx.agas.address", ""));
-        boost::uint16_t agas_port =
-            cfgmap.get_value<boost::uint16_t>("hpx.agas.port",
-                boost::lexical_cast<boost::uint16_t>(
+        std::uint16_t agas_port =
+            cfgmap.get_value<std::uint16_t>("hpx.agas.port",
+                boost::lexical_cast<std::uint16_t>(
                     rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)
                 ));
 
@@ -526,16 +539,16 @@ namespace hpx { namespace util
         ini_config += std::string("hpx.expect_connecting_localities=") +
             (expect_connections ? "1" : "0");
 
-        boost::uint16_t initial_hpx_port = 0;
+        std::uint16_t initial_hpx_port = 0;
         if (num_localities_ != 1 || expect_connections)
         {
             initial_hpx_port =
-                boost::lexical_cast<boost::uint16_t>(
+                boost::lexical_cast<std::uint16_t>(
                     rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
         }
 
-        boost::uint16_t hpx_port =
-            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port", initial_hpx_port);
+        std::uint16_t hpx_port =
+            cfgmap.get_value<std::uint16_t>("hpx.parcel.port", initial_hpx_port);
 
         bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
@@ -580,8 +593,8 @@ namespace hpx { namespace util
         // has been retrieved from the environment)
         if (mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
-            hpx_port = cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
-                boost::lexical_cast<boost::uint16_t>(
+            hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
+                boost::lexical_cast<std::uint16_t>(
                     rtcfg_.get_entry("hpx.parcel.port", HPX_CONNECTING_IP_PORT)
                 ));
 
@@ -618,7 +631,7 @@ namespace hpx { namespace util
                         hpx_port = HPX_INITIAL_IP_PORT;
 
                     // each node gets an unique port
-                    hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
+                    hpx_port = static_cast<std::uint16_t>(hpx_port + node);
                     mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)

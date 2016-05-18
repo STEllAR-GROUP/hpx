@@ -5,46 +5,51 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/hpx_start.hpp>
-#include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_action.hpp>
 
-#include <hpx/include/async.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/hpx_user_main_config.hpp>
+#include <hpx/apply.hpp>
+#include <hpx/async.hpp>
+#include <hpx/runtime_impl.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime_impl.hpp>
-#include <hpx/util/find_prefix.hpp>
-#include <hpx/util/query_counters.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_action.hpp>
+#include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/query_counters.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/assign/std/vector.hpp>
+#include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/scoped_array.hpp>
+
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/ref.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
-#   include <cstdlib>
+#  include <cstdlib>
 #endif
 
+#include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <new>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if !defined(HPX_WINDOWS)
@@ -1312,8 +1317,7 @@ namespace hpx
             boost::program_options::variables_map& /*vm*/,
             util::function_nonser<int(int, char**)> const& f)
         {
-            hpx::util::section const& ini = hpx::get_runtime().get_config();
-            std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
+            std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
 
             using namespace boost::program_options;
 #if defined(HPX_WINDOWS)
@@ -1323,7 +1327,7 @@ namespace hpx
 #endif
 
             // Copy all arguments which are not hpx related to a temporary array
-            boost::scoped_array<char*> argv(new char*[args.size()+1]);
+            std::vector<char*> argv(args.size()+1);
             std::size_t argcount = 0;
             for (std::size_t i = 0; i != args.size(); ++i)
             {
@@ -1343,7 +1347,7 @@ namespace hpx
             argv[argcount] = 0;
 
             // Invoke custom startup functions
-            return f(static_cast<int>(argcount), argv.get());
+            return f(static_cast<int>(argcount), argv.data());
         }
     }
 }

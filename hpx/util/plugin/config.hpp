@@ -3,8 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PLUGIN_CONFIG_HPP_HK_2005_11_07)
-#define HPX_PLUGIN_CONFIG_HPP_HK_2005_11_07
+#ifndef HPX_UTIL_PLUGIN_CONFIG_HPP
+#define HPX_UTIL_PLUGIN_CONFIG_HPP
 
 #include <hpx/config.hpp>
 
@@ -70,4 +70,4 @@
     BOOST_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX)                             \
 /**/
 
-#endif // HPX_PLUGIN_CONFIG_HPP_HK_2005_11_07
+#endif /*HPX_UTIL_PLUGIN_CONFIG_HPP*/

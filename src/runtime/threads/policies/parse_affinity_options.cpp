@@ -3,17 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
 
 #if defined(HPX_HAVE_HWLOC)
 
-#include <hpx/exception.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology.hpp>
 
 #include <hwloc.h>
 
 #include <boost/format.hpp>
+#include <boost/variant.hpp>
 
 // #define BOOST_SPIRIT_DEBUG
 #define BOOST_SPIRIT_USE_PHOENIX_V3
@@ -28,9 +29,10 @@
 #include <boost/fusion/include/std_pair.hpp>
 
 #include <hpx/runtime/threads/detail/partlit.hpp>
-#include <hpx/runtime.hpp>
 
-#include <sstream>
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -222,7 +224,7 @@ namespace hpx { namespace threads { namespace detail
                 }
                 else if (*second < 0) {
                     // all elements between min and -max
-                    for (boost::int64_t i = *first; i <= -*second; ++i)
+                    for (std::int64_t i = *first; i <= -*second; ++i)
                         result.push_back(i);
                 }
                 else {

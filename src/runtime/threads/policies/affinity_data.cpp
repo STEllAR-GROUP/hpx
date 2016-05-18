@@ -3,16 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -66,7 +68,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         const std::size_t used_cores = data.used_cores_;
         std::size_t max_cores =
             hpx::util::safe_lexical_cast<std::size_t>(
-                get_runtime().get_config().get_entry("hpx.cores", used_cores),
+                get_config_entry("hpx.cores", used_cores),
                 used_cores);
 
 #if defined(HPX_HAVE_HWLOC)

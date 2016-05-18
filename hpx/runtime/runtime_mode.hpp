@@ -34,4 +34,4 @@ namespace hpx {
     HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 }
 
-#endif
+#endif /*HPX_RUNTIME_RUNTIME_MODE_HPP*/

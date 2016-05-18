@@ -7,8 +7,6 @@
 
 #if defined(HPX_WINDOWS)
 
-#include <hpx/hpx_init.hpp>
-
 #if !defined(WIN32)
 #  define WIN32
 #endif
@@ -38,4 +36,3 @@ namespace hpx { namespace detail
 }}
 
 #endif
-

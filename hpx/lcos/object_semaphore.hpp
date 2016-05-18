@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/include/client.hpp>
 #include <hpx/lcos/stubs/object_semaphore.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 namespace hpx { namespace lcos
 {

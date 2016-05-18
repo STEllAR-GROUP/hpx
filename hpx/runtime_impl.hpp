@@ -21,7 +21,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/init_logging.hpp>

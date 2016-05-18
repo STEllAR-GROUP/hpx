@@ -8,13 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/include/actions.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/include/naming.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/include/serialization.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/include/traits.hpp>
+#include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/components/server/migrate_component.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>

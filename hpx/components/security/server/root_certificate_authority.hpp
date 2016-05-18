@@ -9,9 +9,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-
-#include <hpx/include/actions.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 
 #include "certificate_authority_base.hpp"

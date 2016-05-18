@@ -20,6 +20,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
 

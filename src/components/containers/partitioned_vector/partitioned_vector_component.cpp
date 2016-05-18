@@ -9,7 +9,8 @@
 /// This file defines the necessary component boilerplate code which is
 /// required for proper functioning of components in the context of HPX.
 
-#include <hpx/include/components.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/components/component_factory.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>

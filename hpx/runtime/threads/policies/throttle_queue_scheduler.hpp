@@ -12,6 +12,8 @@
 
 #if defined(HPX_HAVE_THROTTLE_SCHEDULER)
 
+#include <hpx/runtime/threads_fwd.hpp>
+
 #include <apex_api.hpp>
 
 #include <boost/thread/shared_mutex.hpp>

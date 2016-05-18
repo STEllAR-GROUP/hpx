@@ -3,12 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_POLICIES_AFFINITY_DATA_JAN_11_2013_0922PM)
-#define HPX_THREADMANAGER_POLICIES_AFFINITY_DATA_JAN_11_2013_0922PM
+#ifndef HPX_RUNTIME_THREADS_POLICIES_AFFINITY_DATA_HPP
+#define HPX_RUNTIME_THREADS_POLICIES_AFFINITY_DATA_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -54,7 +55,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         affinity_data(std::size_t num_threads);
 
         std::size_t init(init_affinity_data const& data,
-                topology const & toplogy);
+                topology const& toplogy);
 
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread, bool numa_sensitive) const;
@@ -70,7 +71,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
     protected:
         void init_cached_pu_nums(std::size_t hardware_concurrency,
-                topology const & topology);
+                topology const& topology);
         std::size_t get_pu_num(std::size_t num_thread,
             std::size_t hardware_concurrency) const;
 
@@ -85,6 +86,4 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     };
 }}}}
 
-#endif
-
-
+#endif /*HPX_RUNTIME_THREADS_POLICIES_AFFINITY_DATA_HPP*/

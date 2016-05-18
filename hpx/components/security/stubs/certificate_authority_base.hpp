@@ -10,7 +10,6 @@
 
 #if defined(HPX_HAVE_SECURITY)
 
-#include <hpx/include/components.hpp>
 #include <hpx/components/security/server/certificate_authority_base.hpp>
 
 namespace hpx { namespace components { namespace security { namespace stubs

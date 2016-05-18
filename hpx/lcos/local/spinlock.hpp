@@ -16,9 +16,9 @@
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #include <hpx/throw_exception.hpp>
 #endif
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
@@ -33,6 +33,8 @@
 #    endif
 #  endif
 #endif
+
+#include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local

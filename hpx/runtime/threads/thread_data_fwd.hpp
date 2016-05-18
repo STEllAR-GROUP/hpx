@@ -12,7 +12,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

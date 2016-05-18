@@ -4,25 +4,25 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM)
-#define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
+#ifndef HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP
+#define HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
+
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
 #endif
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-    typedef boost::int32_t component_type;
+    typedef std::int32_t component_type;
 
     enum component_enum_type
     {
@@ -214,5 +214,4 @@ namespace hpx { namespace components
     }}                                                                        \
 /**/
 
-#endif
-
+#endif /*HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP*/

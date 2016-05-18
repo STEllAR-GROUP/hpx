@@ -3,9 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/include/apply.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/components.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp>
+
 #include <hpx/components/component_storage/server/migrate_to_storage.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

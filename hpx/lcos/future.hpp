@@ -24,6 +24,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/void_guard.hpp>

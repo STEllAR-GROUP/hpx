@@ -4,41 +4,45 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
-#if !defined(HPX_UTIL_SEP_21_2014_0840PM)
-#define HPX_UTIL_SEP_21_2014_0840PM
+#ifndef HPX_UTIL_SAFE_LEXICAL_CAST_HPP
+#define HPX_UTIL_SAFE_LEXICAL_CAST_HPP
+
+#include <hpx/config.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <string>
+#include <type_traits>
 
 namespace hpx { namespace util
 {
-    template <class DestType, class SrcType>
-    DestType safe_lexical_cast(const SrcType& value, const DestType& dflt = DestType())
+    template <typename DestType, typename SrcType>
+    DestType safe_lexical_cast(
+        SrcType const& value, DestType const& dflt = DestType())
     {
         try
         {
             return boost::lexical_cast<DestType>(value);
         }
-        catch (const boost::bad_lexical_cast& )
+        catch (boost::bad_lexical_cast const&)
         {
             ;
         }
         return dflt;
     }
 
-    template <class DestType, class Config>
-    typename boost::enable_if<boost::is_integral<DestType>, DestType>::type
-    get_entry_as(const Config& config, const std::string& key, const DestType& dflt)
+    template <typename DestType, typename Config>
+    typename std::enable_if<
+        std::is_integral<DestType>::value, DestType
+    >::type get_entry_as(
+        Config const& config, std::string const& key, DestType const& dflt)
     {
         return safe_lexical_cast(config.get_entry(key, dflt), dflt);
     }
 
-    template <class DestType, class Config>
-    DestType get_entry_as(const Config& config, const std::string& key,
-        const std::string& dflt)
+    template <typename DestType, typename Config>
+    DestType get_entry_as(
+        Config const& config, std::string const& key, std::string const& dflt)
     {
         return safe_lexical_cast(config.get_entry(key, dflt),
             safe_lexical_cast<DestType>(dflt));
@@ -46,4 +50,4 @@ namespace hpx { namespace util
 
 }}
 
-#endif //HPX_UTIL_SEP_21_2014_0840PM
+#endif /*HPX_UTIL_SAFE_LEXICAL_CAST_HPP*/

@@ -14,7 +14,6 @@
 #define HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

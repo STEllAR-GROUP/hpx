@@ -6,6 +6,8 @@
 #ifndef HPX_CONCRETE_FACTORY_VP_2004_08_25
 #define HPX_CONCRETE_FACTORY_VP_2004_08_25
 
+#include <hpx/config.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/plugin/abstract_factory.hpp>
 #include <hpx/util/plugin/plugin_wrapper.hpp>
 

@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>

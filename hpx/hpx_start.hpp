@@ -5,12 +5,11 @@
 
 /// \file hpx_start.hpp
 
-#if !defined(HPX_START_OCT_04_2012_0148PM)
-#define HPX_START_OCT_04_2012_0148PM
+#ifndef HPX_HPX_START_HPP
+#define HPX_HPX_START_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
-#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
@@ -735,5 +734,4 @@ namespace hpx
 #endif
 #endif
 
-#endif
-
+#endif /*HPX_HPX_START_HPP*/

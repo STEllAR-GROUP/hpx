@@ -7,8 +7,8 @@
 #define HPX_LCOS_QUEUE_FEB_10_2011_1232PM
 
 #include <hpx/config.hpp>
-#include <hpx/include/client.hpp>
 #include <hpx/lcos/server/queue.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 #include <boost/exception_ptr.hpp>
 

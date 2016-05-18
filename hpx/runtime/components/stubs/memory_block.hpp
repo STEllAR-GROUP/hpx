@@ -6,13 +6,14 @@
 #if !defined(HPX_COMPONENTS_STUBS_MEMORY_BLOCK_JUN_22_2008_0417PM)
 #define HPX_COMPONENTS_STUBS_MEMORY_BLOCK_JUN_22_2008_0417PM
 
+#include <hpx/config.hpp>
+#include <hpx/async.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/include/async.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

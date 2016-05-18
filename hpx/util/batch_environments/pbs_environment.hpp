@@ -8,7 +8,7 @@
 #define HPX_UTIL_PBS_ENVIRONMENT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <string>
 #include <vector>

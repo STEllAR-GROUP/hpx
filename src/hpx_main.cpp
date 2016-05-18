@@ -5,10 +5,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 
-#include <boost/scoped_array.hpp>
 #include <boost/program_options/parsers.hpp>
 
 #include <string>
@@ -20,8 +18,7 @@
 // depending on whether the main executable defines this symbol or not.
 int hpx_main()
 {
-    hpx::util::section const& ini = hpx::get_runtime().get_config();
-    std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
+    std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
 
     using namespace boost::program_options;
 #if defined(HPX_WINDOWS)
@@ -31,7 +28,7 @@ int hpx_main()
 #endif
 
     // Copy all arguments which are not hpx related to a temporary array
-    boost::scoped_array<char*> argv(new char*[args.size()+1]);
+    std::vector<char*> argv(args.size()+1);
     std::size_t argcount = 0;
     for (std::size_t i = 0; i < args.size(); ++i)
     {
@@ -51,5 +48,5 @@ int hpx_main()
     argv[argcount] = 0;
 
     // Invoke hpx_main
-    return hpx_main(static_cast<int>(argcount), argv.get());
+    return hpx_main(static_cast<int>(argcount), argv.data());
 }

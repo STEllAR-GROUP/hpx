@@ -3,10 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/thread_description.hpp>
+#include <hpx/util/unique_function.hpp>
+
+#include <boost/chrono/chrono.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -26,7 +38,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void default_executor::add(closure_type && f,
+    void default_executor::add(closure_type&& f,
         util::thread_description const& desc,
         threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
@@ -43,7 +55,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     void default_executor::add_at(
         boost::chrono::steady_clock::time_point const& abs_time,
-        closure_type && f, util::thread_description const& description,
+        closure_type&& f, util::thread_description const& description,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         if (stacksize == threads::thread_stacksize_default)
@@ -62,7 +74,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return an estimate of the number of waiting tasks.
-    boost::uint64_t default_executor::num_pending_closures(error_code& ec) const
+    std::uint64_t default_executor::num_pending_closures(error_code& ec) const
     {
         if (&ec != &throws)
             ec = make_success_code();

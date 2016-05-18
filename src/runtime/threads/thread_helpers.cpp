@@ -4,21 +4,26 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
+#include <hpx/util/date_time_chrono.hpp>
+#ifdef HPX_HAVE_VERIFY_LOCKS
+#  include <hpx/util/register_locks.hpp>
+#endif
+#include <hpx/util/thread_description.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
+#include <cstddef>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -563,4 +568,3 @@ namespace hpx { namespace this_thread
         return (std::numeric_limits<std::ptrdiff_t>::max)();
     }
 }}
-
