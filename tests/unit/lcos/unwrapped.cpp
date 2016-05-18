@@ -16,6 +16,7 @@
 #include <boost/assign.hpp>
 #include <boost/atomic.hpp>
 
+#include <numeric>
 #include <string>
 #include <vector>
 

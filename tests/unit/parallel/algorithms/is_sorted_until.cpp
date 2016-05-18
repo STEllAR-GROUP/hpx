@@ -11,6 +11,7 @@
 #include <boost/range/functions.hpp>
 
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 

@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <cstring>
 #include <iterator>
+#include <numeric>
 #include <vector>
 #include <windows.h>
 

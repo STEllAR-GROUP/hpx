@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>

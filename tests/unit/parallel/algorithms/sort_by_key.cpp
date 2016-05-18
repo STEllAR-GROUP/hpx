@@ -11,6 +11,7 @@
 //
 #include <boost/random/uniform_int_distribution.hpp>
 //
+#include <numeric>
 #include <string>
 #include <vector>
 //

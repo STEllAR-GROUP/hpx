@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <boost/range/functions.hpp>
 
+#include <numeric>
 #include <string>
 #include <vector>
 

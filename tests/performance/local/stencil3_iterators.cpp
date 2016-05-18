@@ -10,6 +10,7 @@
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <numeric>
 #include <type_traits>
 #include <vector>
 

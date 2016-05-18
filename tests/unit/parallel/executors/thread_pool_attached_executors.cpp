@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <numeric>
 #include <string>
 #include <vector>
 

@@ -11,6 +11,7 @@
 
 #include "worker_timed.hpp"
 
+#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <vector>
