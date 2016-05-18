@@ -215,8 +215,8 @@ namespace hpx { namespace lcos
                             // in the sequence (if any).
                             boost::intrusive_ptr<wait_all_frame> this_(this);
                             next_future_data->set_on_completed(
-                                util::deferred_call(
-                                    f, std::move(this_), std::move(next), std::move(end)));
+                                util::deferred_call(f, std::move(this_),
+                                    std::move(next), std::move(end)));
                             return;
                         }
                     }
