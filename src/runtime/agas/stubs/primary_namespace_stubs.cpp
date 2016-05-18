@@ -13,6 +13,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 
+#include <cstdint>
 #include <vector>
 
 namespace hpx { namespace agas { namespace stubs
@@ -52,8 +53,8 @@ template lcos::future<bool>
       , threads::thread_priority priority
         );
 
-template lcos::future<boost::int64_t>
-    primary_namespace::service_async<boost::int64_t>(
+template lcos::future<std::int64_t>
+    primary_namespace::service_async<std::int64_t>(
         naming::id_type const& gid
       , request const& req
       , threads::thread_priority priority

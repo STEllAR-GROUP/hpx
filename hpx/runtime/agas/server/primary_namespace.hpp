@@ -30,6 +30,7 @@
 #  include <memory>
 #endif
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -385,7 +386,7 @@ struct HPX_EXPORT primary_namespace
     void increment(
         naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::int64_t& credits
+      , std::int64_t& credits
       , error_code& ec
         );
 
@@ -415,7 +416,7 @@ struct HPX_EXPORT primary_namespace
         std::list<free_entry>& free_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::int64_t credits
+      , std::int64_t credits
       , error_code& ec
         );
 
