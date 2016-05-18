@@ -18,6 +18,8 @@
 #include <cstdlib>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace util
 {
     struct HPX_EXPORT mpi_environment
@@ -67,6 +69,8 @@ namespace hpx { namespace util
         static MPI_Comm communicator_;
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

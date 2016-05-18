@@ -332,4 +332,6 @@ namespace hpx { namespace actions
 
 HPX_TRAITS_SERIALIZED_WITH_ID(hpx::actions::base_action)
 
+#include <hpx/config/warnings_suffix.hpp>
+
 #endif

@@ -30,6 +30,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -228,5 +230,7 @@ namespace hpx { namespace threads { namespace detail
         policies::scheduler_mode mode_;
     };
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
