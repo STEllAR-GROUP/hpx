@@ -28,6 +28,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -202,7 +203,7 @@ public:
     naming::address::address_type get_bootstrap_symbol_ns_ptr() const;
 
     boost::int64_t synchronize_with_async_incref(
-        hpx::future<boost::int64_t> fut
+        hpx::future<std::int64_t> fut
       , naming::id_type const& id
       , boost::int64_t compensated_credit
         );

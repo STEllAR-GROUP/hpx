@@ -25,6 +25,8 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
+
+#include <cstdint>
 #include <limits>
 
 namespace hpx { namespace threads { namespace detail
@@ -119,19 +121,19 @@ namespace hpx { namespace threads { namespace detail
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     struct idle_collect_rate
     {
-        idle_collect_rate(boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
+        idle_collect_rate(std::uint64_t& tfunc_time, std::uint64_t& exec_time)
           : start_timestamp_(util::hardware::timestamp())
           , tfunc_time_(tfunc_time)
           , exec_time_(exec_time)
         {}
 
-        void collect_exec_time(boost::uint64_t timestamp)
+        void collect_exec_time(std::uint64_t timestamp)
         {
             exec_time_ += util::hardware::timestamp() - timestamp;
         }
         void take_snapshot()
         {
-            if (tfunc_time_ == boost::uint64_t(-1))
+            if (tfunc_time_ == std::uint64_t(-1))
             {
                 start_timestamp_ = util::hardware::timestamp();
                 tfunc_time_ = 0;
@@ -143,10 +145,10 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
-        boost::uint64_t start_timestamp_;
+        std::uint64_t start_timestamp_;
 
-        boost::uint64_t& tfunc_time_;
-        boost::uint64_t& exec_time_;
+        std::uint64_t& tfunc_time_;
+        std::uint64_t& exec_time_;
     };
 
     struct exec_time_wrapper
@@ -160,7 +162,7 @@ namespace hpx { namespace threads { namespace detail
             idle_rate_.collect_exec_time(timestamp_);
         }
 
-        boost::uint64_t timestamp_;
+        std::uint64_t timestamp_;
         idle_collect_rate& idle_rate_;
     };
 
@@ -180,7 +182,7 @@ namespace hpx { namespace threads { namespace detail
 #else
     struct idle_collect_rate
     {
-        idle_collect_rate(boost::uint64_t&, boost::uint64_t&) {}
+        idle_collect_rate(std::uint64_t&, std::uint64_t&) {}
     };
 
     struct exec_time_wrapper
@@ -197,19 +199,19 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct scheduling_counters
     {
-        scheduling_counters(boost::int64_t& executed_threads,
-                boost::int64_t& executed_thread_phases,
-                boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
+        scheduling_counters(std::int64_t& executed_threads,
+                std::int64_t& executed_thread_phases,
+                std::uint64_t& tfunc_time, std::uint64_t& exec_time)
           : executed_threads_(executed_threads),
             executed_thread_phases_(executed_thread_phases),
             tfunc_time_(tfunc_time),
             exec_time_(exec_time)
         {}
 
-        boost::int64_t& executed_threads_;
-        boost::int64_t& executed_thread_phases_;
-        boost::uint64_t& tfunc_time_;
-        boost::uint64_t& exec_time_;
+        std::int64_t& executed_threads_;
+        std::int64_t& executed_thread_phases_;
+        std::uint64_t& tfunc_time_;
+        std::uint64_t& exec_time_;
     };
 
     struct scheduling_callbacks

@@ -16,6 +16,8 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
@@ -93,7 +95,7 @@ namespace hpx { namespace threads
     /// \note This function will return a meaningful value only if the
     ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
     ///       being defined.
-    HPX_API_EXPORT boost::uint32_t get_parent_locality_id();
+    HPX_API_EXPORT std::uint32_t get_parent_locality_id();
 
     /// The function \a get_self_component_id returns the lva of the
     /// component the current thread is acting on
@@ -101,7 +103,7 @@ namespace hpx { namespace threads
     /// \note This function will return a meaningful value only if the
     ///       code was compiled with HPX_HAVE_THREAD_TARGET_ADDRESS
     ///       being defined.
-    HPX_API_EXPORT boost::uint64_t get_self_component_id();
+    HPX_API_EXPORT std::uint64_t get_self_component_id();
 
     /// The function \a get_thread_manager returns a reference to the
     /// current thread manager.
@@ -114,11 +116,11 @@ namespace hpx { namespace threads
     ///       number of currently existing threads, but will add the number
     ///       of registered task descriptions (which have not been
     ///       converted into threads yet).
-    HPX_API_EXPORT boost::int64_t get_thread_count(
+    HPX_API_EXPORT std::int64_t get_thread_count(
         thread_state_enum state = unknown);
 
     /// \copydoc get_thread_count(thread_state_enum state)
-    HPX_API_EXPORT boost::int64_t get_thread_count(
+    HPX_API_EXPORT std::int64_t get_thread_count(
         thread_priority priority, thread_state_enum state = unknown);
 }}
 

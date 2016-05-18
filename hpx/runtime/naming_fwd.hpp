@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx
 {
@@ -30,9 +30,9 @@ namespace hpx
 
         HPX_API_EXPORT resolver_client& get_agas_client();
 
-        typedef boost::uint64_t address_type;
+        typedef std::uint64_t address_type;
 
-        HPX_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
+        HPX_CONSTEXPR_OR_CONST std::uint32_t invalid_locality_id = ~0U;
     }
 
     ///////////////////////////////////////////////////////////////////////////

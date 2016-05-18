@@ -11,6 +11,8 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
@@ -24,12 +26,12 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::int64_t get_thread_count(thread_state_enum state)
+    std::int64_t get_thread_count(thread_state_enum state)
     {
         return get_thread_manager().get_thread_count(state);
     }
 
-    boost::int64_t get_thread_count(thread_priority priority,
+    std::int64_t get_thread_count(thread_priority priority,
         thread_state_enum state)
     {
         return get_thread_manager().get_thread_count(state, priority);
