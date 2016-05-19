@@ -14,11 +14,7 @@ namespace hpx { namespace traits
 {
     template <typename T>
     struct is_bitwise_serializable
-#ifdef HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE
-      : std::is_trivially_copyable<T>
-#else
       : std::is_arithmetic<T>
-#endif
     {};
 }}
 
