@@ -80,8 +80,8 @@ namespace hpx
         void serialize(input_archive& ar, std::pair<Key, Value>& t, unsigned)
         {
             typedef std::pair<Key, Value> pair_type;
-            typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<pair_type>::value> optimized;
+            typedef typename
+                hpx::traits::is_bitwise_serializable<pair_type>::type optimized;
 
             detail::load_pair_impl(ar, t, optimized());
         }
@@ -90,8 +90,8 @@ namespace hpx
         void serialize(output_archive& ar, const std::pair<Key, Value>& t, unsigned)
         {
             typedef std::pair<Key, Value> pair_type;
-            typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<pair_type>::value> optimized;
+            typedef typename
+                hpx::traits::is_bitwise_serializable<pair_type>::type optimized;
 
             detail::save_pair_impl(ar, t, optimized());
         }

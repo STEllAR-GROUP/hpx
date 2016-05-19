@@ -495,14 +495,7 @@ namespace hpx { namespace parcelset
     HPX_EXPORT std::string dump_parcel(parcel const& p);
 }}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct is_bitwise_serializable<
-            hpx::parcelset::parcel::data>
-       : boost::mpl::true_
-    {};
-}}
+HPX_IS_BITWISE_SERIALIZABLE(hpx::parcelset::parcel::data)
 
 #include <hpx/config/warnings_suffix.hpp>
 

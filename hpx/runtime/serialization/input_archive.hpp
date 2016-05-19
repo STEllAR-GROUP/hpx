@@ -87,8 +87,8 @@ namespace hpx { namespace serialization
         >::type
         load(T & t)
         {
-            typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<T>::value> use_optimized;
+            typedef typename
+                hpx::traits::is_bitwise_serializable<T>::type use_optimized;
 
             load_bitwise(t, use_optimized());
         }
