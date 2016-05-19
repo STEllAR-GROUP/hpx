@@ -14,7 +14,6 @@
 
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
-#include <boost/mpl/bool.hpp>
 
 #include <climits>
 
@@ -176,14 +175,7 @@ namespace hpx { namespace components { namespace security
 #endif
 }}}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct is_bitwise_serializable<
-            hpx::components::security::capability>
-       : boost::mpl::true_
-    {};
-}}
+HPX_IS_BITWISE_SERIALIZABLE(hpx::components::security::capability)
 
 #endif
 

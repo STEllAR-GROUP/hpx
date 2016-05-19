@@ -81,10 +81,10 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void serialize(input_archive & ar, std::vector<T, Allocator> & v, unsigned)
     {
-        typedef std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable<
+        typedef
+            typename hpx::traits::is_bitwise_serializable<
                 typename std::vector<T, Allocator>::value_type
-            >::value> use_optimized;
+            >::type use_optimized;
 
         v.clear();
         detail::load_impl(ar, v, use_optimized());
@@ -141,10 +141,10 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, const std::vector<T, Allocator> & v,
         unsigned)
     {
-        typedef std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable<
+        typedef
+            typename hpx::traits::is_bitwise_serializable<
                 typename std::vector<T, Allocator>::value_type
-            >::value> use_optimized;
+            >::type use_optimized;
 
         ar << v.size(); //-V128
         if(v.empty()) return;

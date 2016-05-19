@@ -25,7 +25,6 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
 
 #include <cstdint>
@@ -73,14 +72,7 @@ namespace hpx { namespace actions { namespace detail
     };
 }}}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct is_bitwise_serializable<
-            hpx::actions::detail::action_serialization_data>
-       : boost::mpl::true_
-    {};
-}}
+HPX_IS_BITWISE_SERIALIZABLE(hpx::actions::detail::action_serialization_data)
 
 /// \endcond
 

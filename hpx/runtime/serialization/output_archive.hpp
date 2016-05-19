@@ -132,8 +132,8 @@ namespace hpx { namespace serialization
         >::type
         save(T const & t)
         {
-            typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<T>::value> use_optimized;
+            typedef
+                typename hpx::traits::is_bitwise_serializable<T>::type use_optimized;
 
             save_bitwise(t, use_optimized());
         }

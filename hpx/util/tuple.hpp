@@ -994,8 +994,10 @@ namespace hpx { namespace traits
     template <typename ...Ts>
     struct is_bitwise_serializable<
         ::hpx::util::tuple<Ts...>
-    > : ::hpx::util::detail::all_of<
-            hpx::traits::is_bitwise_serializable<Ts>...
+    > : std::integral_constant<bool,
+            ::hpx::util::detail::all_of<
+                hpx::traits::is_bitwise_serializable<Ts>...
+            >::value
         >
     {};
 }}
