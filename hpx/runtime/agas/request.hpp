@@ -24,6 +24,8 @@
 #include <memory>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -259,6 +261,8 @@ HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
   , hpx::util::function<void(std::string const&, hpx::components::component_type)>
   , request_iterate_types_function_type
 )
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 
