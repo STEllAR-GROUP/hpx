@@ -17,6 +17,7 @@
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <list>
 #include <mutex>
 #include <utility>
 

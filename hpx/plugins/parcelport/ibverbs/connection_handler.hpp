@@ -23,6 +23,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <list>
 #include <map>
 #include <memory>
 #include <vector>

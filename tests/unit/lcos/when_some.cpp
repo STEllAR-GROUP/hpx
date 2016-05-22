@@ -10,6 +10,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <list>
 #include <memory>
 #include <string>
 #include <utility>
