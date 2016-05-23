@@ -250,4 +250,6 @@ namespace hpx { namespace parcelset
     std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints);
 }}
 
+#include <hpx/config/warnings_suffix.hpp>
+
 #endif

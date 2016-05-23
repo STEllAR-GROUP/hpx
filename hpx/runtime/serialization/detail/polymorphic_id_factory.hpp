@@ -226,6 +226,8 @@ namespace hpx { namespace serialization {
 
 }}
 
+#include <hpx/config/warnings_suffix.hpp>
+
 #define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                       \
     namespace hpx { namespace serialization { namespace detail {               \
         template <> std::string get_constant_entry_name<Id>()                  \

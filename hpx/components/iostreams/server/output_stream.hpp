@@ -17,6 +17,8 @@
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/order_output.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace iostreams { namespace server
 {
     struct HPX_IOSTREAMS_EXPORT output_stream
@@ -78,6 +80,8 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::iostreams::server::output_stream::write_sync_action
   , output_stream_write_sync_action
 )
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0
 
