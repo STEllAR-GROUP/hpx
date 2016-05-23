@@ -224,7 +224,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         std::string connection_addr = s.remote_endpoint().address().to_string();
         boost::uint16_t connection_port = s.remote_endpoint().port();
-        HPX_ASSERT(l.get<locality>().address() == connection_addr);
+        HPX_ASSERT(hpx::util::cleanup_ip_address(l.get<locality>().address())
+            == hpx::util::cleanup_ip_address(connection_addr));
         HPX_ASSERT(l.get<locality>().port() == connection_port);
 #endif
 
