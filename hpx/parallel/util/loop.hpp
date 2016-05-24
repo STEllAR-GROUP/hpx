@@ -271,7 +271,8 @@ namespace hpx { namespace parallel { namespace util
             template <typename F>
             static prefetching_iterator<T> call(prefetching_iterator<T> it, std::size_t count, F && f)
             {
-                for (/**/; count != -1; (void) --count, ++it)
+                std::size_t cnt = count + 1;
+                for (/**/; cnt != 0; (void) --cnt, ++it)
                 {
                     std::vector<std::size_t>::iterator inner_it = it.base;
                     std::size_t j = it.idx;
@@ -294,7 +295,8 @@ namespace hpx { namespace parallel { namespace util
             static prefetching_iterator<T> call(prefetching_iterator<T> it, std::size_t count, CancelToken& tok,
                 F && f)
             {
-                for (/**/; count != -1; (void) --count, ++it)
+                std::size_t cnt = count + 1;
+                for (/**/; cnt != 0; (void) --cnt, ++it)
                 {
                     std::vector<std::size_t>::iterator inner_it = it.base;
                     for(std::size_t j = it.idx;j < std::min( (it.range_size ),(it.idx + it.chunk_size) ); ++j)
@@ -630,3 +632,4 @@ namespace hpx { namespace parallel { namespace util
 }}}
 
 #endif
+
