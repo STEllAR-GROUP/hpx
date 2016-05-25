@@ -24,6 +24,7 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind.hpp>
@@ -131,14 +132,12 @@ namespace hpx { namespace actions
         typedef Derived derived_type;
 
         // result_type represents the type returned when invoking operator()
-        typedef
-            typename traits::promise_local_result<
-                R
-            >::type
-            result_type;
+        typedef typename traits::promise_local_result<R>::type result_type;
+
         // The remote_result_type is the remote type for the type_continuation
-        typedef typename detail::remote_action_result<R>::type remote_result_type;
-        // The remote_result_type is the local type for the type_continuation
+        typedef typename traits::action_remote_result<R>::type remote_result_type;
+
+        // The local_result_type is the local type for the type_continuation
         typedef
             typename traits::promise_local_result<
                 remote_result_type
