@@ -70,9 +70,11 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
 
-        //New random access iterator which is used for prefetching containers within lambda functions
+        //New random access iterator which is used for prefetching
+        //all containers within lambda functions
         template<typename T>
-        class prefetching_iterator: public std::iterator<std::random_access_iterator_tag, std::size_t>
+        class prefetching_iterator: public std::iterator<std::random_access_iterator_tag,
+        std::size_t>
         {
             public:
 
@@ -84,11 +86,14 @@ namespace hpx { namespace parallel { namespace util
             std::size_t range_size;
             std::size_t idx;
 
-            explicit prefetching_iterator(std::size_t idx_,base_iterator base_ , std::size_t chunk_size_,
+            explicit prefetching_iterator(std::size_t idx_,base_iterator base_ ,
+                std::size_t chunk_size_,
                 std::size_t range_size_, std::vector< T * > const & A)
-            : M_(A), base(base_), chunk_size(chunk_size_), range_size(range_size_), idx(idx_) {}
+            : M_(A), base(base_), chunk_size(chunk_size_),
+            range_size(range_size_), idx(idx_) {}
 
-            using difference_type = typename std::iterator<std::random_access_iterator_tag, std::size_t>::difference_type;
+            using difference_type = typename std::iterator<std::random_access_iterator_tag,
+            std::size_t>::difference_type;
 
             inline prefetching_iterator& operator+=(difference_type rhs)
             {
@@ -139,12 +144,14 @@ namespace hpx { namespace parallel { namespace util
 
             inline prefetching_iterator operator+(difference_type rhs) const
             {
-                return prefetching_iterator((idx+(rhs*chunk_size)),(base+(rhs*chunk_size)),chunk_size,range_size,M_);
+                return prefetching_iterator((idx+(rhs*chunk_size)),(base+(rhs*chunk_size)),
+                    chunk_size,range_size,M_);
             }
 
             inline prefetching_iterator operator-(difference_type rhs) const
             {
-                return prefetching_iterator((idx-(rhs*chunk_size)),(base-(rhs*chunk_size)),chunk_size,range_size,M_);
+                return prefetching_iterator((idx-(rhs*chunk_size)),(base-(rhs*chunk_size)),
+                    chunk_size,range_size,M_);
             }
 
             friend inline prefetching_iterator operator+(difference_type lhs, const prefetching_iterator& rhs)
@@ -158,12 +165,35 @@ namespace hpx { namespace parallel { namespace util
             }
 
 
-            inline bool operator==(const prefetching_iterator& rhs) const {return idx == rhs.idx;}
-            inline bool operator!=(const prefetching_iterator& rhs) const {return idx != rhs.idx;}
-            inline bool operator>(const prefetching_iterator& rhs) const {return idx > rhs.idx;}
-            inline bool operator<(const prefetching_iterator& rhs) const {return idx < rhs.idx;}
-            inline bool operator>=(const prefetching_iterator& rhs) const {return idx >= rhs.idx;}
-            inline bool operator<=(const prefetching_iterator& rhs) const {return idx <= rhs.idx;}
+            inline bool operator==(const prefetching_iterator& rhs) const
+            {
+                return idx == rhs.idx;
+            }
+
+            inline bool operator!=(const prefetching_iterator& rhs) const
+            {
+                return idx != rhs.idx;
+            }
+
+            inline bool operator>(const prefetching_iterator& rhs) const
+            {
+                return idx > rhs.idx;
+            }
+
+            inline bool operator<(const prefetching_iterator& rhs) const
+            {
+                return idx < rhs.idx;
+            }
+
+            inline bool operator>=(const prefetching_iterator& rhs) const
+            {
+                return idx >= rhs.idx;
+            }
+
+            inline bool operator<=(const prefetching_iterator& rhs) const
+            {
+                return idx <= rhs.idx;
+            }
 
 
             inline std::size_t operator*() const {return idx;}
@@ -283,9 +313,9 @@ namespace hpx { namespace parallel { namespace util
                         ++inner_it;
                     }
 
-                    if(j < it.range_size - 1  )
+                    if(j < it.range_size - 1)
                         for (auto& x: it.M_)
-                            _mm_prefetch(((char*)(&x[j+1])), _MM_HINT_T0);
+                            x[j+1];
                 }
 
                 return it;
@@ -306,9 +336,9 @@ namespace hpx { namespace parallel { namespace util
                         f(inner_it);
                         ++inner_it;
 
-                        if(j < it.range_size - 1  )
+                        if(j < it.range_size - 1)
                             for (auto& x: it.M_)
-                                _mm_prefetch(((char*)(&x[j+1])), _MM_HINT_T0);
+                                x[j+1];
                     }
                 }
 
