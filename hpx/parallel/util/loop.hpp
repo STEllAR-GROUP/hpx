@@ -73,7 +73,8 @@ namespace hpx { namespace parallel { namespace util
         //New random access iterator which is used for prefetching
         //all containers within lambda functions
         template<typename T>
-        class prefetching_iterator: public std::iterator<std::random_access_iterator_tag,
+        class prefetching_iterator
+        : public std::iterator<std::random_access_iterator_tag,
         std::size_t>
         {
             public:
@@ -144,22 +145,24 @@ namespace hpx { namespace parallel { namespace util
 
             inline prefetching_iterator operator+(difference_type rhs) const
             {
-                return prefetching_iterator((idx+(rhs*chunk_size)),(base+(rhs*chunk_size)),
-                    chunk_size,range_size,M_);
+                return prefetching_iterator((idx+(rhs*chunk_size)),
+                    (base+(rhs*chunk_size)),chunk_size,range_size,M_);
             }
 
             inline prefetching_iterator operator-(difference_type rhs) const
             {
-                return prefetching_iterator((idx-(rhs*chunk_size)),(base-(rhs*chunk_size)),
-                    chunk_size,range_size,M_);
+                return prefetching_iterator((idx-(rhs*chunk_size)),
+                    (base-(rhs*chunk_size)),chunk_size,range_size,M_);
             }
 
-            friend inline prefetching_iterator operator+(difference_type lhs, const prefetching_iterator& rhs)
+            friend inline prefetching_iterator operator+(difference_type lhs,
+                const prefetching_iterator& rhs)
             {
                 return rhs + lhs;
             }
 
-            friend inline prefetching_iterator operator-(difference_type lhs, const prefetching_iterator& rhs)
+            friend inline prefetching_iterator operator-(difference_type lhs,
+                const prefetching_iterator& rhs)
             {
                 return lhs - rhs;
             }
@@ -199,7 +202,6 @@ namespace hpx { namespace parallel { namespace util
             inline std::size_t operator*() const {return idx;}
         };
 
-
         //Helper class to initialize prefetching_iterator
         template<typename T>
         struct prefetcher_context
@@ -211,13 +213,13 @@ namespace hpx { namespace parallel { namespace util
             std::vector< T * > m;
             std::size_t range_size;
 
-
             explicit prefetcher_context (std::size_t begin, std::size_t end,
                 std::size_t p_factor, std::initializer_list< T * > &&l)
             {
                 std::size_t vector_size = end - begin + 1;
                 range.resize(vector_size);
-                for(std::size_t i=0; i<vector_size; ++i) range[i] = i + begin;
+                for(std::size_t i=0; i<vector_size; ++i)
+                    range[i] = i + begin;
                 it_begin = range.begin();
                 it_end = range.begin() + vector_size - 1;
                 chunk_size = p_factor * 64ul / sizeof(T);
@@ -230,7 +232,8 @@ namespace hpx { namespace parallel { namespace util
             {
                 std::size_t vector_size = end - begin + 1;
                 range.resize(vector_size);
-                for(std::size_t i=0; i<vector_size; ++i) range[i] = i + begin;
+                for(std::size_t i=0; i<vector_size; ++i)
+                    range[i] = i + begin;
                 it_begin = range.begin();
                 it_end = range.begin() + vector_size - 1;
                 chunk_size = 64ul / sizeof(T);
@@ -240,21 +243,23 @@ namespace hpx { namespace parallel { namespace util
 
             prefetching_iterator<T> begin()
             {
-                return prefetching_iterator<T>(0ul, it_begin, chunk_size, range_size, m);
+                return prefetching_iterator<T>(0ul, it_begin, chunk_size,
+                    range_size, m);
             }
 
             prefetching_iterator<T> end()
             {
-                return prefetching_iterator<T>(range_size, it_end, chunk_size, range_size, m);
+                return prefetching_iterator<T>(range_size, it_end, chunk_size,
+                    range_size, m);
             }
 
         };
 
-
         //function which initialize prefetcher_context
         template<typename T>
-        prefetcher_context<T> make_prefetcher_context(std::size_t idx_begin, std::size_t idx_end,
-            std::initializer_list< T * > &&l, std::size_t p_factor = 0)
+        prefetcher_context<T> make_prefetcher_context(std::size_t idx_begin,
+            std::size_t idx_end, std::initializer_list< T * > &&l,
+            std::size_t p_factor = 0)
         {
             if(p_factor == 0)
                 return prefetcher_context<T>(idx_begin, idx_end, std::move(l));
@@ -308,7 +313,7 @@ namespace hpx { namespace parallel { namespace util
                     std::vector<std::size_t>::iterator inner_it = it.base;
                     std::size_t j = it.idx;
 
-                    for(/**/; j < std::min( (it.range_size ),(it.idx + it.chunk_size) ); ++j)
+                    for(/**/;j < std::min((it.range_size ),(it.idx + it.chunk_size));++j)
                     {
                         f(inner_it);
                         ++inner_it;
@@ -331,10 +336,13 @@ namespace hpx { namespace parallel { namespace util
                 for (/**/; cnt != 0; (void) --cnt, ++it)
                 {
                     std::vector<std::size_t>::iterator inner_it = it.base;
-                    for(std::size_t j = it.idx;j < std::min( (it.range_size ),(it.idx + it.chunk_size) ); ++j)
+                    std::size_t j = it.idx;
+
+                    for(/**/;j < std::min((it.range_size ),(it.idx + it.chunk_size));++j)
                     {
                         if (tok.was_cancelled())
                             break;
+
                         f(inner_it);
                         ++inner_it;
 
@@ -664,4 +672,3 @@ namespace hpx { namespace parallel { namespace util
 }}}
 
 #endif
-
