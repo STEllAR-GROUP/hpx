@@ -299,7 +299,8 @@ namespace hpx { namespace parallel { namespace util
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures when using prefetching
             template <typename F>
-            static prefetching_iterator<T> call(prefetching_iterator<T> it, std::size_t count, F && f)
+            static prefetching_iterator<T> call(prefetching_iterator<T> it,
+                std::size_t count, F && f)
             {
                 std::size_t cnt = count + 1;
                 for (/**/; cnt != 0; (void) --cnt, ++it)
@@ -322,7 +323,8 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename CancelToken, typename F>
-            static prefetching_iterator<T> call(prefetching_iterator<T> it, std::size_t count, CancelToken& tok,
+            static prefetching_iterator<T> call(prefetching_iterator<T> it,
+                std::size_t count, CancelToken& tok,
                 F && f)
             {
                 std::size_t cnt = count + 1;
