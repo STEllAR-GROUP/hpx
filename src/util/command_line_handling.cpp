@@ -679,8 +679,9 @@ namespace hpx { namespace util
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
         ini_config += "hpx.affinity=" + affinity_domain_;
 
-        affinity_bind_ = detail::handle_affinity_bind(cfgmap, vm, "balanced");
-        ini_config += "hpx.bind!=" + affinity_bind_;
+        affinity_bind_ = detail::handle_affinity_bind(cfgmap, vm, "");
+        if (!affinity_bind_.empty())
+            ini_config += "hpx.bind!=" + affinity_bind_;
 
         pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
         ini_config += "hpx.pu_step=" + std::to_string(pu_step_);
@@ -691,6 +692,13 @@ namespace hpx { namespace util
         numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
             affinity_bind_.empty() ? 0 : 1);
         ini_config += "hpx.numa_sensitive=" + std::to_string(numa_sensitive_);
+
+        // default affinity mode is now 'balanced'
+        if (affinity_bind_.empty())
+        {
+            affinity_bind_ = "balanced";
+            ini_config += "hpx.bind!=" + affinity_bind_;
+        }
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
