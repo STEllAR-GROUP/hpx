@@ -301,11 +301,9 @@ namespace hpx { namespace parallel { namespace util
                     //based on HPX Inspection Report,
                     //using std::min violates boost min/max
                     if (it.range_size < last)
-                        e = it.range_size;
-                    else
-                        e = last;
+                        last = it.range_size;
 
-                    for(/**/; j < e ; ++j)
+                    for(/**/; j < last ; ++j)
                     {
                         f(inner_it);
                         ++inner_it;
@@ -332,11 +330,9 @@ namespace hpx { namespace parallel { namespace util
                     //based on HPX Inspection Report,
                     //using std::min violates boost min/max
                     if (it.range_size < last)
-                        e = it.range_size;
-                    else
-                        e = last;
+                        last = it.range_size;
 
-                    for(/**/; j < e; ++j)
+                    for(/**/; j < last; ++j)
                     {
                         if (tok.was_cancelled())
                             break;
