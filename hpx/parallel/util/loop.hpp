@@ -12,6 +12,7 @@
 #include <iterator>
 #include <algorithm>
 #include <initializer_list>
+#include <vector>
 
 namespace hpx { namespace parallel { namespace util
 {
@@ -50,7 +51,7 @@ namespace hpx { namespace parallel { namespace util
     }
 
 
-    /////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_FORCEINLINE Begin
     loop(Begin begin, End end, F && f)
