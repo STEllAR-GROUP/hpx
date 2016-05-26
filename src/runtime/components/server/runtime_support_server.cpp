@@ -65,6 +65,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1294,14 +1295,14 @@ namespace hpx { namespace components { namespace server
     {
         if (pre_startup) {
             get_runtime().set_state(state_pre_startup);
-            for (util::function_nonser<void()> const& f : pre_startup_functions_)
+            for (startup_function_type& f : pre_startup_functions_)
             {
                 f();
             }
         }
         else {
             get_runtime().set_state(state_startup);
-            for (util::function_nonser<void()> const& f : startup_functions_)
+            for (startup_function_type& f : startup_functions_)
             {
                 f();
             }
@@ -1313,7 +1314,7 @@ namespace hpx { namespace components { namespace server
         runtime& rt = get_runtime();
         if (pre_shutdown) {
             rt.set_state(state_pre_shutdown);
-            for (util::function_nonser<void()> const& f : pre_shutdown_functions_)
+            for (shutdown_function_type& f : pre_shutdown_functions_)
             {
                 try {
                     f();
@@ -1325,7 +1326,7 @@ namespace hpx { namespace components { namespace server
         }
         else {
             rt.set_state(state_shutdown);
-            for (util::function_nonser<void()> const& f : shutdown_functions_)
+            for (shutdown_function_type& f : shutdown_functions_)
             {
                 try {
                     f();
@@ -1844,19 +1845,19 @@ namespace hpx { namespace components { namespace server
             if (startup_shutdown->get_startup_function(startup, pre_startup))
             {
                 if (pre_startup)
-                    pre_startup_functions_.push_back(startup);
+                    pre_startup_functions_.push_back(std::move(startup));
                 else
-                    startup_functions_.push_back(startup);
+                    startup_functions_.push_back(std::move(startup));
             }
 
-            shutdown_function_type s;
+            shutdown_function_type shutdown;
             bool pre_shutdown = false;
-            if (startup_shutdown->get_shutdown_function(s, pre_shutdown))
+            if (startup_shutdown->get_shutdown_function(shutdown, pre_shutdown))
             {
                 if (pre_shutdown)
-                    pre_shutdown_functions_.push_back(s);
+                    pre_shutdown_functions_.push_back(std::move(shutdown));
                 else
-                    shutdown_functions_.push_back(s);
+                    shutdown_functions_.push_back(std::move(shutdown));
             }
         }
         catch (hpx::exception const&) {
@@ -1989,19 +1990,19 @@ namespace hpx { namespace components { namespace server
             if (startup_shutdown->get_startup_function(startup, pre_startup))
             {
                 if (pre_startup)
-                    pre_startup_functions_.push_back(startup);
+                    pre_startup_functions_.push_back(std::move(startup));
                 else
-                    startup_functions_.push_back(startup);
+                    startup_functions_.push_back(std::move(startup));
             }
 
-            shutdown_function_type s;
+            shutdown_function_type shutdown;
             bool pre_shutdown = false;
-            if (startup_shutdown->get_shutdown_function(s, pre_shutdown))
+            if (startup_shutdown->get_shutdown_function(shutdown, pre_shutdown))
             {
                 if (pre_shutdown)
-                    pre_shutdown_functions_.push_back(s);
+                    pre_shutdown_functions_.push_back(std::move(shutdown));
                 else
-                    shutdown_functions_.push_back(s);
+                    shutdown_functions_.push_back(std::move(shutdown));
             }
         }
         catch (hpx::exception const&) {

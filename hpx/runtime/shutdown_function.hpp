@@ -10,13 +10,13 @@
 #define HPX_RUNTIME_SHUTDOWN_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 namespace hpx
 {
     /// The type of a function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
-    typedef util::function_nonser<void()> shutdown_function_type;
+    typedef util::unique_function_nonser<void()> shutdown_function_type;
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed before any shutdown function is
@@ -35,7 +35,7 @@ namespace hpx
     ///       exception.
     ///
     /// \see    \a hpx::register_shutdown_function()
-    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const& f);
+    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type f);
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed after any pre-shutdown function is
@@ -54,7 +54,7 @@ namespace hpx
     ///       exception.
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
-    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const& f);
+    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type f);
 }
 
 #endif

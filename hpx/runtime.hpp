@@ -227,15 +227,13 @@ namespace hpx
 
         virtual util::unique_id_ranges& get_id_pool() = 0;
 
-        virtual void add_pre_startup_function(util::function_nonser<void()>
-            const& f) = 0;
+        virtual void add_pre_startup_function(startup_function_type f) = 0;
 
-        virtual void add_startup_function(util::function_nonser<void()> const& f) = 0;
+        virtual void add_startup_function(startup_function_type f) = 0;
 
-        virtual void add_pre_shutdown_function(util::function_nonser<void()>
-            const& f) = 0;
+        virtual void add_pre_shutdown_function(shutdown_function_type f) = 0;
 
-        virtual void add_shutdown_function(util::function_nonser<void()> const& f) = 0;
+        virtual void add_shutdown_function(shutdown_function_type f) = 0;
 
         /// Keep the factory object alive which is responsible for the given
         /// component type. This a purely internal function allowing to work

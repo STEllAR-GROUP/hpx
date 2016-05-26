@@ -10,14 +10,14 @@
 #define HPX_RUNTIME_STARTUP_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
     /// startup or pre-startup function.
-    typedef util::function_nonser<void()> startup_function_type;
+    typedef util::unique_function_nonser<void()> startup_function_type;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -41,7 +41,7 @@ namespace hpx
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_startup_function()
-    HPX_API_EXPORT void register_pre_startup_function(startup_function_type const& f);
+    HPX_API_EXPORT void register_pre_startup_function(startup_function_type f);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -66,7 +66,7 @@ namespace hpx
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_pre_startup_function()
-    HPX_API_EXPORT void register_startup_function(startup_function_type const& f);
+    HPX_API_EXPORT void register_startup_function(startup_function_type f);
 }
 
 #endif

@@ -8,6 +8,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/components/performance_counters/io/io_counters.hpp>
@@ -191,7 +192,7 @@ namespace hpx { namespace performance_counters { namespace io
             "bytes");
     }
 
-    bool get_startup(hpx::util::function_nonser<void()>& startup_func,
+    bool get_startup(hpx::startup_function_type& startup_func,
         bool& pre_startup)
     {
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__gnu_linux__)
