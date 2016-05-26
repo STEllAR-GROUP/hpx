@@ -297,7 +297,14 @@ namespace hpx { namespace parallel { namespace util
                     std::vector<std::size_t>::iterator inner_it = it.base;
                     std::size_t j = it.idx;
                     std::size_t last = it.idx+it.chunk_size;
-                    std::size_t e = std::min((it.range_size),(last));
+
+                    //based on HPX Inspection Report,
+                    //using std::min violates boost min/max
+                    if (it.range_size < last)
+                        e = it.range_size;
+                    else
+                        e = last;
+
                     for(/**/; j < e ; ++j)
                     {
                         f(inner_it);
@@ -321,7 +328,14 @@ namespace hpx { namespace parallel { namespace util
                     std::vector<std::size_t>::iterator inner_it = it.base;
                     std::size_t j = it.idx;
                     std::size_t last = it.idx+it.chunk_size;
-                    std::size_t e = std::min((it.range_size),(last));
+
+                    //based on HPX Inspection Report,
+                    //using std::min violates boost min/max
+                    if (it.range_size < last)
+                        e = it.range_size;
+                    else
+                        e = last;
+
                     for(/**/; j < e; ++j)
                     {
                         if (tok.was_cancelled())
