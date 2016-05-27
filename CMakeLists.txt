@@ -608,6 +608,11 @@ if(HPX_WITH_PARCEL_COALESCING)
   hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
 endif()
 
+# Developer tools
+hpx_option(HPX_WITH_VIM_YCM STRING
+  "Generate HPX completion file for VIM YouCompleteMe plugin and save in specified location"
+  "" ADVANCED)
+
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
@@ -1303,6 +1308,10 @@ if(HPX_WITH_VALGRIND)
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
 
+if(NOT "${HPX_WITH_VIM_YCM}" STREQUAL "")
+  SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
+
 ################################################################################
 # Security, libsodium: P(ortable|ackageable) NaCl
 ################################################################################
@@ -1689,6 +1698,12 @@ if(HPX_WITH_DOCUMENTATION)
     COMPONENT docs
     FILES_MATCHING PATTERN "*.png"
     PATTERN ".git" EXCLUDE)
+endif()
+
+
+if(HPX_WITH_VIM_YCM)
+  configure_file(${CMAKE_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
+               ${HPX_WITH_VIM_YCM}/.ycm_extra_conf.py @ONLY)
 endif()
 
 ################################################################################
