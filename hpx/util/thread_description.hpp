@@ -49,7 +49,7 @@ namespace hpx { namespace util
         thread_description() HPX_NOEXCEPT
           : type_(data_type_description)
         {
-            data_.desc_ = 0;
+            data_.desc_ = "<unknown>";
         }
 
         thread_description(char const* desc) HPX_NOEXCEPT

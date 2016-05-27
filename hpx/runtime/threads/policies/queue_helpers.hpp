@@ -52,9 +52,6 @@ namespace detail
         if (HPX_LIKELY(idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX))
             return false;
 
-        // reset idle loop count
-        idle_loop_count = 0;
-
         bool result = false;
         bool collect_suspended = true;
 
