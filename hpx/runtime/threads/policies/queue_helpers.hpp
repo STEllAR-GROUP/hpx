@@ -49,7 +49,9 @@ namespace detail
 #else
         if (!minimal_deadlock_detection)
             return false;
-        if (HPX_LIKELY(idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX))
+
+        // attempt to output possibly deadlocked threads occasionally only
+        if (HPX_LIKELY((idle_loop_count++ % HPX_IDLE_LOOP_COUNT_MAX) != 0))
             return false;
 
         bool result = false;
