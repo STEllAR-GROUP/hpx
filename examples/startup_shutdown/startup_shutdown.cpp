@@ -24,6 +24,7 @@
 // would not be executed by the runtime system.
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/parse_command_line.hpp>
 
 #include <boost/program_options.hpp>
@@ -65,7 +66,7 @@ namespace startup_shutdown
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(hpx::util::function_nonser<void()>& startup_func, bool& pre_startup)
+    bool get_startup(hpx::startup_function_type& startup_func, bool& pre_startup)
     {
         startup_func = startup;     // return our startup-function
         pre_startup = true;         // run 'startup' as pre-startup function

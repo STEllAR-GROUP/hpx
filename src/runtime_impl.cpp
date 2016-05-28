@@ -35,6 +35,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -46,14 +47,14 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // There is no need to protect these global from thread concurrent access
     // as they are access during early startup only.
-    std::list<util::function_nonser<void()> > global_pre_startup_functions;
-    std::list<util::function_nonser<void()> > global_startup_functions;
+    std::list<startup_function_type> global_pre_startup_functions;
+    std::list<startup_function_type> global_startup_functions;
 
-    std::list<util::function_nonser<void()> > global_pre_shutdown_functions;
-    std::list<util::function_nonser<void()> > global_shutdown_functions;
+    std::list<shutdown_function_type> global_pre_shutdown_functions;
+    std::list<shutdown_function_type> global_shutdown_functions;
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_pre_startup_function(startup_function_type const& f)
+    void register_pre_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
@@ -63,14 +64,14 @@ namespace hpx {
                     "Too late to register a new pre-startup function.");
                 return;
             }
-            rt->add_pre_startup_function(f);
+            rt->add_pre_startup_function(std::move(f));
         }
         else {
-            global_pre_startup_functions.push_back(f);
+            global_pre_startup_functions.push_back(std::move(f));
         }
     }
 
-    void register_startup_function(startup_function_type const& f)
+    void register_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
@@ -80,14 +81,14 @@ namespace hpx {
                     "Too late to register a new startup function.");
                 return;
             }
-            rt->add_startup_function(f);
+            rt->add_startup_function(std::move(f));
         }
         else {
-            global_startup_functions.push_back(f);
+            global_startup_functions.push_back(std::move(f));
         }
     }
 
-    void register_pre_shutdown_function(shutdown_function_type const& f)
+    void register_pre_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
@@ -97,14 +98,14 @@ namespace hpx {
                     "Too late to register a new pre-shutdown function.");
                 return;
             }
-            rt->add_pre_shutdown_function(f);
+            rt->add_pre_shutdown_function(std::move(f));
         }
         else {
-            global_pre_shutdown_functions.push_back(f);
+            global_pre_shutdown_functions.push_back(std::move(f));
         }
     }
 
-    void register_shutdown_function(shutdown_function_type const& f)
+    void register_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
@@ -114,10 +115,10 @@ namespace hpx {
                     "Too late to register a new shutdown function.");
                 return;
             }
-            rt->add_shutdown_function(f);
+            rt->add_shutdown_function(std::move(f));
         }
         else {
-            global_shutdown_functions.push_back(f);
+            global_shutdown_functions.push_back(std::move(f));
         }
     }
 
@@ -182,27 +183,27 @@ namespace hpx {
 #endif
 
         // copy over all startup functions registered so far
-        for (util::function_nonser<void()> const& f : global_pre_startup_functions)
+        for (startup_function_type& f : global_pre_startup_functions)
         {
-            add_pre_startup_function(f);
+            add_pre_startup_function(std::move(f));
         }
         global_pre_startup_functions.clear();
 
-        for (util::function_nonser<void()> const& f : global_startup_functions)
+        for (startup_function_type& f : global_startup_functions)
         {
-            add_startup_function(f);
+            add_startup_function(std::move(f));
         }
         global_startup_functions.clear();
 
-        for (util::function_nonser<void()> const& f : global_pre_shutdown_functions)
+        for (shutdown_function_type& f : global_pre_shutdown_functions)
         {
-            add_pre_shutdown_function(f);
+            add_pre_shutdown_function(std::move(f));
         }
         global_pre_shutdown_functions.clear();
 
-        for (util::function_nonser<void()> const& f : global_shutdown_functions)
+        for (shutdown_function_type& f : global_shutdown_functions)
         {
-            add_shutdown_function(f);
+            add_shutdown_function(std::move(f));
         }
         global_shutdown_functions.clear();
 
@@ -707,30 +708,30 @@ namespace hpx {
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_pre_startup_function(util::function_nonser<void()> const& f)
+        add_pre_startup_function(startup_function_type f)
     {
-        runtime_support_->add_pre_startup_function(f);
+        runtime_support_->add_pre_startup_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_startup_function(util::function_nonser<void()> const& f)
+        add_startup_function(startup_function_type f)
     {
-        runtime_support_->add_startup_function(f);
+        runtime_support_->add_startup_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_pre_shutdown_function(util::function_nonser<void()> const& f)
+        add_pre_shutdown_function(shutdown_function_type f)
     {
-        runtime_support_->add_pre_shutdown_function(f);
+        runtime_support_->add_pre_shutdown_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_shutdown_function(util::function_nonser<void()> const& f)
+        add_shutdown_function(shutdown_function_type f)
     {
-        runtime_support_->add_shutdown_function(f);
+        runtime_support_->add_shutdown_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
