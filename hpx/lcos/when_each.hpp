@@ -405,7 +405,10 @@ namespace hpx { namespace lcos
     }
 
     template <typename F, typename Iterator>
-    lcos::future<Iterator>
+    typename std::enable_if<
+        !traits::is_future<Iterator>::value,
+        lcos::future<Iterator>
+    >::type
     when_each(F&& f, Iterator begin, Iterator end)
     {
         typedef
