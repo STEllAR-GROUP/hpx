@@ -21,12 +21,18 @@ namespace hpx
     ///
     /// \param f        The function which will be called for each of the
     ///                 input futures once the future has become ready.
+    ///
     /// \param futures  A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_each should
     ///                 wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future representing the event of all input futures
     ///           being ready.
@@ -50,7 +56,12 @@ namespace hpx
     ///                 which \a wait_each should wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future representing the event of all input futures
     ///           being ready.
@@ -71,7 +82,12 @@ namespace hpx
     ///                 \a wait_each should wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future representing the event of all input futures
     ///           being ready.
@@ -94,7 +110,12 @@ namespace hpx
     ///                 \a first.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future holding the iterator pointing to the first
     ///           element after the last one.

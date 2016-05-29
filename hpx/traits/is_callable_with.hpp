@@ -32,7 +32,7 @@ namespace hpx { namespace traits
     template<typename F, typename... Args>
     using is_callable_with =
         decltype(detail::is_callable_with_impl::f<F, Args...>(0));
-            
+
 }}
 
 #endif
