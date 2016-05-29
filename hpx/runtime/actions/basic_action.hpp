@@ -168,7 +168,7 @@ namespace hpx { namespace actions
                 >::type
                 result_type;
             template <typename ...Ts>
-            result_type operator()(
+            HPX_FORCEINLINE result_type operator()(
                 naming::address::address_type lva, Ts&&... vs) const
             {
                 return invoke(
@@ -176,7 +176,7 @@ namespace hpx { namespace actions
             }
 
             template <typename ...Ts>
-            result_type invoke(std::true_type,
+            HPX_FORCEINLINE result_type invoke(std::true_type,
                 naming::address::address_type lva, Ts&&... vs) const
             {
                 Derived::invoke(lva, std::forward<Ts>(vs)...);
@@ -184,7 +184,7 @@ namespace hpx { namespace actions
             }
 
             template <typename ...Ts>
-            result_type invoke(std::false_type,
+            HPX_FORCEINLINE result_type invoke(std::false_type,
                 naming::address::address_type lva, Ts&&... vs) const
             {
                 return Derived::invoke(lva, std::forward<Ts>(vs)...);

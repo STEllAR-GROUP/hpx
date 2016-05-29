@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,10 +12,9 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-
-#include <boost/mpl/bool.hpp>
 
 #include <memory>
 
@@ -49,8 +48,8 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_init_data data;
             if (traits::action_decorate_continuation<Action>::call(cont))
             {
-                data.func = Action::construct_thread_function(std::move(cont), lva,
-                    std::forward<Ts>(vs)...);
+                data.func = Action::construct_thread_function(std::move(cont),
+                    lva, std::forward<Ts>(vs)...);
             }
             else
             {
@@ -88,9 +87,9 @@ namespace hpx { namespace applier { namespace detail
 
         template <typename ...Ts>
         static void
-        call (std::unique_ptr<actions::continuation> cont, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority priority,
-            Ts&&... vs)
+        call (std::unique_ptr<actions::continuation> cont,
+            naming::id_type const& target, naming::address::address_type lva,
+            threads::thread_priority priority, Ts&&... vs)
         {
             // first decorate the continuation
             traits::action_decorate_continuation<Action>::call(cont);
@@ -116,39 +115,78 @@ namespace hpx { namespace applier { namespace detail
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_FORCEINLINE bool needs_to_execute_asynchronously()
+    {
+        bool async_work = false;
+
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+        std::ptrdiff_t remaining_stack = this_thread::get_available_stack_space();
+
+        if(remaining_stack < 0)
+        {
+            HPX_THROW_EXCEPTION(out_of_memory,
+                "hpx::applier::detail::needs_to_execute_asynchronously",
+                "Stack overflow");
+        }
+
+        async_work = remaining_stack < (8 * HPX_THREADS_STACK_OVERHEAD);
+#endif
+
+        return async_work;
+    }
+
     template <typename Action>
     struct apply_helper<Action, /*DirectExecute=*/true>
     {
         // If local and to be directly executed, just call the function
         template <typename ...Ts>
-        static void
+        HPX_FORCEINLINE static void
         call (naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_priority, Ts&&... vs)
+            threads::thread_priority priority, Ts &&... vs)
         {
-            Action::execute_function(lva, std::forward<Ts>(vs)...);
+            if (needs_to_execute_asynchronously())
+            {
+                apply_helper<Action, false>::call(target, lva, priority,
+                    std::forward<Ts>(vs)...);
+            }
+            else
+            {
+                Action::execute_function(lva, std::forward<Ts>(vs)...);
+            }
         }
 
         template <typename Continuation, typename ...Ts>
-        static void
+        HPX_FORCEINLINE static void
         call (Continuation && c, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority priority,
-            Ts&&... vs)
+            naming::address::address_type lva,
+            threads::thread_priority priority, Ts &&... vs)
         {
             std::unique_ptr<actions::continuation> cont(
                 new typename util::decay<Continuation>::type(
                     std::forward<Continuation>(c)));
-            call(std::move(cont), target, lva, priority, std::forward<Ts>(vs)...);
+
+            call(std::move(cont), target, lva, priority,
+                std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
-        static void
-        call (std::unique_ptr<actions::continuation> cont, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority,
-            Ts&&... vs)
+        HPX_FORCEINLINE static void
+        call (std::unique_ptr<actions::continuation> cont,
+            naming::id_type const& target, naming::address::address_type lva,
+            threads::thread_priority priority, Ts &&... vs)
         {
             try {
-                cont->trigger(Action::execute_function(lva,
-                    std::forward<Ts>(vs)...));
+                if (needs_to_execute_asynchronously())
+                {
+                    apply_helper<Action, false>::call(std::move(cont), target,
+                        lva, priority, std::forward<Ts>(vs)...);
+                }
+                else
+                {
+                    cont->trigger(Action::execute_function(lva,
+                        std::forward<Ts>(vs)...));
+                }
             }
             catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
