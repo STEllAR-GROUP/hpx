@@ -193,7 +193,7 @@ namespace hpx { namespace serialization
             val = static_cast<T>(ul);
         }
 
-#if defined(BOOST_HAS_INT128)
+#if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
         void load_integral(boost::int128_type& t, boost::mpl::false_)
         {
             load_integral_impl(t);
