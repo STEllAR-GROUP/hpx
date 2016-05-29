@@ -130,7 +130,6 @@ namespace hpx
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/is_callable_with.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -157,26 +156,17 @@ namespace hpx { namespace lcos
         // call supplied callback with or without index
         struct dispatch
         {
-            template<typename F, typename IndexType, typename FutureType,
-                typename std::enable_if<
-                    traits::is_callable_with<
-                        F, IndexType, FutureType
-                    >::value, int
-                >::type = 0
-            >
-            inline static void call(F&& f, IndexType index, FutureType&& future)
+
+            template<typename F, typename IndexType, typename FutureType>
+            inline static void call(F&& f, IndexType index, FutureType&& future,
+                boost::true_type)
             {
                 f(index, std::move(future));
             }
 
-            template<typename F, typename IndexType, typename FutureType,
-                typename std::enable_if<
-                    !traits::is_callable_with<
-                        F, IndexType, FutureType
-                    >::value, int
-                >::type = 0
-            >
-            inline static void call(F&& f, IndexType index, FutureType&& future)
+            template<typename F, typename IndexType, typename FutureType>
+            inline static void call(F&& f, IndexType index, FutureType&& future,
+                boost::false_type)
             {
                 f(std::move(future));
             }
@@ -257,7 +247,11 @@ namespace hpx { namespace lcos
                     }
 
                     dispatch::call(std::forward<F>(f_), count_++,
-                        std::move(*next));
+                        std::move(*next),
+                        typename traits::is_callable<
+                            F(std::size_t, future_type)
+                        >::type()
+                    );
 
                     if(count_ == needed_count_)
                     {
@@ -321,7 +315,11 @@ namespace hpx { namespace lcos
                     }
                 }
 
-                dispatch::call(std::forward<F>(f_), count_++, std::move(fut));
+                dispatch::call(std::forward<F>(f_), count_++, std::move(fut),
+                    typename traits::is_callable<
+                        F(std::size_t, future_type)
+                    >::type()
+                );
 
                 if(count_ == needed_count_)
                 {
