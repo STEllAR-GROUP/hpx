@@ -176,11 +176,6 @@ namespace hpx { namespace compute { namespace detail
 
         // FIXME: operator[] is missing
 
-        target_type& target()
-        {
-            return *target_;
-        }
-
         target_type const& target() const
         {
             return *target_;

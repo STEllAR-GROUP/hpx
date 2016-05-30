@@ -27,8 +27,8 @@ namespace hpx { namespace compute { namespace host
     /// It will distribute work evenly accross the passed targets
     ///
     /// \tparam Executor The underlying executor to use
-    template <
-        typename Executor = hpx::threads::executors::local_priority_queue_attached_executor>
+    template <typename Executor =
+        hpx::threads::executors::local_priority_queue_attached_executor>
     struct block_executor : hpx::parallel::executor_tag
     {
     private:
@@ -55,7 +55,11 @@ namespace hpx { namespace compute { namespace host
           , executors_(other.executors_)
         {}
 
-        block_executor(block_executor&& other) = default;
+        block_executor(block_executor&& other)
+          : targets_(std::move(other.targets_))
+          , current_(other.current_.load())
+          , executors_(std::move(other.executors_))
+        {}
 
         template <typename F, typename ... Ts>
         void apply_execute(F && f, Ts &&... ts)
@@ -87,12 +91,17 @@ namespace hpx { namespace compute { namespace host
 
         template <typename F, typename Shape, typename ... Ts>
         std::vector<hpx::future<
-            typename hpx::parallel::v3::detail::bulk_async_execute_result<F, Shape, Ts...>::type>>
+            typename hpx::parallel::v3::detail::bulk_async_execute_result<
+                F, Shape, Ts...
+            >::type>
+        >
         bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             std::vector<hpx::future<
-                typename hpx::parallel::v3::detail::bulk_async_execute_result<F, Shape, Ts...>::type
-            >> results;
+                typename hpx::parallel::v3::detail::bulk_async_execute_result<
+                        F, Shape, Ts...
+                    >::type
+            > > results;
             std::size_t cnt = boost::size(shape);
             std::size_t part_size = cnt / executors_.size();
 
@@ -130,11 +139,14 @@ namespace hpx { namespace compute { namespace host
         }
 
         template <typename F, typename Shape, typename ... Ts>
-        typename hpx::parallel::v3::detail::bulk_execute_result<F, Shape, Ts...>::type
+        typename hpx::parallel::v3::detail::bulk_execute_result<
+            F, Shape, Ts...
+        >::type
         bulk_execute(F && f, Shape const& shape, Ts &&... ts)
         {
-            typename hpx::parallel::v3::detail::bulk_execute_result<F, Shape, Ts...>::type
-                results;
+            typename hpx::parallel::v3::detail::bulk_execute_result<
+                    F, Shape, Ts...
+                >::type results;
             std::size_t cnt = boost::size(shape);
             std::size_t part_size = cnt / executors_.size();
 

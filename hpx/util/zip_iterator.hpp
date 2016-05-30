@@ -427,7 +427,7 @@ namespace hpx { namespace traits
                 operator()(SegIter iter) const
                 {
                     return iter.local();
-                };
+                }
             };
         };
 
@@ -441,7 +441,7 @@ namespace hpx { namespace traits
                 operator()(SegIter iter) const
                 {
                     return iter.remote();
-                };
+                }
             };
         };
 

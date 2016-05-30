@@ -24,7 +24,6 @@ typedef hpx::compute::vector<int, target_allocator> target_vector;
 
 HPX_REGISTER_PARTITIONED_VECTOR(int, target_vector);
 
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
