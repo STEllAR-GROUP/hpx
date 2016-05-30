@@ -54,7 +54,7 @@ namespace hpx
             util::function_nonser<runtime::hpx_main_function_type> func,
             int& result);
 
-        void wait_helper(boost::mutex& mtx, boost::condition& cond,
+        void wait_helper(boost::mutex& mtx, boost::condition_variable& cond,
             bool& running);
 
     public:
@@ -143,7 +143,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, boost::condition& cond, boost::mutex& mtx);
+        void stopped(bool blocking, boost::condition_variable& cond, boost::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
