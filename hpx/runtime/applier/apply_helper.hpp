@@ -116,26 +116,6 @@ namespace hpx { namespace applier { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_FORCEINLINE bool needs_to_execute_asynchronously()
-    {
-        bool async_work = false;
-
-#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-        std::ptrdiff_t remaining_stack = this_thread::get_available_stack_space();
-
-        if(remaining_stack < 0)
-        {
-            HPX_THROW_EXCEPTION(out_of_memory,
-                "hpx::applier::detail::needs_to_execute_asynchronously",
-                "Stack overflow");
-        }
-
-        async_work = remaining_stack < (8 * HPX_THREADS_STACK_OVERHEAD);
-#endif
-
-        return async_work;
-    }
-
     template <typename Action>
     struct apply_helper<Action, /*DirectExecute=*/true>
     {
@@ -145,14 +125,14 @@ namespace hpx { namespace applier { namespace detail
         call (naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            if (needs_to_execute_asynchronously())
+            if (this_thread::has_sufficient_stack_space())
             {
-                apply_helper<Action, false>::call(target, lva, priority,
-                    std::forward<Ts>(vs)...);
+                Action::execute_function(lva, std::forward<Ts>(vs)...);
             }
             else
             {
-                Action::execute_function(lva, std::forward<Ts>(vs)...);
+                apply_helper<Action, false>::call(target, lva, priority,
+                    std::forward<Ts>(vs)...);
             }
         }
 
@@ -176,21 +156,22 @@ namespace hpx { namespace applier { namespace detail
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            try {
-                if (needs_to_execute_asynchronously())
-                {
-                    apply_helper<Action, false>::call(std::move(cont), target,
-                        lva, priority, std::forward<Ts>(vs)...);
-                }
-                else
-                {
+            if (this_thread::has_sufficient_stack_space())
+            {
+                try {
                     cont->trigger(Action::execute_function(lva,
                         std::forward<Ts>(vs)...));
                 }
+                catch (...) {
+                    // make sure hpx::exceptions are propagated back to the
+                    // client
+                    cont->trigger_error(boost::current_exception());
+                }
             }
-            catch (...) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(boost::current_exception());
+            else
+            {
+                apply_helper<Action, false>::call(std::move(cont), target,
+                    lva, priority, std::forward<Ts>(vs)...);
             }
         }
     };

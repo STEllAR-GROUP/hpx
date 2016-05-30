@@ -7,6 +7,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <hpx/error_code.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
@@ -566,5 +567,20 @@ namespace hpx { namespace this_thread
         }
 
         return (std::numeric_limits<std::ptrdiff_t>::max)();
+    }
+
+    bool has_sufficient_stack_space(std::size_t space_needed)
+    {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+        std::ptrdiff_t remaining_stack = get_available_stack_space();
+        if (remaining_stack < 0)
+        {
+            HPX_THROW_EXCEPTION(out_of_memory,
+                "has_sufficient_stack_space", "Stack overflow");
+        }
+        return std::size_t(remaining_stack) >= space_needed;
+#else
+        return true;
+#endif
     }
 }}

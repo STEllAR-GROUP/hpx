@@ -380,27 +380,6 @@ namespace hpx { namespace parcelset
             // invoke the original handler
             f(ec, p);
         }
-
-        HPX_FORCEINLINE bool needs_to_execute_asynchronously()
-        {
-            bool async_work = false;
-
-#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-            std::ptrdiff_t remaining_stack =
-                this_thread::get_available_stack_space();
-
-            if(remaining_stack < 0)
-            {
-                HPX_THROW_EXCEPTION(out_of_memory,
-                    "hpx::parcelset::detail::execute_asynchronously",
-                    "Stack overflow");
-            }
-
-            async_work = remaining_stack < (8 * HPX_THREADS_STACK_OVERHEAD);
-#endif
-
-            return async_work;
-        }
     }
 
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
@@ -412,7 +391,7 @@ namespace hpx { namespace parcelset
 
         // During bootstrap this is handled separately (see
         // addressing_service::resolve_locality.
-        if (detail::needs_to_execute_asynchronously() ||
+        if (!this_thread::has_sufficient_stack_space() ||
             (0 == hpx::threads::get_self_ptr() && !hpx::is_starting()))
         {
             naming::gid_type locality =
@@ -514,7 +493,7 @@ namespace hpx { namespace parcelset
             return;
         }
 
-        if (detail::needs_to_execute_asynchronously() ||
+        if (!this_thread::has_sufficient_stack_space() ||
             (0 == hpx::threads::get_self_ptr() && !hpx::is_starting()))
         {
             naming::gid_type locality = naming::get_locality_from_gid(
