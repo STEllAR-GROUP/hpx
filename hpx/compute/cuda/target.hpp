@@ -25,6 +25,8 @@
 #include <string>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace compute { namespace cuda
 {
     namespace detail
@@ -122,6 +124,8 @@ namespace hpx { namespace compute { namespace cuda
 
     HPX_API_EXPORT target& get_default_target();
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif

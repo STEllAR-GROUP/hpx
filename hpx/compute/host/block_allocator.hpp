@@ -127,7 +127,7 @@ namespace hpx { namespace compute { namespace host
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
         size_type max_size() const HPX_NOEXCEPT
         {
-            return std::numeric_limits<size_type>::max();
+            return (std::numeric_limits<size_type>::max)();
         }
 
     public:

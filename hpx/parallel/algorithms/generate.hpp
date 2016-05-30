@@ -189,7 +189,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f](type& v) mutable
                         {
                             v = f();
-                        });
+                        },
+                        util::projection_identity());
             }
         };
         /// \endcond

@@ -61,6 +61,28 @@ namespace hpx { namespace compute { namespace host
           , executors_(std::move(other.executors_))
         {}
 
+        block_executor& operator=(block_executor const& other)
+        {
+            if (&other != this)
+            {
+                targets_ = other.targets_;
+                current_ = 0;
+                executors_ = other.executors_;
+            }
+            return *this;
+        }
+
+        block_executor& operator=(block_executor && other)
+        {
+            if (&other != this)
+            {
+                targets_ = std::move(other.targets_);
+                current_ = other.current_.load();
+                executors_ = std::move(other.executors_);
+            }
+            return *this;
+        }
+
         template <typename F, typename ... Ts>
         void apply_execute(F && f, Ts &&... ts)
         {

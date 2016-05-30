@@ -19,7 +19,8 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
+#include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/util/assert.hpp>
 
