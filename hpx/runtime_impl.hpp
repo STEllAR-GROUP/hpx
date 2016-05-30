@@ -21,7 +21,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/init_logging.hpp>
@@ -304,7 +304,7 @@ namespace hpx
         /// \note       The difference to a startup function is that all
         ///             pre-startup functions will be (system-wide) executed
         ///             before any startup function.
-        void add_pre_startup_function(util::function_nonser<void()> const& f);
+        void add_pre_startup_function(startup_function_type f);
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///
@@ -312,7 +312,7 @@ namespace hpx
         ///             thread before hpx_main is executed. This is very useful
         ///             to setup the runtime environment of the application
         ///             (install performance counters, etc.)
-        void add_startup_function(util::function_nonser<void()> const& f);
+        void add_startup_function(startup_function_type f);
 
         /// Add a function to be executed inside a HPX thread during
         /// hpx::finalize, but guaranteed before any of teh shutdown functions
@@ -326,7 +326,7 @@ namespace hpx
         /// \note       The difference to a shutdown function is that all
         ///             pre-shutdown functions will be (system-wide) executed
         ///             before any shutdown function.
-        void add_pre_shutdown_function(util::function_nonser<void()> const& f);
+        void add_pre_shutdown_function(shutdown_function_type f);
 
         /// Add a function to be executed inside a HPX thread during hpx::finalize
         ///
@@ -334,7 +334,7 @@ namespace hpx
         ///             thread while hpx::finalize is executed. This is very
         ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
-        void add_shutdown_function(util::function_nonser<void()> const& f);
+        void add_shutdown_function(shutdown_function_type f);
 
         /// Keep the factory object alive which is responsible for the given
         /// component type. This a purely internal function allowing to work

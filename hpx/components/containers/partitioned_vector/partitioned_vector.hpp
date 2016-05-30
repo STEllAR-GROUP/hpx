@@ -11,10 +11,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/when_all.hpp>
+#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/components/copy_component.hpp>
+#include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime/components/server/distributed_metadata_base.hpp>
+#include <hpx/runtime/get_ptr.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>

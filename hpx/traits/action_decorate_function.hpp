@@ -9,6 +9,7 @@
 #include <hpx/traits.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <utility>
 

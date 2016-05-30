@@ -30,6 +30,7 @@
 #include <boost/make_shared.hpp>
 
 #include <algorithm>
+#include <list>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

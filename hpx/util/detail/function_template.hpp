@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/copyable_vtable.hpp>
@@ -61,7 +62,7 @@ namespace hpx { namespace util { namespace detail
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Serializable = true>
+    template <typename Sig, bool Serializable>
     class function;
 
     template <typename R, typename ...Ts, bool Serializable>
@@ -167,12 +168,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
-
-    template <typename Sig>
-    using function_nonser = function<Sig, false>;
-
-#   else
+#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename T>
     class function_nonser;

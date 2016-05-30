@@ -34,6 +34,7 @@ set(example_programs
     pingpong
     print_to_console
     quicksort
+    receive_buffer
     safe_object
     shared_mutex
     simple_future_continuation

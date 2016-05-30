@@ -8,11 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
-#include <hpx/runtime/actions/detail/remote_action_result.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/find_here.hpp>
@@ -28,6 +26,7 @@
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_continuation.hpp>
@@ -333,8 +332,16 @@ namespace hpx { namespace actions
         {
             try {
                 HPX_ASSERT(result.is_ready());
-                static_cast<typed_continuation<Result, RemoteResult>*>(cont.get())->
-                    trigger(result.get());
+                HPX_ASSERT((0 !=
+                    dynamic_cast<
+                        typed_continuation<Result, RemoteResult>*
+                    >(cont.get())));
+
+                static_cast<
+                        typed_continuation<Result, RemoteResult>*
+                    >(cont.get())->trigger(
+                        hpx::util::detail::decay_copy(result.get())
+                    );
             }
             catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -360,17 +367,14 @@ namespace hpx { namespace actions
         void trigger_impl_future(boost::mpl::true_,
             std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
+            typedef typename traits::future_traits<Future>::type type;
             typedef
-                typename traits::future_traits<
-                    Future
-                >::type type;
-            typedef
-                typename detail::remote_action_result<type>::type
+                typename traits::action_remote_result<type>::type
                 remote_result_type;
             typedef typename std::is_void<type>::type is_void;
 
             Future result = util::invoke(std::forward<F>(f),
-                    std::forward<Ts>(vs)...);
+                std::forward<Ts>(vs)...);
 
             if(result.is_ready())
             {
@@ -397,9 +401,15 @@ namespace hpx { namespace actions
             std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             try {
-                static_cast<typed_continuation<Result, RemoteResult>*>(cont.get())->
-                    trigger(util::invoke(std::forward<F>(f),
-                    std::forward<Ts>(vs)...));
+                HPX_ASSERT((0 !=
+                    dynamic_cast<
+                        typed_continuation<Result, RemoteResult>*
+                    >(cont.get())));
+
+                static_cast<
+                        typed_continuation<Result, RemoteResult>*
+                    >(cont.get())->trigger(
+                        util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...));
             }
             catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -423,12 +433,12 @@ namespace hpx { namespace actions
     template <typename Result, typename F, typename ...Ts>
     void trigger(std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
     {
-        typedef typename util::result_of<F(Ts...)>::type
-            result_type;
+        typedef typename util::result_of<F(Ts...)>::type result_type;
 
         typedef
             typename std::is_same<result_type, util::unused_type>::type
             is_void;
+
         detail::trigger_impl<Result, result_type>(is_void(), std::move(cont),
             std::forward<F>(f), std::forward<Ts>(vs)...);
     }
@@ -897,6 +907,11 @@ namespace hpx { namespace actions
             this->trigger();
         }
 
+        virtual void trigger_value(util::unused_type const&)
+        {
+            this->trigger();
+        }
+
     private:
         char const* get_continuation_name() const
         {
@@ -926,10 +941,19 @@ namespace hpx { namespace actions
     template <typename Arg0>
     void continuation::trigger(Arg0 && arg0)
     {
+        // The dynamic cast decays the argument type to avoid the assert firing
+        // for cases when Arg0 is a const&. This does not make the code invalid
+        // as trigger_value (which is a virtual function) takes its argument
+        // by && anyways.
+        HPX_ASSERT(0 != dynamic_cast<
+                typed_continuation<typename util::decay<Arg0>::type> *
+            >(this));
+
         // The static_cast is safe as we know that Arg0 is the result type
         // of the executed action (see apply.hpp).
-        static_cast<typed_continuation<Arg0> *>(this)->trigger_value(
-            std::forward<Arg0>(arg0));
+        static_cast<
+                typed_continuation<typename util::decay<Arg0>::type> *
+            >(this)->trigger_value(std::forward<Arg0>(arg0));
     }
 }}
 

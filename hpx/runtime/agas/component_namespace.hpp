@@ -8,8 +8,9 @@
 #if !defined(HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6)
 #define HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
 
-#include <hpx/include/client.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>

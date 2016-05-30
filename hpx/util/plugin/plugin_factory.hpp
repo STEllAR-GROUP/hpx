@@ -8,6 +8,7 @@
 #define HPX_PLUGIN_FACTORY_VP_2004_08_25
 
 #include <hpx/config.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/plugin/virtual_constructor.hpp>
@@ -19,7 +20,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 
-#include <stdexcept>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>

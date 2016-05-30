@@ -13,10 +13,10 @@
  // The idea for these iterators is taken from
  // http://lafstern.org/matt/segmented.pdf.
 
-#include <hpx/include/naming.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/include/traits.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>

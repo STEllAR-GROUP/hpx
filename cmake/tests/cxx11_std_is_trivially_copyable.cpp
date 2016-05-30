@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2015 Agustin Berge
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,5 +9,5 @@
 
 int main()
 {
-    int check_is_triviallycopyable[std::is_trivially_copyable<int>::value ? 1 : -1];
+    int check_trivially_copyable[std::is_trivially_copyable<int>::value ? 1 : -1];
 }

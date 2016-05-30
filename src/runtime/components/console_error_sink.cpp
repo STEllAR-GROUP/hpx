@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/async.hpp>
 #include <hpx/state.hpp>
-#include <hpx/include/async.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>

@@ -3,29 +3,37 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
-#include <hpx/runtime/threads/resource_manager.hpp>
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
-#endif
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
+#  include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #endif
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+#  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+#endif
+
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
+#include <hpx/runtime/threads/resource_manager.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/thread_description.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/chrono/chrono.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -205,7 +213,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     // Return an estimate of the number of waiting tasks.
     template <typename Scheduler>
-    boost::uint64_t this_thread_executor<Scheduler>::num_pending_closures(
+    std::uint64_t this_thread_executor<Scheduler>::num_pending_closures(
         error_code& ec) const
     {
         if (&ec != &throws)
@@ -320,8 +328,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             parent_thread_num_ = reset_on_exit.previous_thread_num();
 
             // FIXME: turn these values into performance counters
-            boost::int64_t executed_threads = 0, executed_thread_phases = 0;
-            boost::uint64_t overall_times = 0, thread_times = 0;
+            std::int64_t executed_threads = 0, executed_thread_phases = 0;
+            std::uint64_t overall_times = 0, thread_times = 0;
 
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,

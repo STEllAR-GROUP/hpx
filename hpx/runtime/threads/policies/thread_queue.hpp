@@ -14,6 +14,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -29,6 +30,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>

@@ -14,10 +14,37 @@
 namespace hpx { namespace util
 {
     /// \cond NOINTERNAL
+    class backtrace;
+
+    struct command_line_handling;
+
+    template <typename Sig, bool Serializable = true>
+    class function;
+
+#ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
+    template <typename Sig>
+    using function_nonser = function<Sig, false>;
+#else
+    template <typename T>
+    class function_nonser;
+#endif
+
     class HPX_EXPORT io_service_pool;
+
     class HPX_EXPORT runtime_configuration;
     class HPX_EXPORT section;
+
+    template <typename Sig, bool Serializable = true>
+    class unique_function;
+
+#ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
+    template <typename Sig>
+    using unique_function_nonser = unique_function<Sig, false>;
+#else
+    template <typename T>
+    class unique_function_nonser;
+#endif
     /// \endcond
 }}
 
-#endif
+#endif /*HPX_UTIL_FWD_HPP*/

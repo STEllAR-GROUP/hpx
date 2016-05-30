@@ -16,10 +16,10 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
@@ -91,7 +91,7 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(
-            util::runtime_configuration & cfg,
+            util::runtime_configuration& cfg,
             threads::threadmanager_base* tm,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread);

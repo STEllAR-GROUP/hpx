@@ -4,13 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_MUTEX_HPP
-#define HPX_LCOS_MUTEX_HPP
+#ifndef HPX_LCOS_LOCAL_MUTEX_HPP
+#define HPX_LCOS_LOCAL_MUTEX_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
@@ -88,4 +88,4 @@ namespace hpx { namespace lcos { namespace local
     };
 }}}
 
-#endif
+#endif /*HPX_LCOS_LOCAL_MUTEX_HPP*/

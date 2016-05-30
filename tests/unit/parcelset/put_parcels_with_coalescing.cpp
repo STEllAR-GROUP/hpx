@@ -6,8 +6,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parcel_coalescing.hpp>
+#include <hpx/include/performance_counters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>

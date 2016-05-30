@@ -7,12 +7,10 @@
 #define HPX_COMPONENT_STARTUP_SHUTDOWN_BASE_SEP_20_2011_0809PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
-
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-#include <boost/mpl/list.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -33,7 +31,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a startup has been
         ///         successfully initialized with the startup function.
-        virtual bool get_startup_function(util::function_nonser<void()>& startup,
+        virtual bool get_startup_function(startup_function_type& startup,
             bool& pre_startup) = 0;
 
         /// \brief Return any startup function for this component
@@ -45,7 +43,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a shutdown has been
         ///         successfully initialized with the shutdown function.
-        virtual bool get_shutdown_function(util::function_nonser<void()>& shutdown,
+        virtual bool get_shutdown_function(shutdown_function_type& shutdown,
             bool& pre_shutdown) = 0;
     };
 }}

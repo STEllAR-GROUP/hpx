@@ -35,14 +35,16 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/broadcast.hpp>
 
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -294,7 +296,7 @@ void addressing_service::launch_bootstrap(
     naming::gid_type runtime_support_gid1(here);
     runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
     naming::gid_type runtime_support_gid2(here);
-    runtime_support_gid2.set_lsb(boost::uint64_t(0));
+    runtime_support_gid2.set_lsb(std::uint64_t(0));
 
     gva runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
@@ -693,12 +695,12 @@ lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
     {
         naming::id_type const target = bootstrap_locality_namespace_id();
         request req(locality_ns_num_localities, type);
-        return stubs::locality_namespace::service_async<boost::uint32_t>(target, req);
+        return stubs::locality_namespace::service_async<std::uint32_t>(target, req);
     }
 
     naming::id_type const target = bootstrap_component_namespace_id();
     request req(component_ns_num_localities, type);
-    return stubs::component_namespace::service_async<boost::uint32_t>(target, req);
+    return stubs::component_namespace::service_async<std::uint32_t>(target, req);
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -725,7 +727,7 @@ lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async(
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
-    return stubs::locality_namespace::service_async<boost::uint32_t>(target, req);
+    return stubs::locality_namespace::service_async<std::uint32_t>(target, req);
 } // }}}
 
 std::vector<boost::uint32_t> addressing_service::get_num_threads(
@@ -1707,7 +1709,7 @@ void addressing_service::route(
 // if there was a pending decref request at the point when the incref was sent.
 // The pending decref was subtracted from the amount of credits to incref.
 boost::int64_t addressing_service::synchronize_with_async_incref(
-    hpx::future<boost::int64_t> fut
+    hpx::future<std::int64_t> fut
   , naming::id_type const& id
   , boost::int64_t compensated_credit
     )
@@ -1819,8 +1821,8 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         stubs::primary_namespace::get_service_instance(e_lower)
       , naming::id_type::unmanaged);
 
-    lcos::future<boost::int64_t> f =
-        stubs::primary_namespace::service_async<boost::int64_t>(target, req);
+    lcos::future<std::int64_t> f =
+        stubs::primary_namespace::service_async<std::int64_t>(target, req);
 
     // pass the amount of compensated decrefs to the callback
     using util::placeholders::_1;

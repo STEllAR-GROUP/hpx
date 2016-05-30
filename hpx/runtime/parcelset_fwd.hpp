@@ -44,4 +44,4 @@ namespace hpx {
     }
 }
 
-#endif
+#endif /*HPX_RUNTIME_PARCELSET_FWD_HPP*/

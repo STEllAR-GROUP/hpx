@@ -5,21 +5,27 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/runtime/threads/policies/hwloc_topology.hpp>
 
 #if defined(HPX_HAVE_HWLOC)
 
-#include <hpx/exception.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/policies/hwloc_topology.hpp>
 
 #include <boost/format.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/io/ios_state.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/thread.hpp>
 
+#include <cstddef>
+#include <iomanip>
+#include <iostream>
 #include <mutex>
 #include <vector>
 
@@ -422,7 +428,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     mask_type hwloc_topology::get_thread_affinity_mask_from_lva(
-        naming::address::address_type lva
+        naming::address_type lva
       , error_code& ec
         ) const
     { // {{{
@@ -1049,7 +1055,7 @@ namespace hpx { namespace threads
         return mask;
     }
 
-    mask_type hwloc_topology::get_cpubind_mask(boost::thread & handle,
+    mask_type hwloc_topology::get_cpubind_mask(boost::thread& handle,
         error_code& ec) const
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();

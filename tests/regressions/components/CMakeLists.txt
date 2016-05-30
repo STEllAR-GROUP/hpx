@@ -5,6 +5,7 @@
 
 set(tests
     moveonly_constructor_arguments_1405
+    returned_client_2150
    )
 
 foreach(test ${tests})

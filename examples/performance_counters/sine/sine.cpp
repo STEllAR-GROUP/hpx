@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/bind.hpp>
@@ -240,7 +241,7 @@ namespace performance_counters { namespace sine
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(hpx::util::function_nonser<void()>& startup_func, bool& pre_startup)
+    bool get_startup(hpx::startup_function_type& startup_func, bool& pre_startup)
     {
         // check whether the performance counters need to be enabled
         if (!need_perf_counters()) {

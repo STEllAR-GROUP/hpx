@@ -21,6 +21,7 @@
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <list>
 #include <map>
 #include <memory>
 #include <type_traits>
@@ -219,7 +220,7 @@ namespace hpx { namespace serialization
             save_integral_impl(static_cast<boost::uint64_t>(val));
         }
 
-#if defined(BOOST_HAS_INT128)
+#if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
         void save_integral(boost::int128_type t, boost::mpl::false_)
         {
             save_integral_impl(t);

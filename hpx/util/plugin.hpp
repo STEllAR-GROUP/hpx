@@ -4,13 +4,11 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PLUGIN_HPP_HK_2005_11_08
-#define HPX_PLUGIN_HPP_HK_2005_11_08
+#ifndef HPX_UTIL_PLUGIN_HPP
+#define HPX_UTIL_PLUGIN_HPP
 
 #include <hpx/util/plugin/config.hpp>
-#include <hpx/util/plugin/plugin_factory.hpp>
 #include <hpx/util/plugin/dll.hpp>
+#include <hpx/util/plugin/plugin_factory.hpp>
 
-#endif
-
-
+#endif /*HPX_UTIL_PLUGIN_HPP*/

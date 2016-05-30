@@ -15,8 +15,9 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_startup_shutdown class provides a minimal
     /// implementation of a component's startup/shutdown function provider.
-    template <bool(*Startup)(util::function_nonser<void()>&, bool&),
-        bool(*Shutdown)(util::function_nonser<void()>&, bool&)>
+    template <
+        bool(*Startup)(startup_function_type&, bool&),
+        bool(*Shutdown)(shutdown_function_type&, bool&)>
     struct component_startup_shutdown : public component_startup_shutdown_base
     {
         ///
@@ -31,7 +32,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a startup has been
         ///         successfully initialized with the startup function.
-        bool get_startup_function(util::function_nonser<void()>& startup_,
+        bool get_startup_function(startup_function_type& startup_,
             bool& pre_startup_)
         {
             return Startup(startup_, pre_startup_);
@@ -46,7 +47,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a shutdown has been
         ///         successfully initialized with the shutdown function.
-        bool get_shutdown_function(util::function_nonser<void()>& shutdown_,
+        bool get_shutdown_function(shutdown_function_type& shutdown_,
             bool& pre_shutdown_)
         {
             return Shutdown(shutdown_, pre_shutdown_);
@@ -59,18 +60,18 @@ namespace hpx { namespace components
     namespace hpx { namespace components { namespace startup_shutdown_provider\
     {                                                                         \
         bool BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _startup)(             \
-             util::function_nonser<void()>& startup_func, bool& pre_startup)  \
+             startup_function_type& startup_func, bool& pre_startup)          \
         {                                                                     \
-            util::function_nonser<bool(util::function_nonser<void()>&, bool&)> tmp =\
-                static_cast<bool(*)(util::function_nonser<void()>&, bool&)>(startup_);\
+            util::function_nonser<bool(startup_function_type&, bool&)> tmp =  \
+                static_cast<bool(*)(startup_function_type&, bool&)>(startup_);\
             if (!!tmp) { return tmp(startup_func, pre_startup); }             \
             return false;                                                     \
         }                                                                     \
         bool BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _shutdown)(            \
-             util::function_nonser<void()>& shutdown_func, bool& pre_shutdown)\
+             shutdown_function_type& shutdown_func, bool& pre_shutdown)       \
         {                                                                     \
-            util::function_nonser<bool(util::function_nonser<void()>&, bool&)> tmp =\
-                static_cast<bool(*)(util::function_nonser<void()>&, bool&)>(shutdown_);\
+            util::function_nonser<bool(shutdown_function_type&, bool&)> tmp = \
+                static_cast<bool(*)(shutdown_function_type&, bool&)>(shutdown_);\
             if (!!tmp) { return tmp(shutdown_func, pre_shutdown); }           \
             return false;                                                     \
         }                                                                     \

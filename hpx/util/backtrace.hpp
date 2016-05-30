@@ -16,7 +16,7 @@
 
 namespace hpx { namespace util
 {
-    struct backtrace {};
+    class backtrace {};
 
     inline std::string trace(std::size_t frames_no = 0)
     {

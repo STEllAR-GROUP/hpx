@@ -20,9 +20,9 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/lcos/detail/async_colocated_fwd.hpp>
-#include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
-#include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/lcos/detail/async_colocated_callback.hpp>
+#include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <algorithm>

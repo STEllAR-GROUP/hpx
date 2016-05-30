@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -24,6 +23,7 @@
 #include <boost/cstdint.hpp>
 
 #include <deque>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -191,7 +191,7 @@ namespace hpx { namespace parcelset
 
         virtual locality create_locality() const = 0;
 
-        virtual locality agas_locality(util::runtime_configuration const & ini)
+        virtual locality agas_locality(util::runtime_configuration const& ini)
             const = 0;
 
         /// Performance counter data

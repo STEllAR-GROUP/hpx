@@ -6,6 +6,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
+#include <list>
+
 namespace hpx { namespace serialization
 {
     void output_archive::add_gid(

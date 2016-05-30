@@ -38,7 +38,7 @@ namespace hpx
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::remote_result_type>::type,
-            typename DirectExecute = typename Action::direct_execution>
+            bool DirectExecute = Action::direct_execution::value>
         class packaged_action;
 
         template <typename R>

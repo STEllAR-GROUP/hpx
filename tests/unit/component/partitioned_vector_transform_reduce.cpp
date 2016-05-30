@@ -7,6 +7,7 @@
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_transform_reduce.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 

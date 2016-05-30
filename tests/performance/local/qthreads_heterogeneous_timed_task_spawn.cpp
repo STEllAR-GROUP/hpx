@@ -36,6 +36,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <iostream>
+#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <vector>

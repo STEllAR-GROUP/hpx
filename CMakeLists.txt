@@ -809,6 +809,12 @@ hpx_check_for_cxx11_deleted_functions(
 hpx_check_for_cxx11_explicit_cvt_ops(
   REQUIRED "HPX needs support for C++11 explicit conversion operators")
 
+hpx_check_for_cxx11_explicit_variadic_templates(
+  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
+
+hpx_check_for_cxx11_extended_friend_declarations(
+  DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
+
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
@@ -845,12 +851,6 @@ hpx_check_for_cxx11_variadic_macros(
 hpx_check_for_cxx11_variadic_templates(
   REQUIRED "HPX needs support for C++11 variadic templates")
 
-hpx_check_for_cxx11_explicit_variadic_templates(
-  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
-
-hpx_check_for_cxx11_extended_friend_declarations(
-  DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
-
 # Check the availability of certain C++11 library features
 hpx_check_for_cxx11_std_array(
   DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
@@ -875,6 +875,9 @@ hpx_check_for_cxx11_std_is_null_pointer(
 
 hpx_check_for_cxx11_std_is_placeholder(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
+
+hpx_check_for_cxx11_std_is_trivially_copyable(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
 
 hpx_check_for_cxx11_std_lock_guard(
   REQUIRED "HPX needs support for C++11 std::lock_guard")
@@ -902,9 +905,6 @@ hpx_check_for_cxx11_std_unordered_set(
 
 hpx_check_for_cxx11_std_type_traits(
   DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
-
-hpx_check_for_cxx11_is_trivially_copyable(
-  DEFINITIONS HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
 
 # Check the availability of certain C++14 language features
 hpx_check_for_cxx14_constexpr(

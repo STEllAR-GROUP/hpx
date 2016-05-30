@@ -8,6 +8,7 @@
 #include <hpx/include/parallel_search.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <numeric>
 #include <string>
 #include <vector>
 

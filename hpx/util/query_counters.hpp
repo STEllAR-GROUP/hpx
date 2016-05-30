@@ -10,7 +10,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counters.hpp>
 
 #include <boost/cstdint.hpp>
 

@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -170,8 +171,11 @@ namespace hpx { namespace actions { namespace detail
         void trigger_value(remote_result_type && result)
         {
             if(cont_)
+            {
+                HPX_ASSERT(0 != dynamic_cast<base_type *>(cont_.get()));
                 static_cast<base_type *>(cont_.get())->
                     trigger_value(std::move(result));
+            }
             construct_semaphore_type::get_sem().signal();
         }
 

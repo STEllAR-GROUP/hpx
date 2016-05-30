@@ -10,6 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/include/actions.hpp>
 
+#include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+
 #include <hpx/lcos/packaged_action.hpp>
 
 #include <hpx/lcos/barrier.hpp>

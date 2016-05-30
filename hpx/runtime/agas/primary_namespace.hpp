@@ -8,8 +8,9 @@
 #if !defined(HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6)
 #define HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6
 
-#include <hpx/include/client.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>

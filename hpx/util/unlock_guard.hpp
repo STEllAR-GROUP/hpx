@@ -39,4 +39,4 @@ namespace hpx { namespace util
     };
 }}
 
-#endif
+#endif /*HPX_UTIL_UNLOCK_GUARD_HPP*/

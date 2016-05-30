@@ -4,24 +4,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_041EF599_BA27_47ED_B1F0_2691B28966B3)
-#define HPX_041EF599_BA27_47ED_B1F0_2691B28966B3
+#ifndef HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP
+#define HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/one_size_heap_list_base.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/util/logging.hpp>
 #endif
+#include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -339,5 +339,4 @@ namespace hpx { namespace util
     };
 }} // namespace hpx::util
 
-#endif // HPX_041EF599_BA27_47ED_B1F0_2691B28966B3
-
+#endif /*HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP*/

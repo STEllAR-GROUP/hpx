@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <iterator>
 #include <list>
+#include <numeric>
 #include <type_traits>
 #include <vector>
 

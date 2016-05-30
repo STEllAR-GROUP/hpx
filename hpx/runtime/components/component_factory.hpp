@@ -6,8 +6,8 @@
 
 /// \file hpx/runtime/components/component_factory.hpp
 
-#if !defined(HPX_COMPONENT_FACTORY_SEP_26_2008_0647PM)
-#define HPX_COMPONENT_FACTORY_SEP_26_2008_0647PM
+#ifndef HPX_RUNTIME_COMPONENTS_COMPONENT_FACTORY_HPP
+#define HPX_RUNTIME_COMPONENTS_COMPONENT_FACTORY_HPP
 
 #ifdef DOXYGEN
 /// \def HPX_REGISTER_COMPONENT(type, name, mode)
@@ -40,20 +40,23 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/runtime/components/unique_component_name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime/components/unique_component_name.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/atomic_count.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -392,4 +395,4 @@ namespace hpx { namespace components
 
 #endif
 
-#endif
+#endif /*HPX_RUNTIME_COMPONENTS_COMPONENT_FACTORY_HPP*/

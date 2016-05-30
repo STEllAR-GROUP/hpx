@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_USER_MAIN_CONFIG_JUL_26_2015_0222PM)
-#define HPX_USER_MAIN_CONFIG_JUL_26_2015_0222PM
+#ifndef HPX_HPX_USER_MAIN_CONFIG_HPP
+#define HPX_HPX_USER_MAIN_CONFIG_HPP
 
 #include <hpx/config.hpp>
 
@@ -24,4 +24,4 @@ namespace hpx_startup
     }
 }
 
-#endif
+#endif /*HPX_HPX_USER_MAIN_CONFIG_HPP*/

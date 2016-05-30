@@ -7,13 +7,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/async.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
@@ -25,6 +28,7 @@
 #  include <memory>
 #endif
 
+#include <cstdint>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -755,7 +759,7 @@ response primary_namespace::increment_credit(
     )
 { // increment_credit implementation
     // parameters
-    boost::int64_t credits = req.get_credit();
+    std::int64_t credits = req.get_credit();
     naming::gid_type lower = req.get_lower_bound();
     naming::gid_type upper = req.get_upper_bound();
 
@@ -788,7 +792,7 @@ response primary_namespace::decrement_credit(
     )
 { // decrement_credit implementation
     // parameters
-    boost::int64_t credits = req.get_credit();
+    std::int64_t credits = req.get_credit();
     naming::gid_type lower = req.get_lower_bound();
     naming::gid_type upper = req.get_upper_bound();
 
@@ -929,7 +933,7 @@ response primary_namespace::allocate(
 void primary_namespace::increment(
     naming::gid_type const& lower
   , naming::gid_type const& upper
-  , boost::int64_t& credits
+  , std::int64_t& credits
   , error_code& ec
     )
 { // {{{ increment implementation
@@ -973,8 +977,8 @@ void primary_namespace::increment(
         refcnt_table_type::iterator it = refcnts_.find(raw);
         if (it == refcnts_.end())
         {
-            boost::int64_t count =
-                boost::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
+            std::int64_t count =
+                std::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
 
             std::pair<refcnt_table_type::iterator, bool> p =
                 refcnts_.insert(refcnt_table_type::value_type(raw, count));
@@ -1102,7 +1106,7 @@ void primary_namespace::decrement_sweep(
     std::list<free_entry>& free_entry_list
   , naming::gid_type const& lower
   , naming::gid_type const& upper
-  , boost::int64_t credits
+  , std::int64_t credits
   , error_code& ec
     )
 { // {{{ decrement_sweep implementation
@@ -1154,7 +1158,7 @@ void primary_namespace::decrement_sweep(
             refcnt_table_type::iterator it = refcnts_.find(raw);
             if (it == refcnts_.end())
             {
-                if (credits > boost::int64_t(HPX_GLOBALCREDIT_INITIAL))
+                if (credits > std::int64_t(HPX_GLOBALCREDIT_INITIAL))
                 {
                     l.unlock();
 
@@ -1164,12 +1168,12 @@ void primary_namespace::decrement_sweep(
                             "negative entry in reference count table, raw(%1%), "
                             "refcount(%2%)")
                             % raw
-                            % (boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits)));
+                            % (std::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits)));
                     return;
                 }
 
-                boost::int64_t count =
-                    boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
+                std::int64_t count =
+                    std::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
 
                 std::pair<refcnt_table_type::iterator, bool> p =
                     refcnts_.insert(refcnt_table_type::value_type(raw, count));

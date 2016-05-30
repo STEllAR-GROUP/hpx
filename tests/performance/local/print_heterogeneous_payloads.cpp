@@ -9,6 +9,7 @@
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
 
 #include <iostream>
+#include <numeric>
 #include <stdexcept>
 #include <vector>
 

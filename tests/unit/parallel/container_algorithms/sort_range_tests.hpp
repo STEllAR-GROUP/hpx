@@ -10,6 +10,7 @@
 //
 #include <iomanip>
 #include <limits>
+#include <numeric>
 #include <random>
 #include <string>
 #include <vector>

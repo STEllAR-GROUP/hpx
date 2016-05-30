@@ -34,7 +34,7 @@ namespace hpx { namespace parallel { namespace util
         template <typename Category, typename Enable = void>
         struct move_n_helper;
 
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static std::pair<InIter, OutIter>
@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <>
         struct copy_helper<hpx::traits::trivially_copyable_pointer_tag>
         {
@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <>
         struct copy_n_helper<hpx::traits::trivially_copyable_pointer_tag>
         {
@@ -174,7 +174,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <>
         struct move_helper<hpx::traits::trivially_copyable_pointer_tag>
         {
@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <>
         struct move_n_helper<hpx::traits::trivially_copyable_pointer_tag>
         {
