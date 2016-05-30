@@ -25,34 +25,34 @@ unsigned make_unsigned_slowly()
     hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
     return id;
 }
-    
+
 template <class Container>
 void test_when_each_from_list()
 {
     unsigned const count = 10;
-    
+
     auto callback =
         [count](hpx::future<unsigned> fut)
-        { 
+        {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
-    
+
     auto callback_with_index =
         [count](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
-    
+
     Container futures1;
     Container futures2;
-    
+
     for (unsigned j = 0; j < count; ++j)
     {
         futures1.push_back(
@@ -65,7 +65,7 @@ void test_when_each_from_list()
     }
 
     hpx::future<void> r = hpx::when_each(callback, futures1);
-    
+
     hpx::future<void> rwi = hpx::when_each(callback_with_index, futures2);
 
     r.get();
@@ -73,7 +73,7 @@ void test_when_each_from_list()
 
     for (const auto& f : futures1)
         HPX_TEST(!f.valid());
-        
+
     for (const auto& f : futures2)
         HPX_TEST(!f.valid());
 }
@@ -82,29 +82,29 @@ template <class Container>
 void test_when_each_from_list_iterators()
 {
     unsigned const count = 10;
-    
+
     auto callback =
         [count](hpx::future<unsigned> fut)
-        { 
+        {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
-    
+
     auto callback_with_index =
         [count](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
-    
+
     Container futures1;
     Container futures2;
-    
+
     for (unsigned j = 0; j < count; ++j)
     {
         futures1.push_back(
@@ -118,16 +118,16 @@ void test_when_each_from_list_iterators()
 
     hpx::future<void> r =
         hpx::when_each(callback, futures1.begin(), futures1.end());
-    
+
     hpx::future<void> rwi =
         hpx::when_each(callback_with_index, futures2.begin(), futures2.end());
 
     r.get();
     rwi.get();
-    
+
     for (const auto& f : futures1)
         HPX_TEST(!f.valid());
-        
+
     for (const auto& f : futures2)
         HPX_TEST(!f.valid());
 }
@@ -137,29 +137,29 @@ void test_when_each_n_from_list_iterators()
 {
     unsigned const count = 10;
     unsigned const n = 5;
-    
+
     auto callback_n =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     auto callback_with_index_n =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     Container futures1;
     Container futures2;
-    
+
     for (unsigned j = 0; j < count; ++j)
     {
         futures1.push_back(
@@ -173,19 +173,19 @@ void test_when_each_n_from_list_iterators()
 
     hpx::future<void> r =
         hpx::when_each_n(callback_n, futures1.begin(), n);
-    
+
     hpx::future<void> rwi =
         hpx::when_each_n(callback_with_index_n, futures2.begin(), n);
 
     r.get();
     rwi.get();
-    
+
     unsigned num = 0;
     for (auto it = futures1.begin(); num < n; ++num, ++it)
     {
         HPX_TEST(!it->valid());
     }
-    
+
     num = 0;
     for (auto it = futures2.begin(); num < n; ++num, ++it)
     {
@@ -196,35 +196,35 @@ void test_when_each_n_from_list_iterators()
 void test_when_each_one_future()
 {
     unsigned const n = 1;
-    
+
     auto callback =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-        
+
     auto callback_with_index =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     hpx::future<unsigned> f = hpx::make_ready_future(static_cast<unsigned>(0));
     hpx::future<unsigned> g = hpx::make_ready_future(static_cast<unsigned>(0));
-    
+
     hpx::future<void> r = hpx::when_each(callback, std::move(f));
     hpx::future<void> rwi = hpx::when_each(callback_with_index, std::move(g));
-    
+
     r.get();
     rwi.get();
-    
+
     HPX_TEST(!f.valid());
     HPX_TEST(!g.valid());
 }
@@ -232,40 +232,40 @@ void test_when_each_one_future()
 void test_when_each_two_futures()
 {
     unsigned const n = 2;
-    
+
     auto callback =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-        
+
     auto callback_with_index =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
     hpx::future<unsigned> f2 = hpx::make_ready_future(static_cast<unsigned>(1));
     hpx::future<unsigned> g1 = hpx::make_ready_future(static_cast<unsigned>(0));
     hpx::future<unsigned> g2 = hpx::make_ready_future(static_cast<unsigned>(1));
-    
+
     hpx::future<void> r = hpx::when_each(callback,
         std::move(f1), std::move(f2));
-        
+
     hpx::future<void> rwi = hpx::when_each(callback_with_index,
         std::move(g1), std::move(g2));
-    
+
     r.get();
     rwi.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!g1.valid());
@@ -275,42 +275,42 @@ void test_when_each_two_futures()
 void test_when_each_three_futures()
 {
     unsigned const n = 3;
-    
+
     auto callback =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-        
+
     auto callback_with_index =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
     hpx::future<unsigned> f2 = hpx::make_ready_future(static_cast<unsigned>(1));
     hpx::future<unsigned> f3 = hpx::make_ready_future(static_cast<unsigned>(2));
     hpx::future<unsigned> g1 = hpx::make_ready_future(static_cast<unsigned>(0));
     hpx::future<unsigned> g2 = hpx::make_ready_future(static_cast<unsigned>(1));
     hpx::future<unsigned> g3 = hpx::make_ready_future(static_cast<unsigned>(2));
-    
+
     hpx::future<void> r = hpx::when_each(callback,
         std::move(f1), std::move(f2), std::move(f3));
-        
+
     hpx::future<void> rwi = hpx::when_each(callback_with_index,
         std::move(g1), std::move(g2), std::move(g3));
-    
+
     r.get();
     rwi.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -322,26 +322,26 @@ void test_when_each_three_futures()
 void test_when_each_four_futures()
 {
     unsigned const n = 4;
-    
+
     auto callback =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-        
+
     auto callback_with_index =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
     hpx::future<unsigned> f2 = hpx::make_ready_future(static_cast<unsigned>(1));
     hpx::future<unsigned> f3 = hpx::make_ready_future(static_cast<unsigned>(2));
@@ -350,16 +350,16 @@ void test_when_each_four_futures()
     hpx::future<unsigned> g2 = hpx::make_ready_future(static_cast<unsigned>(1));
     hpx::future<unsigned> g3 = hpx::make_ready_future(static_cast<unsigned>(2));
     hpx::future<unsigned> g4 = hpx::make_ready_future(static_cast<unsigned>(3));
-    
+
     hpx::future<void> r = hpx::when_each(callback,
         std::move(f1), std::move(f2), std::move(f3), std::move(f4));
-        
+
     hpx::future<void> rwi = hpx::when_each(callback_with_index,
         std::move(g1), std::move(g2), std::move(g3), std::move(g4));
-    
+
     r.get();
     rwi.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -373,26 +373,26 @@ void test_when_each_four_futures()
 void test_when_each_five_futures()
 {
     unsigned const n = 5;
-    
+
     auto callback =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-        
+
     auto callback_with_index =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
     hpx::future<unsigned> f2 = hpx::make_ready_future(static_cast<unsigned>(1));
     hpx::future<unsigned> f3 = hpx::make_ready_future(static_cast<unsigned>(2));
@@ -403,16 +403,16 @@ void test_when_each_five_futures()
     hpx::future<unsigned> g3 = hpx::make_ready_future(static_cast<unsigned>(2));
     hpx::future<unsigned> g4 = hpx::make_ready_future(static_cast<unsigned>(3));
     hpx::future<unsigned> g5 = hpx::make_ready_future(static_cast<unsigned>(4));
-    
+
     hpx::future<void> r = hpx::when_each(callback,
         std::move(f1), std::move(f2), std::move(f3), std::move(f4), std::move(f5));
-        
+
     hpx::future<void> rwi = hpx::when_each(callback_with_index,
         std::move(g1), std::move(g2), std::move(g3), std::move(g4), std::move(g5));
-    
+
     r.get();
     rwi.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -428,59 +428,59 @@ void test_when_each_five_futures()
 void test_when_each_late_future()
 {
     unsigned const n = 2;
-    
+
     auto callback =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-        
+
     auto callback_with_index =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     hpx::lcos::local::futures_factory<unsigned()> pt0(make_unsigned_slowly<0>);
     hpx::lcos::local::futures_factory<unsigned()> pt1(make_unsigned_slowly<1>);
     hpx::lcos::local::futures_factory<unsigned()> pt2(make_unsigned_slowly<0>);
     hpx::lcos::local::futures_factory<unsigned()> pt3(make_unsigned_slowly<1>);
-    
+
     hpx::future<unsigned> f1 = pt0.get_future();
     pt0.apply();
     hpx::future<unsigned> f2 = pt1.get_future();
-    
 
-    
+
+
     hpx::future<void> r =
         hpx::when_each(callback, std::move(f1), std::move(f2));
-  
+
     pt1.apply();
-    
+
     r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
-  
+
     hpx::future<unsigned> g1 = pt2.get_future();
     pt2.apply();
     hpx::future<unsigned> g2 = pt3.get_future();
-  
-      
+
+
     hpx::future<void> rwi =
         hpx::when_each(callback_with_index, std::move(g1), std::move(g2));
-  
+
     pt3.apply();
-  
+
     rwi.get();
-  
+
     HPX_TEST(!g1.valid());
     HPX_TEST(!g2.valid());
 }
@@ -488,40 +488,40 @@ void test_when_each_late_future()
 void test_when_each_deferred_futures()
 {
     unsigned const n = 2;
-    
+
     auto callback =
         [n](hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-        
+
     auto callback_with_index =
         [n](std::size_t idx, hpx::future<unsigned> fut)
         {
             unsigned id = fut.get();
-            
+
             HPX_TEST_EQ(idx, id);
             HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
-    
+
     hpx::lcos::future<unsigned> f1 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<0>);
     hpx::lcos::future<unsigned> f2 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<1>);
-    
+
     hpx::lcos::future<unsigned> g1 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<0>);
     hpx::lcos::future<unsigned> g2 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<1>);
 
-    
+
     hpx::future<void> r =
         hpx::when_each(callback, std::move(f1), std::move(f2));
-    
+
     hpx::future<void> rwi =
         hpx::when_each(callback_with_index, std::move(g1), std::move(g2));
 
@@ -530,7 +530,7 @@ void test_when_each_deferred_futures()
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
-    
+
     HPX_TEST(!g1.valid());
     HPX_TEST(!g2.valid());
 }
@@ -561,7 +561,7 @@ int hpx_main(variables_map&)
         test_when_each_five_futures();
 
         test_when_each_late_future();
-        
+
         test_when_each_deferred_futures();
     }
 
