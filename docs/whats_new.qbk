@@ -102,12 +102,56 @@ to a different compute node).
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2188] - Adding new example demonstrating receive_buffer
+* [pr    2187] - Mask 128-bit ints if CUDA is being used
+* [pr    2186] - Make startup & shutdown functions unique_function
+* [pr    2185] - Fixing logging output not to cause hang on shutdown
+* [pr    2184] - Allowing component clients as action return types
+* [issue 2183] - Enabling logging output causes hang on shutdown
+* [issue 2182] - 1d_stencil seg fault
+* [issue 2181] - Setting small stack size does not change default
+* [pr    2180] - Changing default bind mode to balanced
+* [pr    2175] - Fix unbalanced config/warnings includes, add some new ones
+* [pr    2174] - Fix test categorization : regression not unit
+* [issue 2172] - Different performance results
+* [issue 2170] - Error while compiling on Mac + boost 1.60
+* [pr    2168] - Fixing problems with is_bitwise_serializable
+* [issue 2167] - startup & shutdown function should accept unique_function
+* [issue 2166] - Simple receive_buffer example
+* [pr    2165] - Fix wait all
+* [pr    2164] - Fix wait all
+* [pr    2163] - Fix some typos in config tests
+* [pr    2162] - Improve #includes
+* [pr    2160] - Add inspect check for missing #include <list>
+* [pr    2159] - Add missing finalize call to stop test hanging
+* [pr    2158] - Algo fixes
+* [pr    2157] - Stack check
+* [issue 2156] - OSX reports stack space incorrectly (generic context coroutines)
+* [issue 2155] - Race condition suspected in runtime
+* [pr    2154] - Replace boost::detail::atomic_count with the new
+                 util::atomic_count
+* [pr    2153] - Fix stack overflow on OSX
+* [pr    2152] - Define is_bitwise_serializable as is_trivially_copyable when
+                 available
+* [pr    2151] - Adding missing <cstring> for std::mem* functions
+* [issue 2150] - Unable to use component clients as action return types
+* [pr    2149] - std::memmove copies bytes, use bytes*sizeof(type) when copying
+                 larger types
+* [pr    2146] - Adding customization point for parallel copy/move
+* [pr    2145] - Applying changes to address warnings issued by latest version
+                 of PVS Studio
+* [issue 2148] - hpx::parallel::copy is broken after trivially copyable changes
+* [pr    2144] - Some minor tweaks to compute prototype
+* [pr    2143] - Added Boost version support information over OSX platform
+* [pr    2142] - Fixing memory leak in example
+* [pr    2141] - Add missing specializations in execution policies
 * [pr    2139] - This PR fixes a few problems reported by Clang's Undefined
                  Behavior sanitizer
 * [pr    2138] - Revert "Adding fedora docs"
 * [pr    2136] - Removed double semicolon
 * [pr    2135] - Add deprecated #include check for hpx_fwd.hpp
 * [pr    2134] - Resolved memory leak in stencil_8
+* [pr    2133] - Replace uses of boost pointer containers
 * [pr    2132] - Removing unused typedef
 * [pr    2131] - Add several include checks for std facilities
 * [pr    2130] - Fixing parcel compression, adding test
@@ -238,6 +282,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2018] - For loop algorithms
 * [pr    2017] - Non-recursive at_index implementation
 * [issue 2016] - Add index-based for-loops
+* [issue 2015] - Change default bind-mode to balanced
 * [pr    2014] - Fixed dataflow if invoked action returns a future
 * [pr    2013] - Fixing compilation issues with external example
 * [pr    2012] - Added Sierpinski Triangle example
