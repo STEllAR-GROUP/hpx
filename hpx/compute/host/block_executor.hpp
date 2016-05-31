@@ -133,7 +133,6 @@ namespace hpx { namespace compute { namespace host
                 auto begin = boost::begin(shape);
                 for (std::size_t i = 0; i != executors_.size(); ++i)
                 {
-                    using namespace hpx::parallel;
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto futures =
@@ -178,7 +177,6 @@ namespace hpx { namespace compute { namespace host
                 auto begin = boost::begin(shape);
                 for (std::size_t i = 0; i != executors_.size(); ++i)
                 {
-                    using namespace hpx::parallel;
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto part_results =

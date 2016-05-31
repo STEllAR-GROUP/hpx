@@ -86,8 +86,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (count != 0)
                 {
-                    // Some compilers complain about loosing const type
-                    // modifiers if the lambdas below are not mutable.
                     return util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy), first, count,
                         for_each_iteration<F, Proj>{

@@ -14,15 +14,14 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/version.hpp>
-#include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/parallel_fill.hpp>
 #include <hpx/include/parallel_transform.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/compute.hpp>
-
-#include <hpx/parallel/util/numa_allocator.hpp>
 
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
@@ -38,8 +37,8 @@
 hpx::threads::topology& retrieve_topology()
 {
     static hpx::threads::topology& topo = hpx::threads::create_topology();
-        return topo;
-        }
+    return topo;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 double mysecond()
@@ -203,6 +202,43 @@ void check_results(std::size_t iterations,
 #endif
 }
 
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+struct multiply_step
+{
+    multiply_step(T factor) : factor_(factor) {}
+
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val) const
+    {
+        return val * factor_;
+    }
+
+    T factor_;
+};
+
+template <typename T>
+struct add_step
+{
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    {
+        return val1 + val2;
+    }
+};
+
+template <typename T>
+struct triad_step
+{
+    triad_step(T factor) : factor_(factor) {}
+
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    {
+        return val1 + val2 * factor_;
+    }
+
+    T factor_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename Allocator, typename Executor, typename Target, typename Chunker>
 std::vector<std::vector<double> >
 run_benchmark(
@@ -231,11 +267,9 @@ run_benchmark(
 
     // Check clock ticks ...
     double t = mysecond();
-    hpx::parallel::for_each(policy, a.begin(), a.end(),
-        [](STREAM_TYPE & v)
-        {
-            v = 2.0 * v;
-        });
+    hpx::parallel::transform(
+        policy, a.begin(), a.end(), a.begin(),
+        multiply_step<STREAM_TYPE>(2.0));
     t = 1.0E6 * (mysecond() - t);
 
     // Get initial value for system clock.
@@ -287,10 +321,7 @@ run_benchmark(
         timing[1][iteration] = mysecond();
         hpx::parallel::transform(policy,
             c.begin(), c.end(), b.begin(),
-            [scalar] HPX_HOST_DEVICE (STREAM_TYPE val)
-            {
-                return scalar * val;
-            }
+            multiply_step<STREAM_TYPE>(scalar)
         );
         timing[1][iteration] = mysecond() - timing[1][iteration];
 
@@ -298,10 +329,7 @@ run_benchmark(
         timing[2][iteration] = mysecond();
         hpx::parallel::transform(policy,
             a.begin(), a.end(), b.begin(), b.end(), c.begin(),
-            [] HPX_HOST_DEVICE (STREAM_TYPE val1, STREAM_TYPE val2)
-            {
-                return val1 + val2;
-            }
+            add_step<STREAM_TYPE>()
         );
         timing[2][iteration] = mysecond() - timing[2][iteration];
 
@@ -309,10 +337,7 @@ run_benchmark(
         timing[3][iteration] = mysecond();
         hpx::parallel::transform(policy,
             b.begin(), b.end(), c.begin(), c.end(), a.begin(),
-            [scalar] HPX_HOST_DEVICE (STREAM_TYPE val1, STREAM_TYPE val2)
-            {
-                return val1 + scalar * val2;
-            }
+            triad_step<STREAM_TYPE>(scalar)
         );
         timing[3][iteration] = mysecond() - timing[3][iteration];
     }
@@ -363,26 +388,21 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "-------------------------------------------------------------\n"
         ;
 
+    double time_total = mysecond();
+
+#if defined(HPX_HAVE_COMPUTE)
     bool use_accel = false;
     if(vm.count("use-accelerator"))
-#if defined(HPX_HAVE_COMPUTE)
         use_accel = true;
-#else
-#error "This version of HPX was built without accelerator support"
-#endif
 
-    double time_total = mysecond();
     std::vector<std::vector<double> > timing;
     if(use_accel)
     {
-        using namespace hpx::parallel;
 #if defined(HPX_HAVE_CUDA)
-        typedef hpx::compute::cuda::default_executor
-            executor_type;
-
         // Get the targets we want to run on
         hpx::compute::cuda::target target;
 
+        typedef hpx::compute::cuda::default_executor executor_type;
         typedef hpx::compute::cuda::allocator<STREAM_TYPE> allocator_type;
 #else
 #error "The STREAM benchmark currently requires CUDA to run on an accelerator"
@@ -393,37 +413,38 @@ int hpx_main(boost::program_options::variables_map& vm)
 //         {
 //             timing =
 //                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target), auto_chunk_size());
+//                     iterations, vector_size, std::move(target),
+//                     hpx::parallel::auto_chunk_size());
 //         }
 //         else if(chunker == "guided")
 //         {
 //             timing =
 //                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target), guided_chunk_size());
+//                     iterations, vector_size, std::move(target),
+//                     hpx::parallel::guided_chunk_size());
 //         }
 //         else if(chunker == "dynamic")
 //         {
 //             timing =
 //                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target), dynamic_chunk_size());
+//                     iterations, vector_size, std::move(target),
+//                     hpx::parallel::dynamic_chunk_size());
 //         }
 //         else
         {
             timing =
                 run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, std::move(target), static_chunk_size());
+                    iterations, vector_size, std::move(target),
+                    hpx::parallel::static_chunk_size());
         }
     }
     else
+#endif
     {
-        typedef hpx::compute::host::block_executor<>
-            executor_type;
-
-        using namespace hpx::parallel;
-
         // Get the targets we want to run on
         auto numa_nodes = hpx::compute::host::numa_domains();
 
+        typedef hpx::compute::host::block_executor<> executor_type;
         typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
 
         // perform benchmark
@@ -431,25 +452,29 @@ int hpx_main(boost::program_options::variables_map& vm)
         {
             timing =
                 run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes, auto_chunk_size());
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::auto_chunk_size());
         }
         else if(chunker == "guided")
         {
             timing =
                 run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes, guided_chunk_size());
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::guided_chunk_size());
         }
         else if(chunker == "dynamic")
         {
             timing =
                 run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes, dynamic_chunk_size());
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::dynamic_chunk_size());
         }
         else
         {
             timing =
                 run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes, static_chunk_size());
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::static_chunk_size());
         }
     }
     time_total = mysecond() - time_total;
@@ -575,8 +600,10 @@ int main(int argc, char* argv[])
             boost::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
             "possible values: dynamic, auto, guided. (default: default)")
+#if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",
             "Use this flag to run the stream benchmark on the GPU")
+#endif
         ;
 
     // parse command line here to extract the necessary settings for HPX

@@ -235,7 +235,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////
-    template <typename Source, typename T>
+    template <typename T>
     inline trivially_cuda_copyable_pointer_tag
     get_pointer_category(
         compute::detail::iterator<T, compute::cuda::allocator<T> > const&,

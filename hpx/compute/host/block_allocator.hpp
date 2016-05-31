@@ -140,9 +140,10 @@ namespace hpx { namespace compute { namespace host
         {
             // first touch policy, distribute evenly onto targets
             auto irange = boost::irange(std::size_t(0), count);
-            using namespace hpx::parallel;
-            for_each(
-                par.on(executor_).with(static_chunk_size()),
+            hpx::parallel::for_each(
+                hpx::parallel::par
+                    .on(executor_)
+                    .with(hpx::parallel::static_chunk_size()),
                 boost::begin(irange), boost::end(irange),
                 [p, args...](std::size_t i)
                 {
@@ -167,9 +168,10 @@ namespace hpx { namespace compute { namespace host
         {
             // keep memory locality, use executor...
             auto irange = boost::irange(std::size_t(0), count);
-            using namespace hpx::parallel;
-            for_each(
-                par.on(executor_).with(static_chunk_size()),
+            hpx::parallel::for_each(
+                hpx::parallel::par
+                    .on(executor_)
+                    .with(hpx::parallel::static_chunk_size()),
                 boost::begin(irange), boost::end(irange),
                 [p](std::size_t i)
                 {

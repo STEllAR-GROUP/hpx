@@ -48,6 +48,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
 
+        struct copy_iteration
+        {
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(std::size_t, Iter part_begin, std::size_t part_size)
+            {
+                using hpx::util::get;
+                auto const& iters = part_begin.get_iterator_tuple();
+                util::copy_n_helper(get<0>(iters), part_size, get<1>(iters));
+            }
+        };
+
         template <typename IterPair>
         struct copy
           : public detail::algorithm<copy<IterPair>, IterPair>
@@ -80,14 +92,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
-                        [](std::size_t, zip_iterator part_begin,
-                            std::size_t part_size)
-                        {
-                            using hpx::util::get;
-                            auto const& iters = part_begin.get_iterator_tuple();
-                            util::copy_n_helper(get<0>(iters), part_size,
-                                get<1>(iters));
-                        },
+                        copy_iteration(),
                         [](zip_iterator && last) -> zip_iterator
                         {
                             using hpx::util::get;

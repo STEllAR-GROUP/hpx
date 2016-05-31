@@ -34,7 +34,7 @@ void test_for_each(executor_type& exec, target_vector& d_A)
 
     hpx::parallel::for_each(
         hpx::parallel::par.on(exec),
-        d_A.data(), d_A.data() + d_A.size(),
+        d_A.begin(), d_A.end(),
         [] HPX_DEVICE (int & i)
         {
              i += 5;

@@ -211,3 +211,4 @@ namespace hpx { namespace traits
 /// \endcond
 
 #endif
+#endif

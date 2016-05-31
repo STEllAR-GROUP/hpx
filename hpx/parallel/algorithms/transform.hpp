@@ -237,8 +237,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     transform(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         F && f)
     {
-        return transform(std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<F>(f), util::projection_identity());
+        static_assert(
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
+            "Requires at least output iterator.");
+
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
+
+        return hpx::util::make_tagged_pair<tag::in, tag::out>(
+            detail::transform<std::pair<InIter, OutIter> >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest, std::forward<F>(f),
+                util::projection_identity()));
     }
     /// \endcond
 
