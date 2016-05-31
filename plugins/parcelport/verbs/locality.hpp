@@ -9,7 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/safe_bool.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace verbs
@@ -31,8 +30,8 @@ namespace hpx { namespace parcelset {
       locality() : ip_(0xFFFF), qp_(0xFFFF) {}
 
       // some condition marking this locality as valid
-      operator util::safe_bool<locality>::result_type() const {
-        return util::safe_bool<locality>()(ip_ != boost::uint32_t(0xFFFF));
+      explicit operator bool() const {
+        return (ip_ != boost::uint32_t(0xFFFF));
       }
 
       void save(serialization::output_archive & ar) const {
@@ -57,7 +56,7 @@ namespace hpx { namespace parcelset {
       friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
         boost::io::ios_flags_saver
         ifs(os);
-        os << loc.ip_ << " : " << os << loc.qp_;
+        os << loc.ip_ << " : " << loc.qp_;
         return os;
       }
     public:

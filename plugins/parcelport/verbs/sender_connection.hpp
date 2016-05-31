@@ -11,7 +11,7 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 //
-#include <boost/shared_ptr.hpp>
+#include <memory>
 //
 #include "RdmaClient.h"
 #include "pinned_memory_vector.hpp"
@@ -90,7 +90,7 @@ namespace policies { namespace verbs
         util::unique_function_nonser< void(
                 error_code const&
               , parcelset::locality const&
-              , boost::shared_ptr<sender_connection>
+              , std::shared_ptr<sender_connection>
             )
         > postprocess_handler_;
 

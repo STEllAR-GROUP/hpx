@@ -5,13 +5,11 @@
 
 // config
 #include <hpx/config/defines.hpp>
-#include <hpx/hpx_fwd.hpp>
 
 // util
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/safe_bool.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 
@@ -29,9 +27,6 @@
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/serialization/detail/future_await_container.hpp>
-
-// boost
-#include <boost/make_shared.hpp>
 
 // Local parcelport plugin
 // #define USE_SPECIALIZED_SCHEDULER
@@ -51,6 +46,7 @@
 //
 #include <unordered_map>
 //
+#include <memory>
 #include <mutex>
 #include <condition_variable>
 
@@ -165,10 +161,10 @@ namespace hpx { namespace parcelset {
         // reuse of classes/types. the use of pointer allocators etc is a dreadful hack and
         // needs reworking
         typedef header<RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE>  header_type;
-        typedef hpx::lcos::local::spinlock                   mutex_type;
-        typedef hpx::lcos::local::spinlock::scoped_lock      scoped_lock;
+        typedef hpx::lcos::local::mutex                      mutex_type;
+        typedef std::lock_guard<mutex_type>                  scoped_lock;
         typedef hpx::lcos::local::condition_variable         condition_type;
-        typedef boost::unique_lock<mutex_type>               unique_lock;
+        typedef std::unique_lock<hpx::lcos::local::mutex>    unique_lock;
 
         // note use std::mutex in stop function as HPX is terminating
         mutex_type  stop_mutex;
@@ -279,7 +275,7 @@ namespace hpx { namespace parcelset {
         // --------------------------------------------------------------------
         //  return a sender_connection object back to the parcelport_impl
         // --------------------------------------------------------------------
-        boost::shared_ptr<sender_connection> create_connection(
+        std::shared_ptr<sender_connection> create_connection(
             parcelset::locality const& dest, error_code& ec)
         {
             FUNC_START_DEBUG_MSG;
@@ -288,7 +284,7 @@ namespace hpx { namespace parcelset {
             LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " create_connection to " << ipaddress(dest_ip) );
 
             RdmaClient *client = get_remote_connection(dest);
-            boost::shared_ptr<sender_connection> result = boost::make_shared<sender_connection>(
+            std::shared_ptr<sender_connection> result = std::make_shared<sender_connection>(
                   this
                 , dest_ip
                 , dest.get<locality>()
@@ -987,9 +983,9 @@ namespace hpx { namespace parcelset {
 
             {
                 LOG_DEBUG_MSG("Extracting futures from parcel");
-                boost::shared_ptr<hpx::serialization::detail::future_await_container>
+                std::shared_ptr<hpx::serialization::detail::future_await_container>
                     future_await(new hpx::serialization::detail::future_await_container());
-                boost::shared_ptr<hpx::serialization::output_archive>
+                std::shared_ptr<hpx::serialization::output_archive>
                     archive(
                         new hpx::serialization::output_archive(
                             *future_await, 0, 0, 0, 0, &future_await->new_gids_)
@@ -1000,8 +996,8 @@ namespace hpx { namespace parcelset {
                 {
                     void (parcelport::*awaiter)(
                       parcelset::locality const &, parcel, write_handler_type, bool
-                      , boost::shared_ptr<hpx::serialization::output_archive> const &
-                      , boost::shared_ptr<
+                      , std::shared_ptr<hpx::serialization::output_archive> const &
+                      , std::shared_ptr<
                             hpx::serialization::detail::future_await_container> const &
                     )
                         = &parcelport::put_parcel_impl;
@@ -1036,13 +1032,13 @@ namespace hpx { namespace parcelset {
                 // until all send operations have completed.
                 active_send_iterator current_send;
                 {
-                    scoped_lock lock(active_send_mutex);
+                    unique_lock lock(active_send_mutex);
 
                     // if more than N parcels are currently queued, then yield
                     // otherwise we can fill the send queues with so many requests that memory buffers
                     // are exhausted.
                     active_send_condition.wait(lock, [this] {
-                      return !active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE;
+                      return !(active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
                     });
 
                     active_sends.emplace_back();
@@ -1155,7 +1151,7 @@ namespace hpx { namespace parcelset {
                 uint64_t wr_id = (uint64_t)(send_data.header_region);
                 {
                     // add wr_id's to completion map
-                    scoped_lock lock(SendCompletionMap_mutex);
+                    unique_lock lock(SendCompletionMap_mutex);
 #ifdef HPX_DEBUG
                     if (SendCompletionMap.find(wr_id) != SendCompletionMap.end()) {
                         for (auto & pair : SendCompletionMap) {
@@ -1204,8 +1200,8 @@ namespace hpx { namespace parcelset {
 /*
         void put_parcel_impl(
             parcelset::locality const & dest, parcel p, write_handler_type f, bool trigger
-          , boost::shared_ptr<hpx::serialization::output_archive> const & archive
-          , boost::shared_ptr<
+          , std::shared_ptr<hpx::serialization::output_archive> const & archive
+          , std::shared_ptr<
                 hpx::serialization::detail::future_await_container
             > const & future_await)
         {
