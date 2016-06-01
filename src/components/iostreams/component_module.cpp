@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
@@ -59,7 +61,7 @@ namespace hpx { namespace iostreams { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(util::function_nonser<void()>& startup_func, bool& pre_startup)
+    bool get_startup(startup_function_type& startup_func, bool& pre_startup)
     {
         // return our startup-function
         startup_func = register_ostreams;   // function to run during startup
@@ -67,7 +69,7 @@ namespace hpx { namespace iostreams { namespace detail
         return true;
     }
 
-    bool get_shutdown(util::function_nonser<void()>& shutdown_func, bool& pre_shutdown)
+    bool get_shutdown(shutdown_function_type& shutdown_func, bool& pre_shutdown)
     {
         // return our startup-function
         shutdown_func = unregister_ostreams;   // function to run during startup

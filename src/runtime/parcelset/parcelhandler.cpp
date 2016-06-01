@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -14,6 +14,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -25,6 +26,7 @@
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -389,9 +391,9 @@ namespace hpx { namespace parcelset
 
         // During bootstrap this is handled separately (see
         // addressing_service::resolve_locality.
-        if (0 == hpx::threads::get_self_ptr() && !hpx::is_starting())
+        if (!this_thread::has_sufficient_stack_space() ||
+            (0 == hpx::threads::get_self_ptr() && !hpx::is_starting()))
         {
-            HPX_ASSERT(resolver_);
             naming::gid_type locality =
                 naming::get_locality_from_gid(ids[0].get_gid());
             if (!resolver_->has_resolved_locality(locality))
@@ -402,8 +404,7 @@ namespace hpx { namespace parcelset
                     ) = &parcelhandler::put_parcel;
 
                 threads::register_thread_nullary(
-                    util::bind(
-                        util::one_shot(put_parcel_ptr), this,
+                    util::deferred_call(put_parcel_ptr, this,
                         std::move(p), std::move(f)),
                     "parcelhandler::put_parcel", threads::pending, true,
                     threads::thread_priority_boost);
@@ -492,10 +493,9 @@ namespace hpx { namespace parcelset
             return;
         }
 
-        if (0 == hpx::threads::get_self_ptr())
+        if (!this_thread::has_sufficient_stack_space() ||
+            (0 == hpx::threads::get_self_ptr() && !hpx::is_starting()))
         {
-            HPX_ASSERT(!hpx::is_starting());
-
             naming::gid_type locality = naming::get_locality_from_gid(
                 (*parcels[0].destinations()).get_gid());
             if (!resolver_->has_resolved_locality(locality))
@@ -506,8 +506,7 @@ namespace hpx { namespace parcelset
                     ) = &parcelhandler::put_parcels;
 
                 threads::register_thread_nullary(
-                    util::bind(
-                        util::one_shot(put_parcels_ptr), this,
+                    util::deferred_call(put_parcels_ptr, this,
                         std::move(parcels), std::move(handlers)),
                     "parcelhandler::put_parcels", threads::pending, true,
                     threads::thread_priority_boost);

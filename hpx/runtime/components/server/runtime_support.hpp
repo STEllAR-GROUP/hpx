@@ -45,6 +45,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -294,28 +295,28 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
-        void add_pre_startup_function(util::function_nonser<void()> const& f)
+        void add_pre_startup_function(startup_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_startup_functions_.push_back(f);
+            pre_startup_functions_.push_back(std::move(f));
         }
 
-        void add_startup_function(util::function_nonser<void()> const& f)
+        void add_startup_function(startup_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            startup_functions_.push_back(f);
+            startup_functions_.push_back(std::move(f));
         }
 
-        void add_pre_shutdown_function(util::function_nonser<void()> const& f)
+        void add_pre_shutdown_function(shutdown_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_shutdown_functions_.push_back(f);
+            pre_shutdown_functions_.push_back(std::move(f));
         }
 
-        void add_shutdown_function(util::function_nonser<void()> const& f)
+        void add_shutdown_function(shutdown_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            shutdown_functions_.push_back(f);
+            shutdown_functions_.push_back(std::move(f));
         }
 
         bool keep_factory_alive(component_type t);
@@ -442,10 +443,10 @@ namespace hpx { namespace components { namespace server
         static_modules_type static_modules_;
 
         lcos::local::spinlock globals_mtx_;
-        std::list<util::function_nonser<void()> > pre_startup_functions_;
-        std::list<util::function_nonser<void()> > startup_functions_;
-        std::list<util::function_nonser<void()> > pre_shutdown_functions_;
-        std::list<util::function_nonser<void()> > shutdown_functions_;
+        std::list<startup_function_type> pre_startup_functions_;
+        std::list<startup_function_type> startup_functions_;
+        std::list<shutdown_function_type> pre_shutdown_functions_;
+        std::list<shutdown_function_type> shutdown_functions_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
