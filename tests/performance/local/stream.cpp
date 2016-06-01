@@ -389,13 +389,13 @@ int hpx_main(boost::program_options::variables_map& vm)
         ;
 
     double time_total = mysecond();
+    std::vector<std::vector<double> > timing;
 
 #if defined(HPX_HAVE_COMPUTE)
     bool use_accel = false;
     if(vm.count("use-accelerator"))
         use_accel = true;
 
-    std::vector<std::vector<double> > timing;
     if(use_accel)
     {
 #if defined(HPX_HAVE_CUDA)

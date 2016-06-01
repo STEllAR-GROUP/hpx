@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -34,9 +35,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct fill_iteration
         {
             typename hpx::util::decay<T>::type val_;
+
             template <typename U>
             HPX_HOST_DEVICE
-            void operator()(U &u)
+            typename std::enable_if<
+                !hpx::traits::is_value_proxy<U>::value
+            >::type
+            operator()(U &u)
+            {
+                u = val_;
+            }
+
+            template <typename U>
+            HPX_HOST_DEVICE
+            typename std::enable_if<
+                hpx::traits::is_value_proxy<U>::value
+            >::type
+            operator()(U u)
             {
                 u = val_;
             }

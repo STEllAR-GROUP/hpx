@@ -14,6 +14,9 @@
 
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
+#include <hpx/traits/is_value_proxy.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace compute { namespace cuda
 {
@@ -27,18 +30,30 @@ namespace hpx { namespace compute { namespace cuda
 
         value_proxy(T *p, cuda::target & tgt) HPX_NOEXCEPT
           : p_(p)
-          , target_(tgt)
+          , target_(&tgt)
+        {}
+
+        value_proxy(value_proxy const& other)
+          : p_(other.p_)
+          , target_(other.target_)
         {}
 
         value_proxy& operator=(T const& t)
         {
-            access_target::write(target_, p_, &t);
+            access_target::write(*target_, p_, &t);
+            return *this;
+        }
+
+        value_proxy& operator=(value_proxy const& other)
+        {
+            p_ = other.p_;
+            target_ = other.target_;
             return *this;
         }
 
         operator T() const
         {
-            return access_target::read(target_, p_);
+            return access_target::read(*target_, p_);
         }
 
         T* device_ptr() const HPX_NOEXCEPT
@@ -48,12 +63,12 @@ namespace hpx { namespace compute { namespace cuda
 
         cuda::target& target() const HPX_NOEXCEPT
         {
-            return target_;
+            return *target_;
         }
 
     private:
         T* p_;
-        cuda::target& target_;
+        cuda::target* target_;
     };
 
     template <typename T>
@@ -95,6 +110,13 @@ namespace hpx { namespace compute { namespace cuda
         cuda::target& target_;
     };
 }}}
+
+namespace hpx { namespace traits {
+    template <typename T>
+    struct is_value_proxy<hpx::compute::cuda::value_proxy<T>>
+      : std::true_type
+    {};
+}}
 
 #endif
 #endif
