@@ -559,6 +559,11 @@ namespace hpx { namespace this_thread
 
     // returns the remaining available stack space
     HPX_EXPORT std::ptrdiff_t get_available_stack_space();
+
+    // returns whether the remaining stack-space is at least as large as
+    // requested
+    HPX_EXPORT bool has_sufficient_stack_space(
+        std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
