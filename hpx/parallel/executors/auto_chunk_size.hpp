@@ -16,6 +16,7 @@
 #include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/parallel/algorithm.hpp>
 
 #include <cstddef>
 #include <algorithm>
@@ -67,7 +68,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 using hpx::util::high_resolution_clock;
                 boost::uint64_t t = high_resolution_clock::now();
-
+		hpx::parallel::for_eac::q
                 std::size_t test_chunk_size = f();
                 if (test_chunk_size != 0)
                 {
