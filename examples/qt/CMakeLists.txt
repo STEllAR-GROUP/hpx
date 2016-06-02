@@ -19,7 +19,7 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   #      hpx_qt.cpp
         ${QT_MOC_SOURCES})
 
-    include_directories(QT4_INCLUDE_DIRS})
+    include_directories(${QT4_INCLUDE_DIRS})
 
     add_hpx_executable(qt
       MODULE qt
