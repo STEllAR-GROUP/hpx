@@ -14,7 +14,6 @@
 using hpx::util::high_resolution_timer;
 
 #include <QtGui/QApplication>
-#include <QtGui/QWidget>
 #include "widget.hpp"
 
 double runner(double now)
@@ -43,7 +42,7 @@ void run(widget * w, std::size_t num_threads)
 void qt_main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-	QApplication 
+
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
     widget main(hpx::util::bind(run, _1, _2));

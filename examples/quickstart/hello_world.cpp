@@ -13,7 +13,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/parallel/algorithm.hpp>
+
 #include <boost/format.hpp>
 #include <boost/ref.hpp>
 
