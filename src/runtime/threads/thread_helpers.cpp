@@ -571,6 +571,9 @@ namespace hpx { namespace this_thread
 
     bool has_sufficient_stack_space(std::size_t space_needed)
     {
+        if (0 == hpx::threads::get_self_ptr())
+            return false;
+
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
         std::ptrdiff_t remaining_stack = get_available_stack_space();
         if (remaining_stack < 0)

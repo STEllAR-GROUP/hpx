@@ -423,8 +423,8 @@ namespace hpx { namespace components { namespace server
 
     private:
         mutex_type mtx_;
-        boost::condition wait_condition_;
-        boost::condition stop_condition_;
+        boost::condition_variable wait_condition_;
+        boost::condition_variable stop_condition_;
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black

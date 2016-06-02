@@ -696,7 +696,7 @@ namespace hpx { namespace threads { namespace policies
                 // created, as it might have that the current HPX thread gets
                 // suspended.
                 {
-                    typename mutex_type::scoped_lock lk(mtx_);
+                    std::unique_lock<mutex_type> lk(mtx_);
 
                     create_thread_object(thrd, data, initial_state, lk);
 

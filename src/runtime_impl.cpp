@@ -363,7 +363,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::wait_helper(
-        boost::mutex& mtx, boost::condition& cond, bool& running)
+        boost::mutex& mtx, boost::condition_variable& cond, bool& running)
     {
         // signal successful initialization
         {
@@ -395,7 +395,7 @@ namespace hpx {
 
         // start the wait_helper in a separate thread
         boost::mutex mtx;
-        boost::condition cond;
+        boost::condition_variable cond;
         bool running = false;
 
         boost::thread t (util::bind(
@@ -405,7 +405,7 @@ namespace hpx {
 
         // wait for the thread to run
         {
-            std::unique_lock<boost::mutex> lk(mtx);
+            boost::unique_lock<boost::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -444,8 +444,8 @@ namespace hpx {
             // from a HPX thread, so it would deadlock by waiting for the thread
             // manager
             boost::mutex mtx;
-            boost::condition cond;
-            std::unique_lock<boost::mutex> l(mtx);
+            boost::condition_variable cond;
+            boost::unique_lock<boost::mutex> l(mtx);
 
             boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 boost::ref(cond), boost::ref(mtx)));
@@ -476,7 +476,7 @@ namespace hpx {
     // a HPX thread!
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::stopped(
-        bool blocking, boost::condition& cond, boost::mutex& mtx)
+        bool blocking, boost::condition_variable& cond, boost::mutex& mtx)
     {
         // wait for thread manager to exit
         runtime_support_->stopped();         // re-activate shutdown HPX-thread

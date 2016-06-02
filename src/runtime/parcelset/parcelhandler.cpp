@@ -391,8 +391,9 @@ namespace hpx { namespace parcelset
 
         // During bootstrap this is handled separately (see
         // addressing_service::resolve_locality.
-        if (!this_thread::has_sufficient_stack_space() ||
-            (0 == hpx::threads::get_self_ptr() && !hpx::is_starting()))
+
+        // if this isn't an HPX thread, the stack space check will return false
+        if (!this_thread::has_sufficient_stack_space() && !hpx::is_starting())
         {
             naming::gid_type locality =
                 naming::get_locality_from_gid(ids[0].get_gid());
@@ -493,8 +494,8 @@ namespace hpx { namespace parcelset
             return;
         }
 
-        if (!this_thread::has_sufficient_stack_space() ||
-            (0 == hpx::threads::get_self_ptr() && !hpx::is_starting()))
+        // if this isn't an HPX thread, the stack space check will return false
+        if (!this_thread::has_sufficient_stack_space() && !hpx::is_starting())
         {
             naming::gid_type locality = naming::get_locality_from_gid(
                 (*parcels[0].destinations()).get_gid());
