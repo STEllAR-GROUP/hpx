@@ -1704,7 +1704,6 @@ endif()
 if(HPX_WITH_VIM_YCM)
   configure_file(${CMAKE_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
                ${HPX_WITH_VIM_YCM}/.ycm_extra_conf.py @ONLY)
-  hpx_info("VIM YouCompleteMe: to enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${HPX_WITH_VIM_YCM}/*']\"")
 endif()
 
 ################################################################################
