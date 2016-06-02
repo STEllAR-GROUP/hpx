@@ -14,6 +14,7 @@ set(HPX_OPTION_CATEGORIES
   "Parcelport"
   "Profiling"
   "Debugging"
+  "Tools"
 )
 
 function(hpx_option option type description default)

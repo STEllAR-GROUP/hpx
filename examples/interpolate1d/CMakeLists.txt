@@ -4,9 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-find_package(HDF5 COMPONENTS CXX)
-
-if(HDF5_FOUND)
+if(HPX_WITH_HDF5)
   if(HDF5_CXX_LIBRARIES AND HDF5_IS_PARALLEL AND HD5F_hdf5_cpp_LIBRARY)
 
     include_directories(${HDF5_INCLUDE_DIRS})

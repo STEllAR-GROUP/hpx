@@ -496,26 +496,73 @@ hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
   ON CATEGORY "Parcelport" ADVANCED)
 
 ## Profiling related build options
-hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_APEX BOOL
+  "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX)
 endif()
-hpx_option(HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_PAPI BOOL
+  "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
 if(HPX_WITH_PAPI)
   hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
-hpx_option(HPX_WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_TAU BOOL
+  "Enable TAU profiling support." OFF CATEGORY "Profiling")
 if(HPX_WITH_TAU)
   hpx_add_config_define(HPX_HAVE_TAU)
 endif()
-hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
+  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
-hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_ITTNOTIFY BOOL
+  "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 #if(HPX_WITH_ITTNOTIFY)
   #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 #endif()
+
+## External libraries/frameworks used by sme of the examples and benchmarks
+hpx_option(HPX_WITH_OPENMP BOOL
+  "Enable OpenMP support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_OPENMP)
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+    hpx_add_config_define(HPX_HAVE_OPENMP)
+  else()
+    set(HPX_WITH_OPENMP OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_TBB BOOL
+  "Enable TBB support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_TBB)
+  find_package(TBB)
+  if(TBB_FOUND)
+    hpx_add_config_define(HPX_HAVE_TBB)
+  else()
+    set(HPX_WITH_TBB OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_QTHREADS BOOL
+  "Enable QThreads support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_QTHREADS)
+  find_package(QThreads)
+  if(QTHREADS_FOUND)
+    hpx_add_config_define(HPX_HAVE_QTHREADS)
+  else()
+    set(HPX_WITH_QTHREADS OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_HDF5 BOOL
+  "Enable HDF5 support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_HDF5)
+  find_package(HDF5 COMPONENTS CXX)
+  if(HDF5_FOUND)
+    hpx_add_config_define(HPX_HAVE_HDF5)
+  else()
+    set(HPX_WITH_HDF5 OFF)
+  endif()
+endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
