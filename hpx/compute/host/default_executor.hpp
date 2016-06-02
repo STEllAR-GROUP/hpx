@@ -12,6 +12,8 @@
 
 #include <hpx/compute/host/target.hpp>
 
+#include <vector>
+
 namespace hpx { namespace compute { namespace host
 {
     struct default_executor : hpx::parallel::executor_tag

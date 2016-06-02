@@ -21,6 +21,8 @@
 
 #include <algorithm>
 #include <utility>
+#include <string>
+#include <vector>
 
 #include <boost/range/functions.hpp>
 

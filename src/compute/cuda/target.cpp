@@ -15,6 +15,8 @@
 
 #include <hpx/compute/cuda/target.hpp>
 
+#include <string>
+
 #include <cuda_runtime.h>
 
 namespace hpx { namespace compute { namespace cuda
