@@ -1308,7 +1308,7 @@ if(HPX_WITH_VALGRIND)
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
 
-if(NOT "${HPX_WITH_VIM_YCM}" STREQUAL "")
+if(HPX_WITH_VIM_YCM)
   SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
