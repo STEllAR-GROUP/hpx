@@ -210,7 +210,7 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            std::lock_guard<boost::recursive_mutex> lock(mutex_instance());
+            std::unique_lock<boost::recursive_mutex> lock(mutex_instance());
 
             static_assert(
                 boost::is_pointer<SymbolType>::value,
@@ -226,6 +226,8 @@ namespace hpx { namespace util { namespace plugin {
                     << dll_name << "' (dlerror: " << dlerror () << ")";
 
                 dlerror();
+
+                lock.unlock();
 
                 // report error
                 HPX_THROWS_IF(ec, dynamic_link_failure,
@@ -244,6 +246,8 @@ namespace hpx { namespace util { namespace plugin {
                 std::ostringstream str;
                 str << "Hpx.Plugin: Could not open shared library '"
                     << dll_name << "' (dlerror: " << dlerror() << ")";
+
+                lock.unlock();
 
                 // report error
                 HPX_THROWS_IF(ec, filesystem_error,
@@ -274,7 +278,7 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                std::lock_guard<boost::recursive_mutex> lock(mutex_instance());
+                std::unique_lock<boost::recursive_mutex> lock(mutex_instance());
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
@@ -283,6 +287,8 @@ namespace hpx { namespace util { namespace plugin {
                     std::ostringstream str;
                     str << "Hpx.Plugin: Could not open shared library '"
                         << dll_name << "' (dlerror: " << dlerror() << ")";
+
+                    lock.unlock();
 
                     HPX_THROWS_IF(ec, filesystem_error,
                         "plugin::LoadLibrary", str.str());
