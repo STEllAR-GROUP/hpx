@@ -37,8 +37,8 @@ namespace hpx { namespace compute { namespace host
     /// std::size_t N = 2048;
     /// vector_type v(N, allocator_type(numa_nodes));
     ///
-    template <typename T,
-        typename Executor = hpx::threads::executors::local_priority_queue_attached_executor>
+    template <typename T, typename Executor =
+        hpx::threads::executors::local_priority_queue_attached_executor>
     struct block_allocator
     {
         typedef T value_type;
@@ -138,6 +138,8 @@ namespace hpx { namespace compute { namespace host
         template <typename U, typename ... Args>
         void bulk_construct(U* p, std::size_t count, Args &&... args)
         {
+            // FIXME: Handle exceptions thrown from constructors
+
             // first touch policy, distribute evenly onto targets
             auto irange = boost::irange(std::size_t(0), count);
             hpx::parallel::for_each(

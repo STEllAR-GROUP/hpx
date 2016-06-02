@@ -242,7 +242,7 @@ namespace hpx { namespace traits
         compute::detail::iterator<T, compute::cuda::allocator<T> > const&)
     {
         // FIXME: turn into proper pointer category
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         static_assert(std::is_trivially_copyable<T>::value,
             "T must be trivially copyable");
 #endif
@@ -259,7 +259,7 @@ namespace hpx { namespace traits
                 T, typename std::iterator_traits<Source>::value_type
             >::value, "The value types of the iterators must match");
 
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         static_assert(std::is_trivially_copyable<T>::value,
             "T must be trivially copyable");
 #endif
@@ -277,7 +277,7 @@ namespace hpx { namespace traits
                 T, typename std::iterator_traits<Dest>::value_type
             >::value, "The value types of the iterators must match");
 
-#if defined(HPX_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         static_assert(std::is_trivially_copyable<T>::value,
             "T must be trivially copyable");
 #endif

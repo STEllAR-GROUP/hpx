@@ -162,19 +162,17 @@ namespace hpx { namespace compute { namespace detail
             return *p_;
         }
 
-//         reference operator*()
-//         {
-//             HPX_ASSERT(p_);
-//             return *p_;
-//         }
-
         pointer operator->() const
         {
             HPX_ASSERT(p_);
             return p_;
         }
 
-        // FIXME: operator[] is missing
+        reference operator[](std::size_t pos) const
+        {
+            HPX_ASSERT(p_);
+            return *(p_ + pos);
+        }
 
         target_type const& target() const
         {
@@ -183,7 +181,7 @@ namespace hpx { namespace compute { namespace detail
 
     private:
         pointer p_;
-        const target_type* target_;
+        target_type const* target_;
     };
 
     template <typename T, typename Allocator>
