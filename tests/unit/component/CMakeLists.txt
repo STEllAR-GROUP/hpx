@@ -28,6 +28,7 @@ set(tests
     partitioned_vector_iter
     partitioned_vector_move
     partitioned_vector_transform_reduce
+    partitioned_vector_fill
    )
 
 # add executable needed for launch_process_test

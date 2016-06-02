@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_FILL_JUL_07_2014_1222PM
 
 #include <hpx/parallel/algorithms/fill.hpp>
+#include <hpx/parallel/segmented_algorithms/fill.hpp>
 
 #endif
 

@@ -19,6 +19,9 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
+// extra
+#include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
@@ -118,12 +121,56 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<InIter>::value),
             "Requires at least forward iterator.");
 
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+
+        return fill_(
+            std::forward<ExPolicy>(policy), first, last, value,
+                is_segmented()
+            );
+
+        //return detail::fill().call(
+        //    std::forward<ExPolicy>(policy), is_seq(),
+        //    first, last, value);
+    }
+
+    // parallel version
+    template <typename ExPolicy, typename InIter, typename T>
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
+        typename util::detail::algorithm_result<ExPolicy, void>::type
+    >::type
+    fill_(ExPolicy && policy, InIter first, InIter last, T value,
+        std::false_type)
+    {
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::fill().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, value);
     }
+
+    // segmented version
+    template <typename ExPolicy, typename InIter, typename T>
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
+        typename util::detail::algorithm_result<ExPolicy, void>::type
+    >::type
+    fill_(ExPolicy && policy, InIter first, InIter last, T value,
+        std::true_type);
+   /* {
+        typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+
+        if (first == last)
+        {
+            return util::detail::algorithm_result<ExPolicy, void>::get();
+        }
+
+        return segmented_fill(
+            detail::fill(), std::forward<ExPolicy>(policy), first, last, value, is_seq()
+        );
+    }
+*/
+
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
     namespace detail

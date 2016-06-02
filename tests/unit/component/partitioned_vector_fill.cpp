@@ -1,0 +1,79 @@
+//  Copyright (c) 2014-2015 Hartmut Kaiser
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/hpx_main.hpp>
+#include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/parallel_fill.hpp>
+
+#include <hpx/util/lightweight_test.hpp>
+
+#include <vector>
+
+///////////////////////////////////////////////////////////////////////////////
+// Define the vector types to be used.
+HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(int);
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+void iota_vector(hpx::partitioned_vector<T>& v, T val)
+{
+    typename hpx::partitioned_vector<T>::iterator it = v.begin(), end = v.end();
+    for(/**/; it != end; ++it)
+        *it = val++;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename T, typename InIter>
+void verify_values(InIter first, InIter last, T const& val)
+{
+    for (InIter it = first; it != last; ++it)
+    {
+        HPX_TEST_EQ(*it, val);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+void verify_vector(hpx::partitioned_vector<T> const& v, T const& val)
+{
+    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
+
+    std::size_t size = 0;
+
+    const_iterator end = v.end();
+    for (const_iterator it = v.begin(); it != end; ++it, ++size)
+    {
+        HPX_TEST_EQ(*it, val);
+    }
+
+    HPX_TEST_EQ(size, v.size());
+}
+
+template <typename T>
+void fill_tests()
+{
+    hpx::partitioned_vector<T> c(12);
+    iota_vector(c, T(std::rand()));
+
+    const T v(42);
+    hpx::parallel::fill(hpx::parallel::seq, c.begin(), c.end(), v);
+    verify_vector(c, v);
+
+    const T v1(43);
+    hpx::parallel::fill(hpx::parallel::par, c.begin()+1, c.end()-1, v1);
+    verify_values(c.begin()+1, c.end()-1, v1);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+int main()
+{
+    fill_tests<double>();
+    fill_tests<int>();
+
+    return 0;
+}
+
