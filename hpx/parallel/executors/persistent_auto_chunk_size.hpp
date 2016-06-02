@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// This executor parameters type makes sure that as many loop iterations
     /// are combined as necessary to run for the amount of time specified.
     ///
-    struct persistent_auto_chunk_size : executor_parameters_tag
+    struct persistent_auto_chunk_size : executor_parameters_chunk_tag
     {
     public:
         /// Construct an \a persistent_auto_chunk_size executor parameters object
