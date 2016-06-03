@@ -23,23 +23,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     namespace detail {
 
-        template<typename Base, typename Arg, typename Enable = void>
+        template<template<typename> class Condition, typename Arg, typename Enable = void>
         struct counter_increment
         {
             constexpr static int value = 0;
         };
 
-        template<typename Base, typename Arg>
-        struct counter_increment<Base, Arg, typename std::enable_if< std::is_base_of<Base, Arg>::value>::type >
+        template<template<typename> class Condition, typename Arg>
+        struct counter_increment<Condition, Arg, typename std::enable_if< Condition<Arg>::value>::type >
         {
             constexpr static int value = 1;
         };
 
-        template<typename T, typename ...Args>
+        template<template<typename> class Condition, typename ...Args>
         struct parameter_type_counter;
 
-        template<typename T>
-        struct parameter_type_counter<T>
+        template<template<typename> class Condition>
+        struct parameter_type_counter<Condition>
         {
             constexpr static int value = 0;
         };
@@ -52,22 +52,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param Parameters       [in] The executor object to use.
         ///
         //
-        template<typename T, typename Arg1, typename ...Args>
-        struct parameter_type_counter<T, Arg1, Args...>
+        template<template<typename> class Condition, typename Arg1, typename ...Args>
+        struct parameter_type_counter<Condition, Arg1, Args...>
         {
-            constexpr static int value = parameter_type_counter<T, Args...>::value + counter_increment<T, Arg1>::value;
+            constexpr static int value = parameter_type_counter<Condition, Args...>::value + counter_increment<Condition, Arg1>::value;
         };
 
         template<typename... Params>
         struct executor_parameters : public Params...
         {
-            public:
-            executor_parameters(Params&&... params) : Params(params)...
+        public:
+            
+            executor_parameters()
             {
-                static_assert(parameter_type_counter<executor_parameters_tag, Params...>::value == sizeof...(Params),
+                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters, Params...>::value == sizeof...(Params),
                     "All passed parameters must be a proper executor parameter!");
 
-                static_assert(parameter_type_counter<executor_parameters_chunk_tag, Params...>::value <= 1,
+                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters_chunk_size, Params...>::value <= 1,
+                    "Passing more than one chunk size policy is prohibited!");
+            }
+            
+            template<typename... Params_>
+            executor_parameters(Params_ &&... params) : Params(params)...
+            {
+                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters, Params...>::value == sizeof...(Params),
+                    "All passed parameters must be a proper executor parameter!");
+
+                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters_chunk_size, Params...>::value <= 1,
                     "Passing more than one chunk size policy is prohibited!");
             }
         };
@@ -76,7 +87,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 	template<typename... Params>
 	struct executor_parameters_join
 	{
-        typedef detail::executor_parameters<Params...> type;
+        typedef detail::executor_parameters<typename hpx::util::decay<typename hpx::util::decay_unwrap<Params>::type...>::type > type;
 
 		//static type join(Params &&... params)
 		//{

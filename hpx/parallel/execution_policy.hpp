@@ -163,7 +163,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///                     execution of the parallel algorithm the
         ///                     returned execution policy is used with.
         ///
-        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
         ///
         /// \returns The new sequential_task_execution_policy
         ///
@@ -280,7 +281,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
-        /// Create a new sequential_task_execution_policy from the given
+        /// Create a new sequential_task_execution_policy_shim from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -290,24 +291,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///                     execution of the parallel algorithm the
         ///                     returned execution policy is used with.
         ///
-        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
         ///
-        /// \returns The new sequential_task_execution_policy
+        /// \returns The new sequential_task_execution_policy_shim
         ///
-        template <typename Parameters_>
+        template <typename... Parameters_,
+			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
-            sequential_task_execution_policy_shim, Executor, Parameters_
+            sequential_task_execution_policy_shim, executor_type, ParametersType
         >::type
-        with(Parameters_ && params) const
+        with(Parameters_ &&... params) const
         {
-            static_assert(
-                is_executor_parameters<Parameters_>::value,
-                "is_executor_parameters<Parameters_>::value");
-
             typedef typename rebind_executor<
-                sequential_task_execution_policy_shim, Executor, Parameters_
+                sequential_task_execution_policy_shim, executor_type, ParametersType
             >::type rebound_type;
-            return rebound_type(exec_, std::forward<Parameters_>(params));
+            return rebound_type(exec_, ParametersType(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
@@ -435,24 +434,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///                     execution of the parallel algorithm the
         ///                     returned execution policy is used with.
         ///
-        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
         ///
         /// \returns The new sequential_execution_policy
         ///
-        template <typename Parameters>
+        template <typename... Parameters,
+			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
-            sequential_execution_policy, executor_type, Parameters
+            sequential_execution_policy, executor_type, ParametersType
         >::type
-        with(Parameters && params) const
+        with(Parameters &&... params) const
         {
-            static_assert(
-                is_executor_parameters<Parameters>::value,
-                "is_executor_parameters<Parameters>::value");
-
             typedef typename rebind_executor<
-                sequential_execution_policy, executor_type, Parameters
+                sequential_execution_policy, executor_type, ParametersType
             >::type rebound_type;
-            return rebound_type(executor(), std::forward<Parameters>(params));
+            return rebound_type(executor(), ParametersType(std::forward<Parameters>(params)...));
         }
 
         /// Return the associated executor object.
@@ -551,7 +548,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
-        /// Create a new sequential_execution_policy from the given
+        /// Create a new sequential_execution_policy_shim from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -561,24 +558,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///                     execution of the parallel algorithm the
         ///                     returned execution policy is used with.
         ///
-        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
         ///
-        /// \returns The new sequential_execution_policy
+        /// \returns The new sequential_execution_policy_shim
         ///
-        template <typename Parameters_>
+        template <typename... Parameters_,
+			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
-            sequential_execution_policy_shim, executor_type, Parameters_
+            sequential_execution_policy_shim, executor_type, ParametersType
         >::type
-        with(Parameters_& params) const
+        with(Parameters_ &&... params) const
         {
-            static_assert(
-                is_executor_parameters<Parameters_>::value,
-                "is_executor_parameters<Parameters_>::value");
-
             typedef typename rebind_executor<
-                sequential_execution_policy_shim, executor_type, Parameters_
+                sequential_execution_policy_shim, executor_type, ParametersType
             >::type rebound_type;
-            return rebound_type(exec_, std::forward<Parameters_>(params));
+            return rebound_type(exec_, ParametersType(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
@@ -700,7 +695,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
-        /// Create a new parallel_task_execution_policy from the given
+        /// Create a new parallel_execution_policy_shim from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -710,24 +705,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///                     execution of the parallel algorithm the
         ///                     returned execution policy is used with.
         ///
-        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
         ///
-        /// \returns The new parallel_task_execution_policy
+        /// \returns The new parallel_execution_policy_shim
         ///
-        template <typename Parameters>
+        template <typename... Parameters,
+			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
-            parallel_task_execution_policy, executor_type, Parameters
+            parallel_task_execution_policy, executor_type, ParametersType
         >::type
-        with(Parameters && params) const
+        with(Parameters &&... params) const
         {
-            static_assert(
-                is_executor_parameters<Parameters>::value,
-                "is_executor_parameters<Parameters>::value");
-
             typedef typename rebind_executor<
-                parallel_task_execution_policy, executor_type, Parameters
+                parallel_task_execution_policy, executor_type, ParametersType
             >::type rebound_type;
-            return rebound_type(executor(), std::forward<Parameters>(params));
+            return rebound_type(executor(), ParametersType(std::forward<Parameters>(params)...));
         }
 
         /// Return the associated executor object.
@@ -829,7 +822,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
-        /// Create a new parallel_task_execution_policy from the given
+        /// Create a new parallel_execution_policy_shim from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -839,24 +832,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///                     execution of the parallel algorithm the
         ///                     returned execution policy is used with.
         ///
-        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
         ///
-        /// \returns The new parallel_task_execution_policy
+        /// \returns The new parallel_execution_policy_shim
         ///
-        template <typename Parameters_>
+        template <typename... Parameters_,
+			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
-            parallel_task_execution_policy_shim, Executor, Parameters_
+            parallel_task_execution_policy_shim, executor_type, ParametersType
         >::type
-        with(Parameters_ && params) const
+        with(Parameters_ &&... params) const
         {
-            static_assert(
-                is_executor_parameters<Parameters_>::value,
-                "is_executor_parameters<Parameters_>::value");
-
             typedef typename rebind_executor<
-                parallel_task_execution_policy_shim, Executor, Parameters_
+                parallel_task_execution_policy_shim, executor_type, ParametersType
             >::type rebound_type;
-            return rebound_type(exec_, std::forward<Parameters_>(params));
+            return rebound_type(exec_, ParametersType(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
@@ -1092,7 +1083,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
-        /// Create a new parallel_execution_policy from the given
+        /// Create a new parallel_execution_policy_shim from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -1104,22 +1095,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \note Requires: is_executor_parameters<Parameters>::value is true
         ///
-        /// \returns The new parallel_execution_policy
+        /// \returns The new parallel_execution_policy_shim
         ///
-        template <typename Parameters_>
+        template <typename... Parameters_,
+			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
-            parallel_execution_policy_shim, Executor, Parameters_
+            parallel_execution_policy_shim, executor_type, ParametersType
         >::type
-        with(Parameters_ && params) const
+        with(Parameters_ &&... params) const
         {
-            static_assert(
-                is_executor_parameters<Parameters_>::value,
-                "is_executor_parameters<Parameters_>::value");
-
             typedef typename rebind_executor<
-                parallel_execution_policy_shim, Executor, Parameters_
+                parallel_execution_policy_shim, executor_type, ParametersType
             >::type rebound_type;
-            return rebound_type(exec_, std::forward<Parameters_>(params));
+            return rebound_type(exec_, ParametersType(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.

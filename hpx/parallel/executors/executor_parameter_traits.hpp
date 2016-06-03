@@ -190,8 +190,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct mark_begin_execution_helper
         {
             template <typename Parameters>
-            static void call(hpx::traits::detail::wrap_int, Parameters&)
+            static void call(hpx::traits::detail::wrap_int, Parameters& params)
             {
+               params.mark_begin_execution(); 
             }
 
             template <typename Parameters>
@@ -376,6 +377,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     template <typename T>
     struct is_executor_parameters;
+
+    template <typename T>
+    struct is_executor_parameters_chunk;
 }}}
 
 #endif

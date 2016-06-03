@@ -27,7 +27,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// \note This executor parameters type is equivalent to OpenMPs DYNAMIC
     ///       scheduling directive.
     ///
-    struct dynamic_chunk_size : executor_parameters_chunk_tag
+    struct dynamic_chunk_size : executor_parameters_chunk_size_tag
     {
         /// Construct a \a dynamic_chunk_size executor parameters object
         ///
