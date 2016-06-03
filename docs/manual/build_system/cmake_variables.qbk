@@ -234,16 +234,18 @@ The options are split into these categories:
 ] [/ Debugging Options]
 
 [#build_system.cmake_variables.Tools][h3 Tools Options]
-* [link build_system.cmake_variables.HPX_WITH_HDF5 HPX_WITH_HDF5]
-* [link build_system.cmake_variables.HPX_WITH_OPENMP HPX_WITH_OPENMP]
-* [link build_system.cmake_variables.HPX_WITH_QTHREADS HPX_WITH_QTHREADS]
-* [link build_system.cmake_variables.HPX_WITH_TBB HPX_WITH_TBB]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_HDF5 HPX_WITH_EXAMPLES_HDF5]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_OPENMP HPX_WITH_EXAMPLES_OPENMP]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_QT4 HPX_WITH_EXAMPLES_QT4]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_QTHREADS HPX_WITH_EXAMPLES_QTHREADS]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_TBB HPX_WITH_EXAMPLES_TBB]
 
 [variablelist
-        [[[#build_system.cmake_variables.HPX_WITH_HDF5] `HPX_WITH_HDF5:BOOL`][Enable HDF5 support (default: OFF).]]
-        [[[#build_system.cmake_variables.HPX_WITH_OPENMP] `HPX_WITH_OPENMP:BOOL`][Enable OpenMP support (default: OFF).]]
-        [[[#build_system.cmake_variables.HPX_WITH_QTHREADS] `HPX_WITH_QTHREADS:BOOL`][Enable QThreads support (default: OFF).]]
-        [[[#build_system.cmake_variables.HPX_WITH_TBB] `HPX_WITH_TBB:BOOL`][Enable TBB support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_HDF5] `HPX_WITH_EXAMPLES_HDF5:BOOL`][Enable examples requiring HDF5 support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_OPENMP] `HPX_WITH_EXAMPLES_OPENMP:BOOL`][Enable examples requiring OpenMP support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_QT4] `HPX_WITH_EXAMPLES_QT4:BOOL`][Enable examples requiring Qt4 support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_QTHREADS] `HPX_WITH_EXAMPLES_QTHREADS:BOOL`][Enable examples requiring QThreads support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_TBB] `HPX_WITH_EXAMPLES_TBB:BOOL`][Enable examples requiring TBB support (default: OFF).]]
 ] [/ Tools Options]
 
 

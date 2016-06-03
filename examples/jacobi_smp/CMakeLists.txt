@@ -11,7 +11,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
       jacobi_nonuniform_hpx)
 endif()
 
-if(HPX_WITH_OPENMP)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set(jacobi_smp_applications ${jacobi_smp_applications}
       jacobi_omp_static
       jacobi_omp_dynamic
@@ -51,7 +51,7 @@ foreach(jacobi_smp_application ${jacobi_smp_applications})
         ${jacobi_smp_application}_exe)
 endforeach()
 
-if(HPX_WITH_OPENMP)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(jacobi_omp_static_exe
       PROPERTIES
       COMPILE_DEFINITIONS JACOBI_SMP_NO_HPX)

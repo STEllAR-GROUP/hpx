@@ -523,44 +523,63 @@ hpx_option(HPX_WITH_ITTNOTIFY BOOL
 #endif()
 
 ## External libraries/frameworks used by sme of the examples and benchmarks
-hpx_option(HPX_WITH_OPENMP BOOL
-  "Enable OpenMP support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
-if(HPX_WITH_OPENMP)
+hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
+  "Enable examples requiring OpenMP support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
   if(OPENMP_FOUND)
-    hpx_add_config_define(HPX_HAVE_OPENMP)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_OPENMP)
   else()
-    set(HPX_WITH_OPENMP OFF)
+    set(HPX_WITH_EXAMPLES_OPENMP OFF)
   endif()
 endif()
-hpx_option(HPX_WITH_TBB BOOL
-  "Enable TBB support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
-if(HPX_WITH_TBB)
+hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
+  "Enable examples requiring TBB support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
   if(TBB_FOUND)
-    hpx_add_config_define(HPX_HAVE_TBB)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_TBB)
   else()
-    set(HPX_WITH_TBB OFF)
+    set(HPX_WITH_EXAMPLES_TBB OFF)
   endif()
 endif()
-hpx_option(HPX_WITH_QTHREADS BOOL
-  "Enable QThreads support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
-if(HPX_WITH_QTHREADS)
+hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
+  "Enable examples requiring QThreads support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
   if(QTHREADS_FOUND)
-    hpx_add_config_define(HPX_HAVE_QTHREADS)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_QTHREADS)
   else()
-    set(HPX_WITH_QTHREADS OFF)
+    set(HPX_WITH_EXAMPLES_QTHREADS OFF)
   endif()
 endif()
-hpx_option(HPX_WITH_HDF5 BOOL
-  "Enable HDF5 support (default: OFF)." OFF CATEGORY "Tools" ADVANCED)
-if(HPX_WITH_HDF5)
+hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
+  "Enable examples requiring HDF5 support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
   if(HDF5_FOUND)
-    hpx_add_config_define(HPX_HAVE_HDF5)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_HDF5)
   else()
-    set(HPX_WITH_HDF5 OFF)
+    set(HPX_WITH_EXAMPLES_HDF5 OFF)
+  endif()
+endif()
+
+# Disabling the Qt example on BG/Q as GUIs don't make sense there anyways
+if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
+    "Enable examples requiring Qt4 support (default: OFF)." OFF
+    CATEGORY "Tools" ADVANCED)
+  if(HPX_WITH_EXAMPLES_QT4)
+    find_package(Qt4)
+    if(QT4_FOUND)
+      hpx_add_config_define(HPX_HAVE_EXAMPLES_QT4)
+    else()
+      set(HPX_WITH_EXAMPLES_QT4 OFF)
+    endif()
   endif()
 endif()
 

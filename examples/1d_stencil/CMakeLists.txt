@@ -22,7 +22,7 @@ if(HPX_WITH_APEX)
      )
 endif()
 
-if(HPX_WITH_OPENMP)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set(example_programs ${example_programs}
       1d_stencil_1_omp
       1d_stencil_3_omp)
@@ -54,7 +54,7 @@ foreach(example_program ${example_programs})
                               ${example_program}_exe)
 endforeach()
 
-if(HPX_WITH_OPENMP)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(1d_stencil_1_omp_exe
     PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
   set_target_properties(1d_stencil_3_omp_exe

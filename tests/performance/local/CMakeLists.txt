@@ -20,7 +20,7 @@ set(benchmarks
     timed_task_spawn
 )
 
-if(HPX_WITH_OPENMP)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks
       ${benchmarks}
       openmp_homogeneous_timed_task_spawn
@@ -30,7 +30,7 @@ if(HPX_WITH_OPENMP)
       DEPENDENCIES ${boost_library_dependencies})
 endif()
 
-if(HPX_WITH_QTHREADS)
+if(HPX_WITH_EXAMPLES_QTHREADS)
   include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks
@@ -48,7 +48,7 @@ if(HPX_WITH_QTHREADS)
                   ${QTHREADS_LIBRARIES})
 endif()
 
-if(HPX_WITH_TBB)
+if(HPX_WITH_EXAMPLES_TBB)
   include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks
@@ -140,7 +140,7 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
-if(HPX_WITH_OPENMP)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe
