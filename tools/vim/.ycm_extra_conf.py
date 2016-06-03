@@ -16,15 +16,7 @@ def FlagsForFile(filename, **kwargs):
     with open('{0}/compile_commands.json'.format(compilation_database_dir), 'r') as f:
         a = ''.join([l.rstrip('\n') for l in f.readlines() if 'command' in l])
 
-    final_flags = []
-    
-    final_flags.extend(set(re.findall('-std\S+', a)))
-    #Allow any number of whitespace between include flag and directory
-    final_flags.extend(set(re.findall('-I\s*\S+', a)))
-    final_flags.extend(set(re.findall('-include\s*\S+', a)))
-    final_flags.extend(set(re.findall('-isystem\s*\S+', a)))
-    final_flags.extend(set(re.findall('-W\S+', a)))
-    final_flags.extend(set(re.findall('-w\S+', a)))
+    final_flags = list(set(re.findall('-(?:std|W|w)\S+|-(?:I|include|isystem)(?:\S+| \S+)', a)))
  
     return {
         'flags': final_flags,
