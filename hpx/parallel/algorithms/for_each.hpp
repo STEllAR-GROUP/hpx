@@ -58,7 +58,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            static typename util::detail::algorithm_result<ExPolicy,
+                InIter>::type
             parallel(ExPolicy && policy, InIter first, std::size_t count,
                 F && f, Proj && proj = Proj())
             {
@@ -71,11 +72,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f, proj](std::size_t /*part_index*/,
                             InIter part_begin, std::size_t part_size) mutable
                         {
+                            typedef typename util::loop_n_iterator_mapping<
+                                InIter>::type iterator_type;
                             // VS2015 bails out when proj or f are captured by
                             // ref
                             util::loop_n(
                                 part_begin, part_size,
-                                [=](InIter curr) mutable
+                                [=](iterator_type curr) mutable
                                 {
                                     hpx::util::invoke(
                                         f, hpx::util::invoke(proj, *curr));
@@ -237,7 +240,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            static typename util::detail::algorithm_result<ExPolicy,
+                InIter>::type
             parallel(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
@@ -250,7 +254,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         ///////////////////////////////////////////////////////////////////////
         // non-segmented implementation
-        template <typename ExPolicy, typename InIter, typename F, typename Proj>
+        template <typename ExPolicy, typename InIter, typename F,
+            typename Proj>
         inline typename util::detail::algorithm_result<ExPolicy, InIter>::type
         for_each_(ExPolicy && policy, InIter first, InIter last, F && f,
             Proj && proj, std::false_type)
@@ -272,7 +277,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename SegIter, typename F, typename Proj>
+        template <typename ExPolicy, typename SegIter, typename F,
+            typename Proj>
         inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type);
