@@ -11,5 +11,7 @@ https://github.com/Valloric/YouCompleteMe
 Configuration:
 Configure hpx build, passing location for YCM configuration file with option HPX_WITH_VIM_YCM. File will be configured to use HPX compilation flags and placed in this directory.
 Configuration file should be placed in your working directory or in any directory above. An optimal choice may be the source directory.
+To avoid asking for confirmation and automatically load config file add this information to your .vimrc file:
+"let g:ycm_extra_conf_globlist = ['LOCATION_OF_CONFIG_FILE/*']"
 
 YCM uses compilation flags exported by CMake in build directory. Do not remove compile_commands.json!
