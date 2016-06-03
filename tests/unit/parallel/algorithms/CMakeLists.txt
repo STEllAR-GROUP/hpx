@@ -66,11 +66,14 @@ set(tests
     inner_product
     inner_product_exception
     inner_product_bad_alloc
+    is_heap
+    is_heap_until
     is_partitioned
     is_sorted
     is_sorted_executors
     is_sorted_until
     lexicographical_compare
+    make_heap
     max_element
     min_element
     minmax_element
