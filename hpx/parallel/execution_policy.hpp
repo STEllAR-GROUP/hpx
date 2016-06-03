@@ -17,6 +17,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
+#include <hpx/parallel/executors/executor_parameters.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -169,7 +170,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename... Parameters,
 			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
-            sequential_task_execution_policy, executor_type, Parameters
+            sequential_task_execution_policy, executor_type, ParametersType
         >::type
         with(Parameters &&... params) const
         {
@@ -985,7 +986,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename... Parameters,
 			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
-            parallel_execution_policy, executor_type, Parameters
+            parallel_execution_policy, executor_type, ParametersType
         >::type
         with(Parameters &&... params) const
         {
