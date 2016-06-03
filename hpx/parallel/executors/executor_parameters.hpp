@@ -83,7 +83,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 	};
 
 	template<typename... Params>
-	struct join_parameters
+	struct executor_parameters_join
 	{
 		typedef executor_parameters<Params...> type;
 
