@@ -60,7 +60,27 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         void operator()(parcelset::parcelport* pp)
         {
             if (!messages_.empty())
+            {
+                if (0 == threads::get_self_ptr())
+                {
+                    // reschedule this call on a new HPX thread
+                    using parcelset::parcelport;
+                    void (parcelport::*put_parcel_ptr) (
+                            parcelset::locality const&,
+                            std::vector<parcelset::parcel>,
+                            std::vector<parcelset::write_handler_type>
+                        ) = &parcelport::put_parcels;
+
+                    threads::register_thread_nullary(
+                        util::deferred_call(put_parcel_ptr, pp,
+                            dest_, std::move(messages_), std::move(handlers_)),
+                        "parcelhandler::put_parcel", threads::pending, true,
+                        threads::thread_priority_boost);
+                    return;
+                }
+
                 pp->put_parcels(dest_, std::move(messages_), std::move(handlers_));
+            }
         }
 
         message_buffer_append_state append(parcelset::locality const & dest,
