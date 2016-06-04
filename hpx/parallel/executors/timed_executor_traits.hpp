@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>

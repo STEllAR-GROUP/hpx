@@ -14,7 +14,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any
-    template <typename T, typename Enable>
+    template <typename T, typename Enable = void>
     struct supports_streaming_with_any
       : boost::mpl::true_       // the default is to support streaming
     {};

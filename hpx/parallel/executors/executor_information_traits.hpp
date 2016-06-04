@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>

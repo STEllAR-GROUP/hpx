@@ -7,7 +7,7 @@
 #if !defined(HPX_TRAITS_POINTER_CATEGORY_MAY_10_2016)
 #define HPX_TRAITS_POINTER_CATEGORY_MAY_10_2016
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 
 #include <type_traits>
 
@@ -17,6 +17,11 @@
 
 namespace hpx { namespace traits
 {
+    struct general_pointer_tag {};
+
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+    struct trivially_copyable_pointer_tag : general_pointer_tag {};
+#endif
 
     template <typename Source, typename Dest>
     inline general_pointer_tag
@@ -26,8 +31,8 @@ namespace hpx { namespace traits
     }
 
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-
-    namespace detail {
+    namespace detail
+    {
 
         template <typename Source, typename Dest>
         struct pointer_category
@@ -89,7 +94,6 @@ namespace hpx { namespace traits
         return category_type();
     }
 #endif
-
 }}
 
 #endif

@@ -16,6 +16,7 @@
 
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
@@ -32,25 +33,6 @@
 
 #include <utility>
 #include <stdexcept>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    template <typename Component>
-    struct managed_component_ctor_policy<
-        Component, typename Component::has_managed_component_base>
-    {
-        typedef typename Component::ctor_policy type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
-    struct managed_component_dtor_policy<
-        Component, typename Component::has_managed_component_base>
-    {
-        typedef typename Component::dtor_policy type;
-    };
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

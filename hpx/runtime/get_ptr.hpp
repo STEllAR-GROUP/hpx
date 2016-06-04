@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>

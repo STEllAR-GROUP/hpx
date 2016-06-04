@@ -9,10 +9,10 @@
 #define HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>

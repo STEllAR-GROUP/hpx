@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/supports_streaming_with_any.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>

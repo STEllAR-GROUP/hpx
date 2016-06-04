@@ -13,6 +13,14 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/action_priority.hpp>
+#include <hpx/traits/action_remote_result.hpp>
+#include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
@@ -23,10 +31,6 @@
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/traits/action_remote_result.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

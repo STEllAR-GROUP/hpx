@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM)
 #define HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM
 
-#include <hpx/traits.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
@@ -50,7 +50,7 @@ namespace hpx { namespace traits
         }
     }
 
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_is_target_valid
     {
         static bool call(naming::id_type const& id)

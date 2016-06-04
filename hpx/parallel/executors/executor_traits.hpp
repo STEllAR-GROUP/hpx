@@ -13,6 +13,7 @@
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>

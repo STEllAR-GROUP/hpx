@@ -10,6 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/traits/action_capability_provider.hpp>
+#endif
+#include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/agas/gva.hpp>

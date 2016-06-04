@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/traits/future_traits.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/thread_description.hpp>

@@ -14,7 +14,7 @@
 
 namespace hpx { namespace traits
 {
-    template <typename Tuple, typename Enable>
+    template <typename Tuple, typename Enable = void>
     struct is_future_tuple
       : boost::mpl::false_
     {};

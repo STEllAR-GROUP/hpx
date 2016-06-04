@@ -8,7 +8,6 @@
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/unlock_guard.hpp>

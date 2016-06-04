@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/components/client_base.hpp>

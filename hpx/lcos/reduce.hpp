@@ -79,6 +79,7 @@ namespace hpx { namespace lcos
 
 #include <hpx/config.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>

@@ -10,8 +10,6 @@
 #define HPX_UTIL_TAGGED_TUPLE_DEC_23_2015_0123PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/future_traits.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tagged.hpp>

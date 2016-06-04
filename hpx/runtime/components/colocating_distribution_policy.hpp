@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations.hpp>

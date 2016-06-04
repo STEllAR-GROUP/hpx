@@ -11,6 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/action_remote_result.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/lcos/future.hpp>

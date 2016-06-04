@@ -12,7 +12,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action stack size
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_stacksize
     {
         enum { value = threads::thread_stacksize_default };

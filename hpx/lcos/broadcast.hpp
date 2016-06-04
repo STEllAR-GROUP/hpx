@@ -137,6 +137,7 @@ namespace hpx { namespace lcos
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
@@ -148,7 +149,6 @@ namespace hpx { namespace lcos
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/traits/extract_action.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 

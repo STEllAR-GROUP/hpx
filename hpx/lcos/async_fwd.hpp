@@ -9,7 +9,6 @@
 #define HPX_LCOS_ASYNC_FWD_SEP_28_2011_0840AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/extract_action.hpp>
 #include <hpx/util/decay.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

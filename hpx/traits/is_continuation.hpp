@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_IS_CONTINUATION_HPP)
 #define HPX_TRAITS_IS_CONTINUATION_HPP
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <boost/mpl/bool.hpp>
@@ -27,7 +27,7 @@ namespace hpx { namespace traits
         {};
     }
 
-    template <typename Continuation, typename Enable>
+    template <typename Continuation, typename Enable = void>
     struct is_continuation
       : detail::is_continuation_impl<typename util::decay<Continuation>::type>
     {};

@@ -9,6 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_type_database.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>

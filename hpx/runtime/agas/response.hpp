@@ -21,7 +21,6 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <cstdint>

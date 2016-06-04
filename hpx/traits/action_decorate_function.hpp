@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM)
 #define HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM
 
-#include <hpx/traits.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -52,7 +52,7 @@ namespace hpx { namespace traits
         }
     }
 
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_decorate_function
     {
         template <typename F>

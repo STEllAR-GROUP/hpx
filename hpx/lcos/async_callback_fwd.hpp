@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_ASYNC_CALLBACK_FWD_MAR_30_2015_1122AM)
 #define HPX_LCOS_ASYNC_CALLBACK_FWD_MAR_30_2015_1122AM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>

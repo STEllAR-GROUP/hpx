@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/traits/future_traits.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/wait_all.hpp>

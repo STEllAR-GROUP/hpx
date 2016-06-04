@@ -8,14 +8,15 @@
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/traits/is_executor.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>

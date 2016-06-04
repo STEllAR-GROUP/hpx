@@ -10,6 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/invoke_function.hpp>
 

@@ -11,16 +11,6 @@
 #define HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/invocation_count_registry.hpp>
-#include <hpx/runtime/components/pinned_ptr.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/traits/action_capability_provider.hpp>
 #endif
@@ -32,6 +22,16 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>

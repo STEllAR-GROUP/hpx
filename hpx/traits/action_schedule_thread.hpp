@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM)
 #define HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM
 
-#include <hpx/traits.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -56,7 +56,7 @@ namespace hpx { namespace traits
         }
     }
 
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_schedule_thread
     {
         // returns whether target was migrated to another locality
