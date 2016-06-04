@@ -14,8 +14,8 @@
  // http://lafstern.org/matt/segmented.pdf.
 
 #include <hpx/config.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>

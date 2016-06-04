@@ -10,13 +10,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/traits/is_timed_executor.hpp>
-#include <hpx/traits/wrap_int.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/deferred_call.hpp>

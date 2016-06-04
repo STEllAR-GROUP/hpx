@@ -7,17 +7,17 @@
 #define HPX_LCOS_ASYNC_COLOCATED_FEB_01_2014_0105PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/async_continue_fwd.hpp>
+#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/async_fwd.hpp>
-#include <hpx/lcos/async_continue_fwd.hpp>
-#include <hpx/lcos/detail/async_colocated_fwd.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>

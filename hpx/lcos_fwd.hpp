@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/traits/promise_local_result.hpp>
 
 namespace hpx
 {

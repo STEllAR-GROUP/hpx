@@ -7,9 +7,6 @@
 #define HPX_LCOS_LOCAL_FUTURES_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>

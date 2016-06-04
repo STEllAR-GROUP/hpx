@@ -11,9 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
@@ -29,6 +26,8 @@
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>

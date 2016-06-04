@@ -13,7 +13,6 @@
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/wrap_int.hpp>
 #include <hpx/util/always_void.hpp>

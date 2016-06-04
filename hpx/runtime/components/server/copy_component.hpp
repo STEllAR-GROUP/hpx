@@ -7,7 +7,6 @@
 #define HPX_RUNTIME_COMPONENTS_SERVER_COPY_COMPONENT_SEP_20_2013_0825PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_ptr.hpp>

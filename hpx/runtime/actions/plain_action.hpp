@@ -10,9 +10,6 @@
 #define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/component_type_database.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>

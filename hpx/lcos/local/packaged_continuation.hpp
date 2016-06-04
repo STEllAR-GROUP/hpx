@@ -13,10 +13,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/thread_description.hpp>
 

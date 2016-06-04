@@ -14,10 +14,6 @@
 #include <hpx/util/reinitializable_static.hpp>
 #endif
 
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/is_component.hpp>
-#include <hpx/traits/managed_component_policies.hpp>
-#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
@@ -36,6 +32,7 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <stdexcept>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

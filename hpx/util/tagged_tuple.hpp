@@ -10,6 +10,7 @@
 #define HPX_UTIL_TAGGED_TUPLE_DEC_23_2015_0123PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tagged.hpp>
 #include <hpx/util/tuple.hpp>

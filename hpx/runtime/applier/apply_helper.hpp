@@ -8,15 +8,13 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/action_priority.hpp>
-#include <hpx/traits/action_schedule_thread.hpp>
-#include <hpx/traits/action_stacksize.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/traits/action_priority.hpp>
+#include <hpx/traits/action_schedule_thread.hpp>
+#include <hpx/traits/action_stacksize.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <memory>

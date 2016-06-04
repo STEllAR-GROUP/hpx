@@ -7,6 +7,7 @@
 #define HPX_TRAITS_ACQUIRE_SHARED_STATE_JUN_24_2015_0923AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>

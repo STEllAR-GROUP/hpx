@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/async_fwd.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/extract_action.hpp>
