@@ -9,6 +9,9 @@
 #define HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/invoke_function.hpp>
 #include <hpx/traits/is_action.hpp>

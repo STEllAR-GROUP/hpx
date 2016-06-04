@@ -16,6 +16,7 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>

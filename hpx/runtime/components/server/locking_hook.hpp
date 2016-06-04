@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_SERVER_LOCKING_HOOK_OCT_17_2012_0732PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/traits/action_decorate_function.hpp>

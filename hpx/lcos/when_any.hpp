@@ -121,14 +121,14 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
-#include <hpx/lcos/when_any.hpp>
-#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/lcos/when_any.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>

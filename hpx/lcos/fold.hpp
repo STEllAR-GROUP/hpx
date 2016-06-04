@@ -166,7 +166,8 @@ namespace hpx { namespace lcos
 #define HPX_LCOS_FOLD_SEP_29_2013_1442AM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/actions/action_support.hpp>

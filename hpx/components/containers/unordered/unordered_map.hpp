@@ -9,6 +9,7 @@
 #define HPX_UNORDERED_MAP_NOV_11_2014_0852PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>

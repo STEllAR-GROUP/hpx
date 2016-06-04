@@ -8,7 +8,6 @@
 
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
 #include <hpx/parallel/tagspec.hpp>

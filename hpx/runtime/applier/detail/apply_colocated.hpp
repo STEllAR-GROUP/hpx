@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FEB_04_2014_0755PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>

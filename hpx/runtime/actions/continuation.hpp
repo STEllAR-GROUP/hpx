@@ -7,6 +7,14 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/action_remote_result.hpp>
+#include <hpx/traits/future_traits.hpp>
+#include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>

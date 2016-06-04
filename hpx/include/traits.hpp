@@ -61,7 +61,7 @@
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/traits/wrap_int.hpp>
 
 #endif
 

@@ -135,7 +135,9 @@ namespace hpx { namespace lcos
 #define HPX_LCOS_BROADCAST_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -148,7 +150,6 @@ namespace hpx { namespace lcos
 #include <hpx/util/calculate_fanout.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 

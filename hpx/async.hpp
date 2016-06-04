@@ -7,16 +7,17 @@
 #define HPX_ASYNC_APR_16_20012_0225PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>

@@ -17,7 +17,6 @@
 
 namespace hpx { namespace traits
 {
-    ///////////////////////////////////////////////////////////////////////////
     struct general_pointer_tag {};
 
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
@@ -35,6 +34,7 @@ namespace hpx { namespace traits
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     namespace detail
     {
+
         template <typename Source, typename Dest>
         struct pointer_category
         {

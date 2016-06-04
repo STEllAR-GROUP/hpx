@@ -7,7 +7,7 @@
 #define HPX_TRAITS_ACTION_SUPPORTS_MIGRATION_FEB_10_2016_1252PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/traits/wrap_int.hpp>
 
 #include <type_traits>
 #include <utility>

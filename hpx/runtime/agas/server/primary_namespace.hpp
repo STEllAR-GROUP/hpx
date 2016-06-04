@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/traits/action_message_handler.hpp>
+#include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>

@@ -6,6 +6,8 @@
 #if !defined(HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM)
 #define HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM
 
+#include <hpx/traits/wrap_int.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>

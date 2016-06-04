@@ -7,12 +7,12 @@
 #define HPX_MIGRATE_FROM_STORAGE_SERVER_FEB_09_2015_0330PM
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/migrate_component.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
