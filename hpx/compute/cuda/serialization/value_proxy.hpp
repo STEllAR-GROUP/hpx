@@ -10,8 +10,8 @@
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__) && !defined(__CUDA_ARCH__)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 namespace hpx { namespace serialization
 {
