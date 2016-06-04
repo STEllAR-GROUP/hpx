@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/traits/wrap_int.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <utility>

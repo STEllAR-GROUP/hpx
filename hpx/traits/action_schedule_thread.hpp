@@ -9,7 +9,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/traits/wrap_int.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
 
 namespace hpx { namespace traits
 {
