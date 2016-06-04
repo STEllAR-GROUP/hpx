@@ -56,36 +56,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct calculate_next
     {
         template <typename T, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static T call(T t1, Stride offset)
         {
             return T(t1 + offset);
         }
 
         template <typename T, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         T call(T t, std::size_t max_count, Stride& offset, std::true_type)
         {
             if (is_negative(offset))
             {
                 offset = Stride(negate(
-                        (std::min)(max_count, std::size_t(negate(offset)))
+                        // NVCC seems to have a bug with std::min...
+                        max_count < std::size_t(negate(offset)) ?
+                            max_count : negate(offset)
                     ));
                 return T(t + offset);
             }
 
-            offset = Stride((std::min)(max_count, std::size_t(offset)));
+            // NVCC seems to have a bug with std::min...
+            offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
             return T(t + offset);
         }
 
         template <typename T, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         T call(T t, std::size_t max_count, Stride& offset, std::false_type)
         {
-            offset = (std::min)(max_count, offset);
+            // NVCC seems to have a bug with std::min...
+            offset = max_count < offset ? max_count : offset;
             return T(t + offset);
         }
 
         template <typename T, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         T call(T t, std::size_t max_count, Stride& offset)
         {
@@ -102,6 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         >::type>
     {
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static Iter call(Iter iter, Stride offset)
         {
             std::advance(iter, offset);
@@ -109,6 +118,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
 
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         Iter call(Iter iter, std::size_t max_count, Stride& offset)
         {
@@ -116,7 +126,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             // negative offsets
             HPX_ASSERT(!std::is_signed<Stride>::value || !is_negative(offset));
 
-            Stride count = Stride((std::min)(max_count, std::size_t(offset)));
+            // NVCC seems to have a bug with std::min...
+            Stride count =
+                Stride(max_count < std::size_t(offset) ? max_count : offset);
 
             // advance through the end or max number of elements
             for (/**/; count != 0; (void)++iter, --count)
@@ -134,6 +146,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         >::type>
     {
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static Iter call(Iter iter, Stride offset)
         {
             std::advance(iter, offset);
@@ -141,19 +154,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
 
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         Iter call(Iter iter, std::size_t max_count, Stride& offset, std::true_type)
         {
             // advance through the end or max number of elements
             if (!is_negative(offset))
             {
-                offset = Stride((std::min)(max_count, std::size_t(offset)));
+                // NVCC seems to have a bug with std::min...
+                offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
                 std::advance(iter, offset);
             }
             else
             {
                 offset = negate(Stride(
-                        (std::min)(max_count, std::size_t(negate(offset)))
+                        // NVCC seems to have a bug with std::min...
+                        max_count < negate(offset) ? max_count : negate(offset)
                     ));
                 std::advance(iter, offset);
             }
@@ -161,16 +177,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
 
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         Iter call(Iter iter, std::size_t max_count, Stride& offset, std::false_type)
         {
             // advance through the end or max number of elements
-            offset = Stride((std::min)(max_count, std::size_t(offset)));
+            // NVCC seems to have a bug with std::min...
+            offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
             std::advance(iter, offset);
             return iter;
         }
 
         template <typename Iter, typename Stride>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE static
         Iter call(Iter iter, std::size_t max_count, Stride& offset)
         {
@@ -180,6 +199,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     template <typename Iterable>
+    HPX_HOST_DEVICE
     HPX_FORCEINLINE Iterable next(Iterable iter, std::size_t offset)
     {
         return calculate_next<
@@ -188,6 +208,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     }
 
     template <typename Iterable, typename Stride>
+    HPX_HOST_DEVICE
     HPX_FORCEINLINE
     Iterable next(Iterable iter, std::size_t max_count, Stride& offset)
     {
@@ -222,7 +243,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     {
         T operator()(T const& t1, T const& t2) const
         {
-            return (std::min)(t1, t2);
+            // NVCC seems to have a bug with std::min...
+            return t1 < t2 ? t1 : t2;
         }
     };
 

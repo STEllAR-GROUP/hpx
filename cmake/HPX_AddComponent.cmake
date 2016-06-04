@@ -131,8 +131,13 @@ macro(add_hpx_component name)
     endif()
   endif()
 
-  add_library(${name}_component ${${name}_lib_linktype} ${exclude_from_all}
-    ${${name}_SOURCES} ${${name}_HEADERS})
+  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
+    cuda_add_library(${name}_component ${${name}_lib_linktype} ${exclude_from_all}
+      ${${name}_SOURCES} ${${name}_HEADERS})
+  else()
+    add_library(${name}_component ${${name}_lib_linktype} ${exclude_from_all}
+      ${${name}_SOURCES} ${${name}_HEADERS})
+  endif()
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)

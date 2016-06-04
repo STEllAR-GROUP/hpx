@@ -22,14 +22,22 @@ namespace hpx { namespace traits
         template <typename T>
         struct is_iterator
         {
+#if defined(HPX_MSVC) && defined(__NVCC__)
+            template <typename U>
+            static typename U::iterator_category * test(U); // iterator
+
+            template <typename U>
+            static void * test(U *); // pointer
+#else
             template <typename U, typename =
                 typename std::iterator_traits<U>::pointer>
-            static char test(U&&);
+            static void* test(U&&);
+#endif
 
-            static long test(...);
+            static char test(...);
 
             static bool const value =
-                sizeof(test(std::declval<T>())) == sizeof(char);
+                sizeof(test(std::declval<T>())) == sizeof(void*);
         };
     }
 

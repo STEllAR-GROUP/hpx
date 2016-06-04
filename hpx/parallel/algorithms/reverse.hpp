@@ -19,6 +19,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -69,7 +70,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             using hpx::util::get;
                             std::swap(get<0>(t), get<1>(t));
-                        }),
+                        },
+                        util::projection_identity()),
                     [last](zip_iterator const&) -> BidirIter
                     {
                         return last;

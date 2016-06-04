@@ -23,13 +23,13 @@ struct registration_wrapper
         // each external OS-thread intended to invoke HPX functionality.
         // Calling this function more than once will silently fail (will
         // return false).
-        rt_->register_thread(name);
+        hpx::register_thread(rt_, name);
     }
     ~registration_wrapper()
     {
         // Unregister the thread from HPX, this should be done once in the
         // end before the external thread exists.
-        rt_->unregister_thread();
+        hpx::unregister_thread(rt_);
     }
 
     hpx::runtime* rt_;

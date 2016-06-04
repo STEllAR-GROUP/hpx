@@ -279,7 +279,7 @@ namespace hpx
         ///          succeeded or not.
         ///
         virtual bool register_thread(char const* name, std::size_t num = 0,
-            bool service_thread = true) = 0;
+            bool service_thread = true, error_code& ec = throws) = 0;
 
         /// \brief Unregister an external OS-thread with HPX
         ///

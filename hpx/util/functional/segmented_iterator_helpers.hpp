@@ -25,7 +25,7 @@ namespace hpx { namespace util { namespace functional
             type operator()(Iter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::segment(iter);
-            };
+            }
         };
     };
 
@@ -42,7 +42,7 @@ namespace hpx { namespace util { namespace functional
             type operator()(Iter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::local(iter);
-            };
+            }
         };
     };
 
@@ -59,7 +59,7 @@ namespace hpx { namespace util { namespace functional
             type operator()(SegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::begin(iter);
-            };
+            }
         };
     };
 
@@ -76,7 +76,7 @@ namespace hpx { namespace util { namespace functional
             type operator()(SegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::end(iter);
-            };
+            }
         };
     };
 
@@ -93,7 +93,7 @@ namespace hpx { namespace util { namespace functional
             type operator()(LocalSegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::begin(iter);
-            };
+            }
         };
     };
 
@@ -110,7 +110,7 @@ namespace hpx { namespace util { namespace functional
             type operator()(LocalSegIter iter) const
             {
                 return traits::segmented_iterator_traits<Iterator>::end(iter);
-            };
+            }
         };
     };
 }}}

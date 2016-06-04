@@ -77,12 +77,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     // add the newly created workitems to the list
                     inititems.reserve(inititems.size() + workitems.size());
@@ -171,11 +172,12 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        bind(invoke_fused(), _2, _1),
+                        std::move(shape), std::forward<F1>(f1));
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
@@ -232,12 +234,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -305,12 +308,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -399,11 +403,12 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        bind(invoke_fused(), _2, _1),
+                        std::move(shape), std::forward<F1>(f1));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
@@ -464,12 +469,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));

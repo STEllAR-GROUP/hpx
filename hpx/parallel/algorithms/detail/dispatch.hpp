@@ -77,12 +77,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename... Args>
+        HPX_HOST_DEVICE
         typename parallel::util::detail::algorithm_result<
             ExPolicy, local_result_type
         >::type
         operator()(ExPolicy && policy, Args&&... args) const
         {
+#if !defined(__CUDA_ARCH__)
             try {
+#endif
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -97,11 +100,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         Derived::sequential(std::forward<ExPolicy>(policy),
                             std::forward<Args>(args)...)
                     );
+#if !defined(__CUDA_ARCH__)
             }
             catch(...) {
                 // this does not return
                 return detail::handle_exception<ExPolicy, local_result_type>::call();
             }
+#endif
         }
 
         ///////////////////////////////////////////////////////////////////////

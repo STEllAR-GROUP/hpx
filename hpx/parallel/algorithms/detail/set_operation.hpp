@@ -180,6 +180,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                             std::copy(buffer.get() + chunk->start,
                                 buffer.get() + chunk->start + chunk->len,
                                 dest + chunk->start_index);
+                        },
+                        [](set_chunk_data* last) -> set_chunk_data*
+                        {
+                            return last;
                         });
 
                 return dest;

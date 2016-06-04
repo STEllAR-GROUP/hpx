@@ -26,7 +26,10 @@ namespace hpx
         class HPX_API_EXPORT base_lco;
 
         template <typename Result, typename RemoteResult = Result>
-        class base_lco_with_value;
+        class HPX_SINGLE_INHERITANCE base_lco_with_value;
+
+        template <>
+        class HPX_SINGLE_INHERITANCE base_lco_with_value<void, void>;
 
         template <typename Result,
             typename RemoteResult =

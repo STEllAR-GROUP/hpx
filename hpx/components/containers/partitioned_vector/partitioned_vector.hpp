@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,7 @@
 #include <hpx/util/bind.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 
@@ -139,17 +140,17 @@ namespace hpx
     ///             is a complete type and meets the requirements of Erasable,
     ///             but many member functions impose stricter requirements.
     ///
-    template <typename T>
+    template <typename T, typename Data = std::vector<T> >
     class partitioned_vector
-      : public hpx::components::client_base<partitioned_vector<T>,
+      : public hpx::components::client_base<partitioned_vector<T, Data>,
             hpx::components::server::distributed_metadata_base<
                 server::partitioned_vector_config_data> >
     {
     public:
-        typedef std::allocator<T> allocator_type;
+        typedef typename Data::allocator_type allocator_type;
 
-        typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
+        typedef typename Data::size_type size_type;
+        typedef typename Data::difference_type difference_type;
 
         typedef T value_type;
         typedef T reference;
@@ -171,9 +172,9 @@ namespace hpx
                     server::partitioned_vector_config_data>
             > base_type;
 
-        typedef hpx::server::partitioned_vector<T>
+        typedef hpx::server::partitioned_vector<T, Data>
             partitioned_vector_partition_server;
-        typedef hpx::partitioned_vector_partition<T>
+        typedef hpx::partitioned_vector_partition<T, Data>
             partitioned_vector_partition_client;
 
         struct partition_data
@@ -208,36 +209,36 @@ namespace hpx
         partitions_vector_type partitions_;
 
     public:
-        typedef vector_iterator<T> iterator;
-        typedef const_vector_iterator<T> const_iterator;
+        typedef vector_iterator<T, Data> iterator;
+        typedef const_vector_iterator<T, Data> const_iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-        typedef local_vector_iterator<T> local_iterator;
-        typedef const_local_vector_iterator<T> const_local_iterator;
+        typedef local_vector_iterator<T, Data> local_iterator;
+        typedef const_local_vector_iterator<T, Data> const_local_iterator;
 
         typedef segment_vector_iterator<
-                T, typename partitions_vector_type::iterator
+                T, Data, typename partitions_vector_type::iterator
             > segment_iterator;
         typedef const_segment_vector_iterator<
-                T, typename partitions_vector_type::const_iterator
+                T, Data, typename partitions_vector_type::const_iterator
             > const_segment_iterator;
 
         typedef local_segment_vector_iterator<
-                T, typename partitions_vector_type::iterator
+                T, Data, typename partitions_vector_type::iterator
             > local_segment_iterator;
         typedef local_segment_vector_iterator<
-                T, typename partitions_vector_type::const_iterator
+                T, Data, typename partitions_vector_type::const_iterator
             > const_local_segment_iterator;
 
     private:
-        friend class vector_iterator<T>;
-        friend class const_vector_iterator<T>;
+        friend class vector_iterator<T, Data>;
+        friend class const_vector_iterator<T, Data>;
 
         friend class segment_vector_iterator<
-            T, typename partitions_vector_type::iterator>;
+            T, Data, typename partitions_vector_type::iterator>;
         friend class const_segment_vector_iterator<
-            T, typename partitions_vector_type::const_iterator>;
+            T, Data, typename partitions_vector_type::const_iterator>;
 
         std::size_t get_partition_size() const
         {
@@ -607,7 +608,8 @@ namespace hpx
             using util::placeholders::_2;
             using util::placeholders::_3;
 
-            create(policy, util::bind(&partitioned_vector::create_helper2<DistPolicy>,
+            create(policy, util::bind(
+                &partitioned_vector::create_helper2<DistPolicy>,
                 _1, _2, _3, std::ref(val)));
         }
 
@@ -768,9 +770,9 @@ namespace hpx
         ///         A (possibly remote) access operation is performed only once
         ///         this proxy instance is used.
         ///
-        detail::vector_value_proxy<T> operator[](size_type pos)
+        detail::vector_value_proxy<T, Data> operator[](size_type pos)
         {
-            return detail::vector_value_proxy<T>(*this, pos);
+            return detail::vector_value_proxy<T, Data>(*this, pos);
         }
 
         /// \brief Array subscript operator. This does not throw any exception.
@@ -958,12 +960,13 @@ namespace hpx
             size_type part_cur = get_partition(pos_vec[0]);
 
             // iterator to the begin of current block
-            std::vector<size_type>::const_iterator part_begin = pos_vec.begin();
+            typename std::vector<size_type>::const_iterator part_begin =
+                pos_vec.begin();
 
             // vector holding futures of the values for all blocks
             std::vector<future<std::vector<T> > > part_values_future;
-            for (std::vector<size_type>::const_iterator it = pos_vec.begin();
-                 it != pos_vec.end(); ++it)
+            for (typename std::vector<size_type>::const_iterator it =
+                    pos_vec.begin(); it != pos_vec.end(); ++it)
             {
                 // get the partition of the current position
                 size_type part = get_partition(*it);
@@ -1306,14 +1309,15 @@ namespace hpx
             size_type part_cur = get_partition(pos[0]);
 
             // iterator to the begin of current block
-            std::vector<size_type>::const_iterator pos_block_begin = pos.begin();
+            typename std::vector<size_type>::const_iterator pos_block_begin =
+                pos.begin();
             typename std::vector<T>::const_iterator val_block_begin = val.begin();
 
             // vector holding futures of the state for all blocks
             std::vector<future<void> > part_futures;
 
             // going through the position vector
-            std::vector<size_type>::const_iterator pos_it = pos.begin();
+            typename std::vector<size_type>::const_iterator pos_it = pos.begin();
             typename std::vector<T>::const_iterator val_it = val.begin();
             for (/**/; pos_it != pos.end(); ++pos_it, ++val_it)
             {
