@@ -7,8 +7,8 @@
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FWD_APR_15_2015_0830AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_continuation.hpp>
 
 namespace hpx { namespace detail

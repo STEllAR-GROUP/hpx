@@ -7,20 +7,20 @@
 #define HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/plugins/unique_plugin_name.hpp>
 
-#include <hpx/util/ini.hpp>
-#include <hpx/util/find_prefix.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/find_prefix.hpp>
+#include <hpx/util/ini.hpp>
 
 #include <hpx/traits/plugin_config_data.hpp>
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
 #include <string>
 #include <vector>

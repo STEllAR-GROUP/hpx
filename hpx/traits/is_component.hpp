@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace traits
 {

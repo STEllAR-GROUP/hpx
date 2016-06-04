@@ -9,18 +9,18 @@
 #define HPX_PARALLEL_DETAIL_ROTATE_AUG_05_2014_0138PM
 
 #include <hpx/config.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/unwrapped.hpp>
 #include <hpx/util/tagged_pair.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/util/unwrapped.hpp>
 
+#include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/reverse.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 

@@ -9,20 +9,20 @@
 #define HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
 #include <cstdlib>
+#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <sstream>
 
 #include <hpx/config/warnings_prefix.hpp>
 

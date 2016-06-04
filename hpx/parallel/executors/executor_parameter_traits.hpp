@@ -9,17 +9,17 @@
 #define HPX_PARALLEL_EXECUTOR_PARAMETER_TRAITS_JUL_30_2015_0914PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_executor_parameters.hpp>
-#include <hpx/traits/wrap_int.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/traits/is_executor_parameters.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <cstdarg>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <cstdarg>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {

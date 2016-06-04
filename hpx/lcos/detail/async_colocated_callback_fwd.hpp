@@ -6,9 +6,9 @@
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_CALLBACK_FWD_MAR_30_2015_1145PM)
 #define HPX_LCOS_ASYNC_COLOCATED_CALLBACK_FWD_MAR_30_2015_1145PM
 
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/lcos/detail/async_colocated_fwd.hpp>
 
 namespace hpx { namespace detail
 {

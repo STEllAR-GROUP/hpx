@@ -12,11 +12,11 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/void_guard.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>

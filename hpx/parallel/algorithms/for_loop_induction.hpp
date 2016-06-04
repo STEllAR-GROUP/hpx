@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <cstdlib>
 #include <type_traits>

@@ -9,14 +9,14 @@
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy_fwd.hpp>
+#include <hpx/parallel/executors.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors.hpp>
-#include <hpx/parallel/execution_policy_fwd.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <memory>
 #include <type_traits>

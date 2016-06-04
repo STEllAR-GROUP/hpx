@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/util_fwd.hpp>
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 

@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <cstddef>

@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/agas/gva.hpp>
@@ -22,6 +21,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <cstdint>
 #include <map>

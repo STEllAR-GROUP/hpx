@@ -8,12 +8,6 @@
 #define HPX_APPLIER_APPLY_NOV_27_2008_0957AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_valid_action.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
@@ -27,6 +21,12 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/traits/component_type_is_compatible.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_valid_action.hpp>
 
 #include <type_traits>
 #include <utility>

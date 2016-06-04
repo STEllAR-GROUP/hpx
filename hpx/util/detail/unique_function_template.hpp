@@ -9,12 +9,12 @@
 #define HPX_UTIL_DETAIL_UNIQUE_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/get_function_address.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -15,16 +15,16 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>

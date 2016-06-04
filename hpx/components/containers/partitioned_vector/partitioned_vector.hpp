@@ -10,8 +10,6 @@
 #define HPX_PARTITIONED_VECTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -19,12 +17,14 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 
 #include <boost/cstdint.hpp>
 

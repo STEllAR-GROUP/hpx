@@ -14,8 +14,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/throw_exception.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <string>
 

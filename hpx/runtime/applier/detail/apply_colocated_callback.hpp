@@ -8,16 +8,16 @@
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_MAR_09_2014_1213PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/action_priority.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/runtime/applier/apply_continue_callback.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/runtime/applier/register_apply_colocated.hpp>
-#include <hpx/util/functional/colocated_helpers.hpp>
+#include <hpx/traits/action_priority.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/functional/colocated_helpers.hpp>
 
 namespace hpx { namespace detail
 {

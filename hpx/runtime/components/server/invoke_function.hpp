@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/result_of.hpp>
 
 namespace hpx { namespace components { namespace server
 {

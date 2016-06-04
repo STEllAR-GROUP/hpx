@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 
-#include <iterator>
 #include <algorithm>
+#include <iterator>
 
 namespace hpx { namespace parallel { namespace util
 {

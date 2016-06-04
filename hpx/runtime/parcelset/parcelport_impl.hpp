@@ -12,16 +12,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/encode_parcels.hpp>
-#include <hpx/runtime/parcelset/detail/call_for_each.hpp>
-#include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/serialization/detail/future_await_container.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/parcelset/detail/call_for_each.hpp>
+#include <hpx/runtime/parcelset/encode_parcels.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/serialization/detail/future_await_container.hpp>
+#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 

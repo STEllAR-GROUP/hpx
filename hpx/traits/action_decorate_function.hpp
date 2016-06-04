@@ -6,9 +6,9 @@
 #if !defined(HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM)
 #define HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM
 
-#include <hpx/traits/wrap_int.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/traits/wrap_int.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <utility>

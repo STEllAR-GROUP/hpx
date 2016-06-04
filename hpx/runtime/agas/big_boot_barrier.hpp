@@ -11,18 +11,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/connection_cache.hpp>
-#include <boost/lockfree/queue.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/util/connection_cache.hpp>
+#include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
+#include <boost/lockfree/queue.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <string>
 

@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/util/interval_timer.hpp>
 
 #include <boost/cstdint.hpp>
 

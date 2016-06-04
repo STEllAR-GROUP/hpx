@@ -12,12 +12,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/is_chunk_allocator.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
 

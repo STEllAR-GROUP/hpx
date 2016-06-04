@@ -9,24 +9,24 @@
 #define HPX_PARALLEL_ALGORITHM_SORT_OCT_2015
 
 #include <hpx/config.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/util/invoke.hpp>
 
-#include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/traits/projected.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
-#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/parallel/traits/projected.hpp>
 
 #include <boost/exception_ptr.hpp>
 

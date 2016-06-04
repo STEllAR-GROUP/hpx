@@ -7,16 +7,16 @@
 #define HPX_BASE_LCO_FACTORY_OCT_10_2013_1118AM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>

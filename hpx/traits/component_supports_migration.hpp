@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/wrap_int.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits
 {

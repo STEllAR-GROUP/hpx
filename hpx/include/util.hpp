@@ -11,16 +11,16 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/interval_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/zip_iterator.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
-#include <hpx/util/interval_timer.hpp>
 
 #endif
 

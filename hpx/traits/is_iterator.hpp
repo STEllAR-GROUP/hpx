@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {

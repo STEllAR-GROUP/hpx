@@ -9,11 +9,11 @@
 #define HPX_RUNTIME_COMPONENTS_COPY_COMPONENT_SEP_20_2013_0828PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/copy_component.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/async.hpp>
 #include <hpx/traits/is_component.hpp>
 
 #include <boost/utility/enable_if.hpp>

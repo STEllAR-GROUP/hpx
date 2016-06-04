@@ -17,8 +17,8 @@
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
+#include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <boost/range/functions.hpp>

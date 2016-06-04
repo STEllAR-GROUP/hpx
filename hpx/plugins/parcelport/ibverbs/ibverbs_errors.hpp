@@ -11,9 +11,9 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <boost/system/system_error.hpp>
-#include <boost/asio/error.hpp>
 #include <boost/asio/detail/throw_error.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/system/system_error.hpp>
 
 #include <string>
 

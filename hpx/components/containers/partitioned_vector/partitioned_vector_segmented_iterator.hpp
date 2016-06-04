@@ -14,16 +14,16 @@
  // http://afstern.org/matt/segmented.pdf.
 
 #include <hpx/config.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
 #include <boost/integer.hpp>
-#include <boost/iterator/iterator_facade.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 
 #include <cstdint>
 #include <iterator>

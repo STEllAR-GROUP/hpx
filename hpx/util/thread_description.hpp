@@ -7,10 +7,10 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_DESCRIPTION_FEB_19_2016_0200PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/get_function_address.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/is_action.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <iosfwd>

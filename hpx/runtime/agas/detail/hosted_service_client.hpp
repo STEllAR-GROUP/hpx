@@ -7,8 +7,8 @@
 #if !defined(HPX_AGAS_CLIENT_HOSTED_FEB_05_2016_114AM)
 #define HPX_AGAS_CLIENT_HOSTED_FEB_05_2016_114AM
 
-#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
+#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>

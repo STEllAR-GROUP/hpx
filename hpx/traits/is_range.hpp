@@ -6,8 +6,8 @@
 #ifndef HPX_TRAITS_IS_RANGE_HPP
 #define HPX_TRAITS_IS_RANGE_HPP
 
-#include <hpx/util/always_void.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/util/always_void.hpp>
 
 #include <boost/mpl/and.hpp>
 

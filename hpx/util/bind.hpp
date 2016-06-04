@@ -8,17 +8,17 @@
 #define HPX_UTIL_BIND_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/type_traits/integral_constant.hpp>
 

@@ -13,34 +13,34 @@
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/traits/action_capability_provider.hpp>
 #endif
-#include <hpx/traits/action_does_termination_detection.hpp>
-#include <hpx/traits/is_component.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/plugins/plugin_factory_base.hpp>
-#include <hpx/util_fwd.hpp>
-#include <hpx/util/one_size_heap_list_base.hpp>
-#include <hpx/util/plugin.hpp>
+#include <hpx/traits/action_does_termination_detection.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
+#include <hpx/util/plugin.hpp>
 #include <hpx/util/unlock_guard.hpp>
+#include <hpx/util_fwd.hpp>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/program_options/options_description.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <list>
 #include <map>
@@ -48,8 +48,8 @@
 #include <mutex>
 #include <set>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

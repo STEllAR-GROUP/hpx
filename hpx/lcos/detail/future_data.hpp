@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
@@ -26,8 +26,8 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/math/common_factor_ct.hpp>
-#include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/max.hpp>
+#include <boost/mpl/sizeof.hpp>
 #include <boost/type_traits/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 

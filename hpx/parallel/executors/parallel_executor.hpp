@@ -9,14 +9,14 @@
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/auto_chunk_size.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/executors/auto_chunk_size.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/traits/is_executor.hpp>
+#include <hpx/util/deferred_call.hpp>
 
 #include <type_traits>
 #include <utility>

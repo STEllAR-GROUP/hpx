@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace traits
 {

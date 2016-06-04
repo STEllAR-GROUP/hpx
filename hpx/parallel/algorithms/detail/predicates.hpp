@@ -10,11 +10,11 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
 #include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail

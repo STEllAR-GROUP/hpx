@@ -7,8 +7,8 @@
 #define HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0226PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 
 #include <boost/exception_ptr.hpp>
 

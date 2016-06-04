@@ -13,17 +13,17 @@
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
-#include <numeric>
 #include <iterator>
+#include <numeric>
 #include <type_traits>
 #include <vector>
 

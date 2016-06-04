@@ -7,16 +7,16 @@
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FEB_04_2014_0755PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/register_apply_colocated.hpp>
-#include <hpx/util/functional/colocated_helpers.hpp>
+#include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/functional/colocated_helpers.hpp>
 
 namespace hpx { namespace detail
 {

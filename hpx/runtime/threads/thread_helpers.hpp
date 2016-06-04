@@ -14,9 +14,9 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/chrono/chrono.hpp>
 

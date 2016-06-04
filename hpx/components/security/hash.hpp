@@ -10,8 +10,8 @@
 
 #if defined(HPX_HAVE_SECURITY)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>

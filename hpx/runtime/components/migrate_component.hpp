@@ -9,15 +9,15 @@
 #define HPX_RUNTIME_COMPONENTS_COPY_MIGRATE_COMPONENT_JAN_31_2014_1009AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_component.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/targeting_distribution_policy.hpp>
-#include <hpx/runtime/components/server/migrate_component.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/server/migrate_component.hpp>
+#include <hpx/runtime/components/targeting_distribution_policy.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/traits/is_component.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 
 #include <boost/utility/enable_if.hpp>
 

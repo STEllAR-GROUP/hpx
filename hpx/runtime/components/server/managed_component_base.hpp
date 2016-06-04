@@ -14,25 +14,25 @@
 #include <hpx/util/reinitializable_static.hpp>
 #endif
 
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component_fwd.hpp>
+#include <hpx/runtime/components/server/wrapper_heap.hpp>
+#include <hpx/runtime/components/server/wrapper_heap_list.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
-#include <hpx/runtime/components_fwd.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/wrapper_heap.hpp>
-#include <hpx/runtime/components/server/wrapper_heap_list.hpp>
-#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/throw_exception.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/throw_exception.hpp>
+#include <boost/type_traits/is_same.hpp>
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

@@ -7,11 +7,11 @@
 #define HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/lcos/future.hpp>
 
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>

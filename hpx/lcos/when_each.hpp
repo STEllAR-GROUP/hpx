@@ -127,19 +127,19 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/when_some.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/lcos/when_some.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>

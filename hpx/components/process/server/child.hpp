@@ -7,17 +7,17 @@
 #define HPX_PROCESS_SERVER_CHILD_MAR_11_2016_0646PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 
 #include <type_traits>
 
 #include <boost/cstdint.hpp>
 
+#include <hpx/components/process/export_definitions.hpp>
 #include <hpx/components/process/util/child.hpp>
 #include <hpx/components/process/util/execute.hpp>
-#include <hpx/components/process/export_definitions.hpp>
 
 namespace hpx { namespace components { namespace process { namespace server
 {

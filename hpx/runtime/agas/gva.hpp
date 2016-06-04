@@ -10,12 +10,12 @@
 #define HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/throw_exception.hpp>
 
-#include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/io/ios_state.hpp>
 
 namespace hpx { namespace agas
 {

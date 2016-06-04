@@ -12,10 +12,10 @@
 #if defined(HPX_HAVE_PARCEL_COALESCING) && !defined(HPX_PARCEL_COALESCING_MODULE_EXPORTS)
 
 #include <hpx/error_code.hpp>
-#include <hpx/traits/action_message_handler.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/traits/action_message_handler.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>

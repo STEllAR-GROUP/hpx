@@ -7,12 +7,12 @@
 #define HPX_TRAITS_ACTION_WAS_OBJECT_MIGRATED_JAN_22_2016_1115AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/wrap_int.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/traits/wrap_int.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits
 {

@@ -7,9 +7,9 @@
 #define HPX_PROCESS_CHILD_MAR_11_2016_0646PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 #include <hpx/components/process/server/child.hpp>
 

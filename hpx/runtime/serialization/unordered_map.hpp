@@ -9,14 +9,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/map.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
 
 #include <unordered_map>
 
 #include <boost/mpl/and.hpp>
-#include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/add_reference.hpp>
+#include <boost/type_traits/remove_const.hpp>
 
 namespace hpx
 {

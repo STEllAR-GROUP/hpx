@@ -7,14 +7,14 @@
 #define HPX_LCOS_LOCAL_FUTURES_FACTORY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 

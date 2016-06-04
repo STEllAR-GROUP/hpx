@@ -7,16 +7,16 @@
 #define HPX_RUNTIME_THREADS_DETAIL_SCHEDULING_LOOP_JAN_11_2013_0838PM
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/util/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/atomic.hpp>
