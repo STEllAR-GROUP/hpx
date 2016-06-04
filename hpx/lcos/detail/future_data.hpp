@@ -355,6 +355,15 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
+            // We need to run the completion asynchronously if we aren't on a
+            // HPX thread
+            if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+            {
+                HPX_THROW_EXCEPTION(null_thread_id,
+                        "future_data::handle_on_completed",
+                        "NULL thread id encountered");
+            }
+
 #if defined(HPX_WINDOWS)
             bool recurse_asynchronously = false;
 #elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)

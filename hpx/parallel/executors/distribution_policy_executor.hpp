@@ -41,13 +41,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Action, typename ... Ts>
         struct distribution_policy_execute_result_impl<Action, true, Ts...>
         {
-            typedef typename util::decay<Action>::type::local_result_type type;
+            typedef typename hpx::util::decay<Action>::type::local_result_type
+                type;
         };
 
         template <typename F, typename ... Ts>
         struct distribution_policy_execute_result
           : distribution_policy_execute_result_impl<F,
-                hpx::traits::is_action<typename util::decay<F>::type>::value,
+                hpx::traits::is_action<typename hpx::util::decay<F>::type>::value,
                 Ts...>
         {};
     }
