@@ -69,8 +69,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         });
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename T>
+        inline typename util::detail::algorithm_result<
+            ExPolicy, void
+        >::type
+        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+            std::false_type)
+        {
+            typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+            return detail::fill().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, value);
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename T>
+        inline typename util::detail::algorithm_result<
+            ExPolicy, void
+        >::type
+        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+            std::true_type);
+
         /// \endcond
     }
+
 
     /// Assigns the given value to the elements in the range [first, last).
     ///
@@ -123,53 +147,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return fill_(
+        return detail::fill_(
             std::forward<ExPolicy>(policy), first, last, value,
                 is_segmented()
             );
-
-        //return detail::fill().call(
-        //    std::forward<ExPolicy>(policy), is_seq(),
-        //    first, last, value);
     }
 
-    // parallel version
-    template <typename ExPolicy, typename InIter, typename T>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, void>::type
-    >::type
-    fill_(ExPolicy && policy, InIter first, InIter last, T value,
-        std::false_type)
-    {
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
-
-        return detail::fill().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, value);
-    }
-
-    // segmented version
-    template <typename ExPolicy, typename InIter, typename T>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, void>::type
-    >::type
-    fill_(ExPolicy && policy, InIter first, InIter last, T value,
-        std::true_type);
-   /* {
-        typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
-
-        if (first == last)
-        {
-            return util::detail::algorithm_result<ExPolicy, void>::get();
-        }
-
-        return segmented_fill(
-            detail::fill(), std::forward<ExPolicy>(policy), first, last, value, is_seq()
-        );
-    }
-*/
 
     ///////////////////////////////////////////////////////////////////////////
     // fill_n

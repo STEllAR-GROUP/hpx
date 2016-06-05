@@ -14,6 +14,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
+
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter, typename T>
         inline typename std::enable_if<
@@ -146,48 +147,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         algo, policy, forced_seq(), beg, end, value));
                 }
             }
+            return result::get(
+                dataflow(
+                    [=](std::vector<shared_future<void>> && r)
+                    {
+                        // handle any remote exceptions, will throw on error
+                        std::list<boost::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
 
-            hpx::util::unwrapped(segments);
-            return result::get();
-
+                        hpx::util::unwrapped(r);
+                        return;
+                    },
+                    std::move(segments)));
         }
 
-
-
-
-        /// \endcond
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    // segmented implementation
-    template <typename ExPolicy, typename InIter, typename T>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, void>::type
-    >::type
-    fill_(ExPolicy && policy, InIter first, InIter last, T value,
-        std::true_type)
-    {
-        typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
-
-        if (first == last)
+        ///////////////////////////////////////////////////////////////////////
+        // segmented implementation
+        template <typename ExPolicy, typename InIter, typename T>
+        inline typename util::detail::algorithm_result<
+            ExPolicy, void
+        >::type
+        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+            std::true_type)
         {
-            return util::detail::algorithm_result<ExPolicy, void>::get();
+            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+
+            if (first == last)
+            {
+                return util::detail::algorithm_result<ExPolicy, void>::get();
+            }
+
+            return segmented_fill(
+                fill(), std::forward<ExPolicy>(policy), first, last, value, is_seq()
+            );
         }
 
-        return segmented_fill(
-            detail::fill(), std::forward<ExPolicy>(policy), first, last, value, is_seq()
-        );
-    }
+        // forward declare the non-segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename T>
+        inline typename util::detail::algorithm_result<
+            ExPolicy, void
+        >::type
+        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+            std::false_type);
 
-    // forward declare the non-segmented version of this algorithm
-    template <typename ExPolicy, typename InIter, typename T>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, void>::type
-    >::type
-    fill_(ExPolicy && policy, InIter first, InIter last, T value,
-        std::false_type);
+
+    }
+        /// \endcond
 }}}
 
 #endif
