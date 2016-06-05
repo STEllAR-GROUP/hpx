@@ -145,7 +145,7 @@ namespace hpx { namespace serialization
               , boost::is_enum<T>
             >
         >::type
-        save(T t)
+        save(T t) //-V659
         {
             save_integral(t,
                 typename boost::is_unsigned<T>::type());

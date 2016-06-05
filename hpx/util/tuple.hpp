@@ -151,7 +151,7 @@ namespace hpx { namespace util
 
             static bool const value =
                 sizeof(
-                    call(util::get<Is>(std::declval<UTuple>())...)
+                    call(util::get<Is>(std::declval<UTuple>())...) //-V510
                 ) == sizeof(yes_type);
 
             typedef std::integral_constant<bool, value> type;

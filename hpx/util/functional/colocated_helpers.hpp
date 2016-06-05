@@ -53,10 +53,11 @@ namespace hpx { namespace util { namespace functional
         public:
             typedef typename util::decay<Bound>::type bound_type;
 
-            apply_continuation_impl() {}
+            apply_continuation_impl()
+              : bound_(), cont_() {}
 
             explicit apply_continuation_impl(Bound && bound)
-              : bound_(std::move(bound))
+              : bound_(std::move(bound)), cont_()
             {}
 
             template <typename Continuation>
@@ -154,10 +155,12 @@ namespace hpx { namespace util { namespace functional
         public:
             typedef typename util::decay<Bound>::type bound_type;
 
-            async_continuation_impl() {}
+            async_continuation_impl()
+              : bound_(), cont_()
+            {}
 
             explicit async_continuation_impl(Bound && bound)
-              : bound_(std::move(bound))
+              : bound_(std::move(bound)), cont_()
             {}
 
             template <typename Continuation>

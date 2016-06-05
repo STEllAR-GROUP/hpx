@@ -77,7 +77,7 @@ namespace hpx { namespace agas { namespace detail
             return 0;
         }
 
-        naming::address::address_type get_locality_ns_ptr() const
+        naming::address::address_type get_locality_ns_ptr() const //-V524
         {
             HPX_ASSERT(false);      // shouldn't ever be called
             return 0;
