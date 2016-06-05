@@ -13,6 +13,7 @@
 
 #include <boost/range/functions.hpp>
 
+#include <numeric>
 #include <vector>
 
 #include "test_utils.hpp"

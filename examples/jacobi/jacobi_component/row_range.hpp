@@ -7,8 +7,9 @@
 #ifndef JACOBI_ROW_RANGE_HPP
 #define JACOBI_ROW_RANGE_HPP
 
+#include <hpx/util/atomic_count.hpp>
+
 #include <boost/intrusive_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
 #include <boost/range/iterator.hpp>
 #include <boost/range/mutable_iterator.hpp>
 
@@ -40,7 +41,7 @@ namespace jacobi
         }
 
         std::vector<double> v_;
-        boost::detail::atomic_count count_;
+        hpx::util::atomic_count count_;
 
         friend void intrusive_ptr_add_ref(value_holder * p)
         {

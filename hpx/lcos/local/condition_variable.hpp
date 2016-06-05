@@ -4,19 +4,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_CONDITION_VARIABLE_DEC_4_2013_0130PM)
-#define HPX_LCOS_LOCAL_CONDITION_VARIABLE_DEC_4_2013_0130PM
+#ifndef HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP
+#define HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <mutex>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -222,4 +225,4 @@ namespace hpx { namespace lcos { namespace local
     };
 }}}
 
-#endif
+#endif /*HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP*/

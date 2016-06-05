@@ -20,13 +20,15 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/traits/action_remote_result.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstdint>
 #include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -38,15 +40,15 @@ namespace hpx { namespace actions { namespace detail
     {
         action_serialization_data()
           : parent_locality_(naming::invalid_locality_id)
-          , parent_id_(static_cast<boost::uint64_t>(-1))
+          , parent_id_(static_cast<std::uint64_t>(-1))
           , parent_phase_(0)
           , priority_(static_cast<threads::thread_priority>(0))
           , stacksize_(static_cast<threads::thread_stacksize>(0))
         {}
 
-        action_serialization_data(boost::uint32_t parent_locality,
-                boost::uint64_t parent_id,
-                boost::uint64_t parent_phase,
+        action_serialization_data(std::uint32_t parent_locality,
+                std::uint64_t parent_id,
+                std::uint64_t parent_phase,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize)
           : parent_locality_(parent_locality)
@@ -56,9 +58,9 @@ namespace hpx { namespace actions { namespace detail
           , stacksize_(stacksize)
         {}
 
-        boost::uint32_t parent_locality_;
-        boost::uint64_t parent_id_;
-        boost::uint64_t parent_phase_;
+        std::uint32_t parent_locality_;
+        std::uint64_t parent_id_;
+        std::uint64_t parent_phase_;
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
 
@@ -78,6 +80,41 @@ namespace hpx { namespace traits
             hpx::actions::detail::action_serialization_data>
        : boost::mpl::true_
     {};
+
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        // If an action returns a future, we need to do special things
+        template <>
+        struct action_remote_result_customization_point<void>
+        {
+            typedef util::unused_type type;
+        };
+
+        template <typename Result>
+        struct action_remote_result_customization_point<lcos::future<Result> >
+        {
+            typedef Result type;
+        };
+
+        template <>
+        struct action_remote_result_customization_point<lcos::future<void> >
+        {
+            typedef hpx::util::unused_type type;
+        };
+
+        template <typename Result>
+        struct action_remote_result_customization_point<lcos::shared_future<Result> >
+        {
+            typedef Result type;
+        };
+
+        template <>
+        struct action_remote_result_customization_point<lcos::shared_future<void> >
+        {
+            typedef hpx::util::unused_type type;
+        };
+    }
 }}
 
 /// \endcond
@@ -109,44 +146,6 @@ namespace hpx { namespace actions
             return util::type_id<Action>::typeid_.type_id();
         }
 #endif
-
-        ///////////////////////////////////////////////////////////////////////
-        // If an action returns a future, we need to do special things
-        template <typename Result>
-        struct remote_action_result
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct remote_action_result<void>
-        {
-            typedef util::unused_type type;
-        };
-
-        template <typename Result>
-        struct remote_action_result<lcos::future<Result> >
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct remote_action_result<lcos::future<void> >
-        {
-            typedef hpx::util::unused_type type;
-        };
-
-        template <typename Result>
-        struct remote_action_result<lcos::shared_future<Result> >
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct remote_action_result<lcos::shared_future<void> >
-        {
-            typedef hpx::util::unused_type type;
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -214,13 +213,13 @@ namespace hpx { namespace actions
                 naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread
-        virtual boost::uint32_t get_parent_locality_id() const = 0;
+        virtual std::uint32_t get_parent_locality_id() const = 0;
 
         /// Return the thread id of the parent thread
         virtual threads::thread_id_repr_type get_parent_thread_id() const = 0;
 
         /// Return the thread phase of the parent thread
-        virtual boost::uint64_t get_parent_thread_phase() const = 0;
+        virtual std::uint64_t get_parent_thread_phase() const = 0;
 
         /// Return the thread priority this action has to be executed with
         virtual threads::thread_priority get_thread_priority() const = 0;
@@ -335,5 +334,7 @@ namespace hpx { namespace actions
 }}
 
 HPX_TRAITS_SERIALIZED_WITH_ID(hpx::actions::base_action)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

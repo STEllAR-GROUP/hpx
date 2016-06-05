@@ -5,13 +5,13 @@
 
 /// \file hpx/runtime/get_os_thread_count.hpp
 
-#if !defined(HPX_RUNTIME_GET_OS_THREAD_COUNT_AUG_15_2015_1119AM)
-#define HPX_RUNTIME_GET_OS_THREAD_COUNT_AUG_15_2015_1119AM
+#ifndef HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP
+#define HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
-#include <cstdlib>
+#include <cstddef>
 
 namespace hpx
 {
@@ -33,4 +33,4 @@ namespace hpx
     HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
 }
 
-#endif
+#endif /*HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP*/

@@ -7,8 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-
-#include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>

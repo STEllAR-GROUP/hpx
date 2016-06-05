@@ -3,20 +3,27 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_JUL_16_2015_0740M)
-#define HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_JUL_16_2015_0740M
+#ifndef HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_HPP
+#define HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/chrono/chrono.hpp>
+
+#include <cstddef>
+#include <cstdint>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -62,7 +69,7 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
-            boost::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const;
 
             // Reset internal (round robin) thread distribution scheme
             void reset_thread_distribution();
@@ -109,8 +116,8 @@ namespace hpx { namespace threads { namespace executors
             std::size_t orig_thread_num_;
 
             // collect statistics
-            boost::atomic<boost::uint64_t> tasks_scheduled_;
-            boost::atomic<boost::uint64_t> tasks_completed_;
+            boost::atomic<std::uint64_t> tasks_scheduled_;
+            boost::atomic<std::uint64_t> tasks_completed_;
 
             // resource manager registration
             std::size_t cookie_;
@@ -145,5 +152,4 @@ namespace hpx { namespace threads { namespace executors
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
-
+#endif /*HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_HPP*/

@@ -3,14 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_NAMING_ID_TYPE_IMPL_OCT_13_2013_0758PM)
-#define HPX_NAMING_ID_TYPE_IMPL_OCT_13_2013_0758PM
+#ifndef HPX_RUNTIME_NAMING_ID_TYPE_IMPL_HPP
+#define HPX_RUNTIME_NAMING_ID_TYPE_IMPL_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -19,7 +19,7 @@ namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
-    inline id_type::id_type(boost::uint64_t lsb_id, management_type t)
+    inline id_type::id_type(std::uint64_t lsb_id, management_type t)
         : gid_(new detail::id_type_impl(0, lsb_id,
             static_cast<detail::id_type_management>(t)))
     {}
@@ -32,7 +32,7 @@ namespace hpx { namespace naming
             detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
     }
 
-    inline id_type::id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
+    inline id_type::id_type(std::uint64_t msb_id, std::uint64_t lsb_id,
             management_type t)
         : gid_(new detail::id_type_impl(msb_id, lsb_id,
             static_cast<detail::id_type_management>(t)))
@@ -113,20 +113,20 @@ namespace hpx { namespace naming
     }
 
     // access the internal parts of the gid
-    inline boost::uint64_t id_type::get_msb() const
+    inline std::uint64_t id_type::get_msb() const
     {
         return gid_->get_msb();
     }
-    inline void id_type::set_msb(boost::uint64_t msb)
+    inline void id_type::set_msb(std::uint64_t msb)
     {
         gid_->set_msb(msb);
     }
 
-    inline boost::uint64_t id_type::get_lsb() const
+    inline std::uint64_t id_type::get_lsb() const
     {
         return gid_->get_lsb();
     }
-    inline void id_type::set_lsb(boost::uint64_t lsb)
+    inline void id_type::set_lsb(std::uint64_t lsb)
     {
         gid_->set_lsb(lsb);
     }
@@ -141,5 +141,6 @@ namespace hpx { namespace naming
     }
 }}
 
-#endif
+#include <hpx/config/warnings_suffix.hpp>
 
+#endif /*HPX_RUNTIME_NAMING_ID_TYPE_IMPL_HPP*/

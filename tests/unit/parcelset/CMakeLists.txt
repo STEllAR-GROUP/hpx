@@ -20,6 +20,12 @@ if(HPX_WITH_PARCEL_COALESCING)
   set(put_parcels_with_coalescing_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
+if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB OR HPX_WITH_COMPRESSION_SNAPPY)
+  set(tests ${tests} put_parcels_with_compression)
+  set(put_parcels_with_compression_PARAMETERS LOCALITIES 2)
+  set(put_parcels_with_compression_FLAGS DEPENDENCIES iostreams_component)
+endif()
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

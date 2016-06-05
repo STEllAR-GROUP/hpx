@@ -7,8 +7,8 @@
 #define HPX_LCOS_BARRIER_MAR_10_2010_0307PM
 
 #include <hpx/config.hpp>
-#include <hpx/include/client.hpp>
 #include <hpx/lcos/stubs/barrier.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 #include <boost/exception_ptr.hpp>
 

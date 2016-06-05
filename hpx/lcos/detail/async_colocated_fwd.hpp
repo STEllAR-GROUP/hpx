@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/async_fwd.hpp>
@@ -19,7 +20,7 @@ namespace hpx { namespace detail
     template <typename Action, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::traits::extract_action<Action>::remote_result_type
         >::type>
     async_colocated(naming::id_type const& id, Ts&&... vs);
 
@@ -28,7 +29,7 @@ namespace hpx { namespace detail
         typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
+            typename hpx::traits::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
@@ -42,7 +43,7 @@ namespace hpx { namespace detail
         traits::is_continuation<Continuation>::value,
         lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::traits::extract_action<Action>::remote_result_type
             >::type
         >
     >::type
@@ -57,7 +58,7 @@ namespace hpx { namespace detail
         traits::is_continuation<Continuation>::value,
         lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
+                typename hpx::traits::extract_action<Derived>::remote_result_type
             >::type
         >
     >::type

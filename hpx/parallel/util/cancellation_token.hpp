@@ -11,6 +11,7 @@
 #include <boost/atomic.hpp>
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 
 namespace hpx { namespace parallel { namespace util

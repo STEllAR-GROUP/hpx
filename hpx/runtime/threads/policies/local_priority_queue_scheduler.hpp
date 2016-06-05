@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -78,6 +79,7 @@ namespace hpx { namespace threads { namespace policies
         {
             init_parameter()
               : num_queues_(1),
+                num_high_priority_queues_(1),
                 max_queue_thread_count_(max_thread_count),
                 numa_sensitive_(0),
                 description_("local_priority_queue_scheduler")
@@ -1136,7 +1138,7 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
                               << "  [TM] " //-V128
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";

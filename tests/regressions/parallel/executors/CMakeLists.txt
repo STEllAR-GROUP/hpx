@@ -23,7 +23,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Parallel/Executors")
 
-  add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("parallel" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.regressions.parallel_dir.executors_dir.${test})

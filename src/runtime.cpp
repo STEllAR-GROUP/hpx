@@ -15,12 +15,15 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp> // EXPORTS get_next_id
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -863,6 +866,24 @@ namespace hpx
     naming::gid_type const & get_locality()
     {
         return get_runtime().get_agas_client().get_local_locality();
+    }
+
+    /// Register the current kernel thread with HPX, this should be done once
+    /// for each external OS-thread intended to invoke HPX functionality.
+    /// Calling this function more than once will silently fail
+    /// (will return false).
+    bool register_thread(runtime* rt, char const* name, error_code& ec)
+    {
+        HPX_ASSERT(rt);
+        return rt->register_thread(name, 0, true, ec);
+    }
+
+    /// Unregister the thread from HPX, this should be done once in
+    /// the end before the external thread exists.
+    void unregister_thread(runtime* rt)
+    {
+        HPX_ASSERT(rt);
+        rt->unregister_thread();
     }
 
     void report_error(std::size_t num_thread, boost::exception_ptr const& e)

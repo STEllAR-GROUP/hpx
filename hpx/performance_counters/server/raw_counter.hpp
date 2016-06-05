@@ -24,7 +24,10 @@ namespace hpx { namespace performance_counters { namespace server
         typedef raw_counter type_holder;
         typedef base_performance_counter base_type_holder;
 
-        raw_counter() {}
+        raw_counter()
+          : reset_(false)
+        {}
+
         raw_counter(counter_info const& info,
             hpx::util::function_nonser<boost::int64_t(bool)> f);
 

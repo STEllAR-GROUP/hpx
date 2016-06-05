@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,13 +13,14 @@
 #include <hpx/async.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/unwrapped.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/unwrapped.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
@@ -63,11 +64,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        template <typename F>
-        static void apply_execute(executor_type& sched, F && f)
+        template <typename F, typename ... Ts>
+        static void apply_execute(executor_type& sched, F && f, Ts &&... ts)
         {
-            hpx::apply(sched, std::forward<F>(f));
+            hpx::apply(sched, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         /// \brief Singleton form of asynchronous execution agent creation.
@@ -80,17 +82,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns f()'s result through a future
+        /// \returns f(ts...)'s result through a future
         ///
-        template <typename F>
+        template <typename F, typename ... Ts>
         static hpx::future<
-            typename hpx::util::result_of<
-                typename hpx::util::decay<F>::type()
-            >::type>
-        async_execute(executor_type& sched, F && f)
+            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        >
+        async_execute(executor_type& sched, F && f, Ts &&... ts)
         {
-            return hpx::async(sched, std::forward<F>(f));
+            return hpx::async(sched, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         /// \brief Singleton form of synchronous execution agent creation.
@@ -104,16 +107,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns f()'s result through a future
+        /// \returns f(ts...)'s result through a future
         ///
-        template <typename F>
-        static typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
-        execute(executor_type& sched, F && f)
+        template <typename F, typename ... Ts>
+        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        execute(executor_type& sched, F && f, Ts &&... ts)
         {
-            return hpx::async(sched, std::forward<F>(f)).get();
+            return hpx::async(sched, std::forward<F>(f),
+                std::forward<Ts>(ts)...).get();
         }
 
         /// \brief Bulk form of asynchronous execution agent creation
@@ -133,24 +136,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///              given executor.
         /// \param shape [in] The shape objects which defines the iteration
         ///              boundaries for the arguments to be passed to \a f.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns The return type of \a executor_type::async_execute if
         ///          defined by \a executor_type. Otherwise a vector
         ///          of futures holding the returned value of each invocation
         ///          of \a f.
         ///
-        template <typename F, typename Shape>
+        template <typename F, typename Shape, typename ... Ts>
         static std::vector<hpx::future<
-            typename detail::bulk_async_execute_result<F, Shape>::type
+            typename detail::bulk_async_execute_result<F, Shape, Ts...>::type
         > >
-        async_execute(executor_type& sched, F && f, Shape const& shape)
+        bulk_async_execute(executor_type& sched, F && f, Shape const& shape,
+            Ts &&... ts)
         {
             std::vector<hpx::future<
-                    typename detail::bulk_async_execute_result<F, Shape>::type
+                    typename detail::bulk_async_execute_result<
+                        F, Shape, Ts...
+                    >::type
                 > > results;
 
             for (auto const& elem: shape)
-                results.push_back(hpx::async(sched, std::forward<F>(f), elem));
+            {
+                results.push_back(hpx::async(sched, std::forward<F>(f),
+                    elem, ts...));
+            }
 
             return results;
         }
@@ -173,22 +183,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///              given executor.
         /// \param shape [in] The shape objects which defines the iteration
         ///              boundaries for the arguments to be passed to \a f.
+        /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns The return type of \a executor_type::execute if defined
         ///          by \a executor_type. Otherwise a vector holding the
         ///          returned value of each invocation of \a f except when
         ///          \a f returns void, which case void is returned.
         ///
-        template <typename F, typename Shape>
-        static typename detail::bulk_execute_result<F, Shape>::type
-        execute(executor_type& sched, F && f, Shape const& shape)
+        template <typename F, typename Shape, typename ... Ts>
+        static typename detail::bulk_execute_result<F, Shape, Ts...>::type
+        bulk_execute(executor_type& sched, F && f, Shape const& shape,
+            Ts &&... ts)
         {
             std::vector<hpx::future<
-                    typename detail::bulk_async_execute_result<F, Shape>::type
+                    typename detail::bulk_async_execute_result<
+                        F, Shape, Ts...
+                    >::type
                 > > results;
 
             for (auto const& elem: shape)
-                results.push_back(hpx::async(sched, std::forward<F>(f), elem));
+            {
+                results.push_back(hpx::async(sched, std::forward<F>(f),
+                    elem, ts...));
+            }
 
             return hpx::util::unwrapped(results);
         }

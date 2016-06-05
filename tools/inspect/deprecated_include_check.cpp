@@ -27,6 +27,7 @@ namespace boost
       { "boost/type_traits\\.hpp", "separate type-traits headers" },
       { "boost/unordered_map\\.hpp", "unordered_map" },
       { "boost/unordered_set\\.hpp", "unordered_set" },
+      { "boost/detail/atomic_count\\.hpp", "hpx/util/atomic_count.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { 0, 0 }
     };

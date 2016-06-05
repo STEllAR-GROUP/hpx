@@ -25,6 +25,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/bind.hpp>
@@ -44,6 +45,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -64,7 +66,7 @@ namespace hpx { namespace components { namespace server
 
         struct component_factory
         {
-            component_factory() : isenabled(false) {}
+            component_factory() : second(), isenabled(false) {}
 
             component_factory(
                   std::shared_ptr<component_factory_base> const& f,
@@ -75,7 +77,7 @@ namespace hpx { namespace components { namespace server
             component_factory(
                   std::shared_ptr<component_factory_base> const& f,
                   bool enabled = true)
-              : first(f), isenabled(enabled)
+              : first(f), second(), isenabled(enabled)
             {};
 
             std::shared_ptr<component_factory_base> first;
@@ -293,28 +295,28 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
-        void add_pre_startup_function(util::function_nonser<void()> const& f)
+        void add_pre_startup_function(startup_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_startup_functions_.push_back(f);
+            pre_startup_functions_.push_back(std::move(f));
         }
 
-        void add_startup_function(util::function_nonser<void()> const& f)
+        void add_startup_function(startup_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            startup_functions_.push_back(f);
+            startup_functions_.push_back(std::move(f));
         }
 
-        void add_pre_shutdown_function(util::function_nonser<void()> const& f)
+        void add_pre_shutdown_function(shutdown_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_shutdown_functions_.push_back(f);
+            pre_shutdown_functions_.push_back(std::move(f));
         }
 
-        void add_shutdown_function(util::function_nonser<void()> const& f)
+        void add_shutdown_function(shutdown_function_type f)
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            shutdown_functions_.push_back(f);
+            shutdown_functions_.push_back(std::move(f));
         }
 
         bool keep_factory_alive(component_type t);
@@ -421,8 +423,8 @@ namespace hpx { namespace components { namespace server
 
     private:
         mutex_type mtx_;
-        boost::condition wait_condition_;
-        boost::condition stop_condition_;
+        boost::condition_variable wait_condition_;
+        boost::condition_variable stop_condition_;
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
@@ -441,10 +443,10 @@ namespace hpx { namespace components { namespace server
         static_modules_type static_modules_;
 
         lcos::local::spinlock globals_mtx_;
-        std::list<util::function_nonser<void()> > pre_startup_functions_;
-        std::list<util::function_nonser<void()> > startup_functions_;
-        std::list<util::function_nonser<void()> > pre_shutdown_functions_;
-        std::list<util::function_nonser<void()> > shutdown_functions_;
+        std::list<startup_function_type> pre_startup_functions_;
+        std::list<startup_function_type> startup_functions_;
+        std::list<shutdown_function_type> pre_shutdown_functions_;
+        std::list<shutdown_function_type> shutdown_functions_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

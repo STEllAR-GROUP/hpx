@@ -3,15 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_BASE_LCO_JUN_12_2008_0852PM)
-#define HPX_LCOS_BASE_LCO_JUN_12_2008_0852PM
+#ifndef HPX_LCOS_BASE_LCO_HPP
+#define HPX_LCOS_BASE_LCO_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 
@@ -24,9 +25,9 @@ namespace hpx { namespace lcos
     class HPX_API_EXPORT base_lco
     {
     public:
-        virtual void set_event () = 0;
+        virtual void set_event() = 0;
 
-        virtual void set_exception (boost::exception_ptr const& e);
+        virtual void set_exception(boost::exception_ptr const& e);
 
         // noop by default
         virtual void connect(naming::id_type const &);
@@ -64,7 +65,7 @@ namespace hpx { namespace lcos
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception_nonvirt (boost::exception_ptr const& e);
+        void set_exception_nonvirt(boost::exception_ptr const& e);
 
         /// The \a function connect_nonvirt is called whenever a
         /// \a connect_action is applied on a instance of a LCO. This function
@@ -109,6 +110,21 @@ namespace hpx { namespace lcos
         /// The \a set_exception_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
             disconnect_action);
+
+        // Internal: The following functions are used for promise
+        // AGAS memory management
+        virtual void add_ref()
+        {
+            HPX_ASSERT(false);
+        }
+        virtual void release()
+        {
+            HPX_ASSERT(false);
+        }
+        virtual long count() const {
+            HPX_ASSERT(false);
+            return 0;
+        }
     };
 }}
 

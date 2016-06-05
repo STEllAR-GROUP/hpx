@@ -12,6 +12,8 @@
 
 #include <boost/format.hpp>
 
+#include <cstring>
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PLUGIN_MODULE();
 HPX_REGISTER_BINARY_FILTER_FACTORY(

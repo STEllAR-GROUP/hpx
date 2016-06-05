@@ -10,6 +10,7 @@
 #include <hpx/include/parallel_for_loop.hpp>
 
 #include <algorithm>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -36,7 +37,7 @@ void test_for_loop_n_strided(ExPolicy && policy, IteratorTag)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1;
+    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
 
     hpx::parallel::for_loop_n_strided(
         std::forward<ExPolicy>(policy),
@@ -50,7 +51,7 @@ void test_for_loop_n_strided(ExPolicy && policy, IteratorTag)
     std::size_t count = 0;
     for (std::size_t i = 0; i != c.size(); ++i)
     {
-        if (i % stride == 0)
+        if (i % stride == 0) //-V104
         {
             HPX_TEST_EQ(c[i], std::size_t(42));
         }
@@ -79,7 +80,7 @@ void test_for_loop_n_strided_async(ExPolicy && p, IteratorTag)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1;
+    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
 
     auto f =
         hpx::parallel::for_loop_n_strided(
@@ -95,7 +96,7 @@ void test_for_loop_n_strided_async(ExPolicy && p, IteratorTag)
     std::size_t count = 0;
     for (std::size_t i = 0; i != c.size(); ++i)
     {
-        if (i % stride == 0)
+        if (i % stride == 0) //-V104
         {
             HPX_TEST_EQ(c[i], std::size_t(42));
         }
@@ -146,7 +147,7 @@ void test_for_loop_n_strided_idx(ExPolicy && policy)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1;
+    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
 
     hpx::parallel::for_loop_n_strided(
         std::forward<ExPolicy>(policy),
@@ -160,7 +161,7 @@ void test_for_loop_n_strided_idx(ExPolicy && policy)
     std::size_t count = 0;
     for (std::size_t i = 0; i != c.size(); ++i)
     {
-        if (i % stride == 0)
+        if (i % stride == 0) //-V104
         {
             HPX_TEST_EQ(c[i], std::size_t(42));
         }
@@ -188,7 +189,7 @@ void test_for_loop_n_strided_idx_async(ExPolicy && p)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1;
+    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
 
     auto f =
         hpx::parallel::for_loop_n_strided(
@@ -204,7 +205,7 @@ void test_for_loop_n_strided_idx_async(ExPolicy && p)
     std::size_t count = 0;
     for (std::size_t i = 0; i != c.size(); ++i)
     {
-        if (i % stride == 0)
+        if (i % stride == 0) //-V104
         {
             HPX_TEST_EQ(c[i], std::size_t(42));
         }

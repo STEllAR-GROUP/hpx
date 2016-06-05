@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/static_reinit.hpp>
@@ -226,15 +227,13 @@ namespace hpx
 
         virtual util::unique_id_ranges& get_id_pool() = 0;
 
-        virtual void add_pre_startup_function(util::function_nonser<void()>
-            const& f) = 0;
+        virtual void add_pre_startup_function(startup_function_type f) = 0;
 
-        virtual void add_startup_function(util::function_nonser<void()> const& f) = 0;
+        virtual void add_startup_function(startup_function_type f) = 0;
 
-        virtual void add_pre_shutdown_function(util::function_nonser<void()>
-            const& f) = 0;
+        virtual void add_pre_shutdown_function(shutdown_function_type f) = 0;
 
-        virtual void add_shutdown_function(util::function_nonser<void()> const& f) = 0;
+        virtual void add_shutdown_function(shutdown_function_type f) = 0;
 
         /// Keep the factory object alive which is responsible for the given
         /// component type. This a purely internal function allowing to work
@@ -280,7 +279,7 @@ namespace hpx
         ///          succeeded or not.
         ///
         virtual bool register_thread(char const* name, std::size_t num = 0,
-            bool service_thread = true) = 0;
+            bool service_thread = true, error_code& ec = throws) = 0;
 
         /// \brief Unregister an external OS-thread with HPX
         ///

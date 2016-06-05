@@ -27,6 +27,7 @@
 #include <boost/make_shared.hpp>
 
 #include <algorithm>
+#include <list>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,7 +79,7 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::placeholders::_1;
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::async_execute(
+                        executor_traits::bulk_async_execute(
                             policy.executor(),
                             bind(invoke_fused(), std::forward<F1>(f1), _1),
                             std::move(shape));
@@ -154,7 +155,7 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::placeholders::_1;
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::async_execute(
+                        executor_traits::bulk_async_execute(
                             policy.executor(),
                             bind(invoke_fused(), std::forward<F1>(f1), _1),
                             std::move(shape));
@@ -163,9 +164,12 @@ namespace hpx { namespace parallel { namespace util
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<R>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
                 // wait for all tasks to finish

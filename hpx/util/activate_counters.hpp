@@ -8,12 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counters.hpp>
 
 #include <string>
 #include <vector>
 
 #include <boost/cstdint.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util
 {
@@ -69,6 +71,8 @@ namespace hpx { namespace util
         std::vector<std::string> uoms_;       // units of measure
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // 7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B
 

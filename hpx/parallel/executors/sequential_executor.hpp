@@ -15,7 +15,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <iterator>
@@ -40,18 +40,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \cond NOINTERNAL
         typedef sequential_execution_tag execution_category;
 
-        template <typename F>
-        static void apply_execute(F && f)
+        template <typename F, typename ... Ts>
+        static void apply_execute(F && f, Ts &&... ts)
         {
-            execute(std::forward<F>(f));
+            execute(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F>
-        static typename hpx::util::result_of<F()>::type
-        execute(F && f)
+        template <typename F, typename ... Ts>
+        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        execute(F && f, Ts &&... ts)
         {
             try {
-                return hpx::util::invoke(f);
+                return hpx::util::invoke(f, std::forward<Ts>(ts)...);
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
@@ -63,27 +63,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             }
         }
 
-        template <typename F>
-        static hpx::future<typename hpx::util::result_of<F()>::type>
-        async_execute(F && f)
+        template <typename F, typename ... Ts>
+        static hpx::future<typename hpx::util::result_of<F&&(Ts&&...)>::type>
+        async_execute(F && f, Ts &&... ts)
         {
-            return hpx::async(launch::deferred, std::forward<F>(f));
+            return hpx::async(launch::deferred, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename Shape>
+        template <typename F, typename Shape, typename ... Ts>
         static std::vector<hpx::future<
-            typename detail::bulk_async_execute_result<F, Shape>::type
+            typename detail::bulk_async_execute_result<F, Shape, Ts...>::type
         > >
-        bulk_async_execute(F && f, Shape const& shape)
+        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             typedef typename
-                    detail::bulk_async_execute_result<F, Shape>::type
+                    detail::bulk_async_execute_result<F, Shape, Ts...>::type
                 result_type;
             std::vector<hpx::future<result_type> > results;
 
             try {
                 for (auto const& elem: shape)
-                    results.push_back(hpx::async(launch::deferred, f, elem));
+                {
+                    results.push_back(hpx::async(
+                        launch::deferred, f, elem, ts...));
+                }
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
@@ -97,12 +101,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             return std::move(results);
         }
 
-        template <typename F, typename Shape>
-        static typename detail::bulk_execute_result<F, Shape>::type
-        bulk_execute(F && f, Shape const& shape)
+        template <typename F, typename Shape, typename ... Ts>
+        static typename detail::bulk_execute_result<F, Shape, Ts...>::type
+        bulk_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             return hpx::util::unwrapped(
-                bulk_async_execute(std::forward<F>(f), shape));
+                bulk_async_execute(std::forward<F>(f), shape,
+                    std::forward<Ts>(ts)...));
         }
 
         std::size_t processing_units_count()

@@ -11,17 +11,17 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <mpi.h>
 
 #include <cstdlib>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace util
 {
-    struct command_line_handling;
-
     struct HPX_EXPORT mpi_environment
     {
         static void init(int *argc, char ***argv, command_line_handling& cfg);
@@ -69,6 +69,8 @@ namespace hpx { namespace util
         static MPI_Comm communicator_;
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

@@ -10,11 +10,12 @@
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/policies/thread_queue.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -703,7 +704,7 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
                               << "  [TM] " //-V128
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";

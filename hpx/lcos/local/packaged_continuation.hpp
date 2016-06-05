@@ -335,8 +335,7 @@ namespace hpx { namespace lcos { namespace detail
             ) = &continuation::async_impl;
 
             parallel::executor_traits<Executor>::apply_execute(
-                exec, util::bind(async_impl_ptr, std::move(this_), f)
-            );
+                exec, async_impl_ptr, std::move(this_), f);
 
             if (&ec != &throws)
                 ec = make_success_code();

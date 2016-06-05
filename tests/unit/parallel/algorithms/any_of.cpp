@@ -29,7 +29,7 @@ void test_any_of(ExPolicy policy, IteratorTag)
     std::size_t iseq[] = { 0, 23, 10007 };
     for (std::size_t i: iseq)
     {
-        std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
+        std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         bool result =
             hpx::parallel::any_of(policy,
@@ -58,7 +58,7 @@ void test_any_of_async(ExPolicy p, IteratorTag)
     std::size_t iseq[] = { 0, 23, 10007 };
     for (std::size_t i: iseq)
     {
-        std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
+        std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         hpx::future<bool> f =
             hpx::parallel::any_of(p,
@@ -150,7 +150,7 @@ void test_any_of_exception(ExPolicy policy, IteratorTag)
     std::size_t iseq[] = { 0, 23, 10007 };
     for (std::size_t i: iseq)
     {
-        std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
+        std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         bool caught_exception = false;
         try {
@@ -183,7 +183,7 @@ void test_any_of_exception_async(ExPolicy p, IteratorTag)
     std::size_t iseq[] = { 0, 23, 10007 };
     for (std::size_t i : iseq)
     {
-        std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
+        std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         bool caught_exception = false;
         bool returned_from_algorithm = false;
@@ -256,7 +256,7 @@ void test_any_of_bad_alloc(ExPolicy policy, IteratorTag)
     std::size_t iseq[] = { 0, 23, 10007 };
     for (std::size_t i : iseq)
     {
-        std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
+        std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         bool caught_exception = false;
         try {
@@ -288,7 +288,7 @@ void test_any_of_bad_alloc_async(ExPolicy p, IteratorTag)
     std::size_t iseq[] = { 0, 23, 10007 };
     for (std::size_t i : iseq)
     {
-        std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
+        std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         bool caught_exception = false;
         bool returned_from_algorithm = false;

@@ -6,6 +6,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
+#include <list>
+
 namespace hpx { namespace serialization
 {
     void output_archive::add_gid(
@@ -22,10 +24,12 @@ namespace hpx { namespace serialization
 
         new_gids_map::iterator it = new_gids_->find(gid);
 
-        HPX_ASSERT(it != new_gids_->end() && !it->second.empty());
+        std::list<naming::gid_type>& gids = it->second;
 
-        naming::gid_type new_gid = it->second.front();
-        it->second.pop_front();
+        HPX_ASSERT(it != new_gids_->end() && !gids.empty());
+
+        naming::gid_type new_gid = gids.front();
+        gids.pop_front();
 
         return new_gid;
     }

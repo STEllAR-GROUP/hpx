@@ -20,29 +20,25 @@ namespace boost
   namespace inspect
   {
     boost::regex include_regex(
-      "^\\s*#\\s*include\\s*<([^\n>]*)>\\s*$"     // # include <foobar>
+      "^\\s*#\\s*include\\s*<([^\n>]*)>(\\s|//[^\\n]*|/\\*.*?\\*/)*$"     // # include <foobar>
       "|"
-      "^\\s*#\\s*include\\s*\"([^\n\"]*)\"\\s*$"  // # include "foobar"
+      "^\\s*#\\s*include\\s*\"([^\n\"]*)\"(\\s|//[^\\n]*|/\\*.*?\\*/)*$"  // # include "foobar"
       , boost::regex::normal);
 
     names_includes const names[] =
     {
       { "(\\bstd\\s*::\\s*make_shared\\b)", "std::make_shared", "memory" },
-      { "(\\bstd\\s*::\\s*map\\b)", "std::map", "map" },
-      { "(\\bstd\\s*::\\s*multimap\\b)", "std::multimap", "map" },
-      { "(\\bstd\\s*::\\s*multiset\\b)", "std::multiset", "set" },
-      { "(\\bstd\\s*::\\s*set\\b)", "std::set", "set" },
-      { "(\\bstd\\s*::\\s*shared_ptr\\b)", "std::shared_ptr", "memory" },
-      { "(\\bstd\\s*::\\s*unique_ptr\\b)", "std::unique_ptr", "memory" },
-      { "(\\bstd\\s*::\\s*unordered_map\\b)", "std::unordered_map", "unordered_map" },
-      { "(\\bstd\\s*::\\s*unordered_multimap\\b)", "std::unordered_multimap", "unordered_map" },
-      { "(\\bstd\\s*::\\s*unordered_set\\b)", "std::unordered_set", "unordered_set" },
-      { "(\\bstd\\s*::\\s*unordered_multiset\\b)", "std::unordered_multiset", "unordered_set" },
+      { "(\\bstd\\s*::\\s*((map)|(set))\\b)", "std::\\2", "\\2" },
+      { "(\\bstd\\s*::\\s*(multi((map)|(set)))\\b)", "std::\\2", "\\3" },
+      { "(\\bstd\\s*::\\s*((shared|unique)_ptr)\\b)", "std::\\2", "memory" },
+      { "(\\bstd\\s*::\\s*(unordered_((map|set)))\\b)", "std::\\2", "unordered_\\3" },
+      { "(\\bstd\\s*::\\s*(unordered_multi((map)|(set)))\\b)", "std::\\2", "unordered_\\3" },
+      { "(\\bstd\\s*::\\s*list\\b)", "std::list", "list" },
       { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
       { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
+      { "(\\bstd\\s*::\\s*(mem((set)|(cpy)|(move)))\\b)", "std::\\2", "cstring" },
       { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
-      { "(\\bboost\\s*::\\s*exception_ptr\\b)", "boost::exception_ptr", "boost/exception_ptr.hpp" },
-      { "(\\bboost\\s*::\\s*intrusive_ptr\\b)", "boost::intrusive_ptr", "boost/intrusive_ptr.hpp" },
+      { "(\\bboost\\s*::\\s*(((exception)|(intrusive))_ptr)\\b)", "boost::\\3_ptr", "boost/\\3_ptr.hpp" },
       { 0, 0, 0 }
     };
 
@@ -104,20 +100,28 @@ namespace boost
 
       // for all given names, check whether corresponding include was found
       std::set<std::string> checked_includes;
+      std::set<std::string> found_names;
       for (names_regex_data const& d : regex_data)
       {
-        // avoid checking the same include twice
-        auto checked_includes_it = checked_includes.find(d.data->include);
-        if (checked_includes_it != checked_includes.end())
-           continue;
-
         boost::sregex_iterator cur(contents.begin(), contents.end(), d.pattern), end;
         for(/**/; cur != end; ++cur)
         {
           auto m = *cur;
           if (m[1].matched)
           {
-            auto include_it = includes.find(d.data->include);
+            // avoid checking the same include twice
+            auto checked_includes_it =
+                checked_includes.find(m.format(d.data->include));
+            if (checked_includes_it != checked_includes.end())
+               continue;
+
+            // avoid errors to be reported twice
+            std::string found_name(m[1].first, m[1].second);
+            if (found_names.find(found_name) != found_names.end())
+                continue;
+            found_names.insert(found_name);
+
+            auto include_it = includes.find(m.format(d.data->include));
             if (include_it == includes.end())
             {
               // include is missing
@@ -138,15 +142,12 @@ namespace boost
               ++m_errors;
               error(library_name, full_path, string(name())
                   + " missing #include ("
-                  + std::string(d.data->include)
+                  + m.format(d.data->include)
                   + ") for symbol "
-                  + std::string(d.data->name) + " on line "
+                  + m.format(d.data->name) + " on line "
                   + linelink(full_path, boost::lexical_cast<string>(line_number)));
             }
-            checked_includes.insert(d.data->include);
-
-            // avoid errors to be reported twice
-            break;
+            checked_includes.insert(m.format(d.data->include));
           }
         }
       }

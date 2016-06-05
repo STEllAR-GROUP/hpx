@@ -4,36 +4,39 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/config/defaults.hpp>
-#include <hpx/version.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/init_ini_data.hpp>
-#include <hpx/util/itt_notify.hpp>
+
+#include <hpx/config/defaults.hpp>
+// TODO: move parcel ports into plugins
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/init_ini_data.hpp>
+#include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-
-// TODO: move parcel ports into plugins
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/preprocessor/stringize.hpp>
-#include <boost/tokenizer.hpp>
-
 #include <boost/detail/endian.hpp>
+#include <boost/preprocessor/stringize.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
+#include <boost/tokenizer.hpp>
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(HPX_WINDOWS)
@@ -588,13 +591,13 @@ namespace hpx { namespace util
         return agas::service_mode_hosted;
     }
 
-    boost::uint32_t runtime_configuration::get_num_localities() const
+    std::uint32_t runtime_configuration::get_num_localities() const
     {
         if (num_localities == 0) {
             if (has_section("hpx")) {
                 util::section const* sec = get_section("hpx");
                 if (NULL != sec) {
-                    num_localities = hpx::util::get_entry_as<boost::uint32_t>(
+                    num_localities = hpx::util::get_entry_as<std::uint32_t>(
                         *sec, "localities", 1);
                 }
             }
@@ -604,7 +607,7 @@ namespace hpx { namespace util
         return num_localities;
     }
 
-    void runtime_configuration::set_num_localities(boost::uint32_t num_localities_)
+    void runtime_configuration::set_num_localities(std::uint32_t num_localities_)
     {
         // this function should not be called on the AGAS server
         HPX_ASSERT(agas::service_mode_bootstrap != get_agas_service_mode());
@@ -619,12 +622,12 @@ namespace hpx { namespace util
         }
     }
 
-    boost::uint32_t runtime_configuration::get_first_used_core() const
+    std::uint32_t runtime_configuration::get_first_used_core() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return hpx::util::get_entry_as<boost::uint32_t>(
+                return hpx::util::get_entry_as<std::uint32_t>(
                     *sec, "first_used_core", 0);
             }
         }
@@ -632,7 +635,7 @@ namespace hpx { namespace util
     }
 
     void runtime_configuration::set_first_used_core(
-        boost::uint32_t first_used_core)
+        std::uint32_t first_used_core)
     {
         if (has_section("hpx")) {
             util::section* sec = get_section("hpx");
@@ -946,13 +949,13 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // Return maximally allowed message size
-    boost::uint64_t runtime_configuration::get_max_inbound_message_size() const
+    std::uint64_t runtime_configuration::get_max_inbound_message_size() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
-                boost::uint64_t maxsize =
-                    hpx::util::get_entry_as<boost::uint64_t>(
+                std::uint64_t maxsize =
+                    hpx::util::get_entry_as<std::uint64_t>(
                         *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
                 if (maxsize > 0)
                     return maxsize;
@@ -961,13 +964,13 @@ namespace hpx { namespace util
         return HPX_PARCEL_MAX_MESSAGE_SIZE;    // default is 1GByte
     }
 
-    boost::uint64_t runtime_configuration::get_max_outbound_message_size() const
+    std::uint64_t runtime_configuration::get_max_outbound_message_size() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
-                boost::uint64_t maxsize =
-                    hpx::util::get_entry_as<boost::uint64_t>(
+                std::uint64_t maxsize =
+                    hpx::util::get_entry_as<std::uint64_t>(
                         *sec, "max_outbound_message_size",
                         HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE);
                 if (maxsize > 0)

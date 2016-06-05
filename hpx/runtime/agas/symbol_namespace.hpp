@@ -8,8 +8,9 @@
 #if !defined(HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7)
 #define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 
-#include <hpx/include/client.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>

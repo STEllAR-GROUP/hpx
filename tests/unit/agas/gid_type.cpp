@@ -9,6 +9,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+#include <cstdint>
+
 using hpx::naming::gid_type;
 
 // TODO: Subtraction tests.
@@ -577,7 +579,7 @@ int main()
     }
 
     { // logical shift tests
-      boost::uint64_t const special_bits_mask =
+      std::uint64_t const special_bits_mask =
         hpx::naming::gid_type::special_bits_mask;
 
       gid_type gid(~0x0ULL & ~special_bits_mask, ~0x0ULL);   // resets lock-bit
@@ -625,14 +627,14 @@ int main()
         "'lsb == true' and 'msb == true' case failed");
 
       // lsb = false and msb == true
-      gid.set_lsb(boost::uint64_t(0x0ULL));
-      gid.set_msb(boost::uint64_t(0xddULL));
+      gid.set_lsb(std::uint64_t(0x0ULL));
+      gid.set_msb(std::uint64_t(0xddULL));
       HPX_TEST_EQ_MSG(bool(gid), true,
         "'lsb == false' and 'msb == true' case failed");
 
       // lsb = false and msb == true
-      gid.set_lsb(boost::uint64_t(0xaULL));
-      gid.set_msb(boost::uint64_t(0x0ULL));
+      gid.set_lsb(std::uint64_t(0xaULL));
+      gid.set_msb(std::uint64_t(0x0ULL));
       HPX_TEST_EQ_MSG(bool(gid), true,
         "'lsb == true' and 'msb == false' case failed");
     }

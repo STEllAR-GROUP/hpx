@@ -10,7 +10,6 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/hpx.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/performance_counters/counters.hpp>
 

@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -141,12 +142,16 @@ namespace hpx { namespace actions { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, int N>
     class wrapped_continuation
-      : public typed_continuation<typename Action::result_type>
+      : public typed_continuation<
+            typename Action::local_result_type,
+            typename Action::remote_result_type
+        >
     {
         typedef action_decorate_function_semaphore<Action, N>
             construct_semaphore_type;
-        typedef typename Action::result_type result_type;
-        typedef typed_continuation<result_type> base_type;
+        typedef typename Action::local_result_type local_result_type;
+        typedef typename Action::remote_result_type remote_result_type;
+        typedef typed_continuation<local_result_type, remote_result_type> base_type;
 
     public:
         wrapped_continuation(std::unique_ptr<continuation> cont)
@@ -163,29 +168,15 @@ namespace hpx { namespace actions { namespace detail
             construct_semaphore_type::get_sem().signal();
         }
 
-        void deferred_trigger(result_type&& result)
+        void trigger_value(remote_result_type && result)
         {
-            if (cont_) {
+            if(cont_)
+            {
+                HPX_ASSERT(0 != dynamic_cast<base_type *>(cont_.get()));
                 static_cast<base_type *>(cont_.get())->
-                    deferred_trigger(std::move(result));
+                    trigger_value(std::move(result));
             }
             construct_semaphore_type::get_sem().signal();
-        }
-
-        void trigger_value(result_type && result)
-        {
-            // if the future is ready, send the result back immediately
-            if (result.is_ready()) {
-                deferred_trigger(std::move(result));
-                return;
-            }
-
-            // attach continuation to this future which will send the result back
-            // once its ready
-            result.then(
-                util::bind(&wrapped_continuation::deferred_trigger,
-                    std::move(*this),
-                    util::placeholders::_1));
         }
 
         void trigger_error(boost::exception_ptr const& e)

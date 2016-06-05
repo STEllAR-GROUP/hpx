@@ -3,19 +3,30 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <mutex>
+#include <utility>
 
 #if defined(__ANDROID__) || defined(ANDROID)
 #include <cpu-features.h>
@@ -23,7 +34,7 @@
 
 namespace hpx
 {
-    void thread::terminate(const char * function, const char * reason) const
+    void thread::terminate(const char* function, const char* reason) const
     {
         try {
             // free all registered exit-callback functions
@@ -43,7 +54,7 @@ namespace hpx
       : id_(threads::invalid_thread_id)
     {}
 
-    thread::thread(thread && rhs) HPX_NOEXCEPT
+    thread::thread(thread&& rhs) HPX_NOEXCEPT
       : id_(threads::invalid_thread_id)   // the rhs needs to end up with an invalid_id
     {
         std::lock_guard<mutex_type> l(rhs.mtx_);
@@ -51,7 +62,7 @@ namespace hpx
         rhs.id_ = threads::invalid_thread_id;
     }
 
-    thread& thread::operator=(thread && rhs) HPX_NOEXCEPT
+    thread& thread::operator=(thread&& rhs) HPX_NOEXCEPT
     {
         std::lock_guard<mutex_type> l(mtx_);
         std::lock_guard<mutex_type> l2(rhs.mtx_);
@@ -139,7 +150,7 @@ namespace hpx
         return hpx::threads::hardware_concurrency();
     }
 
-    void thread::start_thread(util::unique_function_nonser<void()> && func)
+    void thread::start_thread(util::unique_function_nonser<void()>&& func)
     {
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread::thread_function_nullary),
@@ -149,8 +160,8 @@ namespace hpx
         // create the new thread, note that id_ is guaranteed to be valid
         // before the thread function is executed
         error_code ec(lightweight);
-        hpx::get_runtime().get_thread_manager().
-            register_thread(data, id_, threads::pending, true, ec);
+        threads::get_thread_manager().register_thread(
+            data, id_, threads::pending, true, ec);
         if (ec) {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
                 "Could not create thread");

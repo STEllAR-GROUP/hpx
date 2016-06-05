@@ -88,7 +88,7 @@ namespace hpx { namespace detail
         call(Executor& exec, F&& f, Ts&&... ts)
         {
             parallel::executor_traits<Executor>::apply_execute(exec,
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+                std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
         }
     };

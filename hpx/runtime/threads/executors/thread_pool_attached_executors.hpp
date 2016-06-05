@@ -3,19 +3,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_ATTACHED_POOL_EXECUTORS_AUG_28_2015_1132AM)
-#define HPX_RUNTIME_THREADS_EXECUTORS_ATTACHED_POOL_EXECUTORS_AUG_28_2015_1132AM
+#ifndef HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP
+#define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/unique_function.hpp>
 
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/atomic.hpp>
-#include <boost/chrono.hpp>
+#include <boost/chrono/chrono.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -59,7 +61,7 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
-            boost::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const;
 
             // Reset internal (round robin) thread distribution scheme
             void reset_thread_distribution();
@@ -129,5 +131,4 @@ namespace hpx { namespace threads { namespace executors
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
-
+#endif /*HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP*/

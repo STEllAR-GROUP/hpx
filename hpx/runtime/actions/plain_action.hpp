@@ -24,6 +24,9 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
+#if defined(__NVCC__)
+#include <type_traits>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -153,10 +156,19 @@ namespace hpx { namespace traits
     HPX_DEFINE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))              \
     /**/
 
+#if defined(__NVCC__)
+#define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                 \
+    struct name : hpx::actions::make_action<                                  \
+        typename std::add_pointer<                                            \
+            typename std::remove_pointer<decltype(&func)>::type               \
+        >::type, &func, name>::type {}                                        \
+    /**/
+#else
 #define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                 \
     struct name : hpx::actions::make_action<                                  \
         decltype(&func), &func, name>::type {}                                \
     /**/
+#endif
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_1(func)                                \
     HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, BOOST_PP_CAT(func, _action))       \
@@ -180,18 +192,12 @@ namespace hpx { namespace traits
 /// \cond NOINTERNAL
 
 #define HPX_DECLARE_PLAIN_DIRECT_ACTION(...)                                  \
-    HPX_DECLARE_PLAIN_DIRECT_ACTION_(__VA_ARGS__)                             \
+    HPX_DECLARE_PLAIN_ACTION(__VA_ARGS__)                                     \
     /**/
 
 #define HPX_DECLARE_PLAIN_ACTION_(...)                                        \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_DECLARE_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)              \
-    )(__VA_ARGS__))                                                           \
-    /**/
-
-#define HPX_DECLARE_PLAIN_DIRECT_ACTION_(...)                                 \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DECLARE_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
     )(__VA_ARGS__))                                                           \
     /**/
 

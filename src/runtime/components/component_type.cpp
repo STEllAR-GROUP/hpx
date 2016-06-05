@@ -3,9 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ namespace hpx { namespace components
     }
 
     // Return the string representation for a given component type id
-    std::string const get_component_type_name(boost::int32_t type)
+    std::string const get_component_type_name(std::int32_t type)
     {
         std::string result;
 

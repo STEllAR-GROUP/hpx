@@ -15,14 +15,12 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/cache/lru_cache.hpp>
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
 
@@ -30,17 +28,13 @@
 #include <boost/cstdint.hpp>
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <string>
 #include <vector>
-
-namespace hpx { namespace util
-{
-    class runtime_configuration;
-}}
 
 namespace hpx { namespace agas
 {
@@ -209,7 +203,7 @@ public:
     naming::address::address_type get_bootstrap_symbol_ns_ptr() const;
 
     boost::int64_t synchronize_with_async_incref(
-        hpx::future<boost::int64_t> fut
+        hpx::future<std::int64_t> fut
       , naming::id_type const& id
       , boost::int64_t compensated_credit
         );

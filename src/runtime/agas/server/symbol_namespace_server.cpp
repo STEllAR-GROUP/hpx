@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2014 Hartmut Kaiser
+//  Copyright (c) 2012-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,12 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -411,7 +413,7 @@ response symbol_namespace::bind(
                     naming::detail::split_gid_if_needed(*current_gid).get();
 
                 // trigger the lco
-                set_lco_value(id, new_gid);
+                set_lco_value(id, std::move(new_gid));
             }
         }
     }
@@ -582,7 +584,7 @@ response symbol_namespace::on_event(
                 handled = true;
 
                 // trigger LCO as name is already bound to an id
-                set_lco_value(lco, new_gid);
+                set_lco_value(lco, std::move(new_gid));
             }
         }
     }

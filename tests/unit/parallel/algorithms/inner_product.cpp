@@ -10,6 +10,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -29,7 +30,7 @@ void test_inner_product(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c = test::random_iota(1007);
     std::vector<std::size_t> d = test::random_iota(1007);
-    std::size_t init = std::rand() % 1007;
+    std::size_t init = std::rand() % 1007; //-V101
 
     std::size_t r = hpx::parallel::inner_product(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
@@ -51,7 +52,7 @@ void test_inner_product_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c = test::random_iota(1007);
     std::vector<std::size_t> d = test::random_iota(1007);
-    std::size_t init = std::rand() % 1007;
+    std::size_t init = std::rand() % 1007; //-V101
 
     hpx::future<std::size_t> fut_r =
         hpx::parallel::inner_product(p, iterator(boost::begin(c)),

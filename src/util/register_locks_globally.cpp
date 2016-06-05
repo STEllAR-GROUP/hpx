@@ -9,9 +9,10 @@
 #include <hpx/util/static.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/ptr_container/ptr_map.hpp>
-
+#include <map>
+#include <mutex>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -36,7 +37,7 @@ namespace hpx { namespace util
         struct register_locks_globally
         {
             typedef lcos::local::spinlock mutex_type;
-            typedef boost::ptr_map<void const*, global_lock_data> held_locks_map;
+            typedef std::map<void const*, global_lock_data> held_locks_map;
 
             struct global_locks_data
             {
@@ -87,7 +88,7 @@ namespace hpx { namespace util
             register_locks_globally::held_locks_map& held_locks =
                 register_locks_globally::get_lock_map();
 
-            register_locks_globally::mutex_type::scoped_lock l(
+            std::unique_lock<register_locks_globally::mutex_type> l(
                 register_locks_globally::get_mutex());
 
             register_locks_globally::held_locks_map::iterator it =
@@ -96,7 +97,7 @@ namespace hpx { namespace util
                 return false;     // this lock is already registered
 
             std::pair<register_locks_globally::held_locks_map::iterator, bool> p;
-            p = held_locks.insert(lock, new detail::global_lock_data());
+            p = held_locks.insert(std::make_pair(lock, detail::global_lock_data()));
 
             return p.second;
         }
@@ -114,7 +115,7 @@ namespace hpx { namespace util
             register_locks_globally::held_locks_map& held_locks =
                 register_locks_globally::get_lock_map();
 
-            register_locks_globally::mutex_type::scoped_lock l(
+            std::unique_lock<register_locks_globally::mutex_type> l(
                 register_locks_globally::get_mutex());
 
             register_locks_globally::held_locks_map::iterator it =
@@ -145,5 +146,3 @@ namespace hpx { namespace util
 
 #endif
 }}
-
-

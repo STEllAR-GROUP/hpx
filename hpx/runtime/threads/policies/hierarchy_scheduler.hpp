@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -59,6 +60,7 @@ namespace hpx { namespace threads { namespace policies
         {
             init_parameter()
               : num_queues_(1),
+                arity_(1),
                 max_queue_thread_count_(max_thread_count),
                 numa_sensitive_(false),
                 description_("hierarchy_scheduler")

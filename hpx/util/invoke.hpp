@@ -24,6 +24,7 @@ namespace hpx { namespace util
         {
             // f(t0, t1, ..., tN)
             template <typename F, typename ...Ts>
+            HPX_HOST_DEVICE
             inline typename util::result_of<F&&(Ts&&...)>::type
             operator()(F&& f, Ts&&... vs)
             {
@@ -36,6 +37,7 @@ namespace hpx { namespace util
         {
             // t0.*f
             template <typename F, typename T0>
+            HPX_HOST_DEVICE
             inline typename std::enable_if<
                 std::is_base_of<C, typename std::decay<T0>::type>::value,
                 typename util::result_of<F&&(T0&)>::type
@@ -46,6 +48,7 @@ namespace hpx { namespace util
             }
 
             template <typename F, typename T0>
+            HPX_HOST_DEVICE
             inline typename std::enable_if<
                 std::is_base_of<C, typename std::decay<T0>::type>::value
              && !std::is_lvalue_reference<T0>::value,
@@ -58,6 +61,7 @@ namespace hpx { namespace util
 
             // (*t0).*f
             template <typename F, typename T0>
+            HPX_HOST_DEVICE
             inline typename std::enable_if<
                 !std::is_base_of<C, typename std::decay<T0>::type>::value,
                 typename util::result_of<F&&(T0&&)>::type
@@ -73,6 +77,7 @@ namespace hpx { namespace util
         {
             // (t0.*f)(t1, ..., tN)
             template <typename F, typename T0, typename ...Ts>
+            HPX_HOST_DEVICE
             inline typename std::enable_if<
                 std::is_base_of<C, typename std::decay<T0>::type>::value,
                 typename util::result_of<F&&(T0&&, Ts&&...)>::type
@@ -84,6 +89,7 @@ namespace hpx { namespace util
 
             // ((*t0).*f)(t1, ..., tN)
             template <typename F, typename T0, typename ...Ts>
+            HPX_HOST_DEVICE
             inline typename std::enable_if<
                 !std::is_base_of<C, typename std::decay<T0>::type>::value,
                 typename util::result_of<F&&(T0&&, Ts&&...)>::type
@@ -105,6 +111,7 @@ namespace hpx { namespace util
         {
             // support boost::[c]ref, which is not callable as std::[c]ref
             template <typename F, typename ...Ts>
+            HPX_HOST_DEVICE
             inline typename util::result_of<F&&(Ts&&...)>::type
             operator()(F f, Ts&&... vs)
             {
@@ -114,6 +121,7 @@ namespace hpx { namespace util
     }
 
     template <typename F, typename ...Ts>
+    HPX_HOST_DEVICE
     inline typename util::result_of<F&&(Ts&&...)>::type
     invoke(F&& f, Ts&&... vs)
     {
@@ -128,6 +136,7 @@ namespace hpx { namespace util
         struct invoke_guard
         {
             template <typename F, typename ...Ts>
+            HPX_HOST_DEVICE
             inline R operator()(F&& f, Ts&&... vs)
             {
                 return detail::invoke_impl<typename std::decay<F>::type>()(
@@ -139,6 +148,7 @@ namespace hpx { namespace util
         struct invoke_guard<void>
         {
             template <typename F, typename ...Ts>
+            HPX_HOST_DEVICE
             inline void operator()(F&& f, Ts&&... vs)
             {
                 detail::invoke_impl<typename std::decay<F>::type>()(
@@ -148,6 +158,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename F, typename ...Ts>
+    HPX_HOST_DEVICE
     inline R invoke(F&& f, Ts&&... vs)
     {
         return detail::invoke_guard<R>()(
@@ -160,6 +171,7 @@ namespace hpx { namespace util
         struct invoke
         {
             template <typename F, typename... Ts>
+            HPX_HOST_DEVICE
             typename util::result_of<F&&(Ts &&...)>::type
             operator()(F && f, Ts &&... vs)
             {
@@ -172,6 +184,7 @@ namespace hpx { namespace util
         struct invoke_r
         {
             template <typename F, typename... Ts>
+            HPX_HOST_DEVICE
             R operator()(F && f, Ts &&... vs)
             {
                 return util::invoke<R>(std::forward<F>(f),

@@ -3,18 +3,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_COALESCING_MESSAGE_HANDLER_REGISTRATION_MAR_17_2016_0150PM)
-#define HPX_RUNTIME_COALESCING_MESSAGE_HANDLER_REGISTRATION_MAR_17_2016_0150PM
+#ifndef HPX_PLUGINS_PARCEL_COALESCING_MESSAGE_HANDLER_REGISTRATION_HPP
+#define HPX_PLUGINS_PARCEL_COALESCING_MESSAGE_HANDLER_REGISTRATION_HPP
 
 #include <hpx/config.hpp>
 
 // the module itself should not register any actions which coalesce parcels
 #if defined(HPX_HAVE_PARCEL_COALESCING) && !defined(HPX_PARCEL_COALESCING_MODULE_EXPORTS)
 
-#include <hpx/exception.hpp>
-#include <hpx/traits/action_message_handler.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/traits/action_message_handler.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/stringize.hpp>
+
+#include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -183,4 +189,4 @@ namespace hpx { namespace parcelset
 
 #endif
 
-#endif
+#endif /*HPX_PLUGINS_PARCEL_COALESCING_MESSAGE_HANDLER_REGISTRATION_HPP*/

@@ -4,21 +4,27 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
+#include <hpx/util/date_time_chrono.hpp>
+#ifdef HPX_HAVE_VERIFY_LOCKS
+#  include <hpx/util/register_locks.hpp>
+#endif
+#include <hpx/util/thread_description.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
+#include <cstddef>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -519,10 +525,10 @@ namespace hpx { namespace this_thread
 
             if (statex != threads::wait_timeout)
             {
-                error_code ec(lightweight);    // do not throw
+                error_code ec1(lightweight);    // do not throw
                 threads::set_thread_state(timer_id,
                     threads::pending, threads::wait_abort,
-                    threads::thread_priority_boost, ec);
+                    threads::thread_priority_boost, ec1);
             }
         }
 
@@ -562,5 +568,22 @@ namespace hpx { namespace this_thread
 
         return (std::numeric_limits<std::ptrdiff_t>::max)();
     }
-}}
 
+    bool has_sufficient_stack_space(std::size_t space_needed)
+    {
+        if (0 == hpx::threads::get_self_ptr())
+            return false;
+
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+        std::ptrdiff_t remaining_stack = get_available_stack_space();
+        if (remaining_stack < 0)
+        {
+            HPX_THROW_EXCEPTION(out_of_memory,
+                "has_sufficient_stack_space", "Stack overflow");
+        }
+        return std::size_t(remaining_stack) >= space_needed;
+#else
+        return true;
+#endif
+    }
+}}

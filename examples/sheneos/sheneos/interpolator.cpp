@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
@@ -13,6 +14,7 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstring>
 #include <map>
 #include <memory>
 #include <string>
@@ -50,7 +52,7 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_shutdown(hpx::util::function_nonser<void()>& shutdown_func,
+    bool get_shutdown(hpx::shutdown_function_type& shutdown_func,
         bool& pre_shutdown)
     {
         shutdown_func = shutdown;

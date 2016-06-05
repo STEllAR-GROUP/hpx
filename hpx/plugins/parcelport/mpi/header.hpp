@@ -20,6 +20,8 @@
 
 #include <boost/array.hpp>
 
+#include <cstring>
+
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     struct header

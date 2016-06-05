@@ -55,7 +55,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (sizeof(T) <= function_storage_size)
             {
-                ::new (static_cast<void*>(v)) T;
+                ::new (static_cast<void*>(v)) T; //-V206
             } else {
                 *v = new T;
             }
@@ -66,7 +66,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (sizeof(T) <= function_storage_size)
             {
-                ::new (static_cast<void*>(v)) T(std::forward<Arg>(arg));
+                ::new (static_cast<void*>(v)) T(std::forward<Arg>(arg)); //-V206
             } else {
                 *v = new T(std::forward<Arg>(arg));
             }

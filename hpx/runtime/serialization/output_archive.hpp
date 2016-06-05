@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/mpl/or.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -20,8 +21,10 @@
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <list>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -129,8 +132,10 @@ namespace hpx { namespace serialization
         >::type
         save(T const & t)
         {
-            save_bitwise(t,
-                typename hpx::traits::is_bitwise_serializable<T>::type());
+            typedef std::integral_constant<bool,
+                hpx::traits::is_bitwise_serializable<T>::value> use_optimized;
+
+            save_bitwise(t, use_optimized());
         }
 
         template <typename T>
@@ -140,7 +145,7 @@ namespace hpx { namespace serialization
               , boost::is_enum<T>
             >
         >::type
-        save(T t)
+        save(T t) //-V659
         {
             save_integral(t,
                 typename boost::is_unsigned<T>::type());
@@ -168,7 +173,7 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void save_bitwise(T const & t, boost::mpl::false_)
+        void save_bitwise(T const & t, std::false_type)
         {
             save_nonintrusively_polymorphic(t,
                 hpx::traits::is_nonintrusive_polymorphic<T>());
@@ -177,7 +182,7 @@ namespace hpx { namespace serialization
         // FIXME: think about removing this commented stuff below
         // and adding new free function save_bitwise
         template <typename T>
-        void save_bitwise(T const & t, boost::mpl::true_)
+        void save_bitwise(T const & t, std::true_type)
         {
             static_assert(!boost::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
@@ -215,7 +220,7 @@ namespace hpx { namespace serialization
             save_integral_impl(static_cast<boost::uint64_t>(val));
         }
 
-#if defined(BOOST_HAS_INT128)
+#if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
         void save_integral(boost::int128_type t, boost::mpl::false_)
         {
             save_integral_impl(t);

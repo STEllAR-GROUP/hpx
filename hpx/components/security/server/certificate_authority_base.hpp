@@ -10,9 +10,6 @@
 
 #if defined(HPX_HAVE_SECURITY)
 
-#include <hpx/include/actions.hpp>
-#include <hpx/include/components.hpp>
-
 #include <hpx/components/security/certificate.hpp>
 #include <hpx/components/security/certificate_signing_request.hpp>
 #include <hpx/components/security/key_pair.hpp>

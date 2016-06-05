@@ -4,34 +4,35 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_PROMISE_FEB_03_2009_0841AM)
-#define HPX_LCOS_PROMISE_FEB_03_2009_0841AM
+#ifndef HPX_LCOS_PROMISE_HPP
+#define HPX_LCOS_PROMISE_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/once.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/split_gid.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
+#include <hpx/util/unique_function.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/identity.hpp>
+#include <boost/thread/once.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -158,9 +159,6 @@ namespace hpx { namespace lcos { namespace detail
         friend class lcos::promise;
 
     public:
-        virtual void add_ref() = 0;
-        virtual void release() = 0;
-        virtual long count() const = 0;
 
         // retrieve the gid of this promise
         naming::id_type get_id() const
@@ -255,7 +253,7 @@ namespace hpx { namespace lcos { namespace detail
             this->finalize();
         }
 
-        void set_task(util::unique_function_nonser<void()> && f)
+        void set_task(util::unique_function_nonser<void()>&& f)
         {
             f_ = std::move(f);
         }
@@ -264,7 +262,7 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        void set_value (RemoteResult && result)
+        void set_value (RemoteResult&& result)
         {
             // set the received result, reset error status
             this->set_data(std::move(result));
@@ -392,9 +390,6 @@ namespace hpx { namespace components
         struct tag {};
         typedef lcos::local::spinlock_pool<tag> mutex_type;
 
-        typedef lcos::detail::promise_base<void, util::unused_type>
-            promise_base_type;
-
     public:
         managed_promise()
           : promise_(0)
@@ -422,7 +417,7 @@ namespace hpx { namespace components
             p->promise_->release();
         }
 
-        promise_base_type* promise_;
+        lcos::base_lco* promise_;
     };
 }}
 
@@ -496,7 +491,7 @@ namespace hpx { namespace lcos
                 << impl_->get_unmanaged_id() << ")";
         }
 
-        promise(promise && rhs)
+        promise(promise&& rhs)
           : impl_(std::move(rhs.impl_)),
             future_obtained_(rhs.future_obtained_)
         {
@@ -506,7 +501,7 @@ namespace hpx { namespace lcos
         virtual ~promise()
         {}
 
-        promise& operator=(promise && rhs)
+        promise& operator=(promise&& rhs)
         {
             if (this != &rhs)
             {
@@ -517,7 +512,7 @@ namespace hpx { namespace lcos
             return *this;
         }
 
-        void set_task(util::unique_function_nonser<void()> && f)
+        void set_task(util::unique_function_nonser<void()>&& f)
         {
             (*impl_)->set_task(std::move(f));
         }
@@ -605,7 +600,7 @@ namespace hpx { namespace lcos
 
         ///
         template <typename T>
-        void set_value(T && result)
+        void set_value(T&& result)
         {
             (*impl_)->set_data(std::forward<T>(result));
         }
@@ -651,7 +646,7 @@ namespace hpx { namespace lcos
                 << impl_->get_unmanaged_id() << ")";
         }
 
-        promise(promise && rhs)
+        promise(promise&& rhs)
           : impl_(std::move(rhs.impl_)),
             future_obtained_(rhs.future_obtained_)
         {
@@ -660,7 +655,7 @@ namespace hpx { namespace lcos
 
         virtual ~promise() {}
 
-        promise& operator=(promise && rhs)
+        promise& operator=(promise&& rhs)
         {
             if (this != &rhs)
             {
@@ -671,7 +666,7 @@ namespace hpx { namespace lcos
             return *this;
         }
 
-        void set_task(util::unique_function_nonser<void()> && f)
+        void set_task(util::unique_function_nonser<void()>&& f)
         {
             (*impl_)->set_task(std::move(f));
         }
@@ -772,7 +767,7 @@ namespace hpx { namespace traits
 {
     namespace detail
     {
-        HPX_EXPORT extern boost::detail::atomic_count unique_type;
+        HPX_EXPORT extern util::atomic_count unique_type;
     }
 
     template <typename Result, typename RemoteResult>
@@ -804,4 +799,4 @@ namespace hpx { namespace traits
     >::value = components::component_invalid;
 }}
 
-#endif
+#endif /*HPX_LCOS_PROMISE_HPP*/

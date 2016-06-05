@@ -6,23 +6,25 @@
 #ifndef HPX_TRAITS_IS_BITWISE_SERIALIZABLE_HPP
 #define HPX_TRAITS_IS_BITWISE_SERIALIZABLE_HPP
 
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
+#include <hpx/config.hpp>
 
-namespace hpx { namespace traits {
+#include <type_traits>
+
+namespace hpx { namespace traits
+{
     template <typename T>
     struct is_bitwise_serializable
-      : boost::is_arithmetic<T>
+      : std::is_arithmetic<T>
     {};
 }}
 
-#define HPX_IS_BITWISE_SERIALIZABLE(T)                                          \
-namespace hpx { namespace traits {                                              \
-    template <>                                                                 \
-    struct is_bitwise_serializable<T>                                           \
-      : boost::mpl::true_                                                       \
-    {};                                                                         \
-}}                                                                              \
+#define HPX_IS_BITWISE_SERIALIZABLE(T)                                        \
+namespace hpx { namespace traits {                                            \
+    template <>                                                               \
+    struct is_bitwise_serializable< T >                                       \
+      : std::true_type                                                        \
+    {};                                                                       \
+}}                                                                            \
 /**/
 
-#endif
+#endif /*HPX_TRAITS_IS_BITWISE_SERIALIZABLE_HPP*/

@@ -21,12 +21,11 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/init_logging.hpp>
 
-#include <boost/detail/atomic_count.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/exception_ptr.hpp>
@@ -55,7 +54,7 @@ namespace hpx
             util::function_nonser<runtime::hpx_main_function_type> func,
             int& result);
 
-        void wait_helper(boost::mutex& mtx, boost::condition& cond,
+        void wait_helper(boost::mutex& mtx, boost::condition_variable& cond,
             bool& running);
 
     public:
@@ -144,7 +143,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, boost::condition& cond, boost::mutex& mtx);
+        void stopped(bool blocking, boost::condition_variable& cond, boost::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -305,7 +304,7 @@ namespace hpx
         /// \note       The difference to a startup function is that all
         ///             pre-startup functions will be (system-wide) executed
         ///             before any startup function.
-        void add_pre_startup_function(util::function_nonser<void()> const& f);
+        void add_pre_startup_function(startup_function_type f);
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///
@@ -313,7 +312,7 @@ namespace hpx
         ///             thread before hpx_main is executed. This is very useful
         ///             to setup the runtime environment of the application
         ///             (install performance counters, etc.)
-        void add_startup_function(util::function_nonser<void()> const& f);
+        void add_startup_function(startup_function_type f);
 
         /// Add a function to be executed inside a HPX thread during
         /// hpx::finalize, but guaranteed before any of teh shutdown functions
@@ -327,7 +326,7 @@ namespace hpx
         /// \note       The difference to a shutdown function is that all
         ///             pre-shutdown functions will be (system-wide) executed
         ///             before any shutdown function.
-        void add_pre_shutdown_function(util::function_nonser<void()> const& f);
+        void add_pre_shutdown_function(shutdown_function_type f);
 
         /// Add a function to be executed inside a HPX thread during hpx::finalize
         ///
@@ -335,7 +334,7 @@ namespace hpx
         ///             thread while hpx::finalize is executed. This is very
         ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
-        void add_shutdown_function(util::function_nonser<void()> const& f);
+        void add_shutdown_function(shutdown_function_type f);
 
         /// Keep the factory object alive which is responsible for the given
         /// component type. This a purely internal function allowing to work
@@ -352,7 +351,7 @@ namespace hpx
 
         /// Register an external OS-thread with HPX
         bool register_thread(char const* name, std::size_t num = 0,
-            bool service_thread = true);
+            bool service_thread = true, error_code& ec = throws);
 
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
@@ -362,9 +361,17 @@ namespace hpx
         notification_policy_type get_notification_policy(char const* prefix);
 
     private:
-        void init_tss(char const* context, std::size_t num, char const* postfix,
-            bool service_thread);
         void deinit_tss();
+
+        void init_tss_ex(char const* context, std::size_t num,
+            char const* postfix, bool service_thread, error_code& ec);
+
+        void init_tss(char const* context, std::size_t num, char const* postfix,
+            bool service_thread)
+        {
+            error_code ec(lightweight);
+            return init_tss_ex(context, num, postfix, service_thread, ec);
+        }
 
     private:
         util::unique_id_ranges id_pool_;

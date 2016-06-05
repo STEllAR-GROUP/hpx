@@ -3,19 +3,23 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_POOL_EXECUTORS_JAN_11_2013_0831PM)
-#define HPX_RUNTIME_THREADS_EXECUTORS_POOL_EXECUTORS_JAN_11_2013_0831PM
+#ifndef HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_EXECUTORS_HPP
+#define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/unique_function.hpp>
 
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/atomic.hpp>
-#include <boost/chrono.hpp>
+#include <boost/chrono/chrono.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -64,7 +68,7 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
-            boost::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const;
 
             // Reset internal (round robin) thread distribution scheme
             void reset_thread_distribution();
@@ -120,8 +124,8 @@ namespace hpx { namespace threads { namespace executors
             // collect statistics
             boost::atomic<std::size_t> current_concurrency_;
             boost::atomic<std::size_t> max_current_concurrency_;
-            boost::atomic<boost::uint64_t> tasks_scheduled_;
-            boost::atomic<boost::uint64_t> tasks_completed_;
+            boost::atomic<std::uint64_t> tasks_scheduled_;
+            boost::atomic<std::uint64_t> tasks_completed_;
 
             // policy elements
             std::size_t const max_punits_;
@@ -191,5 +195,4 @@ namespace hpx { namespace threads { namespace executors
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
-
+#endif /*HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_EXECUTORS_HPP*/

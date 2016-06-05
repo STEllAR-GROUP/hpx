@@ -3,17 +3,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_COMPONENT_TYPE_DATABASE_OCT_27_2011_0420PM)
-#define HPX_TRAITS_COMPONENT_TYPE_DATABASE_OCT_27_2011_0420PM
+#ifndef HPX_TRAITS_COMPONENT_TYPE_DATABASE_HPP
+#define HPX_TRAITS_COMPONENT_TYPE_DATABASE_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace components
 {
-    typedef boost::int32_t component_type;
+    typedef std::int32_t component_type;
 }}
 
 namespace hpx { namespace traits
@@ -39,4 +39,4 @@ namespace hpx { namespace traits
     {};
 }}
 
-#endif
+#endif /*HPX_TRAITS_COMPONENT_TYPE_DATABASE_HPP*/

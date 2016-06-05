@@ -34,22 +34,22 @@ namespace hpx { namespace components
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
-    struct targeting_distribution_policy
+    struct target_distribution_policy
     {
     public:
-        /// Default-construct a new instance of a \a targeting_distribution_policy.
+        /// Default-construct a new instance of a \a target_distribution_policy.
         /// This policy will represent one locality (the local locality).
-        targeting_distribution_policy()
+        target_distribution_policy()
         {}
 
-        /// Create a new \a targeting_distribution_policy representing the given
+        /// Create a new \a target_distribution_policy representing the given
         /// locality
         ///
         /// \param loc     [in] The locality the new instance should
         ///                 represent
-        targeting_distribution_policy operator()(id_type const& id) const
+        target_distribution_policy operator()(id_type const& id) const
         {
-            return targeting_distribution_policy(id);
+            return target_distribution_policy(id);
         }
 
         /// Create one object on one of the localities associated by
@@ -122,7 +122,7 @@ namespace hpx { namespace components
         template <typename Action, typename ...Ts>
         HPX_FORCEINLINE hpx::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::traits::extract_action<Action>::remote_result_type
             >::type>
         async(launch policy, Ts&&... vs) const
         {
@@ -136,7 +136,7 @@ namespace hpx { namespace components
         template <typename Action, typename Callback, typename ...Ts>
         HPX_FORCEINLINE hpx::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::traits::extract_action<Action>::remote_result_type
             >::type>
         async_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
@@ -206,7 +206,7 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        targeting_distribution_policy(hpx::id_type const& id)
+        target_distribution_policy(hpx::id_type const& id)
           : id_(id)
         {}
 
@@ -222,21 +222,21 @@ namespace hpx { namespace components
         /// \endcond
     };
 
-    /// A predefined instance of the \a targeting_distribution_policy. It will
+    /// A predefined instance of the \a target_distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static targeting_distribution_policy const target;
+    static target_distribution_policy const target;
 }}
 
 /// \cond NOINTERNAL
 namespace hpx
 {
-    using hpx::components::targeting_distribution_policy;
+    using hpx::components::target_distribution_policy;
     using hpx::components::target;
 
     namespace traits
     {
         template <>
-        struct is_distribution_policy<components::targeting_distribution_policy>
+        struct is_distribution_policy<components::target_distribution_policy>
           : std::true_type
         {};
     }

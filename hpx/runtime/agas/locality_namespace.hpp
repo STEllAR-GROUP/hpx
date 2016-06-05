@@ -9,8 +9,9 @@
 #if !defined(HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM)
 #define HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM
 
-#include <hpx/include/client.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/stubs/locality_namespace.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>

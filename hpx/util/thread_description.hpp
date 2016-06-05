@@ -34,8 +34,8 @@ namespace hpx { namespace util
     private:
         union data
         {
-            char const* desc_;
-            std::size_t addr_;
+            char const* desc_; //-V117
+            std::size_t addr_; //-V117
         };
 
         data_type type_;
@@ -49,7 +49,7 @@ namespace hpx { namespace util
         thread_description() HPX_NOEXCEPT
           : type_(data_type_description)
         {
-            data_.desc_ = 0;
+            data_.desc_ = "<unknown>";
         }
 
         thread_description(char const* desc) HPX_NOEXCEPT

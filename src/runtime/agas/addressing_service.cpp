@@ -35,14 +35,16 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/broadcast.hpp>
 
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -294,7 +296,7 @@ void addressing_service::launch_bootstrap(
     naming::gid_type runtime_support_gid1(here);
     runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
     naming::gid_type runtime_support_gid2(here);
-    runtime_support_gid2.set_lsb(boost::uint64_t(0));
+    runtime_support_gid2.set_lsb(std::uint64_t(0));
 
     gva runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
@@ -693,12 +695,12 @@ lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
     {
         naming::id_type const target = bootstrap_locality_namespace_id();
         request req(locality_ns_num_localities, type);
-        return stubs::locality_namespace::service_async<boost::uint32_t>(target, req);
+        return stubs::locality_namespace::service_async<std::uint32_t>(target, req);
     }
 
     naming::id_type const target = bootstrap_component_namespace_id();
     request req(component_ns_num_localities, type);
-    return stubs::component_namespace::service_async<boost::uint32_t>(target, req);
+    return stubs::component_namespace::service_async<std::uint32_t>(target, req);
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -725,7 +727,7 @@ lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async(
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
-    return stubs::locality_namespace::service_async<boost::uint32_t>(target, req);
+    return stubs::locality_namespace::service_async<std::uint32_t>(target, req);
 } // }}}
 
 std::vector<boost::uint32_t> addressing_service::get_num_threads(
@@ -1707,7 +1709,7 @@ void addressing_service::route(
 // if there was a pending decref request at the point when the incref was sent.
 // The pending decref was subtracted from the amount of credits to incref.
 boost::int64_t addressing_service::synchronize_with_async_incref(
-    hpx::future<boost::int64_t> fut
+    hpx::future<std::int64_t> fut
   , naming::id_type const& id
   , boost::int64_t compensated_credit
     )
@@ -1819,8 +1821,8 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         stubs::primary_namespace::get_service_instance(e_lower)
       , naming::id_type::unmanaged);
 
-    lcos::future<boost::int64_t> f =
-        stubs::primary_namespace::service_async<boost::int64_t>(target, req);
+    lcos::future<std::int64_t> f =
+        stubs::primary_namespace::service_async<std::int64_t>(target, req);
 
     // pass the amount of compensated decrefs to the callback
     using util::placeholders::_1;
@@ -2995,7 +2997,7 @@ void addressing_service::send_refcnt_requests_sync(
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<void> addressing_service::mark_as_migrated(
     naming::gid_type const& gid_
-  , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f
+  , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f //-V669
     )
 {
     if (!gid_)
@@ -3144,7 +3146,7 @@ bool addressing_service::was_object_migrated_locked(
 std::pair<bool, components::pinned_ptr>
     addressing_service::was_object_migrated(
         naming::gid_type const& gid
-      , util::unique_function_nonser<components::pinned_ptr()> && f
+      , util::unique_function_nonser<components::pinned_ptr()> && f //-V669
         )
 {
     if (!gid)
@@ -3180,8 +3182,8 @@ namespace hpx
 {
     namespace detail
     {
-        inline std::string
-        name_from_basename(std::string const& basename, std::size_t idx)
+        std::string name_from_basename(std::string const& basename,
+            std::size_t idx)
         {
             HPX_ASSERT(!basename.empty());
 
@@ -3201,7 +3203,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<hpx::future<hpx::id_type> >
-        find_all_from_basename(std::string basename, std::size_t num_ids)
+        find_all_from_basename(std::string const& basename, std::size_t num_ids)
     {
         if (basename.empty())
         {
@@ -3221,7 +3223,7 @@ namespace hpx
     }
 
     std::vector<hpx::future<hpx::id_type> >
-        find_from_basename(std::string basename,
+        find_from_basename(std::string const& basename,
             std::vector<std::size_t> const& ids)
     {
         if (basename.empty())
@@ -3234,14 +3236,14 @@ namespace hpx
         std::vector<hpx::future<hpx::id_type> > results;
         for (std::size_t i : ids)
         {
-            std::string name = detail::name_from_basename(basename, i);
+            std::string name = detail::name_from_basename(basename, i); //-V106
             results.push_back(agas::on_symbol_namespace_event(
                 std::move(name), agas::symbol_ns_bind, true));
         }
         return results;
     }
 
-    hpx::future<hpx::id_type> find_from_basename(std::string basename,
+    hpx::future<hpx::id_type> find_from_basename(std::string const& basename,
         std::size_t sequence_nr)
     {
         if (basename.empty())
@@ -3259,7 +3261,7 @@ namespace hpx
             agas::symbol_ns_bind, true);
     }
 
-    hpx::future<bool> register_with_basename(std::string basename,
+    hpx::future<bool> register_with_basename(std::string const& basename,
         hpx::id_type id, std::size_t sequence_nr)
     {
         if (basename.empty())
@@ -3277,7 +3279,7 @@ namespace hpx
     }
 
     hpx::future<hpx::id_type> unregister_with_basename(
-        std::string basename, std::size_t sequence_nr)
+        std::string const& basename, std::size_t sequence_nr)
     {
         if (basename.empty())
         {

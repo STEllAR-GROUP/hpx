@@ -4,15 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/util/ini.hpp>
-#include <hpx/util/serialize_exception.hpp>
+
+#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <vector>
 

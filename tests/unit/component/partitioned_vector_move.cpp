@@ -17,7 +17,8 @@
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
 HPX_REGISTER_PARTITIONED_VECTOR(int);
-typedef typename std::string string;
+
+typedef std::string string;
 HPX_REGISTER_PARTITIONED_VECTOR(string);
 
 ///////////////////////////////////////////////////////////////////////////////

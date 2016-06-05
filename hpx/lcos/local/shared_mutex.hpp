@@ -45,6 +45,7 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             shared_mutex()
+              : shared_cond(), exclusive_cond(), upgrade_cond()
             {
                 state_data state_ = {0, 0, 0, 0};
                 state = state_;

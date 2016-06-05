@@ -3,11 +3,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
+
+#include <boost/io/ios_state.hpp>
+
+#include <iomanip>
+#include <iostream>
 
 namespace hpx { namespace naming { namespace detail
 {
@@ -18,7 +24,7 @@ namespace hpx { namespace naming { namespace detail
         address::address_type address_;
         address::address_type offset_;
 
-        template <class Archive>
+        template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
             ar & locality_ & type_ & address_ & offset_;
@@ -26,14 +32,7 @@ namespace hpx { namespace naming { namespace detail
     };
 }}}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct is_bitwise_serializable<
-            hpx::naming::detail::name_serialization_data>
-       : boost::mpl::true_
-    {};
-}}
+HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::name_serialization_data)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
@@ -69,4 +68,13 @@ namespace hpx { namespace naming
 
     template HPX_EXPORT
     void address::load(serialization::input_archive&, const unsigned int);
+
+    std::ostream& operator<<(std::ostream& os, address const& addr)
+    {
+        boost::io::ios_flags_saver ifs(os);
+        os << "(" << addr.locality_ << ":"
+           << components::get_component_type_name(addr.type_)
+           << ":" << std::showbase << std::hex << addr.address_ << ")";
+        return os;
+    }
 }}

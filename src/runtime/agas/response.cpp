@@ -6,17 +6,33 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
-#include <hpx/lcos/base_lco.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/response.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/base_lco_factory.hpp>
+
+#include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/map.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/runtime/serialization/variant.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <boost/mpl/at.hpp>
+#include <boost/preprocessor/repeat.hpp>
+#include <boost/variant.hpp>
+
+#include <cstdint>
 #include <map>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -74,7 +90,7 @@ namespace hpx { namespace agas
             util::tuple<
                 naming::gid_type // lower bound
               , naming::gid_type // upper bound
-              , boost::uint32_t  // prefix
+              , std::uint32_t  // prefix
             >
             // 0x1
             // primary_ns_resolve_gid
@@ -100,7 +116,7 @@ namespace hpx { namespace agas
             // primary_ns_localities
             // component_ns_resolve_id
           , util::tuple<
-                std::vector<boost::uint32_t> // prefixes
+                std::vector<std::uint32_t> // prefixes
             >
             // 0x5
             // symbol_ns_unbind
@@ -114,7 +130,7 @@ namespace hpx { namespace agas
             // 0x6
             // primary_ns_resolve_locality
           , util::tuple<
-                boost::uint32_t // prefix
+                std::uint32_t // prefix
             >
             // 0x7
             // primary_ns_free
@@ -140,7 +156,7 @@ namespace hpx { namespace agas
             // 0xa
             // primary_ns_change_credit_one
           , util::tuple<
-                boost::int64_t  // added credits
+                std::int64_t  // added credits
               , int             // dummy
             >
             // 0xb
@@ -215,7 +231,7 @@ namespace hpx { namespace agas
         namespace_action_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
       , error status_
         )
       : mc(type_)
@@ -268,7 +284,7 @@ namespace hpx { namespace agas
 
     response::response(
         namespace_action_code type_
-      , std::vector<boost::uint32_t> const& prefixes_
+      , std::vector<std::uint32_t> const& prefixes_
       , error status_
         )
       : mc(type_)
@@ -292,7 +308,7 @@ namespace hpx { namespace agas
 
     response::response(
         namespace_action_code type_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
       , error status_
         )
       : mc(type_)
@@ -339,7 +355,7 @@ namespace hpx { namespace agas
 
     response::response(
         namespace_action_code type_
-      , boost::int64_t added_credits_
+      , std::int64_t added_credits_
       , error status_
         )
       : mc(type_)
@@ -408,7 +424,7 @@ namespace hpx { namespace agas
         }
     }
 
-    std::vector<boost::uint32_t> response::get_localities(
+    std::vector<std::uint32_t> response::get_localities(
         error_code& ec
         ) const
     {
@@ -431,31 +447,31 @@ namespace hpx { namespace agas
         return data->get_data<response_data::subtype_endpoints, 0>(ec);
     }
 
-    boost::uint32_t response::get_num_localities(
+    std::uint32_t response::get_num_localities(
         error_code& ec
         ) const
     {
         return data->get_data<response_data::subtype_prefix, 0>(ec);
     }
 
-    boost::int64_t response::get_added_credits(
+    std::int64_t response::get_added_credits(
         error_code& ec
         ) const
     {
         return data->get_data<response_data::subtype_added_credits, 0>(ec);
     }
 
-    boost::uint32_t response::get_num_overall_threads(
+    std::uint32_t response::get_num_overall_threads(
         error_code& ec
         ) const
     {
-        std::vector<boost::uint32_t> const& v =
+        std::vector<std::uint32_t> const& v =
             data->get_data<response_data::subtype_prefixes, 0>(ec);
 
-        return std::accumulate(v.begin(), v.end(), boost::uint32_t(0));
+        return std::accumulate(v.begin(), v.end(), std::uint32_t(0));
     }
 
-    std::vector<boost::uint32_t> response::get_num_threads(
+    std::vector<std::uint32_t> response::get_num_threads(
         error_code& ec
         ) const
     {
@@ -469,7 +485,7 @@ namespace hpx { namespace agas
         return data->get_data<response_data::subtype_ctype, 0>(ec);
     }
 
-    boost::uint32_t response::get_locality_id(
+    std::uint32_t response::get_locality_id(
         error_code& ec
         ) const
     {

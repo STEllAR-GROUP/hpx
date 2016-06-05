@@ -4,30 +4,37 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
+
+#include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/logging.hpp>
 
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <boost/io/ios_state.hpp>
+#include <boost/ref.hpp>
 
-#include <hpx/traits/is_bitwise_serializable.hpp>
-
-#include <boost/mpl/bool.hpp>
-
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
 #include <memory>
 #include <mutex>
+#include <sstream>
+#include <string>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,14 +109,7 @@ namespace hpx { namespace naming { namespace detail
     struct gid_serialization_data;
 }}}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct is_bitwise_serializable<
-            hpx::naming::detail::gid_serialization_data>
-       : boost::mpl::true_
-    {};
-}}
+HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::gid_serialization_data)
 
 namespace hpx { namespace naming
 {
@@ -136,7 +136,7 @@ namespace hpx { namespace naming
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,
-                    boost::int64_t credits = detail::get_credit_from_gid(*p);
+                    std::int64_t credits = detail::get_credit_from_gid(*p);
                     HPX_ASSERT(0 != credits);
 
                     if (get_runtime_ptr())
@@ -183,7 +183,7 @@ namespace hpx { namespace naming
 
         // custom deleter for managed gid_types, will be called when the last
         // copy of the corresponding naming::id_type goes out of scope
-        void gid_managed_deleter (id_type_impl* p)
+        void gid_managed_deleter(id_type_impl* p)
         {
             // a credit of zero means the component is not (globally) reference
             // counted
@@ -270,7 +270,7 @@ namespace hpx { namespace naming
 
             // Fill the new gid with our new credit and mark it as being split
             naming::detail::set_credit_for_gid(new_gid,
-                static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL));
+                static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL));
             set_credit_split_mask_for_gid(new_gid);
 
             // Another concurrent split operation might have happened
@@ -280,18 +280,18 @@ namespace hpx { namespace naming
             // Get the current credit for our gid. If no other concurrent
             // split has happened since we invoked incref below, the credit
             // of this gid is equal to 2, otherwise it is larger.
-            boost::int64_t src_credit = get_credit_from_gid(gid);
+            std::int64_t src_credit = get_credit_from_gid(gid);
             HPX_ASSERT(src_credit >= 2);
 
-            boost::int64_t split_credit =
-                static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL) - 2;
-            boost::int64_t new_credit = src_credit + split_credit;
-            boost::int64_t overflow_credit = new_credit -
-                static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL);
+            std::int64_t split_credit =
+                static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL) - 2;
+            std::int64_t new_credit = src_credit + split_credit;
+            std::int64_t overflow_credit = new_credit -
+                static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL);
 
             new_credit
                 = (std::min)(
-                    static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL),
+                    static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL),
                     new_credit);
             naming::detail::set_credit_for_gid(gid, new_credit);
 
@@ -332,7 +332,7 @@ namespace hpx { namespace naming
                 // credit is guaranteed to arrive only after we incremented the
                 // credit successfully in agas.
                 HPX_ASSERT(get_log2credit_from_gid(gid) > 0);
-                boost::int16_t src_log2credits = get_log2credit_from_gid(gid);
+                std::int16_t src_log2credits = get_log2credit_from_gid(gid);
 
                 // Credit exhaustion - we need to get more.
                 if(src_log2credits == 1)
@@ -344,8 +344,8 @@ namespace hpx { namespace naming
 
                     // We add HPX_GLOBALCREDIT_INITIAL credits for the new gid
                     // and HPX_GLOBALCREDIT_INITIAL - 2 for the old one.
-                    boost::int64_t new_credit = 2 *
-                        (static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL) - 1);
+                    std::int64_t new_credit = 2 *
+                        (static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL) - 1);
 
                     naming::gid_type new_gid = gid;     // strips lock-bit
                     HPX_ASSERT(new_gid != invalid_gid);
@@ -377,7 +377,7 @@ namespace hpx { namespace naming
         }
 
         gid_type move_gid_locked(
-            std::unique_lock<gid_type::mutex_type> l, gid_type& gid)
+            std::unique_lock<gid_type::mutex_type> l, gid_type& gid) //-V813
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -404,7 +404,7 @@ namespace hpx { namespace naming
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
-            boost::uint16_t log2credits = get_log2credit_from_gid(id);
+            std::uint16_t log2credits = get_log2credit_from_gid(id);
             HPX_ASSERT(log2credits > 0);
 
             gid_type newid = id;            // strips lock-bit
@@ -419,9 +419,9 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        boost::int64_t replenish_credits(gid_type& gid)
+        std::int64_t replenish_credits(gid_type& gid)
         {
-            boost::int64_t added_credit = 0;
+            std::int64_t added_credit = 0;
 
             {
                 typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
@@ -437,9 +437,9 @@ namespace hpx { namespace naming
             return agas::incref(unlocked_gid, added_credit);
         }
 
-        boost::int64_t add_credit_to_gid(gid_type& id, boost::int64_t credits)
+        std::int64_t add_credit_to_gid(gid_type& id, std::int64_t credits)
         {
-            boost::int64_t c = get_credit_from_gid(id);
+            std::int64_t c = get_credit_from_gid(id);
 
             c += credits;
             set_credit_for_gid(id, c);
@@ -447,9 +447,9 @@ namespace hpx { namespace naming
             return c;
         }
 
-        boost::int64_t remove_credit_from_gid(gid_type& id, boost::int64_t debit)
+        std::int64_t remove_credit_from_gid(gid_type& id, std::int64_t debit)
         {
-            boost::int64_t c = get_credit_from_gid(id);
+            std::int64_t c = get_credit_from_gid(id);
             HPX_ASSERT(c > debit);
 
             c -= debit;
@@ -458,13 +458,13 @@ namespace hpx { namespace naming
             return c;
         }
 
-        boost::int64_t fill_credit_for_gid(gid_type& id,
-            boost::int64_t credits)
+        std::int64_t fill_credit_for_gid(gid_type& id,
+            std::int64_t credits)
         {
-            boost::int64_t c = get_credit_from_gid(id);
+            std::int64_t c = get_credit_from_gid(id);
             HPX_ASSERT(c <= credits);
 
-            boost::int64_t added = credits - c;
+            std::int64_t added = credits - c;
             set_credit_for_gid(id, credits);
 
             return added;
@@ -476,7 +476,7 @@ namespace hpx { namespace naming
             gid_type gid_;
             detail::id_type_management type_;
 
-            template <class Archive>
+            template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
                 ar & gid_ & type_;
@@ -540,7 +540,7 @@ namespace hpx { namespace naming
             }
         }
 
-        /// support functions for boost::intrusive_ptr
+        /// support functions for std::intrusive_ptr
         void intrusive_ptr_add_ref(id_type_impl* p)
         {
             ++p->count_;
@@ -556,15 +556,15 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     gid_type operator+ (gid_type const& lhs, gid_type const& rhs)
     {
-        boost::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
-        boost::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
+        std::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
+        std::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
 
 #if defined(HPX_DEBUG)
         // make sure we're using the operator+ in proper contexts only
-        boost::uint64_t lhs_internal_bits =
+        std::uint64_t lhs_internal_bits =
             detail::get_internal_bits(lhs.id_msb_);
 
-        boost::uint64_t msb_test =
+        std::uint64_t msb_test =
             detail::strip_internal_bits_from_gid(lhs.id_msb_) +
             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
 
@@ -579,20 +579,20 @@ namespace hpx { namespace naming
 
     gid_type operator- (gid_type const& lhs, gid_type const& rhs)
     {
-        boost::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
-        boost::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
+        std::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
+        std::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
 
 // #if defined(HPX_DEBUG)
 //         // make sure we're using the operator- in proper contexts only
-//         boost::uint64_t lhs_internal_bits = detail::get_internal_bits(lhs.id_msb_);
+//         std::uint64_t lhs_internal_bits = detail::get_internal_bits(lhs.id_msb_);
 //
-//         boost::uint64_t msb_test =
+//         std::uint64_t msb_test =
 //             detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
 //             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
 //
-//         boost::uint32_t lhs_locality_id =
+//         std::uint32_t lhs_locality_id =
 //             naming::get_locality_id_from_gid(lhs.id_msb_);
-//         boost::uint32_t rhs_locality_id =
+//         std::uint32_t rhs_locality_id =
 //             naming::get_locality_id_from_gid(rhs.id_msb_);
 //         if (rhs_locality_id != naming::invalid_locality_id)
 //         {
@@ -613,7 +613,16 @@ namespace hpx { namespace naming
         return gid_type(msb, lsb);
     }
 
-    std::ostream& operator<< (std::ostream& os, gid_type const& id)
+    std::string gid_type::to_string() const
+    {
+        std::ostringstream out;
+        out << std::hex
+            << std::right << std::setfill('0') << std::setw(16) << id_msb_
+            << std::right << std::setfill('0') << std::setw(16) << id_lsb_;
+        return out.str();
+    }
+
+    std::ostream& operator<<(std::ostream& os, gid_type const& id)
     {
         boost::io::ios_flags_saver ifs(os);
         if (id != naming::invalid_gid)
@@ -631,18 +640,29 @@ namespace hpx { namespace naming
         return os;
     }
 
+    std::ostream& operator<<(std::ostream& os, id_type const& id)
+    {
+        if (!id)
+        {
+            os << "{invalid}";
+        }
+        else
+        {
+            os << id.get_gid();
+        }
+        return os;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
     void gid_type::save(
-        T& ar
+        serialization::output_archive& ar
       , const unsigned int version) const
     {
         ar << id_msb_ << id_lsb_;
     }
 
-    template <typename T>
     void gid_type::load(
-        T& ar
+        serialization::input_archive& ar
       , const unsigned int /*version*/)
     {
         ar >> id_msb_ >> id_lsb_;
@@ -650,16 +670,9 @@ namespace hpx { namespace naming
         id_msb_ &= ~is_locked_mask;     // strip lock-bit upon receive
     }
 
-    template HPX_EXPORT void gid_type::save<serialization::output_archive>(
-        serialization::output_archive&
-      , const unsigned int) const;
-    template HPX_EXPORT void gid_type::load<serialization::input_archive>(
-        serialization::input_archive&
-      , const unsigned int);
-
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    void id_type::save(T& ar,
+    void id_type::save(
+        serialization::output_archive& ar,
         const unsigned int version) const
     {
         // We serialize the intrusive ptr and use pointer tracking here. This
@@ -668,17 +681,12 @@ namespace hpx { namespace naming
         ar << gid_;
     }
 
-    template <typename T>
-    void id_type::load(T& ar,
+    void id_type::load(
+        serialization::input_archive& ar,
         const unsigned int version)
     {
         ar >> gid_;
     }
-
-    template HPX_EXPORT void id_type::save<serialization::output_archive>(
-        serialization::output_archive&, const unsigned int) const;
-    template HPX_EXPORT void id_type::load<serialization::input_archive>(
-        serialization::input_archive&, const unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
     char const* const management_type_names[] =

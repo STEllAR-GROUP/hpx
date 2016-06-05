@@ -1,32 +1,35 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
-#define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
+#ifndef HPX_RUNTIME_AGAS_RESPONSE_HPP
+#define HPX_RUNTIME_AGAS_RESPONSE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
-#include <boost/variant.hpp>
-#include <boost/mpl/at.hpp>
-
+#include <cstdint>
+#include <map>
 #include <map>
 #include <memory>
-#include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas
@@ -45,7 +48,7 @@ struct HPX_EXPORT response
         namespace_action_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
       , error status_ = success
         );
 
@@ -72,7 +75,7 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , std::vector<boost::uint32_t> const& prefixes_
+      , std::vector<std::uint32_t> const& prefixes_
       , error status_ = success
         );
 
@@ -84,7 +87,7 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , boost::uint32_t prefix_
+      , std::uint32_t prefix_
       , error status_ = success
         );
 
@@ -107,7 +110,7 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , boost::int64_t added_credits_
+      , std::int64_t added_credits_
       , error status_ = success
         );
 
@@ -134,7 +137,7 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    std::vector<boost::uint32_t> get_localities(
+    std::vector<std::uint32_t> get_localities(
         error_code& ec = throws
         ) const;
 
@@ -146,15 +149,15 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_num_localities(
+    std::uint32_t get_num_localities(
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_num_overall_threads(
+    std::uint32_t get_num_overall_threads(
         error_code& ec = throws
         ) const;
 
-    std::vector<boost::uint32_t> get_num_threads(
+    std::vector<std::uint32_t> get_num_threads(
         error_code& ec = throws
         ) const;
 
@@ -162,7 +165,7 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    boost::uint32_t get_locality_id(
+    std::uint32_t get_locality_id(
         error_code& ec = throws
         ) const;
 
@@ -171,7 +174,7 @@ struct HPX_EXPORT response
         ) const;
 
     // primary_ns_change_credit_one
-    boost::int64_t get_added_credits(
+    std::int64_t get_added_credits(
         error_code& ec = throws
         ) const;
 
@@ -229,14 +232,18 @@ struct HPX_EXPORT response
     std::unique_ptr<response_data> data;
 };
 
-}
-
-namespace traits
+template <typename Result>
+struct get_response_result
 {
+    static agas::response const& call(agas::response const& rep)
+    {
+        return rep;
+    }
+};
 
 // TODO: verification of namespace_action_code
 template <>
-struct get_remote_result<naming::id_type, agas::response>
+struct get_response_result<naming::id_type>
 {
     static naming::id_type call(
         agas::response const& rep
@@ -263,16 +270,16 @@ struct get_remote_result<naming::id_type, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<naming::id_type, agas::response>::call",
+            "get_response_result<naming::id_type, agas::response>::call",
             "unexpected action code in result conversion");
         return naming::invalid_id;
     }
 };
 
 template <>
-struct get_remote_result<boost::uint32_t, agas::response>
+struct get_response_result<std::uint32_t>
 {
-    static boost::uint32_t call(
+    static std::uint32_t call(
         agas::response const& rep
         )
     {
@@ -288,16 +295,16 @@ struct get_remote_result<boost::uint32_t, agas::response>
             break;
         }
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<boost::uint32_t, agas::response>::call",
+            "get_response_result<std::uint32_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
     }
 };
 
 template <>
-struct get_remote_result<boost::int64_t, agas::response>
+struct get_response_result<std::int64_t>
 {
-    static boost::int64_t call(
+    static std::int64_t call(
         agas::response const& rep
         )
     {
@@ -310,14 +317,14 @@ struct get_remote_result<boost::int64_t, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<boost::int64_t, agas::response>::call",
+            "get_response_result<std::int64_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
     }
 };
 
 template <>
-struct get_remote_result<bool, agas::response>
+struct get_response_result<bool>
 {
     static bool call(
         agas::response const& rep
@@ -334,16 +341,16 @@ struct get_remote_result<bool, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<void, agas::response>::call",
+            "get_response_result<void, agas::response>::call",
             "unexpected action code in result conversion");
         return false;
     }
 };
 
 template <>
-struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
+struct get_response_result<std::vector<std::uint32_t>>
 {
-    static std::vector<boost::uint32_t> call(
+    static std::vector<std::uint32_t> call(
         agas::response const& rep
         )
     {
@@ -356,14 +363,14 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call",
+            "get_response_result<std::vector<std::uint32_t>, agas::response>::call",
             "unexpected action code in result conversion");
-        return std::vector<boost::uint32_t>();
+        return std::vector<std::uint32_t>();
     }
 };
 
 template <>
-struct get_remote_result<naming::address, agas::response>
+struct get_response_result<naming::address>
 {
     static naming::address call(
         agas::response const& rep
@@ -381,14 +388,14 @@ struct get_remote_result<naming::address, agas::response>
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<naming::address>, agas::response>::call",
+            "get_response_result<naming::address>, agas::response>::call",
             "unexpected action code in result conversion");
         return naming::address();
     }
 };
 
 template <>
-struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>
+struct get_response_result<std::pair<naming::id_type, naming::address> >
 {
     static std::pair<naming::id_type, naming::address> call(
         agas::response const& rep
@@ -409,7 +416,7 @@ struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::resp
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<std::pair<naming::id_type, naming::address>,"
+            "get_response_result<std::pair<naming::id_type, naming::address>,"
             " agas::response>::call",
             "unexpected action code in result conversion");
         return std::pair<naming::id_type, naming::address>();
@@ -417,8 +424,7 @@ struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::resp
 };
 
 template <>
-struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>,
-    agas::response>
+struct get_response_result<std::map<naming::gid_type, parcelset::endpoints_type> >
 {
     static std::map<naming::gid_type, parcelset::endpoints_type> call(
         agas::response const& rep
@@ -429,7 +435,7 @@ struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>,
 };
 
 template <>
-struct get_remote_result<parcelset::endpoints_type, agas::response>
+struct get_response_result<parcelset::endpoints_type>
 {
     static parcelset::endpoints_type call(
         agas::response const& rep
@@ -447,22 +453,4 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::agas::response>, hpx_agas_response_vector_type)
 
-namespace hpx { namespace agas { namespace create_result_ns {
-    typedef
-        hpx::lcos::base_lco_with_value<bool, hpx::agas::response>
-        base_lco_bool_response_type;
-    typedef
-        hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::agas::response>
-        base_lco_id_type_response_type;
-}}}
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::create_result_ns::base_lco_bool_response_type::set_value_action,
-    set_value_action_agas_bool_response_type)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::create_result_ns::base_lco_id_type_response_type::set_value_action,
-    set_value_action_agas_id_type_response_type)
-
-#endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
-
+#endif /*HPX_RUNTIME_AGAS_RESPONSE_HPP*/

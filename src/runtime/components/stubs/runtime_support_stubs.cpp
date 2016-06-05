@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/async.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
@@ -13,7 +14,6 @@
 #include <hpx/runtime/get_colocation_id.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/include/async.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/traits/component_supports_migration.hpp>

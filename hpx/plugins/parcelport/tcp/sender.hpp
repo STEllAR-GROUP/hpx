@@ -21,6 +21,7 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -46,7 +47,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             performance_counters::parcels::gatherer& parcels_sent)
           : socket_(io_service)
           , ack_(0)
-          , there_(locality_id), parcels_sent_(parcels_sent)
+          , there_(locality_id)
+          , timer_()
+          , parcels_sent_(parcels_sent)
         {
         }
 

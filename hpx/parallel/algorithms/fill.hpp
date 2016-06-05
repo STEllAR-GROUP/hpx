@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -17,6 +18,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 // extra
@@ -32,6 +34,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // fill
     namespace detail
     {
+        template <typename T>
+        struct fill_iteration
+        {
+            typename hpx::util::decay<T>::type val_;
+
+            template <typename U>
+            HPX_HOST_DEVICE
+            typename std::enable_if<
+                !hpx::traits::is_value_proxy<U>::value
+            >::type
+            operator()(U &u)
+            {
+                u = val_;
+            }
+
+            template <typename U>
+            HPX_HOST_DEVICE
+            typename std::enable_if<
+                hpx::traits::is_value_proxy<U>::value
+            >::type
+            operator()(U u)
+            {
+                u = val_;
+            }
+        };
+
         /// \cond NOINTERNAL
         struct fill : public detail::algorithm<fill>
         {
@@ -40,6 +68,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {}
 
             template <typename ExPolicy, typename InIter, typename T>
+            HPX_HOST_DEVICE
             static hpx::util::unused_type
             sequential(ExPolicy, InIter first, InIter last,
                 T const& val)
@@ -64,9 +93,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     for_each_n<FwdIter>().call(
                         std::forward<ExPolicy>(policy), std::false_type(),
                         first, std::distance(first, last),
-                        [val](type& v) {
-                            v = val;
-                        });
+                        fill_iteration<T>{val},
+                        util::projection_identity());
             }
         };
 
@@ -190,7 +218,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [val](type& v) -> void
                         {
                             v = val;
-                        });
+                        },
+                        util::projection_identity());
             }
         };
         /// \endcond

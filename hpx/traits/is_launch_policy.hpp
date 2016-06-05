@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,9 +12,7 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/mpl/or.hpp>
+#include <type_traits>
 
 namespace hpx { namespace threads
 {
@@ -27,12 +25,12 @@ namespace hpx { namespace traits
     {
         template <typename Policy>
         struct is_launch_policy
-          : boost::is_same<launch, Policy>
+          : std::is_same<launch, Policy>
         {};
 
         template <typename Policy>
         struct is_threads_executor
-          : boost::is_base_of<threads::executor, Policy>
+          : std::is_base_of<threads::executor, Policy>
         {};
     }
 
@@ -48,7 +46,9 @@ namespace hpx { namespace traits
 
     template <typename Policy>
     struct is_launch_policy_or_executor
-      : boost::mpl::or_<is_launch_policy<Policy>, is_threads_executor<Policy> >
+      : std::integral_constant<bool,
+            is_launch_policy<Policy>::value ||
+                is_threads_executor<Policy>::value>
     {};
 }}
 

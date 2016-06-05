@@ -46,11 +46,11 @@ namespace hpx { namespace lcos { namespace server
         enum { value = components::component_barrier };
 
         barrier()
-          : number_of_threads_(1)
+          : mtx_(), number_of_threads_(1), cond_()
         {}
 
         barrier(std::size_t number_of_threads)
-          : number_of_threads_(number_of_threads)
+          : mtx_(), number_of_threads_(number_of_threads), cond_()
         {}
 
         // disambiguate base classes

@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace process { namespace windows
         {
             boost::filesystem::path p = *it;
             p /= filename;
-            boost::array<std::string, 4> extensions =
+            boost::array<std::string, 4> extensions = //-V112
                 { "", ".exe", ".com", ".bat" };
             for (boost::array<std::string, 4>::iterator it2 = extensions.begin();
                 it2 != extensions.end(); ++it2)
@@ -96,7 +96,7 @@ namespace hpx { namespace components { namespace process { namespace windows
                 boost::system::error_code ec;
                 bool file = boost::filesystem::is_regular_file(p2, ec);
                 if (!ec && file &&
-                    SHGetFileInfoA(p2.string().c_str(), 0, 0, 0, SHGFI_EXETYPE))
+                    SHGetFileInfoA(p2.string().c_str(), 0, 0, 0, SHGFI_EXETYPE)) //-V575
                 {
                     return p2.string();
                 }

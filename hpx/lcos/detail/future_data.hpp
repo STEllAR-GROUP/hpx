@@ -16,13 +16,13 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/util/unique_function.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/unique_function.hpp>
+#include <hpx/util/unused.hpp>
 
-#include <boost/detail/atomic_count.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/math/common_factor_ct.hpp>
@@ -86,7 +86,7 @@ namespace detail
         friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
         friend void intrusive_ptr_release(future_data_refcnt_base* p);
 
-        boost::detail::atomic_count count_;
+        util::atomic_count count_;
     };
 
     /// support functions for boost::intrusive_ptr
@@ -355,26 +355,25 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
+            // We need to run the completion asynchronously if we aren't on a
+            // HPX thread
+            if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+            {
+                HPX_THROW_EXCEPTION(null_thread_id,
+                        "future_data::handle_on_completed",
+                        "NULL thread id encountered");
+            }
+
 #if defined(HPX_WINDOWS)
             bool recurse_asynchronously = false;
 #elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-            std::ptrdiff_t remaining_stack =
-                this_thread::get_available_stack_space();
-
-            if(remaining_stack < 0)
-            {
-                HPX_THROW_EXCEPTION(out_of_memory,
-                    "future_data::handle_on_completed",
-                    "Stack overflow");
-            }
             bool recurse_asynchronously =
-                remaining_stack < 8 * HPX_THREADS_STACK_OVERHEAD;
+                !this_thread::has_sufficient_stack_space();
 #else
             handle_continuation_recursion_count cnt;
             bool recurse_asynchronously =
                 cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
 #endif
-
             if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread

@@ -18,7 +18,11 @@
 using namespace boost::chrono;
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::thread::id test() { return hpx::this_thread::get_id(); }
+hpx::thread::id test(int passed_through)
+{
+    HPX_TEST_EQ(passed_through, 42);
+    return hpx::this_thread::get_id();
+}
 
 template <typename Executor>
 void test_timed_sync(Executor& exec)
@@ -26,12 +30,14 @@ void test_timed_sync(Executor& exec)
     typedef hpx::parallel::timed_executor_traits<Executor> traits;
 
     HPX_TEST(
-        traits::execute_after(exec, milliseconds(1), &test) !=
-            hpx::this_thread::get_id());
+        traits::execute_after(
+            exec, milliseconds(1), &test, 42
+        ) != hpx::this_thread::get_id());
 
     HPX_TEST(
-        traits::execute_at(exec, steady_clock::now()+milliseconds(1), &test) !=
-            hpx::this_thread::get_id());
+        traits::execute_at(
+            exec, steady_clock::now()+milliseconds(1), &test, 42
+        ) != hpx::this_thread::get_id());
 }
 
 template <typename Executor>
@@ -41,12 +47,12 @@ void test_timed_async(Executor& exec)
 
     HPX_TEST(
         traits::async_execute_after(
-            exec, milliseconds(1), &test
+            exec, milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
 
     HPX_TEST(
         traits::async_execute_at(
-            exec, steady_clock::now()+milliseconds(1), &test
+            exec, steady_clock::now()+milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
 }
 
@@ -55,8 +61,9 @@ void test_timed_apply(Executor& exec)
 {
     typedef hpx::parallel::timed_executor_traits<Executor> traits;
 
-    traits::apply_execute_after(exec, milliseconds(1), &test);
-    traits::apply_execute_at(exec, steady_clock::now()+milliseconds(1), &test);
+    traits::apply_execute_after(exec, milliseconds(1), &test, 42);
+    traits::apply_execute_at(
+        exec, steady_clock::now() + milliseconds(1), &test, 42);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// The purpose of this example is to demonstrate how the partinioned_vector
+// The purpose of this example is to demonstrate how the partitioned_vector
 // data structure can be used in an SPMD style way, i.e. how to execute code
 // on each of the localities the partinioned_vector is located. Each locality
 // touches only the elements located on this locality. The access to those
@@ -148,8 +148,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
         else
         {
-            v.connect_to(example_vector_name);
+            hpx::future<void> f1 = v.connect_to(example_vector_name);
             l.connect_to(example_latch_name);
+            f1.get();
         }
 
         boost::random::mt19937 gen(std::rand());

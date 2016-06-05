@@ -34,7 +34,6 @@
 #endif
 
 #include <boost/atomic.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>
 
@@ -238,7 +237,8 @@ namespace hpx { namespace threads { namespace coroutines
             std::ptrdiff_t get_available_stack_space()
             {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-                return reinterpret_cast<std::size_t>(stack_pointer_) - get_stack_ptr();
+                return stack_size_ -
+                    (reinterpret_cast<std::size_t>(stack_pointer_) - get_stack_ptr());
 #else
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif

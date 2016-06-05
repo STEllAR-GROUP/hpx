@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
@@ -162,16 +163,13 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>
     hpx::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
     async_impl(launch policy, hpx::id_type const& id,
         Ts&&... vs)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename traits::promise_local_result<
-            typename action_type::remote_result_type
-        >::type result_type;
+        typedef typename hpx::traits::extract_action<Action>::type action_type;
+        typedef typename action_type::local_result_type result_type;
         typedef typename action_type::component_type component_type;
 
         std::pair<bool, components::pinned_ptr> r;
@@ -209,6 +207,7 @@ namespace hpx { namespace detail
         if (policy == launch::sync || hpx::detail::has_async_policy(policy))
         {
             lcos::packaged_action<action_type, result_type> p;
+
             p.apply(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Ts>(vs)...);
             f = p.get_future();
@@ -247,16 +246,13 @@ namespace hpx { namespace detail
     ///
     template <typename Action, typename Callback, typename ...Ts>
     hpx::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
     async_cb_impl(launch policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename traits::promise_local_result<
-            typename action_type::remote_result_type
-        >::type result_type;
+        typedef typename hpx::traits::extract_action<Action>::type action_type;
+        typedef typename action_type::local_result_type result_type;
         typedef typename action_type::component_type component_type;
 
         std::pair<bool, components::pinned_ptr> r;

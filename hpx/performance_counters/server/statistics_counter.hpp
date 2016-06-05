@@ -52,7 +52,9 @@ namespace hpx { namespace performance_counters { namespace server
         typedef statistics_counter type_holder;
         typedef base_performance_counter base_type_holder;
 
-        statistics_counter() {}
+        statistics_counter()
+          : parameter1_(0), parameter2_(0)
+        {}
 
         statistics_counter(counter_info const& info,
             std::string const& base_counter_name,

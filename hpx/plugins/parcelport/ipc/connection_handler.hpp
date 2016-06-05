@@ -15,7 +15,7 @@
 #include <hpx/plugins/parcelport/ipc/acceptor.hpp>
 #include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <memory>
 #include <set>
@@ -56,7 +56,7 @@ namespace hpx { namespace parcelset {
 
     namespace policies { namespace ipc
     {
-        parcelset::locality parcelport_address(util::runtime_configuration const & ini);
+        parcelset::locality parcelport_address(util::runtime_configuration const& ini);
 
         class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
@@ -83,7 +83,7 @@ namespace hpx { namespace parcelset {
             std::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
-            parcelset::locality agas_locality(util::runtime_configuration const & ini)
+            parcelset::locality agas_locality(util::runtime_configuration const& ini)
                 const;
 
             parcelset::locality create_locality() const;

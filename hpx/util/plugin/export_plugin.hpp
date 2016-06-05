@@ -11,11 +11,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/plugin/config.hpp>
+#include <hpx/util/plugin/abstract_factory.hpp>
 #include <hpx/util/plugin/concrete_factory.hpp>
 
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/any.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/preprocessor/stringize.hpp>
 
 #include <map>
 #include <string>

@@ -6,9 +6,9 @@
 #if !defined(HPX_COMPONENTS_PROCESS_MAR_11_2016_1255PM)
 #define HPX_COMPONENTS_PROCESS_MAR_11_2016_1255PM
 
-#include <hpx/include/actions.hpp>
-#include <hpx/include/naming.hpp>
-#include <hpx/include/components.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
 #include <hpx/components/process/child.hpp>
 

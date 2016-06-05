@@ -3,15 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_NAMING_ADDRESS_MAR_24_2008_0949AM)
-#define HPX_NAMING_ADDRESS_MAR_24_2008_0949AM
+#ifndef HPX_RUNTIME_NAMING_ADDRESS_HPP
+#define HPX_RUNTIME_NAMING_ADDRESS_HPP
 
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <boost/io/ios_state.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
+#include <iosfwd>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -24,8 +27,8 @@ namespace hpx { namespace naming
 {
     struct HPX_EXPORT address
     {
-        typedef boost::int32_t component_type;
-        typedef boost::uint64_t address_type;
+        typedef std::int32_t component_type;
+        typedef std::uint64_t address_type;
 
         ///////////////////////////////////////////////////////////////////////
         address()
@@ -38,7 +41,7 @@ namespace hpx { namespace naming
         {}
 
         address(gid_type const& l, component_type t, void* lva,
-                boost::uint64_t offset = 0)
+                std::uint64_t offset = 0)
           : locality_(l), type_(t),
             address_(reinterpret_cast<address_type>(lva)),
             offset_(offset)
@@ -97,7 +100,7 @@ namespace hpx { namespace naming
         address_type offset_;   /// offset
 
     private:
-        friend std::ostream& operator<< (std::ostream&, address const&);
+        friend HPX_EXPORT std::ostream& operator<<(std::ostream&, address const&);
 
         // serialization support
         friend class hpx::serialization::access;
@@ -110,22 +113,10 @@ namespace hpx { namespace naming
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
-
-    inline std::ostream& operator<< (std::ostream& os, address const& addr)
-    {
-        boost::io::ios_flags_saver ifs(os);
-        os << "(" << addr.locality_ << ":"
-           << components::get_component_type_name(addr.type_)
-           << ":" << std::showbase << std::hex << addr.address_ << ")";
-        return os;
-    }
-
-///////////////////////////////////////////////////////////////////////////////
 }}
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
-
+#endif /*HPX_RUNTIME_NAMING_ADDRESS_HPP*/

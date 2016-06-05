@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,11 +14,13 @@
 
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/foreach_partitioner.hpp>
+#include <hpx/parallel/util/transfer.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -31,18 +34,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
 
-        // sequential move
-        template <typename InIter, typename OutIter>
-        inline std::pair<InIter, OutIter>
-        sequential_move(InIter first, InIter last, OutIter dest)
-        {
-            while (first != last)
-            {
-                *dest++ = std::move(*first++);
-            }
-            return std::make_pair(first, dest);
-        }
-
         template <typename IterPair>
         struct move_pair :
             public detail::algorithm<detail::move_pair<IterPair>, IterPair>
@@ -55,7 +46,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
-                return sequential_move(first, last, dest);
+                return util::move_helper(first, last, dest);
             }
 
             template <typename ExPolicy, typename FwdIter, typename OutIter>
@@ -67,18 +58,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, std::pair<FwdIter, OutIter>
-                    >::type result_type;
 
                 return get_iter_pair(
-                    for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
+                    util::foreach_partitioner<ExPolicy>::call(
+                        std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
-                        [](reference t) {
+                        [](std::size_t, zip_iterator part_begin,
+                            std::size_t part_size)
+                        {
                             using hpx::util::get;
-                            get<1>(t) = std::move(get<0>(t)); //-V573
+
+                            auto const& iters = part_begin.get_iterator_tuple();
+                            util::move_n_helper(get<0>(iters), part_size,
+                                get<1>(iters));
+                        },
+                        [](zip_iterator && last) -> zip_iterator
+                        {
+                            return std::move(last);
                         }));
             }
         };

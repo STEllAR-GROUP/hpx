@@ -10,6 +10,7 @@
 //
 #include <iomanip>
 #include <limits>
+#include <numeric>
 #include <random>
 #include <string>
 #include <vector>
@@ -77,7 +78,7 @@ void rnd_strings(std::vector<std::string> &V)
     V.reserve(test_size);
     // random strings up to 128 chars long
     for (std::size_t i=0; i<test_size; i++) {
-        V.push_back(random_string( std::rand() % 128));
+        V.push_back(random_string( std::rand() % 128)); //-V106
     }
 }
 

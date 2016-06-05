@@ -261,11 +261,15 @@ namespace hpx
             Callback && cb, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
+                typename hpx::traits::extract_action<Action>::remote_result_type
+                remote_result_type;
+            typedef
+                typename hpx::traits::extract_action<Action>::local_result_type
+                local_result_type;
 
             return apply_r_p_cb<Action>(std::move(addr),
-                actions::typed_continuation<result_type>(contgid),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(contgid),
                 gid, priority, std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
         }
@@ -276,11 +280,15 @@ namespace hpx
             naming::id_type const& gid, Callback && cb, Ts&&... vs)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
+                typename hpx::traits::extract_action<Action>::remote_result_type
+                remote_result_type;
+            typedef
+                typename hpx::traits::extract_action<Action>::local_result_type
+                local_result_type;
 
             return apply_r_p_cb<Action>(std::move(addr),
-                actions::typed_continuation<result_type>(contgid),
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
@@ -294,11 +302,14 @@ namespace hpx
         threads::thread_priority priority, Callback && cb, Ts&&... vs)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
-            result_type;
+            typename hpx::traits::extract_action<Action>::remote_result_type
+            remote_result_type;
+        typedef
+            typename hpx::traits::extract_action<Action>::local_result_type
+            local_result_type;
 
         return apply_p_cb<Action>(
-            actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
             gid, priority, std::forward<Callback>(cb),
             std::forward<Ts>(vs)...);
     }
@@ -309,11 +320,14 @@ namespace hpx
         Callback && cb, Ts&&... vs)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
-            result_type;
+            typename hpx::traits::extract_action<Action>::remote_result_type
+            remote_result_type;
+        typedef
+            typename hpx::traits::extract_action<Action>::local_result_type
+            local_result_type;
 
         return apply_p_cb<Action>(
-            actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
             gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
@@ -325,11 +339,14 @@ namespace hpx
         Callback && cb, Ts&&... vs)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
-            result_type;
+            typename hpx::traits::extract_action<Action>::remote_result_type
+            remote_result_type;
+        typedef
+            typename hpx::traits::extract_action<Action>::local_result_type
+            local_result_type;
 
         return apply_p_cb<Action>(
-            actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
             std::move(addr), gid, priority, std::forward<Callback>(cb),
             std::forward<Ts>(vs)...);
     }
@@ -340,11 +357,14 @@ namespace hpx
         naming::id_type const& gid, Callback && cb, Ts&&... vs)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
-            result_type;
+            typename hpx::traits::extract_action<Action>::remote_result_type
+            remote_result_type;
+        typedef
+            typename hpx::traits::extract_action<Action>::local_result_type
+            local_result_type;
 
         return apply_p_cb<Action>(
-            actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
             std::move(addr), gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }

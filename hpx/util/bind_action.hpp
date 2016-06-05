@@ -9,6 +9,7 @@
 #define HPX_UTIL_BIND_ACTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_action.hpp>
@@ -143,7 +144,7 @@ namespace hpx { namespace util
         struct bind_action_async_impl
         {
             typedef lcos::future<typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::traits::extract_action<Action>::remote_result_type
             >::type> type;
 
             template <std::size_t ...Is>
@@ -163,7 +164,7 @@ namespace hpx { namespace util
         template <typename Action, typename Ts, typename Us>
         HPX_FORCEINLINE
         lcos::future<typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::traits::extract_action<Action>::remote_result_type
         >::type>
         bind_action_async(Ts& bound, Us&& unbound)
         {
@@ -178,7 +179,7 @@ namespace hpx { namespace util
         template <typename Action, typename Ts, typename Us>
         HPX_FORCEINLINE
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::traits::extract_action<Action>::remote_result_type
         >::type
         bind_action_invoke(Ts& bound, Us&& unbound)
         {
@@ -195,7 +196,7 @@ namespace hpx { namespace util
         {
         public:
             typedef typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::traits::extract_action<Action>::remote_result_type
             >::type result_type;
 
         public:

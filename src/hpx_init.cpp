@@ -5,45 +5,51 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/hpx_start.hpp>
-#include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_action.hpp>
 
-#include <hpx/include/async.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/hpx_user_main_config.hpp>
+#include <hpx/apply.hpp>
+#include <hpx/async.hpp>
+#include <hpx/runtime_impl.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime_impl.hpp>
-#include <hpx/util/find_prefix.hpp>
-#include <hpx/util/query_counters.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_action.hpp>
+#include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/query_counters.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/assign/std/vector.hpp>
+#include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/ref.hpp>
+
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
-#   include <cstdlib>
+#  include <cstdlib>
 #endif
 
+#include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <new>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if !defined(HPX_WINDOWS)
@@ -451,8 +457,7 @@ namespace hpx
 
         void add_startup_functions(hpx::runtime& rt,
             boost::program_options::variables_map& vm, runtime_mode mode,
-            startup_function_type const& startup,
-            shutdown_function_type const& shutdown)
+            startup_function_type startup, shutdown_function_type shutdown)
         {
             if (vm.count("hpx:app-config"))
             {
@@ -461,10 +466,10 @@ namespace hpx
             }
 
             if (!!startup)
-                rt.add_startup_function(startup);
+                rt.add_startup_function(std::move(startup));
 
             if (!!shutdown)
-                rt.add_shutdown_function(shutdown);
+                rt.add_shutdown_function(std::move(shutdown));
 
             // Add startup function related to listing counter names or counter
             // infos (on console only).
@@ -667,10 +672,10 @@ namespace hpx
             util::function_nonser<int(boost::program_options::variables_map& vm)>
                 const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
-            startup_function_type const& startup,
-            shutdown_function_type const& shutdown)
+            startup_function_type startup, shutdown_function_type shutdown)
         {
-            add_startup_functions(rt, vm, mode, startup, shutdown);
+            add_startup_functions(rt, vm, mode, std::move(startup),
+                std::move(shutdown));
 
             // Run this runtime instance using the given function f.
             if (!f.empty())
@@ -684,10 +689,10 @@ namespace hpx
             util::function_nonser<int(boost::program_options::variables_map& vm)>
                 const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
-            startup_function_type const& startup,
-            shutdown_function_type const& shutdown)
+            startup_function_type startup, shutdown_function_type shutdown)
         {
-            add_startup_functions(rt, vm, mode, startup, shutdown);
+            add_startup_functions(rt, vm, mode, std::move(startup),
+                std::move(shutdown));
 
             if (!f.empty()) {
                 // Run this runtime instance using the given function f.
@@ -700,16 +705,16 @@ namespace hpx
 
         int run_or_start(bool blocking, std::unique_ptr<hpx::runtime> rt,
             util::command_line_handling& cfg,
-            startup_function_type const& startup,
-            shutdown_function_type const& shutdown)
+            startup_function_type startup, shutdown_function_type shutdown)
         {
             if (blocking) {
-                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown);
+                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_,
+                    std::move(startup), std::move(shutdown));
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, std::move(startup),
+                std::move(shutdown));
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
@@ -717,8 +722,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
-        int run_local(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_local(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
@@ -747,7 +752,8 @@ namespace hpx
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=local "
@@ -758,8 +764,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
-        int run_throttle(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_throttle(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
@@ -788,7 +794,8 @@ namespace hpx
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=throttle "
@@ -801,8 +808,8 @@ namespace hpx
         // local static scheduler with priority queue (one queue for each OS
         // threads plus one separate queue for high priority HPX-threads). Doesn't
         // steal.
-        int run_static_priority(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_static_priority(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
@@ -833,7 +840,8 @@ namespace hpx
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=static-priority "
@@ -846,8 +854,8 @@ namespace hpx
         // local static scheduler without priority queue (one queue for each OS
         // threads plus one separate queue for high priority HPX-threads).
         // Doesn't steal.
-        int run_static(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_static(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
@@ -876,7 +884,8 @@ namespace hpx
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=static "
@@ -888,8 +897,8 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // local scheduler with priority queue (one queue for each OS threads
         // plus one separate queue for high priority HPX-threads)
-        int run_priority_local(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_priority_local(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
             ensure_hierarchy_arity_compatibility(cfg.vm_);
@@ -918,14 +927,15 @@ namespace hpx
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // priority abp scheduler: local priority deques for each OS thread,
         // with work stealing from the "bottom" of each.
-        int run_priority_abp(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_priority_abp(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_ABP_SCHEDULER)
@@ -947,7 +957,8 @@ namespace hpx
             std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=abp-priority "
@@ -959,8 +970,8 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // hierarchical scheduler: The thread queues are built up hierarchically
         // this avoids contention during work stealing
-        int run_hierarchy(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_hierarchy(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
@@ -982,7 +993,8 @@ namespace hpx
             std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=hierarchy "
@@ -994,8 +1006,8 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // hierarchical scheduler: The thread queues are built up hierarchically
         // this avoids contention during work stealing
-        int run_periodic(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
+        int run_periodic(startup_function_type startup,
+            shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
@@ -1017,7 +1029,8 @@ namespace hpx
             std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
-            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=periodic-priority "
@@ -1033,8 +1046,8 @@ namespace hpx
             > const& f,
             boost::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> && ini_config,
-            startup_function_type const& startup,
-            shutdown_function_type const& shutdown, hpx::runtime_mode mode,
+            startup_function_type startup,
+            shutdown_function_type shutdown, hpx::runtime_mode mode,
             bool blocking)
         {
             int result = 0;
@@ -1084,12 +1097,14 @@ namespace hpx
                 if (0 == std::string("local").find(cfg.queuing_))
                 {
                     cfg.queuing_ = "local";
-                    result = run_local(startup, shutdown, cfg, blocking);
+                    result = run_local(std::move(startup), std::move(shutdown),
+                        cfg, blocking);
                 }
                 else if (0 == std::string("static").find(cfg.queuing_))
                 {
                     cfg.queuing_ = "static";
-                    result = run_static(startup, shutdown, cfg, blocking);
+                    result = run_static(std::move(startup), std::move(shutdown),
+                        cfg, blocking);
                 }
                 else if (0 == std::string("local-priority").find(cfg.queuing_))
                 {
@@ -1097,12 +1112,14 @@ namespace hpx
                     // OS thread plus separate dequeues for low/high priority
                     /// HPX-threads)
                     cfg.queuing_ = "local-priority";
-                    result = run_priority_local(startup, shutdown, cfg, blocking);
+                    result = run_priority_local(std::move(startup),
+                        std::move(shutdown), cfg, blocking);
                 }
                 else if (0 == std::string("static-priority").find(cfg.queuing_))
                 {
                     cfg.queuing_ = "static-priority";
-                    result = run_static_priority(startup, shutdown, cfg, blocking);
+                    result = run_static_priority(std::move(startup),
+                        std::move(shutdown), cfg, blocking);
                 }
                 else if (0 == std::string("abp-priority").find(cfg.queuing_))
                 {
@@ -1110,23 +1127,27 @@ namespace hpx
                     // OS thread plus separate dequeues for high priority
                     // HPX-threads), uses abp-style stealing
                     cfg.queuing_ = "abp-priority";
-                    result = run_priority_abp(startup, shutdown, cfg, blocking);
+                    result = run_priority_abp(std::move(startup),
+                        std::move(shutdown), cfg, blocking);
                 }
                 else if (0 == std::string("hierarchy").find(cfg.queuing_))
                 {
                     // hierarchy scheduler: tree of queues, with work
                     // stealing from the parent queue in that tree.
                     cfg.queuing_ = "hierarchy";
-                    result = run_hierarchy(startup, shutdown, cfg, blocking);
+                    result = run_hierarchy(std::move(startup),
+                        std::move(shutdown), cfg, blocking);
                 }
                 else if (0 == std::string("periodic-priority").find(cfg.queuing_))
                 {
                     cfg.queuing_ = "periodic-priority";
-                    result = run_periodic(startup, shutdown, cfg, blocking);
+                    result = run_periodic(std::move(startup),
+                        std::move(shutdown), cfg, blocking);
                 }
                 else if (0 == std::string("throttle").find(cfg.queuing_)) {
                     cfg.queuing_ = "throttle";
-                    result = run_throttle(startup, shutdown, cfg, blocking);
+                    result = run_throttle(std::move(startup),
+                        std::move(shutdown), cfg, blocking);
                 }
                 else {
                     throw detail::command_line_error(
@@ -1311,8 +1332,7 @@ namespace hpx
             boost::program_options::variables_map& /*vm*/,
             util::function_nonser<int(int, char**)> const& f)
         {
-            hpx::util::section const& ini = hpx::get_runtime().get_config();
-            std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
+            std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
 
             using namespace boost::program_options;
 #if defined(HPX_WINDOWS)
@@ -1322,7 +1342,7 @@ namespace hpx
 #endif
 
             // Copy all arguments which are not hpx related to a temporary array
-            boost::scoped_array<char*> argv(new char*[args.size()+1]);
+            std::vector<char*> argv(args.size()+1);
             std::size_t argcount = 0;
             for (std::size_t i = 0; i != args.size(); ++i)
             {
@@ -1342,7 +1362,7 @@ namespace hpx
             argv[argcount] = 0;
 
             // Invoke custom startup functions
-            return f(static_cast<int>(argcount), argv.get());
+            return f(static_cast<int>(argcount), argv.data());
         }
     }
 }

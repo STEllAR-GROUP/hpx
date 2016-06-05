@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace serialization
@@ -19,7 +20,7 @@ namespace hpx { namespace serialization
         // load vector<T>
         template <typename T, typename Allocator>
         void load_impl(input_archive & ar, std::vector<T, Allocator> & vs,
-            boost::mpl::false_)
+            std::false_type)
         {
             // normal load ...
             typedef typename std::vector<T, Allocator>::size_type size_type;
@@ -36,11 +37,11 @@ namespace hpx { namespace serialization
 
         template <typename T, typename Allocator>
         void load_impl(input_archive & ar, std::vector<T, Allocator> & v,
-            boost::mpl::true_)
+            std::true_type)
         {
             if(ar.disable_array_optimization())
             {
-                load_impl(ar, v, boost::mpl::false_());
+                load_impl(ar, v, std::false_type());
             }
             else
             {
@@ -80,14 +81,13 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void serialize(input_archive & ar, std::vector<T, Allocator> & v, unsigned)
     {
-        v.clear();
-        detail::load_impl(
-            ar
-          , v
-          , typename traits::is_bitwise_serializable<
+        typedef std::integral_constant<bool,
+            hpx::traits::is_bitwise_serializable<
                 typename std::vector<T, Allocator>::value_type
-            >::type()
-        );
+            >::value> use_optimized;
+
+        v.clear();
+        detail::load_impl(ar, v, use_optimized());
     }
 
     // save vector<T>
@@ -95,7 +95,7 @@ namespace hpx { namespace serialization
     {
         template <typename T, typename Allocator>
         void save_impl(output_archive & ar, const std::vector<T, Allocator> & vs,
-            boost::mpl::false_)
+            std::false_type)
         {
             // normal save ...
             typedef typename std::vector<T, Allocator>::value_type value_type;
@@ -107,11 +107,11 @@ namespace hpx { namespace serialization
 
         template <typename T, typename Allocator>
         void save_impl(output_archive & ar, const std::vector<T, Allocator> & v,
-            boost::mpl::true_)
+            std::true_type)
         {
             if(ar.disable_array_optimization())
             {
-                save_impl(ar, v, boost::mpl::false_());
+                save_impl(ar, v, std::false_type());
             }
             else
             {
@@ -141,15 +141,14 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, const std::vector<T, Allocator> & v,
         unsigned)
     {
+        typedef std::integral_constant<bool,
+            hpx::traits::is_bitwise_serializable<
+                typename std::vector<T, Allocator>::value_type
+            >::value> use_optimized;
+
         ar << v.size(); //-V128
         if(v.empty()) return;
-        detail::save_impl(
-            ar
-          , v
-          , typename traits::is_bitwise_serializable<
-                typename std::vector<T, Allocator>::value_type
-            >::type()
-        );
+        detail::save_impl(ar, v, use_optimized());
     }
 }}
 

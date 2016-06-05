@@ -83,7 +83,7 @@ macro(add_hpx_config_test variable)
         OUTPUT_VARIABLE ${variable}_OUTPUT
         COPY_FILE ${test_binary})
        hpx_debug("Compile test: ${variable}")
-       hpx_debug("Compilation output: \n\n${${variable}_OUTPUT}") 
+       hpx_debug("Compilation output: \n\n${${variable}_OUTPUT}")
     endif()
 
     set(_run_msg "Success")
@@ -193,6 +193,20 @@ macro(hpx_check_for_cxx11_explicit_cvt_ops)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_explicit_variadic_templates)
+  add_hpx_config_test(HPX_WITH_CXX11_EXPLICIT_VARIADIC_TEMPLATES
+    SOURCE cmake/tests/cxx11_explicit_variadic_templates.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_extended_friend_declarations)
+  add_hpx_config_test(HPX_WITH_CXX11_EXTENDED_FRIEND_DECLARATIONS
+    SOURCE cmake/tests/cxx11_extended_friend_declarations.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_function_template_default_args)
   add_hpx_config_test(HPX_WITH_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
     SOURCE cmake/tests/cxx11_function_template_default_args.cpp
@@ -277,13 +291,6 @@ macro(hpx_check_for_cxx11_variadic_templates)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_explicit_variadic_templates)
-  add_hpx_config_test(HPX_WITH_CXX11_EXPLICIT_VARIADIC_TEMPLATES
-    SOURCE cmake/tests/cxx11_explicit_variadic_templates.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_std_array)
   add_hpx_config_test(HPX_WITH_CXX11_ARRAY
     SOURCE cmake/tests/cxx11_std_array.cpp
@@ -336,6 +343,13 @@ endmacro()
 macro(hpx_check_for_cxx11_std_is_placeholder)
   add_hpx_config_test(HPX_WITH_CXX11_IS_PLACEHOLDER
     SOURCE cmake/tests/cxx11_std_is_placeholder.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_is_trivially_copyable)
+  add_hpx_config_test(HPX_WITH_CXX11_IS_TRIVIALLY_COPYABLE
+    SOURCE cmake/tests/cxx11_std_is_trivially_copyable.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -399,13 +413,6 @@ endmacro()
 macro(hpx_check_for_cxx11_std_unordered_set)
   add_hpx_config_test(HPX_WITH_CXX11_UNORDERED_SET
     SOURCE cmake/tests/cxx11_std_unordered_set.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_cxx11_extended_friend_declarations)
-  add_hpx_config_test(HPX_WITH_CXX11_EXTENDED_FRIEND_DECLARATIONS
-    SOURCE cmake/tests/cxx11_extended_friend_declarations.cpp
     FILE ${ARGN})
 endmacro()
 

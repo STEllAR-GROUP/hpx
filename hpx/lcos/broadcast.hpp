@@ -148,6 +148,7 @@ namespace hpx { namespace lcos
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/traits/extract_action.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
@@ -174,7 +175,7 @@ namespace hpx { namespace lcos
         {
             typedef
                 typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<
+                    typename hpx::traits::extract_action<
                         Action
                     >::remote_result_type
                 >::type

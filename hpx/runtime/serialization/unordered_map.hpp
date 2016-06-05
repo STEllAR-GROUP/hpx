@@ -11,7 +11,6 @@
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/map.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <unordered_map>
 

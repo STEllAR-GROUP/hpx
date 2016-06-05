@@ -2,21 +2,23 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#if !defined(HPX_THREADS_THREAD_APR_10_2012_0145PM)
-#define HPX_THREADS_THREAD_APR_10_2012_0145PM
+
+#ifndef HPX_RUNTIME_THREADS_THREAD_HPP
+#define HPX_RUNTIME_THREADS_THREAD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/unique_function.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/thread.hpp>
-#include <boost/utility/enable_if.hpp>
-
+#include <cstddef>
 #include <iosfwd>
 #include <mutex>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -27,7 +29,7 @@ namespace hpx
     class HPX_EXPORT thread
     {
         typedef lcos::local::spinlock mutex_type;
-        void terminate(const char * function, const char * reason) const;
+        void terminate(const char* function, const char* reason) const;
 
     public:
         class id;
@@ -36,7 +38,7 @@ namespace hpx
         thread() HPX_NOEXCEPT;
 
         template <typename F>
-        explicit thread(F && f)
+        explicit thread(F&& f)
           : id_(threads::invalid_thread_id)
         {
             start_thread(util::deferred_call(std::forward<F>(f)));
@@ -54,8 +56,8 @@ namespace hpx
         HPX_MOVABLE_ONLY(thread);
 
     public:
-        thread(thread &&) HPX_NOEXCEPT;
-        thread& operator=(thread &&) HPX_NOEXCEPT;
+        thread(thread&&) HPX_NOEXCEPT;
+        thread& operator=(thread&&) HPX_NOEXCEPT;
 
         void swap(thread&) HPX_NOEXCEPT;
         bool joinable() const HPX_NOEXCEPT
@@ -73,7 +75,7 @@ namespace hpx
 
         id get_id() const HPX_NOEXCEPT;
 
-        native_handle_type native_handle() const
+        native_handle_type native_handle() const //-V659
         {
             std::lock_guard<mutex_type> l(mtx_);
             return id_;
@@ -103,7 +105,7 @@ namespace hpx
         {
             id_ = threads::invalid_thread_id;
         }
-        void start_thread(util::unique_function_nonser<void()> && func);
+        void start_thread(util::unique_function_nonser<void()>&& func);
         static threads::thread_state_enum thread_function_nullary(
             util::unique_function_nonser<void()> const& func);
 
@@ -239,4 +241,4 @@ namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
+#endif /*HPX_RUNTIME_THREADS_THREAD_HPP*/

@@ -15,6 +15,8 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
+#include <boost/io/ios_state.hpp>
+
 namespace hpx { namespace parcelset
 {
     namespace policies { namespace mpi

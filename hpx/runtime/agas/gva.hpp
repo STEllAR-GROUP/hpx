@@ -139,7 +139,7 @@ struct gva
 
     template<class Archive>
     void save(Archive& ar, const unsigned int version) const
-    { ar << prefix << type << count << lva_ << offset; }
+    { ar << prefix << type << count << lva_ << offset; } //-V128
 
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
@@ -148,7 +148,7 @@ struct gva
             HPX_THROW_EXCEPTION(version_too_new
               , "gva::load"
               , "trying to load GVA with unknown version");
-        ar >> prefix >> type >> count >> lva_ >> offset;
+        ar >> prefix >> type >> count >> lva_ >> offset; //-V128
     }
 
     HPX_SERIALIZATION_SPLIT_MEMBER()

@@ -5,30 +5,34 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PX_THREAD_MAY_20_2008_0910AM)
-#define HPX_PX_THREAD_MAY_20_2008_0910AM
+#ifndef HPX_RUNTIME_THREADS_THREAD_DATA_HPP
+#define HPX_RUNTIME_THREADS_THREAD_DATA_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
-#include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+
 #include <hpx/util/assert.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <stack>
 #include <string>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -150,7 +154,7 @@ namespace hpx { namespace threads
                 thread_state tmp = prev_state;
 
                 // ABA prevention for state only (not for state_ex)
-                boost::int64_t tag = tmp.tag();
+                std::int64_t tag = tmp.tag();
                 if (state != tmp.state())
                     ++tag;
 
@@ -204,7 +208,7 @@ namespace hpx { namespace threads
         bool restore_state(thread_state new_state, thread_state old_state)
         {
             // ABA prevention for state only (not for state_ex)
-            boost::int64_t tag = old_state.tag();
+            std::int64_t tag = old_state.tag();
             if (new_state.state() != old_state.state())
                 ++tag;
 
@@ -222,7 +226,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum state_ex, thread_state old_state)
         {
             // ABA prevention for state only (not for state_ex)
-            boost::int64_t tag = old_state.tag();
+            std::int64_t tag = old_state.tag();
             if (new_state != old_state.state())
                 ++tag;
 
@@ -316,7 +320,7 @@ namespace hpx { namespace threads
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
         /// Return the locality of the parent thread
-        boost::uint32_t get_parent_locality_id() const
+        std::uint32_t get_parent_locality_id() const
         {
             return naming::invalid_locality_id;
         }
@@ -334,7 +338,7 @@ namespace hpx { namespace threads
         }
 #else
         /// Return the locality of the parent thread
-        boost::uint32_t get_parent_locality_id() const
+        std::uint32_t get_parent_locality_id() const
         {
             return parent_locality_id_;
         }
@@ -680,7 +684,7 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-        boost::uint32_t parent_locality_id_;
+        std::uint32_t parent_locality_id_;
         thread_id_repr_type parent_thread_id_;
         std::size_t parent_thread_phase_;
 #endif
@@ -712,7 +716,7 @@ namespace hpx { namespace threads
         policies::scheduler_base* scheduler_base_;
 
         //reference count
-        boost::detail::atomic_count count_;
+        util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;
 
@@ -725,4 +729,4 @@ namespace hpx { namespace threads
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
+#endif /*HPX_RUNTIME_THREADS_THREAD_DATA_HPP*/

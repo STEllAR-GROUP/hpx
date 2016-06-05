@@ -25,7 +25,10 @@ namespace hpx
         class HPX_API_EXPORT base_lco;
 
         template <typename Result, typename RemoteResult = Result>
-        class base_lco_with_value;
+        class HPX_SINGLE_INHERITANCE base_lco_with_value;
+
+        template <>
+        class HPX_SINGLE_INHERITANCE base_lco_with_value<void, void>;
 
         template <typename Result,
             typename RemoteResult =
@@ -35,7 +38,7 @@ namespace hpx
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::remote_result_type>::type,
-            typename DirectExecute = typename Action::direct_execution>
+            bool DirectExecute = Action::direct_execution::value>
         class packaged_action;
 
         template <typename R>

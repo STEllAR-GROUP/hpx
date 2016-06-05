@@ -16,13 +16,14 @@
 #include <hpx/plugins/parcelport/ibverbs/acceptor.hpp>
 #include <hpx/plugins/parcelport/ibverbs/locality.hpp>
 
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/cache/local_cache.hpp>
 #include <hpx/util/cache/entries/lru_entry.hpp>
 #include <hpx/util/memory_chunk_pool.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/atomic.hpp>
 
+#include <list>
 #include <map>
 #include <memory>
 #include <vector>
@@ -63,7 +64,7 @@ namespace hpx { namespace parcelset {
 
     namespace policies { namespace ibverbs
     {
-        parcelset::locality parcelport_address(util::runtime_configuration const & ini);
+        parcelset::locality parcelport_address(util::runtime_configuration const& ini);
 
         class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
@@ -92,7 +93,7 @@ namespace hpx { namespace parcelset {
             std::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
-            parcelset::locality agas_locality(util::runtime_configuration const & ini)
+            parcelset::locality agas_locality(util::runtime_configuration const& ini)
                 const;
 
             parcelset::locality create_locality() const;

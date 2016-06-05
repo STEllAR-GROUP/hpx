@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -41,11 +42,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ... Ts, std::size_t ... Is>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE void init_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t part_index)
         {
-            int _sequencer[] =
+            int const _sequencer[] =
             {
                 0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...
             };
@@ -53,6 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         }
 
         template <typename ... Ts, std::size_t ... Is, typename F, typename B>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE void invoke_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>, F && f, B part_begin)
         {
@@ -61,10 +64,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         }
 
         template <typename ... Ts, std::size_t ... Is>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE void next_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
-            int _sequencer[] =
+            int const _sequencer[] =
             {
                 0, (hpx::util::get<Is>(args).next_iteration(), 0)...
             };
@@ -72,16 +76,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         }
 
         template <typename ... Ts, std::size_t ... Is>
+        HPX_HOST_DEVICE
         HPX_FORCEINLINE void exit_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t size)
         {
-            int _sequencer[] =
+            int const _sequencer[] =
             {
                 0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...
             };
             (void)_sequencer;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename S, typename Tuple>
+        struct part_iterations;
+
+        template <typename F, typename S, typename ...Ts>
+        struct part_iterations<F, S, hpx::util::tuple<Ts...> >
+        {
+            typename hpx::util::decay<F>::type f_;
+            S stride_;
+            hpx::util::tuple<Ts...> args_;
+
+            template <typename B>
+            HPX_HOST_DEVICE
+            void operator()(std::size_t part_index, B part_begin,
+                std::size_t part_steps)
+            {
+                auto pack = typename hpx::util::detail::make_index_pack<
+                    sizeof...(Ts)>::type();
+                detail::init_iteration(args_, pack, part_index);
+
+                while (part_steps != 0)
+                {
+                    detail::invoke_iteration(args_, pack, f_, part_begin);
+
+                    detail::next_iteration(args_, pack);
+
+                    // NVCC seems to have a bug with std::min...
+                    std::size_t chunk =
+                        S(part_steps) < stride_ ? part_steps : stride_;
+
+                    // modifies 'chunk'
+                    part_begin = parallel::v1::detail::next(
+                        part_begin, part_steps, chunk);
+                    part_steps -= chunk;
+                }
+            }
+        };
 
         ///////////////////////////////////////////////////////////////////////
         struct for_loop_algo : public v1::detail::algorithm<for_loop_algo>
@@ -92,11 +135,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             template <typename ExPolicy, typename B, typename Size, typename S,
                 typename F, typename... Args>
+            HPX_HOST_DEVICE
             static hpx::util::unused_type
             sequential(ExPolicy policy, B first, Size size, S stride, F && f,
                 Args &&... args)
             {
-                int init_sequencer[] = {
+                int const init_sequencer[] = {
                     0, (args.init_iteration(0), 0)...
                 };
                 (void)init_sequencer;
@@ -106,26 +150,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
 
-                    int next_sequencer[] = {
+                    int const next_sequencer[] = {
                         0, (args.next_iteration(), 0)...
                     };
                     (void)next_sequencer;
 
-                    std::size_t chunk = (std::min)(S(count), stride);
+                    // NVCC seems to have a bug with std::min...
+                    std::size_t chunk = (S(count) < stride) ? count : stride;
 
-                    // modifies stride
+                    // modifies 'chunk'
                     first = parallel::v1::detail::next(first, count, chunk);
                     count -= chunk;
                 }
 
-                // make sure live-out variables are properly set on
-                // return
-                int exit_sequencer[] = {
+                // make sure live-out variables are properly set on return
+                int const exit_sequencer[] = {
                     0, (args.exit_iteration(size), 0)...
                 };
                 (void)exit_sequencer;
 
-                return hpx::util::unused;
+                return hpx::util::unused_type();
             }
 
             template <typename ExPolicy, typename B, typename Size, typename S,
@@ -137,34 +181,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 if (size == 0)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                // gcc does not support binding parameter packs as lambda closures
-                auto args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
-                auto pack = typename hpx::util::detail::make_index_pack<
-                    sizeof...(Ts)>::type();
+                auto && args =
+                    hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
+
+                // we need to decay copy here to properly transport everything
+                // to a GPU device
+                typedef
+                    hpx::util::tuple<typename hpx::util::decay<Ts>::type...>
+                    args_type;
 
                 return util::partitioner<ExPolicy>::call_with_index(
                     policy, first, size, stride,
-                    [=](std::size_t part_index,
-                        B part_begin, std::size_t part_steps) mutable
-                    {
-                        detail::init_iteration(args, pack, part_index);
-
-                        while (part_steps != 0)
-                        {
-                            detail::invoke_iteration(args, pack, f, part_begin);
-
-                            detail::next_iteration(args, pack);
-
-                            std::size_t chunk = (std::min)(S(part_steps), stride);
-
-                            // modifies 'chunk'
-                            part_begin = parallel::v1::detail::next(
-                                part_begin, part_steps, chunk);
-                            part_steps -= chunk;
-                        }
+                    part_iterations<F, S, args_type>{
+                        std::forward<F>(f), stride, std::move(args)
                     },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> void
+                    [=] (std::vector<hpx::future<void> > &&) mutable -> void
                     {
+                        auto pack = typename hpx::util::detail::make_index_pack<
+                            sizeof...(Ts)>::type();
                         // make sure live-out variables are properly set on
                         // return
                         detail::exit_iteration(args, pack, size);
@@ -224,10 +258,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<B>::value);
             }
 
-            typedef typename std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-                hpx::traits::is_input_iterator<B>::value
-            >::type is_seq;
+            typedef std::integral_constant<bool,
+                    is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<B>::value
+                > is_seq;
 
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
 

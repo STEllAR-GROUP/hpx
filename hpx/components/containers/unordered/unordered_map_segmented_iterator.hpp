@@ -13,10 +13,9 @@
  // The idea for these iterators is taken from
  // http://afstern.org/matt/segmented.pdf.
 
-#include <hpx/include/naming.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/include/traits.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/config.hpp>
+//#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 

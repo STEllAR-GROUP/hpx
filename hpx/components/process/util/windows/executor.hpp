@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
 
 struct executor
 {
-    executor() : exe(0), cmd_line(0), proc_attrs(0), thread_attrs(0),
+    executor() : exe(0), cmd_line(0), proc_attrs(0), thread_attrs(0), //-V730
         inherit_handles(FALSE),
 #if (_WIN32_WINNT >= 0x0600)
         creation_flags(EXTENDED_STARTUPINFO_PRESENT),
