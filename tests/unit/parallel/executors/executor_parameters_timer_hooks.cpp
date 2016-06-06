@@ -46,7 +46,7 @@ void chunk_size_test_par(Parameters && params)
     test_for_each_async(par(task).on(par_exec).with(boost::ref(params)), iterator_tag());
 }
 
-struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
+struct timer_hooks_parameters : hpx::parallel::executor_parameters_mark_begin_end_tag
 {
     timer_hooks_parameters(char const* name)
       : name_(name), time_(0), count_(0)

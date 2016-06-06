@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template <typename Parameters>
             static void call(hpx::traits::detail::wrap_int, Parameters& params)
             {
-               params.mark_begin_execution(); 
+ 
             }
 
             template <typename Parameters>

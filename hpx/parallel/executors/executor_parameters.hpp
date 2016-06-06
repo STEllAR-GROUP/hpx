@@ -18,7 +18,9 @@
 #include <utility>
 #include <vector>
 #include <cstdarg>
+#include <functional>
 
+#include <boost/ref.hpp>
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     namespace detail {
@@ -58,8 +60,53 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             constexpr static int value = parameter_type_counter<Condition, Args...>::value + counter_increment<Condition, Arg1>::value;
         };
 
+        template<typename T>
+        struct unwrapper : T
+        {
+            template<typename U>
+            unwrapper(U && u) : T(u) {}
+        };
+
+        template<typename T>
+        struct unwrapper< ::boost::reference_wrapper<T> >
+        {
+            template<typename WrapperType>
+            unwrapper(WrapperType && wrap) : wrap(wrap) {}
+
+            template<typename U = T, typename std::enable_if< is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr>
+            void mark_begin_execution()
+            {
+                wrap.get().mark_begin_execution();
+            }
+ 
+            template<typename U = T, typename std::enable_if< is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr>
+            void mark_end_execution()
+            {
+                wrap.get().mark_end_execution();
+            }
+
+        private:
+            std::reference_wrapper<T> wrap;
+        };
+
+        template<typename T>
+        struct unwrapper< std::reference_wrapper<T> >
+        {
+            template<typename WrapperType>
+            unwrapper(WrapperType && wrap) : wrap(wrap) {}
+
+            template<typename U = T, typename std::enable_if< is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr>
+            void mark_begin_execution()
+            {
+                wrap.get().mark_begin_execution();
+            }
+
+        private:
+            std::reference_wrapper<T> wrap;
+        };
+
         template<typename... Params>
-        struct executor_parameters : public Params...
+        struct executor_parameters : public unwrapper<Params>...
         {
         public:
             
@@ -73,7 +120,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             }
             
             template<typename... Params_>
-            executor_parameters(Params_ &&... params) : Params(params)...
+            executor_parameters(Params_ &&... params) : unwrapper<Params>(params)...
             {
                 static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters, Params...>::value == sizeof...(Params),
                     "All passed parameters must be a proper executor parameter!");
@@ -87,8 +134,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 	template<typename... Params>
 	struct executor_parameters_join
 	{
-        typedef detail::executor_parameters<typename hpx::util::decay<typename hpx::util::decay_unwrap<Params>::type...>::type > type;
+//        typedef detail::executor_parameters<typename hpx::util::decay<typename hpx::util::decay_unwrap<Params>::type...>::type > type;
 
+        typedef detail::executor_parameters<typename hpx::util::decay<Params>::type... > type;
 		//static type join(Params &&... params)
 		//{
 		//	return executor_parameters<Params...>(std::forward<Params>(params)...);
