@@ -169,25 +169,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     fill(ExPolicy && policy, InIter first, InIter last, T value)
     {
-       typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::fill_(
             std::forward<ExPolicy>(policy), first, last, value,
                 is_segmented()
             );
     }
-        template <typename ExPolicy, typename InIter, typename T>
-        inline typename util::detail::algorithm_result<
-            ExPolicy, void
-        >::type
-        fill_1(ExPolicy && policy, InIter first, InIter last, T value, std::false_type)
-        {
-            typedef is_sequential_execution_policy<ExPolicy> is_seq;
-
-            return detail::fill().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, value);
-        }
 
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
