@@ -21,9 +21,6 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
-// extra
-#include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
@@ -102,10 +99,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         inline typename util::detail::algorithm_result<
             ExPolicy, void
         >::type
-        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
             std::false_type)
         {
-            typedef is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef std::integral_constant<bool,
+                parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
 
             return detail::fill().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -117,7 +117,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         inline typename util::detail::algorithm_result<
             ExPolicy, void
         >::type
-        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
             std::true_type);
 
         /// \endcond
@@ -169,18 +169,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     fill(ExPolicy && policy, InIter first, InIter last, T value)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<InIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+       typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::fill_(
             std::forward<ExPolicy>(policy), first, last, value,
                 is_segmented()
             );
     }
+        template <typename ExPolicy, typename InIter, typename T>
+        inline typename util::detail::algorithm_result<
+            ExPolicy, void
+        >::type
+        fill_1(ExPolicy && policy, InIter first, InIter last, T value, std::false_type)
+        {
+            typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
+            return detail::fill().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, value);
+        }
 
     ///////////////////////////////////////////////////////////////////////////
     // fill_n

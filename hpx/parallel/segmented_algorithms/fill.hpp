@@ -6,6 +6,26 @@
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_FILL_MAY_30_2016)
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_FILL_MAY_30_2016
 
+#include <hpx/config.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/fill.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+
+#include <boost/exception_ptr.hpp>
+
+#include <algorithm>
+#include <iterator>
+#include <list>
+#include <type_traits>
+#include <vector>
+
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -169,7 +189,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         inline typename util::detail::algorithm_result<
             ExPolicy, void
         >::type
-        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
             typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
@@ -189,10 +209,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         inline typename util::detail::algorithm_result<
             ExPolicy, void
         >::type
-        fill_(ExPolicy && policy, InIter first, InIter last, T value,
+        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
             std::false_type);
-
-
     }
         /// \endcond
 }}}
