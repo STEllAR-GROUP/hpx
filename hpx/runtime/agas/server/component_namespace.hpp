@@ -274,6 +274,12 @@ struct HPX_EXPORT component_namespace
 
 }}}
 
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::component_namespace::service_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::component_namespace::bulk_service_action)
+
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::component_namespace::service_action,
     component_namespace_service_action)
