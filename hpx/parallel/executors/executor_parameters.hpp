@@ -78,19 +78,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template<typename WrapperType>
             unwrapper(WrapperType && wrap) : wrap(wrap) {}
 
-            template<typename Executor, typename std::enable_if< 
-                is_executor_parameters_chunk_size<T>::value >::type* = nullptr
+            template<typename Executor, typename U = T, typename std::enable_if< 
+                is_executor_parameters_chunk_size<U>::value >::type* = nullptr
                 >
-            auto variable_chunk_size(Executor & exec) -> decltype(std::declval<T>().variable_chunk_size(exec))
+            auto variable_chunk_size(Executor & exec) -> decltype(std::declval<U>().variable_chunk_size(exec))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
  
-            template<typename Executor, typename F, typename std::enable_if< 
-                is_executor_parameters_chunk_size<T>::value >::type* = nullptr
-                >
+            template<typename Executor, typename F, typename U = T, 
+                typename std::enable_if< 
+                    is_executor_parameters_chunk_size<U>::value 
+                >::type* = nullptr>
             auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks) 
-                -> decltype(std::declval<T>().get_chunk_size(exec, std::forward<F>(f), num_tasks))
+                -> decltype(std::declval<U>().get_chunk_size(exec, std::forward<F>(f), num_tasks))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
