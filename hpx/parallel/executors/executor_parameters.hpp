@@ -63,6 +63,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template<typename T>
         struct unwrapper : T
         {
+            unwrapper() {} 
+
             template<typename U>
             unwrapper(U && u) : T(u) {}
         };
