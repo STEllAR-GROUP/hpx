@@ -72,13 +72,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f, proj](std::size_t /*part_index*/,
                             InIter part_begin, std::size_t part_size) mutable
                         {
-                            typedef typename util::loop_n_iterator_mapping<
-                                InIter>::type iterator_type;
                             // VS2015 bails out when proj or f are captured by
                             // ref
+                            typedef typename util::loop_n_iterator_mapping<
+                                InIter>::type it_type;
                             util::loop_n(
                                 part_begin, part_size,
-                                [=](iterator_type curr) mutable
+                                [=](it_type curr) mutable
                                 {
                                     hpx::util::invoke(
                                         f, hpx::util::invoke(proj, *curr));
