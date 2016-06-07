@@ -25,7 +25,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     namespace detail {
 
-        template<template<typename> class Condition, typename Arg, 
+        template<template<typename> class Condition, typename Arg,
             typename Enable = void>
         struct counter_increment
         {
@@ -33,7 +33,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         template<template<typename> class Condition, typename Arg>
-        struct counter_increment<Condition, Arg, 
+        struct counter_increment<Condition, Arg,
             typename std::enable_if< Condition<Arg>::value>::type >
         {
             constexpr static int value = 1;
@@ -59,14 +59,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template<template<typename> class Condition, typename Arg1, typename ...Args>
         struct parameter_type_counter<Condition, Arg1, Args...>
         {
-            constexpr static int value = parameter_type_counter<Condition, Args...>::value + 
+            constexpr static int value = parameter_type_counter<Condition, Args...>::value +
                 counter_increment<Condition, Arg1>::value;
         };
 
         template<typename T>
         struct unwrapper : T
         {
-            unwrapper() {} 
+            unwrapper() {}
 
             template<typename U>
             unwrapper(U && u) : T(u) {}
@@ -78,34 +78,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template<typename WrapperType>
             unwrapper(WrapperType && wrap) : wrap(wrap) {}
 
-            template<typename Executor, typename U = T, typename std::enable_if< 
+            template<typename Executor, typename U = T, typename std::enable_if<
                 is_executor_parameters_chunk_size<U>::value >::type* = nullptr
                 >
-            auto variable_chunk_size(Executor & exec) 
+            auto variable_chunk_size(Executor & exec)
                 -> decltype(std::declval<U>().variable_chunk_size(exec))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
- 
-            template<typename Executor, typename F, typename U = T, 
-                typename std::enable_if< 
-                    is_executor_parameters_chunk_size<U>::value 
+
+            template<typename Executor, typename F, typename U = T,
+                typename std::enable_if<
+                    is_executor_parameters_chunk_size<U>::value
                 >::type* = nullptr>
-            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks) 
+            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks)
                 -> decltype(std::declval<U>().get_chunk_size(exec, std::forward<F>(f), num_tasks))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
 
-            template<typename U = T, typename std::enable_if< 
+            template<typename U = T, typename std::enable_if<
                 is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
                 >
             auto mark_begin_execution() -> decltype(std::declval<U>().mark_begin_execution())
             {
                 return wrap.get().mark_begin_execution();
             }
- 
-            template<typename U = T, typename std::enable_if< 
+
+            template<typename U = T, typename std::enable_if<
                 is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
                 >
             auto mark_end_execution() -> decltype(std::declval<U>().mark_end_execution())
@@ -113,18 +113,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 return wrap.get().mark_end_execution();
             }
 
-            template<typename U = T, typename std::enable_if< 
+            template<typename U = T, typename std::enable_if<
                 is_executor_parameters_processing_units_count<U>::value >::type* = nullptr
                 >
             auto processing_units_count() -> decltype(std::declval<U>().processing_units_count())
             {
                 return wrap.get().processing_units_count();
             }
- 
-            template<typename Executor, typename U = T, typename std::enable_if< 
+
+            template<typename Executor, typename U = T, typename std::enable_if<
                 is_executor_parameters_reset_thread_distr<U>::value >::type* = nullptr
                 >
-            auto reset_thread_distribution(Executor & exec) 
+            auto reset_thread_distribution(Executor & exec)
                 -> decltype(std::declval<U>().reset_thread_distribution(exec))
             {
                 return wrap.get().reset_thread_distribution(exec);
@@ -140,34 +140,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template<typename WrapperType>
             unwrapper(WrapperType && wrap) : wrap(wrap) {}
 
-            template<typename Executor, typename U = T, typename std::enable_if< 
+            template<typename Executor, typename U = T, typename std::enable_if<
                 is_executor_parameters_chunk_size<U>::value >::type* = nullptr
                 >
-            auto variable_chunk_size(Executor & exec) 
+            auto variable_chunk_size(Executor & exec)
                 -> decltype(std::declval<U>().variable_chunk_size(exec))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
- 
-            template<typename Executor, typename F, typename U = T, 
-                typename std::enable_if< 
-                    is_executor_parameters_chunk_size<U>::value 
+
+            template<typename Executor, typename F, typename U = T,
+                typename std::enable_if<
+                    is_executor_parameters_chunk_size<U>::value
                 >::type* = nullptr>
-            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks) 
+            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks)
                 -> decltype(std::declval<U>().get_chunk_size(exec, std::forward<F>(f), num_tasks))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
 
-            template<typename U = T, typename std::enable_if< 
+            template<typename U = T, typename std::enable_if<
                 is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
                 >
             auto mark_begin_execution() -> decltype(std::declval<U>().mark_begin_execution())
             {
                 return wrap.get().mark_begin_execution();
             }
- 
-            template<typename U = T, typename std::enable_if< 
+
+            template<typename U = T, typename std::enable_if<
                 is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
                 >
             auto mark_end_execution() -> decltype(std::declval<U>().mark_end_execution())
@@ -175,18 +175,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 return wrap.get().mark_end_execution();
             }
 
-            template<typename U = T, typename std::enable_if< 
+            template<typename U = T, typename std::enable_if<
                 is_executor_parameters_processing_units_count<U>::value >::type* = nullptr
                 >
             auto processing_units_count() -> decltype(std::declval<U>().processing_units_count())
             {
                 return wrap.get().processing_units_count();
             }
- 
-            template<typename Executor, typename U = T, typename std::enable_if< 
+
+            template<typename Executor, typename U = T, typename std::enable_if<
                 is_executor_parameters_reset_thread_distr<U>::value >::type* = nullptr
                 >
-            auto reset_thread_distribution(Executor & exec) 
+            auto reset_thread_distribution(Executor & exec)
                 -> decltype(std::declval<U>().reset_thread_distribution(exec))
             {
                 return wrap.get().reset_thread_distribution(exec);
@@ -201,24 +201,40 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct executor_parameters : public unwrapper<Params>...
         {
         public:
-            
+
             executor_parameters()
             {
-                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters, Params...>::value == sizeof...(Params),
-                    "All passed parameters must be a proper executor parameter!");
+                static_assert(
+                    parameter_type_counter<
+                            hpx::parallel::is_executor_parameters, Params...
+                        >::value == sizeof...(Params),
+                    "All passed parameters must be a proper executor parameter!"
+                );
 
-                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters_chunk_size, Params...>::value <= 1,
-                    "Passing more than one chunk size policy is prohibited!");
+                static_assert(
+                    parameter_type_counter<
+                        hpx::parallel::is_executor_parameters_chunk_size, Params...
+                        >::value <= 1,
+                    "Passing more than one chunk size policy is prohibited!"
+                );
             }
-            
+
             template<typename... Params_>
             executor_parameters(Params_ &&... params) : unwrapper<Params>(params)...
             {
-                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters, Params...>::value == sizeof...(Params),
-                    "All passed parameters must be a proper executor parameter!");
+                static_assert(
+                    parameter_type_counter<
+                            hpx::parallel::is_executor_parameters, Params...
+                        >::value == sizeof...(Params),
+                    "All passed parameters must be a proper executor parameter!"
+                );
 
-                static_assert(parameter_type_counter<hpx::parallel::is_executor_parameters_chunk_size, Params...>::value <= 1,
-                    "Passing more than one chunk size policy is prohibited!");
+                static_assert(
+                    parameter_type_counter<
+                            hpx::parallel::is_executor_parameters_chunk_size, Params...
+                        >::value <= 1,
+                    "Passing more than one chunk size policy is prohibited!"
+                );
             }
         };
     }
@@ -226,13 +242,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 	template<typename... Params>
 	struct executor_parameters_join
 	{
-//        typedef detail::executor_parameters<typename hpx::util::decay<typename hpx::util::decay_unwrap<Params>::type...>::type > type;
-
-        typedef detail::executor_parameters<typename hpx::util::decay<Params>::type... > type;
-		//static type join(Params &&... params)
-		//{
-		//	return executor_parameters<Params...>(std::forward<Params>(params)...);
-		//}
+        typedef detail::executor_parameters<
+                typename hpx::util::decay<Params>::type...
+            > type;
 	};
 
 }}}
