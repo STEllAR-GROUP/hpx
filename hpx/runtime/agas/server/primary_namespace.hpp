@@ -467,6 +467,15 @@ struct HPX_EXPORT primary_namespace
 
 }}}
 
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::service_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::bulk_service_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::route_action)
+
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::service_action,
     primary_namespace_service_action)

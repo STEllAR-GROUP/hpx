@@ -270,6 +270,12 @@ struct HPX_EXPORT locality_namespace
 
 }}}
 
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::locality_namespace::service_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::locality_namespace::bulk_service_action)
+
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::locality_namespace::service_action,
     locality_namespace_service_action)

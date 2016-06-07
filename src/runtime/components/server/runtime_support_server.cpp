@@ -52,6 +52,8 @@
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 
+#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -545,9 +547,14 @@ namespace hpx { namespace components { namespace server
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
+typedef
+    hpx::lcos::detail::make_broadcast_action<call_shutdown_functions_action>::type
+    call_shutdown_functions_broadcast_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action,
         call_shutdown_functions_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    call_shutdown_functions_broadcast_action)
 HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
         call_shutdown_functions_action,
         hpx::actions::broadcast_call_shutdown_functions_action_id)
