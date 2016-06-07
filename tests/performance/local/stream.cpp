@@ -14,15 +14,14 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/version.hpp>
-#include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/parallel_fill.hpp>
 #include <hpx/include/parallel_transform.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
-
-#include <hpx/parallel/util/numa_allocator.hpp>
+#include <hpx/include/compute.hpp>
 
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
@@ -203,95 +202,108 @@ void check_results(std::size_t iterations,
 #endif
 }
 
-template <typename Vector, typename Policy>
-std::vector<std::vector<double> >
-numa_domain_worker(std::size_t domain,
-    Policy policy,
-    hpx::lcos::local::latch& l,
-    std::size_t part_size, std::size_t offset, std::size_t iterations,
-    Vector& a, Vector& b, Vector& c)
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+struct multiply_step
 {
-    typedef typename Vector::iterator iterator;
-    iterator a_begin = a.begin() + offset;
-    iterator b_begin = b.begin() + offset;
-    iterator c_begin = c.begin() + offset;
+    multiply_step(T factor) : factor_(factor) {}
 
-    iterator a_end = a_begin + part_size;
-    iterator b_end = b_begin + part_size;
-    iterator c_end = c_begin + part_size;
-
-    // Initialize arrays
-    hpx::parallel::fill(policy, a_begin, a_end, 1.0);
-    hpx::parallel::fill(policy, b_begin, b_end, 2.0);
-    hpx::parallel::fill(policy, c_begin, c_end, 0.0);
-
-    double t = mysecond();
-    hpx::parallel::for_each(policy, a_begin, a_end,
-        [&policy](STREAM_TYPE & v)
-        {
-            v = 2.0 * v;
-
-#if defined(HPX_DEBUG)
-            // make sure memory was placed appropriately
-            hpx::threads::topology& topo = retrieve_topology();
-            hpx::threads::mask_cref_type mem_mask =
-                topo.get_thread_affinity_mask_from_lva(
-                    reinterpret_cast<hpx::naming::address_type>(&v));
-
-            typedef typename Policy::executor_type executor_type;
-            typedef hpx::parallel::executor_information_traits<
-                executor_type> traits;
-
-            std::size_t thread_num = hpx::get_worker_thread_num();
-            hpx::threads::mask_cref_type thread_mask =
-                traits::get_pu_mask(policy.executor(), topo, thread_num);
-
-            HPX_ASSERT(hpx::threads::mask_size(mem_mask) ==
-                hpx::threads::mask_size(thread_mask));
-            HPX_ASSERT(hpx::threads::bit_and(mem_mask, thread_mask,
-                hpx::threads::mask_size(mem_mask)));
-#endif
-        });
-    t = 1.0E6 * (mysecond() - t);
-
-    if (domain == 0)
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val) const
     {
-        // Get initial value for system clock.
-        int quantum = checktick();
-        if(quantum >= 1)
-        {
-            std::cout
-                << "Your clock granularity/precision appears to be " << quantum
-                << " microseconds.\n"
-                ;
-        }
-        else
-        {
-            std::cout
-                << "Your clock granularity appears to be less than one microsecond.\n"
-                ;
-            quantum = 1;
-        }
-
-        std::cout
-            << "Each test below will take on the order"
-            << " of " << (int) t << " microseconds.\n"
-            << "   (= " << (int) (t/quantum) << " clock ticks)\n"
-            << "Increase the size of the arrays if this shows that\n"
-            << "you are not getting at least 20 clock ticks per test.\n"
-            << "-------------------------------------------------------------\n"
-            ;
-
-        std::cout
-            << "WARNING -- The above is only a rough guideline.\n"
-            << "For best results, please be sure you know the\n"
-            << "precision of your system timer.\n"
-            << "-------------------------------------------------------------\n"
-            ;
+        return val * factor_;
     }
 
-    // synchronize across NUMA domains
-    l.count_down_and_wait();
+    T factor_;
+};
+
+template <typename T>
+struct add_step
+{
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    {
+        return val1 + val2;
+    }
+};
+
+template <typename T>
+struct triad_step
+{
+    triad_step(T factor) : factor_(factor) {}
+
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    {
+        return val1 + val2 * factor_;
+    }
+
+    T factor_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename Allocator, typename Executor, typename Target, typename Chunker>
+std::vector<std::vector<double> >
+run_benchmark(
+    std::size_t iterations, std::size_t size, Target target, Chunker chunker)
+{
+    // Creating our allocator ...
+    Allocator alloc(target);
+
+    // Allocate our data
+    typedef hpx::compute::vector<STREAM_TYPE, Allocator> vector_type;
+
+    vector_type a(size, alloc);
+    vector_type b(size, alloc);
+    vector_type c(size, alloc);
+
+    // Creating our executor ....
+    Executor exec(target);
+
+    // Creating the policy used in the parallel algorithms
+    auto policy = hpx::parallel::par.on(exec).with(chunker);
+
+    // Initialize arrays
+    hpx::parallel::fill(policy, a.begin(), a.end(), 1.0);
+    hpx::parallel::fill(policy, b.begin(), b.end(), 2.0);
+    hpx::parallel::fill(policy, c.begin(), c.end(), 0.0);
+
+    // Check clock ticks ...
+    double t = mysecond();
+    hpx::parallel::transform(
+        policy, a.begin(), a.end(), a.begin(),
+        multiply_step<STREAM_TYPE>(2.0));
+    t = 1.0E6 * (mysecond() - t);
+
+    // Get initial value for system clock.
+    int quantum = checktick();
+    if(quantum >= 1)
+    {
+        std::cout
+            << "Your clock granularity/precision appears to be " << quantum
+            << " microseconds.\n"
+            ;
+    }
+    else
+    {
+        std::cout
+            << "Your clock granularity appears to be less than one microsecond.\n"
+            ;
+        quantum = 1;
+    }
+
+    std::cout
+        << "Each test below will take on the order"
+        << " of " << (int) t << " microseconds.\n"
+        << "   (= " << (int) (t/quantum) << " clock ticks)\n"
+        << "Increase the size of the arrays if this shows that\n"
+        << "you are not getting at least 20 clock ticks per test.\n"
+        << "-------------------------------------------------------------\n"
+        ;
+
+    std::cout
+        << "WARNING -- The above is only a rough guideline.\n"
+        << "For best results, please be sure you know the\n"
+        << "precision of your system timer.\n"
+        << "-------------------------------------------------------------\n"
+        ;
 
     ///////////////////////////////////////////////////////////////////////////
     // Main Loop
@@ -302,89 +314,47 @@ numa_domain_worker(std::size_t domain,
     {
         // Copy
         timing[0][iteration] = mysecond();
-        hpx::parallel::copy(policy, a_begin, a_end, c_begin);
+        hpx::parallel::copy(policy, a.begin(), a.end(), c.begin());
         timing[0][iteration] = mysecond() - timing[0][iteration];
 
         // Scale
         timing[1][iteration] = mysecond();
         hpx::parallel::transform(policy,
-            c_begin, c_end, b_begin,
-            [scalar](STREAM_TYPE val)
-            {
-                return scalar * val;
-            }
+            c.begin(), c.end(), b.begin(),
+            multiply_step<STREAM_TYPE>(scalar)
         );
         timing[1][iteration] = mysecond() - timing[1][iteration];
 
         // Add
         timing[2][iteration] = mysecond();
         hpx::parallel::transform(policy,
-            a_begin, a_end, b_begin, b_end, c_begin,
-            [](STREAM_TYPE val1, STREAM_TYPE val2)
-            {
-                return val1 + val2;
-            }
+            a.begin(), a.end(), b.begin(), b.end(), c.begin(),
+            add_step<STREAM_TYPE>()
         );
         timing[2][iteration] = mysecond() - timing[2][iteration];
 
         // Triad
         timing[3][iteration] = mysecond();
         hpx::parallel::transform(policy,
-            b_begin, b_end, c_begin, c_end, a_begin,
-            [scalar](STREAM_TYPE val1, STREAM_TYPE val2)
-            {
-                return val1 + scalar * val2;
-            }
+            b.begin(), b.end(), c.begin(), c.end(), a.begin(),
+            triad_step<STREAM_TYPE>(scalar)
         );
         timing[3][iteration] = mysecond() - timing[3][iteration];
     }
+
+    // Check Results ...
+    check_results(iterations, a, b, c);
+
+    std::cout
+        << "-------------------------------------------------------------\n"
+        ;
 
     return timing;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
-    boost::program_options::variables_map& vm)
-{
-    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    if (numa_nodes == 0)
-        numa_nodes = topo.get_number_of_sockets();
-
-    std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
-    if (num_numa_domains_str != "all")
-    {
-        numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
-    }
-    return numa_nodes;
-}
-
-std::pair<std::size_t, std::size_t> get_num_numa_pus(
-    hpx::threads::topology const& topo, std::size_t numa_nodes,
-    boost::program_options::variables_map& vm)
-{
-    std::size_t numa_pus = hpx::threads::hardware_concurrency() / numa_nodes;
-
-    std::string num_threads_str = vm["stream-threads"].as<std::string>();
-    std::size_t pus = numa_pus;
-
-    if(num_threads_str != "all")
-    {
-        pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
-    }
-
-    return std::make_pair(numa_pus, pus);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    // extract hardware topology
-    hpx::threads::topology const& topo = retrieve_topology();
-
-    std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
-    std::pair<std::size_t, std::size_t> pus =
-        get_num_numa_pus(topo, numa_nodes, vm);
-
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
@@ -413,94 +383,100 @@ int hpx_main(boost::program_options::variables_map& vm)
         << " will be used to compute the reported bandwidth.\n"
         << "-------------------------------------------------------------\n"
         << "Number of Threads requested = "
-            << numa_nodes * pus.second << "\n"
+            << hpx::get_os_thread_count() << "\n"
         << "Chunking policy requested: " << chunker << "\n"
         << "-------------------------------------------------------------\n"
         ;
 
-    using namespace hpx::parallel;
-
-    typedef hpx::threads::executors::local_priority_queue_attached_executor
-        executor_type;
-    typedef std::vector<executor_type> executors_vector;
-
-    executors_vector execs;
-    execs.reserve(numa_nodes);
-
-    // creating our executors ....
-    for (std::size_t i = 0; i != numa_nodes; ++i)
-    {
-        // create executor for this NUMA domain
-        execs.emplace_back(i * pus.first, pus.second);
-    }
-
-    // allocate data
-    typedef hpx::parallel::util::numa_allocator<
-            STREAM_TYPE, executors_vector
-        > allocator_type;
-    allocator_type alloc(execs, retrieve_topology());
-
-    typedef std::vector<STREAM_TYPE, allocator_type> vector_type;
-    vector_type a(vector_size, STREAM_TYPE(), alloc);
-    vector_type b(vector_size, STREAM_TYPE(), alloc);
-    vector_type c(vector_size, STREAM_TYPE(), alloc);
-
-    // perform benchmark
-    hpx::lcos::local::latch l(numa_nodes);
-
     double time_total = mysecond();
-    std::vector<hpx::future<std::vector<std::vector<double> > > > workers;
-    workers.reserve(numa_nodes);
+    std::vector<std::vector<double> > timing;
 
-    std::size_t part_size = vector_size / numa_nodes;
+#if defined(HPX_HAVE_COMPUTE)
+    bool use_accel = false;
+    if(vm.count("use-accelerator"))
+        use_accel = true;
 
-    for (std::size_t i = 0; i != numa_nodes; ++i)
+    if(use_accel)
     {
-        if(chunker == "dynamic")
+#if defined(HPX_HAVE_CUDA)
+        // Get the targets we want to run on
+        hpx::compute::cuda::target target;
+
+        typedef hpx::compute::cuda::default_executor executor_type;
+        typedef hpx::compute::cuda::allocator<STREAM_TYPE> allocator_type;
+#else
+#error "The STREAM benchmark currently requires CUDA to run on an accelerator"
+#endif
+
+        // perform benchmark
+//         if(chunker == "auto")
+//         {
+//             timing =
+//                 run_benchmark<allocator_type, executor_type>(
+//                     iterations, vector_size, std::move(target),
+//                     hpx::parallel::auto_chunk_size());
+//         }
+//         else if(chunker == "guided")
+//         {
+//             timing =
+//                 run_benchmark<allocator_type, executor_type>(
+//                     iterations, vector_size, std::move(target),
+//                     hpx::parallel::guided_chunk_size());
+//         }
+//         else if(chunker == "dynamic")
+//         {
+//             timing =
+//                 run_benchmark<allocator_type, executor_type>(
+//                     iterations, vector_size, std::move(target),
+//                     hpx::parallel::dynamic_chunk_size());
+//         }
+//         else
         {
-            auto policy = par.on(execs[i]).with(dynamic_chunk_size());
-            workers.push_back(
-                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
-                    i, policy, boost::ref(l),
-                    part_size, part_size*i, iterations,
-                    boost::ref(a), boost::ref(b), boost::ref(c))
-            );
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, std::move(target),
+                    hpx::parallel::static_chunk_size());
         }
-        else if(chunker == "auto")
+    }
+    else
+#endif
+    {
+        // Get the targets we want to run on
+        auto numa_nodes = hpx::compute::host::numa_domains();
+
+        typedef hpx::compute::host::block_executor<> executor_type;
+        typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
+
+        // perform benchmark
+        if(chunker == "auto")
         {
-            auto policy = par.on(execs[i]).with(auto_chunk_size());
-            workers.push_back(
-                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
-                    i, policy, boost::ref(l),
-                    part_size, part_size*i, iterations,
-                    boost::ref(a), boost::ref(b), boost::ref(c))
-            );
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::auto_chunk_size());
         }
         else if(chunker == "guided")
         {
-            auto policy = par.on(execs[i]).with(guided_chunk_size());
-            workers.push_back(
-                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
-                    i, policy, boost::ref(l),
-                    part_size, part_size*i, iterations,
-                    boost::ref(a), boost::ref(b), boost::ref(c))
-            );
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::guided_chunk_size());
+        }
+        else if(chunker == "dynamic")
+        {
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::dynamic_chunk_size());
         }
         else
         {
-            // default
-            auto policy = par.on(execs[i]);
-            workers.push_back(
-                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
-                    i, policy, boost::ref(l),
-                    part_size, part_size*i, iterations,
-                    boost::ref(a), boost::ref(b), boost::ref(c))
-            );
+            timing =
+                run_benchmark<allocator_type, executor_type>(
+                    iterations, vector_size, numa_nodes,
+                    hpx::parallel::static_chunk_size());
         }
     }
-
-    std::vector<std::vector<std::vector<double> > >
-        timings_all = hpx::util::unwrapped(workers);
     time_total = mysecond() - time_total;
 
     /* --- SUMMARY --- */
@@ -517,25 +493,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
         3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size)
     };
-    std::vector<std::vector<double> > timing(4, std::vector<double>(iterations, 0.0));
 
-    for(auto const & times : timings_all)
-    {
-        for(std::size_t iteration = 0; iteration != iterations; ++iteration)
-        {
-            timing[0][iteration] += times[0][iteration];
-            timing[1][iteration] += times[1][iteration];
-            timing[2][iteration] += times[2][iteration];
-            timing[3][iteration] += times[3][iteration];
-        }
-    }
-    for(std::size_t iteration = 0; iteration != iterations; ++iteration)
-    {
-        timing[0][iteration] /= numa_nodes;
-        timing[1][iteration] /= numa_nodes;
-        timing[2][iteration] /= numa_nodes;
-        timing[3][iteration] /= numa_nodes;
-    }
     // Note: skip first iteration
     std::vector<double> avgtime(4, 0.0);
     std::vector<double> mintime(4, (std::numeric_limits<double>::max)());
@@ -569,14 +527,44 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "-------------------------------------------------------------\n"
         ;
 
-    // Check Results ...
-    check_results(iterations, a, b, c);
-
-    std::cout
-        << "-------------------------------------------------------------\n"
-        ;
-
     return hpx::finalize();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Commandline handling ...
+//
+std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
+    boost::program_options::variables_map& vm)
+{
+    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
+    if (numa_nodes == 0)
+        numa_nodes = topo.get_number_of_sockets();
+
+    std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
+    if (num_numa_domains_str != "all")
+    {
+        numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
+    }
+    return numa_nodes;
+}
+
+std::pair<std::size_t, std::size_t> get_num_numa_pus(
+    hpx::threads::topology const& topo, std::size_t numa_nodes,
+    boost::program_options::variables_map& vm)
+{
+    std::size_t numa_pus = hpx::threads::hardware_concurrency() / numa_nodes;
+
+    std::string num_threads_str = vm["stream-threads"].as<std::string>();
+    std::size_t pus = numa_pus;
+
+    if(num_threads_str != "all")
+    {
+        pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
+    }
+
+    return std::make_pair(numa_pus, pus);
 }
 
 
@@ -612,6 +600,10 @@ int main(int argc, char* argv[])
             boost::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
             "possible values: dynamic, auto, guided. (default: default)")
+#if defined(HPX_HAVE_COMPUTE)
+        (   "use-accelerator",
+            "Use this flag to run the stream benchmark on the GPU")
+#endif
         ;
 
     // parse command line here to extract the necessary settings for HPX

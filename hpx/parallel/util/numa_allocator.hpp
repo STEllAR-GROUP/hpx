@@ -85,13 +85,13 @@ namespace hpx { namespace parallel { namespace util
 
             for (std::size_t i = 0; i != executors_.size(); ++i)
             {
-                using namespace hpx::parallel;
-
                 pointer begin = p + i * part_size;
                 pointer end = begin + part_size;
                 first_touch.push_back(
-                    for_each(
-                        par(task).on(executors_[i]).with(static_chunk_size()),
+                    hpx::parallel::for_each(
+                        hpx::parallel::par(hpx::parallel::task)
+                            .on(executors_[i])
+                            .with(hpx::parallel::static_chunk_size()),
                         begin, end,
                         [this, i](T& val)
                         {

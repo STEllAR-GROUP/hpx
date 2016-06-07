@@ -15,5 +15,7 @@ find_program(FOP_EXECUTABLE
     "An XSL-FO processor"
   )
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FOP DEFAULT_MSG FOP_EXECUTABLE)
+if(FOP_EXECUTABLE)
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(FOP DEFAULT_MSG FOP_EXECUTABLE)
+endif()

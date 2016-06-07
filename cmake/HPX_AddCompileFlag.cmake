@@ -29,6 +29,10 @@ macro(hpx_add_target_compile_option FLAG)
   endforeach()
 
   get_property(HPX_TARGET_COMPILE_OPTIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
+
+  if(HPX_WITH_CUDA)
+      hpx_add_compile_flag(${FLAG})
+  endif()
 endmacro()
 
 macro(hpx_remove_target_compile_option FLAG)
@@ -80,6 +84,10 @@ macro(hpx_add_target_compile_definition FLAG)
   endforeach()
 
   get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
+
+  if(HPX_WITH_CUDA)
+    hpx_add_compile_flag(-D${FLAG})
+  endif()
 endmacro()
 
 macro(hpx_remove_target_compile_definition FLAG)

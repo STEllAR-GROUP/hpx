@@ -35,6 +35,15 @@ namespace hpx { namespace traits
                 local_iterator
             >::local_raw_iterator type;
     };
+
+    template <typename Iterator>
+    struct projected_iterator<Iterator,
+        typename hpx::util::always_void<
+            typename hpx::util::decay<Iterator>::type::proxy_type>::type>
+    {
+        typedef typename hpx::util::decay<Iterator>::type::proxy_type
+            type;
+    };
 }}
 
 namespace hpx { namespace parallel { namespace traits

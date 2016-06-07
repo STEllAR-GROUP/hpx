@@ -56,10 +56,26 @@
 #if defined(_MSC_VER)
 #   define HPX_MSVC _MSC_VER
 #   define HPX_WINDOWS
+#   if defined(__NVCC__)
+#       define HPX_SINGLE_INHERITANCE __single_inheritance
+#   endif
 #endif
 
 #if defined(__MINGW32__)
 #   define HPX_WINDOWS
+#endif
+
+#if defined(__CUDACC__)
+#define HPX_DEVICE __device__
+#define HPX_HOST __host__
+#else
+#define HPX_DEVICE
+#define HPX_HOST
+#endif
+#define HPX_HOST_DEVICE HPX_HOST HPX_DEVICE
+
+#if !defined(HPX_SINGLE_INHERITANCE)
+#define HPX_SINGLE_INHERITANCE /* empty */
 #endif
 
 #endif

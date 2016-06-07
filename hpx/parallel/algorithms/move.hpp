@@ -72,6 +72,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             auto const& iters = part_begin.get_iterator_tuple();
                             util::move_n_helper(get<0>(iters), part_size,
                                 get<1>(iters));
+                        },
+                        [](zip_iterator && last) -> zip_iterator
+                        {
+                            return std::move(last);
                         }));
             }
         };
