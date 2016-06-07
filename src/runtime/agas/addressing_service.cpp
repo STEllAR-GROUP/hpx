@@ -1648,7 +1648,8 @@ void addressing_service::route(
         ) = &addressing_service::route;
 
         threads::register_thread_nullary(
-            util::deferred_call(route_ptr, this, std::move(p), std::move(f), local_priority),
+            util::deferred_call(
+                route_ptr, this, std::move(p), std::move(f), local_priority),
             "addressing_service::route", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default);
