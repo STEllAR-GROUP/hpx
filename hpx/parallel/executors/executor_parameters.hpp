@@ -25,14 +25,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     namespace detail {
 
-        template<template<typename> class Condition, typename Arg, typename Enable = void>
+        template<template<typename> class Condition, typename Arg, 
+            typename Enable = void>
         struct counter_increment
         {
             constexpr static int value = 0;
         };
 
         template<template<typename> class Condition, typename Arg>
-        struct counter_increment<Condition, Arg, typename std::enable_if< Condition<Arg>::value>::type >
+        struct counter_increment<Condition, Arg, 
+            typename std::enable_if< Condition<Arg>::value>::type >
         {
             constexpr static int value = 1;
         };
@@ -57,7 +59,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template<template<typename> class Condition, typename Arg1, typename ...Args>
         struct parameter_type_counter<Condition, Arg1, Args...>
         {
-            constexpr static int value = parameter_type_counter<Condition, Args...>::value + counter_increment<Condition, Arg1>::value;
+            constexpr static int value = parameter_type_counter<Condition, Args...>::value + 
+                counter_increment<Condition, Arg1>::value;
         };
 
         template<typename T>
@@ -75,29 +78,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template<typename WrapperType>
             unwrapper(WrapperType && wrap) : wrap(wrap) {}
 
-            template<typename Executor, typename U = T, 
-                typename std::enable_if< is_executor_parameters_chunk_size<U>::value >::type* = nullptr>
-            auto variable_chunk_size(Executor & exec) -> decltype(std::declval<U>().variable_chunk_size(exec))
+            template<typename Executor, typename std::enable_if< 
+                is_executor_parameters_chunk_size<T>::value >::type* = nullptr
+                >
+            auto variable_chunk_size(Executor & exec) -> decltype(std::declval<T>().variable_chunk_size(exec))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
  
-            template<typename Executor, typename F, typename U = T, 
-                typename std::enable_if< is_executor_parameters_chunk_size<U>::value >::type* = nullptr>
+            template<typename Executor, typename F, typename std::enable_if< 
+                is_executor_parameters_chunk_size<T>::value >::type* = nullptr
+                >
             auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks) 
-                -> decltype(std::declval<U>().get_chunk_size(exec, std::forward<F>(f), num_tasks))
+                -> decltype(std::declval<T>().get_chunk_size(exec, std::forward<F>(f), num_tasks))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
             
-            template<typename U = T, typename std::enable_if< is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr>
-            auto mark_begin_execution() -> decltype(std::declval<U>().mark_begin_execution())
+            template<typename std::enable_if< is_executor_parameters_mark_begin_end<T>::value >::type* = nullptr>
+            auto mark_begin_execution() -> decltype(std::declval<T>().mark_begin_execution())
             {
                 return wrap.get().mark_begin_execution();
             }
  
-            template<typename U = T, typename std::enable_if< is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr>
-            auto mark_end_execution() -> decltype(std::declval<U>().mark_end_execution())
+            template<typename std::enable_if< is_executor_parameters_mark_begin_end<T>::value >::type* = nullptr>
+            auto mark_end_execution() -> decltype(std::declval<T>().mark_end_execution())
             {
                 return wrap.get().mark_end_execution();
             }
