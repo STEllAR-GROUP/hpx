@@ -94,15 +94,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 return wrap.get().variable_chunk_size(exec);
             }
-            
-            template<typename std::enable_if< is_executor_parameters_mark_begin_end<T>::value >::type* = nullptr>
-            auto mark_begin_execution() -> decltype(std::declval<T>().mark_begin_execution())
+
+            /// Enforce a template 
+            template<typename U = T, typename std::enable_if< 
+                is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
+                >
+            auto mark_begin_execution() -> decltype(std::declval<U>().mark_begin_execution())
             {
                 return wrap.get().mark_begin_execution();
             }
- 
-            template<typename std::enable_if< is_executor_parameters_mark_begin_end<T>::value >::type* = nullptr>
-            auto mark_end_execution() -> decltype(std::declval<T>().mark_end_execution())
+
+            /// Enforce a template 
+            template<typename U = T, typename std::enable_if< 
+                is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
+                >
+            auto mark_end_execution() -> decltype(std::declval<U>().mark_end_execution())
             {
                 return wrap.get().mark_end_execution();
             }
