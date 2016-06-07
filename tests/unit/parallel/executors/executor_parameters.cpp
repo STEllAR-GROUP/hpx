@@ -49,6 +49,9 @@ void chunk_size_test(Parameters && params)
 {
     chunk_size_test_impl(std::forward<Parameters>(params));
     chunk_size_test_impl(boost::ref(params));
+#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
+    chunk_size_test_impl(std::ref(params));
+#endif
 }
 
 void test_dynamic_chunk_size()

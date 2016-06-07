@@ -81,7 +81,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template<typename Executor, typename U = T, typename std::enable_if< 
                 is_executor_parameters_chunk_size<U>::value >::type* = nullptr
                 >
-            auto variable_chunk_size(Executor & exec) -> decltype(std::declval<U>().variable_chunk_size(exec))
+            auto variable_chunk_size(Executor & exec) 
+                -> decltype(std::declval<U>().variable_chunk_size(exec))
             {
                 return wrap.get().variable_chunk_size(exec);
             }
@@ -96,7 +97,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 return wrap.get().variable_chunk_size(exec);
             }
 
-            /// Enforce a template 
             template<typename U = T, typename std::enable_if< 
                 is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
                 >
@@ -104,8 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 return wrap.get().mark_begin_execution();
             }
-
-            /// Enforce a template 
+ 
             template<typename U = T, typename std::enable_if< 
                 is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
                 >
@@ -114,25 +113,89 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 return wrap.get().mark_end_execution();
             }
 
+            template<typename U = T, typename std::enable_if< 
+                is_executor_parameters_processing_units_count<U>::value >::type* = nullptr
+                >
+            auto processing_units_count() -> decltype(std::declval<U>().processing_units_count())
+            {
+                return wrap.get().processing_units_count();
+            }
+ 
+            template<typename Executor, typename U = T, typename std::enable_if< 
+                is_executor_parameters_reset_thread_distr<U>::value >::type* = nullptr
+                >
+            auto reset_thread_distribution(Executor & exec) 
+                -> decltype(std::declval<U>().reset_thread_distribution(exec))
+            {
+                return wrap.get().reset_thread_distribution(exec);
+            }
         private:
             boost::reference_wrapper<T> wrap;
         };
 
+#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
         template<typename T>
         struct unwrapper< std::reference_wrapper<T> >
         {
             template<typename WrapperType>
             unwrapper(WrapperType && wrap) : wrap(wrap) {}
 
-            template<typename U = T, typename std::enable_if< is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr>
-            void mark_begin_execution()
+            template<typename Executor, typename U = T, typename std::enable_if< 
+                is_executor_parameters_chunk_size<U>::value >::type* = nullptr
+                >
+            auto variable_chunk_size(Executor & exec) 
+                -> decltype(std::declval<U>().variable_chunk_size(exec))
             {
-                wrap.get().mark_begin_execution();
+                return wrap.get().variable_chunk_size(exec);
+            }
+ 
+            template<typename Executor, typename F, typename U = T, 
+                typename std::enable_if< 
+                    is_executor_parameters_chunk_size<U>::value 
+                >::type* = nullptr>
+            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks) 
+                -> decltype(std::declval<U>().get_chunk_size(exec, std::forward<F>(f), num_tasks))
+            {
+                return wrap.get().variable_chunk_size(exec);
+            }
+
+            template<typename U = T, typename std::enable_if< 
+                is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
+                >
+            auto mark_begin_execution() -> decltype(std::declval<U>().mark_begin_execution())
+            {
+                return wrap.get().mark_begin_execution();
+            }
+ 
+            template<typename U = T, typename std::enable_if< 
+                is_executor_parameters_mark_begin_end<U>::value >::type* = nullptr
+                >
+            auto mark_end_execution() -> decltype(std::declval<U>().mark_end_execution())
+            {
+                return wrap.get().mark_end_execution();
+            }
+
+            template<typename U = T, typename std::enable_if< 
+                is_executor_parameters_processing_units_count<U>::value >::type* = nullptr
+                >
+            auto processing_units_count() -> decltype(std::declval<U>().processing_units_count())
+            {
+                return wrap.get().processing_units_count();
+            }
+ 
+            template<typename Executor, typename U = T, typename std::enable_if< 
+                is_executor_parameters_reset_thread_distr<U>::value >::type* = nullptr
+                >
+            auto reset_thread_distribution(Executor & exec) 
+                -> decltype(std::declval<U>().reset_thread_distribution(exec))
+            {
+                return wrap.get().reset_thread_distribution(exec);
             }
 
         private:
             std::reference_wrapper<T> wrap;
         };
+#endif
 
         template<typename... Params>
         struct executor_parameters : public unwrapper<Params>...
