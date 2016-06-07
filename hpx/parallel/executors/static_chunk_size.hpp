@@ -51,6 +51,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
           : chunk_size_(chunk_size)
         {}
 
+        template <typename Executor>
+        static bool variable_chunk_size(Executor&)
+        {
+            return false;
+        }
+        
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
         std::size_t get_chunk_size(Executor& exec, F &&, std::size_t num_tasks)

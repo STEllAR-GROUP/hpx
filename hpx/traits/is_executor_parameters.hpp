@@ -23,10 +23,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
     struct executor_parameters_tag {};
-
+    /// Parameters implement functions:
+    /// bool variable_chunk_size(Executor &)
+    /// std::size_t get_chunk_size(Executor &, F &&, std::size_t num_tasks)
     struct executor_parameters_chunk_size_tag : executor_parameters_tag {};
 
+    /// Parameters implement functions:
+    /// void mark_begin_execution();
+    /// void mark_end_execution();
     struct executor_parameters_mark_begin_end_tag : executor_parameters_tag {};
+    
+    /// Parameters implement function std::size_t processing_units_count();
+    struct executor_parameters_processing_units_count_tag : executor_parameters_tag {};
+
+    /// Parameters implement function: void reset_thread_distribution(Executor &)
+    struct executor_parameters_reset_thread_distr_tag : executor_parameters_tag {};
 
     namespace detail
     {
@@ -70,6 +81,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
       : detail::is_executor_parameters<typename hpx::util::decay<T>::type, executor_parameters_mark_begin_end_tag>
     {};
 
+    template <typename T>
+    struct is_executor_parameters_reset_thread_distr
+      : detail::is_executor_parameters<typename hpx::util::decay<T>::type, executor_parameters_reset_thread_distr_tag>
+    {};
+
+    template <typename T>
+    struct is_executor_parameters_processing_units_count
+      : detail::is_executor_parameters<typename hpx::util::decay<T>::type, executor_parameters_processing_units_count_tag>
+    {};
+
     template <typename Executor, typename Enable = void>
     struct executor_parameter_traits;
 }}}
@@ -92,6 +113,15 @@ namespace hpx { namespace traits
       : parallel::v3::is_executor_parameters_mark_begin_end<Parameters>
     {};
 
+    template <typename Parameters, typename Enable>
+    struct is_executor_parameters_reset_thread_distr
+      : parallel::v3::is_executor_parameters_reset_thread_distr<Parameters>
+    {};
+
+    template <typename Parameters, typename Enable>
+    struct is_executor_parameters_processing_units_count
+      : parallel::v3::is_executor_parameters_processing_units_count<Parameters>
+    {};
 }}
 
 #endif

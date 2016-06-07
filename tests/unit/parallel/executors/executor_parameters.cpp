@@ -19,12 +19,13 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/functions.hpp>
+#include <boost/ref.hpp>
 
 #include "../algorithms/foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Parameters>
-void chunk_size_test(Parameters && params)
+template<typename Parameters>
+void chunk_size_test_impl(Parameters && params)
 {
     using namespace hpx::parallel;
 
@@ -41,6 +42,13 @@ void chunk_size_test(Parameters && params)
     parallel_executor par_exec;
     test_for_each(par.on(par_exec).with(params), iterator_tag());
     test_for_each_async(par(task).on(par_exec).with(params), iterator_tag());
+}
+
+template <typename Parameters>
+void chunk_size_test(Parameters && params)
+{
+    chunk_size_test_impl(std::forward<Parameters>(params));
+    chunk_size_test_impl(boost::ref(params));
 }
 
 void test_dynamic_chunk_size()
