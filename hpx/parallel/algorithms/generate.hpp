@@ -16,6 +16,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
@@ -56,7 +57,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f](type& v) mutable
                         {
                             v = f();
-                        });
+                        },
+                        util::projection_identity());
             }
         };
 
@@ -187,7 +189,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f](type& v) mutable
                         {
                             v = f();
-                        });
+                        },
+                        util::projection_identity());
             }
         };
         /// \endcond

@@ -21,6 +21,18 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        template <typename Category, typename Enable = void>
+        struct copy_helper;
+        template <typename Category, typename Enable = void>
+        struct copy_n_helper;
+
+        template <typename Category, typename Enable = void>
+        struct copy_synchronize_helper;
+
+        template <typename Category, typename Enable = void>
+        struct move_helper;
+        template <typename Category, typename Enable = void>
+        struct move_n_helper;
 
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         ///////////////////////////////////////////////////////////////////////
@@ -47,7 +59,7 @@ namespace hpx { namespace parallel { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         // Customization point for optimizing copy operations
-        template <typename Category, typename Enable = void>
+        template <typename Category, typename Enable>
         struct copy_helper
         {
             template <typename InIter, typename OutIter>
@@ -86,7 +98,7 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
         // Customization point for optimizing copy_n operations
-        template <typename Category, typename Enable = void>
+        template <typename Category, typename Enable>
         struct copy_n_helper
         {
             template <typename InIter, typename OutIter>
@@ -124,8 +136,32 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        // Customization point for copy-synchronize operations
+        template <typename Category, typename Enable>
+        struct copy_synchronize_helper
+        {
+            template <typename InIter, typename OutIter>
+            HPX_FORCEINLINE static void
+            call(InIter const&, OutIter const&)
+            {
+                // do nothing by default (std::memmove is already synchronous)
+            }
+        };
+    }
+
+    template <typename InIter, typename OutIter>
+    HPX_FORCEINLINE void
+    copy_synchronize(InIter const& first, OutIter const& dest)
+    {
+        typedef decltype(hpx::traits::get_pointer_category(first, dest)) category;
+        detail::copy_synchronize_helper<category>::call(first, dest);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
         // Customization point for optimizing copy_n operations
-        template <typename Category, typename Enable = void>
+        template <typename Category, typename Enable>
         struct move_helper
         {
             template <typename InIter, typename OutIter>
@@ -164,7 +200,7 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
         // Customization point for optimizing copy_n operations
-        template <typename Category, typename Enable = void>
+        template <typename Category, typename Enable>
         struct move_n_helper
         {
             template <typename InIter, typename OutIter>

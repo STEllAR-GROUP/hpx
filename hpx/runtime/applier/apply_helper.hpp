@@ -46,7 +46,7 @@ namespace hpx { namespace applier { namespace detail
         {
             std::unique_ptr<actions::continuation> cont;
             threads::thread_init_data data;
-            if (traits::action_decorate_continuation<Action>::call(cont))
+            if (traits::action_decorate_continuation<Action>::call(cont)) //-V614
             {
                 data.func = Action::construct_thread_function(std::move(cont),
                     lva, std::forward<Ts>(vs)...);

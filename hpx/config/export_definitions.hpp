@@ -13,6 +13,12 @@
 # define HPX_SYMBOL_INTERNAL    /* empty */
 # define HPX_APISYMBOL_EXPORT   __declspec(dllexport)
 # define HPX_APISYMBOL_IMPORT   __declspec(dllimport)
+#elif defined(__CUDACC__)
+# define HPX_SYMBOL_EXPORT      /* empty */
+# define HPX_SYMBOL_IMPORT      /* empty */
+# define HPX_SYMBOL_INTERNAL    /* empty */
+# define HPX_APISYMBOL_EXPORT   /* empty */
+# define HPX_APISYMBOL_IMPORT   /* empty */
 #elif defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
 # define HPX_SYMBOL_EXPORT      __attribute__((visibility("default")))
 # define HPX_SYMBOL_IMPORT      __attribute__((visibility("default")))

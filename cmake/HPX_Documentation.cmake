@@ -30,7 +30,7 @@ if(HPX_WITH_DOCUMENTATION)
     hpx_error("Boost auto_index tool is unavailable, index generation will be disabled. Set BOOSTAUTOINDEX_ROOT to your Boost auto_index installation directory.")
     set(HPX_WITH_DOCUMENTATION OFF)
   elseif(NOT FOP_FOUND)
-    hpx_warn("FOP is unavailable, PDF generation will be disabled. Set FOP_ROOT to your FOP installation directory.")
+    hpx_info("FOP is unavailable, PDF generation will be disabled. Set FOP_ROOT to your FOP installation directory.")
   endif()
 endif()
 

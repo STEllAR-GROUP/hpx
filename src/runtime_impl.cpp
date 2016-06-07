@@ -363,7 +363,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::wait_helper(
-        boost::mutex& mtx, boost::condition& cond, bool& running)
+        boost::mutex& mtx, boost::condition_variable& cond, bool& running)
     {
         // signal successful initialization
         {
@@ -395,7 +395,7 @@ namespace hpx {
 
         // start the wait_helper in a separate thread
         boost::mutex mtx;
-        boost::condition cond;
+        boost::condition_variable cond;
         bool running = false;
 
         boost::thread t (util::bind(
@@ -405,7 +405,7 @@ namespace hpx {
 
         // wait for the thread to run
         {
-            std::unique_lock<boost::mutex> lk(mtx);
+            boost::unique_lock<boost::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -444,8 +444,8 @@ namespace hpx {
             // from a HPX thread, so it would deadlock by waiting for the thread
             // manager
             boost::mutex mtx;
-            boost::condition cond;
-            std::unique_lock<boost::mutex> l(mtx);
+            boost::condition_variable cond;
+            boost::unique_lock<boost::mutex> l(mtx);
 
             boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 boost::ref(cond), boost::ref(mtx)));
@@ -476,7 +476,7 @@ namespace hpx {
     // a HPX thread!
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::stopped(
-        bool blocking, boost::condition& cond, boost::mutex& mtx)
+        bool blocking, boost::condition_variable& cond, boost::mutex& mtx)
     {
         // wait for thread manager to exit
         runtime_support_->stopped();         // re-activate shutdown HPX-thread
@@ -622,9 +622,9 @@ namespace hpx {
     }
 
     template <typename SchedulingPolicy>
-    void runtime_impl<SchedulingPolicy>::init_tss(
+    void runtime_impl<SchedulingPolicy>::init_tss_ex(
         char const* context, std::size_t num, char const* postfix,
-        bool service_thread)
+        bool service_thread, error_code& ec)
     {
         // initialize our TSS
         this->runtime::init_tss();
@@ -644,7 +644,7 @@ namespace hpx {
             char const* name = runtime::thread_name_.get()->c_str();
 
             // initialize thread mapping for external libraries (i.e. PAPI)
-            thread_support_->register_thread(name);
+            thread_support_->register_thread(name, ec);
 
             // initialize coroutines context switcher
             hpx::threads::coroutines::thread_startup(name);
@@ -763,7 +763,8 @@ namespace hpx {
     /// Register an external OS-thread with HPX
     template <typename SchedulingPolicy>
     bool runtime_impl<SchedulingPolicy>::
-        register_thread(char const* name, std::size_t num, bool service_thread)
+        register_thread(char const* name, std::size_t num, bool service_thread,
+            error_code& ec)
     {
         if (NULL != runtime::thread_name_.get())
             return false;       // already registered
@@ -771,9 +772,9 @@ namespace hpx {
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss(thread_name.c_str(), num, 0, service_thread);
+        init_tss_ex(thread_name.c_str(), num, 0, service_thread, ec);
 
-        return true;
+        return !ec ? true : false;
     }
 
     /// Unregister an external OS-thread with HPX

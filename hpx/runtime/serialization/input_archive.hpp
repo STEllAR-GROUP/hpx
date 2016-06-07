@@ -100,7 +100,7 @@ namespace hpx { namespace serialization
               , boost::is_enum<T>
             >
         >::type
-        load(T & t)
+        load(T & t) //-V659
         {
             load_integral(t,
                 typename boost::is_unsigned<T>::type());

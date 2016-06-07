@@ -13,6 +13,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
@@ -37,17 +38,15 @@
 
 namespace hpx
 {
-    class HPX_API_EXPORT runtime;
-    class HPX_API_EXPORT thread;
+    /// Register the current kernel thread with HPX, this should be done once
+    /// for each external OS-thread intended to invoke HPX functionality.
+    /// Calling this function more than once will silently fail.
+    HPX_API_EXPORT bool register_thread(runtime* rt, char const* name,
+        error_code& ec = throws);
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
-    class HPX_API_EXPORT runtime_impl;
-
-    /// The function \a get_runtime returns a reference to the (thread
-    /// specific) runtime instance.
-    HPX_API_EXPORT runtime& get_runtime();
-    HPX_API_EXPORT runtime* get_runtime_ptr();
+    /// Unregister the thread from HPX, this should be done once in
+    /// the end before the external thread exists.
+    HPX_API_EXPORT void unregister_thread(runtime* rt);
 
     /// The function \a get_locality returns a reference to the locality prefix
     HPX_API_EXPORT naming::gid_type const& get_locality();

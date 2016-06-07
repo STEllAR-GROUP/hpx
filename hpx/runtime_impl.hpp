@@ -54,7 +54,7 @@ namespace hpx
             util::function_nonser<runtime::hpx_main_function_type> func,
             int& result);
 
-        void wait_helper(boost::mutex& mtx, boost::condition& cond,
+        void wait_helper(boost::mutex& mtx, boost::condition_variable& cond,
             bool& running);
 
     public:
@@ -143,7 +143,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, boost::condition& cond, boost::mutex& mtx);
+        void stopped(bool blocking, boost::condition_variable& cond, boost::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -351,7 +351,7 @@ namespace hpx
 
         /// Register an external OS-thread with HPX
         bool register_thread(char const* name, std::size_t num = 0,
-            bool service_thread = true);
+            bool service_thread = true, error_code& ec = throws);
 
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
@@ -361,9 +361,17 @@ namespace hpx
         notification_policy_type get_notification_policy(char const* prefix);
 
     private:
-        void init_tss(char const* context, std::size_t num, char const* postfix,
-            bool service_thread);
         void deinit_tss();
+
+        void init_tss_ex(char const* context, std::size_t num,
+            char const* postfix, bool service_thread, error_code& ec);
+
+        void init_tss(char const* context, std::size_t num, char const* postfix,
+            bool service_thread)
+        {
+            error_code ec(lightweight);
+            return init_tss_ex(context, num, postfix, service_thread, ec);
+        }
 
     private:
         util::unique_id_ranges id_pool_;

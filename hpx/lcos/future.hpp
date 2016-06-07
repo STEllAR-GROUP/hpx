@@ -952,7 +952,7 @@ namespace hpx { namespace lcos
            !std::is_convertible<Future, hpx::future<T> >::value,
             hpx::future<T>
         >::type
-        make_future_helper(Future && f)
+        make_future_helper(Future && f) //-V659
         {
             return f.then(
                 [](Future && f) -> T
@@ -993,7 +993,7 @@ namespace hpx { namespace lcos
            !std::is_convertible<Future, hpx::future<T> >::value,
             hpx::future<T>
         >::type
-        convert_future_helper(Future && f, Conv && conv)
+        convert_future_helper(Future && f, Conv && conv) //-V659
         {
             return f.then(
                 [conv](Future && f) -> T

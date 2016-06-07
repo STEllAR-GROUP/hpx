@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
-
+#include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -21,12 +21,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins
-{
-    struct HPX_EXPORT plugin_registry_base;
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

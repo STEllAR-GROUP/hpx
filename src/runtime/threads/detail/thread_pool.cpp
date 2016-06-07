@@ -603,7 +603,7 @@ namespace hpx { namespace threads { namespace detail
                         tfunc_times_[num_thread], exec_times_[num_thread]);
 
                     detail::scheduling_callbacks callbacks(
-                        util::bind(
+                        util::bind( //-V107
                             &policies::scheduler_base::idle_callback,
                             &sched_, num_thread
                         ),
@@ -611,7 +611,7 @@ namespace hpx { namespace threads { namespace detail
 
                     if (mode_ & policies::do_background_work)
                     {
-                        callbacks.background_ = util::bind(
+                        callbacks.background_ = util::bind( //-V107
                             &policies::scheduler_base::background_callback,
                             &sched_, num_thread);
                     }

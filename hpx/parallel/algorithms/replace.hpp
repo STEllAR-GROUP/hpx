@@ -89,7 +89,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             t = new_value;
                         }
-                    });
+                    },
+                    util::projection_identity());
             }
         };
         /// \endcond
@@ -230,7 +231,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         using hpx::util::invoke;
                         if (invoke(f, invoke(proj, t)))
                             t = new_value;
-                    });
+                    },
+                    util::projection_identity());
             }
         };
         /// \endcond
@@ -395,7 +397,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 get<1>(t) = new_value;
                             else
                                 get<1>(t) = get<0>(t); //-V573
-                        }));
+                        },
+                        util::projection_identity()));
             }
         };
         /// \endcond
@@ -570,7 +573,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 get<1>(t) = new_value;
                             else
                                 get<1>(t) = get<0>(t); //-V573
-                        }));
+                        },
+                        util::projection_identity()));
             }
         };
         /// \endcond

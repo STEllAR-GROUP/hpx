@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                     to decide how many loop iterations should be
         ///                     combined.
         ///
-        explicit auto_chunk_size(util::steady_duration const& rel_time)
+        explicit auto_chunk_size(hpx::util::steady_duration const& rel_time)
           : min_time_(rel_time.value().count())
         {}
 

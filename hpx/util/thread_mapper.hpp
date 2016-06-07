@@ -81,7 +81,8 @@ namespace hpx { namespace util
         ~thread_mapper();
 
         // registers invoking OS thread with a unique label
-        std::uint32_t register_thread(char const *label);
+        boost::uint32_t register_thread(char const *label,
+            error_code& ec = throws);
 
         // unregisters the calling OS thread
         bool unregister_thread();
