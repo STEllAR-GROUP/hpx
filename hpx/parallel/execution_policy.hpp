@@ -168,8 +168,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy
         ///
-        template <typename... Parameters,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+        template <typename... Parameters, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             sequential_task_execution_policy, executor_type, ParametersType
         >::type
@@ -296,8 +296,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy_shim
         ///
-        template <typename... Parameters_,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+        template <typename... Parameters_, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             sequential_task_execution_policy_shim, executor_type, ParametersType
         >::type
@@ -439,8 +439,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_execution_policy
         ///
-        template <typename... Parameters,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+        template <typename... Parameters, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             sequential_execution_policy, executor_type, ParametersType
         >::type
@@ -563,8 +563,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_execution_policy_shim
         ///
-        template <typename... Parameters_,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+        template <typename... Parameters_, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             sequential_execution_policy_shim, executor_type, ParametersType
         >::type
@@ -710,8 +710,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy_shim
         ///
-        template <typename... Parameters,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+        template <typename... Parameters, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             parallel_task_execution_policy, executor_type, ParametersType
         >::type
@@ -837,8 +837,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy_shim
         ///
-        template <typename... Parameters_,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+        template <typename... Parameters_, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             parallel_task_execution_policy_shim, executor_type, ParametersType
         >::type
@@ -974,8 +974,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy
         ///
-        template <typename... Parameters,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+        template <typename... Parameters, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             parallel_execution_policy, executor_type, ParametersType
         >::type
@@ -1097,8 +1097,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy_shim
         ///
-        template <typename... Parameters_,
-			typename ParametersType = typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+        template <typename... Parameters_, typename ParametersType = 
+            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             parallel_execution_policy_shim, executor_type, ParametersType
         >::type
