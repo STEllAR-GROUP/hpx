@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx//util/tuple.hpp>
 
 #include <iterator>
 #include <algorithm>
-#include <initializer_list>
 #include <vector>
 
 namespace hpx { namespace parallel { namespace util
