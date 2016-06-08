@@ -6,8 +6,8 @@
 #ifndef HPX_TRAITS_IS_RANGE_HPP
 #define HPX_TRAITS_IS_RANGE_HPP
 
-#include <hpx/util/always_void.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/util/always_void.hpp>
 
 #include <boost/mpl/and.hpp>
 
@@ -19,11 +19,10 @@ namespace hpx { namespace traits
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(end);
     }
 
-    template <class T, class Enable>
-    struct is_range:
-        boost::mpl::and_<detail::has_begin<T>,
-            detail::has_end<T> > {};
-
+    template <typename T, typename Enable = void>
+    struct is_range
+      : boost::mpl::and_<detail::has_begin<T>, detail::has_end<T> >
+    {};
 }}
 
 #endif

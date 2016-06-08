@@ -11,24 +11,24 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/lcos/local/mutex.hpp>
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include <boost/format.hpp>
 #include <boost/atomic.hpp>
+#include <boost/format.hpp>
 
 namespace hpx { namespace agas
 {
@@ -269,6 +269,12 @@ struct HPX_EXPORT locality_namespace
 };
 
 }}}
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::locality_namespace::service_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::locality_namespace::bulk_service_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::locality_namespace::service_action,

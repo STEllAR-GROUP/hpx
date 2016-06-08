@@ -10,8 +10,8 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/plugins/parcelport/ibverbs/messages.hpp>
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
+#include <hpx/plugins/parcelport/ibverbs/messages.hpp>
 #include <hpx/util/spinlock.hpp>
 
 #include <cstring>

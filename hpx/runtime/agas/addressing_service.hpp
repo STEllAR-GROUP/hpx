@@ -13,16 +13,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/cache/lru_cache.hpp>
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>

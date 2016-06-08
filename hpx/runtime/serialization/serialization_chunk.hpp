@@ -11,8 +11,8 @@
 
 #include <boost/cstdint.hpp>
 
-#include <cstddef>
 #include <climits>
+#include <cstddef>
 #include <cstring>
 
 #if CHAR_BIT != 8

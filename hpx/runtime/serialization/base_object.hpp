@@ -9,10 +9,10 @@
 #ifndef HPX_SERIALIZATION_BASE_OBJECT_HPP
 #define HPX_SERIALIZATION_BASE_OBJECT_HPP
 
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/access.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/decay.hpp>

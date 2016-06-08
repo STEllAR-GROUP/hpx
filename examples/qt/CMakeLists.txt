@@ -3,11 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Disabling the Qt example on BG/Q as GUIs don't make sense there anyways
-if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-  find_package(Qt4)
-
-  if(HPX_WITH_CXX11_LAMBDAS AND QT4_FOUND)
+if(HPX_WITH_EXAMPLES_QT4)
     include(${QT_USE_FILE})
 
     QT4_WRAP_CPP(QT_MOC_SOURCES widget.hpp OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
@@ -16,16 +12,16 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     set(qt_sources
         qt.cpp
         widget.cpp
-  #      hpx_qt.cpp
+#       hpx_qt.cpp
         ${QT_MOC_SOURCES})
 
     include_directories(${QT4_INCLUDE_DIRS})
 
     add_hpx_executable(qt
-      MODULE qt
-      SOURCES ${qt_sources}
-      ${qt_FLAGS}
-      FOLDER "Examples/Qt")
+        MODULE qt
+        SOURCES ${qt_sources}
+        ${qt_FLAGS}
+        FOLDER "Examples/Qt")
 
     target_link_libraries(qt_exe ${QT_LIBRARIES})
 
@@ -37,5 +33,4 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
 
     # add dependencies to pseudo-target
     add_hpx_pseudo_dependencies(examples.qt.qt qt_exe)
-  endif()
 endif()

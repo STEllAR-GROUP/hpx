@@ -52,9 +52,9 @@
 #include <boost/type_traits/type_with_alignment.hpp>
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+#include <errno.h>
 #include <sys/mman.h>
 #include <sys/param.h>
-#include <errno.h>
 
 #include <stdexcept>
 #endif

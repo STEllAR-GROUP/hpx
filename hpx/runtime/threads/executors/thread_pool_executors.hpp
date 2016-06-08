@@ -7,8 +7,8 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/date_time_chrono.hpp>

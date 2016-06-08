@@ -14,8 +14,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <utility>
 #include <cstring>
+#include <utility>
 
 #include <windows.h>
 

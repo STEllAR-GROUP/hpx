@@ -20,6 +20,10 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     struct general_pointer_tag {};
 
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+    struct trivially_copyable_pointer_tag : general_pointer_tag {};
+#endif
+
     template <typename Source, typename Dest>
     inline general_pointer_tag
     get_pointer_category(Source const&, Dest const&)

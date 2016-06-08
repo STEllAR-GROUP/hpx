@@ -14,10 +14,10 @@
 #error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
-#include <hpx/config/defines.hpp>
 #include <hpx/config/branch_hints.hpp>
-#include <hpx/config/constexpr.hpp>
 #include <hpx/config/compiler_specific.hpp>
+#include <hpx/config/constexpr.hpp>
+#include <hpx/config/defines.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>

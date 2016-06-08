@@ -118,6 +118,7 @@ namespace hpx
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/when_each.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/detail/pack.hpp>
 
 #include <type_traits>

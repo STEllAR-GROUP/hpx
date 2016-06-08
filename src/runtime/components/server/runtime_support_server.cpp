@@ -52,6 +52,8 @@
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 
+#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -545,9 +547,14 @@ namespace hpx { namespace components { namespace server
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
+typedef
+    hpx::lcos::detail::make_broadcast_action<call_shutdown_functions_action>::type
+    call_shutdown_functions_broadcast_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action,
         call_shutdown_functions_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    call_shutdown_functions_broadcast_action)
 HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
         call_shutdown_functions_action,
         hpx::actions::broadcast_call_shutdown_functions_action_id)
@@ -1356,13 +1363,10 @@ namespace hpx { namespace components { namespace server
     // working around non-copy-ability of packaged_task
     struct indirect_packaged_task
     {
-        typedef void write_handler_type(
-            boost::system::error_code const&, parcelset::parcel const&);
-        typedef lcos::local::packaged_task<write_handler_type> packaged_task_type;
+        typedef lcos::local::packaged_task<void()> packaged_task_type;
 
         indirect_packaged_task()
-          : pt(std::make_shared<packaged_task_type>(
-                &parcelset::default_write_handler))
+          : pt(std::make_shared<packaged_task_type>([](){}))
         {}
 
         hpx::future<void> get_future()
@@ -1373,7 +1377,9 @@ namespace hpx { namespace components { namespace server
         template <typename ...Ts>
         void operator()(Ts&& ... vs)
         {
-            (*pt)(std::forward<Ts>(vs)...);
+            // This needs to be run on a HPX thread
+            hpx::apply(std::move(*pt));
+            pt.reset();
         }
 
         std::shared_ptr<packaged_task_type> pt;

@@ -7,7 +7,6 @@
 #define HPX_TRAITS_IS_EXECUTOR_PARAMETERS_AUG_01_2015_0709AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
 #include <hpx/config/inline_namespace.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/util/decay.hpp>
@@ -63,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 namespace hpx { namespace traits
 {
     // new executor framework
-    template <typename Parameters, typename Enable>
+    template <typename Parameters, typename Enable = void>
     struct is_executor_parameters
       : parallel::v3::is_executor_parameters<Parameters>
     {};

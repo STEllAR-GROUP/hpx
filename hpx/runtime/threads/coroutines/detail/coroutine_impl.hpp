@@ -36,10 +36,10 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_base.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 

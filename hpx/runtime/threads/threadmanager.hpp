@@ -9,15 +9,15 @@
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>

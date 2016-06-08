@@ -19,12 +19,12 @@
 #include <netdb.h>
 #include <rdma/rdma_cma.h>
 
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <poll.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
     template <typename Connection>

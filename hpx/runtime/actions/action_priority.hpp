@@ -10,6 +10,7 @@
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/traits/action_priority.hpp>
+#include <hpx/traits/extract_action.hpp>
 
 namespace hpx { namespace actions
 {

@@ -8,14 +8,14 @@
 #define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/traits/is_component.hpp>
 
-#include <boost/mpl/or.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/mpl/or.hpp>
 #include <boost/type_traits/add_const.hpp>
+#include <boost/type_traits/is_base_and_derived.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

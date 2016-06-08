@@ -7,8 +7,8 @@
 #define HPX_BINARY_FILTER_FACTORY_BASE_MAR_24_2013_0339PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>

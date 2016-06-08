@@ -11,9 +11,9 @@
 #if defined(HPX_HAVE_SODIUM)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/components/security/key_pair.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/util/assert.hpp>
 

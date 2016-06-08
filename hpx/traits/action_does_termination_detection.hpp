@@ -10,7 +10,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for Action::does_termination_detection
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_does_termination_detection
     {
         static bool call()

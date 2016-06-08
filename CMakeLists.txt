@@ -514,26 +514,92 @@ hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
   ON CATEGORY "Parcelport" ADVANCED)
 
 ## Profiling related build options
-hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_APEX BOOL
+  "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX)
 endif()
-hpx_option(HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_PAPI BOOL
+  "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
 if(HPX_WITH_PAPI)
   hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
-hpx_option(HPX_WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_TAU BOOL
+  "Enable TAU profiling support." OFF CATEGORY "Profiling")
 if(HPX_WITH_TAU)
   hpx_add_config_define(HPX_HAVE_TAU)
 endif()
-hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
+  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
-hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_ITTNOTIFY BOOL
+  "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 #if(HPX_WITH_ITTNOTIFY)
   #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 #endif()
+
+## External libraries/frameworks used by sme of the examples and benchmarks
+hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
+  "Enable examples requiring OpenMP support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_OPENMP)
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_OPENMP)
+  else()
+    set(HPX_WITH_EXAMPLES_OPENMP OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
+  "Enable examples requiring TBB support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_TBB)
+  find_package(TBB)
+  if(TBB_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_TBB)
+  else()
+    set(HPX_WITH_EXAMPLES_TBB OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
+  "Enable examples requiring QThreads support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_QTHREADS)
+  find_package(QThreads)
+  if(QTHREADS_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_QTHREADS)
+  else()
+    set(HPX_WITH_EXAMPLES_QTHREADS OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
+  "Enable examples requiring HDF5 support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_HDF5)
+  find_package(HDF5 COMPONENTS CXX)
+  if(HDF5_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_HDF5)
+  else()
+    set(HPX_WITH_EXAMPLES_HDF5 OFF)
+  endif()
+endif()
+
+# Disabling the Qt example on BG/Q as GUIs don't make sense there anyways
+if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
+    "Enable examples requiring Qt4 support (default: OFF)." OFF
+    CATEGORY "Tools" ADVANCED)
+  if(HPX_WITH_EXAMPLES_QT4)
+    find_package(Qt4)
+    if(QT4_FOUND)
+      hpx_add_config_define(HPX_HAVE_EXAMPLES_QT4)
+    else()
+      set(HPX_WITH_EXAMPLES_QT4 OFF)
+    endif()
+  endif()
+endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")

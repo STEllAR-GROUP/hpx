@@ -7,10 +7,10 @@
 #define HPX_UTIL_INVOKE_FUSED_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>

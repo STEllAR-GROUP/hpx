@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-#include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 
 #include <hpx/compute/cuda/get_targets.hpp>
 

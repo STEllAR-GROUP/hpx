@@ -7,6 +7,9 @@
 #define HPX_LCOS_ASYNC_CONTINUE_CALLBACK_FWD_MAR_30_2015_1130AM
 
 #include <hpx/lcos/async_continue_fwd.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+
 #ifndef HPX_MSVC
 #include <boost/utility/enable_if.hpp>
 #endif

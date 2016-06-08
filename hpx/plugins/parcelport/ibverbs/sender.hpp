@@ -11,13 +11,13 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/plugins/parcelport/ibverbs/context.hpp>
-#include <hpx/plugins/parcelport/ibverbs/messages.hpp>
-#include <hpx/plugins/parcelport/ibverbs/allocator.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/plugins/parcelport/ibverbs/allocator.hpp>
+#include <hpx/plugins/parcelport/ibverbs/context.hpp>
+#include <hpx/plugins/parcelport/ibverbs/messages.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/placeholders.hpp>

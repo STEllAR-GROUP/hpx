@@ -9,14 +9,14 @@
 #define HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/async.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
@@ -25,8 +25,8 @@
 
 #include <boost/exception_ptr.hpp>
 
-#include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
+#include <memory>                           // std::addressof
 
 #include <mutex>
 #include <vector>

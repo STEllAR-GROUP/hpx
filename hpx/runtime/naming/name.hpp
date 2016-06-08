@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>

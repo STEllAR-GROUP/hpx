@@ -8,10 +8,10 @@
 #define HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/state.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/util/logging.hpp>

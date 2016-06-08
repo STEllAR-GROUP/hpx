@@ -8,19 +8,19 @@
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
 #include <hpx/config.hpp>
-#include <hpx/util/plugin/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/plugin/config.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/once.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/once.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/type_traits/is_pointer.hpp>
+#include <boost/type_traits/remove_pointer.hpp>
 
 #include <iostream>
 #include <mutex>

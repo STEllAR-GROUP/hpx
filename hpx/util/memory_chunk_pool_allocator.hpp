@@ -7,10 +7,8 @@
 #define HPX_UTIL_MEMORY_CHUNK_POOL_ALLOCATOR_HPP
 
 #include <hpx/config.hpp>
-
-#include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-//
+
 #include <cstdlib>
 #include <vector>
 
