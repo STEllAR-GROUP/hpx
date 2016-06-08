@@ -14,7 +14,6 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/async_continue_fwd.hpp>

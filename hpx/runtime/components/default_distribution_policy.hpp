@@ -20,7 +20,6 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
 

@@ -21,7 +21,6 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
