@@ -346,10 +346,6 @@ namespace hpx { namespace components { namespace server
             components::component_type type);
 #endif
 
-        ///////////////////////////////////////////////////////////////////////
-        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
-            components::component_type type);
-
     protected:
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,

@@ -20,7 +20,8 @@ namespace hpx
         bool move_credits)
     {
         typedef lcos::base_lco::set_event_action set_action;
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
@@ -45,7 +46,8 @@ namespace hpx
         typedef
             hpx::traits::extract_action<set_action>::remote_result_type
             remote_result_type;
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
@@ -68,7 +70,8 @@ namespace hpx
         boost::exception_ptr const& e, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
@@ -87,7 +90,8 @@ namespace hpx
         boost::exception_ptr && e, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
@@ -114,7 +118,8 @@ namespace hpx
         typedef
             hpx::traits::extract_action<set_action>::remote_result_type
             remote_result_type;
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
@@ -144,7 +149,8 @@ namespace hpx
         typedef
             hpx::traits::extract_action<set_action>::remote_result_type
             remote_result_type;
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();

@@ -72,7 +72,7 @@ namespace hpx { namespace lcos
         typedef promise<Result, remote_result_type> base_type;
 
         static void parcel_write_handler(
-            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
+            typename base_type::shared_state_ptr shared_state,
             boost::system::error_code const& ec, parcelset::parcel const& p)
         {
             // any error in the parcel layer will be stored in the future object
@@ -82,13 +82,13 @@ namespace hpx { namespace lcos
                     HPX_GET_EXCEPTION(ec,
                         "packaged_action::parcel_write_handler",
                         parcelset::dump_parcel(p));
-                (*impl)->set_exception(exception);
+                shared_state->set_exception(exception);
             }
         }
 
         template <typename Callback>
         static void parcel_write_handler_cb(Callback const& cb,
-            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
+            typename base_type::shared_state_ptr            shared_state,
             boost::system::error_code const& ec, parcelset::parcel const& p)
         {
             // any error in the parcel layer will be stored in the future object
@@ -98,7 +98,7 @@ namespace hpx { namespace lcos
                     HPX_GET_EXCEPTION(ec,
                         "packaged_action::parcel_write_handler",
                         parcelset::dump_parcel(p));
-                (*impl)->set_exception(exception);
+                shared_state->set_exception(exception);
             }
 
             // invoke user supplied callback
@@ -114,20 +114,21 @@ namespace hpx { namespace lcos
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+            auto f = util::bind(&packaged_action::parcel_write_handler,
+                this->shared_state_, _1, _2);
+
+            naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id());
             naming::detail::set_dont_store_in_cache(cont_id);
 
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            auto f = util::bind(&packaged_action::parcel_write_handler,
-                this->impl_, _1, _2);
-
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), this->resolve()),
+                        std::move(cont_id), std::move(addr_)),
                     std::move(addr), id, priority, std::move(f),
                     std::forward<Ts>(vs)...);
             }
@@ -135,9 +136,8 @@ namespace hpx { namespace lcos
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), this->resolve()),
-                    id, priority, std::move(f),
-                    std::forward<Ts>(vs)...);
+                        std::move(cont_id), std::move(addr_)),
+                    id, priority, std::move(f), std::forward<Ts>(vs)...);
             }
         }
 
@@ -149,6 +149,10 @@ namespace hpx { namespace lcos
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+            auto f = util::bind(&packaged_action::parcel_write_handler,
+                this->shared_state_, _1, _2);
+
+            naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id());
             naming::detail::set_dont_store_in_cache(cont_id);
 
@@ -157,12 +161,8 @@ namespace hpx { namespace lcos
 
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
-                    std::move(cont_id), this->resolve()),
-                id, priority,
-                util::bind(
-                    &packaged_action::parcel_write_handler,
-                    this->impl_, _1, _2),
-                std::forward<Ts>(vs)...);
+                    std::move(cont_id), std::move(addr_)),
+                id, priority, std::move(f), std::forward<Ts>(vs)...);
         }
 
         template <typename Callback, typename ... Ts>
@@ -173,23 +173,25 @@ namespace hpx { namespace lcos
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+            typedef typename util::decay<Callback>::type callback_type;
+
+            auto f = util::bind(
+                &packaged_action::parcel_write_handler_cb<callback_type>,
+                util::protect(std::forward<Callback>(cb)), this->shared_state_,
+                _1, _2);
+
+            naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id());
             naming::detail::set_dont_store_in_cache(cont_id);
 
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            typedef typename util::decay<Callback>::type callback_type;
-
-            auto f = util::bind(
-                &packaged_action::parcel_write_handler_cb<callback_type>,
-                util::protect(std::forward<Callback>(cb)), this->impl_, _1, _2);
-
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), this->resolve()),
+                        std::move(cont_id), std::move(addr_)),
                     std::move(addr), id, priority, std::move(cb),
                     std::forward<Ts>(vs)...);
             }
@@ -197,9 +199,8 @@ namespace hpx { namespace lcos
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), this->resolve()),
-                    id, priority, std::move(cb),
-                    std::forward<Ts>(vs)...);
+                        std::move(cont_id), std::move(addr_)),
+                    id, priority, std::move(cb), std::forward<Ts>(vs)...);
             }
         }
 
@@ -211,23 +212,24 @@ namespace hpx { namespace lcos
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+            typedef typename util::decay<Callback>::type callback_type;
+
+            auto f = util::bind(
+                &packaged_action::parcel_write_handler_cb<callback_type>,
+                util::protect(std::forward<Callback>(cb)), this->shared_state_,
+                _1, _2);
+
+            naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id());
             naming::detail::set_dont_store_in_cache(cont_id);
 
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            typedef typename util::decay<Callback>::type callback_type;
-
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
-                    std::move(cont_id), this->resolve()),
-                id, priority,
-                util::bind(
-                    &packaged_action::parcel_write_handler_cb<callback_type>,
-                    util::protect(std::forward<Callback>(cb)),
-                    this->impl_, _1, _2),
-                std::forward<Ts>(vs)...);
+                    std::move(cont_id), std::move(addr_)),
+                id, priority, std::move(f), std::forward<Ts>(vs)...);
         }
 
     public:
@@ -308,21 +310,20 @@ namespace hpx { namespace lcos
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+            auto cb = util::bind(&packaged_action::parcel_write_handler,
+                this->shared_state_, _1, _2);
+
             naming::id_type cont_id(this->get_id());
             naming::detail::set_dont_store_in_cache(cont_id);
 
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            auto f = hpx::functional::apply_c_p_cb<action_type>(
-                cont_id, std::move(addr), id,
-                actions::action_priority<action_type>(),
-                util::bind(
-                    &packaged_action::parcel_write_handler, this->impl_, _1, _2
-                ),
-                std::forward<Ts>(vs)...);
+            auto f = hpx::functional::apply_c_p_cb<action_type>(cont_id,
+                std::move(addr), id, actions::action_priority<action_type>(),
+                std::move(cb), std::forward<Ts>(vs)...);
 
-            this->base_type::set_task(std::move(f));
+            this->shared_state_->set_task(std::move(f));
         }
 
         template <typename Callback, typename ...Ts>
@@ -333,25 +334,23 @@ namespace hpx { namespace lcos
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+            typedef typename util::decay<Callback>::type callback_type;
+            auto                                         cb_ = util::bind(
+                &packaged_action::parcel_write_handler_cb<callback_type>,
+                util::protect(std::forward<Callback>(cb)), this->shared_state_,
+                _1, _2);
+
             naming::id_type cont_id(this->get_id());
             naming::detail::set_dont_store_in_cache(cont_id);
 
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            typedef typename util::decay<Callback>::type callback_type;
+            auto f = hpx::functional::apply_c_p_cb<action_type>(cont_id,
+                std::move(addr), id, actions::action_priority<action_type>(),
+                std::move(cb_), std::forward<Ts>(vs)...);
 
-            auto f = hpx::functional::apply_c_p_cb<action_type>(
-                cont_id, std::move(addr), id,
-                actions::action_priority<action_type>(),
-                util::bind(
-                     &packaged_action::parcel_write_handler_cb<callback_type>,
-                     util::protect(std::forward<Callback>(cb)),
-                     this->impl_, _1, _2
-                ),
-                std::forward<Ts>(vs)...);
-
-            this->base_type::set_task(std::move(f));
+            this->shared_state_->set_task(std::move(f));
         }
     };
 
@@ -390,15 +389,16 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
-                        (*this->impl_)->set_data(action_type::execute_function(
-                            addr.address_, std::forward<Ts>(vs)...));
+                        this->shared_state_->set_data(
+                            action_type::execute_function(
+                                addr.address_, std::forward<Ts>(vs)...));
                         return;
                     }
                 }
                 else
                 {
                     // local, direct execution
-                    (*this->impl_)->set_data(action_type::execute_function(
+                    this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
                     return;
                 }
@@ -428,15 +428,16 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
-                        (*this->impl_)->set_data(action_type::execute_function(
-                            addr.address_, std::forward<Ts>(vs)...));
+                        this->shared_state_->set_data(
+                            action_type::execute_function(
+                                addr.address_, std::forward<Ts>(vs)...));
                         return;
                     }
                 }
                 else
                 {
                     // local, direct execution
-                    (*this->impl_)->set_data(action_type::execute_function(
+                    this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
                     return;
                 }
@@ -467,8 +468,9 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
-                        (*this->impl_)->set_data(action_type::execute_function(
-                            addr.address_, std::forward<Ts>(vs)...));
+                        this->shared_state_->set_data(
+                            action_type::execute_function(
+                                addr.address_, std::forward<Ts>(vs)...));
 
                         // invoke callback
                         cb(boost::system::error_code(), parcelset::parcel());
@@ -478,7 +480,7 @@ namespace hpx { namespace lcos
                 else
                 {
                     // local, direct execution
-                    (*this->impl_)->set_data(action_type::execute_function(
+                    this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
 
                     // invoke callback
@@ -511,8 +513,9 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
-                        (*this->impl_)->set_data(action_type::execute_function(
-                            addr.address_, std::forward<Ts>(vs)...));
+                        this->shared_state_->set_data(
+                            action_type::execute_function(
+                                addr.address_, std::forward<Ts>(vs)...));
 
                         // invoke callback
                         cb(boost::system::error_code(), parcelset::parcel());
@@ -522,7 +525,7 @@ namespace hpx { namespace lcos
                 else
                 {
                     // local, direct execution
-                    (*this->impl_)->set_data(action_type::execute_function(
+                    this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
 
                     // invoke callback
