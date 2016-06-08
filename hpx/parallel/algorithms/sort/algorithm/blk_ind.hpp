@@ -690,19 +690,20 @@ void blk_ind ( iter_t first, iter_t last , NThread NT = NThread() )
 ///                  by default is the number of HW threads of the machine
 //-----------------------------------------------------------------------------
 template < class iter_t, typename compare >
-void blk_ind ( iter_t first, iter_t last, compare comp, NThread NT = NThread() )
+iter_t blk_ind ( iter_t first, iter_t last, compare comp, NThread NT = NThread() )
 {   //----------------------------- begin ----------------------------------
     typedef pblk::blk_ind <iter_t,compare> para_sort ;
-	hpx_util::range<iter_t> R ( first, last ) ;
-	assert ( R.valid() ) ;
-    para_sort PS( R, comp,NT);
+	    hpx_util::range<iter_t> R ( first, last ) ;
+	    assert ( R.valid() ) ;
+    para_sort PS( R, comp, hpx::get_os_thread_count());
+    return last;
 };
 
 //
 //****************************************************************************
 };//    End namespace algorithm
 };//    End namespace parallel
-};};//    End HPX_INLINE_NAMESPACE(v2) 
+};};//    End HPX_INLINE_NAMESPACE(v2)
 };//    End namespace boost
 //****************************************************************************
 //
