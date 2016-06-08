@@ -78,19 +78,20 @@ namespace hpx { namespace lcos
 #define HPX_LCOS_REDUCE_SEP_28_2013_1105AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/extract_action.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/calculate_fanout.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 

@@ -7,11 +7,11 @@
 #define HPX_PARALLEL_DETAIL_ALGORITHM_RESULT_MAY_28_2014_1020PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/traits/concepts.hpp>
+#include <hpx/util/invoke.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <type_traits>
 

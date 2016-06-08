@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_FUTURE_TRAITS_APR_29_2014_0925AM)
 #define HPX_TRAITS_FUTURE_TRAITS_APR_29_2014_0925AM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>

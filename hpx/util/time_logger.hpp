@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 
-#include <boost/version.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/version.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <process.h>

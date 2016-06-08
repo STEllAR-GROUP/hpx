@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/tuple.hpp>
 
-#include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <algorithm>
 #include <vector>

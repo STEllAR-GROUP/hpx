@@ -7,7 +7,6 @@
 #define HPX_UTIL_MEMORY_CHUNK_POOL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
 #include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/util/memory_chunk.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>

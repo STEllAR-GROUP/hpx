@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_SODIUM)
-#include <hpx/exception_fwd.hpp>
 #include <hpx/components/security/key_pair.hpp>
 #include <hpx/components/security/server/root_certificate_authority.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/assert.hpp>
 

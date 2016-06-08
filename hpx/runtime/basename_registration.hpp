@@ -9,9 +9,9 @@
 #define HPX_RUNTIME_BASENAME_REGISTRATION_AUG_17_2015_0432PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/lcos/future.hpp>
 
 #include <string>
 #include <vector>

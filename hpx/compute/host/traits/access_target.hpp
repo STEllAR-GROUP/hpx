@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/host/target.hpp>
+#include <hpx/compute/traits/access_target.hpp>
 
 #include <vector>
 

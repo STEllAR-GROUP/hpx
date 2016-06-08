@@ -11,13 +11,13 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/plugins/parcelport/ipc/data_window.hpp>
-#include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
-#include <hpx/plugins/parcelport/ipc/locality.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
+#include <hpx/plugins/parcelport/ipc/data_window.hpp>
+#include <hpx/plugins/parcelport/ipc/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/protect.hpp>

@@ -13,8 +13,8 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
+#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
 #include <hpx/parallel/traits/range_traits.hpp>

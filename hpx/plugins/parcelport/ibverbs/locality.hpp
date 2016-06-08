@@ -16,8 +16,8 @@
 
 #include <hpx/runtime/parcelset/locality.hpp>
 
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/io/ios_state.hpp>
 
 #include <string>

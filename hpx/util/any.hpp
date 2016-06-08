@@ -15,20 +15,20 @@
 #define HPX_UTIL_ANY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/traits/supports_streaming_with_any.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/supports_streaming_with_any.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/decay.hpp>
 
+#include <boost/detail/sp_typeinfo.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/throw_exception.hpp>
 #include <boost/type_traits/is_reference.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/detail/sp_typeinfo.hpp>
-#include <boost/functional/hash.hpp>
 
 #include <algorithm>
 #include <iosfwd>

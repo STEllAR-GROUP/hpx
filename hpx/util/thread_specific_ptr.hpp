@@ -84,8 +84,8 @@ namespace hpx { namespace util
 
 #else
 
-#include <pthread.h>
 #include <hpx/util/static.hpp>
+#include <pthread.h>
 
 namespace hpx { namespace util
 {

@@ -20,15 +20,15 @@
 
 #include <hpx/config.hpp>
 
-#include <iostream>
 #include <boost/thread/thread.hpp>
+#include <iostream>
 
 #include <boost/atomic.hpp>
 
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 
-#include <hpx/util/lockfree/freelist.hpp>
 #include <hpx/util/lockfree/detail/tagged_ptr_pair.hpp>
+#include <hpx/util/lockfree/freelist.hpp>
 
 namespace boost { namespace lockfree
 {

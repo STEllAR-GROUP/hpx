@@ -11,9 +11,9 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/util/interval_timer.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
+#include <hpx/util/interval_timer.hpp>
 
 #include <map>
 #include <vector>

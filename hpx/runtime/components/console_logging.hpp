@@ -8,12 +8,12 @@
 #define HPX_COMPONENTS_CONSOLE_LOGGING_DEC_16_2008_0435PM
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/components/server/console_logging.hpp>
+#include <hpx/state.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
 
 #include <boost/atomic.hpp>

@@ -13,9 +13,9 @@
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
-#include <hpx/components/iostreams/write_functions.hpp>
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/order_output.hpp>
+#include <hpx/components/iostreams/write_functions.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

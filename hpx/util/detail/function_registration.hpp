@@ -9,10 +9,10 @@
 #define HPX_UTIL_DETAIL_FUNCTION_REGISTRATION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/get_table.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/get_table.hpp>
 
 #include <boost/mpl/bool.hpp>
 

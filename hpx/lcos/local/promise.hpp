@@ -7,9 +7,10 @@
 #define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <boost/exception_ptr.hpp>

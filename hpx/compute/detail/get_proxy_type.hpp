@@ -8,8 +8,10 @@
 #ifndef HPX_COMPUTE_DETAIL_GET_PROXY_TYPE_HPP
 #define HPX_COMPUTE_DETAIL_GET_PROXY_TYPE_HPP
 
-#include <hpx/util/always_void.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/always_void.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <type_traits>
 

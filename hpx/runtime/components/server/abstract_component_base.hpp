@@ -10,12 +10,11 @@
 #define HPX_B08244B4_3831_436F_9F72_3E82FFAF03E8
 
 #include <hpx/config.hpp>
-#include <hpx/traits/component_type_database.hpp>
-#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/traits/is_component.hpp>
 
 #include <utility>
 

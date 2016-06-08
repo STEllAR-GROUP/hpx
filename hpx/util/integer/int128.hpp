@@ -12,9 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
-#include <exception>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
+#include <exception>
 #include <new>
 
 #include <boost/cstdint.hpp>

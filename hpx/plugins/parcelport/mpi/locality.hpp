@@ -11,9 +11,9 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
+#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
 #include <boost/io/ios_state.hpp>
 

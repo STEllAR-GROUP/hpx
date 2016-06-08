@@ -7,16 +7,16 @@
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_21_2008_0159PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/is_component.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 

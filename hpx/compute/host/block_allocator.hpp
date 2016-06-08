@@ -12,8 +12,8 @@
 
 #include <hpx/compute/host/block_executor.hpp>
 #include <hpx/compute/host/target.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 #include <hpx/util/functional/new.hpp>

@@ -16,20 +16,20 @@
 #include <hpx/lcos/packaged_action.hpp>
 
 #include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/gather.hpp>
 #include <hpx/lcos/latch.hpp>
 #include <hpx/lcos/queue.hpp>
 #include <hpx/lcos/reduce.hpp>
-#include <hpx/lcos/gather.hpp>
 
-#include <hpx/include/local_lcos.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>
-#include <hpx/lcos/wait_any.hpp>
+#include <hpx/include/local_lcos.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/wait_any.hpp>
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/lcos/wait_some.hpp>
-#include <hpx/lcos/when_any.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/when_any.hpp>
 #include <hpx/lcos/when_each.hpp>
 #include <hpx/lcos/when_some.hpp>
 

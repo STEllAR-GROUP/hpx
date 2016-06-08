@@ -7,10 +7,10 @@
 #define HPX_UTIL_INTERVAL_TIMER_SEP_27_2011_0434PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>
 

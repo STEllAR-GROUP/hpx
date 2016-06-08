@@ -9,10 +9,10 @@
 #define HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/executors/service_executors.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
+#include <hpx/parallel/executors/thread_executor_traits.hpp>
+#include <hpx/runtime/threads/executors/service_executors.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {

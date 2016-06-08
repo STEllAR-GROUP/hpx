@@ -7,20 +7,20 @@
 #define HPX_LCOS_ASYNC_SEP_28_2011_0840AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_valid_action.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/components/client_base.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_client.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_valid_action.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/utility/enable_if.hpp>
 

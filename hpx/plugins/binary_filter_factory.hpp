@@ -7,9 +7,9 @@
 #define HPX_BINARY_FILTER_FACTORY_MAR_24_2013_0347PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/unique_plugin_name.hpp>
-#include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
+#include <hpx/plugins/plugin_registry.hpp>
+#include <hpx/plugins/unique_plugin_name.hpp>
 
 #include <hpx/util/detail/count_num_args.hpp>
 

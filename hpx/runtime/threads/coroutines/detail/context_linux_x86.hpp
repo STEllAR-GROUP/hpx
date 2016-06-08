@@ -14,20 +14,20 @@
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#include <sys/param.h>
-#include <cstdlib>
 #include <cstddef>
+#include <cstdlib>
 #include <stdexcept>
+#include <sys/param.h>
 
-#include <boost/format.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/format.hpp>
 
 #if defined(HPX_HAVE_VALGRIND)
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)

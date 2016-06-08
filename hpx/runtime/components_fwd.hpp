@@ -10,7 +10,7 @@
 #define HPX_RUNTIME_COMPONENTS_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/managed_component_policies.hpp>
 
 #include <string>
 

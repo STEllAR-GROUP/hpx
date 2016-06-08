@@ -8,9 +8,9 @@
 #define HPX_RUNTIME_APPLIER_APPLY_CONTINUE_JAN_27_2013_0726PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/extract_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/traits/extract_action.hpp>
 
 namespace hpx
 {

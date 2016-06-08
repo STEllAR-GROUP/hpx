@@ -11,13 +11,13 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <type_traits>
 #include <utility>
