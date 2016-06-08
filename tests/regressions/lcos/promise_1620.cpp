@@ -32,8 +32,8 @@ void test_leak()
 
         {
             hpx::lcos::promise<test> p;
-            hpx::apply_c<call_action>(p.get_id(), hpx::find_here());
             f = p.get_future();
+            hpx::apply_c<call_action>(p.get_id(), hpx::find_here());
         }
 
         test t = f.get();
