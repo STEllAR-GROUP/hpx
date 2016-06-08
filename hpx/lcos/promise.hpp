@@ -545,6 +545,13 @@ namespace hpx { namespace lcos
         /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
+            if (!future_obtained_)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "promise<Result>::get_id",
+                    "future has not been retrieved from this promise yet");
+                return naming::invalid_id;
+            }
             return (*impl_)->get_id();
         }
 
@@ -699,6 +706,13 @@ namespace hpx { namespace lcos
         /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
+            if (!future_obtained_)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "promise<void>::get_id",
+                    "future has not been retrieved from this promise yet");
+                return naming::invalid_id;
+            }
             return (*impl_)->get_id();
         }
 
