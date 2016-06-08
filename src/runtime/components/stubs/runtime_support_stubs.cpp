@@ -172,8 +172,9 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type(gid, naming::id_type::unmanaged));
 
         lcos::packaged_action<action_type, void> p;
+        lcos::future<void> f = p.get_future();
         p.apply(id, g, gid, count);
-        p.get_future().get();
+        f.get();
     }
 
     void runtime_support::free_component_locally(agas::gva const& g,
