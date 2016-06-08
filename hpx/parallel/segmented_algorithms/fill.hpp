@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
+#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -35,152 +36,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
 
+        template<typename T>
+        struct fill_function
+        {
+            fill_function(T val = T()) : value_(val) {}
+
+            T value_;
+
+            void operator()(T& val) const
+            {
+                val = value_;
+            }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned version)
+            {
+                ar & value_;
+            }
+        };
+
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter, typename T>
-        inline typename std::enable_if<
-            is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, void>::type
-        >::type
-        segmented_fill(Algo && algo, ExPolicy const& policy,
+        static typename util::detail::algorithm_result<ExPolicy, void>::type
+        segmented_fill(Algo && algo, ExPolicy && policy,
             SegIter first, SegIter last, T const& value, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, void> result;
-
-            segment_iterator sit = traits::segment(first);
-            segment_iterator send = traits::segment(last);
-
-            if (sit == send) {
-                // all elements are on the same partition
-                local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::local(last);
-
-                if (beg != end)
-                {
-                    dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, value);
-                }
-            }
-            else {
-                // handle remaining part of the first partition
-                local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::end(sit);
-                if (beg != end)
-                {
-                    dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, value);
-                }
-
-                // handle all of the full partitions
-                for (++sit; sit != send; ++sit)
-                {
-                    beg = traits::begin(sit);
-                    end = traits::end(sit);
-                    if (beg != end)
-                    {
-                        dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, value);
-                    }
-                }
-
-                // handle the beginning of the last partition
-                beg = traits::begin(sit);
-                end = traits::local(last);
-                if (beg != end)
-                {
-                    dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, value);
-                }
-            }
-
-            return result::get();
+            auto a = hpx::parallel::for_each(
+                std::forward<ExPolicy>(policy), first, last, fill_function<T>(value));
+            return util::detail::algorithm_result<ExPolicy, void>::get();
         }
 
         // parallel remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename T>
-        inline typename std::enable_if<
-            is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, void>::type
-        >::type
-        segmented_fill(Algo && algo, ExPolicy const& policy,
+        template <typename Algo, typename ExPolicy, typename SegIter, typename T>
+        static typename util::detail::algorithm_result<ExPolicy, void>::type
+        segmented_fill(Algo && algo, ExPolicy && policy,
             SegIter first, SegIter last, T const& value, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-
             typedef util::detail::algorithm_result<ExPolicy, void> result;
 
-            typedef std::integral_constant<bool,
-                    !hpx::traits::is_forward_iterator<SegIter>::value
-                > forced_seq;
+            auto r = hpx::parallel::for_each(
+                std::forward<ExPolicy>(policy), first, last, fill_function<T>(value));
 
-            segment_iterator sit = traits::segment(first);
-            segment_iterator send = traits::segment(last);
-
-            std::vector<shared_future<void>> segments;
-            segments.reserve(std::distance(sit, send));
-
-            if (sit == send)
-            {
-                // all elements are on the same partition
-                local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::local(last);
-
-                if (beg != end)
-                {
-                    segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, value));
-                }
-            }
-            else {
-                // handle remaining part of the first partition
-                local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::end(sit);
-                if (beg != end)
-                {
-                    segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, value));
-                }
-
-                // handle all of the full partitions
-                for (++sit; sit != send; ++sit)
-                {
-                    beg = traits::begin(sit);
-                    end = traits::end(sit);
-                    if (beg != end)
-                    {
-                    segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, value));
-                    }
-                }
-
-                // handle the beginning of the last partition
-                beg = traits::begin(sit);
-                end = traits::local(last);
-                if (beg != end)
-                {
-                    segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, value));
-                }
-            }
             return result::get(
                 dataflow(
-                    [=](std::vector<shared_future<void>> && r)
+                    [=](decltype(r) && res)
                     {
-                        // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
-                        parallel::util::detail::handle_remote_exceptions<
-                            ExPolicy
-                        >::call(r, errors);
-
-                        hpx::util::unwrapped(r);
+                        hpx::util::unwrapped(res);
                         return;
                     },
-                    std::move(segments)));
+                    std::move(r)));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -202,13 +106,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return segmented_fill(
                 fill(), std::forward<ExPolicy>(policy), first, last, value, is_seq()
             );
+
         }
 
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T>
         inline typename util::detail::algorithm_result<
-            ExPolicy, void
-        >::type
+            ExPolicy, void>::type
         fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
             std::false_type);
     }
