@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx//util/tuple.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <iterator>
 #include <algorithm>
@@ -219,20 +219,6 @@ namespace hpx { namespace parallel { namespace util
         }
 
     }
-
-    template <typename Iter>
-    struct loop_n_iterator_mapping
-    {
-        typedef Iter type;
-    };
-
-    template <typename Iter, typename ...TS>
-    struct loop_n_iterator_mapping<detail::prefetching_iterator<Iter,TS...>>
-    {
-        typedef typename detail::prefetching_iterator<Iter,
-            TS...>::base_iterator type;
-    };
-
 
 }}}
 

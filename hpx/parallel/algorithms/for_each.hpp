@@ -74,8 +74,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             // VS2015 bails out when proj or f are captured by
                             // ref
-                            typedef typename util::loop_n_iterator_mapping<
+                            typedef typename util::detail::loop_n<
                                 InIter>::type it_type;
+
                             util::loop_n(
                                 part_begin, part_size,
                                 [=](it_type curr) mutable

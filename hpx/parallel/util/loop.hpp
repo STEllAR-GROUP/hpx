@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/prefetching.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <iterator>
 #include <algorithm>
@@ -79,6 +80,8 @@ namespace hpx { namespace parallel { namespace util
         {
          /////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
+            typedef Iterator type;
+
             template <typename Iter, typename F>
             static Iter call(Iter it, std::size_t count, F && f)
             {
@@ -106,6 +109,9 @@ namespace hpx { namespace parallel { namespace util
         {
             /////////////////////////////////////////////////////////////////
             // handle sequences of non-futures when using prefetching
+            typedef typename detail::prefetching_iterator<Itr,
+                TS...>::base_iterator type;
+
             template <typename F>
             static prefetching_iterator<Itr, TS...>
             call(prefetching_iterator<Itr, TS...> it,
