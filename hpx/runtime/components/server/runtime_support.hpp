@@ -818,12 +818,12 @@ HPX_ACTION_USES_LARGE_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_startup_functions_action,
     call_startup_functions_action)
-HPX_ACTION_USES_LARGE_STACK(
+HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::call_startup_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
     call_shutdown_functions_action)
-HPX_ACTION_USES_LARGE_STACK(
+HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::call_shutdown_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::free_component_action,
@@ -831,9 +831,13 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::shutdown_action,
     shutdown_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::shutdown_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::shutdown_all_action,
     shutdown_all_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::shutdown_all_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::terminate_action,
     terminate_action)
@@ -863,6 +867,8 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::dijkstra_termination_action,
     dijkstra_termination_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::dijkstra_termination_action)
 
 namespace hpx { namespace components { namespace server
 {

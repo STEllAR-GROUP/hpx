@@ -8,6 +8,8 @@
 
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
@@ -581,7 +583,23 @@ namespace hpx { namespace this_thread
             HPX_THROW_EXCEPTION(out_of_memory,
                 "has_sufficient_stack_space", "Stack overflow");
         }
-        return std::size_t(remaining_stack) >= space_needed;
+        bool sufficient_stack_space = std::size_t(remaining_stack) >= space_needed;
+
+        // We might find ourselves in the situation where we don't have enough
+        // stack space, but can't really schedule a new thread. In this sitation,
+        // it would be best to change the code that provoked this behaviour
+        // instead of dynamically schedule a new thread. A such, we throw an
+        // exception to point to that problem instead of silently hanging because
+        // the thread will never be executed.
+        if (!sufficient_stack_space &&
+            !hpx::threads::threadmanager_is(hpx::state::state_running))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "has_sufficient_stack_space",
+                "A potential stack overflow has been detected. Unable to "
+                "schedule new thread during startup/shutdown.");
+        }
+        return sufficient_stack_space;
 #else
         return true;
 #endif
