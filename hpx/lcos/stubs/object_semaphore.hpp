@@ -53,8 +53,10 @@ struct object_semaphore : components::stub_base<
     {
         typedef typename server_type::get_action action_type;
         lcos::promise<ValueType> lco;
+        auto f = lco.get_future();
+
         hpx::apply<action_type>(gid, lco.get_id());
-        return lco.get_future();
+        return f;
     }
 
     static ValueType get_sync(naming::id_type const& gid)

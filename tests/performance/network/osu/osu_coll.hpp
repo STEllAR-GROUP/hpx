@@ -101,8 +101,8 @@ distribute_component(std::vector<hpx::id_type> localities,
     future_type f;
     {
         hpx::lcos::packaged_action<action_type, std::vector<hpx::naming::gid_type> > p;
-        p.apply(hpx::launch::async, this_loc, type, num_components);
         f = p.get_future();
+        p.apply(hpx::launch::async, this_loc, type, num_components);
     }
 
     std::vector<hpx::future<result_type> > components_futures;
@@ -120,21 +120,19 @@ distribute_component(std::vector<hpx::id_type> localities,
         if(locs_first.size() > 0)
         {
             hpx::lcos::packaged_action<distribute_component_action, result_type > p;
+            auto f = p.get_future();
             hpx::id_type id = locs_first[0];
             p.apply(hpx::launch::async, id, std::move(locs_first), type);
-            components_futures.push_back(
-                p.get_future()
-            );
+            components_futures.push_back(std::move(f));
         }
 
         if(locs_second.size() > 0)
         {
             hpx::lcos::packaged_action<distribute_component_action, result_type > p;
+            auto f = p.get_future();
             hpx::id_type id = locs_second[0];
             p.apply(hpx::launch::async, id, std::move(locs_second), type);
-            components_futures.push_back(
-                p.get_future()
-            );
+            components_futures.push_back(std::move(f));
         }
     }
 
