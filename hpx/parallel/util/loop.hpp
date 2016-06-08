@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename Itr, typename ...TS>
-        struct loop_n <prefetching_iterator<Itr, TS...> >
+        struct loop_n <detail::prefetching_iterator<Itr, TS...> >
         {
             /////////////////////////////////////////////////////////////////
             // handle sequences of non-futures when using prefetching
@@ -113,8 +113,8 @@ namespace hpx { namespace parallel { namespace util
                 TS...>::base_iterator type;
 
             template <typename F>
-            static prefetching_iterator<Itr, TS...>
-            call(prefetching_iterator<Itr, TS...> it,
+            static detail::prefetching_iterator<Itr, TS...>
+            call(detail::prefetching_iterator<Itr, TS...> it,
                 std::size_t count, F && f)
             {
                 Itr inner_it = it.base;
@@ -148,8 +148,8 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename CancelToken, typename F>
-            static prefetching_iterator<Itr, TS...>
-            call(prefetching_iterator<Itr, TS...> it,
+            static detail::prefetching_iterator<Itr, TS...>
+            call(detail::prefetching_iterator<Itr, TS...> it,
                 std::size_t count, CancelToken& tok,
                 F && f)
             {
