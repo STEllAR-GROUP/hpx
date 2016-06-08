@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return false;
         }
-        
+
         /// \cond NOINTERNAL
         // Estimate a chunk size based on number of cores used.
         template <typename Executor, typename F>
