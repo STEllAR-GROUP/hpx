@@ -61,6 +61,7 @@ namespace hpx { namespace detail
 
             lcos::packaged_action<Action, Result> p;
             future<Result> f = p.get_future();
+
             p.apply(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Ts>(vs)...);
 
@@ -118,6 +119,7 @@ namespace hpx { namespace detail
 
             lcos::packaged_action<Action, Result> p;
             future<Result> f = p.get_future();
+
             p.apply_cb(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
 
@@ -216,6 +218,7 @@ namespace hpx { namespace detail
         else if (policy == launch::deferred)
         {
             lcos::packaged_action<action_type, result_type> p;
+
             f = p.get_future();
             p.apply_deferred(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Ts>(vs)...);
@@ -295,6 +298,7 @@ namespace hpx { namespace detail
         if (policy == launch::sync || hpx::detail::has_async_policy(policy))
         {
             lcos::packaged_action<action_type, result_type> p;
+
             f = p.get_future();
             p.apply_cb(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
@@ -302,6 +306,7 @@ namespace hpx { namespace detail
         else if (policy == launch::deferred)
         {
             lcos::packaged_action<action_type, result_type> p;
+
             f = p.get_future();
             p.apply_deferred_cb(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
