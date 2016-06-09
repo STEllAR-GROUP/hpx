@@ -33,8 +33,6 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-    struct trivially_copyable_pointer_tag : general_pointer_tag {};
-
     namespace detail
     {
         template <typename Source, typename Dest>
