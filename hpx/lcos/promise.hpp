@@ -185,10 +185,15 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_gid_locked(
             std::unique_lock<naming::gid_type> l) const
         {
+            if(!naming::detail::has_credits(gid_))
+            {
+                naming::detail::replenish_credits_locked(l, gid_);
+            }
             hpx::future<naming::gid_type> gid =
                 naming::detail::split_gid_if_needed_locked(l, gid_);
             l.unlock();
-            return naming::id_type(gid.get(), naming::id_type::managed);
+            naming::gid_type result = gid.get();
+            return naming::id_type(result, naming::id_type::managed);
         }
 
     protected:
@@ -291,27 +296,31 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            std::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
-            long counter = --this->count_;
-
+            long count = --this->count_;
             // special precautions for it to go out of scope
-            if (1 == counter && naming::detail::has_credits(this->gid_))
+            // We can safely give up our credit that we hold for the shared
+            // state, since we know that the other credit is either on flight
+            // in a typed_continuation or done executing.
+            if (count == 1)
             {
-                // At this point, the remaining count has to be held by AGAS
-                // for this reason, we break the self-reference to allow for
-                // proper destruction
+                std::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
+                // if the count is one, the only remaining reference is in AGAS
+                if (naming::detail::has_credits(this->gid_) )
+                {
+                    // At this point, the remaining count has to be held by AGAS
+                    // for this reason, we break the self-reference to allow for
+                    // proper destruction
 
-                // move all credits to a temporary id_type
-                naming::gid_type gid = this->gid_;
-                naming::detail::strip_credits_from_gid(this->gid_);
+                    // move all credits to a temporary id_type
+                    naming::gid_type gid = this->gid_;
+                    naming::detail::strip_credits_from_gid(this->gid_);
 
-                naming::id_type id (gid, id_type::managed);
-                l.unlock();
-
-                return false;
+                    naming::id_type id (gid, id_type::managed);
+                    l.unlock();
+                }
             }
 
-            return 0 == counter;
+            return 0 == count;
         }
 
         // disambiguate reference counting
