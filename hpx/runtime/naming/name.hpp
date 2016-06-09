@@ -650,6 +650,8 @@ namespace hpx { namespace naming
             gid_type& gid);
 
         HPX_EXPORT std::int64_t replenish_credits(gid_type& id);
+        HPX_EXPORT std::int64_t replenish_credits_locked(
+            std::unique_lock<gid_type::mutex_type>& l, gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
         // splits the current credit of the given id and assigns half of it to
