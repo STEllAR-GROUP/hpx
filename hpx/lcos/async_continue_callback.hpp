@@ -10,6 +10,7 @@
 
 #include <hpx/lcos/async_callback_fwd.hpp>
 #include <hpx/lcos/async_continue.hpp>
+#include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
