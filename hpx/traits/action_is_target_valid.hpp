@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/traits/wrap_int.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
 
 namespace hpx { namespace traits
 {
