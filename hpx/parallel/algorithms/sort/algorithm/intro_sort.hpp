@@ -44,10 +44,11 @@ inline iter_t mid3(iter_t it_l, iter_t it_m, iter_t it_r,compare comp)
 //----------------------------------------------------------------------------
 template <class iter_t , class compare >
 inline void pivot3 ( iter_t first, iter_t last, compare comp)
-{   auto N2 = ( last - first ) >>1 ;
-	iter_t it_val = mid3 ( first +1, first + N2, last-1,comp);
-    std::swap ( *first , * it_val);
-};
+{
+    auto N2 = ( last - first ) >>1 ;
+    iter_t it_val = mid3 ( first +1, first + N2, last-1,comp);
+    std::iter_swap (first, it_val);
+}
 
 template <class iter_t , class compare >
 inline iter_t mid9 ( iter_t it1, iter_t it2 , iter_t it3 ,
@@ -61,13 +62,14 @@ inline iter_t mid9 ( iter_t it1, iter_t it2 , iter_t it3 ,
 
 template <class iter_t , class compare >
 inline void pivot9 ( iter_t first, iter_t last, compare comp)
-{	//----------------------------- begin ------------------------------------
-	size_t cupo = (last - first) >>3 ;
-	iter_t itaux = mid9 (first+1, first+cupo, first+2*cupo,
-  	                	first+3*cupo, first + 4*cupo, first + 5*cupo,
-						first + 6*cupo, first + 7*cupo,last-1,comp);
-	std::swap ( *first , * itaux);
-};
+{
+    //----------------------------- begin ------------------------------------
+    size_t cupo = (last - first) >> 3 ;
+    iter_t itaux = mid9 (first+1, first+cupo, first+2*cupo,
+                        first+3*cupo, first + 4*cupo, first + 5*cupo,
+                        first + 6*cupo, first + 7*cupo,last-1,comp);
+    std::iter_swap(first, itaux);
+}
 //
 //-----------------------------------------------------------------------------
 //  function : intro_sort_internal
@@ -93,17 +95,18 @@ void intro_sort_internal( iter_t  first , iter_t  last,
     //--------------------- division ----------------------------------
     pivot3 ( first, last, comp);
 
-    const value_t & val = const_cast < value_t &>(* first);
+    auto const& val = *first;
     iter_t c_first = first+1 , c_last  = last-1;
 
     while ( comp(*c_first, val) ) ++c_first ;
     while ( comp ( val,*c_last ) ) --c_last ;
-    while (not( c_first > c_last ))
-    {   std::swap ( *(c_first++), *(c_last--));
+    while (!( c_first > c_last ))
+    {
+        std::iter_swap (c_first++, c_last--);
         while ( comp (*c_first, val) ) ++c_first;
         while ( comp ( val, *c_last) ) --c_last ;
-    }; // End while
-    std::swap ( *first , * c_last);
+    } // End while
+    std::iter_swap (first, c_last);
     intro_sort_internal (first , c_last, Level -1, comp);
     intro_sort_internal (c_first, last, Level -1 , comp);
 };

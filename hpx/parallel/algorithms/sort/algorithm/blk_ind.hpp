@@ -269,11 +269,16 @@ blk_ind<iter_t,compare>::blk_ind ( range_it R1, compare cmp, NThread NT )
     LevelThread = (NBits64 ( MaxThread) <<1);
 
     //----------------- creation of the temporary buffer --------------------
-    Ptr =std::get_temporary_buffer<value_t>( BLK_SIZE*NT()).first ;
-    if ( Ptr == nullptr) throw std::bad_alloc() ;
-    Rglobal_buf = range_buf ( Ptr , Ptr + (BLK_SIZE *NT()) );
-    hpx_util::init ( Rglobal_buf, *R.first);
-    construct = true ;
+    Ptr = std::get_temporary_buffer<value_t>(BLK_SIZE * NT()).first;
+    if (Ptr == nullptr)
+        throw std::bad_alloc();
+    Rglobal_buf = range_buf (Ptr, Ptr + (BLK_SIZE * NT()));
+    {
+        value_t init_val = std::move(*R.first);
+        hpx_util::init (Rglobal_buf, init_val);
+        *R.first = std::move(init_val);
+    }
+    construct = true;
 
     // --------------- create the ranges for the futures -------------------
     value_t * P1 = Ptr ;
@@ -365,20 +370,21 @@ void blk_ind<iter_t,compare>::sort_thread ( iter_t first,
     if (SW) return ;
 
     //-------------------- pivoting  ----------------------------------
-    pivot9 ( first, last ,comp);
-    const value_t & val = const_cast < value_t &>(* first);
+    pivot9 (first, last ,comp);
+    auto const& val = *first;
     iter_t c_first = first+1 , c_last  = last-1;
 
-    while ( comp(*c_first, val) ) ++c_first ;
-    while ( comp ( val,*c_last ) ) --c_last ;
-    while (not( c_first > c_last ))
-    {   std::swap ( *(c_first++), *(c_last--));
-        while ( comp (*c_first, val) ) ++c_first;
-        while ( comp ( val, *c_last) ) --c_last ;
-    }; // End while
+    while (comp(*c_first, val)) ++c_first;
+    while (comp (val,*c_last)) --c_last;
+    while (!(c_first > c_last))
+    {
+        std::iter_swap(c_first++, c_last--);
+        while (comp (*c_first, val)) ++c_first;
+        while (comp (val, *c_last)) --c_last;
+    } // End while
 
-    std::swap ( *first , * c_last);
-    //hpx_tools::atomic_add ( *pf ,1);
+    std::iter_swap(first, c_last);
+    //hpx_tools::atomic_add (*pf ,1);
 
     future<void> f1 = hpx::async (&this_t::sort_thread,this,c_first,last,level-1);
     future<void> f2 = hpx::async (&this_t::sort_thread,this,first,c_last,level-1);

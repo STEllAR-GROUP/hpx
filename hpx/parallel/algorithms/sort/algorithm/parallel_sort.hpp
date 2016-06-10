@@ -110,27 +110,29 @@ struct parallel_sort_comp
         iter_t itB = first + ( size_t (N ) >>1 ) ;
         iter_t itC = last -1 ;
 
-        if ( comp( *itB , *itA )) std::swap ( *itA, *itB);
+        if ( comp( *itB , *itA )) std::iter_swap(itA, itB);
         if ( comp (*itC , *itB))
-        {   std::swap (*itC , *itB );
-            if ( comp( *itB , *itA )) std::swap ( *itA, *itB);
-        };
-        std::swap ( *first , *itB);
-        value_t &  val = const_cast < value_t &>(* first);
+        {
+            std::iter_swap (itC , itB);
+            if ( comp( *itB , *itA )) std::iter_swap(itA, itB);
+        }
+        std::iter_swap(first, itB);
+        auto&  val = *first;
         iter_t c_first = first+2 , c_last  = last-2;
 
-        while ( c_first != last and comp (*c_first, val)) ++c_first ;
+        while ( c_first != last && comp(*c_first, val)) ++c_first ;
         while ( comp(val ,*c_last ) ) --c_last ;
         while (not( c_first > c_last ))
-        {   std::swap ( *(c_first++), *(c_last--));
+        {
+            std::iter_swap (c_first++, c_last--);
             while ( comp(*c_first,val) ) ++c_first;
             while ( comp(val, *c_last) ) --c_last ;
         }; // End while
-        std::swap ( *first , *c_last);
+        std::iter_swap(first, c_last);
 
         //----------------------------------------------------------------
         hpx::future <void> Rt1 = hpx::async ( &parallel_sort_comp::sort_thread,
-							    this, first, c_last  );
+                                this, first, c_last);
 
         hpx::future<void> Rt2 = hpx::async ( &parallel_sort_comp::sort_thread,
 								this,c_first, last );

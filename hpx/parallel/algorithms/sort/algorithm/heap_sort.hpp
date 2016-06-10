@@ -126,11 +126,11 @@ void make_heap ( iter_t first , size_t N , Compare comp = Compare())
             pos_son = pos_father ;
             pos_father =  ( pos_son - 1 )>>1 ;
             iter_father = first + pos_father;
-            if ( (SW = comp(*iter_father, *iter_son)) )
-                std::swap (*iter_father , *iter_son);
-        } while ( SW and pos_father != 0  );
-    };
-};
+            if ((SW = comp(*iter_father, *iter_son)))
+                std::iter_swap (iter_father, iter_son);
+        } while (SW && pos_father != 0);
+    }
+}
 //
 //-----------------------------------------------------------------------------
 //  function : heap_sort
@@ -159,28 +159,31 @@ void heap_sort ( iter_t first , iter_t last , Compare comp= Compare()  )
     size_t pos_father , pos_son ;
     iter_t iter_father = first , iter_son = first ;
 
-    bool SW = false ;
-    for ( size_t i = 1 ; i < N ; ++i)
-    {   std::swap ( *first , * (first + (N-i)));
-        pos_father =0 ;
-        pos_son = 1 ;
-        iter_father = first ;
-        SW = true ;
-        while (SW and pos_son  < (N-i) )
-        {   // if the father have two sons must select the bigger
-            iter_son = first + pos_son ;
-            if ( ( pos_son + 1 ) < (N-i) and comp(*iter_son,*(iter_son +1)) )
-            {   ++pos_son ;
-                ++iter_son ;
-            };
-            if ( (SW = comp(*iter_father, *iter_son)) )
-                std::swap ( *iter_father , *iter_son);
-            pos_father = pos_son ;
-            iter_father = iter_son ;
-            pos_son = ( pos_father <<1) +1 ;
-        };
-    };
-};
+    bool SW = false;
+    for (size_t i = 1; i < N; ++i)
+    {
+        std::iter_swap (first, first + (N-i));
+        pos_father =0;
+        pos_son = 1;
+        iter_father = first;
+        SW = true;
+        while (SW && pos_son  < (N-i))
+        {
+            // if the father have two sons must select the bigger
+            iter_son = first + pos_son;
+            if ((pos_son + 1) < (N-i) && comp(*iter_son,*(iter_son +1)))
+            {
+                ++pos_son;
+                ++iter_son;
+            }
+            if ((SW = comp(*iter_father, *iter_son)))
+                std::iter_swap (iter_father, iter_son);
+            pos_father = pos_son;
+            iter_father = iter_son;
+            pos_son = (pos_father <<1) +1;
+        }
+    }
+}
 //############################################################################
 //                                                                          ##
 //                I N D I R E C T     F U N C T I O N S                     ##

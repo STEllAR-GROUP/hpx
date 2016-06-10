@@ -286,8 +286,13 @@ bool in_place_merge_uncontiguous ( iter1_t  src1,
 	iter2_t  src2_first = src2 ;
     init_move (aux , src1 , end_src1);
 
-	while ( ( src1 != end_src1) and (src2 != end_src2))
-		*(src1++) = std::move((not comp (*src2,*aux))?*(aux++):*(src2++));
+    while ((src1 != end_src1) && (src2 != end_src2))
+    {
+        if (!comp(*src2, *aux))
+            *(src1++) = std::move(*aux++);
+        else
+            *(src1++) = std::move(*src2++);
+    }
 
 	if ( src2 == end_src2)
 	{	while ( src1 != end_src1) *(src1 ++) = std::move ( *(aux ++));
