@@ -2,10 +2,10 @@
 /// @file heap_sort.hpp
 /// @brief Insertion Sort algorithm
 ///
-/// @author Copyright (c) 2010 Francisco Jose Tapia (fjtapia@gmail.com )\n
+/// @author Copyright (c) 2010 Francisco Jose Tapia (fjtapia@gmail.com)\n
 ///         Distributed under the Boost Software License, Version 1.0.\n
-///         ( See accompanyingfile LICENSE_1_0.txt or copy at
-///           http://www.boost.org/LICENSE_1_0.txt  )
+///         (See accompanyingfile LICENSE_1_0.txt or copy at
+///           http://www.boost.org/LICENSE_1_0.txt)
 /// @version 0.1
 ///
 /// @remarks
@@ -31,8 +31,7 @@ HPX_INLINE_NAMESPACE(v2) { namespace boostsort
 {
 namespace algorithm
 {
-using std::iterator_traits ;
-using namespace tools ;
+using namespace tools;
 //
 //------------------------------------------------------------------------------
 //  function : sort3
@@ -48,57 +47,61 @@ using namespace tools ;
 //-----------------------------------------------------------------------------
 template <class value_t>
 inline bool sort3 (value_t &R0, value_t &R1, value_t &R2,
-                   bool    &B0 ,bool    &B1, bool    &B2  )
+                   bool    &B0 ,bool    &B1, bool    &B2)
 {   //----------------------------- begin-------------------------------
-    B0 = B1 = B2 = false ;
-    int value = 0 ;
-    if ( R0 < R1) value +=4 ;
-    if ( R1 < R2) value += 2;
-    if ( R0 < R2) value += 1 ;
+    B0 = B1 = B2 = false;
+    int value = 0;
+    if (R0 < R1) value += 4;
+    if (R1 < R2) value += 2;
+    if (R0 < R2) value += 1;
 
-    switch ( value )
-    {   case 0: break ;
-        case 2: std::swap ( R1 , R2);
-                B1 = B2 = true ;
-                break ;
-        case 3: if ( not ( R0 >  R1))
-                {   std::swap ( R0 , R2);
-                    B0 = B2 = true ;
-                }
-                else
-                {   auto Aux = std::move ( R2 );
-                    R2 = std::move(R1 );
-                    R1 = std::move ( R0 );
-                    R0 = std::move ( Aux );
-                    B0 = B1 = B2 = true ;
-                };
+    switch (value)
+    {
+        case 0: break;
+        case 2: std::swap (R1 , R2);
+                B1 = B2 = true;
                 break;
-        case 4: std::swap ( R0 , R1);
-                B0 = B1 = true ;
-                break ;
-
-        case 5: if ( R1 > R2)
-                {   auto Aux = std::move ( R0);
-                    R0 = std::move(R1);
-                    R1 = std::move( R2);
-                    R2 = std::move ( Aux);
-                    B0 = B1 = B2 = true ;
+        case 3: if (!(R0 >  R1))
+                {
+                    std::swap (R0 , R2);
+                    B0 = B2 = true;
                 }
                 else
-                {   std::swap ( R0 , R2);
-                    B0 = B2 = true ;
-                };
-                break ;
+                {
+                    auto Aux = std::move (R2);
+                    R2 = std::move(R1);
+                    R1 = std::move (R0);
+                    R0 = std::move (Aux);
+                    B0 = B1 = B2 = true;
+                }
+                break;
+        case 4: std::swap (R0 , R1);
+                B0 = B1 = true;
+                break;
 
-        case 7: std::swap ( R0 , R2);
-                B0 = B2 = true ;
-                break ;
+        case 5: if (R1 > R2)
+                {
+                    auto Aux = std::move (R0);
+                    R0 = std::move(R1);
+                    R1 = std::move(R2);
+                    R2 = std::move (Aux);
+                    B0 = B1 = B2 = true;
+                }
+                else
+                {
+                    std::swap (R0 , R2);
+                    B0 = B2 = true;
+                }
+                break;
+
+        case 7: std::swap (R0 , R2);
+                B0 = B2 = true;
+                break;
         default: abort();
-
     }
 
-    return ( B0 or B1 or B2);
-};
+    return (B0 || B1 || B2);
+}
 //
 //-----------------------------------------------------------------------------
 //  function : make_heap
@@ -109,22 +112,24 @@ inline bool sort3 (value_t &R0, value_t &R1, value_t &R2,
 /// @remarks This algorithm is O(NLogN)
 //-----------------------------------------------------------------------------
 template < class iter_t,
-           class Compare = std::less < typename iterator_traits<iter_t>::value_type >
+           class Compare = std::less < typename std::iterator_traits<iter_t>::value_type >
          >
-void make_heap ( iter_t first , size_t N , Compare comp = Compare())
+void make_heap (iter_t first , size_t N , Compare comp = Compare())
 {   //-------------------- begin -----------------------------
-    size_t pos_father , pos_son ;
-    iter_t iter_father = first , iter_son = first ;
-    bool SW = false ;
+    size_t pos_father , pos_son;
+    iter_t iter_father = first , iter_son = first;
+    bool SW = false;
 
-    for ( size_t i = 1 ; i < N ; ++i)
-    {   pos_father = i ;
-        iter_father = first + i ;
-        SW = false ;
+    for (size_t i = 1; i < N; ++i)
+    {
+        pos_father = i;
+        iter_father = first + i;
+        SW = false;
         do
-        {   iter_son = iter_father ;
-            pos_son = pos_father ;
-            pos_father =  ( pos_son - 1 )>>1 ;
+        {
+            iter_son = iter_father;
+            pos_son = pos_father;
+            pos_father =  (pos_son - 1)>>1;
             iter_father = first + pos_father;
             if ((SW = comp(*iter_father, *iter_son)))
                 std::iter_swap (iter_father, iter_son);
@@ -141,23 +146,23 @@ void make_heap ( iter_t first , size_t N , Compare comp = Compare())
 /// @remarks This algorithm is O(NLogN)
 //-----------------------------------------------------------------------------
 template < class iter_t,
-           class Compare =std::less <typename iterator_traits<iter_t>::value_type>
+           class Compare =std::less <typename std::iterator_traits<iter_t>::value_type>
          >
-void heap_sort ( iter_t first , iter_t last , Compare comp= Compare()  )
+void heap_sort (iter_t first , iter_t last , Compare comp= Compare())
 {   //--------------------------- begin -----------------------------
-    assert ( (last - first) >= 0 );
-    size_t N = last - first ;
-    if ( N < 2 ) return ;
+    assert ((last - first) >= 0);
+    size_t N = last - first;
+    if (N < 2) return;
     //-----------------------------------------------------------------------
     // Creating the initial heap
     //-----------------------------------------------------------------------
-    make_heap ( first , N ,comp);
+    make_heap (first , N ,comp);
 
     //-----------------------------------------------------------------------
     //  Sort the heap
     //-----------------------------------------------------------------------
-    size_t pos_father , pos_son ;
-    iter_t iter_father = first , iter_son = first ;
+    size_t pos_father , pos_son;
+    iter_t iter_father = first , iter_son = first;
 
     bool SW = false;
     for (size_t i = 1; i < N; ++i)
@@ -200,24 +205,24 @@ void heap_sort ( iter_t first , iter_t last , Compare comp= Compare()  )
 /// @remarks This algorithm is O(NLogN)
 //-----------------------------------------------------------------------------
 template < class iter_t,
-           typename compare = std::less<typename iterator_traits<iter_t>::value_type>
+           typename compare = std::less<typename std::iterator_traits<iter_t>::value_type>
          >
-void indirect_heap_sort ( iter_t first, iter_t last ,
-                                    compare comp = compare() )
+void indirect_heap_sort (iter_t first, iter_t last ,
+                                    compare comp = compare())
 {   //------------------------------- begin--------------------------
-    typedef less_ptr_no_null <iter_t, compare>      compare_ptr ;
+    typedef less_ptr_no_null <iter_t, compare>      compare_ptr;
 
-    std::vector<iter_t> VP ;
-    create_index ( first , last , VP);
-    heap_sort  ( VP.begin() , VP.end(), compare_ptr(comp) );
-    sort_index ( first , VP) ;
-};
+    std::vector<iter_t> VP;
+    create_index (first , last , VP);
+    heap_sort  (VP.begin() , VP.end(), compare_ptr(comp));
+    sort_index (first , VP);
+}
 //
 //****************************************************************************
-};//    End namespace algorithm
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace parallel
-};//    End namespace hpx
+}//    End namespace algorithm
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace parallel
+}//    End namespace hpx
 //****************************************************************************
 //
 #endif

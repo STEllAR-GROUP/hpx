@@ -42,7 +42,7 @@ namespace tools
 /// @brief This class is a concurrent stack controled by a spin_lock
 /// @remarks
 //---------------------------------------------------------------------------
-template <typename T , typename Allocator=std::allocator<T> >
+template <typename T , typename Allocator = std::allocator<T> >
 class deque_cnc
 {
 public:
@@ -97,9 +97,10 @@ virtual ~deque_cnc (void) {  dq.clear(); };
 /// @brief Delete all the elements of the deque_cnc.
 //---------------------------------------------------------------------------
 void clear(void)
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.clear ( );
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : swap
@@ -108,11 +109,12 @@ void clear(void)
 /// @return none
 //---------------------------------------------------------------------------
 void swap ( deque_cnc  & A ) noexcept
-{   //------------------ begin ------------------
+{
+    //------------------ begin ------------------
     if ( this == &A ) return ;
     std::lock_guard<spinlock>  S(spl);
     dq.swap( A.dq);
-};
+}
 //
 //***************************************************************************
 //  S I Z E , M A X _ S I Z E , R E S I Z E
@@ -125,9 +127,10 @@ void swap ( deque_cnc  & A ) noexcept
 /// @return number of elements in the deque_cnc
 //---------------------------------------------------------------------------
 size_type size ( void) const noexcept
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     return dq.size() ;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :max_size
@@ -135,9 +138,10 @@ size_type size ( void) const noexcept
 /// @return maximun size of the container
 //---------------------------------------------------------------------------
 size_type max_size (void) const noexcept
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     return ( dq.max_size() );
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : shrink_to_fit
@@ -150,9 +154,10 @@ size_type max_size (void) const noexcept
 /// @return none
 //---------------------------------------------------------------------------
 void shrink_to_fit ( )
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.shrink_to_fit();
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : empty
@@ -160,18 +165,20 @@ void shrink_to_fit ( )
 /// @return true if the map is empty, false in any other case
 //---------------------------------------------------------------------------
 bool empty ( void) const noexcept
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     return (dq.empty()) ;
-};
+}
 //---------------------------------------------------------------------------
 //  function : push_back
 /// @brief Insert one element in the back of the container
 /// @param [in] D : value to insert. Can ve a value, a reference or an rvalue
 //---------------------------------------------------------------------------
 void push_back (const value_type  & D )
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.push_back(D);
-};
+}
 
 //---------------------------------------------------------------------------
 //  function : emplace_back
@@ -180,9 +187,10 @@ void push_back (const value_type  & D )
 //---------------------------------------------------------------------------
 template <class ... Args>
 void emplace_back ( Args && ... args )
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.emplace_back (std::forward <Args>(args) ...);
-};
+}
 //---------------------------------------------------------------------------
 //  function : push_back
 /// @brief Insert one element in the back of the container
@@ -192,11 +200,12 @@ void emplace_back ( Args && ... args )
 //---------------------------------------------------------------------------
 template <class Allocator2>
 deque_cnc & push_back ( const std::deque<value_type,Allocator2> & D)
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     for ( size_type i =0 ; i < D.size() ; ++i)
         dq.push_back(D[i]);
     return *this ;
-};
+}
 //---------------------------------------------------------------------------
 //  function : push_back
 /// @brief Insert one element in the back of the container
@@ -205,11 +214,12 @@ deque_cnc & push_back ( const std::deque<value_type,Allocator2> & D)
 /// @return reference to the deque after the insertion
 //---------------------------------------------------------------------------
 deque_cnc & push_back ( std::deque<value_type,Allocator> && D)
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     for ( size_type i =0 ; i < D.size() ; ++i)
     	dq.emplace_back(std::move(D[i]));
     return *this ;
-};
+}
 
 //
 //---------------------------------------------------------------------------
@@ -217,9 +227,10 @@ deque_cnc & push_back ( std::deque<value_type,Allocator> && D)
 /// @brief erase the last element of the container
 //---------------------------------------------------------------------------
 void pop_back ( void)
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.pop_back() ;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :pop_copy_back
@@ -230,13 +241,14 @@ void pop_back ( void)
 ///         false - Empty tree
 //---------------------------------------------------------------------------
 bool pop_copy_back ( value_type & P)
-{   //-------------------------- begin -----------------------------
+{
+    //-------------------------- begin -----------------------------
     std::lock_guard<spinlock>  S(spl);
     if ( dq.size() == 0) return false ;
     P = dq.back() ;
     dq.pop_back() ;
     return true;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :pop_move_back
@@ -247,13 +259,14 @@ bool pop_copy_back ( value_type & P)
 ///         false - Empty tree
 //---------------------------------------------------------------------------
 bool pop_move_back ( value_type & P)
-{   //-------------------------- begin -----------------------------
+{
+    //-------------------------- begin -----------------------------
     std::lock_guard<spinlock>  S(spl);
     if ( dq.size() == 0) return false ;
     P = std::move(dq.back()) ;
     dq.pop_back() ;
     return true;
-};
+}
 
 
 //---------------------------------------------------------------------------
@@ -262,9 +275,10 @@ bool pop_move_back ( value_type & P)
 /// @param [in] D : value to insert
 //---------------------------------------------------------------------------
 void push_front (const value_type  & D )
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.push_front(D);
-};
+}
 
 //---------------------------------------------------------------------------
 //  function : emplace_front
@@ -273,9 +287,10 @@ void push_front (const value_type  & D )
 //---------------------------------------------------------------------------
 template <class ... Args>
 void emplace_front ( Args && ... args )
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.emplace_front (std::forward <Args>(args) ...);
-};
+}
 //---------------------------------------------------------------------------
 //  function : push_front
 /// @brief Insert a copy of the elements of the deque V1 in the front 
@@ -285,10 +300,11 @@ void emplace_front ( Args && ... args )
 //---------------------------------------------------------------------------
 template <class Allocator2>
 deque_cnc & push_front ( const std::deque<value_type,Allocator2> & V1)
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     for ( size_type i =0 ; i < V1.size() ; ++i) dq.push_front(V1[i]);
     return *this ;
-};
+}
 //---------------------------------------------------------------------------
 //  function : push_front
 /// @brief Insert a move of the elements of the deque V1 in the front 
@@ -297,11 +313,12 @@ deque_cnc & push_front ( const std::deque<value_type,Allocator2> & V1)
 /// @return reference to the deque after the insertion
 //---------------------------------------------------------------------------
 deque_cnc & push_front ( std::deque<value_type,Allocator> && V1)
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     for ( size_type i =0 ; i < V1.size() ; ++i)  
     	dq.emplace_front(std::move(V1[i]));
     return *this ;
-};
+}
 
 //
 //---------------------------------------------------------------------------
@@ -309,9 +326,10 @@ deque_cnc & push_front ( std::deque<value_type,Allocator> && V1)
 /// @brief erase the first element of the container
 //---------------------------------------------------------------------------
 void pop_front ( void)
-{   std::lock_guard<spinlock>  S(spl);
+{
+    std::lock_guard<spinlock>  S(spl);
     dq.pop_front() ;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :pop_copy_front
@@ -322,13 +340,14 @@ void pop_front ( void)
 ///         false - Empty tree
 //---------------------------------------------------------------------------
 bool pop_copy_front ( value_type & P)
-{   //-------------------------- begin -----------------------------
+{
+    //-------------------------- begin -----------------------------
     std::lock_guard<spinlock>  S(spl);
     if ( dq.size() == 0) return false ;
     P = dq.front() ;
     dq.pop_front() ;
     return true;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :pop_move_front
@@ -339,13 +358,14 @@ bool pop_copy_front ( value_type & P)
 ///         false - Empty tree
 //---------------------------------------------------------------------------
 bool pop_move_front ( value_type & P)
-{   //-------------------------- begin -----------------------------
+{
+    //-------------------------- begin -----------------------------
     std::lock_guard<spinlock>  S(spl);
     if ( dq.size() == 0) return false ;
     P = std::move (dq.front()) ;
     dq.pop_front() ;
     return true;
-};
+}
 
 //----------------------------------------------------------------------------
 }; // end class deque_cnc
@@ -353,9 +373,9 @@ bool pop_move_front ( value_type & P)
 //
 
 //****************************************************************************
-};//    End namespace tools
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace parallel
-};//    End namespace hpx
+}//    End namespace tools
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace parallel
+}//    End namespace hpx
 //****************************************************************************
 #endif

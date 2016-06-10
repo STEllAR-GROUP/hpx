@@ -15,10 +15,10 @@
 
 #include <cstdint>
 
-namespace hpx		{
-namespace parallel	{
-HPX_INLINE_NAMESPACE(v2) { namespace boostsort		{
-namespace tools		{
+namespace hpx {
+namespace parallel {
+HPX_INLINE_NAMESPACE(v2) { namespace boostsort {
+namespace tools {
 //
 //##########################################################################
 //                                                                        ##
@@ -26,7 +26,7 @@ namespace tools		{
 //                                                                        ##
 //##########################################################################
 //
-static constexpr const uint32_t TMSB [256] =
+static HPX_CONSTEXPR const uint32_t TMSB [256] =
 {   0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,
     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
@@ -58,7 +58,7 @@ static constexpr const uint32_t TMSB [256] =
 /// @exception none
 /// @return Number of bits
 //---------------------------------------------------------------------------
-static inline uint32_t NBits32 ( uint32_t N) noexcept
+static inline uint32_t NBits32 ( uint32_t N) HPX_NOEXCEPT
 {   //----------------------- begin -------------------------------------
     int Pos = (N & 0xffff0000U)?16:0 ;
     if ((N>>Pos) & 0xff00U) Pos += 8 ;

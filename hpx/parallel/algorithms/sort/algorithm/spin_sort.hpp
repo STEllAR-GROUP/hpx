@@ -25,10 +25,10 @@
 #include <hpx/parallel/algorithms/sort/algorithm/insertion_sort.hpp>
 #include <hpx/parallel/algorithms/sort/util/range.hpp>
 
-namespace hpx		{
-namespace parallel	{
-HPX_INLINE_NAMESPACE(v2) { namespace boostsort		{
-namespace algorithm	{
+namespace hpx {
+namespace parallel {
+HPX_INLINE_NAMESPACE(v2) { namespace boostsort {
+namespace algorithm {
 //
 //****************************************************************************
 //                 NAMESPACES AND USING SENTENCES
@@ -36,7 +36,6 @@ namespace algorithm	{
 namespace su = hpx::parallel::v2::boostsort::util ;
 using hpx::parallel::v2::boostsort::util::range ;
 using hpx::parallel::v2::boostsort::tools::NBits64 ;
-using std::iterator_traits ;
 
 //-----------------------------------------------------------------------------
 //  function : range_sort
@@ -53,7 +52,8 @@ template <class iter_t  , class iterb_t, class compare>
 inline range<iterb_t> range_sort ( const range<iter_t> &RA ,
 		                           const range<iterb_t> &RB,
                                    compare comp, uint32_t level )
-{   //---------------------------- begin ------------------------------------
+{
+    //---------------------------- begin ------------------------------------
 #if __DEBUG_SORT != 0
 	assert ( RA.size() == RB.size());
 #endif
@@ -72,7 +72,7 @@ inline range<iterb_t> range_sort ( const range<iter_t> &RA ,
         insertion_sort (RA2.first ,RA2.last, comp );
     }
     return full_merge (RB, RA1, RA2,comp );
-};
+}
 
 //---------------------------------------------------------------------------
 /// @struct spin_sort_tag
@@ -83,13 +83,13 @@ inline range<iterb_t> range_sort ( const range<iter_t> &RA ,
 //----------------------------------------------------------------------------
 template < class iter_t,
            typename compare
-            =std::less<typename iterator_traits<iter_t>::value_type >  >
+            = std::less<typename std::iterator_traits<iter_t>::value_type >  >
 struct spin_sort_tag
 {
 //****************************************************************************
 //               DEFINITIONS AND CONSTANTS
 //****************************************************************************
-typedef typename iterator_traits<iter_t>::value_type value_t ;
+typedef typename std::iterator_traits<iter_t>::value_type value_t ;
 static const uint32_t Sort_min = 36 ;
 
 //****************************************************************************
@@ -126,13 +126,15 @@ spin_sort_tag ( range<iter_t> R, compare comp, range <value_t *> RB);
 /// @remarks
 //-----------------------------------------------------------------------------
 ~spin_sort_tag ( void)
-{   //----------------------------------- begin -------------------------
+{
+    //----------------------------------- begin -------------------------
     if ( construct)
-    {   destroy (range<value_t*>( Ptr, Ptr +NPtr));
+    {
+        destroy (range<value_t*>( Ptr, Ptr +NPtr));
         construct = false ;
-    };
+    }
     if ( owner and Ptr != nullptr) std::return_temporary_buffer ( Ptr) ;
-};
+}
 
 //
 //----------------------------------------------------------------------------
@@ -146,8 +148,8 @@ spin_sort_tag ( range<iter_t> R, compare comp, range <value_t *> RB);
 //-----------------------------------------------------------------------------
 template < class iter_t,  typename compare>
 spin_sort_tag<iter_t, compare>::spin_sort_tag ( range<iter_t> R , compare comp)
-                                                :Ptr(nullptr),NPtr(0),
-												 construct(false),owner(false)
+  : Ptr(nullptr),NPtr(0),
+    construct(false),owner(false)
 {   //-------------------------- begin -------------------------------------
 #if __DEBUG_SORT != 0
 	assert ( R.valid());
@@ -160,13 +162,14 @@ spin_sort_tag<iter_t, compare>::spin_sort_tag ( range<iter_t> R , compare comp)
 	size_t N2 = N - N1 ;
 
     if ( N <= ( Sort_min))
-    {   insertion_sort (R.first, R.last, comp);
+    {
+        insertion_sort (R.first, R.last, comp);
         return ;
-    };
+    }
     //------------------- check if sort --------------------------------------
     bool SW = true ;
     for ( iter_t it1 = R.first, it2 = R.first+1 ;
-          it2 != R.last and (SW = not comp(*it2,*it1));it1 = it2++);
+          it2 != R.last && (SW = !comp(*it2,*it1));it1 = it2++);
     if (SW) return ;
 
     Ptr = std::get_temporary_buffer<value_t>(NPtr).first ;
@@ -196,8 +199,8 @@ spin_sort_tag<iter_t, compare>::spin_sort_tag ( range<iter_t> R , compare comp)
 		RA1.last = RA1.first + RA2.size() ;
 		RA2 = range_sort ( RA1, RA2 , comp, NLevel-1 );
 		R = half_merge ( R, RB, RA2, comp ) ;
-	};
-};
+	}
+}
 
 //-----------------------------------------------------------------------------
 //  function : spin_sort_tag
@@ -211,7 +214,8 @@ spin_sort_tag<iter_t, compare>::spin_sort_tag ( range<iter_t> R, compare comp,
                                                 range <value_t *> RB)
 											   :Ptr(RB.first), NPtr(RB.size()),
                                                 construct(false),owner(false)
-{   //-------------------------- begin -------------------------------------
+{
+    //-------------------------- begin -------------------------------------
     size_t N = R.size();
     owner= construct= false ;
 
@@ -223,9 +227,10 @@ spin_sort_tag<iter_t, compare>::spin_sort_tag ( range<iter_t> R, compare comp,
     size_t N2 = N - N1 ;
 
     if ( N <= ( Sort_min))
-    {   insertion_sort (R.first, R.last, comp);
+    {
+        insertion_sort (R.first, R.last, comp);
         return ;
-    };
+    }
     //------------------------------------------------------------------------
     //                  Process
     //------------------------------------------------------------------------
@@ -249,9 +254,9 @@ spin_sort_tag<iter_t, compare>::spin_sort_tag ( range<iter_t> R, compare comp,
 		RA1.last = RA1.first + RA2.size() ;
 		RA2 = range_sort ( RA1, RA2 , comp, NLevel-1 );
 		R = half_merge ( R, RB, RA2, comp ) ;
-	};
+    }
 
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : spin_sort
@@ -262,12 +267,13 @@ spin_sort_tag<iter_t, compare>::spin_sort_tag ( range<iter_t> R, compare comp,
 //---------------------------------------------------------------------------
 template < class iter_t,
            typename compare
-           = std::less<typename iterator_traits<iter_t>::value_type> >
+           = std::less<typename std::iterator_traits<iter_t>::value_type> >
 void spin_sort (iter_t first, iter_t last, compare comp = compare() )
-{   //----------------------------- begin ----------------------------
-	range<iter_t> RA ( first, last);
+{
+    //----------------------------- begin ----------------------------
+    range<iter_t> RA ( first, last);
     spin_sort_tag<iter_t,compare> ( RA , comp);
-};
+}
 
 //
 //---------------------------------------------------------------------------
@@ -283,19 +289,20 @@ void spin_sort (iter_t first, iter_t last, compare comp = compare() )
 /// @remarks
 //---------------------------------------------------------------------------
 template < class iter_t,
-           typename value_t= typename iterator_traits<iter_t>::value_type,
+           typename value_t= typename std::iterator_traits<iter_t>::value_type,
            typename compare = std::less<value_t>  >
 void spin_sort ( iter_t first, iter_t last, compare comp,
                  value_t* bfirst, size_t Nb)
-{   //------------------------------- begin--------------------------
-	typedef typename iterator_traits<iter_t>::value_type value2_t ;
+{
+    //------------------------------- begin--------------------------
+    typedef typename std::iterator_traits<iter_t>::value_type value2_t ;
     static_assert ( std::is_same<value_t, value2_t>::value,
                    "Incompatible iterators\n");
     //---------------------------------------------------------------
-	range<iter_t> RA ( first, last);
-	range<value_t*> RB ( bfirst , bfirst + Nb);
+    range<iter_t> RA ( first, last);
+    range<value_t*> RB ( bfirst , bfirst + Nb);
     spin_sort_tag<iter_t,compare> ( RA , comp,RB );
-};
+}
 
 //############################################################################
 //                                                                          ##
@@ -317,7 +324,7 @@ void spin_sort ( iter_t first, iter_t last, compare comp,
 //---------------------------------------------------------------------------
 template < class iter_t,
            typename compare
-           = std::less<typename iterator_traits<iter_t>::value_type>  >
+           = std::less<typename std::iterator_traits<iter_t>::value_type>  >
 void indirect_spin_sort ( iter_t first, iter_t last, compare comp = compare() )
 {   //------------------------------- begin-----------------------------------
     typedef hpx::parallel::v2::boostsort::algorithm::less_ptr_no_null <iter_t, compare>      compare_ptr ;
@@ -326,13 +333,13 @@ void indirect_spin_sort ( iter_t first, iter_t last, compare comp = compare() )
     create_index ( first , last , VP);
     spin_sort  ( VP.begin() , VP.end(), compare_ptr(comp) );
     sort_index ( first , VP) ;
-};
+}
 
 //****************************************************************************
-};//    End namespace algorithm
-};//    End namespace parallel
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namepspace boost
+}//    End namespace algorithm
+}//    End namespace parallel
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namepspace boost
 //****************************************************************************
 //
 #endif

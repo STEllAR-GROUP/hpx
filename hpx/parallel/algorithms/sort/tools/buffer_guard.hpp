@@ -4,7 +4,7 @@
 ///
 /// @author Copyright (c) 2016 Francisco José Tapia (fjtapia@gmail.com )\n
 ///         Distributed under the Boost Software License, Version 1.0.\n
-///         ( See accompanyingfile LICENSE_1_0.txt or copy at
+///         (See accompanyingfile LICENSE_1_0.txt or copy at
 ///           http://www.boost.org/LICENSE_1_0.txt  )
 /// @version 0.1
 ///
@@ -49,32 +49,35 @@ namespace tools
 template <class iter_t >
 struct buffer_guard
 {
-    //---------------------- varibales ------------------------------------
+    //---------------------- variables ------------------------------------
     stack_cnc<iter_t> & stk;
     bool OK = false;
     iter_t itx ;
 
-    buffer_guard (stack_cnc<iter_t> & STI, iter_t &it_buf ) :stk(STI)
-    {   //---------------------- begin----------------------------
-    	while (not (OK = stk.pop_copy_back(itx))  )hpx::this_thread::yield();
-    	it_buf= itx ;
-    };
+    buffer_guard (stack_cnc<iter_t> & STI, iter_t &it_buf ) : stk(STI)
+    {
+        //---------------------- begin----------------------------
+        while (!(OK = stk.pop_copy_back(itx)))
+            hpx::this_thread::yield();
+        it_buf = itx;
+    }
 
-    void  close ( void)
-    { 	stk.push_back( itx);
-    	OK = false;
-    };
+    void  close (void)
+    {
+        stk.push_back(itx);
+        OK = false;
+    }
+
     ~buffer_guard ()
-    { 	if ( OK) stk.push_back( itx);
-    };
+    {
+        if (OK) stk.push_back(itx);
+    }
 };
 
-
-
 //***************************************************************************
-};// end namespace tools
-};};// end HPX_INLINE_NAMESPACE(v2)
-};// end namespace parallel
-};// end namespace hpx
+}// end namespace tools
+}}// end HPX_INLINE_NAMESPACE(v2)
+}// end namespace parallel
+}// end namespace hpx
 //***************************************************************************
 #endif

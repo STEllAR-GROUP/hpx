@@ -94,21 +94,21 @@ public :
 //  function : stack_cnc
 /// @brief  constructor
 //---------------------------------------------------------------------------
-explicit inline stack_cnc (void ):V(){  } ;
+explicit inline stack_cnc (void ) : V() {}
 //
 //---------------------------------------------------------------------------
 //  function : stack_cnc
 /// @brief  constructor
 /// @param [in] ALLC : Allocator
 //---------------------------------------------------------------------------
-explicit inline stack_cnc ( const Allocator &ALLC ):V(ALLC){  } ;
+explicit inline stack_cnc ( const Allocator &ALLC ):V(ALLC) {}
 //
 //---------------------------------------------------------------------------
 //  function : stack_cnc
 /// @brief  Copy constructor
 /// @param [in] VT : stack_cnc from where copy the data
 //---------------------------------------------------------------------------
-stack_cnc ( const stack_cnc & VT ) = delete ;
+stack_cnc ( const stack_cnc & VT ) = delete;
 //
 //---------------------------------------------------------------------------
 //  function : stack_cnc
@@ -116,20 +116,20 @@ stack_cnc ( const stack_cnc & VT ) = delete ;
 /// @param [in] VT : stack_cnc from where copy the data
 //---------------------------------------------------------------------------
 template <typename Allocator2>
-inline stack_cnc ( const std::vector<value_type,Allocator2> & VT ): V ( VT) { };
+inline stack_cnc ( const std::vector<value_type,Allocator2> & VT ): V ( VT) {}
 //
 //---------------------------------------------------------------------------
 //  function : stack_cnc
 /// @brief  Move constructor
 /// @param [in] VT : stack_cnc from where copy the data
 //---------------------------------------------------------------------------
-stack_cnc ( stack_cnc && VT) = delete ;
+stack_cnc ( stack_cnc && VT) = delete;
 //
 //---------------------------------------------------------------------------
 //  function : ~stack_cnc
 /// @brief  Destructor
 //---------------------------------------------------------------------------
-virtual ~stack_cnc (void) {  V.clear(); };
+virtual ~stack_cnc (void) {  V.clear(); }
 //
 //***************************************************************************
 //  O P E R A T O R = , A S S I G N , C L E A R , S W A P
@@ -148,7 +148,7 @@ virtual ~stack_cnc (void) {  V.clear(); };
 //  void assign ( unsize_type n, const value_type& u )
 //
 //  void clear(void)
-//  void swap ( stack_cnc  & A ) noexcept
+//  void swap ( stack_cnc  & A ) HPX_NOEXCEPT
 //
 //***************************************************************************
 //
@@ -158,7 +158,7 @@ virtual ~stack_cnc (void) {  V.clear(); };
 /// @param [in] VT : stack_cnc from where copy the data
 /// @return Reference to the stack_cnc after the copy
 //---------------------------------------------------------------------------
-stack_cnc & operator= (const stack_cnc &VT)  = delete ;
+stack_cnc & operator= (const stack_cnc &VT) = delete;
 //
 //---------------------------------------------------------------------------
 //  function : operator =
@@ -168,21 +168,23 @@ stack_cnc & operator= (const stack_cnc &VT)  = delete ;
 //---------------------------------------------------------------------------
 template < typename alloc_t2 >
 stack_cnc & operator= (const std::vector<value_type,alloc_t2> &VT)
-{   //-------------------------- begin ------------------------------
+{
+    //-------------------------- begin ------------------------------
     if ( this == &VT ) return *this ;
     std::lock_guard <spinlock_t>  S(spl);
     V = VT ;
     return *this ;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : clear
 /// @brief Delete all the elements of the stack_cnc.
 //---------------------------------------------------------------------------
 void clear(void)
-{   std::lock_guard<spinlock_t>  S(spl);
+{
+    std::lock_guard<spinlock_t>  S(spl);
     V.clear ( );
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : swap
@@ -190,23 +192,24 @@ void clear(void)
 /// @param [in] A : stack_cnc to swap
 /// @return none
 //---------------------------------------------------------------------------
-void swap ( stack_cnc  & A ) noexcept
-{   //------------------ begin ------------------
+void swap ( stack_cnc  & A ) HPX_NOEXCEPT
+{
+    //------------------ begin ------------------
     if ( this == &A ) return ;
     std::lock_guard<spinlock_t>  S(spl);
     V.swap( A.V);
-};
+}
 //
 //***************************************************************************
 //  S I Z E , M A X _ S I Z E , R E S I Z E
 //  C A P A C I T Y , E M P T Y , R E S E R V E
 //
-//  size_type size        ( void  ) const noexcept
-//  size_type max_size    ( void  ) const noexcept
+//  size_type size        ( void  ) const HPX_NOEXCEPT
+//  size_type max_size    ( void  ) const HPX_NOEXCEPT
 //  void      resize      ( unsize_type sz,value_type c = value_type())
-//  size_type capacity    ( void  ) const noexcept
-//  bool      empty       ( void  ) const noexcept
-//  void      reserve     ( size_type n ) noexcept
+//  size_type capacity    ( void  ) const HPX_NOEXCEPT
+//  bool      empty       ( void  ) const HPX_NOEXCEPT
+//  void      reserve     ( size_type n ) HPX_NOEXCEPT
 //
 //***************************************************************************
 //
@@ -215,20 +218,22 @@ void swap ( stack_cnc  & A ) noexcept
 /// @brief return the number of elements in the stack_cnc
 /// @return number of elements in the stack_cnc
 //---------------------------------------------------------------------------
-size_type size ( void) const noexcept
-{   std::lock_guard<spinlock_t>  S(spl);
+size_type size ( void) const HPX_NOEXCEPT
+{
+    std::lock_guard<spinlock_t>  S(spl);
     return V.size() ;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :max_size
 /// @brief return the maximun size of the container
 /// @return maximun size of the container
 //---------------------------------------------------------------------------
-size_type max_size (void) const noexcept
-{   std::lock_guard<spinlock_t>  S(spl);
+size_type max_size (void) const HPX_NOEXCEPT
+{
+    std::lock_guard<spinlock_t>  S(spl);
     return ( V.max_size() );
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : shrink_to_fit
@@ -241,7 +246,8 @@ size_type max_size (void) const noexcept
 /// @return none
 //---------------------------------------------------------------------------
 void shrink_to_fit ( )
-{   std::lock_guard<spinlock_t>  S(spl);
+{
+    std::lock_guard<spinlock_t>  S(spl);
     V.shrink_to_fit();
 };
 //
@@ -250,20 +256,22 @@ void shrink_to_fit ( )
 /// @brief return the maximun size of the container
 /// @return maximun size of the container
 //---------------------------------------------------------------------------
-size_type capacity ( void) const noexcept
-{   std::lock_guard<spinlock_t>  S(spl);
+size_type capacity ( void) const HPX_NOEXCEPT
+{
+    std::lock_guard<spinlock_t>  S(spl);
     return ( V.capacity() );
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : empty
 /// @brief indicate if the map is empty
 /// @return true if the map is empty, false in any other case
 //---------------------------------------------------------------------------
-bool empty ( void) const noexcept
-{   std::lock_guard<spinlock_t>  S(spl);
+bool empty ( void) const HPX_NOEXCEPT
+{
+    std::lock_guard<spinlock_t>  S(spl);
     return (V.empty()) ;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : reserve
@@ -273,10 +281,11 @@ bool empty ( void) const noexcept
 /// @remarks This function has not utility. It is provided only for
 ///          compatibility with the STL vector interface
 //---------------------------------------------------------------------------
-void reserve ( size_type n ) noexcept
-{   std::lock_guard<spinlock_t>  S(spl);
+void reserve ( size_type n ) HPX_NOEXCEPT
+{
+    std::lock_guard<spinlock_t>  S(spl);
     V.reserve(n);
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function : copy
@@ -287,9 +296,10 @@ void reserve ( size_type n ) noexcept
 //---------------------------------------------------------------------------
 template< class Allocator2>
 void copy ( std::vector<value_type,Allocator2> & V2)
-{   std::lock_guard<spinlock_t>  S(spl);
+{
+    std::lock_guard<spinlock_t>  S(spl);
     V2 = V ;
-};
+}
 
 //***************************************************************************
 //          P U S H _ B A C K
@@ -315,9 +325,10 @@ void copy ( std::vector<value_type,Allocator2> & V2)
 /// @remarks This operation is O ( const )
 //---------------------------------------------------------------------------
 void push_back (const value_type  & D )
-{   std::lock_guard<spinlock_t>  S(spl);
+{
+    std::lock_guard<spinlock_t>  S(spl);
     V.push_back(D);
-};
+}
 
 //---------------------------------------------------------------------------
 //  function : emplace_back
@@ -328,9 +339,10 @@ void push_back (const value_type  & D )
 //---------------------------------------------------------------------------
 template <class ... Args>
 void emplace_back ( Args && ... args )
-{   std::lock_guard<spinlock_t>  S(spl);
+{
+    std::lock_guard<spinlock_t>  S(spl);
     V.emplace_back (std::forward <Args>(args) ...);
-};
+}
 //---------------------------------------------------------------------------
 //  function : push_back
 /// @brief Insert one element in the back of the container
@@ -340,11 +352,12 @@ void emplace_back ( Args && ... args )
 //---------------------------------------------------------------------------
 template <class Allocator2>
 stack_cnc & push_back ( const std::vector<value_type,Allocator2> & V1)
-{   std::lock_guard<spinlock_t>  S(spl);
+{
+    std::lock_guard<spinlock_t>  S(spl);
     for ( size_type i =0 ; i < V1.size() ; ++i)
         V.push_back(V1[i]);
     return *this ;
-};
+}
 //
 //***************************************************************************
 //                  P O P _ B A C K
@@ -374,9 +387,10 @@ stack_cnc & push_back ( const std::vector<value_type,Allocator2> & V1)
 /// @remarks This operation is O(constant)
 //---------------------------------------------------------------------------
 void pop_back ( void)
-{   std::lock_guard<spinlock_t>  S(spl);
+{
+    std::lock_guard<spinlock_t>  S(spl);
     V.pop_back() ;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :pop_copy_back
@@ -388,13 +402,14 @@ void pop_back ( void)
 /// @remarks This operation is O(1)
 //---------------------------------------------------------------------------
 bool pop_copy_back ( value_type & P)
-{   //-------------------------- begin -----------------------------
+{
+    //-------------------------- begin -----------------------------
     std::lock_guard<spinlock_t>  S(spl);
     if ( V.size() == 0) return false ;
     P = V.back() ;
     V.pop_back() ;
     return true;
-};
+}
 //
 //---------------------------------------------------------------------------
 //  function :pop_copy_back
@@ -407,7 +422,8 @@ bool pop_copy_back ( value_type & P)
 template <class Allocator2>
 size_type pop_copy_back ( std::vector<value_type,Allocator2> & V1,
                           size_type NElem )
-{   //-------------------------- begin -----------------------------
+{
+    //-------------------------- begin -----------------------------
     std::lock_guard<spinlock_t>  S(spl);
     size_type Aux = 0 ;
     if ( V.size() != 0 )
@@ -418,14 +434,14 @@ size_type pop_copy_back ( std::vector<value_type,Allocator2> & V1,
         V.erase( V.begin() + PosIni , V.end() );
     }
     return Aux;
-};
+}
 
 }; // end class stack_cnc
 
 //***************************************************************************
-};// end namespace tools
-};};// end HPX_INLINE_NAMESPACE(v2)
-};// end namespace parallel
-};// end namespace hpx
+}// end namespace tools
+}}// end HPX_INLINE_NAMESPACE(v2)
+}// end namespace parallel
+}// end namespace hpx
 //***************************************************************************
 #endif
