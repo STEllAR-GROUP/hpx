@@ -157,7 +157,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
-        struct maximal_size_of_chunks_helper
+        struct maximal_number_of_chunks_helper
         {
             template <typename Parameters, typename Executor>
             static std::size_t
@@ -171,10 +171,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(int, Parameters& params, Executor& exec,
                     std::size_t cores)
             ->  decltype(
-                    params.get_maximal_size_of_chunks(exec, cores)
+                    params.get_maximal_number_of_chunks(exec, cores)
                 )
             {
-                return params.get_maximal_size_of_chunks(exec, cores);
+                return params.get_maximal_number_of_chunks(exec, cores);
             }
 
             template <typename Executor>
@@ -186,10 +186,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         template <typename Parameters, typename Executor>
-        std::size_t call_maximal_size_of_chunks(Parameters& params,
+        std::size_t call_maximal_number_of_chunks(Parameters& params,
             Executor& exec, std::size_t cores)
         {
-            return maximal_size_of_chunks_helper<
+            return maximal_number_of_chunks_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
                 >::call(params, exec, cores);
         }
@@ -339,22 +339,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 std::forward<F>(f), num_tasks);
         }
 
-        /// Return the largest reasonable number of iterations to combine in
-        /// a single chunk.
+        /// Return the largest reasonable number of chunks to create for a
+        /// single algorithm invocation.
         ///
         /// \param params   [in] The executor parameters object to use for
-        ///                 determining the chunk size for the given number of
-        ///                 tasks \a num_tasks.
+        ///                 determining the number of chunks for the given
+        ///                 number of \a cores.
         /// \param exec     [in] The executor object which will be used used
         ///                 for scheduling of the the loop iterations.
-        /// \param cores    [in] The number of cores the chunk size should be
-        ///                 determined for
+        /// \param cores    [in] The number of cores the number of chunks
+        ///                 should be determined for.
         ///
         template <typename Executor>
-        static std::size_t maximal_size_of_chunks(
+        static std::size_t maximal_number_of_chunks(
             executor_parameters_type& params, Executor& exec, std::size_t cores)
         {
-            return detail::call_maximal_size_of_chunks(params, exec, cores);
+            return detail::call_maximal_number_of_chunks(params, exec, cores);
         }
 
         /// Reset the internal round robin thread distribution scheme for the

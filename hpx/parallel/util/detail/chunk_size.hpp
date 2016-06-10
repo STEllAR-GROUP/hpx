@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         bool variable_chunk_sizes = traits::variable_chunk_size(
             policy.parameters(), policy.executor());
-        std::size_t max_chunk_size = traits::maximal_size_of_chunks(
+        std::size_t max_chunk_size = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores);
 
         std::vector<tuple_type> shape;
@@ -199,7 +199,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         bool variable_chunk_sizes = traits::variable_chunk_size(
             policy.parameters(), policy.executor());
-        std::size_t max_chunk_size = traits::maximal_size_of_chunks(
+        std::size_t max_chunk_size = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores);
 
         std::vector<tuple_type> shape;
