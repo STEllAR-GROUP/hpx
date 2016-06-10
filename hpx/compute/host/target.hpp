@@ -10,37 +10,95 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/compute/host/get_targets.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace compute { namespace host
 {
-    struct HPX_EXPORT target
+    struct target
     {
-        typedef hpx::threads::mask_type native_handle_type;
+    public:
+        struct HPX_EXPORT native_handle_type
+        {
+            native_handle_type()
+              : mask_(hpx::threads::get_topology().get_machine_affinity_mask())
+              , locality_(hpx::find_here())
+            {}
 
+            explicit native_handle_type(hpx::threads::mask_type mask)
+              : mask_(mask)
+              , locality_(hpx::find_here())
+            {}
+
+            explicit native_handle_type(hpx::id_type const& locality)
+              : mask_(hpx::threads::get_topology().get_machine_affinity_mask())
+              , locality_(locality)
+            {}
+
+            native_handle_type(hpx::id_type const& locality,
+                    hpx::threads::mask_type mask)
+              : mask_(mask)
+              , locality_(locality)
+            {}
+
+            hpx::threads::mask_type& get_device() HPX_NOEXCEPT
+            {
+                return mask_;
+            }
+            hpx::threads::mask_type const& get_device() const HPX_NOEXCEPT
+            {
+                return mask_;
+            }
+
+            hpx::id_type const& get_locality() const HPX_NOEXCEPT
+            {
+                return locality_;
+            }
+
+        private:
+            friend struct target;
+
+            hpx::threads::mask_type mask_;
+            hpx::id_type locality_;
+        };
+
+    public:
         // Constructs default target
         target()
-          : mask_(hpx::threads::get_topology().get_machine_affinity_mask())
         {
         }
 
-        // Constructs target from a given device ID
+        // Constructs target from a given mask of processing units
         explicit target(hpx::threads::mask_type mask)
-          : mask_(mask)
+          : handle_(mask)
+        {
+        }
+
+        explicit target(hpx::id_type const& locality)
+          : handle_(locality)
+        {
+        }
+
+        target(hpx::id_type const& locality, hpx::threads::mask_type mask)
+          : handle_(locality, mask)
         {
         }
 
         native_handle_type const& native_handle() const
         {
-            return mask_;
+            return handle_;
         }
 
         native_handle_type & native_handle()
         {
-            return mask_;
+            return handle_;
         }
 
         std::pair<std::size_t, std::size_t> num_pus() const;
@@ -55,9 +113,29 @@ namespace hpx { namespace compute { namespace host
             return hpx::make_ready_future();
         }
 
+        static std::vector<target> get_local_targets()
+        {
+            return host::get_local_targets();
+        }
+        static hpx::future<std::vector<target> >
+            get_targets(hpx::id_type const& locality)
+        {
+            return host::get_targets(locality);
+        }
+
     private:
-        native_handle_type mask_;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & handle_.mask_ & handle_.locality_;
+        }
+
+        native_handle_type handle_;
     };
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

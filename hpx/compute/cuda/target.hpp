@@ -12,8 +12,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
+#include <hpx/compute/cuda/get_targets.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 
 #if !defined(__CUDA_ARCH__)
@@ -41,7 +43,7 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT target
+    struct target
     {
     private:
         HPX_MOVABLE_ONLY(target);
@@ -54,6 +56,7 @@ namespace hpx { namespace compute { namespace cuda
             HPX_MOVABLE_ONLY(native_handle_type);
 
             native_handle_type(int device = 0);
+            native_handle_type(hpx::id_type const& locality, int device = 0);
 
             ~native_handle_type();
 
@@ -90,6 +93,10 @@ namespace hpx { namespace compute { namespace cuda
           : handle_(device)
         {}
 
+        explicit target(hpx::id_type const& locality, int device)
+          : handle_(device)
+        {}
+
         target(target && rhs) HPX_NOEXCEPT
           : handle_(std::move(rhs.handle_))
         {}
@@ -108,6 +115,16 @@ namespace hpx { namespace compute { namespace cuda
         void synchronize() const;
 
         hpx::future<void> get_future() const;
+
+        static std::vector<target> get_local_targets()
+        {
+            return cuda::get_local_targets();
+        }
+        static hpx::future<std::vector<target> >
+            get_targets(hpx::id_type const& locality)
+        {
+            return cuda::get_targets(locality);
+        }
 
     private:
 #if !defined(__CUDA_ARCH__)

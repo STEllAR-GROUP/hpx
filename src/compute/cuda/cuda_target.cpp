@@ -130,6 +130,11 @@ namespace hpx { namespace compute { namespace cuda
       : device_(device), stream_(0), locality_(hpx::find_here())
     {}
 
+    target::native_handle_type::native_handle_type(hpx::id_type const& locality,
+            int device)
+      : device_(device), stream_(0), locality_(locality)
+    {}
+
     target::native_handle_type::~native_handle_type()
     {
         if (stream_)
@@ -190,6 +195,9 @@ namespace hpx { namespace compute { namespace cuda
     ///////////////////////////////////////////////////////////////////////////
     void target::synchronize() const
     {
+        // FIXME: implement remote targets
+        HPX_ASSERT(hpx::find_here() == locality_);
+
         if (handle_.stream_ == 0)
         {
             HPX_THROW_EXCEPTION(invalid_status,
