@@ -203,11 +203,11 @@ namespace lcos {
             void check_abandon_shared_state(const char* fun)
             {
                 if (this->shared_state_ != 0 && this->future_retrieved_ &&
-                    !id_retrieved_)
+                    !(this->has_result_ || id_retrieved_))
                 {
-                    this->shared_state_->set_error(broken_promise,
-                        fun,
+                    this->shared_state_->set_error(broken_promise, fun,
                         "abandoning not ready shared state");
+                    return;
                 }
             }
             mutable bool id_retrieved_;

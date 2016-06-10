@@ -389,6 +389,7 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
+                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -398,6 +399,7 @@ namespace hpx { namespace lcos
                 else
                 {
                     // local, direct execution
+                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
                     return;
@@ -428,6 +430,7 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
+                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -437,6 +440,7 @@ namespace hpx { namespace lcos
                 else
                 {
                     // local, direct execution
+                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
                     return;
@@ -468,6 +472,7 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
+                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -480,6 +485,7 @@ namespace hpx { namespace lcos
                 else
                 {
                     // local, direct execution
+                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
 
@@ -513,6 +519,7 @@ namespace hpx { namespace lcos
                     if (!r.first)
                     {
                         // local, direct execution
+                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -525,6 +532,7 @@ namespace hpx { namespace lcos
                 else
                 {
                     // local, direct execution
+                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
 

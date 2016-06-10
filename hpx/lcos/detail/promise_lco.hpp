@@ -99,6 +99,9 @@ namespace lcos {
             {
             }
 
+            // This gets called from within the managed_component dtor. This
+            // is called only once and we can safely, unconditionally delete
+            // our LCO here.
             friend void intrusive_ptr_release(promise_lco_base* p)
             {
                 delete p;
