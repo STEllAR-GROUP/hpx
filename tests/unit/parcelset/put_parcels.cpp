@@ -53,10 +53,11 @@ void test_plain_argument(hpx::id_type const& id)
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
         hpx::lcos::promise<hpx::id_type> p;
+        auto f = p.get_future();
         parcels.push_back(
             generate_parcel<test1_action>(id, p.get_id(), data)
         );
-        results.push_back(p.get_future());
+        results.push_back(std::move(f));
     }
 
     // send parcels
