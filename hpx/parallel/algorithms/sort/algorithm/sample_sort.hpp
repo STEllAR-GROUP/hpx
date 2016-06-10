@@ -30,13 +30,12 @@
 #include <hpx/parallel/algorithms/sort/util/merge_vector.hpp>
 #include <hpx/parallel/algorithms/sort/algorithm/indirect.hpp>
 
-namespace hpx		{
-namespace parallel 	{
-HPX_INLINE_NAMESPACE(v2) { namespace boostsort		{
-namespace algorithm	{
+namespace hpx {
+namespace parallel {
+HPX_INLINE_NAMESPACE(v2) { namespace boostsort {
+namespace algorithm {
 
 namespace su = util ;
-using std::iterator_traits ;
 using hpx::parallel::v2::boostsort::tools::NThread ;
 using hpx::parallel::v2::boostsort::tools::NThread_HW ;
 using hpx::parallel::v2::boostsort::tools::atomic_add ;
@@ -52,13 +51,13 @@ using hpx::parallel::v2::boostsort::util::merge_vector4 ;
 //----------------------------------------------------------------------------
 template < class iter_t,
            typename compare
-           =std::less<typename iterator_traits<iter_t>::value_type >   >
+           = std::less<typename std::iterator_traits<iter_t>::value_type >   >
 struct sample_sort_tag
 {
 //------------------------------------------------------------------------
 //                     DEFINITIONS
 //------------------------------------------------------------------------
-typedef typename iterator_traits<iter_t>::value_type   value_t ;
+typedef typename std::iterator_traits<iter_t>::value_type   value_t ;
 typedef range <iter_t>                      range_it ;
 typedef range <value_t*>                    range_buf ;
 
@@ -128,9 +127,10 @@ inline void execute_first ( void)
 {   //------------------------------- begin ----------------------------------
     uint32_t Job =0 ;
     while ((Job = atomic_add(NJobs, 1)) < Ninterval   )
-    {   uninit_merge_level4( VBIni[Job] , VMem[Job],VBuf[Job] ,comp);
-    };
-};
+    {
+        uninit_merge_level4( VBIni[Job] , VMem[Job],VBuf[Job] ,comp);
+    }
+}
 //
 //-----------------------------------------------------------------------------
 //  function : execute
@@ -140,10 +140,10 @@ inline void execute ( void)
 {   //------------------------------- begin ----------------------------------
     uint32_t Job =0 ;
     while ((Job = atomic_add(NJobs, 1)) < Ninterval   )
-    {   merge_vector4 ( VBIni[Job] , VMIni[Job] ,VBuf[Job], VMem[Job], comp);
-
-    };
-};
+    {
+        merge_vector4 ( VBIni[Job] , VMIni[Job] ,VBuf[Job], VMem[Job], comp);
+    }
+}
 //
 //-----------------------------------------------------------------------------
 //  function : first merge
@@ -160,7 +160,7 @@ inline void first_merge ( void)
 
 	for ( uint32_t i =0 ; i < NThr ; ++i) F[i].get() ;
 
-};
+}
 //
 //-----------------------------------------------------------------------------
 //  function : final merge
@@ -178,7 +178,7 @@ inline void final_merge ( void)
 
 	for ( uint32_t i =0 ; i < NThr ; ++i) F[i].get() ;
 
-};
+}
 //
 //----------------------------------------------------------------------------
 };//                    End class sample_sort_tag
@@ -236,13 +236,12 @@ sample_sort_tag<iter_t,compare>:: sample_sort_tag (range_it R ,compare cmp,
     //------------------------------------------------------------------------
     //                    PROCESS
     //------------------------------------------------------------------------
-    initial_configuration () ;
+    initial_configuration();
 
-    first_merge ( );
-    construct = true ;
-    final_merge ( );
-
-};
+    first_merge();
+    construct = true;
+    final_merge();
+}
 //
 //-----------------------------------------------------------------------------
 //  function : sample_sort_tag
@@ -298,10 +297,11 @@ template <class iter_t, typename compare>
 sample_sort_tag<iter_t,compare>::~sample_sort_tag ( void)
 {   //----------------------------------- begin -------------------------
     if ( construct)
-    {   destroy ( global_buf);
+    {
+        destroy ( global_buf);
         construct = false ;
     }
-    if ( global_buf.first != nullptr and owner )
+    if ( global_buf.first != nullptr && owner )
     	std::return_temporary_buffer ( global_buf.first) ;
 };
 //
@@ -325,9 +325,10 @@ void sample_sort_tag<iter_t,compare>::initial_configuration ( void)
     value_t * 	buf_first 	= global_buf.first ;
 
     for ( uint32_t i =0 ; i < NThr-1 ; ++i, it_first += cupo, buf_first += cupo)
-    {	VMem_thread.emplace_back ( it_first, it_first + cupo) ;
+    {
+        VMem_thread.emplace_back ( it_first, it_first + cupo) ;
         VBuf_thread.emplace_back ( buf_first, buf_first + cupo );
-    };
+    }
     VMem_thread.emplace_back ( it_first, global_range.last) ;
     VBuf_thread.emplace_back ( buf_first, global_buf.last );
 
@@ -340,7 +341,7 @@ void sample_sort_tag<iter_t,compare>::initial_configuration ( void)
 	{	F[i] = hpx::async (spin_sort<iter_t,value_t,compare>,
 				            VMem_thread[i].first, VMem_thread[i].last,
 							comp, VBuf_thread[i].first,VBuf_thread[i].size());
-	};
+	}
 
 	for ( uint32_t i =0 ; i < NThr ; ++i) F[i].get() ;
 
@@ -351,11 +352,13 @@ void sample_sort_tag<iter_t,compare>::initial_configuration ( void)
     Vsample.reserve ( NThr * (Ninterval-1)) ;
 
     for ( uint32_t i =0 ; i < NThr ; ++i)
-    {   size_t distance = VMem_thread[i].size() / Ninterval ;
+    {
+        size_t distance = VMem_thread[i].size() / Ninterval ;
         for ( size_t j = 1 ,pos = distance; j < Ninterval; ++j,pos+=distance)
-        {   Vsample.push_back (VMem_thread[i].first + pos );
-        };
-    };
+        {
+            Vsample.push_back (VMem_thread[i].first + pos );
+        }
+    }
     typedef less_ptr_no_null <iter_t, compare>  compare_ptr ;
     spin_sort  ( Vsample.begin() , Vsample.end(), compare_ptr(comp) );
 
@@ -374,16 +377,18 @@ void sample_sort_tag<iter_t,compare>::initial_configuration ( void)
     std::vector< std::vector<range <iter_t> > > VR  (NThr);
 
     for ( uint32_t i =0 ; i < NThr; ++i)
-    {   iter_t itaux = VMem_thread[i].first ;
+    {
+        iter_t itaux = VMem_thread[i].first ;
         for ( uint32_t k =0 ; k < (Ninterval -1) ; ++k)
-        {   iter_t it2 = std::upper_bound ( itaux,
+        {
+            iter_t it2 = std::upper_bound ( itaux,
                                             VMem_thread[i].last ,
                                             * Vmilestone[k], comp );
             VR[i].emplace_back ( itaux, it2);
             itaux = it2 ;
-        };
+        }
         VR[i].emplace_back(itaux,VMem_thread[i].last );
-    };
+    }
 
     //------------------------------------------------------------------------
     // Copy in buffer and  creation of the final matrix of ranges
@@ -394,25 +399,27 @@ void sample_sort_tag<iter_t,compare>::initial_configuration ( void)
     VBIni.reserve (Ninterval);
 
     for ( uint32_t i =0 ; i < Ninterval ; ++i)
-    {   VMem[i].reserve ( NThr);
+    {
+        VMem[i].reserve ( NThr);
         VBuf[i].reserve ( NThr);
-    };
+    }
     iter_t it = global_range.first ;
     value_t * it_buf = global_buf.first ;
     for ( uint32_t k =0 ; k < Ninterval ; ++k)
-    {   size_t N =0 ;
+    {
+        size_t N =0 ;
         for ( uint32_t i = 0 ; i< NThr ; ++i)
         {   size_t N2 = VR[i][k].size();
             if ( N2 != 0 ) VMem[k].push_back(VR[i][k] );
             N += N2 ;
-        };
+        }
         VMIni.emplace_back (it,it + N  );
         VBIni.emplace_back (it_buf , it_buf+ N) ;
 
         it += N ;
         it_buf += N ;
-    };
-};
+    }
+}
 //
 //############################################################################
 //                                                                          ##
@@ -438,10 +445,11 @@ void sample_sort_tag<iter_t,compare>::initial_configuration ( void)
 //-----------------------------------------------------------------------------
 template < class iter_t >
 void sample_sort ( iter_t first, iter_t last , const NThread &NT = NThread() )
-{   //----------------------------------- begin ------------------------------
-    typedef std::less<typename iterator_traits<iter_t>::value_type > compare;
+{
+    //----------------------------------- begin ------------------------------
+    typedef std::less<typename std::iterator_traits<iter_t>::value_type > compare;
     sample_sort_tag <iter_t,compare> ( range<iter_t>(first, last), compare(),NT);
-};
+}
 //
 //-----------------------------------------------------------------------------
 //  function : sample_sort
@@ -459,12 +467,13 @@ void sample_sort ( iter_t first, iter_t last , const NThread &NT = NThread() )
 //-----------------------------------------------------------------------------
 template < class iter_t,
           typename compare
-          = std::less <typename iterator_traits<iter_t>::value_type>  >
+          = std::less <typename std::iterator_traits<iter_t>::value_type>  >
 void sample_sort ( iter_t first, iter_t last,
                    compare comp, const NThread &NT = NThread() )
-{   //----------------------------- begin ----------------------------------
+{
+    //----------------------------- begin ----------------------------------
     sample_sort_tag<iter_t,compare> (range<iter_t>( first, last),comp,NT);
-};
+}
 
 
 //############################################################################
@@ -485,15 +494,16 @@ void sample_sort ( iter_t first, iter_t last,
 template < class iter_t >
 void indirect_sample_sort ( iter_t first, iter_t last ,
                                    NThread NT = NThread() )
-{   //------------------------------- begin--------------------------
-    typedef std::less <typename iterator_traits<iter_t>::value_type> compare ;
+{
+    //------------------------------- begin--------------------------
+    typedef std::less <typename std::iterator_traits<iter_t>::value_type> compare ;
     typedef less_ptr_no_null <iter_t, compare>      compare_ptr ;
 
     std::vector<iter_t> VP ;
     create_index ( first , last , VP);
     sample_sort  ( VP.begin() , VP.end(), compare_ptr(),NT );
     sort_index ( first , VP) ;
-};
+}
 //
 //-----------------------------------------------------------------------------
 //  function : indirect_sample_sort
@@ -508,23 +518,24 @@ void indirect_sample_sort ( iter_t first, iter_t last ,
 //-----------------------------------------------------------------------------
 template < class iter_t,
           typename
-          compare = std::less <typename iterator_traits<iter_t>::value_type> >
+          compare = std::less <typename std::iterator_traits<iter_t>::value_type> >
 void indirect_sample_sort ( iter_t first, iter_t last,
                             compare comp1, NThread NT = NThread() )
-{   //----------------------------- begin ----------------------------------
+{
+    //----------------------------- begin ----------------------------------
     typedef less_ptr_no_null <iter_t, compare>      compare_ptr ;
 
     std::vector<iter_t> VP ;
     create_index ( first , last , VP);
     sample_sort  ( VP.begin() , VP.end(), compare_ptr(comp1),NT );
     sort_index ( first , VP) ;
-};
+}
 //
 //****************************************************************************
-};//    End namespace algorithm
-};//    End namespace parallel
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace boost
+}//    End namespace algorithm
+}//    End namespace parallel
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace boost
 //****************************************************************************
 //
 #endif

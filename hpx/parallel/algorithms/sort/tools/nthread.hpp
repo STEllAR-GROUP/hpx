@@ -4,7 +4,7 @@
 ///        pass to the para llel algorithms the number of threads to use
 /// @author Copyright(c) 2015 Francisco José Tapia (fjtapia@gmail.com )\n
 ///         Distributed under the Boost Software License, Version 1.0.\n
-///         ( See accompanyingfile LICENSE_1_0.txt or copy at
+///         (See accompanyingfile LICENSE_1_0.txt or copy at
 ///           http://www.boost.org/LICENSE_1_0.txt  )
 /// @version 0.1
 ///
@@ -39,31 +39,29 @@ namespace tools
 /// @remarks The empty construct load the object with the number of HW threads
 ///          in the actual machine
 //---------------------------------------------------------------------------
-static const uint32_t NThread_HW = std::thread::hardware_concurrency();
+static const std::uint32_t NThread_HW = std::thread::hardware_concurrency();
+
 class NThread
-{   uint32_t num_th ;
+{
+    std::uint32_t num_th;
 
 public:
-    NThread ( void): num_th ( NThread_HW){};
-    NThread ( const NThread & Number):num_th ( Number.num_th){};
-    NThread ( uint32_t Nmb ):num_th ((Nmb< 2)?1:Nmb ){};
+    NThread (void) : num_th (NThread_HW) {}
+    NThread (std::uint32_t Nmb ) : num_th ((Nmb< 2)?1:Nmb ) {}
 
-    uint32_t operator () ( void)const { return num_th;};
+    std::uint32_t operator () (void) const { return num_th; }
 
-    NThread & operator = (const NThread & Number)
-    {   num_th = Number.num_th ;
+    NThread & operator= (std::uint32_t Nmb)
+    {
+        num_th = (Nmb < 2) ? 1 : Nmb;
         return *this ;
-    };
-    NThread & operator= ( uint32_t Nmb)
-    {   num_th = ( Nmb < 2)?1:Nmb;
-        return *this ;
-    };
+    }
 };
 
 //****************************************************************************
-};//    End namespace tools
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace parallel
-};//    End namespace hpx
+}//    End namespace tools
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace parallel
+}//    End namespace hpx
 //****************************************************************************
 #endif

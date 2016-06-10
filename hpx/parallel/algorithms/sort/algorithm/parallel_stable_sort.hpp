@@ -25,17 +25,14 @@
 
 #include <hpx/parallel/algorithms/sort/algorithm/indirect.hpp>
 
+namespace hpx {
+namespace parallel {
+HPX_INLINE_NAMESPACE(v2) { namespace boostsort {
+namespace algorithm {
 
-
-namespace hpx		{
-namespace parallel	{    
-HPX_INLINE_NAMESPACE(v2) { namespace boostsort		{
-namespace algorithm	{
-
-using std::iterator_traits ;
 namespace bspu = util;
-using hpx::parallel::v2::boostsort::tools::NThread ;
-using hpx::parallel::v2::boostsort::tools::NThread_HW ;
+using hpx::parallel::v2::boostsort::tools::NThread;
+using hpx::parallel::v2::boostsort::tools::NThread_HW;
 //
 ///---------------------------------------------------------------------------
 /// @struct parallel_stable_sort_tag
@@ -44,21 +41,21 @@ using hpx::parallel::v2::boostsort::tools::NThread_HW ;
 //----------------------------------------------------------------------------
 template < class iter_t,
           typename compare 
-          = std::less < typename iterator_traits<iter_t>::value_type >
+          = std::less < typename std::iterator_traits<iter_t>::value_type >
         >
 struct parallel_stable_sort_tag
 {
 //-------------------------------------------------------------------------
 //                      DEFINITIONS
 //-------------------------------------------------------------------------
-typedef typename iterator_traits<iter_t>::value_type value_t ;
+typedef typename std::iterator_traits<iter_t>::value_type value_t;
 
 //-------------------------------------------------------------------------
 //                     VARIABLES
 //-------------------------------------------------------------------------
-size_t NElem ;
-value_t *Ptr ;
-const size_t NELEM_MIN = 1<<16 ;
+std::size_t NElem;
+value_t *Ptr;
+const std::size_t NELEM_MIN = 1<<16;
 
 //#########################################################################
 //
@@ -84,8 +81,8 @@ parallel_stable_sort_tag ( range<iter_t> R, compare comp, NThread NT=NThread());
 //-----------------------------------------------------------------------------
 ~parallel_stable_sort_tag ()
 {   //------------------------------- begin ----------------------------------
-    if ( Ptr != nullptr) std::return_temporary_buffer ( Ptr) ;
-};
+    if ( Ptr != nullptr) std::return_temporary_buffer ( Ptr);
+}
 //----------------------------------------------------------------------------
 };// end struct parallel_stable_sort_tag
 //----------------------------------------------------------------------------
@@ -103,23 +100,25 @@ template < class iter_t, typename compare >
 parallel_stable_sort_tag<iter_t,compare>::
 parallel_stable_sort_tag ( range<iter_t> R, compare comp,
                            NThread NT ):NElem(0),Ptr(nullptr)
-{   //------------------------------- begin -----------------------------
-	assert ( R.valid());
+{
+    //------------------------------- begin -----------------------------
+    HPX_ASSERT ( R.valid());
 
-    NElem = R.size() ;
-    size_t NPtr = ( NElem +1 )>>1 ;
+    NElem = R.size();
+    std::size_t NPtr = ( NElem +1 )>>1;
 
     if ( NElem < NELEM_MIN or NT() == 1)
-    {   spin_sort ( R.first , R.last, comp );
-        return ;
-    };
+    {
+        spin_sort ( R.first , R.last, comp );
+        return;
+    }
     //------------------- check if sort --------------------------------------
-    bool SW = true ;
-    for ( iter_t it1 = R.first, it2 = R.first+1 ;
-          it2 != R.last and (SW = not comp(*it2,*it1));it1 = it2++);
-    if (SW) return ;
+    bool SW = true;
+    for ( iter_t it1 = R.first, it2 = R.first+1;
+          it2 != R.last && (SW = !comp(*it2,*it1));it1 = it2++);
+    if (SW) return;
 
-    Ptr = std::get_temporary_buffer<value_t>(NPtr).first ;
+    Ptr = std::get_temporary_buffer<value_t>(NPtr).first;
     if ( Ptr == nullptr) throw std::bad_alloc();
 
     //---------------------------------------------------------------------
@@ -132,7 +131,7 @@ parallel_stable_sort_tag ( range<iter_t> R, compare comp,
 
     Rbuf = init_move (Rbuf, R1);
     R = half_merge (R, Rbuf, R2, comp );
-}; // end of constructor
+} // end of constructor
 //
 //-----------------------------------------------------------------------------
 //  function : parallel_stable_sort
@@ -146,11 +145,12 @@ parallel_stable_sort_tag ( range<iter_t> R, compare comp,
 template < class iter_t >
 void parallel_stable_sort ( iter_t first, iter_t last ,
                             const NThread &NT = NThread() )
-{   //------------------------------- begin ----------------------------------
-    typedef std::less<typename iterator_traits<iter_t>::value_type > compare;
+{
+    //------------------------------- begin ----------------------------------
+    typedef std::less<typename std::iterator_traits<iter_t>::value_type > compare;
     range<iter_t> R ( first, last);
     parallel_stable_sort_tag <iter_t,compare> ( R,compare(), NT);
-};
+}
 //
 //-----------------------------------------------------------------------------
 //  function : parallel_stable_sort
@@ -163,13 +163,14 @@ void parallel_stable_sort ( iter_t first, iter_t last ,
 ///                  in the process. By default is the number of thread HW
 //-----------------------------------------------------------------------------
 template < class iter_t,
-          typename compare = std::less <typename iterator_traits<iter_t>::value_type> >
+          typename compare = std::less <typename std::iterator_traits<iter_t>::value_type> >
 void parallel_stable_sort ( iter_t first, iter_t last,
                            compare comp1, NThread NT = NThread() )
-{   //----------------------------- begin ----------------------------------
+{
+    //----------------------------- begin ----------------------------------
     range<iter_t> R ( first, last);
     parallel_stable_sort_tag<iter_t,compare> ( R,comp1,NT);
-};
+}
 
 //############################################################################
 //                                                                          ##
@@ -189,15 +190,16 @@ void parallel_stable_sort ( iter_t first, iter_t last,
 template < class iter_t >
 void indirect_parallel_stable_sort ( iter_t first, iter_t last ,
                                       NThread NT = NThread() )
-{   //------------------------------- begin--------------------------
-    typedef std::less <typename iterator_traits<iter_t>::value_type> compare ;
-    typedef less_ptr_no_null <iter_t, compare>      compare_ptr ;
+{
+    //------------------------------- begin--------------------------
+    typedef std::less <typename std::iterator_traits<iter_t>::value_type> compare;
+    typedef less_ptr_no_null <iter_t, compare>      compare_ptr;
 
-    std::vector<iter_t> VP ;
+    std::vector<iter_t> VP;
     create_index ( first , last , VP);
     parallel_stable_sort  ( VP.begin() , VP.end(), compare_ptr(),NT );
-    sort_index ( first , VP) ;
-};
+    sort_index ( first , VP);
+}
 //
 //-----------------------------------------------------------------------------
 //  function : indirect_parallel_stable_sort
@@ -211,23 +213,24 @@ void indirect_parallel_stable_sort ( iter_t first, iter_t last ,
 //-----------------------------------------------------------------------------
 template < class iter_t,
           typename compare 
-          = std::less <typename iterator_traits<iter_t>::value_type> >
+          = std::less <typename std::iterator_traits<iter_t>::value_type> >
 void indirect_parallel_stable_sort ( iter_t first, iter_t last,
                                     compare comp1, NThread NT = NThread() )
-{   //----------------------------- begin ----------------------------------
-    typedef less_ptr_no_null <iter_t, compare>      compare_ptr ;
+{
+    //----------------------------- begin ----------------------------------
+    typedef less_ptr_no_null <iter_t, compare>      compare_ptr;
 
-    std::vector<iter_t> VP ;
+    std::vector<iter_t> VP;
     create_index ( first , last , VP);
     parallel_stable_sort  ( VP.begin() , VP.end(), compare_ptr(comp1),NT );
-    sort_index ( first , VP) ;
-};
+    sort_index ( first , VP);
+}
 //
 //****************************************************************************
-};//    End namespace algorithm
-};//    End namespace parallel
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace boost
+}//    End namespace algorithm
+}//    End namespace parallel
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace boost
 //****************************************************************************
 //
 #endif

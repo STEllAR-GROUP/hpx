@@ -34,7 +34,7 @@ HPX_INLINE_NAMESPACE(v2) { namespace boostsort
 namespace util
 {
 
-using std::iterator_traits ;
+using std::iterator_traits;
 
 
 ///---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ using std::iterator_traits ;
 template <class iter_t>
 struct range
 {   //------------------------ variables -------------------
-    iter_t first , last ;
+    iter_t first , last;
 
     //------------------------- functions ------------------
     range ( void){};
@@ -70,9 +70,9 @@ template <class iter_t>
 range<iter_t> concat ( const range<iter_t> &it1 , const range <iter_t> &it2 )
 {	//--------------------------- begin -------------------------------------
 #if __DEBUG_SORT != 0
-	assert ( it1.last == it2.first ) ;
+    HPX_ASSERT ( it1.last == it2.first );
 #endif
-	return range<iter_t> ( it1.first , it2.last ) ;
+    return range<iter_t> ( it1.first , it2.last );
 };
 //
 //-----------------------------------------------------------------------------
@@ -86,20 +86,20 @@ range<iter_t> concat ( const range<iter_t> &it1 , const range <iter_t> &it2 )
 //-----------------------------------------------------------------------------
 template <class iter1_t , class iter2_t >
 inline range<iter2_t> init_move ( const range<iter2_t> & dest,
-		                     const range<iter1_t> & src)
+                             const range<iter1_t> & src)
 {   //------------- static checking ------------------------------------------
-	typedef typename iterator_traits<iter1_t>::value_type type1 ;
-    typedef typename iterator_traits<iter2_t>::value_type type2 ;
+    typedef typename iterator_traits<iter1_t>::value_type type1;
+    typedef typename iterator_traits<iter2_t>::value_type type2;
     static_assert ( std::is_same<type1, type2>::value,
                     "Incompatible iterators\n");
 
     //------------------------------- begin ----------------------------------
     if ( src.size() == 0 ) return range<iter2_t>(dest.first, dest.first);
 #if __DEBUG_SORT != 0
-    assert ( dest.size() >= src.size() ) ;
+    HPX_ASSERT ( dest.size() >= src.size() );
 #endif
     lwl::init_move(dest.first ,src.first, src.last  );
-    return range<iter2_t>(dest.first, dest.first + src.size()) ;
+    return range<iter2_t>(dest.first, dest.first + src.size());
 };
 //-----------------------------------------------------------------------------
 //  function : uninit_move
@@ -112,20 +112,20 @@ inline range<iter2_t> init_move ( const range<iter2_t> & dest,
 //-----------------------------------------------------------------------------
 template <class iter1_t ,class iter2_t >
 inline range<iter2_t> uninit_move ( const range<iter2_t> &dest,
-		                            const range<iter1_t> &src  )
+                                    const range<iter1_t> &src  )
 {   //------------- static checking ------------------------------------------
-	typedef typename iterator_traits<iter1_t>::value_type type1 ;
-    typedef typename iterator_traits<iter2_t>::value_type type2 ;
+    typedef typename iterator_traits<iter1_t>::value_type type1;
+    typedef typename iterator_traits<iter2_t>::value_type type2;
     static_assert ( std::is_same<type1, type2>::value,
                     "Incompatible iterators\n");
 
     //------------------------------- begin ----------------------------------
     if ( src.size() == 0 ) return range<iter2_t>(dest.first, dest.first);
 #if __DEBUG_SORT != 0
-    assert ( dest.size() >= src.size() ) ;
+    HPX_ASSERT ( dest.size() >= src.size() );
 #endif
     lwl::uninit_move (dest.first,src.first, src.last  );
-    return range<iter2_t>(dest.first, dest.first + src.size()) ;
+    return range<iter2_t>(dest.first, dest.first + src.size());
 };
 //
 //-----------------------------------------------------------------------------
@@ -136,7 +136,7 @@ inline range<iter2_t> uninit_move ( const range<iter2_t> &dest,
 template <class iter_t >
 inline void destroy ( range<iter_t> r)
 {   //----------------- begin ---------------------------
-	lwl::destroy ( r.first, r.last);
+    lwl::destroy ( r.first, r.last);
 };
 //
 //-----------------------------------------------------------------------------
@@ -149,11 +149,12 @@ inline void destroy ( range<iter_t> r)
 //-----------------------------------------------------------------------------
 template <class iter_t >
 inline range<iter_t> init ( const range<iter_t> & r,
-				            typename iterator_traits< iter_t>::value_type & val)
-{   //----------------- begin ---------------------------
-	lwl::init ( r.first, r.last , val);
-	return r ;
-};
+    typename iterator_traits< iter_t>::value_type & val)
+{
+    //----------------- begin ---------------------------
+    lwl::init ( r.first, r.last , val);
+    return r;
+}
 //
 //-----------------------------------------------------------------------------
 //  function : full_merge
@@ -171,21 +172,22 @@ template <class iter1_t, class iter2_t, class iter3_t, class compare >
 inline range<iter3_t> full_merge ( const range<iter3_t> &dest,
                                    const range<iter1_t> &src1,
                                    const range<iter2_t> &src2, compare  comp )
-{   //------------------- metaprogramming ------------------------------------
-	typedef typename iterator_traits<iter1_t>::value_type type1 ;
-    typedef typename iterator_traits<iter2_t>::value_type type2 ;
-    typedef typename iterator_traits<iter3_t>::value_type type3 ;
+{
+    //------------------- metaprogramming ------------------------------------
+    typedef typename iterator_traits<iter1_t>::value_type type1;
+    typedef typename iterator_traits<iter2_t>::value_type type2;
+    typedef typename iterator_traits<iter3_t>::value_type type3;
     static_assert ( std::is_same<type1, type2>::value,
                    "Incompatible iterators\n");
     static_assert ( std::is_same<type3, type2>::value,
                    "Incompatible iterators\n");
     //--------------------- code -------------------------------------------
 #if __DEBUG_SORT != 0
-    assert ( dest.size() >= ( src1.size() + src2.size() ) ) ;
+    HPX_ASSERT ( dest.size() >= ( src1.size() + src2.size() ) );
 #endif
     return range<iter3_t> (dest.first,lwl::full_merge ( src1.first, src1.last,
-    		               src2.first, src2.last , dest.first, comp) );
-};
+                           src2.first, src2.last , dest.first, comp) );
+}
 
 //-----------------------------------------------------------------------------
 //  function : uninit_full_merge
@@ -203,23 +205,24 @@ template <class iter1_t, class iter2_t, class value_t, class compare >
 inline range<value_t*> uninit_full_merge ( const range<value_t *> &dest,
                                            const range<iter1_t> &src1,
                                            const range<iter2_t> &src2,
-										   compare  comp                  )
-{   //------------------- metaprogramming ------------------------------------
-	typedef typename iterator_traits<iter1_t>::value_type type1 ;
-    typedef typename iterator_traits<iter2_t>::value_type type2 ;
+                                           compare  comp                  )
+{
+    //------------------- metaprogramming ------------------------------------
+    typedef typename iterator_traits<iter1_t>::value_type type1;
+    typedef typename iterator_traits<iter2_t>::value_type type2;
     static_assert ( std::is_same<type1, type2>::value,
                    "Incompatible iterators\n");
     static_assert ( std::is_same<value_t, type2>::value,
                    "Incompatible iterators\n");
     //--------------------- code -------------------------------------------
 #if __DEBUG_SORT != 0
-    assert ( dest.size() >= ( src1.size() + src2.size() ) ) ;
+    HPX_ASSERT ( dest.size() >= ( src1.size() + src2.size() ) );
 #endif
     return range<value_t *> (dest.first,
-    			             lwl::uninit_full_merge( src1.first, src1.last,
-    			        		                     src2.first, src2.last ,
-												     dest.first, comp      ));
-};
+                             lwl::uninit_full_merge( src1.first, src1.last,
+                                                     src2.first, src2.last ,
+                                                     dest.first, comp      ));
+}
 //
 //---------------------------------------------------------------------------
 //  function : half_merge
@@ -234,24 +237,25 @@ inline range<value_t*> uninit_full_merge ( const range<value_t *> &dest,
 //---------------------------------------------------------------------------
 template <class iter1_t, class iter2_t, class compare >
 inline range<iter2_t> half_merge ( 	const range<iter2_t> &dest,
-									const range<iter1_t> &src1,
-									const range<iter2_t> &src2, compare  comp )
-{   //---------------------------- begin ------------------------------------
-	typedef typename iterator_traits<iter1_t>::value_type       type1 ;
-	typedef typename iterator_traits<iter2_t>::value_type       type2 ;
+                                    const range<iter1_t> &src1,
+                                    const range<iter2_t> &src2, compare  comp )
+{
+    //---------------------------- begin ------------------------------------
+    typedef typename iterator_traits<iter1_t>::value_type       type1;
+    typedef typename iterator_traits<iter2_t>::value_type       type2;
     static_assert ( std::is_same<type1, type2>::value,
                    "Incompatible iterators\n");
 
     //--------------------- code -------------------------------------------
 #if __DEBUG_SORT != 0
-    assert (( src2.first - dest.first) >= 0 and
-    		 size_t ( src2.first - dest.first) == src1.size() ) ;
-    assert ( dest.size() >= (src1.size() + src2.size() ) ) ;
+    HPX_ASSERT (( src2.first - dest.first) >= 0 and
+             size_t ( src2.first - dest.first) == src1.size() );
+    HPX_ASSERT ( dest.size() >= (src1.size() + src2.size() ) );
 #endif
     return range<iter2_t>( dest.first ,
                            lwl::half_merge ( src1.first , src1.last,
                                              src2.first, src2.last,
-											 dest.first, comp         ) );
+                                             dest.first, comp         ) );
 };
 //
 //-----------------------------------------------------------------------------
@@ -270,12 +274,13 @@ inline range<iter2_t> half_merge ( 	const range<iter2_t> &dest,
 //-----------------------------------------------------------------------------
 template <class iter1_t  , class iter2_t , class iter3_t, class compare >
 bool in_place_merge_uncontiguous ( const range<iter1_t> &src1,
-		                           const range<iter2_t> &src2,
+                                   const range<iter2_t> &src2,
                                    const range<iter3_t> &aux, compare comp)
-{	//------------------- metaprogramming ------------------------------------
-	typedef typename iterator_traits<iter1_t>::value_type type1 ;
-    typedef typename iterator_traits<iter2_t>::value_type type2 ;
-    typedef typename iterator_traits<iter3_t>::value_type type3 ;
+{
+    //------------------- metaprogramming ------------------------------------
+    typedef typename iterator_traits<iter1_t>::value_type type1;
+    typedef typename iterator_traits<iter2_t>::value_type type2;
+    typedef typename iterator_traits<iter3_t>::value_type type3;
 
     static_assert ( std::is_same<type1, type2>::value,
                    "Incompatible iterators\n");
@@ -283,12 +288,12 @@ bool in_place_merge_uncontiguous ( const range<iter1_t> &src1,
                    "Incompatible iterators\n");
     //--------------------- code -------------------------------------------
 #if __DEBUG_SORT != 0
-    assert ( aux.size() >= src1.size() ) ;
+    HPX_ASSERT ( aux.size() >= src1.size() );
 #endif
-	return lwl::in_place_merge_uncontiguous ( src1.first, src1.last,
-	                                          src2.first, src2.last,
-	                                          aux.first, comp );
-};
+    return lwl::in_place_merge_uncontiguous ( src1.first, src1.last,
+                                              src2.first, src2.last,
+                                              aux.first, comp );
+}
 
 //
 //-----------------------------------------------------------------------------
@@ -307,29 +312,29 @@ bool in_place_merge_uncontiguous ( const range<iter1_t> &src1,
 //-----------------------------------------------------------------------------
 template <class iter1_t  , class iter2_t , class compare >
 inline range<iter1_t> in_place_merge (const range<iter1_t> &src1,
-									  const range<iter1_t> &src2,
-									  const range<iter2_t> &buf, compare  comp )
+                                      const range<iter1_t> &src2,
+                                      const range<iter2_t> &buf, compare  comp )
 {   //---------------------------- begin ------------------------------------
-	typedef typename iterator_traits<iter1_t>::value_type type1 ;
-    typedef typename iterator_traits<iter2_t>::value_type type2 ;
+    typedef typename iterator_traits<iter1_t>::value_type type1;
+    typedef typename iterator_traits<iter2_t>::value_type type2;
 
     static_assert ( std::is_same<type1, type2>::value,
                    "Incompatible iterators\n");
     //---------------------------- begin --------------------------------------
 #if __DEBUG_SORT != 0
-    assert ( src1.last == src2.first) ;
-    assert ( buf.size() >= src1.size() ) ;
+    HPX_ASSERT ( src1.last == src2.first);
+    HPX_ASSERT ( buf.size() >= src1.size() );
 #endif
-	lwl::in_place_merge ( src1.first , src1.last,
-	                      src2.last, buf.first, comp );
-	return concat ( src1, src2);
-};
+    lwl::in_place_merge ( src1.first , src1.last,
+                          src2.last, buf.first, comp );
+    return concat ( src1, src2);
+}
 //
 //****************************************************************************
-};//    End namespace util
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace parallel
-};//    End namespace hpx
+}//    End namespace util
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace parallel
+}//    End namespace hpx
 //****************************************************************************
 //
 #endif

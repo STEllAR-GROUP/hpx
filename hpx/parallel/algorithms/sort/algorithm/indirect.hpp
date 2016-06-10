@@ -21,12 +21,11 @@
 
 
 
-namespace hpx		{
-namespace parallel	{
-HPX_INLINE_NAMESPACE(v2) { namespace boostsort		{
-namespace algorithm	{
+namespace hpx {
+namespace parallel{
+HPX_INLINE_NAMESPACE(v2) { namespace boostsort {
+namespace algorithm {
 
-using std::iterator_traits ;
 //
 //##########################################################################
 //                                                                        ##
@@ -42,7 +41,7 @@ using std::iterator_traits ;
 //---------------------------------------------------------------------------
 template    <   class iter_t ,
                 class comp_t
-				=std::less<typename iterator_traits<iter_t>::value_type> >
+                =std::less<typename std::iterator_traits<iter_t>::value_type> >
 struct less_ptr_no_null
 {   //----------------------------- Variables -----------------------
     comp_t comp ;
@@ -51,7 +50,7 @@ struct less_ptr_no_null
     inline bool operator ()( iter_t  T1,  iter_t  T2 ) const
     {   //-------------------- begin ------------------------------
         return  comp(*T1 ,*T2);
-    };
+    }
 };
 //
 //-----------------------------------------------------------------------------
@@ -70,7 +69,7 @@ void create_index (iter_t first, iter_t last, std::vector<iter_t> &VP )
     VP.clear() ;
     VP.reserve ( N1);
     for ( ; first != last ; ++first) VP.push_back( first);
-};
+}
 //
 //-----------------------------------------------------------------------------
 //  function : sort_index
@@ -81,12 +80,14 @@ void create_index (iter_t first, iter_t last, std::vector<iter_t> &VP )
 //-----------------------------------------------------------------------------
 template <class iter_t>
 void sort_index (iter_t first, std::vector<iter_t> &VP )
-{   //-------------------------- begin -------------------------------------
-    typedef typename iterator_traits<iter_t>::value_type       value_t ;
+{
+    //-------------------------- begin -------------------------------------
+    typedef typename std::iterator_traits<iter_t>::value_type       value_t ;
     size_t Ax  = 0 , Bx =0 , Pos =0 , N = VP.size();
     iter_t itA, itB ;
     while ( Pos < N )
-    {   while  ( Pos < N and (size_t (VP[Pos]-first)) == Pos ) ++Pos;
+    {
+        while  ( Pos < N and (size_t (VP[Pos]-first)) == Pos ) ++Pos;
         if ( Pos == N ) return ;
         Ax = Bx = Pos ;
         itA = first + Ax  ;
@@ -97,18 +98,18 @@ void sort_index (iter_t first, std::vector<iter_t> &VP )
             *itA = std::move ( *itB);
             itA = itB ;
             Ax = Bx ;
-        };
+        }
         *itA = std::move ( Aux ) ;
         VP[Ax] = itA ;
         ++Pos ;
-    };
-};
+    }
+}
 //
 //****************************************************************************
-};//    End namespace algorithm
-};//    End namespace parallel
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace boost
+}//    End namespace algorithm
+}//    End namespace parallel
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace boost
 //****************************************************************************
 //
 #endif

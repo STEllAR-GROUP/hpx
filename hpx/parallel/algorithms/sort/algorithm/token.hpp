@@ -58,10 +58,10 @@ struct token_level
 };
 //
 //****************************************************************************
-};//    End namespace algorithm
-};};//    End HPX_INLINE_NAMESPACE(v2) 
-};//    End namespace parallel
-};//    End namespace hpx
+}//    End namespace algorithm
+}}//    End HPX_INLINE_NAMESPACE(v2) 
+}//    End namespace parallel
+}//    End namespace hpx
 //****************************************************************************
 //
 #endif
