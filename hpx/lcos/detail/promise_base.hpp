@@ -16,10 +16,12 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <memory>
 #include <utility>
 
 namespace hpx {
@@ -95,30 +97,24 @@ namespace lcos {
               , id_retrieved_(false)
             {
                 // The lifetime of the LCO (component) part is completely
-                // handled
-                // by the shared state, we create the object to get our gid
-                // and then attach it to the completion handler.
-                boost::intrusive_ptr<wrapping_type> lco_ptr(
+                // handled by the shared state, we create the object to get our
+                // gid and then attach it to the completion handler of the
+                // shared
+                // state.
+                typedef std::unique_ptr<wrapping_type> wrapping_ptr;
+                wrapping_ptr                           lco_ptr(
                     new wrapping_type(new wrapped_type(this->shared_state_)));
-
-                auto f = [lco_ptr]() mutable {
-                    // The count of our lco_ptr needs to be 2:
-                    //  - The first one is in the intrusive_ptr
-                    //  - The second was done in the managed_component ctor
-                    HPX_ASSERT((*lco_ptr)->count() == 2);
-                    wrapping_type* back_ptr = lco_ptr.get();
-                    lco_ptr.reset();
-
-                    // We need to manually free our back pointer to further
-                    // decrease our reference count.
-                    delete back_ptr;
-                };
-                this->shared_state_->set_on_completed(std::move(f));
 
                 id_   = lco_ptr->get_unmanaged_id();
                 addr_ = naming::address(hpx::get_locality(),
                     lco_ptr->get_component_type(),
                     lco_ptr.get());
+
+                // This helper is used to keep the component alive until the
+                // completion handler has been called.
+                auto keep_alive = hpx::util::deferred_call(
+                    [](wrapping_ptr ptr) {}, std::move(lco_ptr));
+                this->shared_state_->set_on_completed(std::move(keep_alive));
             }
 
             promise_base(promise_base&& other) HPX_NOEXCEPT
@@ -206,15 +202,13 @@ namespace lcos {
         protected:
             void check_abandon_shared_state(const char* fun)
             {
-                // FIXME: add proper check here
-                //             if (this->shared_state_ != 0 &&
-                //             this->future_retrieved_ &&
-                //                 !this->has_result_ && !id_retrieved_)
-                //             {
-                //                 this->shared_state_->set_error(broken_promise,
-                //                 fun,
-                //                     "abandoning not ready shared state");
-                //             }
+                if (this->shared_state_ != 0 && this->future_retrieved_ &&
+                    !id_retrieved_)
+                {
+                    this->shared_state_->set_error(broken_promise,
+                        fun,
+                        "abandoning not ready shared state");
+                }
             }
             mutable bool id_retrieved_;
 

@@ -64,7 +64,6 @@ namespace lcos {
         public:
             promise_lco_base(shared_state_ptr const& shared_state)
               : shared_state_(shared_state)
-              , count_(0)
             {
             }
 
@@ -90,39 +89,20 @@ namespace lcos {
                 value = components::component_promise
             };
 
-            void add_ref()
-            {
-                intrusive_ptr_add_ref(this);
-            }
-
-            void release()
-            {
-                intrusive_ptr_release(this);
-            }
-
-            long count() const
-            {
-                return this->count_;
-            }
-
         protected:
             shared_state_ptr shared_state_;
 
         private:
-            // disambiguate reference counting
+            // disambiguate reference counting, noop since we don't require
+            // reference counting here.
             friend void intrusive_ptr_add_ref(promise_lco_base* p)
             {
-                ++p->count_;
             }
 
             friend void intrusive_ptr_release(promise_lco_base* p)
             {
-                --p->count_;
-                if (p->count() == 0)
-                    delete p;
+                delete p;
             }
-
-            hpx::util::atomic_count count_;
         };
 
         template <typename Result, typename RemoteResult>
