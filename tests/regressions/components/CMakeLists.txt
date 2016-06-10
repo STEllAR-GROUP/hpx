@@ -5,6 +5,7 @@
 
 set(tests
     moveonly_constructor_arguments_1405
+    partitioned_vector_2201
     returned_client_2150
    )
 
