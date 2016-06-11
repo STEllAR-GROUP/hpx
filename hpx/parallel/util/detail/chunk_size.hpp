@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         bool variable_chunk_sizes = traits::variable_chunk_size(
             policy.parameters(), policy.executor());
-        std::size_t max_chunk_size = traits::maximal_number_of_chunks(
+        std::size_t max_chunks = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores);
 
         std::vector<tuple_type> shape;
@@ -102,8 +102,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 traits::get_chunk_size(policy.parameters(),
                     policy.executor(), test_function, count);
 
-            if (chunk_size < (count / max_chunk_size))
-                chunk_size = (count + max_chunk_size - 1) / cores;
+            if (chunk_size < (count / max_chunks))
+                chunk_size = (count / max_chunks);
 
             if (stride != 1)
             {
@@ -131,8 +131,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     traits::get_chunk_size(policy.parameters(),
                         policy.executor(), [](){ return 0; }, count);
 
-                if (chunk_size < (count / max_chunk_size))
-                    chunk_size = (count + max_chunk_size - 1) / cores;
+                if (chunk_size < (count / max_chunks))
+                    chunk_size = (count / max_chunks);
 
                 if (stride != 1)
                 {
@@ -199,7 +199,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         bool variable_chunk_sizes = traits::variable_chunk_size(
             policy.parameters(), policy.executor());
-        std::size_t max_chunk_size = traits::maximal_number_of_chunks(
+        std::size_t max_chunks = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores);
 
         std::vector<tuple_type> shape;
@@ -238,8 +238,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 traits::get_chunk_size(policy.parameters(),
                     policy.executor(), test_function, count);
 
-            if (chunk_size < (count / max_chunk_size) )
-                chunk_size = (count + max_chunk_size - 1) / cores;
+            if (chunk_size < (count / max_chunks))
+                chunk_size = (count / max_chunks);
 
             if (stride != 1)
             {
@@ -269,8 +269,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     traits::get_chunk_size(policy.parameters(),
                         policy.executor(), [](){ return 0; }, count);
 
-                if (chunk_size < (count / max_chunk_size))
-                    chunk_size = (count + max_chunk_size - 1) / cores;
+                if (chunk_size < (count / max_chunks))
+                    chunk_size = (count / max_chunks);
 
                 if (stride != 1)
                 {
