@@ -29,14 +29,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             typename Enable = void>
         struct counter_increment
         {
-            constexpr static int value = 0;
+            HPX_CONSTEXPR static int value = 0;
         };
 
         template<template<typename> class Condition, typename Arg>
         struct counter_increment<Condition, Arg,
             typename std::enable_if< Condition<Arg>::value>::type >
         {
-            constexpr static int value = 1;
+            HPX_CONSTEXPR static int value = 1;
         };
 
         template<template<typename> class Condition, typename ...Args>
@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template<template<typename> class Condition>
         struct parameter_type_counter<Condition>
         {
-            constexpr static int value = 0;
+            HPX_CONSTEXPR static int value = 0;
         };
 
         /// Return the number of parameters which have been derived from type T.
@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template<template<typename> class Condition, typename Arg1, typename ...Args>
         struct parameter_type_counter<Condition, Arg1, Args...>
         {
-            constexpr static int value =
+            HPX_CONSTEXPR static int value =
                 parameter_type_counter<Condition, Args...>::value +
                 counter_increment<Condition, Arg1>::value;
         };
