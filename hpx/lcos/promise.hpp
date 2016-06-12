@@ -185,21 +185,18 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_gid_locked(
             std::unique_lock<naming::gid_type> l) const
         {
-            if(!naming::detail::has_credits(gid_))
-            {
-                naming::detail::replenish_credits_locked(l, gid_);
-            }
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
             hpx::future<naming::gid_type> gid =
                 naming::detail::split_gid_if_needed_locked(l, gid_);
             l.unlock();
-            naming::gid_type result = gid.get();
-            return naming::id_type(result, naming::id_type::managed);
+            return naming::id_type(gid.get(), naming::id_type::managed);
         }
 
     protected:
         naming::gid_type get_base_gid() const
         {
             HPX_ASSERT(gid_ != naming::invalid_gid);
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
             return gid_;
         }
 
@@ -297,6 +294,7 @@ namespace hpx { namespace lcos { namespace detail
         bool requires_delete()
         {
             long count = --this->count_;
+
             // special precautions for it to go out of scope
             // We can safely give up our credit that we hold for the shared
             // state, since we know that the other credit is either on flight
@@ -304,6 +302,7 @@ namespace hpx { namespace lcos { namespace detail
             if (count == 1)
             {
                 std::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
+
                 // if the count is one, the only remaining reference is in AGAS
                 if (naming::detail::has_credits(this->gid_) )
                 {
@@ -318,7 +317,8 @@ namespace hpx { namespace lcos { namespace detail
                     naming::id_type id (gid, id_type::managed);
                     l.unlock();
                 }
-            }
+
+                return false;            }
 
             return 0 == count;
         }
@@ -359,6 +359,7 @@ namespace hpx { namespace lcos { namespace detail
             HPX_ASSERT(bp);
             HPX_ASSERT(this->gid_ == naming::invalid_gid);
             this->gid_ = bp->get_base_gid();
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
         }
     };
 
@@ -382,6 +383,7 @@ namespace hpx { namespace lcos { namespace detail
             HPX_ASSERT(bp);
             HPX_ASSERT(this->gid_ == naming::invalid_gid);
             this->gid_ = bp->get_base_gid();
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
         }
     };
 }}}
