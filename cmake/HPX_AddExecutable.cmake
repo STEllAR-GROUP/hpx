@@ -116,8 +116,23 @@ macro(add_hpx_executable name)
     set(exclude_from_all ${exclude_from_all} EXCLUDE_FROM_DEFAULT_BUILD TRUE)
   endif()
 
-  add_executable(${name}_exe
-    ${${name}_SOURCES} ${${name}_HEADERS})
+  if(HPX_WITH_CUDA_CLANG)
+    foreach(source ${${name}_SOURCES})
+      get_filename_component(extension ${source} EXT)
+      if(${extension} STREQUAL ".cu")
+        message(${extension})
+        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES LANGUAGE CXX)
+      endif()
+    endforeach()
+  endif()
+
+  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
+    cuda_add_executable(${name}_exe
+      ${${name}_SOURCES} ${${name}_HEADERS})
+  else()
+    add_executable(${name}_exe
+      ${${name}_SOURCES} ${${name}_HEADERS})
+  endif()
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)

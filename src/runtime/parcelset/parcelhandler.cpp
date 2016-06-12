@@ -393,11 +393,12 @@ namespace hpx { namespace parcelset
         // addressing_service::resolve_locality.
 
         // if this isn't an HPX thread, the stack space check will return false
-        if (!this_thread::has_sufficient_stack_space() && !hpx::is_starting())
+        if (!this_thread::has_sufficient_stack_space() &&
+            hpx::threads::threadmanager_is(hpx::state::state_running))
         {
-            naming::gid_type locality =
-                naming::get_locality_from_gid(ids[0].get_gid());
-            if (!resolver_->has_resolved_locality(locality))
+//             naming::gid_type locality =
+//                 naming::get_locality_from_gid(ids[0].get_gid());
+//             if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
                 void (parcelhandler::*put_parcel_ptr) (
@@ -408,7 +409,8 @@ namespace hpx { namespace parcelset
                     util::deferred_call(put_parcel_ptr, this,
                         std::move(p), std::move(f)),
                     "parcelhandler::put_parcel", threads::pending, true,
-                    threads::thread_priority_boost);
+                    threads::thread_priority_boost, std::size_t(-1),
+                    threads::thread_stacksize_medium);
                 return;
             }
         }
@@ -495,11 +497,12 @@ namespace hpx { namespace parcelset
         }
 
         // if this isn't an HPX thread, the stack space check will return false
-        if (!this_thread::has_sufficient_stack_space() && !hpx::is_starting())
+        if (!this_thread::has_sufficient_stack_space() &&
+            hpx::threads::threadmanager_is(hpx::state::state_running))
         {
-            naming::gid_type locality = naming::get_locality_from_gid(
-                (*parcels[0].destinations()).get_gid());
-            if (!resolver_->has_resolved_locality(locality))
+//             naming::gid_type locality = naming::get_locality_from_gid(
+//                 (*parcels[0].destinations()).get_gid());
+//             if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
                 void (parcelhandler::*put_parcels_ptr) (
@@ -510,7 +513,8 @@ namespace hpx { namespace parcelset
                     util::deferred_call(put_parcels_ptr, this,
                         std::move(parcels), std::move(handlers)),
                     "parcelhandler::put_parcels", threads::pending, true,
-                    threads::thread_priority_boost);
+                    threads::thread_priority_boost, std::size_t(-1),
+                    threads::thread_stacksize_medium);
                 return;
             }
         }

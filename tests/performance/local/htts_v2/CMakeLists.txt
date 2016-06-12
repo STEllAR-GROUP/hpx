@@ -15,19 +15,19 @@ set(benchmarks
 
 set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
 
-if(OPENMP_FOUND)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks ${benchmarks} htts2_omp)
   set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
 endif()
 
-if(QTHREADS_FOUND)
+if(HPX_WITH_EXAMPLES_QTHREADS)
   include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_qthreads)
   set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY})
 endif()
 
-if(TBB_FOUND)
+if(HPX_WITH_EXAMPLES_TBB)
   include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_tbb)
@@ -59,7 +59,7 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
-if(OPENMP_FOUND)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(htts2_omp_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(htts2_omp_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()

@@ -64,7 +64,11 @@ namespace hpx { namespace util
 
 //////////////////////////////////////////////////////////////////////////////
 // use this to silence compiler warnings related to unused function arguments.
+#if defined(__CUDA_ARCH__)
+#define HPX_UNUSED(x)  (void)x
+#else
 #define HPX_UNUSED(x)  ::hpx::util::unused = (x)
+#endif
 
 #if defined(HPX_MSVC)
 # pragma warning(pop)

@@ -31,6 +31,10 @@ if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs ${subdirs} parallel)
 endif()
 
+if(HPX_WITH_COMPUTE)
+  set(subdirs ${subdirs} computeapi)
+endif()
+
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.${subdir})
   add_subdirectory(${subdir})

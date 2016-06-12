@@ -351,7 +351,7 @@ namespace hpx
 
         /// Register an external OS-thread with HPX
         bool register_thread(char const* name, std::size_t num = 0,
-            bool service_thread = true);
+            bool service_thread = true, error_code& ec = throws);
 
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
@@ -361,9 +361,17 @@ namespace hpx
         notification_policy_type get_notification_policy(char const* prefix);
 
     private:
-        void init_tss(char const* context, std::size_t num, char const* postfix,
-            bool service_thread);
         void deinit_tss();
+
+        void init_tss_ex(char const* context, std::size_t num,
+            char const* postfix, bool service_thread, error_code& ec);
+
+        void init_tss(char const* context, std::size_t num, char const* postfix,
+            bool service_thread)
+        {
+            error_code ec(lightweight);
+            return init_tss_ex(context, num, postfix, service_thread, ec);
+        }
 
     private:
         util::unique_id_ranges id_pool_;

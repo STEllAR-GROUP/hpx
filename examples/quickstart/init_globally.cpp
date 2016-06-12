@@ -118,11 +118,11 @@ struct manage_global_runtime
     // registration of external (to HPX) threads
     void register_thread(char const* name)
     {
-        rts_->register_thread(name);
+        hpx::register_thread(rts_, name);
     }
     void unregister_thread()
     {
-        rts_->unregister_thread();
+        hpx::unregister_thread(rts_);
     }
 
 protected:

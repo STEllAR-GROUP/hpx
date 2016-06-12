@@ -10,7 +10,7 @@ set(HPX_GITCOMMIT_LOADED TRUE)
 if(NOT HPX_WITH_GIT_COMMIT OR "${HPX_WITH_GIT_COMMIT}" STREQUAL "None")
 
   find_package(Git)
-  
+
   if(GIT_FOUND)
     execute_process(
       COMMAND "${GIT_EXECUTABLE}" "log" "--pretty=%H" "-1" "${PROJECT_SOURCE_DIR}"

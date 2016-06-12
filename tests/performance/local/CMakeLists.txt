@@ -4,14 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-################################################################################
-# find dependencies
-################################################################################
-find_package(QThreads)
-find_package(TBB)
-find_package(SWARM)
-find_package(OpenMP)
-
 if(NOT MSVC)
   set(boost_library_dependencies ${Boost_LIBRARIES})
 endif()
@@ -28,7 +20,7 @@ set(benchmarks
     timed_task_spawn
 )
 
-if(OPENMP_FOUND)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks
       ${benchmarks}
       openmp_homogeneous_timed_task_spawn
@@ -38,7 +30,7 @@ if(OPENMP_FOUND)
       DEPENDENCIES ${boost_library_dependencies})
 endif()
 
-if(QTHREADS_FOUND)
+if(HPX_WITH_EXAMPLES_QTHREADS)
   include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks
@@ -56,7 +48,7 @@ if(QTHREADS_FOUND)
                   ${QTHREADS_LIBRARIES})
 endif()
 
-if(TBB_FOUND)
+if(HPX_WITH_EXAMPLES_TBB)
   include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks
@@ -67,19 +59,6 @@ if(TBB_FOUND)
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
                    ${TBB_LIBRARIES})
-endif()
-
-if(SWARM_FOUND)
-  include_directories(${SWARM_INCLUDE_DIR})
-
-  set(benchmarks
-      ${benchmarks}
-      swarm_homogeneous_timed_task_spawn
-     )
-
-  set(swarm_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                   ${SWARM_LIBRARIES})
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
@@ -133,8 +112,11 @@ if(HPX_WITH_CXX11_LAMBDAS)
   set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
   set(partitioned_vector_foreach_FLAGS
     DEPENDENCIES iostreams_component partitioned_vector_component)
-endif()
 
+  if(HPX_WITH_CUDA)
+    set_source_files_properties( stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ )
+  endif()
+endif()
 
 foreach(benchmark ${benchmarks})
   set(sources
@@ -162,7 +144,7 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
-if(OPENMP_FOUND)
+if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe

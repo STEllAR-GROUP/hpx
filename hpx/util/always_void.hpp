@@ -8,7 +8,7 @@
 
 namespace hpx { namespace util
 {
-    template <typename T>
+    template <typename ... T>
     struct always_void
     {
         typedef void type;
