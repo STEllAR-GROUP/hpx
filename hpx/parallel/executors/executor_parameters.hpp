@@ -77,7 +77,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct unwrapper< boost::reference_wrapper<T> >
         {
             template<typename WrapperType>
-            unwrapper(WrapperType && wrap) : wrap(wrap) {}
+            unwrapper(WrapperType && wrapped_param) :
+                wrap(std::forward<WrapperType>(wrapped_param)) {}
 
             template<typename Executor, typename U = T, typename std::enable_if<
                 is_executor_parameters_chunk_size<U>::value >::type* = nullptr
@@ -144,7 +145,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct unwrapper< std::reference_wrapper<T> >
         {
             template<typename WrapperType>
-            unwrapper(WrapperType && wrap) : wrap(wrap) {}
+            unwrapper(WrapperType && wrapped_param) :
+                wrap(std::forward<WrapperType>(wrapped_param)) {}
 
             template<typename Executor, typename U = T, typename std::enable_if<
                 is_executor_parameters_chunk_size<U>::value >::type* = nullptr
