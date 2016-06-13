@@ -21,12 +21,12 @@
 
 #include <hpx/util/integer/cover_operators.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/type_traits/is_signed.hpp>
-#include <boost/cstdint.hpp>
 
-#include <iosfwd>
 #include <climits>
+#include <iosfwd>
 
 # if CHAR_BIT != 8
 #   error Platforms with CHAR_BIT != 8 are not supported

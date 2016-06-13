@@ -12,8 +12,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>

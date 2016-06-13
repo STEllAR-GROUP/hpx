@@ -16,9 +16,9 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
+#include <boost/throw_exception.hpp>
 
 #include <cstddef>
 #include <exception>

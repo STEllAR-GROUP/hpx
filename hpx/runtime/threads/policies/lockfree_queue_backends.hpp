@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/util/lockfree/deque.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lockfree/queue.hpp>
 #include <boost/lockfree/stack.hpp>
-#include <hpx/util/lockfree/deque.hpp>
 
 namespace hpx { namespace threads { namespace policies
 {

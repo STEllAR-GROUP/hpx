@@ -15,12 +15,12 @@
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <boost/iterator/counting_iterator.hpp>
-#include <boost/range/counting_range.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/for_each.hpp>
-#include <unistd.h>
-#include <fcntl.h>
+#include <boost/range/counting_range.hpp>
 #include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #ifndef HPX_PROCESS_POSIX_MAX_FD
 #   define HPX_PROCESS_POSIX_MAX_FD 32

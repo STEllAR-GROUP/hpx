@@ -22,9 +22,9 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
 #include <boost/integer.hpp>
-#include <boost/iterator/iterator_facade.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 
 #include <cstdint>
 #include <iterator>
@@ -256,12 +256,14 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         local_raw_iterator local()
         {
-            HPX_ASSERT(data_);
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return local_raw_iterator(data_->begin() + local_index_, data_);
         }
         local_raw_const_iterator local() const
         {
-            HPX_ASSERT(data_);
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return local_raw_iterator(data_->cbegin() + local_index_, data_);
         }
 
@@ -272,8 +274,6 @@ namespace hpx
         void load(Archive& ar, unsigned version)
         {
             ar & partition_ & local_index_;
-            if (partition_)
-                data_ = partition_.get_ptr();
         }
         template <typename Archive>
         void save(Archive& ar, unsigned version) const
@@ -326,11 +326,15 @@ namespace hpx
 
         std::shared_ptr<server::partitioned_vector<T, Data> >& get_data()
         {
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return data_;
         }
         std::shared_ptr<server::partitioned_vector<T, Data> > const&
             get_data() const
         {
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return data_;
         }
 
@@ -342,7 +346,7 @@ namespace hpx
         size_type local_index_;
 
         // caching address of component
-        std::shared_ptr<server::partitioned_vector<T, Data> > data_;
+        mutable std::shared_ptr<server::partitioned_vector<T, Data> > data_;
     };
 
     template <typename T, typename Data>
@@ -391,12 +395,14 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         local_raw_iterator local()
         {
-            HPX_ASSERT(data_);
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return local_raw_iterator(data_->cbegin() + local_index_, data_);
         }
         local_raw_const_iterator local() const
         {
-            HPX_ASSERT(data_);
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return local_raw_const_iterator(data_->cbegin() + local_index_, data_);
         }
 
@@ -407,8 +413,6 @@ namespace hpx
         void load(Archive& ar, unsigned version)
         {
             ar & partition_ & local_index_;
-            if (partition_)
-                data_ = partition_.get_ptr();
         }
         template <typename Archive>
         void save(Archive& ar, unsigned version) const
@@ -462,11 +466,15 @@ namespace hpx
 
         std::shared_ptr<server::partitioned_vector<T, Data> >& get_data()
         {
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return data_;
         }
         std::shared_ptr<server::partitioned_vector<T, Data> > const&
             get_data() const
         {
+            if (partition_ && !data_)
+                data_ = partition_.get_ptr();
             return data_;
         }
 
@@ -478,7 +486,7 @@ namespace hpx
         size_type local_index_;
 
         // caching address of component
-        std::shared_ptr<server::partitioned_vector<T, Data> > data_;
+        mutable std::shared_ptr<server::partitioned_vector<T, Data> > data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

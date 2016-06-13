@@ -9,16 +9,18 @@
 #define HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/invoke_function.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <hpx/util/decay.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <type_traits>
 

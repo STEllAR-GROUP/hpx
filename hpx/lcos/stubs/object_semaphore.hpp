@@ -7,10 +7,10 @@
 #if !defined(HPX_18186AAE_AF96_4ADC_88AF_215F13F18004)
 #define HPX_18186AAE_AF96_4ADC_88AF_215F13F18004
 
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/async.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
-#include <hpx/async.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
 
 namespace hpx { namespace lcos { namespace stubs
 {

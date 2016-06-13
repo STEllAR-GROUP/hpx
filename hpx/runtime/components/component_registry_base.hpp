@@ -7,9 +7,9 @@
 #define HPX_COMPONENT_REGISTRY_BASE_MAR_10_2010_0710PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
 
 #include <string>
 #include <vector>

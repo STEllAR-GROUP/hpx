@@ -13,8 +13,8 @@
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
 
-#include <boost/version.hpp>
 #include <boost/preprocessor/cat.hpp>
+#include <boost/version.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  The version of HPX

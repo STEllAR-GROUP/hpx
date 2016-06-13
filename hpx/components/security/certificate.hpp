@@ -11,9 +11,9 @@
 #if defined(HPX_HAVE_SECURITY)
 
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include "certificate_signing_request.hpp"
 #include "public_key.hpp"

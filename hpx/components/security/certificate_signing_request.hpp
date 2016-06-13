@@ -11,8 +11,8 @@
 #if defined(HPX_HAVE_SECURITY)
 
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <hpx/components/security/capability.hpp>
 #include <hpx/components/security/public_key.hpp>

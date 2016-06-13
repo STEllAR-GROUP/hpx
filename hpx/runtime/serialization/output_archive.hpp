@@ -10,15 +10,16 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
-#include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
+#include <hpx/runtime/serialization/output_container.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/mpl/or.hpp>
+#include <boost/type_traits/is_enum.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
-#include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <list>

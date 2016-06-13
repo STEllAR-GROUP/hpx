@@ -47,8 +47,8 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
+#include <boost/cstdint.hpp>
 
 #if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) \
             && _XOPEN_VERSION >= 500)
@@ -57,9 +57,9 @@
 // swapcontext() et al. Use GNU Pth workalike functions.
 #if defined(__APPLE__) && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1050)
 
-#include "pth/pth.h"
 #include <cerrno>
 #include <limits>
+#include "pth/pth.h"
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix { namespace pth
@@ -101,8 +101,8 @@ namespace posix { namespace pth
  * NOTE2: makecontext and friends are declared obsolescent in SuSv3, but
  * it is unlikely that they will be removed any time soon.
  */
-#include <ucontext.h>
 #include <cstddef>                  // ptrdiff_t
+#include <ucontext.h>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix { namespace ucontext
@@ -141,11 +141,11 @@ namespace posix { namespace ucontext
 
 #endif // generic Posix platform
 
-#include <signal.h>                 // SIGSTKSZ
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
+#include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <signal.h>                 // SIGSTKSZ
 
 namespace hpx { namespace threads { namespace coroutines
 {

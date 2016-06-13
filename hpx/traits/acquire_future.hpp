@@ -28,7 +28,7 @@ namespace hpx { namespace traits
         struct acquire_future_impl;
     }
 
-    template <typename T, typename Enable>
+    template <typename T, typename Enable = void>
     struct acquire_future
       : detail::acquire_future_impl<typename util::decay<T>::type>
     {};

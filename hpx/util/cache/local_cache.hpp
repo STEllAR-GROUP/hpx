@@ -10,10 +10,10 @@
 #include <hpx/util/cache/policies/always.hpp>
 #include <hpx/util/cache/statistics/no_statistics.hpp>
 
-#include <deque>
-#include <map>
-#include <functional>
 #include <algorithm>
+#include <deque>
+#include <functional>
+#include <map>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache

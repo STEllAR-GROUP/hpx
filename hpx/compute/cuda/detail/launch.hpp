@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
+#include <hpx/compute/cuda/target.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 

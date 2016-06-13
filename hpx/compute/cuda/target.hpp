@@ -12,9 +12,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 
 #if !defined(__CUDA_ARCH__)
 #include <hpx/runtime/serialization/serialization_fwd.hpp>

@@ -8,14 +8,14 @@
 #define HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
+#include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/lcos/async_fwd.hpp>
-#include <hpx/lcos/detail/async_implementations_fwd.hpp>
-#include <hpx/lcos/detail/async_colocated_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <vector>
 

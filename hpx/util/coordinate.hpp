@@ -12,8 +12,8 @@
 #include <hpx/util/assert.hpp>
 
 #include <algorithm>
-#include <numeric>
 #include <cstddef>
+#include <numeric>
 #if defined(HPX_HAVE_CXX11_INITIALIZER_LIST)
 #include <initializer_list>
 #endif

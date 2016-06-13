@@ -7,9 +7,9 @@
 #define HPX_MIGRATE_TO_STORAGE_SERVER_FEB_04_2015_1021AM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>

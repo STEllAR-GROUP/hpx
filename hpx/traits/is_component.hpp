@@ -7,11 +7,10 @@
 #define HPX_TRAITS_IS_COMPONENT_OCT_10_2012_0221PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace traits
 {
@@ -24,7 +23,7 @@ namespace hpx { namespace traits
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable>
+    template <typename Component, typename Enable = void>
     struct is_component
       : boost::mpl::false_
     {};
@@ -66,7 +65,7 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable>
+    template <typename T, typename Enable = void>
     struct is_component_or_component_array
       : is_component<T>
     {};

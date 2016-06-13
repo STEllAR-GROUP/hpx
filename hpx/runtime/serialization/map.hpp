@@ -14,8 +14,8 @@
 #include <map>
 #include <type_traits>
 
-#include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/add_reference.hpp>
+#include <boost/type_traits/remove_const.hpp>
 
 namespace hpx
 {

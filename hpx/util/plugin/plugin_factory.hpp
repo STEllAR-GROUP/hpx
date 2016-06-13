@@ -11,10 +11,10 @@
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/plugin/virtual_constructor.hpp>
 #include <hpx/util/plugin/abstract_factory.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
+#include <hpx/util/plugin/virtual_constructor.hpp>
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/shared_ptr.hpp>

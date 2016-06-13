@@ -8,7 +8,6 @@
 #define HPX_LCOS_PROMISE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -18,6 +17,10 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_type_database.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>

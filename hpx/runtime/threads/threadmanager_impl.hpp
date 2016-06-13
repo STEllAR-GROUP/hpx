@@ -10,13 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/state.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/spinlock.hpp>

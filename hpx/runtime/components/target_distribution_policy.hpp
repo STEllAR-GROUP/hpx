@@ -9,21 +9,21 @@
 #define HPX_COMPONENTS_TARGET_DISTRIBUTION_POLICY_APR_12_2015_1245PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/traits/action_is_target_valid.hpp>
-#include <hpx/traits/extract_action.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/packaged_action.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 
 #include <algorithm>
 #include <vector>

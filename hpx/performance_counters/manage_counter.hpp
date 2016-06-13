@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 namespace hpx { namespace performance_counters
 {

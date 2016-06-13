@@ -7,9 +7,9 @@
 #define HPX_PARCELSET_MAR_24_2008_1031AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 
 #endif
 

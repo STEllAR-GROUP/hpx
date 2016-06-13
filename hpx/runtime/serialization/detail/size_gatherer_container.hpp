@@ -9,6 +9,10 @@
 // This 'container' is used to gather the required archive size for a given
 // type before it is serialized.
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
+
+#include <cstddef>
 
 namespace hpx { namespace serialization { namespace detail
 {

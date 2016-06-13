@@ -8,14 +8,14 @@
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
