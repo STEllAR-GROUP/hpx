@@ -32,8 +32,8 @@ void test_leak()
 
         {
             hpx::lcos::promise<test> p;
-            hpx::apply_c<call_action>(p.get_id(), hpx::find_here());
             f = p.get_future();
+            hpx::apply_c<call_action>(p.get_id(), hpx::find_here());
         }
 
         test t = f.get();
@@ -52,9 +52,35 @@ int hpx_main(int argc, char* argv[])
         test_leak();
 
         hpx::id_type promise_id;
+        hpx::future<int> f;
         {
             hpx::promise<int> p;
+            f = p.get_future();
+            {
+                auto local_promise_id = p.get_id();
+                hpx::cout << local_promise_id << hpx::endl;
+            }
 
+            hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+
+            promise_id = p.get_id();
+            hpx::cout << promise_id << hpx::endl;
+        }
+
+        hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+
+        HPX_TEST(!f.is_ready());
+        // This segfaults, because the promise is not alive any more.
+        // It SHOULD get kept alive by AGAS though.
+        hpx::set_lco_value(promise_id, 10, false);
+        HPX_TEST(f.is_ready());
+        HPX_TEST_EQ(f.get(), 10);
+    }
+    {
+        hpx::id_type promise_id;
+        {
+            hpx::promise<int> p;
+            p.get_future();
             {
                 auto local_promise_id = p.get_id();
                 hpx::cout << local_promise_id << hpx::endl;
@@ -71,7 +97,6 @@ int hpx_main(int argc, char* argv[])
         // This segfaults, because the promise is not alive any more.
         // It SHOULD get kept alive by AGAS though.
         hpx::set_lco_value(promise_id, 10, false);
-
     }
     return hpx::finalize();
 }
