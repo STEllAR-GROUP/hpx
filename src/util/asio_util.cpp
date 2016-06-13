@@ -174,30 +174,32 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
-    HPX_API_EXPORT std::string cleanup_ip_address(const std::string &addr)
+    std::string cleanup_ip_address(const std::string &addr)
     {
         unsigned char buf[sizeof(struct in6_addr)];
         int i=0, domain[2] = {AF_INET, AF_INET6};
         char str[INET6_ADDRSTRLEN];
         boost::system::error_code ec;
-        unsigned long scope_id=0x0e;
+        unsigned long scope_id = 0x0e;
 
-        for (i=0; i<2; ++i) {
+        for (i = 0; i < 2; ++i) {
             int s = boost::asio::detail::socket_ops::inet_pton(
                 domain[i], &addr[0], buf, &scope_id, ec);
-            if (!ec && s>0) break;
+            if (!ec && s > 0)
+                break;
         }
-        if (i==2) {
+        if (i == 2) {
             HPX_THROW_EXCEPTION(bad_parameter, "cleanup_ip_address",
                 "Invalid IP address string");
         }
 
-       if (boost::asio::detail::socket_ops::inet_ntop(
-          domain[i], buf, str, INET6_ADDRSTRLEN, scope_id, ec) == NULL) {
-           HPX_THROW_EXCEPTION(bad_parameter, "cleanup_ip_address",
-               "inet_ntop failure");
-       }
-       return std::string(str);
+        if (boost::asio::detail::socket_ops::inet_ntop(
+                domain[i], buf, str, INET6_ADDRSTRLEN, scope_id, ec) == NULL)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter, "cleanup_ip_address",
+                "inet_ntop failure");
+        }
+        return std::string(str);
     }
 
     endpoint_iterator_type connect_begin(std::string const & address,
