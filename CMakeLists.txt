@@ -897,7 +897,7 @@ hpx_check_for_cxx11_noexcept(
   DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
 
 hpx_check_for_cxx11_nullptr(
-  DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
+  REQUIRED "HPX needs support for C++11 nullptr")
 
 hpx_check_for_cxx11_range_based_for(
   REQUIRED "HPX needs support for C++11 range-based for-loop")
@@ -916,9 +916,6 @@ hpx_check_for_cxx11_variadic_macros(
 
 hpx_check_for_cxx11_variadic_templates(
   REQUIRED "HPX needs support for C++11 variadic templates")
-
-hpx_check_for_cxx11_nullptr(
-  REQUIRED "HPX needs support for C++11 nullptr")
 
 # Check the availability of certain C++11 library features
 hpx_check_for_cxx11_std_array(
