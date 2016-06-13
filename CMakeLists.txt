@@ -917,6 +917,9 @@ hpx_check_for_cxx11_variadic_macros(
 hpx_check_for_cxx11_variadic_templates(
   REQUIRED "HPX needs support for C++11 variadic templates")
 
+hpx_check_for_cxx11_nullptr(
+  REQUIRED "HPX needs support for C++11 nullptr")
+
 # Check the availability of certain C++11 library features
 hpx_check_for_cxx11_std_array(
   DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
