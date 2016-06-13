@@ -49,8 +49,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy, InIter first, std::size_t count, F && f,
                 Proj && proj = Proj())
             {
+                typedef typename util::detail::loop_n<InIter>::type it_type;
+
                 return util::loop_n(first, count,
-                    [&f, &proj](InIter curr)
+                    [&f, &proj](it_type curr)
                     {
                         hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
@@ -72,11 +74,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f, proj](std::size_t /*part_index*/,
                             InIter part_begin, std::size_t part_size) mutable
                         {
+                            typedef typename util::detail::loop_n<
+                                    InIter
+                                >::type it_type;
+
                             // VS2015 bails out when proj or f are captured by
                             // ref
-                            typedef typename util::detail::loop_n<
-                                InIter>::type it_type;
-
                             util::loop_n(
                                 part_begin, part_size,
                                 [=](it_type curr) mutable
@@ -223,20 +226,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
+                typedef typename util::detail::loop<InIter>::type it_type;
+
                 return util::loop(first, last,
                     [&f, &proj](Iter curr)
                     {
                         f(hpx::util::invoke(proj, *curr));
                     });
-            }
-
-            template <typename ExPolicy, typename InIter, typename F>
-            static InIter
-            sequential(ExPolicy, InIter first, InIter last, F && f,
-                util::projection_identity)
-            {
-                std::for_each(first, last, std::forward<F>(f));
-                return last;
             }
 
             template <typename ExPolicy, typename InIter, typename F,

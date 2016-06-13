@@ -8,62 +8,77 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/traits/is_range.hpp>
 
-#include <iterator>
 #include <algorithm>
+#include <cstddef>
+#include <iterator>
 #include <vector>
+
+#if defined(HPX_HAVE_MM_PREFETCH)
+#if defined(HPX_MSVC)
+#include <mmintrin.h>
+#endif
+#if defined(HPX_GCC_VERSION)
+#include <emmintrin.h>
+#endif
+#endif
 
 namespace hpx { namespace parallel { namespace util
 {
     namespace detail
     {
-
-
-        template<typename Itr, typename ...TS >
+        template <typename Itr, typename ...Ts>
         class prefetching_iterator
-        : public std::iterator<std::random_access_iterator_tag, std::size_t>
+          : public std::iterator<std::random_access_iterator_tag, std::size_t>
         {
-            public:
+        public:
             typedef Itr base_iterator;
-            hpx::util::tuple<TS*...> M_;
-            base_iterator base;
-            std::size_t chunk_size;
-            std::size_t range_size;
-            std::size_t idx;
 
-            explicit prefetching_iterator(std::size_t idx_,
-                base_iterator base_ , std::size_t chunk_size_,
-                std::size_t range_size_,
-                const hpx::util::tuple<TS*...> & A_)
-            : M_(A_), base(base_), chunk_size(chunk_size_),
-            range_size(range_size_), idx(idx_){}
+        private:
+            hpx::util::tuple<Ts const& ...> rngs_;
+            base_iterator base_;
+            std::size_t chunk_size_;
+            std::size_t range_size_;
+            std::size_t idx_;
 
-            typedef  typename std::iterator<std::random_access_iterator_tag,
-            std::size_t>::difference_type difference_type;
+        public:
+            explicit prefetching_iterator(std::size_t idx,
+                    base_iterator base, std::size_t chunk_size,
+                    std::size_t range_size,
+                    hpx::util::tuple<Ts*...> const& rngs)
+              : rngs_(rngs), base_(base), chunk_size_(chunk_size),
+                range_size_(range_size), idx_(idx)
+            {}
+
+            typedef typename std::iterator<
+                    std::random_access_iterator_tag, std::size_t
+                >::difference_type difference_type;
 
             inline prefetching_iterator& operator+=(difference_type rhs)
             {
-                idx = idx + (rhs*chunk_size);
-                base = base + (rhs*chunk_size);
+                idx_ += rhs * chunk_size_;
+                std::advance(base_, rhs_ * chunk_size_);
                 return *this;
             }
             inline prefetching_iterator& operator-=(difference_type rhs)
             {
-                idx = idx - (rhs*chunk_size);
-                base = base - (rhs*chunk_size);
+                idx_ -= rhs * chunk_size_;
+                std::advance(base_, -(rhs_ * chunk_size_));
                 return *this;
             }
             inline prefetching_iterator& operator++()
             {
-                idx = idx + chunk_size;
-                base = base + chunk_size;
+                idx_ += chunk_size_;
+                std::advance(base_, chunk_size_);
                 return *this;
             }
             inline prefetching_iterator& operator--()
             {
-                idx = idx - chunk_size;
-                base = base - chunk_size;
+                idx_ -= chunk_size_;
+                std::advance(base_, -chunk_size_);
                 return *this;
             }
             inline prefetching_iterator operator++(int)
@@ -78,148 +93,278 @@ namespace hpx { namespace parallel { namespace util
                 operator--();
                 return tmp;
             }
+
+            // FIXME: What happens if the distance is not divisible by the
+            //        chunk_size? Should enforce this?
             inline difference_type
             operator-(const prefetching_iterator& rhs) const
             {
-                return (idx-rhs.idx)/chunk_size;
+                return (idx_ - rhs.idx_) / chunk_size_;
             }
             inline prefetching_iterator
             operator+(difference_type rhs) const
             {
-                return prefetching_iterator((idx+(rhs*chunk_size)),
-                    (base+(rhs*chunk_size)),chunk_size,range_size,M_);
+                return prefetching_iterator(idx_ + (rhs * chunk_size_),
+                    base_ + (rhs * chunk_size_), chunk_size_, range_size_, rngs_);
             }
+
             inline prefetching_iterator
             operator-(difference_type rhs) const
             {
-                return prefetching_iterator((idx-(rhs*chunk_size)),
-                    (base-(rhs*chunk_size)),chunk_size,range_size,M_);
+                return prefetching_iterator(idx_ - (rhs * chunk_size_),
+                    base_ - (rhs * chunk_size_), chunk_size_, range_size_, rngs_);
             }
+
             friend inline prefetching_iterator
-            operator+(difference_type lhs,
-                const prefetching_iterator& rhs)
+            operator+(const prefetching_iterator& lhs, difference_type rhs)
             {
                 return rhs + lhs;
             }
             friend inline prefetching_iterator
-            operator-(difference_type lhs,
-                const prefetching_iterator& rhs)
+            operator-(const prefetching_iterator& lhs, difference_type rhs)
             {
                 return lhs - rhs;
             }
+
+            // FIXME: should other members be compared too?
             inline bool operator==(const prefetching_iterator& rhs) const
             {
-                return idx == rhs.idx;
+                return idx_ == rhs.idx_ && base_ == rhs.base_;
             }
+
+            // FIXME: should the base iterators be compared too?
             inline bool operator!=(const prefetching_iterator& rhs) const
             {
-                return idx != rhs.idx;
+                return idx_ != rhs.idx_;
             }
             inline bool operator>(const prefetching_iterator& rhs) const
             {
-                return idx > rhs.idx;
+                return idx_ > rhs.idx_;
             }
             inline bool operator<(const prefetching_iterator& rhs) const
             {
-                return idx < rhs.idx;
+                return idx_ < rhs.idx_;
             }
             inline bool operator>=(const prefetching_iterator& rhs) const
             {
-                return idx >= rhs.idx;
+                return idx_ >= rhs.idx_;
             }
             inline bool operator<=(const prefetching_iterator& rhs) const
             {
-                return idx <= rhs.idx;
+                return idx_ <= rhs.idx_;
             }
 
+            // FIXME: This looks wrong, it should dispatch to the base iterator
+            //        instead.
             inline std::size_t & operator[](std::size_t rhs)
             {
-                return idx;
+                return idx_;
             }
 
-            inline std::size_t operator*() const {return idx;}
+            // FIXME: This looks wrong, it should dispatch to the base iterator
+            //        instead.
+            inline std::size_t operator*() const
+            {
+                return idx_;
+            }
         };
 
-        ////////////////////////////////////////////////////////////////////
-
-        template <typename T>
-        struct identity { typedef T type; };
-
-        //Helper class to initialize prefetching_iterator
-        template<typename Itr, typename ...TS >
+        ///////////////////////////////////////////////////////////////////////
+        // Helper class to initialize prefetching_iterator
+        template <typename Itr, typename ... Ts>
         struct prefetcher_context
         {
-            Itr it_begin;
-            Itr it_end;
-            std::size_t chunk_size;
-            hpx::util::tuple<TS*...> m;
-            std::size_t range_size;
+        private:
+            Itr it_begin_;
+            Itr it_end_;
+            hpx::util::tuple<Ts const&...> rngs_;
+            std::size_t chunk_size_;
+            std::size_t range_size_;
 
-            explicit prefetcher_context (Itr begin, Itr end,
-                std::size_t p_factor,
-                hpx::util::tuple<TS*&&...> l)
+        public:
+            // FIXME: cache line size is probably platform dependent
+            static HPX_CONSTEXPR_OR_CONST std::size_t cache_line_size = 64ull;
+
+            prefetcher_context (Itr begin, Itr end,
+                    hpx::util::tuple<Ts const&...> rngs,
+                    std::size_t p_factor = 1)
+              : it_begin_(begin), it_end_(end), rngs_(rngs),
+                chunk_size_((p_factor * cache_line_size) /
+                    sizeof(typename hpx::util::tuple_element<0, rngs>::type))
+                range_size_(std::distance(begin, end))
+            {}
+
+            prefetching_iterator<Itr, Ts const&...> begin()
             {
-                it_begin = begin;
-                it_end = end;
-                m = l;
-                std::size_t size_of_types = sizeof(typename identity<
-                    decltype(hpx::util::get<0>(l)[0])>::type);
-                chunk_size = p_factor * 64ul / size_of_types;
-                range_size = std::distance(begin, end);
+                return prefetching_iterator<Itr, Ts const&...>(
+                    0ull, it_begin_, chunk_size_, range_size_, rngs_);
             }
 
-            explicit prefetcher_context (Itr begin, Itr end,
-                hpx::util::tuple<TS*&&...> l)
+            prefetching_iterator<Itr, Ts const&...> end()
             {
-                it_begin = begin;
-                it_end = end;
-                std::size_t size_of_types = sizeof(typename identity<
-                    decltype(hpx::util::get<0>(l)[0])>::type);
-                chunk_size = 64ul / size_of_types;
-                m = l;
-                range_size = std::distance(begin, end);
+                return prefetching_iterator<Itr, Ts const&...>(
+                    range_size_, it_end_, chunk_size_, range_size_, rngs_);
             }
-
-            prefetching_iterator<Itr, TS...> begin()
-            {
-                return prefetching_iterator<Itr, TS...>(0ul, it_begin,
-                    chunk_size, range_size, m);
-            }
-
-            prefetching_iterator<Itr, TS...> end()
-            {
-                return prefetching_iterator<Itr, TS...>(range_size, it_end,
-                    chunk_size, range_size, m);
-            }
-
         };
 
-        //function which initialize prefetcher_context
-        template<typename Itr, typename ...TS >
-        prefetcher_context<Itr, TS...> make_prefetcher_context(Itr idx_begin,
-            Itr idx_end, std::size_t p_factor, TS*&&... ts)
+        ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_MM_PREFETCH)
+        template <typename T>
+        HPX_FORCEINLINE void prefetch_address(T const& val)
         {
-            auto && t = hpx::util::forward_as_tuple(std::forward<TS*>(ts)...);
-            return prefetcher_context<Itr, TS...>(idx_begin,
-                idx_end, p_factor, t);
+            _mm_prefetch((char*)&val, _MM_HINT_T0);
         }
 
-
-        template<std::size_t I = 0, typename... TS>
-        inline typename std::enable_if<I == sizeof...(TS), void>::type
-        prefetch_(hpx::util::tuple<TS...>& t, std::size_t idx)
-        {}
-
-        template<std::size_t I = 0, typename... TS>
-        inline typename std::enable_if<I < sizeof...(TS), void>::type
-        prefetch_(hpx::util::tuple<TS...>& t, std::size_t idx)
+        template <typename ... Ts, std::size_t ... Is>
+        HPX_FORCEINLINE void
+        prefetch_containers(hpx::util::tuple<Ts...> const& t,
+            hpx::util::detail::pack_c<std::size_t, Is...>, std::size_t idx)
         {
-            _mm_prefetch(((char*)(&hpx::util::get<I>(t)[idx])), _MM_HINT_T0);
-            prefetch_<I + 1, TS...>(t, idx);
+            int const sequencer[] = {
+                (prefetch_address(hpx::util::get<Is>(t)[idx])..., 0), 0
+            };
+            (void)sequencer;
         }
+#else
+        template <typename ... Ts, std::size_t ... Is>
+        HPX_FORCEINLINE void
+        prefetch_containers(hpx::util::tuple<Ts...> const& t,
+            hpx::util::detail::pack_c<std::size_t, Is...>, std::size_t idx)
+        {
+            int const sequencer[] = {
+                (hpx::util::get<Is>(t)[idx], 0)..., 0
+            };
+            (void)sequencer;
+        }
+#endif
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Itr, typename ... Ts>
+        struct loop<detail::prefetching_iterator<Itr, Ts...> >
+        {
+            typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
+            typedef typename iterator_type::base_iterator type;
+            typedef typename hpx::util::detail::make_index_pack<
+                    sizeof...(Ts)
+                >::type index_pack_type;
+
+            template <typename End, typename F>
+            static iterator_type
+            call(iterator_type it, End end, F && f)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    Itr base = it.base_;
+                    std::size_t j = it.idx_;
+
+                    std::size_t last = (std::min)(it.idx_ + it.chunk_size_,
+                        it.range_size_);
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(base);
+
+                    if (j != it.range_size_)
+                        prefetch_containers(it.rngs_, index_pack_type(), j);
+                }
+                return it;
+            }
+
+            template <typename End, typename CancelToken, typename F>
+            static iterator_type
+            call(iterator_type it, End end, CancelToken& tok, F && f)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+
+                    Itr base = it.base_;
+                    std::size_t j = it.idx_;
+
+                    std::size_t last = (std::min)(it.idx_ + it.chunk_size_,
+                        it.range_size_);
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(base);
+
+                    if (j != it.range_size_)
+                        prefetch_containers(it.rngs_, index_pack_type(), j);
+                }
+                return it;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Itr, typename ... Ts>
+        struct loop_n<detail::prefetching_iterator<Itr, Ts...> >
+        {
+            typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
+            typedef typename iterator_type::base_iterator type;
+            typedef typename hpx::util::detail::make_index_pack<
+                    sizeof...(Ts)
+                >::type index_pack_type;
+
+            template <typename F>
+            static iterator_type 
+            call(iterator_type it, std::size_t count, F && f)
+            {
+                for (/**/; count >= 0; (void) --count, ++it)
+                {
+                    Itr base = it.base_;
+                    std::size_t j = it.idx_;
+
+                    std::size_t last = (std::min)(it.idx_ + it.chunk_size_,
+                        it.range_size_);
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(base);
+
+                    if (j != it.range_size_)
+                        prefetch_containers(it.rngs_, index_pack_type(), j);
+                }
+                return it;
+            }
+
+            template <typename CancelToken, typename F>
+            static iterator_type
+            call(iterator_type it, std::size_t count, CancelToken& tok, F && f)
+            {
+                for (/**/; count >= 0; (void) --count, ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+
+                    Itr base = it.base_;
+                    std::size_t j = it.idx_;
+
+                    std::size_t last = (std::min)(it.idx_ + it.chunk_size_,
+                        it.range_size_);
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(base);
+
+                    if (j != it.range_size_)
+                        prefetch_containers(it.rngs_, index_pack_type(), j);
+                }
+                return it;
+            }
+        };
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // function to create a prefetcher_context
+    template <typename Itr, typename ... Ts>
+    prefetcher_context<Itr, Ts...>
+    make_prefetcher_context(Itr base_begin, Itr base_end,
+        std::size_t p_factor, Ts const& ... rngs)
+    {
+        static_assert(
+            hpx::util::detail::all_of<hpx::traits::is_range<Ts>...>::value,
+            "All variadic parameters have to represent ranges");
+
+        return prefetcher_context<Itr, Ts...>(base_begin, base_end,
+            hpx::util::forward_as_tuple(rngs...), p_factor);
+    }
 }}}
 
 #endif
