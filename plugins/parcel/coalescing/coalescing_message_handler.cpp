@@ -218,7 +218,7 @@ namespace hpx { namespace plugins { namespace parcel
         ++num_messages_;
         l.unlock();
 
-        HPX_ASSERT(NULL != pp_);
+        HPX_ASSERT(nullptr != pp_);
         buff(pp_);                   // 'invoke' the buffer
 
         return true;

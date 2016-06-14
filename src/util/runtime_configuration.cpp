@@ -556,7 +556,7 @@ namespace hpx { namespace util
         if (has_section("hpx.parcel"))
         {
             util::section const * sec = get_section("hpx.parcel.ipc");
-            if(NULL != sec)
+            if(nullptr != sec)
             {
                 return hpx::util::get_entry_as<std::size_t>(
                     *sec, "data_buffer_cache_size",
@@ -572,7 +572,7 @@ namespace hpx { namespace util
         if (has_section("hpx.agas"))
         {
             util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec)
+            if (nullptr != sec)
             {
                 std::string const m = sec->get_entry("service_mode", "hosted");
 
@@ -596,7 +596,7 @@ namespace hpx { namespace util
         if (num_localities == 0) {
             if (has_section("hpx")) {
                 util::section const* sec = get_section("hpx");
-                if (NULL != sec) {
+                if (nullptr != sec) {
                     num_localities = hpx::util::get_entry_as<std::uint32_t>(
                         *sec, "localities", 1);
                 }
@@ -615,7 +615,7 @@ namespace hpx { namespace util
 
         if (has_section("hpx")) {
             util::section* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 sec->add_entry("localities",
                     std::to_string(num_localities));
             }
@@ -626,7 +626,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::uint32_t>(
                     *sec, "first_used_core", 0);
             }
@@ -639,7 +639,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 sec->add_entry("first_used_core",
                     std::to_string(first_used_core));
             }
@@ -652,7 +652,7 @@ namespace hpx { namespace util
 
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 cache_size = hpx::util::get_entry_as<std::size_t>(
                     *sec, "local_cache_size", cache_size);
             }
@@ -667,7 +667,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
                     *sec, "use_caching", "1") != 0;
             }
@@ -679,7 +679,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
                     *sec, "use_range_caching", "1") != 0;
             }
@@ -692,7 +692,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
                     *sec, "max_pending_refcnt_requests",
                     HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS);
@@ -708,7 +708,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
                     *sec, "dedicated_server", 0) != 0;
             }
@@ -721,7 +721,7 @@ namespace hpx { namespace util
 #if HPX_HAVE_ITTNOTIFY != 0
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
                     *sec, "use_itt_notify", "0") != 0;
             }
@@ -736,7 +736,7 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
                     *sec, "lock_detection", "0") != 0;
             }
@@ -751,7 +751,7 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
                     *sec, "global_lock_detection", "0") != 0;
             }
@@ -766,7 +766,7 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
 #ifdef HPX_DEBUG
                 return hpx::util::get_entry_as<int>(
                     *sec, "minimal_deadlock_detection", "1") != 0;
@@ -794,7 +794,7 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
 #ifdef HPX_DEBUG
                 return hpx::util::get_entry_as<int>(
                     *sec, "spinlock_deadlock_detection", "1") != 0;
@@ -822,7 +822,7 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
                     *sec, "spinlick_deadlock_detection_limit", "1000000");
             }
@@ -837,7 +837,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
                     *sec, "os_threads", 1);
             }
@@ -849,7 +849,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return sec->get_entry("cmd_line", "");
             }
         }
@@ -861,7 +861,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx.threadpools")) {
             util::section const* sec = get_section("hpx.threadpools");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
                     *sec, std::string(poolname) + "_size", "2");
             }
@@ -874,7 +874,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx.parcel")) {
             util::section const* sec = get_section("hpx.parcel");
-            if (NULL != sec) {
+            if (nullptr != sec) {
 #ifdef BOOST_BIG_ENDIAN
                 return sec->get_entry("endian_out", "big");
 #else
@@ -896,7 +896,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.stacks");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 std::string entry = sec->get_entry(entryname, defaultvaluestr);
                 std::ptrdiff_t val = defaultvalue;
 
@@ -914,7 +914,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.stacks");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
                     *sec, "use_guard_pages", "1") != 0;
             }
@@ -953,7 +953,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.parcel");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 std::uint64_t maxsize =
                     hpx::util::get_entry_as<std::uint64_t>(
                         *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
@@ -968,7 +968,7 @@ namespace hpx { namespace util
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.parcel");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 std::uint64_t maxsize =
                     hpx::util::get_entry_as<std::uint64_t>(
                         *sec, "max_outbound_message_size",

@@ -190,7 +190,7 @@ namespace hpx { namespace lcos
             void operator()(SharedState& shared_state,
                 typename std::enable_if<
                     traits::is_shared_state<SharedState>::value
-                >::type* = 0) const
+                >::type* = nullptr) const
             {
                 std::size_t counter =
                     wait_.count_.load(boost::memory_order_seq_cst);
@@ -223,7 +223,7 @@ namespace hpx { namespace lcos
             void operator()(Sequence_& sequence,
                 typename std::enable_if<
                     !traits::is_shared_state<Sequence_>::value
-                >::type* = 0) const
+                >::type* = nullptr) const
             {
                 apply(sequence);
             }

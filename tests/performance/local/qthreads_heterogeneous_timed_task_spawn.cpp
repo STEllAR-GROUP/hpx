@@ -241,7 +241,7 @@ int qthreads_main(
         for (boost::uint64_t i = 0; i < tasks; ++i)
         {
             void* const ptr = reinterpret_cast<void*>(payloads[i]);
-            qthread_fork(&worker_func, ptr, NULL);
+            qthread_fork(&worker_func, ptr, nullptr);
         }
 
         ///////////////////////////////////////////////////////////////////////

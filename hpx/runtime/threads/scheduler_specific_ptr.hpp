@@ -108,7 +108,7 @@ namespace hpx { namespace threads
             return temp;
         }
 
-        void reset(T* new_value = 0)
+        void reset(T* new_value = nullptr)
         {
             T* const current_value = get();
             if (current_value != new_value)

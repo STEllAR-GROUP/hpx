@@ -120,7 +120,7 @@ namespace hpx { namespace threads
         thread_self* p = get_self_ptr();
         if (HPX_UNLIKELY(!p)) {
             HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self",
-                "NULL thread id encountered (is this executed on a HPX-thread?)");
+                "null thread id encountered (is this executed on a HPX-thread?)");
         }
         return *p;
     }
@@ -151,7 +151,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!p))
         {
             HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked",
-                "NULL thread id encountered (is this executed on a HPX-thread?)");
+                "null thread id encountered (is this executed on a HPX-thread?)");
             return 0;
         }
 

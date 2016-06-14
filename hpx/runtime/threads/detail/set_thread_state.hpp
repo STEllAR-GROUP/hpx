@@ -43,7 +43,7 @@ namespace hpx { namespace threads { namespace detail
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threads::detail::set_active_state",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return terminated;
         }
 
@@ -79,7 +79,7 @@ namespace hpx { namespace threads { namespace detail
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id, "threads::detail::set_thread_state",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return thread_state(unknown, wait_unknown);
         }
 
@@ -241,13 +241,13 @@ namespace hpx { namespace threads { namespace detail
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threads::detail::wake_timer_thread",
-                "NULL thread id encountered (id)");
+                "null thread id encountered (id)");
             return terminated;
         }
         if (HPX_UNLIKELY(!timer_id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threads::detail::wake_timer_thread",
-                "NULL thread id encountered (timer_id)");
+                "null thread id encountered (timer_id)");
             return terminated;
         }
 
@@ -276,7 +276,7 @@ namespace hpx { namespace threads { namespace detail
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threads::detail::at_timer",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return terminated;
         }
 
@@ -343,7 +343,7 @@ namespace hpx { namespace threads { namespace detail
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threads::detail::set_thread_state",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return 0;
         }
 

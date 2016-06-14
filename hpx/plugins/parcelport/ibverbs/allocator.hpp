@@ -45,7 +45,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             return &x;
         }
 
-        pointer allocate(size_type n, void* /*hint*/ = 0)
+        pointer allocate(size_type n, void* /*hint*/ = nullptr)
         {
             if(n <= SmallSize) return new char[n];
             return memory_pool_->allocate(n);

@@ -42,7 +42,7 @@ namespace hpx { namespace util
         void stop_counters(error_code& ec = throws);
         void reset_counters(error_code& ec = throws);
         bool evaluate_counters(bool reset = false,
-            char const* description = 0, error_code& ec = throws);
+            char const* description = nullptr, error_code& ec = throws);
 
     protected:
         void find_counters();

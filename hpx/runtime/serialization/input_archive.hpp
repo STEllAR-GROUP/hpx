@@ -42,7 +42,7 @@ namespace hpx { namespace serialization
         template <typename Container>
         input_archive(Container & buffer,
             std::size_t inbound_data_size = 0,
-            const std::vector<serialization_chunk>* chunks = 0)
+            const std::vector<serialization_chunk>* chunks = nullptr)
           : base_type(0U)
           , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
         {
@@ -64,7 +64,7 @@ namespace hpx { namespace serialization
             bool has_filter = false;
             load(has_filter);
 
-            serialization::binary_filter* filter = 0;
+            serialization::binary_filter* filter = nullptr;
             if (has_filter && enable_compression())
             {
                 *this >> detail::raw_ptr(filter);

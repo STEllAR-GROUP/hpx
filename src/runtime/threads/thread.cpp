@@ -103,7 +103,7 @@ namespace hpx
         if (id == threads::invalid_thread_id) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "run_thread_exit_callbacks",
-                "NULL thread id encountered");
+                "null thread id encountered");
         }
         threads::run_thread_exit_callbacks(id);
     }
@@ -300,7 +300,7 @@ namespace hpx
         if (id_ == threads::invalid_thread_id)
         {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return lcos::future<void>();
         }
 

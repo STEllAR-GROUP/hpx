@@ -200,7 +200,8 @@ namespace hpx { namespace threads
         virtual mask_cref_type get_used_processing_units() const = 0;
 
         ///////////////////////////////////////////////////////////////////////
-        virtual std::size_t get_worker_thread_num(bool* numa_sensitive = 0) = 0;
+        virtual std::size_t get_worker_thread_num(
+            bool* numa_sensitive = nullptr) = 0;
 
         virtual void reset_thread_distribution() = 0;
 

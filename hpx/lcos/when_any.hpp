@@ -218,7 +218,7 @@ namespace hpx { namespace lcos
             void operator()(Future& future,
                 typename std::enable_if<
                     traits::is_future<Future>::value
-                >::type* = 0) const
+                >::type* = nullptr) const
             {
                 std::size_t index =
                     when_.index_.load(boost::memory_order_seq_cst);
@@ -264,7 +264,7 @@ namespace hpx { namespace lcos
             void operator()(Sequence_& sequence,
                 typename std::enable_if<
                     traits::is_future_range<Sequence_>::value
-                >::type* = 0) const
+                >::type* = nullptr) const
             {
                 apply(sequence);
             }

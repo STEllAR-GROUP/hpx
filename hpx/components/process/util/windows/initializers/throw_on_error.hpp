@@ -34,9 +34,9 @@ public:
         if (!FormatMessage(
             FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, hr,
+            nullptr, hr,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-            (LPTSTR) &buffer, 0, NULL))
+            (LPTSTR) &buffer, 0, nullptr))
         {
             HPX_THROW_EXCEPTION(kernel_error,
                 "process::on_CreateProcess_error",

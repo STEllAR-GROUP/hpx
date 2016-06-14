@@ -84,7 +84,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::interrupt_thread",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return;
         }
 
@@ -104,7 +104,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::interruption_point",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return;
         }
 
@@ -121,7 +121,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return false;
         }
 
@@ -137,7 +137,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return false;
         }
 
@@ -153,7 +153,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_interruption_requested",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return false;
         }
 
@@ -170,7 +170,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_data",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return 0;
         }
 
@@ -183,7 +183,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_data",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return 0;
         }
 
@@ -220,7 +220,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::run_thread_exit_callbacks",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return;
         }
 
@@ -236,7 +236,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::add_thread_exit_callback",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return false;
         }
 
@@ -251,7 +251,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::add_thread_exit_callback",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return;
         }
 
@@ -276,7 +276,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_description",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return util::thread_description();
         }
         if (&ec != &throws)
@@ -291,8 +291,8 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_lco_description",
-                "NULL thread id encountered");
-            return NULL;
+                "null thread id encountered");
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -308,8 +308,8 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_lco_description",
-                "NULL thread id encountered");
-            return NULL;
+                "null thread id encountered");
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -317,7 +317,7 @@ namespace hpx { namespace threads
 
         if (id)
             return id->set_lco_description(desc);
-        return NULL;
+        return nullptr;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -331,8 +331,8 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_backtrace",
-                "NULL thread id encountered");
-            return NULL;
+                "null thread id encountered");
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -352,8 +352,8 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_backtrace",
-                "NULL thread id encountered");
-            return NULL;
+                "null thread id encountered");
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -368,7 +368,7 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_executor",
-                "NULL thread id encountered");
+                "null thread id encountered");
             return executors::current_executor(0);
         }
 

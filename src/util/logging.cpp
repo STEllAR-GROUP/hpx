@@ -413,7 +413,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.agas")) {
             util::section const* logini = ini.get_section("hpx.logging.agas");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -465,7 +465,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.parcel")) {
             util::section const* logini = ini.get_section("hpx.logging.parcel");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -518,7 +518,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.timing")) {
             util::section const* logini = ini.get_section("hpx.logging.timing");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -573,7 +573,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging")) {
             util::section const* logini = ini.get_section("hpx.logging");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -660,7 +660,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.application")) {
             util::section const* logini = ini.get_section("hpx.logging.application");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -713,7 +713,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.debuglog")) {
             util::section const* logini = ini.get_section("hpx.logging.debuglog");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -764,7 +764,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.console.agas")) {
             util::section const* logini = ini.get_section("hpx.logging.console.agas");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -813,7 +813,7 @@ namespace hpx { namespace util
         if (ini.has_section("hpx.logging.console.parcel")) {
             util::section const* logini =
                 ini.get_section("hpx.logging.console.parcel");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -861,7 +861,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.console.timing")) {
             util::section const* logini = ini.get_section("hpx.logging.console.timing");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -909,7 +909,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.console")) {
             util::section const* logini = ini.get_section("hpx.logging.console");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -957,7 +957,7 @@ namespace hpx { namespace util
         if (ini.has_section("hpx.logging.console.application")) {
             util::section const* logini =
                 ini.get_section("hpx.logging.console.application");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -1006,7 +1006,7 @@ namespace hpx { namespace util
         if (ini.has_section("hpx.logging.console.debuglog")) {
             util::section const* logini =
                 ini.get_section("hpx.logging.console.debuglog");
-            HPX_ASSERT(NULL != logini);
+            HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);

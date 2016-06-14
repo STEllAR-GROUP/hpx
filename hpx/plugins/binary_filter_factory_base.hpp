@@ -30,7 +30,7 @@ namespace hpx { namespace plugins
         /// return Returns the newly created instance of the binary filter
         ///        supported by this factory
         virtual serialization::binary_filter* create(bool compress,
-            serialization::binary_filter* next_filter = 0) = 0;
+            serialization::binary_filter* next_filter = nullptr) = 0;
     };
 }}
 

@@ -43,7 +43,7 @@ public:
     pointer address(reference value) const { return &value; }
     const_pointer address(const_reference value) const { return &value; }
 
-    pointer allocate(size_type n, void const* hint = 0)
+    pointer allocate(size_type n, void const* hint = nullptr)
     {
         HPX_ASSERT(n == size_);
         return static_cast<T*>(pointer_);

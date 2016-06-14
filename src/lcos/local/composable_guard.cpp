@@ -43,7 +43,7 @@ namespace hpx { namespace lcos { namespace local
 
         void free(guard_task* task)
         {
-            if (task == NULL)
+            if (task == nullptr)
                 return;
             task->check();
             delete task;
@@ -78,18 +78,18 @@ namespace hpx { namespace lcos { namespace local
 
         ~stage_data() {
             delete[] stages;
-            stages = NULL;
+            stages = nullptr;
         }
     };
 
     static void run_guarded(guard& g, detail::guard_task* task)
     {
-        HPX_ASSERT(task != NULL);
+        HPX_ASSERT(task != nullptr);
         task->check();
         detail::guard_task* prev = g.task.exchange(task);
-        if (prev != NULL) {
+        if (prev != nullptr) {
             prev->check();
-            detail::guard_task* zero = NULL;
+            detail::guard_task* zero = nullptr;
             if (!prev->next.compare_exchange_strong(zero, task)) {
                 run_async(task);
                 free(prev);
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos { namespace local
         std::size_t n;
         stage_task_cleanup(stage_data* sd_, std::size_t n_) : sd(sd_), n(n_) {}
         ~stage_task_cleanup() {
-            detail::guard_task* zero = NULL;
+            detail::guard_task* zero = nullptr;
             // The tasks on the other guards had single_task marked,
             // so they haven't had their next field set yet. Setting
             // the next field is necessary if they are going to
@@ -114,7 +114,7 @@ namespace hpx { namespace lcos { namespace local
                 detail::guard_task* lt = sd->stages[k];
                 lt->check();
                 HPX_ASSERT(!lt->single_guard);
-                zero = NULL;
+                zero = nullptr;
                 if (!lt->next.compare_exchange_strong(zero, lt)) {
                     HPX_ASSERT(zero != lt);
                     run_async(zero);
@@ -169,7 +169,7 @@ namespace hpx { namespace lcos { namespace local
 
     static void run_async(detail::guard_task* task)
     {
-        HPX_ASSERT(task != NULL);
+        HPX_ASSERT(task != nullptr);
         task->check();
         hpx::apply(&run_composable, task);
     }
@@ -183,15 +183,15 @@ namespace hpx { namespace lcos { namespace local
         detail::guard_task* task;
         run_composable_cleanup(detail::guard_task* task_) : task(task_) {}
         ~run_composable_cleanup() {
-            detail::guard_task* zero = 0;
+            detail::guard_task* zero = nullptr;
             // If single_guard is false, then this is one of the
             // setup tasks for a multi-guarded task. By not setting
             // the next field, we halt processing on items queued
             // to this guard.
-            HPX_ASSERT(task != NULL);
+            HPX_ASSERT(task != nullptr);
             task->check();
             if (!task->next.compare_exchange_strong(zero, task)) {
-                HPX_ASSERT(task->next.load()!=NULL);
+                HPX_ASSERT(task->next.load()!=nullptr);
                 run_async(zero);
                 free(task);
             }
@@ -200,7 +200,7 @@ namespace hpx { namespace lcos { namespace local
 
     static void run_composable(detail::guard_task* task)
     {
-        HPX_ASSERT(task != NULL);
+        HPX_ASSERT(task != nullptr);
         task->check();
         if (task->single_guard) {
             run_composable_cleanup rcc(task);

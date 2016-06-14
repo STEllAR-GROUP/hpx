@@ -97,7 +97,7 @@ namespace hpx { namespace threads
                 this, std::shared_ptr<cleanup_function>());
             return temp;
         }
-        void reset(T* new_value = 0)
+        void reset(T* new_value = nullptr)
         {
             T* const current_value = get();
             if (current_value != new_value)

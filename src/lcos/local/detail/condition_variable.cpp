@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 HPX_THROWS_IF(ec, null_thread_id,
                     "condition_variable::notify_one",
-                    "NULL thread id encountered");
+                    "null thread id encountered");
                 return false;
             }
 
@@ -130,7 +130,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                     HPX_THROWS_IF(ec, null_thread_id,
                         "condition_variable::notify_all",
-                        "NULL thread id encountered");
+                        "null thread id encountered");
                     return;
                 }
 
@@ -245,7 +245,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 {
                     LERR_(fatal)
                         << "condition_variable::abort_all:"
-                        << " NULL thread id encountered";
+                        << " null thread id encountered";
                     continue;
                 }
 

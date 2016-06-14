@@ -299,7 +299,7 @@ namespace detail
         {
             // yields control if needed
             wait(ec);
-            if (ec) return NULL;
+            if (ec) return nullptr;
 
             // No locking is required. Once a future has been made ready, which
             // is a postcondition of wait, either:
@@ -313,7 +313,7 @@ namespace detail
                 HPX_THROWS_IF(ec, no_state,
                     "future_data::get_result",
                     "this future has no valid shared state");
-                return NULL;
+                return nullptr;
             }
 
             // the thread has been re-activated by one of the actions
@@ -332,7 +332,7 @@ namespace detail
                 else {
                     ec = make_error_code(*exception_ptr);
                 }
-                return NULL;
+                return nullptr;
             }
             return static_cast<result_type*>(storage_.address());
         }
@@ -361,7 +361,7 @@ namespace detail
             {
                 HPX_THROW_EXCEPTION(null_thread_id,
                         "future_data::handle_on_completed",
-                        "NULL thread id encountered");
+                        "null thread id encountered");
             }
 
 #if defined(HPX_WINDOWS)

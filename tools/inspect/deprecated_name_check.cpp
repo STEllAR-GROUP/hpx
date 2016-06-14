@@ -37,6 +37,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*unordered_set\\b)", "std::unordered_set" },
       { "(\\bboost\\s*::\\s*unordered_multiset\\b)", "std::unordered_multiset" },
       { "(\\bboost\\s*::\\s*detail\\s*::\\s*atomic_count\\b)", "hpx::util::atomic_count" },
+      { "(\\bNULL\\b)", "nullptr" },
       { 0, 0 }
     };
 

@@ -506,7 +506,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t high_priority_queues = high_priority_queues_.size();
 
             HPX_ASSERT(num_thread < queues_size);
-            thread_queue_type* this_high_priority_queue = 0;
+            thread_queue_type* this_high_priority_queue = nullptr;
             thread_queue_type* this_queue = queues_[num_thread];
 
             if (num_thread < high_priority_queues)
@@ -968,7 +968,7 @@ namespace hpx { namespace threads { namespace policies
             bool result = true;
 
             std::size_t high_priority_queues = high_priority_queues_.size();
-            thread_queue_type* this_high_priority_queue = 0;
+            thread_queue_type* this_high_priority_queue = nullptr;
             thread_queue_type* this_queue = queues_[num_thread];
 
             if (num_thread < high_priority_queues)

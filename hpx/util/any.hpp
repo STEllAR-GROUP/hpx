@@ -476,7 +476,7 @@ namespace hpx { namespace util
                 boost::is_same<
                     basic_any,
                     typename util::decay<T>::type
-                > >::type* = 0)
+                > >::type* = nullptr)
           : table(detail::any::get_table<
                       typename util::decay<T>::type
                   >::template get<IArchive, OArchive, Char>()),
@@ -657,7 +657,9 @@ namespace hpx { namespace util
             }
             else
             {
-                typename detail::any::fxn_ptr_table<IArchive, OArchive, Char> *p = 0;
+                typename detail::any::fxn_ptr_table<
+                        IArchive, OArchive, Char
+                > *p = nullptr;
                 ar >> hpx::serialization::detail::raw_ptr(p);
                 table = p->get_ptr();
                 delete p;
@@ -757,7 +759,7 @@ namespace hpx { namespace util
                 boost::is_same<
                     basic_any,
                     typename util::decay<T>::type
-                > >::type* = 0)
+                > >::type* = nullptr)
           : table(detail::any::get_table<
                       typename util::decay<T>::type
                   >::template get<void, void, Char>()),
