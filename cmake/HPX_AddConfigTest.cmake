@@ -83,7 +83,7 @@ macro(add_hpx_config_test variable)
         OUTPUT_VARIABLE ${variable}_OUTPUT
         COPY_FILE ${test_binary})
        hpx_debug("Compile test: ${variable}")
-       hpx_debug("Compilation output: \n\n${${variable}_OUTPUT}")
+       hpx_debug("Compilation output: ${${variable}_OUTPUT}")
     endif()
 
     set(_run_msg "Success")
@@ -448,5 +448,12 @@ endmacro()
 macro(hpx_check_for_cxx_experimental_std_optional)
   add_hpx_config_test(HPX_WITH_CXX1Y_EXPERIMENTAL_OPTIONAL
     SOURCE cmake/tests/cxx1y_experimental_std_optional.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_mm_prefetch)
+  add_hpx_config_test(HPX_WITH_MM_PREFECTH
+    SOURCE cmake/tests/mm_prefetch.cpp
     FILE ${ARGN})
 endmacro()
