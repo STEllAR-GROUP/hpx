@@ -172,8 +172,9 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type(gid, naming::id_type::unmanaged));
 
         lcos::packaged_action<action_type, void> p;
+        lcos::future<void> f = p.get_future();
         p.apply(id, g, gid, count);
-        p.get_future().get();
+        f.get();
     }
 
     void runtime_support::free_component_locally(agas::gva const& g,
@@ -196,10 +197,13 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::shutdown_action action_type;
 
         lcos::promise<void> value;
+        auto f = value.get_future();
+
         // We need to make it unmanaged to avoid late refcnt requests
         id_type gid(value.get_id().get_gid(), id_type::unmanaged);
         hpx::apply<action_type>(targetgid, timeout, gid);
-        return value.get_future();
+
+        return f;
     }
 
     void runtime_support::shutdown(naming::id_type const& targetgid,
@@ -238,8 +242,10 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::terminate_action action_type;
 
         lcos::promise<void> value;
+        auto f = value.get_future();
+
         hpx::apply<action_type>(targetgid, value.get_id());
-        return value.get_future();
+        return f;
     }
 
     void runtime_support::terminate(naming::id_type const& targetgid)

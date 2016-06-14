@@ -2081,13 +2081,15 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     }
 
     lcos::promise<naming::id_type, naming::gid_type> p;
+    auto result_f = p.get_future();
+
     request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_id());
     hpx::future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
     using util::placeholders::_1;
     return f.then(util::bind(
-            util::one_shot(&detail::on_register_event), _1, p.get_future()
+            util::one_shot(&detail::on_register_event), _1, std::move(result_f)
         ));
 }
 

@@ -51,8 +51,11 @@ int main()
         for (hpx::id_type const& id: localities)
         {
             hpx::lcos::promise<void> p;
+            auto f = p.get_future();
+
             hpx::apply<test_action>(id, p.get_id());
-            wait_for.push_back(p.get_future());
+
+            wait_for.push_back(std::move(f));
         }
 
         hpx::wait_all(wait_for);
@@ -68,8 +71,11 @@ int main()
         for (hpx::id_type const& id: localities)
         {
             hpx::lcos::promise<void> p;
+            auto f = p.get_future();
+
             hpx::apply<test_action>(id, p.get_id());
-            wait_for.push_back(p.get_future());
+
+            wait_for.push_back(std::move(f));
         }
 
         hpx::wait_all(wait_for);

@@ -157,6 +157,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
+        struct maximal_number_of_chunks_helper
+        {
+            template <typename Parameters, typename Executor>
+            static std::size_t
+            call(hpx::traits::detail::wrap_int, Parameters&, Executor&,
+                std::size_t cores)
+            {
+                return 4 * cores;       // assume 4 times the number of cores
+            }
+
+            template <typename Parameters, typename Executor>
+            static auto call(int, Parameters& params, Executor& exec,
+                    std::size_t cores)
+            ->  decltype(
+                    params.get_maximal_number_of_chunks(exec, cores)
+                )
+            {
+                return params.get_maximal_number_of_chunks(exec, cores);
+            }
+
+            template <typename Executor>
+            static std::size_t
+            call(Parameters_& params, Executor& exec, std::size_t cores)
+            {
+                return call(0, params, exec, cores);
+            }
+        };
+
+        template <typename Parameters, typename Executor>
+        std::size_t call_maximal_number_of_chunks(Parameters& params,
+            Executor& exec, std::size_t cores)
+        {
+            return maximal_number_of_chunks_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type
+                >::call(params, exec, cores);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Parameters_>
         struct reset_thread_distribution_helper
         {
             template <typename Parameters, typename Executor>
@@ -298,6 +337,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return detail::call_get_chunk_size(params, exec,
                 std::forward<F>(f), num_tasks);
+        }
+
+        /// Return the largest reasonable number of chunks to create for a
+        /// single algorithm invocation.
+        ///
+        /// \param params   [in] The executor parameters object to use for
+        ///                 determining the number of chunks for the given
+        ///                 number of \a cores.
+        /// \param exec     [in] The executor object which will be used used
+        ///                 for scheduling of the the loop iterations.
+        /// \param cores    [in] The number of cores the number of chunks
+        ///                 should be determined for.
+        ///
+        template <typename Executor>
+        static std::size_t maximal_number_of_chunks(
+            executor_parameters_type& params, Executor& exec, std::size_t cores)
+        {
+            return detail::call_maximal_number_of_chunks(params, exec, cores);
         }
 
         /// Reset the internal round robin thread distribution scheme for the

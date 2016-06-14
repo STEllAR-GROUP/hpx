@@ -1,12 +1,10 @@
-# Copyright (c) 2007-2016 Hartmut Kaiser
+# Copyright (c) 2016 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    moveonly_constructor_arguments_1405
-    partitioned_vector_2201
-    returned_client_2150
+    block_allocator
    )
 
 foreach(test ${tests})
@@ -21,19 +19,19 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Components")
+                     FOLDER "Tests/Unit/Compute/Host")
 
-  add_hpx_regression_test("components_dir" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("host_" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this test
-  add_hpx_pseudo_target(tests.regressions.components_dir.${test})
+  # add a custom target for this example
+  add_hpx_pseudo_target(tests.unit.computeapi.host_.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.components_dir
-                              tests.regressions.components_dir.${test})
+  add_hpx_pseudo_dependencies(tests.unit.computeapi.host_
+                              tests.unit.computeapi.host_.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.components_dir.${test}
+  add_hpx_pseudo_dependencies(tests.unit.computeapi.host_.${test}
                               ${test}_test_exe)
 endforeach()
 

@@ -1095,13 +1095,13 @@ namespace hpx { namespace threads
 
     /// This is equivalent to malloc(), except that it tries to allocate
     /// page-aligned memory from the OS.
-    void* hwloc_topology::allocate(std::size_t len)
+    void* hwloc_topology::allocate(std::size_t len) const
     {
         return hwloc_alloc(topo, len);
     }
 
     /// Free memory that was previously allocated by allocate
-    void hwloc_topology::deallocate(void* addr, std::size_t len)
+    void hwloc_topology::deallocate(void* addr, std::size_t len) const
     {
         hwloc_free(topo, addr, len);
     }
