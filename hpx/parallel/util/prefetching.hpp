@@ -7,7 +7,6 @@
 #define HPX_PREFETCHING_LOOP
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/util/loop.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <iterator>
