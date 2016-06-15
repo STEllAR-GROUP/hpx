@@ -13,13 +13,14 @@
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/util/void_guard.hpp>
 
+#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+
 
 #include <algorithm>
 #include <iterator>
@@ -94,8 +95,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         util::projection_identity());
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename T>
+        static typename util::detail::algorithm_result<
+            ExPolicy, void
+        >::type
+        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
+            std::false_type)
+        {
+
+            typedef std::integral_constant<bool,
+                parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                !hpx::traits::is_forward_iterator<InIter>::value
+            > is_seq;
+
+            return detail::fill().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, value);
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename T>
+        static typename util::detail::algorithm_result<
+            ExPolicy, void
+        >::type
+        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
+            std::true_type);
         /// \endcond
     }
+
 
     /// Assigns the given value to the elements in the range [first, last).
     ///
@@ -142,16 +170,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >::type
     fill(ExPolicy && policy, InIter first, InIter last, T value)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<InIter>::value),
-            "Requires at least forward iterator.");
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
-
-        return detail::fill().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, value);
+        return detail::fill_(
+            std::forward<ExPolicy>(policy), first, last, value,
+                is_segmented()
+            );
     }
+
+
+
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
     namespace detail
