@@ -60,7 +60,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
-            typedef typename util::detail::algorithm_result<ExPolicy, void>::type result_type;
+            typedef typename util::detail::algorithm_result<
+                ExPolicy, void
+            >::type result_type;
+
             return hpx::util::void_guard<result_type>(),
                 hpx::parallel::for_each(std::forward<ExPolicy>(policy),
                     first, last, fill_function<T>(value));
