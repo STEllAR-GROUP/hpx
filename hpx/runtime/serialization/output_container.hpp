@@ -90,7 +90,7 @@ namespace hpx { namespace serialization
         output_container(Container& cont,
             std::vector<serialization_chunk>* chunks,
             binary_filter* filter)
-            : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
+            : cont_(cont), current_(0), start_compressing_at_(0), filter_(nullptr),
               chunks_(chunks), current_chunk_(std::size_t(-1))
         {
             if (chunks_)

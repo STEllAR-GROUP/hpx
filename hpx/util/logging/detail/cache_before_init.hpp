@@ -80,7 +80,7 @@ private:
     };
 
     struct thread_info {
-        thread_info() : last_enabled(0) {}
+        thread_info() : last_enabled(nullptr) {}
         is_enabled_func last_enabled;
     };
 

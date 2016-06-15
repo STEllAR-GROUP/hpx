@@ -59,7 +59,7 @@ namespace hpx { namespace threads { namespace detail
         thread_self* self = get_self_ptr();
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-        if (0 == data.parent_id) {
+        if (nullptr == data.parent_id) {
 
             if (self)
             {
@@ -71,7 +71,7 @@ namespace hpx { namespace threads { namespace detail
             data.parent_locality_id = get_locality_id();
 #endif
 
-        if (0 == data.scheduler_base)
+        if (nullptr == data.scheduler_base)
             data.scheduler_base = scheduler;
 
         // Pass critical priority from parent to child.
@@ -86,12 +86,12 @@ namespace hpx { namespace threads { namespace detail
             thread_priority_boost == data.priority)
         {
             // For critical priority threads, create the thread immediately.
-            scheduler->create_thread(data, 0, initial_state, true, ec,
+            scheduler->create_thread(data, nullptr, initial_state, true, ec,
                 data.num_os_thread);
         }
         else {
             // Create a task description for the new thread.
-            scheduler->create_thread(data, 0, initial_state, false, ec,
+            scheduler->create_thread(data, nullptr, initial_state, false, ec,
                 data.num_os_thread);
         }
     }

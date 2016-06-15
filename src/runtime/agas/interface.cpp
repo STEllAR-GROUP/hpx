@@ -418,7 +418,7 @@ naming::id_type get_console_locality(
 
 boost::uint32_t get_locality_id(error_code& ec)
 {
-    if (get_runtime_ptr() == 0)
+    if (get_runtime_ptr() == nullptr)
         return naming::invalid_locality_id;
 
     naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
@@ -431,7 +431,7 @@ naming::gid_type get_next_id(
   , error_code& ec
     )
 {
-    if (get_runtime_ptr() == 0)
+    if (get_runtime_ptr() == nullptr)
     {
         HPX_THROWS_IF(ec, invalid_status,
             "get_next_id", "the runtime system has not been started yet.");

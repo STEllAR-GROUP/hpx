@@ -141,7 +141,7 @@ namespace hpx { namespace threads { namespace coroutines
             typedef x86_linux_context_impl_base context_impl_base;
 
             x86_linux_context_impl()
-                : m_stack(0)
+                : m_stack(nullptr)
             {}
 
             /**
@@ -153,7 +153,7 @@ namespace hpx { namespace threads { namespace coroutines
               : m_stack_size(stack_size == -1
                   ? static_cast<std::ptrdiff_t>(default_stack_size)
                   : stack_size),
-                m_stack(0)
+                m_stack(nullptr)
             {
                 if (0 != (m_stack_size % EXEC_PAGESIZE))
                 {

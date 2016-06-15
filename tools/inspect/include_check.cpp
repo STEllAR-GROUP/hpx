@@ -39,7 +39,7 @@ namespace boost
       { "(\\bstd\\s*::\\s*(mem((set)|(cpy)|(move)))\\b)", "std::\\2", "cstring" },
       { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
       { "(\\bboost\\s*::\\s*(((exception)|(intrusive))_ptr)\\b)", "boost::\\3_ptr", "boost/\\3_ptr.hpp" },
-      { 0, 0, 0 }
+      { nullptr, nullptr, nullptr }
     };
 
     //  include_check constructor  -------------------------------------------//
@@ -58,7 +58,7 @@ namespace boost
       register_signature( ".ipp" );
 
       for (names_includes const* names_it = &names[0];
-           names_it->name_regex != 0;
+           names_it->name_regex != nullptr;
            ++names_it)
       {
         std::string rx(names_it->name_regex);

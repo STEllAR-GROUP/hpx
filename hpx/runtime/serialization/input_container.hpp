@@ -49,7 +49,7 @@ namespace hpx { namespace serialization
         input_container(Container const& cont, std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
+            chunks_(nullptr), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {}
 
         input_container(Container const& cont,
@@ -57,7 +57,7 @@ namespace hpx { namespace serialization
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
+            chunks_(nullptr), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {
             if (chunks && chunks->size() != 0)
             {

@@ -1499,7 +1499,7 @@ namespace hpx
 
         HPX_THROWS_IF(ec, invalid_status, "create_message_handler",
             "the runtime system is not available at this time");
-        return 0;
+        return nullptr;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1514,7 +1514,7 @@ namespace hpx
 
         HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
             "the runtime system is not available at this time");
-        return 0;
+        return nullptr;
     }
 
     // helper function to stop evaluating counters during shutdown

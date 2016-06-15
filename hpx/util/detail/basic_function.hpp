@@ -39,7 +39,7 @@ namespace hpx { namespace util { namespace detail
     template <typename F>
     static bool is_empty_function(F const& f, std::true_type) HPX_NOEXCEPT
     {
-        return f == 0;
+        return f == nullptr;
     }
 
     template <typename F>

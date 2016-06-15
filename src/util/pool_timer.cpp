@@ -135,7 +135,7 @@ namespace hpx { namespace util { namespace detail
             is_stopped_ = false;
             is_started_ = true;
 
-            HPX_ASSERT(timer_ != 0);
+            HPX_ASSERT(timer_ != nullptr);
             timer_->expires_at(abs_time_);
             timer_->async_wait(util::bind(&pool_timer::timer_handler,
                 this->shared_from_this()));
@@ -157,7 +157,7 @@ namespace hpx { namespace util { namespace detail
             is_started_ = false;
             is_stopped_ = true;
 
-            HPX_ASSERT(timer_ != 0);
+            HPX_ASSERT(timer_ != nullptr);
             timer_->cancel();
             return true;
         }
@@ -177,7 +177,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
         delete timer_;
-        timer_ = 0;
+        timer_ = nullptr;
     }
 
     pool_timer::~pool_timer()

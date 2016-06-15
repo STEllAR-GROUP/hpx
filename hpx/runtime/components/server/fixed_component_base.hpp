@@ -208,7 +208,7 @@ namespace detail
         static Component* alloc(std::size_t count)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
-            return 0;
+            return nullptr;
         }
         static void free(void* p, std::size_t count)
         {
@@ -232,7 +232,7 @@ class fixed_component : public Component
     static Component* create(std::size_t count)
     {
         HPX_ASSERT(false);        // this shouldn't ever be called
-        return 0;
+        return nullptr;
     }
 
     /// \brief  The function \a destroy is used for destruction and

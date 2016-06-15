@@ -45,7 +45,7 @@ int hpx_main()
     }
 
     // add a single nullptr in the end as some application rely on that
-    argv[argcount] = 0;
+    argv[argcount] = nullptr;
 
     // Invoke hpx_main
     return hpx_main(static_cast<int>(argcount), argv.data());

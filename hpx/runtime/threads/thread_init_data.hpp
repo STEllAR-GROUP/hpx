@@ -38,13 +38,13 @@ namespace hpx { namespace threads
             description(),
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            parent_locality_id(0), parent_id(0), parent_phase(0),
+            parent_locality_id(0), parent_id(nullptr), parent_phase(0),
 #endif
             priority(thread_priority_normal),
             num_os_thread(std::size_t(-1)),
             stacksize(get_default_stack_size()),
             target(),
-            scheduler_base(0)
+            scheduler_base(nullptr)
         {}
 
         thread_init_data(thread_init_data&& rhs)
@@ -82,7 +82,7 @@ namespace hpx { namespace threads
             description(desc),
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            parent_locality_id(0), parent_id(0), parent_phase(0),
+            parent_locality_id(0), parent_id(nullptr), parent_phase(0),
 #endif
             priority(priority_), num_os_thread(os_thread),
             stacksize(stacksize_ == std::ptrdiff_t(-1) ?

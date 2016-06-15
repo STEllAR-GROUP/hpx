@@ -256,7 +256,7 @@ namespace hpx { namespace components
           : registered_name_(std::move(rhs.registered_name_)),
             shared_state_(std::move(rhs.shared_state_))
         {
-            rhs.shared_state_ = 0;
+            rhs.shared_state_ = nullptr;
         }
 
         // A future to a client_base can be unwrapped to represent the
@@ -327,7 +327,7 @@ namespace hpx { namespace components
         // Returns: true only if *this refers to a shared state.
         bool valid() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0;
+            return shared_state_ != nullptr;
         }
 
         // check whether the embedded shared state is valid

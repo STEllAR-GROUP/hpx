@@ -61,7 +61,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         {
             if (!messages_.empty())
             {
-                if (0 == threads::get_self_ptr())
+                if (nullptr == threads::get_self_ptr())
                 {
                     // reschedule this call on a new HPX thread
                     using parcelset::parcelport;

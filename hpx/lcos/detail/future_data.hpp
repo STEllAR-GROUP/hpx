@@ -357,7 +357,7 @@ namespace detail
         {
             // We need to run the completion asynchronously if we aren't on a
             // HPX thread
-            if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+            if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
             {
                 HPX_THROW_EXCEPTION(null_thread_id,
                         "future_data::handle_on_completed",
@@ -702,12 +702,12 @@ namespace detail
 
     public:
         task_base()
-          : started_(false), sched_(0)
+          : started_(false), sched_(nullptr)
         {}
 
         task_base(threads::executor& sched)
           : started_(false),
-            sched_(sched ? &sched : 0)
+            sched_(sched ? &sched : nullptr)
         {}
 
         virtual void execute_deferred(error_code& ec = throws)

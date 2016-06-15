@@ -91,7 +91,7 @@ namespace hpx { namespace threads
     mask_type hwloc_topology::empty_mask = mask_type();
 
     hwloc_topology::hwloc_topology()
-      : topo(0), machine_affinity_mask_(0)
+      : topo(nullptr), machine_affinity_mask_(0)
     { // {{{
         int err = hwloc_topology_init(&topo);
         if (err != 0)

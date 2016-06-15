@@ -74,12 +74,12 @@ namespace hpx { namespace parcelset
         {}
 
         locality(locality const & other)
-          : impl_(other.impl_ ? other.impl_->clone() : 0)
+          : impl_(other.impl_ ? other.impl_->clone() : nullptr)
         {
         }
 
         locality(locality && other)
-          : impl_(other.impl_ ? other.impl_->move() : 0)
+          : impl_(other.impl_ ? other.impl_->move() : nullptr)
         {
         }
 

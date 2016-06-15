@@ -60,7 +60,7 @@ struct level {
 See @ref hpx::util::logging::tag "how to use tags".
 */
 struct time {
-    time() : val( ::time(0) ) {}
+    time() : val( ::time(nullptr) ) {}
     ::time_t val;
 };
 

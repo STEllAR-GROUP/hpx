@@ -39,7 +39,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*detail\\s*::\\s*atomic_count\\b)", "hpx::util::atomic_count" },
       { "(\\bboost\\s*::\\s*function\\b)", "hpx::util::function_nonser" },
       { "(\\bNULL\\b)", "nullptr" },
-      { 0, 0 }
+      { nullptr, nullptr }
     };
 
     //  deprecated_name_check constructor  --------------------------------- //
@@ -58,7 +58,7 @@ namespace boost
       register_signature( ".ipp" );
 
       for (deprecated_names const* names_it = &names[0];
-           names_it->name_regex != 0;
+           names_it->name_regex != nullptr;
            ++names_it)
       {
         std::string rx(names_it->name_regex);
