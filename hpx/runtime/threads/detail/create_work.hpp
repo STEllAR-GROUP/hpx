@@ -42,7 +42,7 @@ namespace hpx { namespace threads { namespace detail
         if (!data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                "thread::detail::create_work", "description is NULL");
+                "thread::detail::create_work", "description is nullptr");
             return;
         }
 #endif

@@ -508,7 +508,7 @@ namespace hpx
         {}
 
         segment_vector_iterator(BaseIter const& it,
-                partitioned_vector<T, Data>* data = 0)
+                partitioned_vector<T, Data>* data = nullptr)
           : base_type(it), data_(data)
         {}
 
@@ -542,7 +542,7 @@ namespace hpx
         {}
 
         const_segment_vector_iterator(BaseIter const& it,
-                partitioned_vector<T, Data> const* data = 0)
+                partitioned_vector<T, Data> const* data = nullptr)
           : base_type(it), data_(data)
         {}
 

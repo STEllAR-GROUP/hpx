@@ -59,7 +59,7 @@ namespace hpx { namespace plugins { namespace compression
       : public serialization::binary_filter
     {
         zlib_serialization_filter(bool compress = false,
-                serialization::binary_filter* next_filter = 0)
+                serialization::binary_filter* next_filter = nullptr)
           : compdecomp_(compress), current_(0)
         {}
 

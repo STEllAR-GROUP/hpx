@@ -264,7 +264,7 @@ namespace hpx { namespace threads { namespace detail
 
         while (true) {
             // Get the next HPX thread from the queue
-            thread_data* thrd = NULL;
+            thread_data* thrd = nullptr;
 
             if (scheduler.SchedulingPolicy::get_next_thread(
                     num_thread, idle_loop_count, thrd))

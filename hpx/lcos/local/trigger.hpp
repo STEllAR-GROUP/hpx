@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         /// \brief get a future allowing to wait for the trigger to fire
-        future<void> get_future(std::size_t* generation_value = 0,
+        future<void> get_future(std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
             std::lock_guard<mutex_type> l(mtx_);

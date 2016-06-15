@@ -79,7 +79,7 @@ namespace hpx { namespace util { namespace storage
                     typename boost::disable_if<boost::is_same<
                         elem_type,
                         typename util::decay<T>::type
-                    > >::type* = 0)
+                    > >::type* = nullptr)
             {
                 tuple_.push_back(elem_type(field)); // insert an any object
                 return *this;

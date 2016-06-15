@@ -59,7 +59,7 @@ namespace hpx { namespace util { namespace detail
             return &x;
         }
 
-        pointer allocate(size_type n, void* /*hint*/ = 0)
+        pointer allocate(size_type n, void* /*hint*/ = nullptr)
         {
             HPX_ASSERT(memory_pool_);
             return reinterpret_cast<T*>(memory_pool_->allocate(sizeof(T) * n));

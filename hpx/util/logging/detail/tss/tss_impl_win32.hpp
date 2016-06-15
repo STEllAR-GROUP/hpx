@@ -90,10 +90,10 @@ inline unsigned long slot_idx() {
 
 inline tss_slots* get_slots()
 {
-    tss_slots* slots = 0;
+    tss_slots* slots = nullptr;
     slots = static_cast<tss_slots*>( TlsGetValue( tss_data_native_key() ));
 
-    if (slots == 0)
+    if (slots == nullptr)
     {
         std::auto_ptr<tss_slots> temp( new_object_ensure_delete<tss_slots>() );
         // pre-allocate a few elems, so that we'll be fast

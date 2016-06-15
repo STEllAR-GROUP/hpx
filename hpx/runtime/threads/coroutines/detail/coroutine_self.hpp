@@ -160,7 +160,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
         }
 
-        explicit coroutine_self(impl_type * pimpl, coroutine_self* next_self = 0)
+        explicit coroutine_self(impl_type * pimpl,
+                coroutine_self* next_self = nullptr)
           : m_pimpl(pimpl), next_self_(next_self)
         {}
 

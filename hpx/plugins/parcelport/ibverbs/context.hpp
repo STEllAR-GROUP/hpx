@@ -51,7 +51,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
             ibv_cq * cq;
             ibv_wc wc[N];
-            void *dummy = NULL;
+            void *dummy = nullptr;
 
             while(ret == -1)
             {
@@ -116,7 +116,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
             ibv_cq * cq;
             ibv_wc wc[N];
-            void *dummy = NULL;
+            void *dummy = nullptr;
             ret = ibv_get_cq_event(this_->comp_channel_, &cq, &dummy);
             if(ret == -1)
             {
@@ -340,7 +340,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
                 int ret = 0;
 
-                ret = rdma_create_id(event_channel_, &conn_, NULL, RDMA_PS_TCP);
+                ret = rdma_create_id(event_channel_, &conn_, nullptr, RDMA_PS_TCP);
                 if(ret)
                 {
                     int verrno = errno;
@@ -358,7 +358,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 ret = getaddrinfo(
                     there.address().to_string().c_str()
                   , std::to_string(there.port()).c_str()
-                  , NULL
+                  , nullptr
                   , &addr
                 );
 
@@ -372,7 +372,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     return;
                 }
                 const int TIMEOUT_IN_MS = 500;
-                ret = rdma_resolve_addr(conn_, NULL, addr->ai_addr, TIMEOUT_IN_MS);
+                ret = rdma_resolve_addr(conn_, nullptr, addr->ai_addr, TIMEOUT_IN_MS);
                 freeaddrinfo(addr);
 
                 if(ret)
@@ -565,7 +565,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 return;
             }
 
-            cq_ = ibv_create_cq(ctx_, 10, NULL, comp_channel_, 0);
+            cq_ = ibv_create_cq(ctx_, 10, nullptr, comp_channel_, 0);
             if(!cq_)
             {
                 int verrno = errno;

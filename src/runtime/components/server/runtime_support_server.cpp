@@ -1592,11 +1592,11 @@ namespace hpx { namespace components { namespace server
         try {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = NULL;
+            util::section const* glob_ini = nullptr;
             if (ini.has_section("settings"))
                 glob_ini = ini.get_section("settings");
 
-            util::section const* component_ini = NULL;
+            util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
@@ -1718,9 +1718,9 @@ namespace hpx { namespace components { namespace server
         //  key = value
         //
         util::section* sec = ini.get_section("hpx.components");
-        if (NULL == sec)
+        if (nullptr == sec)
         {
-            LRT_(error) << "NULL section found";
+            LRT_(error) << "nullptr section found";
             return 0;     // something bad happened
         }
 
@@ -2074,11 +2074,11 @@ namespace hpx { namespace components { namespace server
         try {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = NULL;
+            util::section const* glob_ini = nullptr;
             if (ini.has_section("settings"))
                 glob_ini = ini.get_section("settings");
 
-            util::section const* component_ini = NULL;
+            util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
@@ -2191,9 +2191,9 @@ namespace hpx { namespace components { namespace server
         //  key = value
         //
         util::section* sec = ini.get_section("hpx.plugins");
-        if (NULL == sec)
+        if (nullptr == sec)
         {
-            LRT_(error) << "NULL section found";
+            LRT_(error) << "nullptr section found";
             return false;     // something bad happened
         }
 
@@ -2295,11 +2295,11 @@ namespace hpx { namespace components { namespace server
         try {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = NULL;
+            util::section const* glob_ini = nullptr;
             if (ini.has_section("settings"))
                 glob_ini = ini.get_section("settings");
 
-            util::section const* plugin_ini = NULL;
+            util::section const* plugin_ini = nullptr;
             std::string plugin_section("hpx.plugins." + instance);
             if (ini.has_section(plugin_section))
                 plugin_ini = ini.get_section(plugin_section);
@@ -2432,7 +2432,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to extract capabilities for component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
 
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,

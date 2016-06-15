@@ -449,7 +449,7 @@ namespace hpx
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
     inline int
-    init(std::string const& app_name, int argc = 0, char** argv = 0,
+    init(std::string const& app_name, int argc = 0, char** argv = nullptr,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -490,7 +490,7 @@ namespace hpx
 #if !defined(HPX_HAVE_STATIC_LINKING)
     inline
 #endif
-    int init(int argc = 0, char** argv = 0,
+    int init(int argc = 0, char** argv = nullptr,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.

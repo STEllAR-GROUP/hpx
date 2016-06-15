@@ -84,7 +84,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 }
 
                 int ret = 0;
-                ret = rdma_create_id(event_channel_, &listener_, NULL, RDMA_PS_TCP);
+                ret = rdma_create_id(event_channel_, &listener_, nullptr, RDMA_PS_TCP);
 
                 if(ret)
                 {
@@ -104,7 +104,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
                 addrinfo *addr;
 
-                getaddrinfo(host.c_str(), port.c_str(), NULL, &addr);
+                getaddrinfo(host.c_str(), port.c_str(), nullptr, &addr);
 
                 ret = rdma_bind_addr(listener_, addr->ai_addr);
 

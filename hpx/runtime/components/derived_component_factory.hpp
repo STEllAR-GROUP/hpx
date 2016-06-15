@@ -52,7 +52,7 @@ namespace hpx { namespace components
         /// \param global   [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the [settings]
         ///                 section of the global configuration file (hpx.ini)
-        ///                 This pointer may be NULL if no such section has
+        ///                 This pointer may be nullptr if no such section has
         ///                 been found.
         /// \param local    [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the section
@@ -68,9 +68,9 @@ namespace hpx { namespace components
           : isenabled_(isenabled), refcnt_(0)
         {
             // store the configuration settings
-            if (NULL != global)
+            if (nullptr != global)
                 global_settings_ = *global;
-            if (NULL != local)
+            if (nullptr != local)
                 local_settings_ = *local;
         }
 

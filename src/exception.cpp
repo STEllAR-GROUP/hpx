@@ -172,8 +172,8 @@ namespace hpx { namespace detail
     inline std::size_t get_arraylen(char** array)
     {
         std::size_t count = 0;
-        if (NULL != array) {
-            while(NULL != array[count])
+        if (nullptr != array) {
+            while(nullptr != array[count])
                 ++count;   // simply count the environment strings
         }
         return count;
@@ -352,7 +352,7 @@ namespace hpx { namespace detail
         util::thread_description thread_name;
 
         threads::thread_self* self = threads::get_self_ptr();
-        if (NULL != self)
+        if (nullptr != self)
         {
             if (threads::threadmanager_is(state_running))
                 shepherd = hpx::get_worker_thread_num();
@@ -473,7 +473,7 @@ namespace hpx { namespace detail
             // If the runtime pointer is available, we can safely get the prefix
             // of this locality. If it's not available, then just terminate.
             runtime* rt = get_runtime_ptr();
-            if (NULL != rt)  {
+            if (nullptr != rt)  {
                 rt->report_error(boost::current_exception());
             }
             else {

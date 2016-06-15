@@ -114,7 +114,7 @@ namespace hpx { namespace util
             }
 
             //std::size_t size = 0;
-            value_type* p = NULL;
+            value_type* p = nullptr;
             {
                 if (!heap_list_.empty())
                 {
@@ -175,7 +175,7 @@ namespace hpx { namespace util
                     result = heap->alloc(&p, count);
                 }
 
-                if (HPX_UNLIKELY(!result || NULL == p))
+                if (HPX_UNLIKELY(!result || nullptr == p))
                 {
                     // out of memory
                     HPX_THROW_EXCEPTION(out_of_memory,
@@ -218,7 +218,7 @@ namespace hpx { namespace util
             if (HPX_UNLIKELY(!p))
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
-                    name() + "::add_heap", "encountered NULL heap");
+                    name() + "::add_heap", "encountered nullptr heap");
             }
 
             unique_lock_type ul(mtx_);
@@ -259,7 +259,7 @@ namespace hpx { namespace util
         {
             unique_lock_type ul(mtx_);
 
-            if (NULL == p || !threads::threadmanager_is(state_running))
+            if (nullptr == p || !threads::threadmanager_is(state_running))
                 return;
 
             // if this is called from outside a HPX thread we need to

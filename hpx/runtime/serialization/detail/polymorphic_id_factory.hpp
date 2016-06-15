@@ -118,7 +118,7 @@ namespace hpx { namespace serialization {
             void cache_id(boost::uint32_t id, ctor_t ctor)
             {
                 if (id >= cache.size()) //-V104
-                    cache.resize(id + 1, NULL); //-V106
+                    cache.resize(id + 1, nullptr); //-V106
                 cache[id] = ctor; //-V108
             }
 
@@ -149,7 +149,7 @@ namespace hpx { namespace serialization {
                       , "Unknown type descriptor " + std::to_string(id));
 
                 ctor_t ctor = vec[id]; //-V108
-                HPX_ASSERT(ctor != NULL);
+                HPX_ASSERT(ctor != nullptr);
                 return static_cast<T*>(ctor());
             }
 

@@ -200,12 +200,13 @@ namespace hpx { namespace threads
     HPX_API_EXPORT char const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT char const* set_thread_backtrace(
-        thread_id_type const& id, char const* bt = 0, error_code& ec = throws);
+        thread_id_type const& id, char const* bt = nullptr,
+        error_code& ec = throws);
 #else
     HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
-        thread_id_type const& id, util::backtrace const* bt = 0,
+        thread_id_type const& id, util::backtrace const* bt = nullptr,
         error_code& ec = throws);
 #endif
 

@@ -83,7 +83,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
                 return;
             }
-            struct ibv_recv_wr wr, *bad_wr = NULL;
+            struct ibv_recv_wr wr, *bad_wr = nullptr;
             struct ibv_sge sge;
 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
@@ -123,7 +123,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 return;
             }
 
-            struct ibv_send_wr wr, *bad_wr = NULL;
+            struct ibv_send_wr wr, *bad_wr = nullptr;
             struct ibv_sge sge;
 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
