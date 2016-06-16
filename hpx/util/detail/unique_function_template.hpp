@@ -16,6 +16,7 @@
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -78,6 +79,10 @@ namespace hpx { namespace util
         typedef typename base_type::result_type result_type;
 
         unique_function() HPX_NOEXCEPT
+          : base_type()
+        {}
+
+        unique_function(std::nullptr_t) HPX_NOEXCEPT
           : base_type()
         {}
 
