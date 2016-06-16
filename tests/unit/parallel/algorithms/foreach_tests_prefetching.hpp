@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_TEST_FOREACH_MAY24_16
 
 #include <hpx/include/parallel_for_each.hpp>
+#include <hpx/parallel/util/prefetching.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/functions.hpp>
@@ -24,33 +25,31 @@ void test_for_each_prefetching(ExPolicy && policy, IteratorTag)
         hpx::parallel::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
-
     std::size_t prefetch_distance_factor = 2;
-    std::vector<double> c(10007,1.0);
-    std::vector<double> range(10007);
-    for(int i=0; i<10007; ++i)
-        range[i] = i;
+    std::vector<double> c(10007, 1.0);
 
-    auto ctx = hpx::parallel::util::detail::make_prefetcher_context(range.begin(),
-        range.end(), prefetch_distance_factor, c.data());
+    std::vector<std::size_t> range(10007);
+    std::iota(range.begin(), range.end(), 0);
+
+    auto ctx = hpx::parallel::util::make_prefetcher_context(
+        range.begin(), range.end(), prefetch_distance_factor, c);
 
     hpx::parallel::for_each(std::forward<ExPolicy>(policy),
         ctx.begin(), ctx.end(),
-        [&](std::size_t i) {
+        [&](std::size_t i)
+        {
             c[i] = 42.1;
         });
-
 
     // verify values
     std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(42.1));
+        [&count](double v) -> void
+        {
+            HPX_TEST_EQ(v, 42.1);
             ++count;
         });
     HPX_TEST_EQ(count, c.size());
-
-
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -60,15 +59,15 @@ void test_for_each_prefetching_async(ExPolicy && p, IteratorTag)
     std::vector<double>::iterator, double> iterator;
 
     std::size_t prefetch_distance_factor = 2;
-    std::vector<double> c(10007,1.0);
-    std::vector<double> range(10007);
-    for(int i=0; i<10007; ++i)
-        range[i] = i;
+    std::vector<double> c(10007, 1.0);
 
-    auto ctx = hpx::parallel::util::detail::make_prefetcher_context(range.begin(),
-        range.end(), prefetch_distance_factor, c.data());
+    std::vector<std::size_t> range(10007);
+    std::iota(range.begin(), range.end(), 0);
 
-    hpx::future<iterator> f =
+    auto ctx = hpx::parallel::util::make_prefetcher_context(range.begin(),
+        range.end(), prefetch_distance_factor, c);
+
+    auto f =
         hpx::parallel::for_each(std::forward<ExPolicy>(p),
         ctx.begin(), ctx.end(),
         [&](std::size_t i)
@@ -80,8 +79,9 @@ void test_for_each_prefetching_async(ExPolicy && p, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(42.1));
+        [&count](double v) -> void
+        {
+            HPX_TEST_EQ(v, 42.1);
             ++count;
         });
     HPX_TEST_EQ(count, c.size());
@@ -99,13 +99,13 @@ void test_for_each_prefetching_exception(ExPolicy policy, IteratorTag)
     std::vector<double>::iterator, double> iterator;
 
     std::size_t prefetch_distance_factor = 2;
-    std::vector<double> c(10007,1.0);
-    std::vector<double> range(10007);
-    for(int i=0; i<10007; ++i)
-        range[i] = i;
+    std::vector<double> c(10007, 1.0);
 
-    auto ctx = hpx::parallel::util::detail::make_prefetcher_context(range.begin(),
-        range.end(), prefetch_distance_factor, c.data());
+    std::vector<std::size_t> range(10007);
+    std::iota(range.begin(), range.end(), 0);
+
+    auto ctx = hpx::parallel::util::make_prefetcher_context(range.begin(),
+        range.end(), prefetch_distance_factor, c);
 
 
     bool caught_exception = false;
@@ -136,19 +136,18 @@ void test_for_each_prefetching_exception_async(ExPolicy p, IteratorTag)
     std::vector<double>::iterator, double> iterator;
 
     std::size_t prefetch_distance_factor = 2;
-    std::vector<double> c(10007,1.0);
-    std::vector<double> range(10007);
-    for(int i=0; i<10007; ++i)
-        range[i] = i;
+    std::vector<double> c(10007, 1.0);
 
-    auto ctx = hpx::parallel::util::detail::make_prefetcher_context(range.begin(),
-        range.end(), prefetch_distance_factor, c.data());
+    std::vector<std::size_t> range(10007);
+    std::iota(range.begin(), range.end(), 0);
 
+    auto ctx = hpx::parallel::util::make_prefetcher_context(range.begin(),
+        range.end(), prefetch_distance_factor, c);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<iterator> f =
+        auto f =
             hpx::parallel::for_each(p,
                 ctx.begin(), ctx.end(),
                 [](std::size_t i) { throw std::runtime_error("test"); });
@@ -167,7 +166,6 @@ void test_for_each_prefetching_exception_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,13 +180,13 @@ void test_for_each_prefetching_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<double>::iterator, double> iterator;
 
     std::size_t prefetch_distance_factor = 2;
-    std::vector<double> c(10007,1.0);
-    std::vector<double> range(10007);
-    for(int i=0; i<10007; ++i)
-        range[i] = i;
+    std::vector<double> c(10007, 1.0);
 
-    auto ctx = hpx::parallel::util::detail::make_prefetcher_context(range.begin(),
-        range.end(), prefetch_distance_factor, c.data());
+    std::vector<std::size_t> range(10007);
+    std::iota(range.begin(), range.end(), 0);
+
+    auto ctx = hpx::parallel::util::make_prefetcher_context(range.begin(),
+        range.end(), prefetch_distance_factor, c);
 
     bool caught_exception = false;
     try {
@@ -206,7 +204,6 @@ void test_for_each_prefetching_bad_alloc(ExPolicy policy, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
-
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -216,20 +213,19 @@ void test_for_each_prefetching_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<double>::iterator, double> iterator;
 
     std::size_t prefetch_distance_factor = 2;
-    std::vector<double> c(10007,1.0);
-    std::vector<double> range(10007);
-    for(int i=0; i<10007; ++i)
-        range[i] = i;
+    std::vector<double> c(10007, 1.0);
 
-    auto ctx = hpx::parallel::util::detail::make_prefetcher_context(range.begin(),
-        range.end(), prefetch_distance_factor, c.data());
+    std::vector<std::size_t> range(10007);
+    std::iota(range.begin(), range.end(), 0);
+
+    auto ctx = hpx::parallel::util::make_prefetcher_context(range.begin(),
+        range.end(), prefetch_distance_factor, c);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
 
     try {
-
-        hpx::future<iterator> f =
+        auto f =
             hpx::parallel::for_each(p,
                 ctx.begin(), ctx.end(),
                 [](std::size_t i) { throw std::bad_alloc(); });
@@ -247,7 +243,6 @@ void test_for_each_prefetching_bad_alloc_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
-
 }
 
 #endif

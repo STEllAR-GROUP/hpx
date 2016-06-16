@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/prefetching.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <iterator>

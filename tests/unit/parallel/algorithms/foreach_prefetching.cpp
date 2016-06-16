@@ -90,7 +90,6 @@ void for_each_prefetching_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-
     unsigned int seed = (unsigned int)std::time(0);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
@@ -106,7 +105,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-
     // add command line option which controls the random number generator seed
     using namespace boost::program_options;
     options_description desc_commandline(
