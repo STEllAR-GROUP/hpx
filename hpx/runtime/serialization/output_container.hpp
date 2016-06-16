@@ -170,7 +170,7 @@ namespace hpx { namespace serialization
 
         void set_filter(binary_filter* filter) // override
         {
-            HPX_ASSERT(0 == filter_);
+            HPX_ASSERT(nullptr == filter_);
             filter_ = filter;
             start_compressing_at_ = current_;
 
@@ -225,7 +225,8 @@ namespace hpx { namespace serialization
 
         void save_binary_chunk(void const* address, std::size_t count) // override
         {
-            if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            if (filter_ || chunks_ == nullptr ||
+                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);

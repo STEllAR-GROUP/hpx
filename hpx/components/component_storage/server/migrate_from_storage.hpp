@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace server
 
             {
                 std::vector<char> data = f.get();
-                serialization::input_archive archive(data, data.size(), 0);
+                serialization::input_archive archive(data, data.size(), nullptr);
                 archive >> ptr;
             }
 

@@ -105,7 +105,7 @@ int hpx_main(
     ///////////////////////////////////////////////////////////////////////////
     // Initialize the PRNG seed.
     if (!seed)
-        seed = boost::uint64_t(std::time(0));
+        seed = boost::uint64_t(std::time(nullptr));
 
     {
 

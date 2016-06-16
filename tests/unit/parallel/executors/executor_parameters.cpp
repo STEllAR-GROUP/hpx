@@ -117,7 +117,7 @@ void test_persistent_auto_chunk_size()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = static_cast<unsigned int>(std::time(0));
+    unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 

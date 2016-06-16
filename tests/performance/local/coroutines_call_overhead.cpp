@@ -202,7 +202,7 @@ int hpx_main(
             header = false;
 
         if (!seed)
-            seed = boost::uint64_t(std::time(0));
+            seed = boost::uint64_t(std::time(nullptr));
 
         boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
 

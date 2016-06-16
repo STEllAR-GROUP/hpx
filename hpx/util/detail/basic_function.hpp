@@ -235,7 +235,7 @@ namespace hpx { namespace util { namespace detail
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())
-                return 0;
+                return nullptr;
 
             return &vtable::get<target_type>(object);
         }
@@ -251,7 +251,7 @@ namespace hpx { namespace util { namespace detail
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())
-                return 0;
+                return nullptr;
 
             return &vtable::get<target_type>(object);
         }

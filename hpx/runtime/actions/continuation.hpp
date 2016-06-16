@@ -336,7 +336,7 @@ namespace hpx { namespace actions
         {
             try {
                 HPX_ASSERT(result.is_ready());
-                HPX_ASSERT((0 !=
+                HPX_ASSERT((nullptr !=
                     dynamic_cast<
                         typed_continuation<Result, RemoteResult>*
                     >(cont.get())));

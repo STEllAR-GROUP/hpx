@@ -20,14 +20,14 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     interval_timer::interval_timer()
-      : microsecs_(0), id_(0)
+      : microsecs_(0), id_(nullptr)
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(),
-        microsecs_(microsecs), id_(0), description_(description),
+        microsecs_(microsecs), id_(nullptr), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false), is_stopped_(false)
     {}
@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(on_term),
-        microsecs_(microsecs), id_(0), description_(description),
+        microsecs_(microsecs), id_(nullptr), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false), is_stopped_(false)
     {}
@@ -122,12 +122,12 @@ namespace hpx { namespace util { namespace detail
                 error_code ec(lightweight);       // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
                     threads::wait_abort, threads::thread_priority_boost, ec);
-                id_ = 0;
+                id_ = nullptr;
             }
             return true;
         }
 
-        HPX_ASSERT(id_ == 0);
+        HPX_ASSERT(id_ == nullptr);
         return false;
     }
 
@@ -184,10 +184,10 @@ namespace hpx { namespace util { namespace detail
                 return threads::terminated;        // object has been finalized, exit
             }
 
-            if (id_ != 0 && id_ != threads::get_self_id())
+            if (id_ != nullptr && id_ != threads::get_self_id())
                 return threads::terminated;        // obsolete timer thread
 
-            id_ = 0;
+            id_ = nullptr;
             is_started_ = false;
 
             bool result = false;
@@ -198,7 +198,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             // some other thread might already have started the timer
-            if (0 == id_ && result) {
+            if (nullptr == id_ && result) {
                 HPX_ASSERT(!is_started_);
                 schedule_thread(l);        // wait and repeat
             }

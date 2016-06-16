@@ -263,7 +263,7 @@ namespace hpx { namespace components
         // client_base directly as a client_base is semantically a future to
         // the id of the referenced object.
         client_base(future<Derived> && d)
-          : shared_state_(d.valid() ? lcos::detail::unwrap(std::move(d)) : 0)
+          : shared_state_(d.valid() ? lcos::detail::unwrap(std::move(d)) : nullptr)
         {}
 
         ~client_base()
@@ -427,21 +427,21 @@ namespace hpx { namespace components
         // Returns: true if the shared state is ready, false if it isn't.
         bool is_ready() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0 && shared_state_->is_ready();
+            return shared_state_ != nullptr && shared_state_->is_ready();
         }
 
         // Returns: true if the shared state is ready and stores a value,
         //          false if it isn't.
         bool has_value() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0 && shared_state_->has_value();
+            return shared_state_ != nullptr && shared_state_->has_value();
         }
 
         // Returns: true if the shared state is ready and stores an exception,
         //          false if it isn't.
         bool has_exception() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0 && shared_state_->has_exception();
+            return shared_state_ != nullptr && shared_state_->has_exception();
         }
 
         void wait() const

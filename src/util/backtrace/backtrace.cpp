@@ -165,14 +165,15 @@ namespace hpx { namespace util {
             res.imbue(std::locale::classic());
             res << std::left << std::setw(sizeof(void*)*2) << std::setfill(' ')
                 << ptr <<": ";
-            Dl_info info = {0, 0, 0, 0};
+            Dl_info info = {nullptr, nullptr, nullptr, nullptr};
             if(dladdr(ptr,&info) == 0) {
                 res << "???";
             }
             else {
                 if(info.dli_sname) {
                     int status = 0;
-                    char *demangled = abi::__cxa_demangle(info.dli_sname,0,0,&status);
+                    char *demangled =
+                        abi::__cxa_demangle(info.dli_sname,nullptr,nullptr,&status);
                     if(demangled) {
                         res << demangled;
                         free(demangled);
@@ -228,11 +229,11 @@ namespace hpx { namespace util {
         {
             char ** ptr = backtrace_symbols(&address,1);
             try {
-                if(ptr == 0)
+                if(ptr == nullptr)
                     return std::string();
                 std::string res = ptr[0];
                 free(ptr);
-                ptr = 0;
+                ptr = nullptr;
                 return res;
             }
             catch(...) {
@@ -246,7 +247,7 @@ namespace hpx { namespace util {
         {
             char ** ptr = backtrace_symbols(address,size);
             try {
-                if(ptr==0)
+                if(ptr==nullptr)
                     return std::string();
                 std::string res = std::to_string(size)
                     + ((1==size)?" frame:":" frames:");
@@ -255,7 +256,7 @@ namespace hpx { namespace util {
                     res+=ptr[i];
                 }
                 free(ptr);
-                ptr = 0;
+                ptr = nullptr;
                 return res;
             }
             catch(...) {
@@ -270,12 +271,12 @@ namespace hpx { namespace util {
             char ** ptr = backtrace_symbols(addresses,size);
             out << size << ((1==size)?" frame:":" frames:");
             try {
-                if(ptr==0)
+                if(ptr==nullptr)
                     return;
                 for(std::size_t i=0;i<size;i++)
                     out << '\n' << ptr[i];
                 free(ptr);
-                ptr = 0;
+                ptr = nullptr;
                 out << std::flush;
             }
             catch(...) {
@@ -287,12 +288,12 @@ namespace hpx { namespace util {
 #elif defined(HPX_MSVC)
 
         namespace {
-            HANDLE hProcess = 0;
+            HANDLE hProcess = nullptr;
             bool syms_ready = false;
 
             void init()
             {
-                if(hProcess == 0) {
+                if(hProcess == nullptr) {
                     hProcess = GetCurrentProcess();
                     SymSetOptions(SYMOPT_DEFERRED_LOADS);
 
@@ -306,7 +307,7 @@ namespace hpx { namespace util {
 
         HPX_API_EXPORT std::string get_symbol(void *ptr)
         {
-            if(ptr==0)
+            if(ptr==nullptr)
                 return std::string();
             init();
             std::ostringstream ss;
@@ -388,7 +389,7 @@ namespace hpx { namespace util {
         {
             out << size << ((1 == size)?" frame:":" frames:"); //-V128
             for(std::size_t i=0;i<size;i++) {
-                if(addresses[i]!=0)
+                if(addresses[i]!=nullptr)
                     out << '\n' << std::left << std::setw(sizeof(void*)*2)
                     << std::setfill(' ') << addresses[i];
             }
@@ -402,7 +403,7 @@ namespace hpx { namespace util {
     {
         if(frames_.empty())
             return std::string();
-        if (0 == threads::get_self_ptr())
+        if (nullptr == threads::get_self_ptr())
             return trace();
 
         lcos::local::futures_factory<std::string()> p(

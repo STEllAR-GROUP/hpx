@@ -432,14 +432,14 @@ namespace hpx { namespace util
         basic_any() HPX_NOEXCEPT
           : table(detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>()),
-            object(0)
+            object(nullptr)
         {
         }
 
         basic_any(basic_any const& x)
           : table(detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>()),
-            object(0)
+            object(nullptr)
         {
             assign(x);
         }
@@ -449,7 +449,7 @@ namespace hpx { namespace util
           : table(detail::any::get_table<
                       typename util::decay<T>::type
                   >::template get<IArchive, OArchive, Char>()),
-            object(0)
+            object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
 
@@ -466,7 +466,7 @@ namespace hpx { namespace util
         {
             x.table = detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>();
-            x.object = 0;
+            x.object = nullptr;
         }
 
         // Perfect forwarding of T
@@ -480,7 +480,7 @@ namespace hpx { namespace util
           : table(detail::any::get_table<
                       typename util::decay<T>::type
                   >::template get<IArchive, OArchive, Char>()),
-            object(0)
+            object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
 
@@ -624,7 +624,7 @@ namespace hpx { namespace util
                 table->static_delete(&object);
                 table = detail::any::get_table<detail::any::empty>::
                     template get<IArchive, OArchive, Char>();
-                object = 0;
+                object = nullptr;
             }
         }
 
@@ -715,14 +715,14 @@ namespace hpx { namespace util
         basic_any() HPX_NOEXCEPT
           : table(detail::any::get_table<
                 detail::any::empty>::template get<void, void, Char>()),
-            object(0)
+            object(nullptr)
         {
         }
 
         basic_any(basic_any const& x)
           : table(detail::any::get_table<
                 detail::any::empty>::template get<void, void, Char>()),
-            object(0)
+            object(nullptr)
         {
             assign(x);
         }
@@ -732,7 +732,7 @@ namespace hpx { namespace util
           : table(detail::any::get_table<
                       typename util::decay<T>::type
                   >::template get<void, void, Char>()),
-            object(0)
+            object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
 
@@ -747,7 +747,7 @@ namespace hpx { namespace util
           : table(x.table),
             object(x.object)
         {
-            x.object = 0;
+            x.object = nullptr;
             x.table = detail::any::get_table<detail::any::empty>::
                 template get<void, void, Char>();
         }
@@ -763,7 +763,7 @@ namespace hpx { namespace util
           : table(detail::any::get_table<
                       typename util::decay<T>::type
                   >::template get<void, void, Char>()),
-            object(0)
+            object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
 
@@ -906,7 +906,7 @@ namespace hpx { namespace util
                 table->static_delete(&object);
                 table = detail::any::get_table<detail::any::empty>::
                     template get<void, void, Char>();
-                object = 0;
+                object = nullptr;
             }
         }
 
@@ -950,7 +950,7 @@ namespace hpx { namespace util
                 reinterpret_cast<T*>(reinterpret_cast<void*>(&operand->object)) :
                 reinterpret_cast<T*>(reinterpret_cast<void*>(operand->object));
         }
-        return 0;
+        return nullptr;
     }
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
@@ -1043,7 +1043,7 @@ namespace hpx { namespace util
             {
                 std::vector<char> data;
                 serialization::output_archive ar (
-                        data, 0U, ~0U, 0, &hasher);
+                        data, 0U, ~0U, nullptr, &hasher);
                 ar << elem;
             }  // let archive go out of scope
 

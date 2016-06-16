@@ -679,7 +679,7 @@ namespace hpx { namespace util
         boost::scoped_array<char*> argv(new char* [args.size()+1]);
         for (std::size_t i = 0; i < args.size(); ++i)
             argv[i] = const_cast<char*>(args[i].c_str());
-        argv[args.size()] = 0;
+        argv[args.size()] = nullptr;
 
         return parse_commandline(
             rtcfg, app_options, static_cast<int>(args.size()), argv.get(), vm,

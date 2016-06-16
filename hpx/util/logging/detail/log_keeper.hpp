@@ -62,7 +62,7 @@ template<class type> struct logger_holder {
     logger_base_type * base()                { return m_base; }
 
 protected:
-    logger_holder() : m_log(0), m_base(0) {}
+    logger_holder() : m_log(nullptr), m_base(nullptr) {}
     virtual ~logger_holder() {}
 
     void init(type * log) {

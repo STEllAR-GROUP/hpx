@@ -105,7 +105,7 @@ namespace detail {
 
         template<class msg_type> void write(msg_type & msg) const {
             // see type of convert
-            write_with_convert( msg, 0 );
+            write_with_convert( msg, nullptr );
         }
 
     private:
@@ -187,7 +187,7 @@ namespace detail {
                 }
                 else {
                     // last part
-                    info->write_steps.push_back( write_step( unescape(remaining), 0) );
+                    info->write_steps.push_back( write_step( unescape(remaining), nullptr) );
                     remaining.clear();
                 }
             }

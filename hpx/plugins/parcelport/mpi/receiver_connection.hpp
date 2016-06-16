@@ -49,7 +49,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , tag_(h.tag())
           , header_(h)
           , request_(MPI_REQUEST_NULL)
-          , request_ptr_(0)
+          , request_ptr_(nullptr)
           , chunks_idx_(0)
           , pp_(pp)
         {
@@ -216,7 +216,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool request_done()
         {
-            if(request_ptr_ == 0) return true;
+            if(request_ptr_ == nullptr) return true;
 
             util::mpi_environment::scoped_try_lock l;
 
@@ -228,7 +228,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_ASSERT(ret == MPI_SUCCESS);
             if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
             {
-                request_ptr_ = 0;
+                request_ptr_ = nullptr;
                 return true;
             }
             return false;

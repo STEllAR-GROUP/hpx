@@ -129,7 +129,7 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT((boost::int64_t)count >= 0);
 
-            if (filter_.get() || chunks_ == 0 ||
+            if (filter_.get() || chunks_ == nullptr ||
                 count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
                 this->input_container::load_binary(address, count);

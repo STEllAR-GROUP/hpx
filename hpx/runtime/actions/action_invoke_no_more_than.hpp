@@ -171,7 +171,7 @@ namespace hpx { namespace actions { namespace detail
         {
             if(cont_)
             {
-                HPX_ASSERT(0 != dynamic_cast<base_type *>(cont_.get()));
+                HPX_ASSERT(nullptr != dynamic_cast<base_type *>(cont_.get()));
                 static_cast<base_type *>(cont_.get())->
                     trigger_value(std::move(result));
             }

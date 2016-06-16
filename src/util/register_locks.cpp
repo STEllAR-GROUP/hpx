@@ -26,7 +26,7 @@ namespace hpx { namespace util
         {
             lock_data()
               : ignore_(false)
-              , user_data_(0)
+              , user_data_(nullptr)
             {
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
                 backtrace_ = hpx::detail::backtrace_direct();
@@ -178,7 +178,7 @@ namespace hpx { namespace util
         using detail::register_locks;
 
         if (register_locks::lock_detection_enabled_ &&
-            0 != threads::get_self_ptr())
+            nullptr != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -205,7 +205,7 @@ namespace hpx { namespace util
         using detail::register_locks;
 
         if (register_locks::lock_detection_enabled_ &&
-            0 != threads::get_self_ptr())
+            nullptr != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -248,7 +248,7 @@ namespace hpx { namespace util
             register_locks::get_lock_enabled();
 
         if (enabled && register_locks::lock_detection_enabled_ &&
-            0 != threads::get_self_ptr())
+            nullptr != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -327,7 +327,7 @@ namespace hpx { namespace util
         void set_ignore_status(void const* lock, bool status)
         {
             if (register_locks::lock_detection_enabled_ &&
-                0 != threads::get_self_ptr())
+                nullptr != threads::get_self_ptr())
             {
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();

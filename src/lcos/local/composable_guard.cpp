@@ -36,9 +36,9 @@ namespace hpx { namespace lcos { namespace local
             bool const single_guard;
 
             guard_task()
-              : next((guard_task*)0), run((void(*)())0), single_guard(true) {}
+              : next(nullptr), run(nullptr), single_guard(true) {}
             guard_task(bool sg)
-              : next((guard_task*)0), run((void(*)())0), single_guard(sg) {}
+              : next(nullptr), run(nullptr), single_guard(sg) {}
         };
 
         void free(guard_task* task)
