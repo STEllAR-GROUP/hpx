@@ -56,7 +56,6 @@ namespace hpx { namespace compute { namespace cuda
             HPX_MOVABLE_ONLY(native_handle_type);
 
             native_handle_type(int device = 0);
-            native_handle_type(hpx::id_type const& locality, int device = 0);
 
             ~native_handle_type();
 
@@ -71,34 +70,31 @@ namespace hpx { namespace compute { namespace cuda
                 return device_;
             }
 
-            hpx::id_type const& get_locality() const HPX_NOEXCEPT
-            {
-                return locality_;
-            }
-
         private:
             friend struct target;
 
             mutable mutex_type mtx_;
             int device_;
             mutable cudaStream_t stream_;
-            hpx::id_type locality_;
         };
 
         // Constructs default target
-        target() HPX_NOEXCEPT {}
+        target()
+          : handle_(), locality_(hpx::find_here())
+        {}
 
         // Constructs target from a given device ID
         explicit target(int device)
-          : handle_(device)
+          : handle_(device), locality_(hpx::find_here())
         {}
 
         explicit target(hpx::id_type const& locality, int device)
-          : handle_(device)
+          : handle_(device), locality_(locality)
         {}
 
         target(target && rhs) HPX_NOEXCEPT
-          : handle_(std::move(rhs.handle_))
+          : handle_(std::move(rhs.handle_)),
+            locality_(std::move(rhs.locality_))
         {}
 
         target& operator=(target && rhs) HPX_NOEXCEPT
@@ -107,9 +103,18 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
-        native_handle_type const& native_handle() const
+        native_handle_type& native_handle() HPX_NOEXCEPT
         {
             return handle_;
+        }
+        native_handle_type const& native_handle() const HPX_NOEXCEPT
+        {
+            return handle_;
+        }
+
+        hpx::id_type const& get_locality() const HPX_NOEXCEPT
+        {
+            return locality_;
         }
 
         void synchronize() const;
@@ -126,6 +131,12 @@ namespace hpx { namespace compute { namespace cuda
             return cuda::get_targets(locality);
         }
 
+        friend bool operator==(target const& lhs, target const& rhs)
+        {
+            return lhs.handle_.get_device() == rhs.handle_.get_device() &&
+                lhs.locality_ == rhs.locality_;
+        }
+
     private:
 #if !defined(__CUDA_ARCH__)
         friend class hpx::serialization::access;
@@ -133,10 +144,11 @@ namespace hpx { namespace compute { namespace cuda
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar & handle_.device_ & handle_.locality_;
+            ar & handle_.device_ & locality_;
         }
 #endif
         native_handle_type handle_;
+        hpx::id_type locality_;
     };
 
     HPX_API_EXPORT target& get_default_target();

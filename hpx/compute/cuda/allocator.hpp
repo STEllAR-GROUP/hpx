@@ -66,7 +66,7 @@ namespace hpx { namespace compute { namespace cuda
         {}
 
         template <typename U>
-        allocator(allocator<U>& alloc)
+        allocator(allocator<U> const& alloc)
           : target_(alloc.target_)
         {}
 

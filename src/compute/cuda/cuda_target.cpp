@@ -127,12 +127,7 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     target::native_handle_type::native_handle_type(int device)
-      : device_(device), stream_(0), locality_(hpx::find_here())
-    {}
-
-    target::native_handle_type::native_handle_type(hpx::id_type const& locality,
-            int device)
-      : device_(device), stream_(0), locality_(locality)
+      : device_(device), stream_(0)
     {}
 
     target::native_handle_type::~native_handle_type()
@@ -144,11 +139,9 @@ namespace hpx { namespace compute { namespace cuda
     target::native_handle_type::native_handle_type(
             target::native_handle_type && rhs) HPX_NOEXCEPT
       : device_(rhs.device_),
-        stream_(rhs.stream_),
-        locality_(rhs.locality_)
+        stream_(rhs.stream_)
     {
         rhs.stream_ = 0;
-        rhs.locality_ = hpx::invalid_id;
     }
 
     target::native_handle_type& target::native_handle_type::operator=(
@@ -159,9 +152,7 @@ namespace hpx { namespace compute { namespace cuda
 
         device_ = rhs.device_;
         stream_ = rhs.stream_;
-        locality_ = rhs.locality_;
         rhs.stream_ = 0;
-        rhs.locality_ = hpx::invalid_id;
         return *this;
     }
 

@@ -13,17 +13,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_PARTITIONED_VECTOR(double);
-HPX_REGISTER_PARTITIONED_VECTOR(int);
+typedef hpx::compute::host::block_allocator<int> target_allocator_int;
+typedef hpx::compute::vector<int, target_allocator_int> target_vector_int;
+HPX_REGISTER_PARTITIONED_VECTOR(int, target_vector_int);
 
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-void fill_vector(hpx::partitioned_vector<T>& v, T const& val)
-{
-    typename hpx::partitioned_vector<T>::iterator it = v.begin(), end = v.end();
-    for (/**/; it != end; ++it)
-        *it = val;
-}
+typedef hpx::compute::host::block_allocator<double> target_allocator_double;
+typedef hpx::compute::vector<double, target_allocator_double> target_vector_double;
+HPX_REGISTER_PARTITIONED_VECTOR(double, target_vector_double);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
@@ -31,13 +27,17 @@ void allocation_tests()
 {
     std::size_t const length = 12;
 
+    typedef hpx::compute::host::block_allocator<T> target_allocator;
+    typedef hpx::compute::vector<T, target_allocator> target_vector;
+
     for (hpx::id_type const& locality : hpx::find_all_localities())
     {
         std::vector<hpx::compute::host::target> targets =
             hpx::compute::host::get_targets(locality).get();
 
         {
-            hpx::partitioned_vector<T> v(length, hpx::compute::host::target_layout);
+            hpx::partitioned_vector<T, target_vector> v(length, T(42),
+                hpx::compute::host::target_layout);
         }
     }
 

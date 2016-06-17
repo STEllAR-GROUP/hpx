@@ -99,7 +99,7 @@ namespace hpx { namespace compute
         hpx::future<hpx::id_type> create(Ts &&... ts) const
         {
             target_type t = get_next_target();
-            hpx::id_type target_locality = t.native_handle().get_locality();
+            hpx::id_type target_locality = t.get_locality();
             return components::stub_base<Component>::create_async(
                 target_locality, std::forward<Ts>(ts)..., std::move(t));
         }
@@ -126,18 +126,34 @@ namespace hpx { namespace compute
         hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts &&... ts) const
         {
+            // collect all targets per locality
+            std::map<hpx::id_type, std::vector<target_type> > targets;
+            for(target_type const& t : targets_)
+            {
+                hpx::id_type target_locality = t.get_locality();
+                targets[target_locality].push_back(t);
+            }
+
             std::vector<hpx::id_type> localities;
+
             std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
             objs.reserve(targets_.size());
 
-            for(target_type const& t : targets_)
+            auto end = targets.end();
+            for (auto it = targets.begin(); it != end; ++it)
             {
-                hpx::id_type target_locality = t.native_handle().get_locality();
+                hpx::id_type target_locality = it->first;
                 localities.push_back(target_locality);
+
+                std::size_t num_partitions = 0;
+                for (target_type const& t : it->second)
+                {
+                    num_partitions += get_num_items(count, t);
+                }
+
                 objs.push_back(
                     components::stub_base<Component>::bulk_create_async(
-                        target_locality, get_num_items(count, target_locality),
-                        ts..., t));
+                        target_locality, num_partitions, ts..., it->second));
             }
 
             return hpx::dataflow(
@@ -188,46 +204,29 @@ namespace hpx { namespace compute
             return (n1 / n2) * n3;
         }
 
-        std::size_t
-        get_num_items(std::size_t items, hpx::id_type const& loc) const
+        std::size_t get_num_items(std::size_t items, target_type const& t) const
         {
-            // make sure the given id is known to this distribution policy
-            HPX_ASSERT((
-                std::find_if(targets_.begin(), targets_.end(),
-                    [loc](target_type const& t) -> bool
-                    {
-                        return t.native_handle().get_locality() == loc;
-                    }) != targets_.end() ||
-                (targets_.empty() && loc == hpx::find_here())
-            ));
-
             // this distribution policy places an equal number of items onto
-            // each locality
-            std::size_t locs = (std::max)(std::size_t(1), targets_.size());
+            // each target
+            std::size_t sites = (std::max)(std::size_t(1), targets_.size());
 
             // the overall number of items to create is smaller than the number
-            // of localities
-            if (items < locs)
+            // of sites
+            if (items < sites)
             {
-                auto it =
-                    std::find_if(targets_.begin(), targets_.end(),
-                        [loc](target_type const& t) -> bool
-                        {
-                            return t.native_handle().get_locality() == loc;
-                        });
+                auto it = std::find(targets_.begin(), targets_.end(), t);
                 std::size_t num_loc = std::distance(targets_.begin(), it);
                 return (items < num_loc) ? 1 : 0;
             }
 
             // the last locality might get less items
-            if (targets_.size() > 1 &&
-                loc == targets_.back().native_handle().get_locality())
+            if (!targets_.empty() && t == targets_.back())
             {
-                return items - round_to_multiple(items, locs, locs-1);
+                return items - round_to_multiple(items, sites, sites-1);
             }
 
             // otherwise just distribute evenly
-            return (items + locs - 1) / locs;
+            return (items + sites - 1) / sites;
         }
         /// \endcond
 
