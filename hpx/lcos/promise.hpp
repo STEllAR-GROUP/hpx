@@ -11,6 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/promise_base.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 namespace hpx {
 namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
