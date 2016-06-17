@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
                 return;
             }
 
-            struct ibv_recv_wr wr, *bad_wr = NULL;
+            struct ibv_recv_wr wr, *bad_wr = nullptr;
             struct ibv_sge sge;
 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
@@ -158,7 +158,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
                 return;
             }
 
-            ibv_send_wr wr[2], *bad_wr = NULL;
+            ibv_send_wr wr[2], *bad_wr = nullptr;
             ibv_sge sge[2];
 
             std::memset(wr, 0, sizeof(wr));
@@ -211,7 +211,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
                 return;
             }
 
-            struct ibv_send_wr wr, *bad_wr = NULL;
+            struct ibv_send_wr wr, *bad_wr = nullptr;
             struct ibv_sge sge;
 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));

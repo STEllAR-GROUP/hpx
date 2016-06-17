@@ -710,7 +710,7 @@ namespace hpx
         partitioned_vector(size_type size, DistPolicy const& policy,
                 typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
-                >::type* = 0)
+                >::type* = nullptr)
           : size_(size),
             partition_size_(std::size_t(-1))
         {
@@ -732,7 +732,7 @@ namespace hpx
         partitioned_vector(size_type size, T const& val, DistPolicy const& policy,
                 typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
-                >::type* = 0)
+                >::type* = nullptr)
           : size_(size),
             partition_size_(std::size_t(-1))
         {

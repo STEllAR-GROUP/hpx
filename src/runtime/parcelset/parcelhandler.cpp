@@ -357,7 +357,7 @@ namespace hpx { namespace parcelset
     /// Return the reference to an existing io_service
     util::io_service_pool* parcelhandler::get_thread_pool(char const* name)
     {
-        util::io_service_pool* result = 0;
+        util::io_service_pool* result = nullptr;
         for (pports_type::value_type& pp : pports_)
         {
             result = pp.second->get_thread_pool(name);

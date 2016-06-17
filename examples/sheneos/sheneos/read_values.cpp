@@ -94,7 +94,7 @@ namespace sheneos { namespace detail
 
             // Get the size of each dimension in the dataspace.
             hsize_t dims[1];
-            dataspace.getSimpleExtentDims(dims, NULL);
+            dataspace.getSimpleExtentDims(dims, nullptr);
             if (end == std::size_t(-1))
                 end = dims[0];
 

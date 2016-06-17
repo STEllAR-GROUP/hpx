@@ -67,6 +67,7 @@ namespace hpx { namespace detail
 
             // keep id alive, if needed - this allows to send the destination
             // as an unmanaged id
+
             if (target_is_managed)
             {
                 typedef typename traits::detail::shared_state_ptr_for<
@@ -209,14 +210,15 @@ namespace hpx { namespace detail
         if (policy == launch::sync || hpx::detail::has_async_policy(policy))
         {
             lcos::packaged_action<action_type, result_type> p;
-            f = p.get_future();
 
+            f = p.get_future();
             p.apply(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Ts>(vs)...);
         }
         else if (policy == launch::deferred)
         {
             lcos::packaged_action<action_type, result_type> p;
+
             f = p.get_future();
             p.apply_deferred(std::move(addr), target_is_managed ? id1 : id,
                 std::forward<Ts>(vs)...);

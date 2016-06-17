@@ -38,7 +38,7 @@
 
 namespace hpx { namespace util
 {
-    static const char* prefix_ = 0;
+    static const char* prefix_ = nullptr;
 
     void set_hpx_prefix(const char * prefix)
     {
@@ -118,7 +118,7 @@ namespace hpx { namespace util
         HPX_UNUSED(argv0);
 
         char exe_path[MAX_PATH + 1] = { '\0' };
-        if (!GetModuleFileName(NULL, exe_path, sizeof(exe_path)))
+        if (!GetModuleFileName(nullptr, exe_path, sizeof(exe_path)))
         {
             HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
                 "get_executable_filename",
@@ -219,11 +219,11 @@ namespace hpx { namespace util
 
         int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
         size_t cb = 0;
-        sysctl(mib, 4, NULL, &cb, NULL, 0);
+        sysctl(mib, 4, nullptr, &cb, nullptr, 0);
         if (cb)
         {
             std::vector<char> buf(cb);
-            sysctl(mib, 4, &buf[0], &cb, NULL, 0);
+            sysctl(mib, 4, &buf[0], &cb, nullptr, 0);
             r = &buf[0];
         }
 

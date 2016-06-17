@@ -80,9 +80,9 @@ namespace posix { namespace pth
 #define HPX_COROUTINE_CREATE_CONTEXT(ctx)                                     \
     hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_create(&(ctx)))
 #define HPX_COROUTINE_MAKE_CONTEXT(ctx, stack, size, startfunc, startarg, exitto) \
-    /* const sigset_t* sigmask = NULL: we don't expect per-context signal masks */ \
+    /* const sigset_t* sigmask = nullptr: we don't expect per-context signal masks */ \
     hpx::threads::coroutines::detail::posix::pth::check(                      \
-        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), NULL,        \
+        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), nullptr,        \
         (startfunc), (startarg), (exitto)))
 #define HPX_COROUTINE_SWAP_CONTEXT(from, to)                                  \
     hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_switch(*(from), *(to)))
@@ -109,7 +109,7 @@ namespace posix { namespace ucontext
 {
     inline int make_context(::ucontext_t* ctx, void* stack, std::ptrdiff_t size,
                             void (*startfunc)(void*), void* startarg,
-                            ::ucontext_t* exitto = NULL)
+                            ::ucontext_t* exitto = nullptr)
     {
         int error = ::getcontext(ctx);
         if (error)
@@ -218,7 +218,7 @@ namespace hpx { namespace threads { namespace coroutines
                 HPX_ASSERT(m_stack);
                 funp_ = &trampoline<Functor>;
                 int error = HPX_COROUTINE_MAKE_CONTEXT(
-                    &m_ctx, m_stack, m_stack_size, funp_, cb_, NULL);
+                    &m_ctx, m_stack, m_stack_size, funp_, cb_, nullptr);
                 HPX_UNUSED(error);
                 HPX_ASSERT(error == 0);
             }
@@ -267,7 +267,7 @@ namespace hpx { namespace threads { namespace coroutines
                     // the stack start
                     increment_stack_recycle_count();
                     int error = HPX_COROUTINE_MAKE_CONTEXT(
-                        &m_ctx, m_stack, m_stack_size, funp_, cb_, NULL);
+                        &m_ctx, m_stack, m_stack_size, funp_, cb_, nullptr);
                     HPX_UNUSED(error);
                     HPX_ASSERT(error == 0);
                 }

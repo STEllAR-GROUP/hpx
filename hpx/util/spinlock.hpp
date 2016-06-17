@@ -27,7 +27,7 @@ struct spinlock
     boost::detail::spinlock m;
 
   public:
-    spinlock(char const* /*desc*/ = 0)
+    spinlock(char const* /*desc*/ = nullptr)
     {
         HPX_ITT_SYNC_CREATE(this, "util::spinlock", "");
 

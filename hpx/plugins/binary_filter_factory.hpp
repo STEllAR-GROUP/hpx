@@ -35,7 +35,7 @@ namespace hpx { namespace plugins
         /// \param global   [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the [settings]
         ///                 section of the global configuration file (hpx.ini)
-        ///                 This pointer may be NULL if no such section has
+        ///                 This pointer may be nullptr if no such section has
         ///                 been found.
         /// \param local    [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the section
@@ -51,9 +51,9 @@ namespace hpx { namespace plugins
           : isenabled_(isenabled)
         {
             // store the configuration settings
-            if (NULL != global)
+            if (nullptr != global)
                 global_settings_ = *global;
-            if (NULL != local)
+            if (nullptr != local)
                 local_settings_ = *local;
         }
 
@@ -65,7 +65,7 @@ namespace hpx { namespace plugins
         /// return Returns the newly created instance of the message handler
         ///        supported by this factory
         serialization::binary_filter* create(bool compress,
-            serialization::binary_filter* next_filter = 0)
+            serialization::binary_filter* next_filter = nullptr)
         {
             if (isenabled_)
                 return new BinaryFilter(compress, next_filter);

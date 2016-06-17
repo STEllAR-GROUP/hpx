@@ -44,9 +44,9 @@ namespace hpx { namespace serialization
         output_archive(Container & buffer,
             boost::uint32_t flags = 0U,
             boost::uint32_t dest_locality_id = ~0U,
-            std::vector<serialization_chunk>* chunks = 0,
-            binary_filter* filter = 0,
-            new_gids_map* new_gids = 0)
+            std::vector<serialization_chunk>* chunks = nullptr,
+            binary_filter* filter = nullptr,
+            new_gids_map* new_gids = nullptr)
             : base_type(flags)
             , buffer_(new output_container<Container>(buffer, chunks, filter))
             , dest_locality_id_(dest_locality_id)

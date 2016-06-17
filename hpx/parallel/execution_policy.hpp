@@ -1595,7 +1595,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     is_execution_policy<ExPolicy>::value &&
                         !is_rebound_execution_policy<ExPolicy>::value,
                     ExPolicy
-                >::type* = 0)
+                >::type* = nullptr)
           : inner_(std::make_shared<
                     detail::execution_policy_shim<ExPolicy>
                 >(policy))

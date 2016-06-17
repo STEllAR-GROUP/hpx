@@ -800,7 +800,7 @@ namespace hpx { namespace lcos
         //   - other.valid() == false.
         template <typename T>
         future(future<T>&& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = 0
+            typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
         {
             other = future<T>();
@@ -1097,7 +1097,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         template <typename T>
         shared_future(shared_future<T> const& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = 0
+            typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
         {}
 

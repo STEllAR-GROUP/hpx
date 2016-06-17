@@ -310,7 +310,7 @@ namespace hpx
         void stop_active_counters(error_code& ec = throws);
         void reset_active_counters(error_code& ec = throws);
         void evaluate_active_counters(bool reset = false,
-            char const* description = 0, error_code& ec = throws);
+            char const* description = nullptr, error_code& ec = throws);
 
         // stop periodic evaluation of counters during shutdown
         void stop_evaluating_counters();

@@ -20,6 +20,7 @@
 
 #include <boost/mpl/bool.hpp>
 
+#include <cstddef>
 #include <cstring>
 #include <string>
 #include <type_traits>
@@ -161,6 +162,11 @@ namespace hpx { namespace util { namespace detail
                 other.reset();
             }
             return *this;
+        }
+
+        void assign(std::nullptr_t) HPX_NOEXCEPT
+        {
+            reset();
         }
 
         template <typename F>

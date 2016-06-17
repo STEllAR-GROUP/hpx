@@ -222,7 +222,7 @@ namespace hpx
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
     HPX_API_EXPORT void evaluate_active_counters(bool reset = false,
-        char const* description = 0, error_code& ec = throws);
+        char const* description = nullptr, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin
@@ -237,7 +237,8 @@ namespace hpx
     ///           hpx::exception.
     HPX_API_EXPORT serialization::binary_filter* create_binary_filter(
         char const* binary_filter_type, bool compress,
-        serialization::binary_filter* next_filter = 0, error_code& ec = throws);
+        serialization::binary_filter* next_filter = nullptr,
+        error_code& ec = throws);
 
 #if defined(HPX_HAVE_SODIUM)
     namespace components { namespace security

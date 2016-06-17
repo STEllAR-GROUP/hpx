@@ -85,7 +85,7 @@ struct stage_tasks_functor : public tbb::task
             spawn_and_wait_for_all(a);
         }
 
-        return NULL;
+        return nullptr;
     }
 };
 

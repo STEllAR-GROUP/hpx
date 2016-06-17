@@ -82,7 +82,7 @@ namespace posix
 
     inline void* alloc_stack(std::size_t size)
     {
-        void* real_stack = ::mmap(NULL,
+        void* real_stack = ::mmap(nullptr,
             size + EXEC_PAGESIZE,
             PROT_EXEC | PROT_READ | PROT_WRITE,
 #if defined(__APPLE__)

@@ -502,7 +502,7 @@ namespace hpx
         unordered_map(DistPolicy const& policy,
             typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
-                >::type* = 0)
+                >::type* = nullptr)
         {
             create(policy);
         }
@@ -518,7 +518,7 @@ namespace hpx
         unordered_map(std::size_t bucket_count, DistPolicy const& policy,
             typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
-                >::type* = 0)
+                >::type* = nullptr)
         {
             create(policy, bucket_count, Hash(), KeyEqual());
         }
@@ -528,7 +528,7 @@ namespace hpx
                 Hash const& hash, DistPolicy const& policy,
                 typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
-                >::type* = 0)
+                >::type* = nullptr)
           : hash_base_type(hash, KeyEqual())
         {
             create(policy, bucket_count, hash, KeyEqual());
@@ -540,7 +540,7 @@ namespace hpx
                 DistPolicy const& policy,
                 typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
-                >::type* = 0)
+                >::type* = nullptr)
           : hash_base_type(hash, equal)
         {
             create(policy, bucket_count, hash, equal);

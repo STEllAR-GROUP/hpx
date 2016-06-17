@@ -227,14 +227,14 @@ BMP::BMP()
  BitDepth = 24;
  Pixels = new RGBApixel* [Width];
  Pixels[0] = new RGBApixel [Height];
- Colors = NULL;
+ Colors = nullptr;
 
  XPelsPerMeter = 0;
  YPelsPerMeter = 0;
 
- MetaData1 = NULL;
+ MetaData1 = nullptr;
  SizeOfMetaData1 = 0;
- MetaData2 = NULL;
+ MetaData2 = nullptr;
  SizeOfMetaData2 = 0;
 }
 
@@ -248,13 +248,13 @@ BMP::BMP( BMP& Input )
  BitDepth = 24;
  Pixels = new RGBApixel* [Width];
  Pixels[0] = new RGBApixel [Height];
- Colors = NULL;
+ Colors = nullptr;
  XPelsPerMeter = 0;
  YPelsPerMeter = 0;
 
- MetaData1 = NULL;
+ MetaData1 = nullptr;
  SizeOfMetaData1 = 0;
- MetaData2 = NULL;
+ MetaData2 = nullptr;
  SizeOfMetaData2 = 0;
 
  // now, set the correct bit depth
@@ -373,7 +373,7 @@ bool BMP::SetBitDepth( int NewDepth )
  if( BitDepth == 1 || BitDepth == 4 || BitDepth == 8 )
  { Colors = new RGBApixel [NumberOfColors]; }
  else
- { Colors = NULL; }
+ { Colors = nullptr; }
  if( BitDepth == 1 || BitDepth == 4 || BitDepth == 8 )
  { CreateStandardColorTable(); }
 
@@ -438,7 +438,7 @@ bool BMP::WriteToFile( const char* FileName )
  }
 
  FILE* fp = fopen( FileName, "wb" );
- if( fp == NULL )
+ if( fp == nullptr )
  {
   if( EasyBMPwarnings )
   {
@@ -682,7 +682,7 @@ bool BMP::ReadFromFile( const char* FileName )
  }
 
  FILE* fp = fopen( FileName, "rb" );
- if( fp == NULL )
+ if( fp == nullptr )
  {
   if( EasyBMPwarnings )
   {

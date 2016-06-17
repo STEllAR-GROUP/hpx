@@ -162,13 +162,13 @@ namespace hpx
         sigemptyset(&new_action.sa_mask);
         new_action.sa_flags = 0;
 
-        sigaction(SIGINT, &new_action, NULL);  // Interrupted
-        sigaction(SIGBUS, &new_action, NULL);  // Bus error
-        sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
-        sigaction(SIGILL, &new_action, NULL);  // Illegal instruction
-        sigaction(SIGPIPE, &new_action, NULL); // Bad pipe
-        sigaction(SIGSEGV, &new_action, NULL); // Segmentation fault
-        sigaction(SIGSYS, &new_action, NULL);  // Bad syscall
+        sigaction(SIGINT, &new_action, nullptr);  // Interrupted
+        sigaction(SIGBUS, &new_action, nullptr);  // Bus error
+        sigaction(SIGFPE, &new_action, nullptr);  // Floating point exception
+        sigaction(SIGILL, &new_action, nullptr);  // Illegal instruction
+        sigaction(SIGPIPE, &new_action, nullptr); // Bad pipe
+        sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
+        sigaction(SIGSYS, &new_action, nullptr);  // Bad syscall
 #endif
 
         std::set_new_handler(hpx::new_handler);
@@ -533,9 +533,9 @@ namespace hpx
     void runtime::init_tss()
     {
         // initialize our TSS
-        if (NULL == runtime::runtime_.get())
+        if (nullptr == runtime::runtime_.get())
         {
-            HPX_ASSERT(NULL == threads::thread_self::get_self());
+            HPX_ASSERT(nullptr == threads::thread_self::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
             runtime::uptime_.reset(new boost::uint64_t);
@@ -847,14 +847,14 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime& get_runtime()
     {
-        HPX_ASSERT(NULL != runtime::runtime_.get());   // should have been initialized
+        HPX_ASSERT(nullptr != runtime::runtime_.get());   // should have been initialized
         return **runtime::runtime_;
     }
 
     runtime* get_runtime_ptr()
     {
         runtime** rt = runtime::runtime_.get();
-        return rt ? *rt : NULL;
+        return rt ? *rt : nullptr;
     }
 
     naming::gid_type const & get_locality()
@@ -916,7 +916,7 @@ namespace hpx
     bool register_on_exit(util::function_nonser<void()> const& f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL == rt)
+        if (nullptr == rt)
             return false;
 
         rt->on_exit(f);
@@ -926,19 +926,19 @@ namespace hpx
     std::size_t get_runtime_instance_number()
     {
         runtime* rt = get_runtime_ptr();
-        return (NULL == rt) ? 0 : rt->get_instance_number();
+        return (nullptr == rt) ? 0 : rt->get_instance_number();
     }
 
     std::string get_config_entry(std::string const& key, std::string const& dflt)
     {
-        if (NULL == get_runtime_ptr())
+        if (nullptr == get_runtime_ptr())
             return "";
         return get_runtime().get_config().get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
-        if (NULL == get_runtime_ptr())
+        if (nullptr == get_runtime_ptr())
             return "";
         return get_runtime().get_config().get_entry(key, dflt);
     }
@@ -947,7 +947,7 @@ namespace hpx
     // Helpers
     naming::id_type find_here(error_code& ec)
     {
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_here",
                 "the runtime system is not available at this time");
@@ -961,7 +961,7 @@ namespace hpx
     naming::id_type find_root_locality(error_code& ec)
     {
         runtime* rt = hpx::get_runtime_ptr();
-        if (NULL == rt)
+        if (nullptr == rt)
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
                 "the runtime system is not available at this time");
@@ -986,7 +986,7 @@ namespace hpx
     find_all_localities(components::component_type type, error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
                 "the runtime system is not available at this time");
@@ -1000,7 +1000,7 @@ namespace hpx
     std::vector<naming::id_type> find_all_localities(error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
                 "the runtime system is not available at this time");
@@ -1015,7 +1015,7 @@ namespace hpx
     find_remote_localities(components::component_type type, error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
                 "the runtime system is not available at this time");
@@ -1029,7 +1029,7 @@ namespace hpx
     std::vector<naming::id_type> find_remote_localities(error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
                 "the runtime system is not available at this time");
@@ -1045,7 +1045,7 @@ namespace hpx
     // find a locality supporting the given component
     naming::id_type find_locality(components::component_type type, error_code& ec)
     {
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_locality",
                 "the runtime system is not available at this time");
@@ -1066,7 +1066,7 @@ namespace hpx
     ///        for the running application.
     boost::uint32_t get_num_localities_sync(error_code& ec)
     {
-        if (NULL == hpx::get_runtime_ptr())
+        if (nullptr == hpx::get_runtime_ptr())
             return 0;
 
         return get_runtime().get_agas_client().get_num_localities(ec);
@@ -1074,7 +1074,7 @@ namespace hpx
 
     boost::uint32_t get_initial_num_localities()
     {
-        if (NULL == hpx::get_runtime_ptr())
+        if (nullptr == hpx::get_runtime_ptr())
             return 0;
 
         return get_runtime().get_config().get_num_localities();
@@ -1083,7 +1083,7 @@ namespace hpx
     boost::uint32_t get_num_localities_sync(components::component_type type,
         error_code& ec)
     {
-        if (NULL == hpx::get_runtime_ptr())
+        if (nullptr == hpx::get_runtime_ptr())
             return 0;
 
         return get_runtime().get_agas_client().get_num_localities(type, ec);
@@ -1091,7 +1091,7 @@ namespace hpx
 
     lcos::future<boost::uint32_t> get_num_localities()
     {
-        if (NULL == hpx::get_runtime_ptr())
+        if (nullptr == hpx::get_runtime_ptr())
             return lcos::make_ready_future<boost::uint32_t>(0);
 
         return get_runtime().get_agas_client().get_num_localities_async();
@@ -1100,7 +1100,7 @@ namespace hpx
     lcos::future<boost::uint32_t> get_num_localities(
         components::component_type type)
     {
-        if (NULL == hpx::get_runtime_ptr())
+        if (nullptr == hpx::get_runtime_ptr())
             return lcos::make_ready_future<boost::uint32_t>(0);
 
         return get_runtime().get_agas_client().get_num_localities_async(type);
@@ -1111,7 +1111,7 @@ namespace hpx
     {
         naming::gid_type get_next_id(std::size_t count)
         {
-            if (NULL == get_runtime_ptr())
+            if (nullptr == get_runtime_ptr())
                 return naming::invalid_gid;
 
             return get_runtime().get_next_id(count);
@@ -1128,7 +1128,7 @@ namespace hpx
     std::size_t get_os_thread_count()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL == rt)
+        if (nullptr == rt)
             return std::size_t(0);
         return rt->get_config().get_os_thread_count();
     }
@@ -1136,7 +1136,7 @@ namespace hpx
     std::size_t get_os_thread_count(threads::executor const& exec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL == rt)
+        if (nullptr == rt)
             return std::size_t(0);
 
         if (!exec)
@@ -1150,7 +1150,7 @@ namespace hpx
     std::size_t get_worker_thread_num()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL == rt)
+        if (nullptr == rt)
             return std::size_t(-1);
         return rt->get_thread_manager().get_worker_thread_num();
     }
@@ -1158,7 +1158,7 @@ namespace hpx
     std::size_t get_num_worker_threads()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL == rt)
+        if (nullptr == rt)
             return std::size_t(0);
         error_code ec(lightweight);
         return static_cast<std::size_t>(
@@ -1168,7 +1168,7 @@ namespace hpx
     bool is_scheduler_numa_sensitive()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL == rt)
+        if (nullptr == rt)
             return false;
 
         bool numa_sensitive = false;
@@ -1182,7 +1182,7 @@ namespace hpx
     bool keep_factory_alive(components::component_type type)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt)
+        if (nullptr != rt)
             return rt->keep_factory_alive(type);
         return false;
     }
@@ -1198,7 +1198,7 @@ namespace hpx
     bool is_running()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt)
+        if (nullptr != rt)
             return rt->get_state() == state_running;
         return false;
     }
@@ -1206,7 +1206,7 @@ namespace hpx
     bool is_stopped()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt)
+        if (nullptr != rt)
             return rt->get_state() == state_stopped;
         return true;        // assume stopped
     }
@@ -1214,7 +1214,7 @@ namespace hpx
     bool is_stopped_or_shutting_down()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt)
+        if (nullptr != rt)
         {
             state st = rt->get_state();
             return st >= state_shutdown;
@@ -1225,7 +1225,7 @@ namespace hpx
     bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();
-        return NULL != rt ? rt->get_state() <= state_startup : true;
+        return nullptr != rt ? rt->get_state() <= state_startup : true;
     }
 }
 
@@ -1426,7 +1426,7 @@ namespace hpx
     void start_active_counters(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             rt->start_active_counters(ec);
         }
         else {
@@ -1438,7 +1438,7 @@ namespace hpx
     void stop_active_counters(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             rt->stop_active_counters(ec);
         }
         else {
@@ -1450,7 +1450,7 @@ namespace hpx
     void reset_active_counters(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             rt->reset_active_counters(ec);
         }
         else {
@@ -1462,7 +1462,7 @@ namespace hpx
     void evaluate_active_counters(bool reset, char const* description, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             rt->evaluate_active_counters(reset, description, ec);
         }
         else {
@@ -1477,7 +1477,7 @@ namespace hpx
         char const* action, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             return rt->register_message_handler(message_handler_type, action, ec);
         }
 
@@ -1492,7 +1492,7 @@ namespace hpx
         std::size_t interval, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             return rt->create_message_handler(message_handler_type, action,
                 pp, num_messages, interval, ec);
         }
@@ -1508,7 +1508,7 @@ namespace hpx
         bool compress, serialization::binary_filter* next_filter, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt)
+        if (nullptr != rt)
             return rt->create_binary_filter
                     (binary_filter_type, compress, next_filter, ec);
 
@@ -1521,7 +1521,7 @@ namespace hpx
     void stop_evaluating_counters()
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) rt->stop_evaluating_counters();
+        if (nullptr != rt) rt->stop_evaluating_counters();
     }
 }
 

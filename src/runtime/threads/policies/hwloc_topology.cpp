@@ -514,7 +514,7 @@ namespace hpx { namespace threads
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            obj = hwloc_get_next_child(topo, parent, NULL);
+            obj = hwloc_get_next_child(topo, parent, nullptr);
         }
 
         while (obj)
@@ -527,7 +527,7 @@ namespace hpx { namespace threads
                         std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
                         obj = hwloc_get_next_child(topo, parent, obj);
                     }
-                } while (obj != NULL &&
+                } while (obj != nullptr &&
                          hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0);
                 return;
             }
@@ -547,11 +547,11 @@ namespace hpx { namespace threads
     { // {{{
         hwloc_obj_t obj;
 
-        if(parent == NULL) return count;
+        if(parent == nullptr) return count;
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            obj = hwloc_get_next_child(topo, parent, NULL);
+            obj = hwloc_get_next_child(topo, parent, nullptr);
         }
 
         while (obj)
@@ -565,7 +565,7 @@ namespace hpx { namespace threads
                         std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
                         obj = hwloc_get_next_child(topo, parent, obj);
                     }
-                } while (obj != NULL && hwloc_compare_types(type, obj->type) == 0);
+                } while (obj != nullptr && hwloc_compare_types(type, obj->type) == 0);
                 return count;
                 */
                 ++count;
@@ -1095,13 +1095,13 @@ namespace hpx { namespace threads
 
     /// This is equivalent to malloc(), except that it tries to allocate
     /// page-aligned memory from the OS.
-    void* hwloc_topology::allocate(std::size_t len)
+    void* hwloc_topology::allocate(std::size_t len) const
     {
         return hwloc_alloc(topo, len);
     }
 
     /// Free memory that was previously allocated by allocate
-    void hwloc_topology::deallocate(void* addr, std::size_t len)
+    void hwloc_topology::deallocate(void* addr, std::size_t len) const
     {
         hwloc_free(topo, addr, len);
     }

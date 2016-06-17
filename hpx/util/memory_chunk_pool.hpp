@@ -87,7 +87,7 @@ namespace hpx { namespace util
             if(size > chunk_size_)
                 return std::make_pair(p, size);
 
-            memory_chunk_type *chunk = 0;
+            memory_chunk_type *chunk = nullptr;
             std::memcpy(&chunk, p - offset_, offset_);
             if(chunk)
             {
@@ -99,7 +99,7 @@ namespace hpx { namespace util
 
         char *allocate(size_type size)
         {
-            char * result = 0;
+            char * result = nullptr;
 
             if(size + offset_ <= chunk_size_)
             {
@@ -118,7 +118,7 @@ namespace hpx { namespace util
                         void * chunk_addr = &chunk;
                         std::memcpy(result, &chunk_addr, offset_);
 #if defined(HPX_DEBUG)
-                        memory_chunk_type *chunk_test = 0;
+                        memory_chunk_type *chunk_test = nullptr;
                         std::memcpy(&chunk_test, result, offset_);
                         HPX_ASSERT(chunk_test == &chunk);
 #endif
@@ -159,7 +159,7 @@ namespace hpx { namespace util
 
         void deallocate(char * p, size_type size)
         {
-            memory_chunk_type *chunk = 0;
+            memory_chunk_type *chunk = nullptr;
             std::memcpy(&chunk, p - offset_, offset_);
             if(chunk)
             {

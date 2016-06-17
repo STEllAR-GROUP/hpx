@@ -100,7 +100,7 @@ namespace hpx { namespace compute { namespace cuda
 #if defined(__CUDA_ARCH__)
             pointer result;
 #else
-            value_type *p = 0;
+            value_type *p = nullptr;
             detail::scoped_active_target active(*target_);
 
             cudaError_t error = cudaMalloc(&p, n*sizeof(T));

@@ -165,13 +165,11 @@ namespace lcos {
         //          constructed object.
         // Postcondition: other has no shared state.
         promise(promise&& other) HPX_NOEXCEPT : base_type(std::move(other))
-        {
-        }
+        {}
 
         // Effects: Abandons any shared state
         ~promise()
-        {
-        }
+        {}
 
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).

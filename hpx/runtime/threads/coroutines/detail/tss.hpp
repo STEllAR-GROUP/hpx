@@ -158,7 +158,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             tss_node_data_map::iterator current_node = data_.find(key);
             if (current_node != data_.end())
                 return &current_node->second;
-            return NULL;
+            return nullptr;
         }
 
         void insert(void const* key,
@@ -200,8 +200,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         bool cleanup_existing = false);
 
     HPX_EXPORT void set_tss_data(void const* key,
-        std::shared_ptr<tss_cleanup_function> const& func, void* tss_data = 0,
-        bool cleanup_existing = false);
+        std::shared_ptr<tss_cleanup_function> const& func,
+        void* tss_data = nullptr, bool cleanup_existing = false);
 
     //////////////////////////////////////////////////////////////////////////
     class tss_storage;

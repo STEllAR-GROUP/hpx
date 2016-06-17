@@ -143,7 +143,7 @@ namespace hpx { namespace threads { namespace coroutines
             HPX_ASSERT(m_pimpl);
             HPX_ASSERT(m_pimpl->is_ready());
 
-            result_type* ptr = 0;
+            result_type* ptr = nullptr;
             m_pimpl->bind_args(&arg);
             m_pimpl->bind_result_pointer(&ptr);
 

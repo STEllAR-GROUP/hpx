@@ -39,7 +39,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
             return false;
         }
 
-        rdma_cm_event * event = NULL;
+        rdma_cm_event * event = nullptr;
 
         if(rdma_get_cm_event(event_channel, &event) == 0)
         {

@@ -31,11 +31,11 @@ struct simple_refcnt_monitor
     > base_type;
 
   private:
-      lcos::promise<void>   flag_promise_;
-      lcos::future<void>    flag_;
-      naming::id_type const locality_;
+    lcos::promise<void> flag_promise_;
+    lcos::future<void> flag_;
+    naming::id_type const locality_;
 
-      using base_type::create;
+    using base_type::create;
 
   public:
     typedef server::simple_refcnt_checker server_type;
