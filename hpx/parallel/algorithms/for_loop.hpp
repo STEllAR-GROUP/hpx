@@ -99,6 +99,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             S stride_;
             hpx::util::tuple<Ts...> args_;
 
+            template <typename F_, typename S_, typename Args>
+            part_iterations(F_&& f, S_&& stride, Args&& args)
+              : f_(std::forward<F_>(f))
+              , stride_(std::forward<S_>(stride))
+              , args_(std::forward<Args>(args))
+            {}
+
             template <typename B>
             HPX_HOST_DEVICE
             void operator()(std::size_t part_index, B part_begin,
