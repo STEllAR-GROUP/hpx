@@ -19,6 +19,7 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 
 #include <algorithm>
+#include <map>
 #include <type_traits>
 #include <utility>
 #include <vector>

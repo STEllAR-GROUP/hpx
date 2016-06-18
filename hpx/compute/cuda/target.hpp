@@ -26,28 +26,15 @@
 #include <mutex>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace compute { namespace cuda
 {
-    namespace detail
-    {
-        struct HPX_EXPORT runtime_registration_wrapper
-        {
-            runtime_registration_wrapper(hpx::runtime* rt);
-            ~runtime_registration_wrapper();
-
-            hpx::runtime* rt_;
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     struct target
     {
-    private:
-        HPX_MOVABLE_ONLY(target);
-
     public:
         struct HPX_EXPORT native_handle_type
         {
@@ -69,6 +56,8 @@ namespace hpx { namespace compute { namespace cuda
             {
                 return device_;
             }
+
+            void reset() HPX_NOEXCEPT;
 
         private:
             friend struct target;
@@ -92,10 +81,25 @@ namespace hpx { namespace compute { namespace cuda
           : handle_(device), locality_(locality)
         {}
 
+        target(target const& rhs) HPX_NOEXCEPT
+          : handle_(),
+            locality_(rhs.locality_)
+        {}
+
         target(target && rhs) HPX_NOEXCEPT
           : handle_(std::move(rhs.handle_)),
             locality_(std::move(rhs.locality_))
         {}
+
+        target& operator=(target const& rhs) HPX_NOEXCEPT
+        {
+            if (&rhs != this)
+            {
+                handle_.reset();
+                locality_ = rhs.locality_;
+            }
+            return *this;
+        }
 
         target& operator=(target && rhs) HPX_NOEXCEPT
         {

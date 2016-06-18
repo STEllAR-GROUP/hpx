@@ -21,6 +21,7 @@
 #include <hpx/compute/cuda/target.hpp>
 
 #include <string>
+#include <vector>
 
 #include <cuda_runtime.h>
 

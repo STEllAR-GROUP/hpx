@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
