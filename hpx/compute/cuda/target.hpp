@@ -46,8 +46,10 @@ namespace hpx { namespace compute { namespace cuda
 
             ~native_handle_type();
 
+            native_handle_type(native_handle_type const& rhs) HPX_NOEXCEPT;
             native_handle_type(native_handle_type && rhs) HPX_NOEXCEPT;
 
+            native_handle_type& operator=(native_handle_type const& rhs) HPX_NOEXCEPT;
             native_handle_type& operator=(native_handle_type && rhs) HPX_NOEXCEPT;
 
             cudaStream_t get_stream() const;
@@ -82,7 +84,7 @@ namespace hpx { namespace compute { namespace cuda
         {}
 
         target(target const& rhs) HPX_NOEXCEPT
-          : handle_(),
+          : handle_(rhs.handle_),
             locality_(rhs.locality_)
         {}
 
@@ -95,7 +97,7 @@ namespace hpx { namespace compute { namespace cuda
         {
             if (&rhs != this)
             {
-                handle_.reset();
+                handle_ = rhs.handle_;
                 locality_ = rhs.locality_;
             }
             return *this;
@@ -103,7 +105,11 @@ namespace hpx { namespace compute { namespace cuda
 
         target& operator=(target && rhs) HPX_NOEXCEPT
         {
-            handle_ = std::move(rhs.handle_);
+            if (&rhs != this)
+            {
+                handle_ = std::move(rhs.handle_);
+                locality_ = std::move(rhs.locality_);
+            }
             return *this;
         }
 
