@@ -152,6 +152,10 @@ namespace hpx { namespace util
           : base_type()
         {}
 
+        unique_function_nonser(std::nullptr_t) HPX_NOEXCEPT
+          : base_type()
+        {}
+
         unique_function_nonser(unique_function_nonser&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
