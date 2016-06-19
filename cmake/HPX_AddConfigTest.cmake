@@ -326,20 +326,6 @@ macro(hpx_check_for_cxx11_std_is_bind_expression)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_std_is_final)
-  add_hpx_config_test(HPX_WITH_CXX11_IS_FINAL
-    SOURCE cmake/tests/cxx11_std_is_final.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_cxx11_std_is_null_pointer)
-  add_hpx_config_test(HPX_WITH_CXX11_IS_NULL_POINTER
-    SOURCE cmake/tests/cxx11_std_is_null_pointer.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_std_is_placeholder)
   add_hpx_config_test(HPX_WITH_CXX11_IS_PLACEHOLDER
     SOURCE cmake/tests/cxx11_std_is_placeholder.cpp
@@ -434,6 +420,20 @@ endmacro()
 macro(hpx_check_for_cxx14_std_integer_sequence)
   add_hpx_config_test(HPX_WITH_CXX14_INTEGER_SEQUENCE
     SOURCE cmake/tests/cxx14_std_integer_sequence.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_std_is_final)
+  add_hpx_config_test(HPX_WITH_CXX14_IS_FINAL
+    SOURCE cmake/tests/cxx14_std_is_final.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_std_is_null_pointer)
+  add_hpx_config_test(HPX_WITH_CXX14_IS_NULL_POINTER
+    SOURCE cmake/tests/cxx14_std_is_null_pointer.cpp
     FILE ${ARGN})
 endmacro()
 
