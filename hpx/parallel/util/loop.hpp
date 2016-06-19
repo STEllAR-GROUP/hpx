@@ -20,7 +20,7 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        // Helper class to repeatedly call a function starting from a givena
+        // Helper class to repeatedly call a function starting from a given
         // iterator position.
         template <typename Iterator>
         struct loop
