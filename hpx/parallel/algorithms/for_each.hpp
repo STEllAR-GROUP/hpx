@@ -21,7 +21,7 @@
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/prefetching.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 
@@ -229,7 +229,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename util::detail::loop<InIter>::type it_type;
 
                 return util::loop(first, last,
-                    [&f, &proj](Iter curr)
+                    [&f, &proj](it_type curr)
                     {
                         f(hpx::util::invoke(proj, *curr));
                     });
