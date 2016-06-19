@@ -903,6 +903,13 @@ hpx_check_for_cxx_experimental_std_optional(
   DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
 
 ################################################################################
+# check for miscellaneous things
+################################################################################
+
+hpx_check_for_mm_prefetch(
+  DEFINITIONS HPX_HAVE_MM_PREFETCH)
+
+################################################################################
 # Check for misc system headers
 ################################################################################
 

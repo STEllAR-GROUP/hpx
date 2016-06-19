@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/prefetching.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <iterator>
@@ -23,9 +22,11 @@ namespace hpx { namespace parallel { namespace util
         ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a givena
         // iterator position.
-        template <typename IterCat>
+        template <typename Iterator>
         struct loop
         {
+            typedef Iterator type;
+
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
             static Begin call(Begin it, End end, F && f)
@@ -51,24 +52,20 @@ namespace hpx { namespace parallel { namespace util
         };
     }
 
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_FORCEINLINE Begin
     loop(Begin begin, End end, F && f)
     {
-        typedef typename std::iterator_traits<Begin>::iterator_category cat;
-        return detail::loop<cat>::call(begin, end, std::forward<F>(f));
+        return detail::loop<Begin>::call(begin, end, std::forward<F>(f));
     }
 
     template <typename Begin, typename End, typename CancelToken, typename F>
     HPX_FORCEINLINE Begin
     loop(Begin begin, End end, CancelToken& tok, F && f)
     {
-        typedef typename std::iterator_traits<Begin>::iterator_category cat;
-        return detail::loop<cat>::call(begin, end, tok, std::forward<F>(f));
-    };
-
+        return detail::loop<Begin>::call(begin, end, tok, std::forward<F>(f));
+    }
 
     namespace detail
     {
@@ -78,10 +75,10 @@ namespace hpx { namespace parallel { namespace util
         template <typename Iterator>
         struct loop_n
         {
-         /////////////////////////////////////////////////////////////////
-            // handle sequences of non-futures
             typedef Iterator type;
 
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
             template <typename Iter, typename F>
             static Iter call(Iter it, std::size_t count, F && f)
             {
@@ -103,93 +100,9 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
         };
-
-        template <typename Itr, typename ...TS>
-        struct loop_n <detail::prefetching_iterator<Itr, TS...> >
-        {
-            /////////////////////////////////////////////////////////////////
-            // handle sequences of non-futures when using prefetching
-            typedef typename detail::prefetching_iterator<Itr,
-                TS...>::base_iterator type;
-
-            template <typename F>
-            static detail::prefetching_iterator<Itr, TS...>
-            call(detail::prefetching_iterator<Itr, TS...> it,
-                std::size_t count, F && f)
-            {
-                Itr inner_it = it.base;
-                std::size_t cnt = count + 1;
-                for (/**/; cnt != 0; (void) --cnt, ++it)
-                {
-                    std::size_t j = it.idx;
-                    std::size_t last = it.idx + it.chunk_size;
-
-                    if (it.range_size < last)
-                        last = it.range_size;
-
-                    for(/**/; j < last ; ++j)
-                    {
-                        f(inner_it);
-                        ++inner_it;
-                    }
-
-#ifdef SUPPORT_mm_prefetch
-                    if(j < it.range_size - 1)
-                        prefetch_(it.M_, j+1);
-#endif
-
-#ifdef NOT_SUPPORT_mm_prefetch
-                        if(j < it.range_size - 1)
-                            hpx::util::get<I>(t)[j+1];
-#endif
-
-                }
-                return it;
-            }
-
-            template <typename CancelToken, typename F>
-            static detail::prefetching_iterator<Itr, TS...>
-            call(detail::prefetching_iterator<Itr, TS...> it,
-                std::size_t count, CancelToken& tok,
-                F && f)
-            {
-                Itr inner_it = it.base;
-                std::size_t cnt = count + 1;
-                for (/**/; cnt != 0; (void) --cnt, ++it)
-                {
-                    std::size_t j = it.idx;
-                    std::size_t last = it.idx + it.chunk_size;
-
-                    if (it.range_size < last)
-                        last = it.range_size;
-
-                    for(/**/; j < last; ++j)
-                    {
-                        if (tok.was_cancelled())
-                            break;
-                        f(inner_it);
-                        ++inner_it;
-
-#ifdef SUPPORT_mm_prefetch
-                        if(j < it.range_size - 1)
-                            prefetch_(it.M_, j+1);
-#endif
-
-#ifdef NOT_SUPPORT_mm_prefetch
-                        if(j < it.range_size - 1)
-                            hpx::util::get<I>(t)[j+1];
-#endif
-
-                    }
-                }
-                return it;
-            }
-        };
-
     }
 
     ///////////////////////////////////////////////////////////////////////////
-
     template <typename Iter, typename F>
     HPX_FORCEINLINE Iter
     loop_n(Iter it, std::size_t count, F && f)
@@ -202,7 +115,7 @@ namespace hpx { namespace parallel { namespace util
     loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, tok, std::forward<F>(f));
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

@@ -43,6 +43,7 @@ set(tests
     findifnot_bad_alloc
     foreach
     foreach_executors
+    foreach_prefetching
     foreach_projection
     foreachn
     foreachn_exception
