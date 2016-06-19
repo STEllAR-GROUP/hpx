@@ -12,6 +12,7 @@ set(tests
     function
     pack_traversal
     parse_slurm_nodelist
+    range
     tagged
     tuple
    )
