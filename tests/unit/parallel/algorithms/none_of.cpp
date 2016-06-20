@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_all_any_none_of.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -35,14 +34,14 @@ void test_none_of(ExPolicy policy, IteratorTag)
 
         bool result =
             hpx::parallel::none_of(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 [](std::size_t v) {
                     return v != 0;
                 });
 
         // verify values
         bool expected =
-            std::none_of(boost::begin(c), boost::end(c),
+            std::none_of(std::begin(c), std::end(c),
                 [](std::size_t v) {
                     return v != 0;
                 });
@@ -64,7 +63,7 @@ void test_none_of_async(ExPolicy p, IteratorTag)
 
         hpx::future<bool> f =
             hpx::parallel::none_of(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 [](std::size_t v) {
                     return v != 0;
                 });
@@ -72,7 +71,7 @@ void test_none_of_async(ExPolicy p, IteratorTag)
 
         // verify values
         bool expected =
-            std::none_of(boost::begin(c), boost::end(c),
+            std::none_of(std::begin(c), std::end(c),
                 [](std::size_t v) {
                     return v != 0;
                 });
@@ -159,7 +158,7 @@ void test_none_of_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try {
             hpx::parallel::none_of(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 [](std::size_t v) {
                     return throw std::runtime_error("test"), v != 0;
                 });
@@ -194,7 +193,7 @@ void test_none_of_exception_async(ExPolicy p, IteratorTag)
         try {
             hpx::future<void> f =
                 hpx::parallel::none_of(p,
-                    iterator(boost::begin(c)), iterator(boost::end(c)),
+                    iterator(std::begin(c)), iterator(std::end(c)),
                     [](std::size_t v) {
                         return throw std::runtime_error("test"), v != 0;
                     });
@@ -267,7 +266,7 @@ void test_none_of_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try {
             hpx::parallel::none_of(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 [](std::size_t v) {
                     return throw std::bad_alloc(), v != 0;
                 });
@@ -301,7 +300,7 @@ void test_none_of_bad_alloc_async(ExPolicy p, IteratorTag)
         try {
             hpx::future<void> f =
                 hpx::parallel::none_of(p,
-                    iterator(boost::begin(c)), iterator(boost::end(c)),
+                    iterator(std::begin(c)), iterator(std::end(c)),
                     [](std::size_t v) {
                         return throw std::bad_alloc(), v != 0;
                     });

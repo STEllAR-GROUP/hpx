@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -42,7 +41,7 @@ void test_generate(ExPolicy policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(
-        boost::begin(c.base()), boost::end(c.base()),
+        std::begin(c.base()), std::end(c.base()),
         [&count](std::size_t v) -> void
         {
             HPX_TEST_EQ(v, std::size_t(10));
@@ -68,7 +67,7 @@ void test_generate_async(ExPolicy p, IteratorTag)
 
     std::size_t count = 0;
     std::for_each(
-        boost::begin(c.base()), boost::end(c.base()),
+        std::begin(c.base()), std::end(c.base()),
         [&count](std::size_t v) -> void
         {
             HPX_TEST_EQ(v, std::size_t(10));
@@ -126,9 +125,9 @@ void test_generate_exception(ExPolicy policy, IteratorTag)
         hpx::parallel::generate(policy,
             boost::make_iterator_range(
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c))),
+                decorated_iterator(std::end(c))),
             gen);
         HPX_TEST(false);
     }
@@ -161,9 +160,9 @@ void test_generate_exception_async(ExPolicy p, IteratorTag)
             hpx::parallel::generate(p,
                 boost::make_iterator_range(
                     decorated_iterator(
-                        boost::begin(c),
+                        std::begin(c),
                         [](){ throw std::runtime_error("test"); }),
-                    decorated_iterator(boost::end(c))),
+                    decorated_iterator(std::end(c))),
                 gen);
         returned_from_algorithm = true;
         f.get();
@@ -236,9 +235,9 @@ void test_generate_bad_alloc(ExPolicy policy, IteratorTag)
         hpx::parallel::generate(policy,
             boost::make_iterator_range(
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c))),
+                decorated_iterator(std::end(c))),
             gen);
         HPX_TEST(false);
     }
@@ -270,9 +269,9 @@ void test_generate_bad_alloc_async(ExPolicy p, IteratorTag)
             hpx::parallel::generate(p,
                 boost::make_iterator_range(
                     decorated_iterator(
-                        boost::begin(c),
+                        std::begin(c),
                         [](){ throw std::bad_alloc(); }),
-                    decorated_iterator(boost::end(c))),
+                    decorated_iterator(std::end(c))),
                 gen);
         returned_from_algorithm = true;
         f.get();

@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_rotate.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -35,23 +34,23 @@ void test_rotate_copy(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
-    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
 
     std::size_t mid_pos = std::rand() % c.size();
 
-    auto mid = boost::begin(c);
+    auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    hpx::parallel::rotate_copy(policy, c, iterator(mid), boost::begin(d1));
+    hpx::parallel::rotate_copy(policy, c, iterator(mid), std::begin(d1));
 
-    auto mid_base = boost::begin(c.base());
+    auto mid_base = std::begin(c.base());
     std::advance(mid_base, mid_pos);
 
-    std::rotate_copy(boost::begin(c.base()), mid_base, boost::end(c.base()),
-        boost::begin(d2));
+    std::rotate_copy(std::begin(c.base()), mid_base, std::end(c.base()),
+        std::begin(d2));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(d1), boost::end(d1), boost::begin(d2),
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -72,24 +71,24 @@ void test_rotate_copy_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size()); //-V656
 
-    std::iota(boost::begin(c.base()), boost::end(c.base()), std::rand());
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
 
     std::size_t mid_pos = std::rand() % c.size();
 
-    auto mid = boost::begin(c);
+    auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    auto f = hpx::parallel::rotate_copy(p, c, iterator(mid), boost::begin(d1));
+    auto f = hpx::parallel::rotate_copy(p, c, iterator(mid), std::begin(d1));
     f.wait();
 
-    auto mid_base = boost::begin(c.base());
+    auto mid_base = std::begin(c.base());
     std::advance(mid_base, mid_pos);
 
-    std::rotate_copy(boost::begin(c.base()), mid_base, boost::end(c.base()),
-        boost::begin(d2));
+    std::rotate_copy(std::begin(c.base()), mid_base, std::end(c.base()),
+        std::begin(d2));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(d1), boost::end(d1), boost::begin(d2),
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -141,9 +140,9 @@ void test_rotate_copy_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    base_iterator mid = boost::begin(c);
+    base_iterator mid = std::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
@@ -154,11 +153,11 @@ void test_rotate_copy_exception(ExPolicy policy, IteratorTag)
         hpx::parallel::rotate_copy(policy,
             boost::make_iterator_range(
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c))),
+                decorated_iterator(std::end(c))),
             decorated_iterator(mid),
-            boost::begin(d));
+            std::begin(d));
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
@@ -181,9 +180,9 @@ void test_rotate_copy_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    base_iterator mid = boost::begin(c);
+    base_iterator mid = std::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
@@ -196,11 +195,11 @@ void test_rotate_copy_exception_async(ExPolicy p, IteratorTag)
             hpx::parallel::rotate_copy(p,
                 boost::make_iterator_range(
                     decorated_iterator(
-                        boost::begin(c),
+                        std::begin(c),
                         [](){ throw std::runtime_error("test"); }),
-                    decorated_iterator(boost::end(c))),
+                    decorated_iterator(std::end(c))),
                 decorated_iterator(mid),
-                boost::begin(d));
+                std::begin(d));
         returned_from_algorithm = true;
         f.get();
 
@@ -267,9 +266,9 @@ void test_rotate_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    base_iterator mid = boost::begin(c);
+    base_iterator mid = std::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
@@ -280,11 +279,11 @@ void test_rotate_copy_bad_alloc(ExPolicy policy, IteratorTag)
         hpx::parallel::rotate_copy(policy,
             boost::make_iterator_range(
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c))),
+                decorated_iterator(std::end(c))),
             decorated_iterator(mid),
-            boost::begin(d));
+            std::begin(d));
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&) {
@@ -306,9 +305,9 @@ void test_rotate_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    base_iterator mid = boost::begin(c);
+    base_iterator mid = std::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
@@ -321,11 +320,11 @@ void test_rotate_copy_bad_alloc_async(ExPolicy p, IteratorTag)
             hpx::parallel::rotate_copy(p,
                 boost::make_iterator_range(
                     decorated_iterator(
-                        boost::begin(c),
+                        std::begin(c),
                         [](){ throw std::bad_alloc(); }),
-                    decorated_iterator(boost::end(c))),
+                    decorated_iterator(std::end(c))),
                 decorated_iterator(mid),
-                boost::begin(d));
+                std::begin(d));
         returned_from_algorithm = true;
         f.get();
 

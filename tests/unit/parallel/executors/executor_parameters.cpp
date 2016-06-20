@@ -10,7 +10,6 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/iterator_range.hpp>
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <chrono>

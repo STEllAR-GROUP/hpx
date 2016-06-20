@@ -8,19 +8,19 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
+#include <iterator>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/atomic.hpp>
-#include <boost/range/functions.hpp>
 
 using namespace std::chrono;
 

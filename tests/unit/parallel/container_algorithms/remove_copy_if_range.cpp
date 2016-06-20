@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_remove_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -35,24 +34,24 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
     std::vector<int> d(c.size());
     std::size_t middle_idx = std::rand() % (c.size()/2);
     auto middle =
-        hpx::parallel::v1::detail::next(boost::begin(c.base()), middle_idx);
-    std::iota(boost::begin(c.base()), middle,
+        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    std::iota(std::begin(c.base()), middle,
         static_cast<int>(std::rand() % c.size()));
-    std::fill(middle, boost::end(c.base()), -1);
+    std::fill(middle, std::end(c.base()), -1);
 
-    hpx::parallel::remove_copy_if(policy, c, boost::begin(d),
+    hpx::parallel::remove_copy_if(policy, c, std::begin(d),
         [](int i){ return i < 0; });
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c.base()), middle, boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
         [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, boost::end(c.base()),
-        boost::begin(d) + middle_idx,
+    HPX_TEST(std::equal(middle, std::end(c.base()),
+        std::begin(d) + middle_idx,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -74,27 +73,27 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
     std::vector<int> d(c.size());
     std::size_t middle_idx = std::rand() % (c.size()/2);
     auto middle =
-        hpx::parallel::v1::detail::next(boost::begin(c.base()), middle_idx);
-    std::iota(boost::begin(c.base()), middle,
+        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    std::iota(std::begin(c.base()), middle,
         static_cast<int>(std::rand() % c.size()));
-    std::fill(middle, boost::end(c.base()), -1);
+    std::fill(middle, std::end(c.base()), -1);
 
     auto f =
         hpx::parallel::remove_copy_if(p, c,
-            boost::begin(d), [](int i){ return i < 0; });
+            std::begin(d), [](int i){ return i < 0; });
     f.wait();
 
     std::size_t count = 0;
     HPX_TEST(std::equal(
-        boost::begin(c.base()), middle, boost::begin(d),
+        std::begin(c.base()), middle, std::begin(d),
         [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, boost::end(c.base()),
-        boost::begin(d) + middle_idx,
+    HPX_TEST(std::equal(middle, std::end(c.base()),
+        std::begin(d) + middle_idx,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -120,15 +119,15 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
     std::vector<int> d(0);
     std::size_t middle_idx = std::rand() % (c.size()/2);
     auto middle =
-        hpx::parallel::v1::detail::next(boost::begin(c.base()), middle_idx);
-    std::iota(boost::begin(c.base()), middle,
+        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    std::iota(std::begin(c.base()), middle,
         static_cast<int>(std::rand() % c.size()));
-    std::fill(middle, boost::end(c.base()), -1);
+    std::fill(middle, std::end(c.base()), -1);
 
     hpx::parallel::remove_copy_if(policy, c,
         std::back_inserter(d), [](int i){ return i < 0; });
 
-    HPX_TEST(std::equal(boost::begin(c.base()), middle, boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
         [](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             return v1 == v2;
@@ -149,17 +148,17 @@ void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
     std::vector<int> d(0);
     std::size_t middle_idx = std::rand() % (c.size()/2);
     auto middle =
-        hpx::parallel::v1::detail::next(boost::begin(c.base()), middle_idx);
-    std::iota(boost::begin(c.base()), middle,
+        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    std::iota(std::begin(c.base()), middle,
         static_cast<int>(std::rand() % c.size()));
-    std::fill(middle, boost::end(c.base()), -1);
+    std::fill(middle, std::end(c.base()), -1);
 
     auto f =
         hpx::parallel::remove_copy_if(p, c,
             std::back_inserter(d), [](int i){ return i < 0; });
     f.wait();
 
-    HPX_TEST(std::equal(boost::begin(c.base()), middle, boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
         [](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             return v1 == v2;
@@ -235,12 +234,12 @@ void test_remove_copy_if_exception(ExPolicy policy, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::remove_copy_if(policy,
-            c, boost::begin(d),
+            c, std::begin(d),
             [](std::size_t v) {
                 return throw std::runtime_error("test"), v == 0;
             });
@@ -267,14 +266,14 @@ void test_remove_copy_if_exception_async(ExPolicy p, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         auto f =
             hpx::parallel::remove_copy_if(p, c,
-                boost::begin(d),
+                std::begin(d),
                 [](std::size_t v) {
                     return throw std::runtime_error("test"), v == 0;
                 });
@@ -347,12 +346,12 @@ void test_remove_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::remove_copy_if(policy,
-            c, boost::begin(d),
+            c, std::begin(d),
             [](std::size_t v) {
                 return throw std::bad_alloc(), v;
             });
@@ -379,14 +378,14 @@ void test_remove_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         auto f =
             hpx::parallel::remove_copy_if(p, c,
-            boost::begin(d),
+            std::begin(d),
             [](std::size_t v) {
                 return throw std::bad_alloc(), v;
             });

@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_lexicographical_compare.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -30,15 +29,15 @@ void test_lexicographical_compare1(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     //d is lexicographical less than c
     std::vector<std::size_t> d(10006);
-    std::iota(boost::begin(d), boost::end(d), 0);
+    std::iota(std::begin(d), std::end(d), 0);
 
     bool res = hpx::parallel::lexicographical_compare(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d), boost::end(d));
+        iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), std::end(d));
 
     HPX_TEST(!res);
 }
@@ -50,16 +49,16 @@ void test_lexicographical_compare1_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     // d is lexicographical less than c
     std::vector<std::size_t> d(10006);
-    std::iota(boost::begin(d), boost::end(d), 0);
+    std::iota(std::begin(d), std::end(d), 0);
 
     hpx::future<bool> f =
         hpx::parallel::lexicographical_compare(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d), boost::end(d));
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), std::end(d));
 
     f.wait();
 
@@ -117,14 +116,14 @@ void test_lexicographical_compare2(ExPolicy policy, IteratorTag)
 
     // lexicographically equal, so result is false
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     std::vector<std::size_t> d(10007);
-    std::iota(boost::begin(d), boost::end(d), 0);
+    std::iota(std::begin(d), std::end(d), 0);
 
     bool res = hpx::parallel::lexicographical_compare(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d), boost::end(d));
+        iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), std::end(d));
 
     HPX_TEST(!res);
 }
@@ -137,15 +136,15 @@ void test_lexicographical_compare2_async(ExPolicy p, IteratorTag)
 
     // lexicographically equal, so result is false
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     std::vector<std::size_t> d(10007);
-    std::iota(boost::begin(d), boost::end(d), 0);
+    std::iota(std::begin(d), std::end(d), 0);
 
     hpx::future<bool> f =
         hpx::parallel::lexicographical_compare(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d), boost::end(d));
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), std::end(d));
 
     f.wait();
 
@@ -200,15 +199,15 @@ void test_lexicographical_compare3(ExPolicy policy, IteratorTag)
     // C is lexicographically less due to the (std::rand() % size + 1)th
     // element being less than D
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
     c[(std::rand() % 5000) + 1] = 0; //-V108
 
     std::vector<std::size_t> d(10007);
-    std::iota(boost::begin(d), boost::end(d), 0);
+    std::iota(std::begin(d), std::end(d), 0);
 
     bool res = hpx::parallel::lexicographical_compare(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d), boost::end(d));
+        iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), std::end(d));
 
     HPX_TEST(res);
 }
@@ -220,16 +219,16 @@ void test_lexicographical_compare3_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
     c[(std::rand() % 10006) + 1] = 0; //-V108
 
     std::vector<std::size_t> d(10007);
-    std::iota(boost::begin(d), boost::end(d), 0);
+    std::iota(std::begin(d), std::end(d), 0);
 
     hpx::future<bool> f =
         hpx::parallel::lexicographical_compare(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d), boost::end(d));
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), std::end(d));
 
     f.wait();
 
@@ -283,21 +282,21 @@ void test_lexicographical_compare_exception(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     std::vector<std::size_t> h(10007);
-    std::iota(boost::begin(h), boost::end(h), 0);
+    std::iota(std::begin(h), std::end(h), 0);
 
     bool caught_exception = false;
     try {
         hpx::parallel::lexicographical_compare(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("test"); }),
             decorated_iterator(
-                boost::end(c),
+                std::end(c),
                 [](){ throw std::runtime_error("test"); }),
-            boost::begin(h), boost::end(h));
+            std::begin(h), std::end(h));
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -319,10 +318,10 @@ void test_lexicographical_compare_async_exception(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::fill(boost::begin(c), boost::end(c), std::rand() + 1);
+    std::fill(std::begin(c), std::end(c), std::rand() + 1);
 
     std::vector<std::size_t> h(10006);
-    std::fill(boost::begin(h), boost::end(h), std::rand() + 1);
+    std::fill(std::begin(h), std::end(h), std::rand() + 1);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -330,12 +329,12 @@ void test_lexicographical_compare_async_exception(ExPolicy p, IteratorTag)
         hpx::future<bool> f =
             hpx::parallel::lexicographical_compare(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(
-                    boost::end(c),
+                    std::end(c),
                     [](){ throw std::runtime_error("test"); }),
-            boost::begin(h), boost::end(h));
+            std::begin(h), std::end(h));
         returned_from_algorithm = true;
         f.get();
 
@@ -401,21 +400,21 @@ void test_lexicographical_compare_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::fill(boost::begin(c), boost::end(c), std::rand() + 1);
+    std::fill(std::begin(c), std::end(c), std::rand() + 1);
 
     std::vector<std::size_t> h(10006);
-    std::fill(boost::begin(h), boost::end(h), std::rand() + 1);
+    std::fill(std::begin(h), std::end(h), std::rand() + 1);
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::lexicographical_compare(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::bad_alloc(); }),
             decorated_iterator(
-                boost::end(c),
+                std::end(c),
                 [](){ throw std::bad_alloc(); }),
-            boost::begin(h), boost::end(h));
+            std::begin(h), std::end(h));
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
@@ -436,10 +435,10 @@ void test_lexicographical_compare_async_bad_alloc(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::fill(boost::begin(c), boost::end(c), std::rand() + 1);
+    std::fill(std::begin(c), std::end(c), std::rand() + 1);
 
     std::vector<std::size_t> h(10006);
-    std::fill(boost::begin(h), boost::end(h), std::rand() + 1);
+    std::fill(std::begin(h), std::end(h), std::rand() + 1);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -447,12 +446,12 @@ void test_lexicographical_compare_async_bad_alloc(ExPolicy p, IteratorTag)
         hpx::future<bool> f =
             hpx::parallel::lexicographical_compare(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(
-                    boost::end(c),
+                    std::end(c),
                     [](){ throw std::bad_alloc(); }),
-                boost::begin(h), boost::end(h));
+                std::begin(h), std::end(h));
         returned_from_algorithm = true;
 
         f.get();

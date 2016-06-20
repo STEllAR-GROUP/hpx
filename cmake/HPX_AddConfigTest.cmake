@@ -440,6 +440,13 @@ macro(hpx_check_for_cxx11_std_lock_guard)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_range_access)
+  add_hpx_config_test(HPX_WITH_CXX11_RANGE_ACCESS
+    SOURCE cmake/tests/cxx11_std_range_access.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_reference_wrapper)
   add_hpx_config_test(HPX_WITH_CXX11_REFERENCE_WRAPPER
     SOURCE cmake/tests/cxx11_std_reference_wrapper.cpp

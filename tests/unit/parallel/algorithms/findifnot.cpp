@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -30,16 +29,16 @@ void test_find_if_not(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     //fill vector with random values about 1
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100)+2);
+    std::fill(std::begin(c), std::end(c), (std::rand()%100)+2);
     c.at(c.size()/2) = 1;
 
     iterator index = hpx::parallel::find_if_not(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         [](std::size_t v) {
             return v != std::size_t(1);
         });
 
-    base_iterator test_index = boost::begin(c) + c.size()/2;
+    base_iterator test_index = std::begin(c) + c.size()/2;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -52,19 +51,19 @@ void test_find_if_not_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     //fill vector with random values above 1
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 2);
+    std::fill(std::begin(c), std::end(c), (std::rand()%100) + 2);
     c.at(c.size()/2) = 1;
 
     hpx::future<iterator> f =
         hpx::parallel::find_if_not(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
         [](std::size_t v) {
             return v != std::size_t(1);
         });
     f.wait();
 
     //create iterator at position of value to be found
-    base_iterator test_index = boost::begin(c) + c.size()/2;
+    base_iterator test_index = std::begin(c) + c.size()/2;
 
     HPX_TEST(f.get() == iterator(test_index));
 }
