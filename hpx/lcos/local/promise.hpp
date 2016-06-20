@@ -475,7 +475,7 @@ namespace hpx { namespace lcos { namespace local
 
 namespace hpx { namespace lcos
 {
-    // Allow for using __await with an expression which evaluates to
+    // Allow for using co_await with an expression which evaluates to
     // hpx::future<T>.
     template <typename T>
     HPX_FORCEINLINE bool await_ready(future<T> const& f)
@@ -510,7 +510,7 @@ namespace hpx { namespace lcos
         return f.get().get();
     }
 
-    // Allow for using __await with an expression which evaluates to
+    // Allow for using co_await with an expression which evaluates to
     // hpx::shared_future<T>.
     template <typename T>
     HPX_FORCEINLINE bool await_ready(shared_future<T> const& f)
@@ -536,7 +536,7 @@ namespace hpx { namespace lcos
 ///////////////////////////////////////////////////////////////////////////////
 namespace std { namespace experimental
 {
-    // Allow for functions which use __await to return an hpx::future<T>
+    // Allow for functions which use co_await to return an hpx::future<T>
     template <typename T, typename ...Ts>
     struct coroutine_traits<hpx::lcos::future<T>, Ts...>
     {
@@ -595,7 +595,7 @@ namespace std { namespace experimental
 
             void destroy()
             {
-                coroutine_handle<promise_type>::from_promise(this).destroy();
+                coroutine_handle<promise_type>::from_promise(*this).destroy();
             }
         };
     };

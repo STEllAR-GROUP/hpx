@@ -786,7 +786,7 @@ endif()
 
 if(MSVC14 AND CMAKE_CL_64)
   hpx_option(HPX_WITH_AWAIT BOOL
-      "Enable the use of experimental __await functionality"
+      "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
   if(HPX_WITH_AWAIT)
     hpx_add_config_define(HPX_HAVE_AWAIT)
