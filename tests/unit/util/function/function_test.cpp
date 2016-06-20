@@ -677,7 +677,7 @@ static void test_exception()
     }
 }
 
-typedef boost::function< void * (void * reader) > reader_type;
+typedef hpx::util::function_nonser< void * (void * reader) > reader_type;
 typedef std::pair<int, reader_type> mapped_type;
 
 static void test_implicit()
