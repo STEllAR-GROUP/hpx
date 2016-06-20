@@ -1033,12 +1033,12 @@ namespace hpx { namespace parcelset {
                 active_send_iterator current_send;
                 {
                     unique_lock lock(active_send_mutex);
-
                     // if more than N parcels are currently queued, then yield
-                    // otherwise we can fill the send queues with so many requests that memory buffers
-                    // are exhausted.
+                    // otherwise we can fill the send queues with so many requests
+                    // that memory buffers are exhausted.
+                    LOG_DEBUG_MSG("HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << active_sends.size());
                     active_send_condition.wait(lock, [this] {
-                      return !(active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
+                      return (active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
                     });
 
                     active_sends.emplace_back();
