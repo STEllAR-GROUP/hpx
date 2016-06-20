@@ -29,6 +29,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
@@ -41,7 +42,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
 #include <cstddef>
@@ -433,8 +433,8 @@ namespace hpx { namespace lcos { namespace detail
             future_type & f_ = util::get<I>(futures_);
 
             await_range<I>(
-                boost::begin(util::unwrap_ref(f_))
-              , boost::end(util::unwrap_ref(f_))
+                util::begin(util::unwrap_ref(f_))
+              , util::end(util::unwrap_ref(f_))
             );
         }
 

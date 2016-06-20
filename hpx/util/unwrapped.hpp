@@ -11,6 +11,7 @@
 #include <hpx/util_fwd.hpp>
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>

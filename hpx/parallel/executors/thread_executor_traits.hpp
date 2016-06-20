@@ -20,6 +20,7 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <cstddef>
@@ -162,20 +163,13 @@ namespace hpx { namespace parallel { inline namespace v3
                         F, Shape, Ts...
                     >::type
                 > > results;
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-            std::size_t size = std::distance(boost::begin(shape),
-                boost::end(shape));
-#else
-            std::size_t size = boost::size(shape);
-#endif
+            std::size_t size = hpx::util::size(shape);
             results.resize(size);
 
             static std::size_t num_tasks =
                 (std::min)(std::size_t(128), hpx::get_os_thread_count());
 
-            spawn(sched, results, 0, size, num_tasks, f, boost::begin(shape),
+            spawn(sched, results, 0, size, num_tasks, f, hpx::util::begin(shape),
                 ts...).get();
             return results;
         }

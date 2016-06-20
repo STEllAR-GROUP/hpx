@@ -33,6 +33,17 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct range_iterator
+      : util::detail::iterator<T>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct range_sentinel
+      : util::detail::sentinel<T>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename R, bool IsRange = is_range<R>::value>
     struct range_traits
     {};
@@ -42,7 +53,10 @@ namespace hpx { namespace traits
       : std::iterator_traits<
             typename util::detail::iterator<R>::type
         >
-    {};
+    {
+        typedef typename util::detail::iterator<R>::type iterator_type;
+        typedef typename util::detail::sentinel<R>::type sentinel_type;
+    };
 }}
 
 #endif /*HPX_TRAITS_IS_RANGE_HPP*/

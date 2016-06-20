@@ -22,9 +22,10 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/functional/new.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/range/iterator_range_core.hpp>
+#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -183,7 +184,7 @@ namespace hpx { namespace compute { namespace host
 
             cancellation_token tok;
             partitioner::call(std::move(policy),
-                boost::begin(irange), count,
+                util::begin(irange), count,
                 [&arguments, p, &tok](iterator_type it, std::size_t part_size)
                     mutable -> partition_result_type
                 {
@@ -241,7 +242,7 @@ namespace hpx { namespace compute { namespace host
                 hpx::parallel::execution::par
                     .on(executor_)
                     .with(hpx::parallel::static_chunk_size()),
-                boost::begin(irange), boost::end(irange),
+                util::begin(irange), util::end(irange),
                 [p](std::size_t i)
                 {
                     (p + i)->~U();
