@@ -68,6 +68,10 @@
 //
 // (+or more) where %l is num_ranks, and %%x is rank of current process
 
+//----------------------------------------------------------------------------
+// @TODO : add support for custom network executor
+// local_priority_queue_os_executor exec(4, "thread:0-3=core:12-15.pu:0");
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // #defines to control program
@@ -89,7 +93,7 @@
 #define MAX_RANKS 64
 
 //----------------------------------------------------------------------------
-// control the amount of debug messaging that is output 
+// control the amount of debug messaging that is output
 #define DEBUG_LEVEL 0
 
 //----------------------------------------------------------------------------
@@ -266,9 +270,9 @@ typedef pointer_allocator<char>                             PointerAllocator;
 typedef hpx::serialization::serialize_buffer<char,
     PointerAllocator> transfer_buffer_type;
 
-typedef std::map<uint64_t, boost::shared_ptr<general_buffer_type>>  alive_map;
-typedef hpx::lcos::local::spinlock                                  mutex_type;
-typedef hpx::lcos::local::spinlock::scoped_lock                     scoped_lock;
+typedef std::map<uint64_t, std::shared_ptr<general_buffer_type>>  alive_map;
+typedef hpx::lcos::local::spinlock                                mutex_type;
+typedef std::lock_guard<mutex_type>                               scoped_lock;
 //
 mutex_type keep_alive_mutex;
 alive_map  keep_alive_buffers;
@@ -461,7 +465,7 @@ void test_write(
     bool active = (rank==0) | (rank>0 && options.all2all);
     for(std::uint64_t i = 0; active && i < options.iterations; i++) {
         hpx::util::simple_profiler iteration(level1,"Iteration");
-        
+
         DEBUG_OUTPUT(1,
             "Starting iteration " << i << " on rank " << rank
         );
@@ -506,7 +510,8 @@ void test_write(
             uint32_t memory_offset = static_cast<uint32_t>
                 (memory_slot*options.transfer_size_B);
             DEBUG_OUTPUT(5,
-                "Rank " << rank << " sending block " << i << " to rank " << send_rank
+                "Rank " << rank << " sending block " << i
+                << " to rank " << send_rank
             );
             prof_setup.done();
 
@@ -524,7 +529,7 @@ void test_write(
                 std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
 
-                boost::shared_ptr<general_buffer_type> temp_buffer = boost::make_shared<general_buffer_type>(
+                std::shared_ptr<general_buffer_type> temp_buffer = std::make_shared<general_buffer_type>(
                         static_cast<char*>(buffer), options.transfer_size_B, general_buffer_type::reference);
                 using hpx::util::placeholders::_1;
                 using hpx::util::placeholders::_2;
@@ -784,8 +789,9 @@ void test_read(
         int total = numwait;
 #endif
         DEBUG_OUTPUT(3,
-            "Future timer, rank " << rank << " waiting on " << numwait << " total " << total << " "
-            << futuretimer.elapsed() << " Move time " << movetime
+            "Future timer, rank " << rank << " waiting on " << numwait
+            << " total " << total << " " << futuretimer.elapsed()
+            << " Move time " << movetime
         );
     }
     hpx::lcos::barrier::synchronize();
@@ -861,7 +867,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     uint64_t num_transfer_slots = 1024*1024*options.local_storage_MB
         / options.transfer_size_B;
     DEBUG_OUTPUT(1,
-        "num ranks " << nranks << ", num_transfer_slots " << num_transfer_slots << " on rank " << rank
+        "num ranks " << nranks << ", num_transfer_slots "
+        << num_transfer_slots << " on rank " << rank
     );
     //
     boost::random::mt19937 gen;
