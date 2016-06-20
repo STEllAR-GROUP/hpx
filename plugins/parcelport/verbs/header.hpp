@@ -19,6 +19,12 @@
 namespace hpx { namespace parcelset {
 namespace policies { namespace verbs
 {
+    struct rdma_region {
+        std::size_t     size;
+        const void *    addr;
+        boost::uint32_t key;
+    };
+
     template <int SIZE>
     struct header
     {
@@ -35,7 +41,9 @@ namespace policies { namespace verbs
             pos_piggy_back_flag   = 6 * sizeof(value_type),// + (1 * sizeof(flag_type)),
             pos_chunk_offset      = 7 * sizeof(value_type),// + (2 * sizeof(flag_type)),
             pos_piggy_back_offset = 8 * sizeof(value_type),// + (2 * sizeof(flag_type)) + 1,
-            pos_data_zone         = 9 * sizeof(value_type),// + (2 * sizeof(flag_type)) + 1
+            pos_piggy_back_key    = 9 * sizeof(value_type),// + (2 * sizeof(flag_type)) + 1,
+            pos_piggy_back_addr   =10 * sizeof(value_type),// + (2 * sizeof(flag_type)) + 1,
+            pos_data_zone         =10 * sizeof(value_type) + sizeof(const void *)
         };
 
         static int const data_size_ = SIZE;
@@ -48,12 +56,6 @@ namespace policies { namespace verbs
 
             HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
             HPX_ASSERT(numbytes <= (std::numeric_limits<value_type>::max)());
-
-            // chunk data is not stored by default
-            set<pos_chunk_flag>(static_cast<value_type>(0));
-            set<pos_piggy_back_flag>(static_cast<value_type>(0));
-            set<pos_chunk_offset>(static_cast<value_type>(0));
-            set<pos_piggy_back_offset>(static_cast<value_type>(0));
 
             set<pos_tag>(static_cast<value_type>(tag));
             set<pos_size>(static_cast<value_type>(size));
@@ -71,6 +73,8 @@ namespace policies { namespace verbs
               LOG_DEBUG_MSG("Chunkbytes is " << hexnumber(chunkbytes));
             }
             else {
+              set<pos_chunk_flag>(static_cast<value_type>(0));
+              set<pos_chunk_offset>(static_cast<value_type>(0));
               chunkbytes = 0;
             }
 
@@ -78,8 +82,11 @@ namespace policies { namespace verbs
             set<pos_piggy_back_offset>(static_cast<value_type>(pos_data_zone + chunkbytes));
 
             // can we send main message chunk as well as other information
-            if(buffer.data_.size() <= (data_size_ - chunkbytes - pos_data_zone)) {
+            if (buffer.data_.size() <= (data_size_ - chunkbytes - pos_data_zone)) {
                 set<pos_piggy_back_flag>(static_cast<value_type>(1));
+            }
+            else {
+              set<pos_piggy_back_flag>(static_cast<value_type>(0));
             }
         }
 
@@ -158,6 +165,32 @@ namespace policies { namespace verbs
             // otherwise, just end of normal header
             else
                 return static_cast<std::size_t>(pos_data_zone);
+        }
+
+        void setRdmaKey(value_type v) {
+            set<pos_piggy_back_key>(v);
+        }
+
+        value_type GetRdmaKey() const {
+            return get<pos_piggy_back_key>();
+        }
+
+        void setRdmaAddr(const void *v) {
+            set<pos_piggy_back_addr>(v);
+        }
+
+        const void * GetRdmaAddr() const {
+            void * res;
+            std::memcpy(&res, &data_[pos_piggy_back_addr], sizeof(res));
+            return res;
+        }
+
+        void setRdmaMessageLength(value_type v) {
+            set<pos_piggy_back_offset>(v);
+        }
+
+        value_type GetRdmaMessageLength() const {
+            return get<pos_piggy_back_offset>();
         }
 
     private:
