@@ -6,7 +6,6 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_LOCALITY_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_LOCALITY_HPP
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
