@@ -138,9 +138,9 @@ namespace hpx { namespace compute { namespace traits
             {
                 typedef typename Allocator::pointer pointer;
                 pointer init_value(std::forward<Ts>(vs)...);
-                pointer* end = p + count;
+                pointer end = p + count;
                 typename Allocator::size_type allocated = 0;
-                for(pointer* it = p; it != end; ++it)
+                for(pointer it = p; it != end; ++it)
                 {
 #if defined(__CUDA_ARCH__)
                     allocator_traits<Allocator>::construct(alloc, it, init_value);
