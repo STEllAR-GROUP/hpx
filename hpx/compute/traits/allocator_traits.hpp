@@ -185,7 +185,7 @@ namespace hpx { namespace compute { namespace traits
             template <typename Allocator>
             HPX_HOST_DEVICE
             static void call(hpx::traits::detail::wrap_int, Allocator& alloc, 
-                typename Allocator::pointer* p, typename Allocator::size_type count)
+                typename Allocator::pointer p, typename Allocator::size_type count)
                 HPX_NOEXCEPT
             {
                 typedef typename Allocator::pointer pointer;
