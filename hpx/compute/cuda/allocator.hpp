@@ -160,8 +160,8 @@ namespace hpx { namespace compute { namespace cuda
     public:
         // Constructs count objects of type T in allocated uninitialized
         // storage pointed to by p, using placement-new
-        template <typename U, typename ... Args>
-        void bulk_construct(U* p, std::size_t count, Args &&... args)
+        template <typename ... Args>
+        void bulk_construct(pointer p, std::size_t count, Args &&... args)
         {
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
@@ -183,8 +183,8 @@ namespace hpx { namespace compute { namespace cuda
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
-        template <typename U, typename ... Args>
-        void construct(U* p, Args &&... args)
+        template <typename ... Args>
+        void construct(pointer p, Args &&... args)
         {
             detail::launch(
                 *target_, 1, 1,
@@ -197,8 +197,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         // Calls the destructor of count objects pointed to by p
-        template <typename U>
-        void bulk_destroy(U* p, std::size_t count)
+        void bulk_destroy(pointer p, std::size_t count)
         {
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
@@ -219,8 +218,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         // Calls the destructor of the object pointed to by p
-        template <typename U>
-        void destroy(U* p)
+        void destroy(pointer p)
         {
             bulk_destroy(p, 1);
         }

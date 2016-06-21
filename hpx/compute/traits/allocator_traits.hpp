@@ -239,14 +239,14 @@ namespace hpx { namespace compute { namespace traits
             alloc.deallocate(p, n);
         }
 
-        template< class T, class... Args >
-        static void construct(Allocator& alloc, T* p, Args&&... args)
+        template<class... Args >
+        static void construct(Allocator& alloc, pointer* p, Args&&... args)
         {
             alloc.construct(p, std::forward<Args>(args)...);
         }
 
-        template< class T, class... Args >
-        static void destroy(Allocator& alloc, T* p)
+        template<class... Args >
+        static void destroy(Allocator& alloc, pointe* p)
         {
             alloc.destroy(p);
         }
@@ -262,6 +262,7 @@ namespace hpx { namespace compute { namespace traits
     public:
         using typename base_type::size_type;
         using typename base_type::value_type;
+        using typename base_type::pointer;
 #endif
 
         typedef
@@ -280,17 +281,16 @@ namespace hpx { namespace compute { namespace traits
             return detail::call_target_helper(alloc);
         }
 
-        template <typename T, typename ...Ts>
+        template <typename ...Ts>
         HPX_HOST_DEVICE
-        static void bulk_construct(Allocator& alloc, T* p, size_type count,
+        static void bulk_construct(Allocator& alloc, pointer p, size_type count,
             Ts &&... vs)
         {
             detail::call_bulk_construct(alloc, p, count, std::forward<Ts>(vs)...);
         }
 
-        template <typename T>
         HPX_HOST_DEVICE
-        static void bulk_destroy(Allocator& alloc, T* p, size_type count) HPX_NOEXCEPT
+        static void bulk_destroy(Allocator& alloc, pointer p, size_type count) HPX_NOEXCEPT
         {
             if (p != 0) detail::call_bulk_destroy(alloc, p, count);
         }
