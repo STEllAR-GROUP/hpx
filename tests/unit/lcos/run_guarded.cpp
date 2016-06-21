@@ -64,8 +64,7 @@ int hpx_main(boost::program_options::variables_map& vm) {
         run_guarded(*l2,incr2);
     }
 
-    boost::function<void()> check_func = hpx::util::bind(check);
-    run_guarded(guards,check_func);
+    run_guarded(guards, &::check);
     return hpx::finalize();
 }
 

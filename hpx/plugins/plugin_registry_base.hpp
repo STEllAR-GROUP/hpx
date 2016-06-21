@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/util_fwd.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <string>
 #include <vector>

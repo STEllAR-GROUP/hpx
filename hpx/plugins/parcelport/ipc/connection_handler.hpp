@@ -11,10 +11,10 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/plugins/parcelport/ipc/acceptor.hpp>
 #include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <memory>

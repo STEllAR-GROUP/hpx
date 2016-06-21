@@ -7,8 +7,8 @@
 #if !defined(HPX_CONFIG_DEFAULTS_SEP_26_2008_0352PM)
 #define HPX_CONFIG_DEFAULTS_SEP_26_2008_0352PM
 
-#include <hpx/version.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 

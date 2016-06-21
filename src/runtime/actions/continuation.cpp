@@ -6,9 +6,10 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/lcos/base_lco.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/lcos/base_lco.hpp>
 
 #include <boost/exception_ptr.hpp>
 

@@ -103,9 +103,8 @@ namespace hpx { namespace compute { namespace host
         }
 
         template <typename F, typename ... Ts>
-        auto
+        typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
         execute(F && f, Ts &&... ts)
-            ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
         {
             std::size_t current = ++current_ % executors_.size();
             return executor_traits::execute(executors_[current],

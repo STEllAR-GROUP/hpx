@@ -791,7 +791,7 @@ endif()
 
 if(MSVC14 AND CMAKE_CL_64)
   hpx_option(HPX_WITH_AWAIT BOOL
-      "Enable the use of experimental __await functionality"
+      "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
   if(HPX_WITH_AWAIT)
     hpx_add_config_define(HPX_HAVE_AWAIT)
@@ -902,7 +902,7 @@ hpx_check_for_cxx11_noexcept(
   DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
 
 hpx_check_for_cxx11_nullptr(
-  DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
+  REQUIRED "HPX needs support for C++11 nullptr")
 
 hpx_check_for_cxx11_range_based_for(
   REQUIRED "HPX needs support for C++11 range-based for-loop")
@@ -937,12 +937,6 @@ hpx_check_for_cxx11_std_initializer_list(
 
 hpx_check_for_cxx11_std_is_bind_expression(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
-
-hpx_check_for_cxx11_std_is_final(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
-
-hpx_check_for_cxx11_std_is_null_pointer(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
 
 hpx_check_for_cxx11_std_is_placeholder(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
@@ -987,6 +981,12 @@ hpx_check_for_cxx14_lambdas(
 # Check the availability of certain C++14 library features
 hpx_check_for_cxx14_std_integer_sequence(
   DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
+
+hpx_check_for_cxx14_std_is_final(
+  DEFINITIONS HPX_HAVE_CXX14_STD_IS_FINAL)
+
+hpx_check_for_cxx14_std_is_null_pointer(
+  DEFINITIONS HPX_HAVE_CXX14_STD_IS_NULL_POINTER)
 
 hpx_check_for_cxx14_std_result_of_sfinae(
   DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)

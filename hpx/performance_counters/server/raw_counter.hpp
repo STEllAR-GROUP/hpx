@@ -7,8 +7,8 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_RAW_COUNTER_MAR_03_2009_0743M
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/util/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

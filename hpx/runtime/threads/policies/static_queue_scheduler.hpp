@@ -8,14 +8,14 @@
 #define HPX_THREADMANAGER_SCHEDULING_STATIC_QUEUE_JUL_22_2015_0103PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/policies/thread_queue.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>

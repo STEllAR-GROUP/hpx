@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/util/assert.hpp>
 
 namespace hpx { namespace serialization

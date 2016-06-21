@@ -9,15 +9,15 @@
 #define HPX_5D993B14_5B65_4231_A84E_90AD1807EB8F
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <utility>
 #include <vector>

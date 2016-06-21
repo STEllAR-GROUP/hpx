@@ -8,7 +8,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 find_package(PkgConfig)
-pkg_check_modules(PC_JEMALLOC QUIET libjemalloc)
+pkg_check_modules(PC_JEMALLOC QUIET jemalloc)
 
 find_path(JEMALLOC_INCLUDE_DIR jemalloc/jemalloc.h
   HINTS

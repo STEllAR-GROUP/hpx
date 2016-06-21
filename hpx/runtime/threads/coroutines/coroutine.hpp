@@ -32,12 +32,12 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/mpl/bool.hpp>
@@ -143,7 +143,7 @@ namespace hpx { namespace threads { namespace coroutines
             HPX_ASSERT(m_pimpl);
             HPX_ASSERT(m_pimpl->is_ready());
 
-            result_type* ptr = 0;
+            result_type* ptr = nullptr;
             m_pimpl->bind_args(&arg);
             m_pimpl->bind_result_pointer(&ptr);
 

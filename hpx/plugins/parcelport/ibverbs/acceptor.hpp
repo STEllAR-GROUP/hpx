@@ -11,17 +11,17 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/plugins/parcelport/ibverbs/context.hpp>
-#include <hpx/plugins/parcelport/ibverbs/receiver.hpp>
 #include <hpx/plugins/parcelport/ibverbs/helper.hpp>
+#include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
+#include <hpx/plugins/parcelport/ibverbs/receiver.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_io_object.hpp>
+#include <boost/atomic.hpp>
+#include <boost/scope_exit.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
-#include <boost/scope_exit.hpp>
-#include <boost/atomic.hpp>
 
 #include <cstring>
 #include <list>
@@ -84,7 +84,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 }
 
                 int ret = 0;
-                ret = rdma_create_id(event_channel_, &listener_, NULL, RDMA_PS_TCP);
+                ret = rdma_create_id(event_channel_, &listener_, nullptr, RDMA_PS_TCP);
 
                 if(ret)
                 {
@@ -104,7 +104,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
                 addrinfo *addr;
 
-                getaddrinfo(host.c_str(), port.c_str(), NULL, &addr);
+                getaddrinfo(host.c_str(), port.c_str(), nullptr, &addr);
 
                 ret = rdma_bind_addr(listener_, addr->ai_addr);
 

@@ -10,12 +10,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-#include <hpx/exception.hpp>
+#include <hpx/compute/cuda/detail/launch.hpp>
+#include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
-#include <hpx/compute/cuda/detail/scoped_active_target.hpp>
-#include <hpx/compute/cuda/detail/launch.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <cuda_runtime.h>
@@ -100,7 +100,7 @@ namespace hpx { namespace compute { namespace cuda
 #if defined(__CUDA_ARCH__)
             pointer result;
 #else
-            value_type *p = 0;
+            value_type *p = nullptr;
             detail::scoped_active_target active(*target_);
 
             cudaError_t error = cudaMalloc(&p, n*sizeof(T));

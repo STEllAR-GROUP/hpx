@@ -65,7 +65,7 @@ namespace hpx
 
     public:
         segment_unordered_map_iterator(BaseIter const& it,
-                unordered_map<Key, T, Hash, KeyEqual>* data = 0)
+                unordered_map<Key, T, Hash, KeyEqual>* data = nullptr)
           : base_type(it), data_(data)
         {}
 
@@ -106,7 +106,7 @@ namespace hpx
 
     public:
         const_segment_unordered_map_iterator(BaseIter const& it,
-                unordered_map<Key, T, Hash, KeyEqual> const* data = 0)
+                unordered_map<Key, T, Hash, KeyEqual> const* data = nullptr)
           : base_type(it), data_(data)
         {}
 

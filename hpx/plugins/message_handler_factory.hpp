@@ -7,9 +7,9 @@
 #define HPX_MESSAGE_HANDLER_FACTORY_MAR_24_2013_0347PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/unique_plugin_name.hpp>
-#include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/message_handler_factory_base.hpp>
+#include <hpx/plugins/plugin_registry.hpp>
+#include <hpx/plugins/unique_plugin_name.hpp>
 
 #include <hpx/util/detail/count_num_args.hpp>
 
@@ -35,7 +35,7 @@ namespace hpx { namespace plugins
         /// \param global   [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the [settings]
         ///                 section of the global configuration file (hpx.ini)
-        ///                 This pointer may be NULL if no such section has
+        ///                 This pointer may be nullptr if no such section has
         ///                 been found.
         /// \param local    [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the section
@@ -51,9 +51,9 @@ namespace hpx { namespace plugins
           : isenabled_(isenabled)
         {
             // store the configuration settings
-            if (NULL != global)
+            if (nullptr != global)
                 global_settings_ = *global;
-            if (NULL != local)
+            if (nullptr != local)
                 local_settings_ = *local;
         }
 

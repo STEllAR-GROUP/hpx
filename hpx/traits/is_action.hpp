@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_IS_ACTION_APR_15_2012_0601PM)
 #define HPX_TRAITS_IS_ACTION_APR_15_2012_0601PM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <boost/mpl/bool.hpp>
@@ -27,7 +27,7 @@ namespace hpx { namespace traits
         {};
     }
 
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct is_action
       : detail::is_action_impl<typename util::decay<Action>::type>
     {};

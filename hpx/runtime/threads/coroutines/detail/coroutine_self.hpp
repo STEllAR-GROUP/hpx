@@ -30,9 +30,9 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
@@ -160,7 +160,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
         }
 
-        explicit coroutine_self(impl_type * pimpl, coroutine_self* next_self = 0)
+        explicit coroutine_self(impl_type * pimpl,
+                coroutine_self* next_self = nullptr)
           : m_pimpl(pimpl), next_self_(next_self)
         {}
 

@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/compute/detail/get_proxy_type.hpp>
+#include <hpx/compute/traits/allocator_traits.hpp>
 
 #include <iterator>
 

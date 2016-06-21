@@ -124,7 +124,7 @@ int qthreads_main(
         high_resolution_timer t;
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            qthread_fork(&worker, NULL, NULL);
+            qthread_fork(&worker, nullptr, nullptr);
 
         // Yield until all our null qthreads are done.
         do {

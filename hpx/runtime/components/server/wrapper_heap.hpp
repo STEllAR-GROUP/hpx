@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
@@ -100,7 +100,7 @@ namespace hpx { namespace components { namespace detail
 #endif
             std::size_t step = static_cast<std::size_t>(-1)
         )
-          : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
+          : pool_(nullptr), first_free_(nullptr), step_(step), size_(0), free_size_(0),
             base_gid_(naming::invalid_gid),
             class_name_(class_name),
 #if defined(HPX_DEBUG)
@@ -124,7 +124,7 @@ namespace hpx { namespace components { namespace detail
         }
 
         wrapper_heap()
-          : pool_(NULL), first_free_(NULL),
+          : pool_(nullptr), first_free_(nullptr),
             step_(heap_step), size_(0), free_size_(0),
             base_gid_(naming::invalid_gid),
 #if defined(HPX_DEBUG)
@@ -159,7 +159,7 @@ namespace hpx { namespace components { namespace detail
         bool is_empty() const
         {
             util::itt::heap_internal_access hia; HPX_UNUSED(hia);
-            return NULL == pool_;
+            return nullptr == pool_;
         }
         bool has_allocatable_slots() const
         {
@@ -183,7 +183,7 @@ namespace hpx { namespace components { namespace detail
 #endif
 
             value_type* p = static_cast<value_type*>(first_free_->address()); //-V707
-            HPX_ASSERT(p != NULL);
+            HPX_ASSERT(p != nullptr);
 
             first_free_ += count;
 
@@ -211,9 +211,9 @@ namespace hpx { namespace components { namespace detail
 #if HPX_DEBUG_WRAPPER_HEAP != 0
             storage_type* p1 = static_cast<storage_type*>(p);
 
-            HPX_ASSERT(NULL != pool_ && p1 >= pool_);
-            HPX_ASSERT(NULL != pool_ && p1 + count <= pool_ + size_);
-            HPX_ASSERT(first_free_ == NULL || p1 != first_free_);
+            HPX_ASSERT(nullptr != pool_ && p1 >= pool_);
+            HPX_ASSERT(nullptr != pool_ && p1 + count <= pool_ + size_);
+            HPX_ASSERT(first_free_ == nullptr || p1 != first_free_);
             HPX_ASSERT(free_size_ + count <= size_);
             // make sure this has not been freed yet
             HPX_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value,
@@ -237,7 +237,7 @@ namespace hpx { namespace components { namespace detail
         {
             // no lock is necessary here as all involved variables are immutable
             util::itt::heap_internal_access hia; HPX_UNUSED(hia);
-            return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
+            return nullptr != pool_ && nullptr != p && pool_ <= p && p < pool_ + size_;
         }
 
         /// \brief Get the global id of the managed_component instance
@@ -315,7 +315,7 @@ namespace hpx { namespace components { namespace detail
     protected:
         bool test_release(scoped_lock& lk)
         {
-            if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
+            if (pool_ == nullptr || free_size_ < size_ || first_free_ < pool_+size_)
                 return false;
             HPX_ASSERT(free_size_ == size_);
 
@@ -334,7 +334,7 @@ namespace hpx { namespace components { namespace detail
 
         bool ensure_pool(std::size_t count)
         {
-            if (NULL == pool_)
+            if (nullptr == pool_)
                 return false;
             if (first_free_ + count > pool_+size_)
                 return false;
@@ -344,11 +344,11 @@ namespace hpx { namespace components { namespace detail
         bool init_pool()
         {
             HPX_ASSERT(size_ == 0);
-            HPX_ASSERT(first_free_ == NULL);
+            HPX_ASSERT(first_free_ == nullptr);
 
             std::size_t s = step_ * heap_size; //-V104 //-V707
             pool_ = static_cast<storage_type*>(Allocator::alloc(s));
-            if (NULL == pool_)
+            if (nullptr == pool_)
                 return false;
 
             first_free_ = pool_;
@@ -366,7 +366,7 @@ namespace hpx { namespace components { namespace detail
 
         void tidy()
         {
-            if (pool_ != NULL) {
+            if (pool_ != nullptr) {
                 LOSH_(debug) //-V128
                     << "wrapper_heap ("
                     << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
@@ -390,7 +390,7 @@ namespace hpx { namespace components { namespace detail
                 }
 
                 Allocator::free(pool_);
-                pool_ = first_free_ = NULL;
+                pool_ = first_free_ = nullptr;
                 size_ = free_size_ = 0;
             }
         }
@@ -444,8 +444,8 @@ namespace hpx { namespace components { namespace detail
             {
                 // normally this should return ::realloc(p, size), but we are
                 // not interested in growing the allocated heaps, so we just
-                // return NULL
-                return NULL;
+                // return nullptr
+                return nullptr;
             }
         };
     }

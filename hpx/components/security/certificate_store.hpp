@@ -12,8 +12,8 @@
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <boost/optional.hpp>
 #include <boost/format.hpp>
+#include <boost/optional.hpp>
 
 #include "certificate.hpp"
 #include "public_key.hpp"

@@ -28,7 +28,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool register_lock(void const* lock,
-        register_lock_data* data = 0);
+        register_lock_data* data = nullptr);
     HPX_API_EXPORT bool unregister_lock(void const* lock);
     HPX_API_EXPORT void verify_no_locks();
     HPX_API_EXPORT void force_error_on_lock();
@@ -91,7 +91,7 @@ namespace hpx { namespace util
         ignore_all_while_checking() {}
     };
 
-    inline bool register_lock(void const*, util::register_lock_data* = 0)
+    inline bool register_lock(void const*, util::register_lock_data* = nullptr)
     {
         return true;
     }

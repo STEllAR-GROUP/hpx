@@ -32,7 +32,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         // load all components as described in the configuration information
         if (ini.has_section("hpx.parcel")) {
             util::section const* sec = ini.get_section("hpx.parcel");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return parcelset::locality(
                     locality(
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
@@ -55,7 +55,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread)
       : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
-      , acceptor_(NULL)
+      , acceptor_(nullptr)
     {
         if (here_.type() != std::string("tcp")) {
             HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
@@ -66,14 +66,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
     connection_handler::~connection_handler()
     {
-        HPX_ASSERT(acceptor_ == NULL);
+        HPX_ASSERT(acceptor_ == nullptr);
     }
 
     bool connection_handler::do_run()
     {
         using boost::asio::ip::tcp;
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
-        if (NULL == acceptor_)
+        if (nullptr == acceptor_)
             acceptor_ = new tcp::acceptor(io_service);
 
         // initialize network
@@ -128,12 +128,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             write_connections_.clear();
 #endif
         }
-        if(acceptor_ != NULL)
+        if(acceptor_ != nullptr)
         {
             boost::system::error_code ec;
             acceptor_->close(ec);
             delete acceptor_;
-            acceptor_ = NULL;
+            acceptor_ = nullptr;
         }
     }
 
@@ -151,10 +151,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         boost::system::error_code error = boost::asio::error::try_again;
         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
-            // The acceptor is only NULL when the parcelport has been stopped.
+            // The acceptor is only nullptr when the parcelport has been stopped.
             // An exit here, avoids hangs when late parcels are in flight (those are
             // mainly decref requests).
-            if(acceptor_ == NULL)
+            if(acceptor_ == nullptr)
                 return std::shared_ptr<sender>();
             try {
                 util::endpoint_iterator_type end = util::connect_end();
@@ -240,7 +240,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         // load all components as described in the configuration information
         if (ini.has_section("hpx.agas")) {
             util::section const* sec = ini.get_section("hpx.agas");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return
                     parcelset::locality(
                         locality(

@@ -41,6 +41,14 @@
 # define HPX_INTEL_VERSION __INTEL_COMPILER
 # if defined(_WIN32) || (_WIN64)
 #  define HPX_INTEL_WIN HPX_INTEL_VERSION
+// suppress a couple of benign warnings
+   // template parameter "..." is not used in declaring the parameter types of
+   // function template "..."
+#  pragma warning disable 488
+   // invalid redeclaration of nested class
+#  pragma warning disable 1170
+   // decorated name length exceeded, name was truncated
+#  pragma warning disable 2586
 # endif
 #else
 

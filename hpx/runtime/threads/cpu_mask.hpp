@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <climits>
 #include <cstddef>
 #include <cstdint>
-#include <climits>
 
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
             && HPX_HAVE_MAX_CPU_COUNT > 64)

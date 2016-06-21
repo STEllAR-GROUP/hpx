@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/detail/iterator.hpp>
-#include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/compute/traits/access_target.hpp>
+#include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>

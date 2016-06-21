@@ -176,10 +176,10 @@ namespace hpx { namespace threads
 
         /// This is equivalent to malloc(), except that it tries to allocate
         /// page-aligned memory from the OS.
-        void* allocate(std::size_t len);
+        void* allocate(std::size_t len) const;
 
         /// Free memory that was previously allocated by allocate
-        void deallocate(void* addr, std::size_t len);
+        void deallocate(void* addr, std::size_t len) const;
 
     private:
         static mask_type empty_mask;

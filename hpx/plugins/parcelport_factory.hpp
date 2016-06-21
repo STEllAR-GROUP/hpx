@@ -8,16 +8,17 @@
 #define HPX_PLUGINS_PARCELPORT_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/unique_plugin_name.hpp>
-#include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/plugins/parcelport_factory_base.hpp>
+#include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/traits/plugin_config_data.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/assign.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/assign.hpp>
 #include <boost/preprocessor/cat.hpp>
 
 #include <string>
@@ -42,7 +43,7 @@ namespace hpx { namespace plugins
         /// \param global   [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the [settings]
         ///                 section of the global configuration file (hpx.ini)
-        ///                 This pointer may be NULL if no such section has
+        ///                 This pointer may be nullptr if no such section has
         ///                 been found.
         /// \param local    [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the section

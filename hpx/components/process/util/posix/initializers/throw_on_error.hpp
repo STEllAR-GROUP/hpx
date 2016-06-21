@@ -13,12 +13,12 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <unistd.h>
-#include <fcntl.h>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace hpx { namespace components { namespace process { namespace posix {
 

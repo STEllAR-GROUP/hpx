@@ -8,20 +8,20 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/static_reinit.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/lcos/local/spinlock.hpp>
@@ -317,7 +317,7 @@ namespace hpx
         void stop_active_counters(error_code& ec = throws);
         void reset_active_counters(error_code& ec = throws);
         void evaluate_active_counters(bool reset = false,
-            char const* description = 0, error_code& ec = throws);
+            char const* description = nullptr, error_code& ec = throws);
 
         // stop periodic evaluation of counters during shutdown
         void stop_evaluating_counters();

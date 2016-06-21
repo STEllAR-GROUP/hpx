@@ -28,6 +28,11 @@ to a different compute node).
 * We have implemented index-based parallel for-loops based on a
   corresponding standardization proposal (__cpp20_p0075r1__). Please see
   [issue 2016] for a list of available algorithms.
+* We have started to implement a new prototypical functionality with
+  HPX.Compute which uniformly exposes some of the higher level APIs to
+  heterogeneous architectures (currently CUDA). This functionality is an early
+  preview and should not be considered stable. It may change considerably in
+  the future.
 * We have pervasively added (optional) executor arguments to all API functions
   which schedule new work. Executors are now used throughout the code base as
   the main means of executing tasks.
@@ -102,6 +107,36 @@ to a different compute node).
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2220] - Fixing gcc 4.6 compilation issues
+* [pr    2219] - nullptr support for [unique_]function
+* [pr    2216] - Replace NULL with nullptr
+* [issue 2214] - Let inspect flag use of NULL, suggest nullptr instead
+* [pr    2213] - Require support for nullptr
+* [pr    2212] - Properly find jemalloc through pkg-config
+* [pr    2211] - Disable a couple of warnings reported by Intel on Windows
+* [pr    2210] - Fixed host::block_allocator::bulk_construct
+* [pr    2209] - Started to clean up new sort algorithms, made things compile
+                 for sort_by_key
+* [pr    2208] - A couple of fixes that were exposed by a new sort algorithm
+* [pr    2207] - Adding missing includes in /hpx/include/serialization.hpp
+* [pr    2206] - Call package_action::get_future before package_action::apply
+* [pr    2205] - The indirect_packaged_task::operator() needs to be run on a
+                 HPX thread
+* [pr    2203] - Delay-initialize members of partitoned iterator
+* [pr    2202] - Added segmented fill for hpx::vector
+* [issue 2201] - Null Thread id encountered on partitioned_vector
+* [pr    2200] - Fix hangs
+* [pr    2199] - Deprecating hpx/traits.hpp
+* [pr    2198] - Making explicit inclusion of external libraries into build
+* [pr    2197] - Fix typo in QT CMakeLists
+* [pr    2196] - Fixing a gcc warning about attributes being ignored
+* [pr    2194] - Fixing partitioned_vector_spmd_foreach example
+* [issue 2193] - partitioned_vector_spmd_foreach seg faults
+* [pr    2192] - Support Boost.Thread v4
+* [pr    2191] - HPX.Compute prototype
+* [pr    2190] - Spawning operation on new thread if remaining stack space
+                 becomes too small
+* [pr    2189] - Adding callback taking index and future to when_each
 * [pr    2188] - Adding new example demonstrating receive_buffer
 * [pr    2187] - Mask 128-bit ints if CUDA is being used
 * [pr    2186] - Make startup & shutdown functions unique_function
@@ -114,6 +149,8 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2175] - Fix unbalanced config/warnings includes, add some new ones
 * [pr    2174] - Fix test categorization : regression not unit
 * [issue 2172] - Different performance results
+* [issue 2171] - "negative entry in reference count table" running octotiger on
+                 32 nodes on queenbee
 * [issue 2170] - Error while compiling on Mac + boost 1.60
 * [pr    2168] - Fixing problems with is_bitwise_serializable
 * [issue 2167] - startup & shutdown function should accept unique_function

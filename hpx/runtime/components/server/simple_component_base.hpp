@@ -8,17 +8,17 @@
 #define HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/is_component.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/applier/bind_naming_wrappers.hpp>
-#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/mpl/bool.hpp>

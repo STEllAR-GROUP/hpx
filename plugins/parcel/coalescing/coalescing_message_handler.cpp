@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/traits/plugin_config_data.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -217,7 +218,7 @@ namespace hpx { namespace plugins { namespace parcel
         ++num_messages_;
         l.unlock();
 
-        HPX_ASSERT(NULL != pp_);
+        HPX_ASSERT(nullptr != pp_);
         buff(pp_);                   // 'invoke' the buffer
 
         return true;

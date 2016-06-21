@@ -28,7 +28,7 @@ void install_windows_counters()
 {
     // CounterInitialize() is created by ctrpp.exe and is present in ucsCounter.h
     // CounterInitialize starts the provider and initializes the counter sets.
-    ULONG status = CounterInitialize(NULL, NULL, NULL, NULL);
+    ULONG status = CounterInitialize(nullptr, nullptr, nullptr, nullptr);
     if (status != ERROR_SUCCESS) {
         std::cerr << "CounterInitialize failed with error code: "
                   << std::to_string(status);
@@ -37,7 +37,7 @@ void install_windows_counters()
 
     // Create the instances for multiple instance counter set.
     queue_counter = PerfCreateInstance(HPXHeartBeat, &QueueLengthGuid, L"Instance_1", 0);
-    if (queue_counter == NULL) {
+    if (queue_counter == nullptr) {
         std::cerr << "PerfCreateInstance for 'sum_queue_counter' failed "
                      "with error code: "
                   << std::to_string(GetLastError());
@@ -46,7 +46,7 @@ void install_windows_counters()
 
     avg_queue_counter = PerfCreateInstance
         (HPXHeartBeat, &QueueLengthGuid, L"Instance_2", 0);
-    if (avg_queue_counter == NULL) {
+    if (avg_queue_counter == nullptr) {
         std::cerr << "PerfCreateInstance for 'avg_queue_counter' failed"
                      "with error code: "
                   << std::to_string(GetLastError());

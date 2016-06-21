@@ -185,7 +185,7 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
-        frame_context(domain const& domain, id* ident = 0)
+        frame_context(domain const& domain, id* ident = nullptr)
           : domain_(domain), ident_(ident)
         {
             HPX_ITT_FRAME_BEGIN(domain_.domain_, ident_? ident_->id_ : 0);
@@ -204,11 +204,11 @@ namespace hpx { namespace util { namespace itt
         undo_frame_context(frame_context& frame)
           : frame_(frame)
         {
-            HPX_ITT_FRAME_END(frame_.domain_.domain_, NULL);
+            HPX_ITT_FRAME_END(frame_.domain_.domain_, nullptr);
         }
         ~undo_frame_context()
         {
-            HPX_ITT_FRAME_BEGIN(frame_.domain_.domain_, NULL);
+            HPX_ITT_FRAME_BEGIN(frame_.domain_.domain_, nullptr);
         }
 
         frame_context& frame_;
@@ -416,7 +416,7 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
-        frame_context(domain const&, id* = 0) {}
+        frame_context(domain const&, id* = nullptr) {}
         ~frame_context() {}
     };
 

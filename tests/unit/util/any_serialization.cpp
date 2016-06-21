@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 
-#include <cstddef> // NULL
+#include <cstddef>
 #include <cstdio> // remove
 #include <fstream>
 #include <vector>

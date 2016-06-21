@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 
 #include <utility>
 

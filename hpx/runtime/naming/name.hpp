@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
@@ -650,6 +650,8 @@ namespace hpx { namespace naming
             gid_type& gid);
 
         HPX_EXPORT std::int64_t replenish_credits(gid_type& id);
+        HPX_EXPORT std::int64_t replenish_credits_locked(
+            std::unique_lock<gid_type::mutex_type>& l, gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
         // splits the current credit of the given id and assigns half of it to

@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

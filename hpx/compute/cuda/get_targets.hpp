@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-#include <hpx/exception.hpp>
 #include <hpx/compute/cuda/target.hpp>
+#include <hpx/exception.hpp>
 
 #include <cuda_runtime.h>
 

@@ -8,17 +8,18 @@
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/action_priority.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/traits/component_type_is_compatible.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/protect.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/traits/extract_action.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>

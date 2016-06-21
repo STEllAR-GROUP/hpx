@@ -8,7 +8,6 @@
 #define HPX_LCOS_PROMISE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -18,6 +17,10 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_type_database.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
@@ -185,6 +188,7 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_gid_locked(
             std::unique_lock<naming::gid_type> l) const
         {
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
             hpx::future<naming::gid_type> gid =
                 naming::detail::split_gid_if_needed_locked(l, gid_);
             l.unlock();
@@ -195,6 +199,7 @@ namespace hpx { namespace lcos { namespace detail
         naming::gid_type get_base_gid() const
         {
             HPX_ASSERT(gid_ != naming::invalid_gid);
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
             return gid_;
         }
 
@@ -291,27 +296,34 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            std::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
-            long counter = --this->count_;
+            long count = --this->count_;
 
             // special precautions for it to go out of scope
-            if (1 == counter && naming::detail::has_credits(this->gid_))
+            // We can safely give up our credit that we hold for the shared
+            // state, since we know that the other credit is either on flight
+            // in a typed_continuation or done executing.
+            if (count == 1)
             {
-                // At this point, the remaining count has to be held by AGAS
-                // for this reason, we break the self-reference to allow for
-                // proper destruction
+                std::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
 
-                // move all credits to a temporary id_type
-                naming::gid_type gid = this->gid_;
-                naming::detail::strip_credits_from_gid(this->gid_);
+                // if the count is one, the only remaining reference is in AGAS
+                if (naming::detail::has_credits(this->gid_) )
+                {
+                    // At this point, the remaining count has to be held by AGAS
+                    // for this reason, we break the self-reference to allow for
+                    // proper destruction
 
-                naming::id_type id (gid, id_type::managed);
-                l.unlock();
+                    // move all credits to a temporary id_type
+                    naming::gid_type gid = this->gid_;
+                    naming::detail::strip_credits_from_gid(this->gid_);
 
-                return false;
-            }
+                    naming::id_type id (gid, id_type::managed);
+                    l.unlock();
+                }
 
-            return 0 == counter;
+                return false;            }
+
+            return 0 == count;
         }
 
         // disambiguate reference counting
@@ -350,6 +362,7 @@ namespace hpx { namespace lcos { namespace detail
             HPX_ASSERT(bp);
             HPX_ASSERT(this->gid_ == naming::invalid_gid);
             this->gid_ = bp->get_base_gid();
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
         }
     };
 
@@ -373,6 +386,7 @@ namespace hpx { namespace lcos { namespace detail
             HPX_ASSERT(bp);
             HPX_ASSERT(this->gid_ == naming::invalid_gid);
             this->gid_ = bp->get_base_gid();
+            HPX_ASSERT(naming::detail::has_credits(this->gid_));
         }
     };
 }}}
@@ -545,6 +559,13 @@ namespace hpx { namespace lcos
         /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
+            if (!future_obtained_)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "promise<Result>::get_id",
+                    "future has not been retrieved from this promise yet");
+                return naming::invalid_id;
+            }
             return (*impl_)->get_id();
         }
 
@@ -699,6 +720,13 @@ namespace hpx { namespace lcos
         /// \brief Return the global id of this \a promise instance
         naming::id_type get_id() const
         {
+            if (!future_obtained_)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "promise<void>::get_id",
+                    "future has not been retrieved from this promise yet");
+                return naming::invalid_id;
+            }
             return (*impl_)->get_id();
         }
 

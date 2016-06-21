@@ -8,18 +8,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/runtime_fwd.hpp>
 
-#include <boost/cstdint.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/ref.hpp>
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/atomic.hpp>
 #include <boost/chrono/system_clocks.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/ref.hpp>
 
 namespace hpx { namespace threads { namespace detail
 {

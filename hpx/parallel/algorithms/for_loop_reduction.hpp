@@ -14,14 +14,14 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <boost/shared_array.hpp>
 
 #include <cstdlib>
-#include <type_traits>
 #include <functional>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {

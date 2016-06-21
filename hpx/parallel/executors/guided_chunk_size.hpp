@@ -9,14 +9,14 @@
 #define HPX_PARALLEL_GUIDED_CHUNK_SIZE_AUG_01_2015_0238PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_executor_parameters.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/is_executor_parameters.hpp>
 
-#include <cstddef>
 #include <algorithm>
+#include <cstddef>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {

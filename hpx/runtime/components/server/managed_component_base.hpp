@@ -14,43 +14,25 @@
 #include <hpx/util/reinitializable_static.hpp>
 #endif
 
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/is_component.hpp>
-#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
-#include <hpx/runtime/components/server/create_component_fwd.hpp>
+#include <hpx/runtime/components_fwd.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/is_component.hpp>
+#include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/throw_exception.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/throw_exception.hpp>
+#include <boost/type_traits/is_same.hpp>
 
-#include <utility>
 #include <stdexcept>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    template <typename Component>
-    struct managed_component_ctor_policy<
-        Component, typename Component::has_managed_component_base>
-    {
-        typedef typename Component::ctor_policy type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
-    struct managed_component_dtor_policy<
-        Component, typename Component::has_managed_component_base>
-    {
-        typedef typename Component::dtor_policy type;
-    };
-}}
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -457,7 +439,7 @@ namespace hpx { namespace components
         {
             if (!component_) {
                 std::ostringstream strm;
-                strm << "component is NULL ("
+                strm << "component is nullptr ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
@@ -472,7 +454,7 @@ namespace hpx { namespace components
         {
             if (!component_) {
                 std::ostringstream strm;
-                strm << "component is NULL ("
+                strm << "component is nullptr ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
@@ -497,7 +479,7 @@ namespace hpx { namespace components
             if (size > sizeof(managed_component))
                 return ::operator new(size);
             void* p = heap_type::alloc();
-            if (NULL == p) {
+            if (nullptr == p) {
                 HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::operator new(std::size_t size)");
             }
@@ -505,8 +487,8 @@ namespace hpx { namespace components
         }
         static void operator delete(void* p, std::size_t size)
         {
-            if (NULL == p)
-                return;     // do nothing if given a NULL pointer
+            if (nullptr == p)
+                return;     // do nothing if given a nullptr pointer
 
             if (size != sizeof(managed_component)) {
                 ::operator delete(p);
@@ -533,7 +515,7 @@ namespace hpx { namespace components
         {
             // allocate the memory
             void* p = heap_type::alloc(count);
-            if (NULL == p) {
+            if (nullptr == p) {
                 HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::create");
             }
@@ -570,8 +552,8 @@ namespace hpx { namespace components
         //          de-allocation of arrays of wrappers
         static void destroy(value_type* p, std::size_t count = 1)
         {
-            if (NULL == p || 0 == count)
-                return;     // do nothing if given a NULL pointer
+            if (nullptr == p || 0 == count)
+                return;     // do nothing if given a nullptr pointer
 
             // call destructors for all managed_component instances
             value_type* curr = p;

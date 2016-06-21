@@ -9,14 +9,15 @@
 #define HPX_COMPUTE_ALLOCATOR_TRAITS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/util/always_void.hpp>
 
-#include <hpx/compute/traits/access_target.hpp>
-#include <hpx/compute/host/traits/access_target.hpp>
 #include <hpx/compute/host/target.hpp>
+#include <hpx/compute/host/traits/access_target.hpp>
+#include <hpx/compute/traits/access_target.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace hpx { namespace compute { namespace traits
 {
@@ -46,10 +47,14 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename Allocator, typename Enable = void>
         struct get_reference_type
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+        ;
+#else
         {
             typedef
                 typename std::allocator_traits<Allocator>::value_type& type;
         };
+#endif
 
         template <typename Allocator>
         struct get_reference_type<Allocator,
@@ -62,10 +67,14 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename Allocator, typename Enable = void>
         struct get_const_reference_type
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+        ;
+#else
         {
             typedef
                 typename std::allocator_traits<Allocator>::value_type const& type;
         };
+#endif
 
         template <typename Allocator>
         struct get_const_reference_type<Allocator,
@@ -74,6 +83,19 @@ namespace hpx { namespace compute { namespace traits
             >::type>
         {
             typedef typename Allocator::const_reference type;
+        };
+
+        template <typename Allocator, typename Enable = void>
+        struct target_helper_result
+        {
+            typedef compute::host::target& type;
+        };
+
+        template <typename Allocator>
+        struct target_helper_result<Allocator,
+            typename hpx::util::always_void<typename Allocator::target_type>::type>
+        {
+            typedef decltype(std::declval<Allocator const&>().target()) type;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -99,8 +121,8 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename Allocator>
         HPX_HOST_DEVICE
-        auto call_target_helper(Allocator const& alloc)
-        ->  decltype(target_helper::call(0, alloc))
+        typename target_helper_result<Allocator>::type
+        call_target_helper(Allocator const& alloc)
         {
             return target_helper::call(0, alloc);
         }
@@ -194,14 +216,53 @@ namespace hpx { namespace compute { namespace traits
 
     template <typename Allocator>
     struct allocator_traits
+#if !(defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) && !defined(HPX_NATIVE_MIC)
       : std::allocator_traits<Allocator>
+#endif
     {
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+    public:
+        typedef typename Allocator::value_type value_type;
+        typedef typename Allocator::pointer pointer;
+        typedef typename Allocator::const_pointer const_pointer;
+        typedef typename Allocator::size_type size_type;
+        typedef typename Allocator::difference_type difference_type;
+
+        static pointer allocate(Allocator& alloc, size_type n,
+            const_pointer hint = nullptr)
+        {
+            return alloc.allocate(n, hint);
+        }
+
+        static void deallocate(Allocator& alloc, pointer p, size_type n)
+        {
+            alloc.deallocate(p, n);
+        }
+
+        template< class T, class... Args >
+        static void construct(Allocator& alloc, T* p, Args&&... args)
+        {
+            alloc.construct(p, std::forward<Args>(args)...);
+        }
+
+        template< class T, class... Args >
+        static void destroy(Allocator& alloc, T* p)
+        {
+            alloc.destroy(p);
+        }
+
+        size_type max_size(Allocator const& alloc)
+        {
+            return alloc.max_size();
+        }
+#else
     private:
         typedef std::allocator_traits<Allocator> base_type;
 
     public:
         using typename base_type::size_type;
         using typename base_type::value_type;
+#endif
 
         typedef
             typename detail::get_reference_type<Allocator>::type reference;

@@ -455,7 +455,7 @@ namespace hpx
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
     inline bool
-    start(std::string const& app_name, int argc = 0, char** argv = 0,
+    start(std::string const& app_name, int argc = 0, char** argv = nullptr,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -495,7 +495,7 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline bool start(int argc = 0, char** argv = 0,
+    inline bool start(int argc = 0, char** argv = nullptr,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.

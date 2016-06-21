@@ -96,7 +96,7 @@ namespace hpx { namespace threads
     topology const& get_topology()
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == NULL)
+        if (rt == nullptr)
         {
             HPX_THROW_EXCEPTION(invalid_status, "hpx::threads::get_topology",
                 "the hpx runtime system has not been initialized yet");

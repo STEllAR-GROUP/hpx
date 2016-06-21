@@ -7,12 +7,12 @@
 #define HPX_TRAITS_ACTION_WAS_OBJECT_MIGRATED_JAN_22_2016_1115AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits
 {
@@ -52,7 +52,7 @@ namespace hpx { namespace traits
         }
     }
 
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_was_object_migrated
     {
         // returns whether target was migrated to another locality

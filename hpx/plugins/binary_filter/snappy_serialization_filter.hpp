@@ -27,7 +27,7 @@ namespace hpx { namespace plugins { namespace compression
       : public serialization::binary_filter
     {
         snappy_serialization_filter(bool compress = false,
-                serialization::binary_filter* next_filter = 0)
+                serialization::binary_filter* next_filter = nullptr)
           : current_(0), compress_(compress)
         {}
 

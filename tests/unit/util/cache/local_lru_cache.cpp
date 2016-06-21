@@ -30,7 +30,7 @@ data cache_entries[] =
     data ("blue", "0,0,255"),
     data ("magenta", "255,0,255"),
     data ("black", "0,0,0"),
-    data (NULL, NULL)
+    data (nullptr, nullptr)
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ void test_lru_insert()
     HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != NULL; ++d) {
+    for (data* d = &cache_entries[0]; d->key != nullptr; ++d) {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -67,7 +67,7 @@ void test_lru_insert_with_touch()
     int i = 0;
     data* d = &cache_entries[0];
 
-    for (/**/; i < 3 && d->key != NULL; ++d, ++i) {
+    for (/**/; i < 3 && d->key != nullptr; ++d, ++i) {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -80,7 +80,7 @@ void test_lru_insert_with_touch()
     HPX_TEST(white == "255,255,255");
 
     // add two more items
-    for (i = 0; i < 2 && d->key != NULL; ++d, ++i) {
+    for (i = 0; i < 2 && d->key != nullptr; ++d, ++i) {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 == c.size());
     }
@@ -101,7 +101,7 @@ void test_lru_clear()
     HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != NULL; ++d) {
+    for (data* d = &cache_entries[0]; d->key != nullptr; ++d) {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -138,7 +138,7 @@ void test_lru_erase_one()
     HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != NULL; ++d) {
+    for (data* d = &cache_entries[0]; d->key != nullptr; ++d) {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -167,7 +167,7 @@ void test_lru_update()
     int i = 0;
     data* d = &cache_entries[0];
 
-    for (/**/; i < 3 && d->key != NULL; ++d, ++i) {
+    for (/**/; i < 3 && d->key != nullptr; ++d, ++i) {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }

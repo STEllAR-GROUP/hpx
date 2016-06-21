@@ -8,10 +8,10 @@
 #define HPX_LCOS_LOCAL_RECEIVE_BUFFER_MAY_08_2014_1102AM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <map>

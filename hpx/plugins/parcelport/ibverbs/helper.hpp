@@ -19,12 +19,12 @@
 #include <netdb.h>
 #include <rdma/rdma_cma.h>
 
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <poll.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
     template <typename Connection>
@@ -39,7 +39,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
             return false;
         }
 
-        rdma_cm_event * event = NULL;
+        rdma_cm_event * event = nullptr;
 
         if(rdma_get_cm_event(event_channel, &event) == 0)
         {

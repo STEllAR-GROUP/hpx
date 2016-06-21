@@ -7,10 +7,10 @@
 #if!defined(HPX_INIT_INI_DATA_SEP_26_2008_0344PM)
 #define HPX_INIT_INI_DATA_SEP_26_2008_0344PM
 
+#include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/plugin/virtual_constructor.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <boost/filesystem/path.hpp>
 
@@ -25,7 +25,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     bool handle_ini_file (section& ini, std::string const& loc);
     bool handle_ini_file_env (section& ini, char const* env_var,
-        char const* file_suffix = NULL);
+        char const* file_suffix = nullptr);
 
     ///////////////////////////////////////////////////////////////////////////
     // read system and user specified ini files
