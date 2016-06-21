@@ -240,13 +240,13 @@ namespace hpx { namespace compute { namespace traits
         }
 
         template<class... Args >
-        static void construct(Allocator& alloc, pointer* p, Args&&... args)
+        static void construct(Allocator& alloc, pointer p, Args&&... args)
         {
             alloc.construct(p, std::forward<Args>(args)...);
         }
 
         template<class... Args >
-        static void destroy(Allocator& alloc, pointer* p)
+        static void destroy(Allocator& alloc, pointer p)
         {
             alloc.destroy(p);
         }
