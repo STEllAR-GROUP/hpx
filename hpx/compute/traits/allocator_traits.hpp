@@ -132,7 +132,7 @@ namespace hpx { namespace compute { namespace traits
         {
             template <typename Allocator, typename ...Ts>
             HPX_HOST_DEVICE
-            static void call(hpx::traits::detail::wrap_int, Allocator& alloc, 
+            static void call(hpx::traits::detail::wrap_int, Allocator& alloc,
                 typename Allocator::pointer p, typename Allocator::size_type count,
                 Ts &&... vs)
             {
@@ -162,7 +162,7 @@ namespace hpx { namespace compute { namespace traits
 
             template <typename Allocator, typename ...Ts>
             HPX_HOST_DEVICE
-            static auto call(int, Allocator& alloc, 
+            static auto call(int, Allocator& alloc,
                 typename Allocator::pointer p, typename Allocator::size_type count,
                     Ts &&... vs)
               -> decltype(alloc.bulk_construct(p, count, std::forward<Ts>(vs)...))
@@ -184,7 +184,7 @@ namespace hpx { namespace compute { namespace traits
         {
             template <typename Allocator>
             HPX_HOST_DEVICE
-            static void call(hpx::traits::detail::wrap_int, Allocator& alloc, 
+            static void call(hpx::traits::detail::wrap_int, Allocator& alloc,
                 typename Allocator::pointer p, typename Allocator::size_type count)
                 HPX_NOEXCEPT
             {
@@ -198,7 +198,7 @@ namespace hpx { namespace compute { namespace traits
 
             template <typename Allocator>
             HPX_HOST_DEVICE
-            static auto call(int, Allocator& alloc, 
+            static auto call(int, Allocator& alloc,
                 typename Allocator::pointer p, typename Allocator::size_type count)
                     HPX_NOEXCEPT
             ->  decltype(alloc.bulk_destroy(p, count))
@@ -292,7 +292,8 @@ namespace hpx { namespace compute { namespace traits
         }
 
         HPX_HOST_DEVICE
-        static void bulk_destroy(Allocator& alloc, pointer p, size_type count) HPX_NOEXCEPT
+        static void bulk_destroy(Allocator& alloc, pointer p,
+            size_type count) HPX_NOEXCEPT
         {
             if (p != 0) detail::call_bulk_destroy(alloc, p, count);
         }
