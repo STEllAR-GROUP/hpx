@@ -80,10 +80,8 @@ namespace lcos {
             }
 
             // This is the component id. Every component needs to have an
-            // embedded
-            // enumerator 'value' which is used by the generic action
-            // implementation
-            // to associate this component with a given action.
+            // embedded enumerator 'value' which is used by the generic action
+            // implementation to associate this component with a given action.
             enum
             {
                 value = components::component_promise

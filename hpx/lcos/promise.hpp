@@ -55,11 +55,15 @@ namespace lcos {
     ///                  template parameter \a RemoteResult
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
-    class promise : public detail::promise_base<Result, RemoteResult>
+    class promise 
+      : public detail::promise_base<
+            Result, RemoteResult, detail::promise_data<Result> >
     {
         HPX_MOVABLE_ONLY(promise);
 
-        typedef detail::promise_base<Result, RemoteResult> base_type;
+        typedef detail::promise_base<
+                Result, RemoteResult, detail::promise_data<Result>
+           > base_type;
 
     public:
         // Effects: constructs a promise object and a shared state.
@@ -98,10 +102,7 @@ namespace lcos {
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
-        {
-            return base_type::valid();
-        }
+        using base_type::valid;
 
         // Returns: A future<Result> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
@@ -111,10 +112,7 @@ namespace lcos {
         //   - future_already_retrieved if get_future has already been called
         //     on a promise with the same shared state as *this.
         //   - no_state if *this has no shared state.
-        future<Result> get_future(error_code& ec = throws)
-        {
-            return base_type::get_future(ec);
-        }
+        using base_type::get_future;
 
         // Effects: atomically stores the value r in the shared state and makes
         //          that state ready (30.6.4).
@@ -125,11 +123,7 @@ namespace lcos {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        template <typename T>
-        void set_value(T&& t, error_code& ec = throws)
-        {
-            base_type::set_value(std::forward<T>(t), ec);
-        }
+        using base_type::set_value;
 
         // Effects: atomically stores the exception pointer p in the shared
         //          state and makes that state ready (30.6.4).
@@ -139,20 +133,19 @@ namespace lcos {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(
-            boost::exception_ptr const& e, error_code& ec = throws)
-        {
-            base_type::set_exception(e, ec);
-        }
+        using base_type::set_exception;
     };
 
     template <>
     class promise<void, hpx::util::unused_type>
-        : public detail::promise_base<void, hpx::util::unused_type>
+      : public detail::promise_base<
+            void, hpx::util::unused_type, detail::promise_data<void> >
     {
         HPX_MOVABLE_ONLY(promise);
 
-        typedef detail::promise_base<void, hpx::util::unused_type> base_type;
+        typedef detail::promise_base<
+                void, hpx::util::unused_type, detail::promise_data<void>
+            > base_type;
 
     public:
         // Effects: constructs a promise object and a shared state.
@@ -190,10 +183,7 @@ namespace lcos {
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
-        {
-            return base_type::valid();
-        }
+        using base_type::valid;
 
         // Returns: A future<Result> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
@@ -203,10 +193,7 @@ namespace lcos {
         //   - future_already_retrieved if get_future has already been called
         //     on a promise with the same shared state as *this.
         //   - no_state if *this has no shared state.
-        future<void> get_future(error_code& ec = throws)
-        {
-            return base_type::get_future(ec);
-        }
+        using base_type::get_future;
 
         // Effects: atomically stores the value r in the shared state and makes
         //          that state ready (30.6.4).
@@ -232,11 +219,7 @@ namespace lcos {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(
-            boost::exception_ptr const& e, error_code& ec = throws)
-        {
-            base_type::set_exception(e, ec);
-        }
+        using base_type::set_exception;
     };
 
     template <typename Result, typename RemoteResult>
