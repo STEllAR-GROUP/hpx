@@ -95,7 +95,7 @@ namespace hpx { namespace compute { namespace cuda
         // called. The pointer hint may be used to provide locality of
         // reference: the allocator, if supported by the implementation, will
         // attempt to allocate the new memory block as close as possible to hint.
-        pointer allocate(size_type n, 
+        pointer allocate(size_type n,
             std::allocator<void>::const_pointer hint = nullptr)
         {
 #if defined(__CUDA_ARCH__)
