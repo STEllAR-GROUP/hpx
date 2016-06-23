@@ -84,14 +84,14 @@ namespace hpx { namespace compute { namespace cuda
             return p_ != nullptr;
         }
 
-        bool operator==(std::nullptr_t) const
+        friend bool operator==(target_ptr const& lhs, std::nullptr_t)
         {
-            return p_ == nullptr;
+            return lhs.p_ == nullptr;
         }
 
-        bool operator!=(std::nullptr_t) const
+        friend bool operator!=(target_ptr const& lhs, std::nullptr_t)
         {
-            return p_ != nullptr;
+            return lhs.p_ != nullptr;
         }
 
         friend bool operator==(std::nullptr_t, target_ptr const& rhs)
