@@ -44,7 +44,7 @@ namespace lcos {
 
                 try
                 {
-                    f_();            // trigger action
+                    f_();    // trigger action
                     this->wait();    // wait for value to come back
                 }
                 catch (...)
@@ -84,8 +84,8 @@ namespace lcos {
                 base_type;
 
         protected:
-            typedef Result                                  result_type;
-            typedef lcos::detail::future_data<Result>       shared_state_type;
+            typedef Result result_type;
+            typedef lcos::detail::future_data<Result> shared_state_type;
             typedef boost::intrusive_ptr<shared_state_type> shared_state_ptr;
 
             typedef promise_lco<Result, RemoteResult> wrapped_type;
@@ -102,18 +102,21 @@ namespace lcos {
                 // shared
                 // state.
                 typedef std::unique_ptr<wrapping_type> wrapping_ptr;
-                wrapping_ptr                           lco_ptr(
+                wrapping_ptr lco_ptr(
                     new wrapping_type(new wrapped_type(this->shared_state_)));
 
-                id_   = lco_ptr->get_unmanaged_id();
+                id_ = lco_ptr->get_unmanaged_id();
                 addr_ = naming::address(hpx::get_locality(),
                     lco_ptr->get_component_type(),
                     lco_ptr.get());
 
                 // This helper is used to keep the component alive until the
-                // completion handler has been called.
+                // completion handler has been called. We need to manually free
+                // the component here, since we don't rely on reference counting
+                // anymore
                 auto keep_alive = hpx::util::deferred_call(
-                    [](wrapping_ptr ptr) {}, std::move(lco_ptr));
+                    [](wrapping_ptr ptr) { delete ptr->get(); },
+                    std::move(lco_ptr));
                 this->shared_state_->set_on_completed(std::move(keep_alive));
             }
 
@@ -123,7 +126,7 @@ namespace lcos {
                   id_(std::move(other.id_)),
                   addr_(std::move(other.addr_))
             {
-                other.id_   = naming::invalid_id;
+                other.id_ = naming::invalid_id;
                 other.addr_ = naming::address();
             }
 
@@ -137,11 +140,11 @@ namespace lcos {
             promise_base& operator=(promise_base&& other) HPX_NOEXCEPT
             {
                 base_type::operator=(std::move(other));
-                id_retrieved_      = other.id_retrieved_;
-                id_                = std::move(other.id_);
-                addr_              = std::move(other.addr_);
+                id_retrieved_ = other.id_retrieved_;
+                id_ = std::move(other.id_);
+                addr_ = std::move(other.addr_);
 
-                other.id_   = naming::invalid_id;
+                other.id_ = naming::invalid_id;
                 other.addr_ = naming::address();
                 return *this;
             }

@@ -93,18 +93,16 @@ namespace lcos {
             shared_state_ptr shared_state_;
 
         private:
-            // disambiguate reference counting, noop since we don't require
+            // intrusive reference counting, noop since we don't require
             // reference counting here.
             friend void intrusive_ptr_add_ref(promise_lco_base* p)
             {
             }
 
-            // This gets called from within the managed_component dtor. This
-            // is called only once and we can safely, unconditionally delete
-            // our LCO here.
+            // intrusive reference counting, noop since we don't require
+            // reference counting here.
             friend void intrusive_ptr_release(promise_lco_base* p)
             {
-                delete p;
             }
         };
 
