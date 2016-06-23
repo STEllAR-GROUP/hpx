@@ -12,13 +12,13 @@
 [heading General Changes]
 
 As the version number of this release hints at, we consider it to be a preview
-for the upcoming V1.0. All of the functionalities we set out to implement are
-in place, all of the features we wanted to have exposed are ready. We are very
-happy with the stability and performance of __hpx__ and we would like to have
-a formal release out for people to use as a solid basis and for us to gather
-broad feedback from the community before doing the actual V1.0 release in a
-couple of months. We still expect for some minor details to change, but mostly
-this release represents what we would like to have in a V1.0.
+for the upcoming V1.0. All of the functionalities we set out to implement for
+V1.0 are in place, all of the features we wanted to have exposed are ready. We
+are very happy with the stability and performance of __hpx__ and we would like
+to have a formal release out for people to use as a solid basis and for us to
+gather broad feedback from the community before doing the actual V1.0 release
+in a couple of months. We still expect for some minor details to change, but
+mostly this release represents what we would like to have in a V1.0.
 
 Overall, since the last release we have had almost 1500 commits closing almost
 400 tickets. These numbers reflect the incredible development activity we have
@@ -130,6 +130,9 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2226] - Preparing for release of V0.9.99
+* [pr    2225] - fix issue when compiling components with hpxcxx
+* [pr    2223] - Simplify promise
 * [pr    2222] - Replace last uses of boost::function by util::function_nonser
 * [pr    2221] - Fix config tests
 * [pr    2220] - Fixing gcc 4.6 compilation issues
