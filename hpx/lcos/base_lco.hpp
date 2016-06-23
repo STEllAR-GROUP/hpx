@@ -110,21 +110,6 @@ namespace hpx { namespace lcos
         /// The \a set_exception_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
             disconnect_action);
-
-        // Internal: The following functions are used for promise
-        // AGAS memory management
-        virtual void add_ref()
-        {
-            HPX_ASSERT(false);
-        }
-        virtual void release()
-        {
-            HPX_ASSERT(false);
-        }
-        virtual long count() const {
-            HPX_ASSERT(false);
-            return 0;
-        }
     };
 }}
 

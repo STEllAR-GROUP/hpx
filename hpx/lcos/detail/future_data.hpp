@@ -801,9 +801,10 @@ namespace detail
             this->future_data<Result>::set_data(std::forward<T>(result));
         }
 
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(
+            boost::exception_ptr const& e, error_code& ec = throws)
         {
-            this->future_data<Result>::set_exception(e);
+            this->future_data<Result>::set_exception(e, ec);
         }
 
         virtual void do_run()
