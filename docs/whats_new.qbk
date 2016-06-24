@@ -228,6 +228,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2125] - Making parcel coalescing test actually test something
 * [issue 2124] - Make a testcase for parcel compression
 * [issue 2123] - hpx/hpx/runtime/applier_fwd.hpp - Multiple defined types
+* [issue 2122] - Exception in primary_namespace::resolve_free_list
 * [issue 2121] - Possible memory leak in 1d_stencil_8
 * [pr    2120] - Fixing 2119
 * [issue 2119] - reduce_by_key compilation problems
@@ -244,6 +245,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2110] - Compilation error when passing non-future argument to unwrapped
                  continuation in dataflow
 * [issue 2109] - Warning while compiling hpx
+* [issue 2109] - Stack trace of last bug causing issues with octotiger
 * [pr    2107] - Making sure that a missing parcel_coalescing module does not
                  cause startup exceptions
 * [pr    2106] - Stop using hpx_fwd.hpp
