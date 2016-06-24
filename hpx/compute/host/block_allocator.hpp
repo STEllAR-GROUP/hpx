@@ -116,7 +116,8 @@ namespace hpx { namespace compute { namespace host
         // topo.allocate(). The pointer hint may be used to provide locality of
         // reference: the allocator, if supported by the implementation, will
         // attempt to allocate the new memory block as close as possible to hint.
-        pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
+        pointer allocate(size_type n,
+            std::allocator<void>::const_pointer hint = nullptr)
         {
             return reinterpret_cast<pointer>(
                 hpx::threads::get_topology().allocate(n * sizeof(T)));
