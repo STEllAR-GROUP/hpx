@@ -8,27 +8,27 @@
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-#include <hpx/performance_counters/registry.hpp>
-#include <hpx/util_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/init_logging.hpp>
+#include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util_fwd.hpp>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <string>
 

@@ -7,15 +7,32 @@
 
 [section:whats_new What's New]
 
-[section:hpx_0_9_12 __hpx__ V0.9.12]
+[section:hpx_0_9_99 __hpx__ V0.9.99]
 
 [heading General Changes]
 
-This release of __hpx__ is mostly a bug-fix release. Besides cleaning up many
-minor issues and some API inconsistencies, we have also added some new
-functionalities. The most notable addition is the full implementation
-of object migration (i.e. the ability to transparently move __hpx__ components
-to a different compute node).
+As the version number of this release hints at, we consider it to be a preview
+for the upcoming V1.0. All of the functionalities we set out to implement for
+V1.0 are in place, all of the features we wanted to have exposed are ready. We
+are very happy with the stability and performance of __hpx__ and we would like
+to have a formal release out for people to use as a solid basis and for us to
+gather broad feedback from the community before doing the actual V1.0 release
+in a couple of months. We still expect for some minor details to change, but
+mostly this release represents what we would like to have in a V1.0.
+
+Overall, since the last release we have had almost 1500 commits closing almost
+400 tickets. These numbers reflect the incredible development activity we have
+seen over the last couple of months. We would like to express a big 'Thank you!'
+to all contributors and those who helped to make this release happen.
+
+The most notable addition in terms of new functionality available with this
+release is the full implementation of object migration (i.e. the ability to
+transparently move __hpx__ components to a different compute node).
+Additionally, this release of __hpx__ cleans up many minor issues and some
+API inconsistencies.
+
+Here are some of the main highlights and changes for this release (in no
+particular order):
 
 * We have fixed a couple of issues in AGAS and the parcel layer which have
   caused hangs, segmentation faults at exit, and a slowdown of applications
@@ -28,6 +45,11 @@ to a different compute node).
 * We have implemented index-based parallel for-loops based on a
   corresponding standardization proposal (__cpp20_p0075r1__). Please see
   [issue 2016] for a list of available algorithms.
+* We have started to implement a new prototypical functionality with
+  HPX.Compute which uniformly exposes some of the higher level APIs to
+  heterogeneous architectures (currently CUDA). This functionality is an early
+  preview and should not be considered stable. It may change considerably in
+  the future.
 * We have pervasively added (optional) executor arguments to all API functions
   which schedule new work. Executors are now used throughout the code base as
   the main means of executing tasks.
@@ -92,16 +114,57 @@ to a different compute node).
   TS (__cpp11_n4104__) while it was being added to the upcoming C++17 Standard.
   This facility can be still enabled at configure time by specifying
   `-DHPX_WITH_GENERIC_EXECUTION_POLICY=On` to __cmake__.
+* Uses of `boost::shared_ptr` and related facilities have been replaced with
+  `std::shared_ptr` and friends. Uses of `boost::unique_lock`,
+  `boost::lock_guard` etc. have also been replaced by the equivalent (and
+  equally named) tools available from the C++11 standard library.
 * Facilities that used to expect an explicit `boost::unique_lock` now take an
   `std::unique_lock`. Additionally, `condition_variable` no longer aliases
   `condition_variable_any`; its interface now only works with
   `std::unique_lock<local::mutex>`.
-* Uses of `boost::shared_ptr` have been replaced with `std::shared_ptr`.
+* Uses of `boost::function`, `boost::bind`, `boost::tuple` have been replaced
+  by the corresponding facilities in __hpx__ (`hpx::util::function`,
+  `hpx::util::bind`, and `hpx::util::tuple`, respectively).
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2226] - Preparing for release of V0.9.99
+* [pr    2225] - fix issue when compiling components with hpxcxx
+* [pr    2223] - Simplify promise
+* [pr    2222] - Replace last uses of boost::function by util::function_nonser
+* [pr    2221] - Fix config tests
+* [pr    2220] - Fixing gcc 4.6 compilation issues
+* [pr    2219] - nullptr support for [unique_]function
+* [pr    2216] - Replace NULL with nullptr
+* [issue 2214] - Let inspect flag use of NULL, suggest nullptr instead
+* [pr    2213] - Require support for nullptr
+* [pr    2212] - Properly find jemalloc through pkg-config
+* [pr    2211] - Disable a couple of warnings reported by Intel on Windows
+* [pr    2210] - Fixed host::block_allocator::bulk_construct
+* [pr    2209] - Started to clean up new sort algorithms, made things compile
+                 for sort_by_key
+* [pr    2208] - A couple of fixes that were exposed by a new sort algorithm
+* [pr    2207] - Adding missing includes in /hpx/include/serialization.hpp
+* [pr    2206] - Call package_action::get_future before package_action::apply
+* [pr    2205] - The indirect_packaged_task::operator() needs to be run on a
+                 HPX thread
+* [pr    2203] - Delay-initialize members of partitoned iterator
+* [pr    2202] - Added segmented fill for hpx::vector
+* [issue 2201] - Null Thread id encountered on partitioned_vector
+* [pr    2200] - Fix hangs
+* [pr    2199] - Deprecating hpx/traits.hpp
+* [pr    2198] - Making explicit inclusion of external libraries into build
+* [pr    2197] - Fix typo in QT CMakeLists
+* [pr    2196] - Fixing a gcc warning about attributes being ignored
+* [pr    2194] - Fixing partitioned_vector_spmd_foreach example
+* [issue 2193] - partitioned_vector_spmd_foreach seg faults
+* [pr    2192] - Support Boost.Thread v4
+* [pr    2191] - HPX.Compute prototype
+* [pr    2190] - Spawning operation on new thread if remaining stack space
+                 becomes too small
+* [pr    2189] - Adding callback taking index and future to when_each
 * [pr    2188] - Adding new example demonstrating receive_buffer
 * [pr    2187] - Mask 128-bit ints if CUDA is being used
 * [pr    2186] - Make startup & shutdown functions unique_function
@@ -111,9 +174,12 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2182] - 1d_stencil seg fault
 * [issue 2181] - Setting small stack size does not change default
 * [pr    2180] - Changing default bind mode to balanced
+* [issue 2176] - Launch process test fails on OSX
 * [pr    2175] - Fix unbalanced config/warnings includes, add some new ones
 * [pr    2174] - Fix test categorization : regression not unit
 * [issue 2172] - Different performance results
+* [issue 2171] - "negative entry in reference count table" running octotiger on
+                 32 nodes on queenbee
 * [issue 2170] - Error while compiling on Mac + boost 1.60
 * [pr    2168] - Fixing problems with is_bitwise_serializable
 * [issue 2167] - startup & shutdown function should accept unique_function
@@ -162,6 +228,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2125] - Making parcel coalescing test actually test something
 * [issue 2124] - Make a testcase for parcel compression
 * [issue 2123] - hpx/hpx/runtime/applier_fwd.hpp - Multiple defined types
+* [issue 2122] - Exception in primary_namespace::resolve_free_list
 * [issue 2121] - Possible memory leak in 1d_stencil_8
 * [pr    2120] - Fixing 2119
 * [issue 2119] - reduce_by_key compilation problems
@@ -178,6 +245,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2110] - Compilation error when passing non-future argument to unwrapped
                  continuation in dataflow
 * [issue 2109] - Warning while compiling hpx
+* [issue 2109] - Stack trace of last bug causing issues with octotiger
 * [pr    2107] - Making sure that a missing parcel_coalescing module does not
                  cause startup exceptions
 * [pr    2106] - Stop using hpx_fwd.hpp
@@ -471,6 +539,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1815] - seg fault in AGAS
 * [issue 1803] - wait_all documentation
 * [issue 1796] - Outdated documentation to be revised
+* [issue 1759] - glibc munmap_chunk or free(): invalid pointer on SuperMIC
 * [issue 1753] - HPX performance degrades with time since execution begins
 * [issue 1748] - All public HPX headers need to be self contained
 * [pr    1719] - How to build HPX with Visual Studio
@@ -485,6 +554,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1472] - Serialization issues
 * [issue 1457] - Implement N4392: C++ Latches and Barriers
 * [pr    1444] - Enabling usage of moveonly types for component construction
+* [issue 1407] - The Intel 13 compiler has failing unit tests
 * [issue 1405] - Allow component constructors to take movable only types
 * [issue 1265] - Enable dataflow() to be usable with actions
 * [issue 1236] - NUMA aware allocators

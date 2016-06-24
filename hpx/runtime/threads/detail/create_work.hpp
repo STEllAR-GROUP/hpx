@@ -7,10 +7,10 @@
 #define HPX_RUNTIME_THREADS_DETAIL_CREATE_WORK_JAN_13_2013_0526PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
 
 namespace hpx { namespace threads { namespace detail
@@ -42,7 +42,7 @@ namespace hpx { namespace threads { namespace detail
         if (!data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                "thread::detail::create_work", "description is NULL");
+                "thread::detail::create_work", "description is nullptr");
             return;
         }
 #endif

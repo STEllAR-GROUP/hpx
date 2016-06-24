@@ -9,12 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/lcos/base_lco.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
 #include <boost/exception_ptr.hpp>

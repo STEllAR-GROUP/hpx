@@ -7,11 +7,11 @@
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>

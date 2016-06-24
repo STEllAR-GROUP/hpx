@@ -39,7 +39,7 @@ namespace
     "BOOST_NO_0X_HDR_UNORDERED_SET",
     "BOOST_NO_0X_HDR_UNORDERED_MAP",
     "BOOST_NO_STD_UNORDERED",
-    NULL
+    nullptr
     };
 
   const char * boost151macros [] = {
@@ -70,7 +70,7 @@ namespace
     "BOOST_NO_VARIADIC_TEMPLATES",
     "BOOST_NO_VARIADIC_MACROS",
     "BOOST_NO_NUMERIC_LIMITS_LOWEST",
-    NULL
+    nullptr
     };
 
   const char * boost153macros [] = {
@@ -79,7 +79,7 @@ namespace
     "BOOST_HAS_VARIADIC_TMPL",
     "BOOST_HAS_CHAR16_T",
     "BOOST_HAS_CHAR32_T",
-    NULL
+    nullptr
     };
 } // unnamed namespace
 
@@ -113,7 +113,7 @@ namespace boost
 
       const char **ptr;
       long errors = 0;
-      for ( ptr = boost150macros; *ptr != NULL; ++ptr )
+      for ( ptr = boost150macros; *ptr != nullptr; ++ptr )
       {
         if ( contents.find( *ptr ) != string::npos ) {
           ++errors;
@@ -122,7 +122,7 @@ namespace boost
           }
       }
 
-      for ( ptr = boost151macros; *ptr != NULL; ++ptr )
+      for ( ptr = boost151macros; *ptr != nullptr; ++ptr )
       {
         if ( contents.find( *ptr ) != string::npos ) {
           ++errors;
@@ -131,7 +131,7 @@ namespace boost
           }
       }
 
-      for ( ptr = boost153macros; *ptr != NULL; ++ptr )
+      for ( ptr = boost153macros; *ptr != nullptr; ++ptr )
       {
         if ( contents.find( *ptr ) != string::npos ) {
           ++errors;

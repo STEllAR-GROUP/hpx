@@ -14,7 +14,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action capabilities
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_decorate_continuation
     {
         static bool call(std::unique_ptr<hpx::actions::continuation>& cont)

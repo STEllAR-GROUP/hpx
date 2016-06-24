@@ -7,8 +7,8 @@
 #define HPX_COMPONENTS_PINNED_PTR_JAN_22_2016_1027AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <memory>

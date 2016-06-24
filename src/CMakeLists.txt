@@ -91,9 +91,6 @@ add_hpx_library_headers(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/*.hpp"
   EXCLUDE ".*hpx_main.*[.]hpp")
 add_hpx_library_headers(hpx
-  GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/preprocessed/*.hpp"
-  APPEND)
-add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/runtime/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx

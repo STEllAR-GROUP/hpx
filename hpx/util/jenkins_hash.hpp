@@ -6,8 +6,8 @@
 #if !defined(JENKINS_HASH_HPP_SEP_08_2007_0102PM)
 #define JENKINS_HASH_HPP_SEP_08_2007_0102PM
 
-#include <cstdlib>
 #include <boost/cstdint.hpp>
+#include <cstdlib>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
 #include <hpx/runtime/serialization/serialize.hpp>

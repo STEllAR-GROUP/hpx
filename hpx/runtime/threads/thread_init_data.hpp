@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <cstddef>
@@ -73,7 +73,7 @@ namespace hpx { namespace threads
                 std::size_t os_thread = std::size_t(-1),
                 std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
                 naming::id_type const& target_ = naming::invalid_id,
-                policies::scheduler_base* scheduler_base_ = 0)
+                policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f)),
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             lva(lva_),

@@ -15,12 +15,12 @@
 #if defined(HPX_DEBUG)
 #include <hpx/runtime/components/component_type.hpp>
 #endif
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>

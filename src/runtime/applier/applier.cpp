@@ -75,7 +75,7 @@ namespace hpx { namespace applier
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_thread_nullary",
@@ -102,7 +102,7 @@ namespace hpx { namespace applier
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_thread",
@@ -129,7 +129,7 @@ namespace hpx { namespace applier
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_thread_plain",
@@ -153,7 +153,7 @@ namespace hpx { namespace applier
         bool run_now, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_thread_plain",
@@ -175,7 +175,7 @@ namespace hpx { namespace applier
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_work_nullary",
@@ -200,7 +200,7 @@ namespace hpx { namespace applier
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_work",
@@ -226,7 +226,7 @@ namespace hpx { namespace applier
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_work_plain",
@@ -251,7 +251,7 @@ namespace hpx { namespace applier
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_work_plain",
@@ -274,7 +274,7 @@ namespace hpx { namespace applier
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
+        if (nullptr == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::applier::register_work_plain",
@@ -386,7 +386,7 @@ namespace hpx { namespace applier
 
     void applier::init_tss()
     {
-        if (NULL == applier::applier_.get())
+        if (nullptr == applier::applier_.get())
             applier::applier_.reset(new applier* (this));
     }
 
@@ -575,14 +575,14 @@ namespace hpx { namespace applier
     applier& get_applier()
     {
         // should have been initialized
-        HPX_ASSERT(NULL != applier::applier_.get());
+        HPX_ASSERT(nullptr != applier::applier_.get());
         return **applier::applier_;
     }
 
     applier* get_applier_ptr()
     {
         applier** appl = applier::applier_.get();
-        return appl ? *appl : NULL;
+        return appl ? *appl : nullptr;
     }
 
     // The function \a get_locality_id returns the id of this locality

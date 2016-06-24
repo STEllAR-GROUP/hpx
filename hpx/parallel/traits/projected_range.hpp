@@ -7,15 +7,15 @@
 #define HPX_PARALLEL_TRAITS_PROJECTED_RANGE_JUL_18_2015_1001PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <hpx/parallel/traits/is_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/traits/projected.hpp>
+#include <hpx/parallel/traits/range_traits.hpp>
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 namespace hpx { namespace parallel { namespace traits
 {

@@ -6,8 +6,8 @@
 #if !defined(HPX_UTIL_GET_AND_RESET_VALUE_FEB_27_2012_0248PM)
 #define HPX_UTIL_GET_AND_RESET_VALUE_FEB_27_2012_0248PM
 
-#include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace util
 {

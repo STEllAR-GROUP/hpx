@@ -15,8 +15,8 @@
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/array.hpp>
 

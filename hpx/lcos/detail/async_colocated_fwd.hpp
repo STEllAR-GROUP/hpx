@@ -7,12 +7,13 @@
 #define HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/lcos/async_fwd.hpp>
 
 namespace hpx { namespace detail
 {

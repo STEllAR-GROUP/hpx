@@ -9,20 +9,20 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/apply.hpp>
+#include <hpx/async.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>
-#include <hpx/apply.hpp>
-#include <hpx/async.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/iostreams/stream.hpp>
 
 #include <ios>
 #include <iostream>
-#include <mutex>
 #include <iterator>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>

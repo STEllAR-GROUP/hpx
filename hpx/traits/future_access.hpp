@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_FUTURE_ACCESS_JUN_24_2015_0930AM)
 #define HPX_TRAITS_FUTURE_ACCESS_JUN_24_2015_0930AM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/future_traits.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -68,7 +68,7 @@ namespace hpx { namespace traits
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable>
+    template <typename T, typename Enable = void>
     struct is_shared_state
       : boost::mpl::false_
     {};

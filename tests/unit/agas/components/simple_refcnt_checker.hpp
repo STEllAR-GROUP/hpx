@@ -31,7 +31,8 @@ struct simple_refcnt_monitor
     > base_type;
 
   private:
-    lcos::promise<void> flag_;
+    lcos::promise<void> flag_promise_;
+    lcos::future<void> flag_;
     naming::id_type const locality_;
 
     using base_type::create;
@@ -40,26 +41,26 @@ struct simple_refcnt_monitor
     typedef server::simple_refcnt_checker server_type;
 
     /// Create a new component on the target locality.
-    explicit simple_refcnt_monitor(
-        naming::gid_type const& locality
-        )
-      : base_type(), flag_(),
-        locality_(naming::get_locality_from_gid(locality)
-                , naming::id_type::unmanaged)
+    explicit simple_refcnt_monitor(naming::gid_type const& locality)
+      : base_type()
+      , flag_promise_()
+      , flag_(flag_promise_.get_future())
+      , locality_(
+            naming::get_locality_from_gid(locality), naming::id_type::unmanaged)
     {
         static_cast<base_type&>(*this) =
-            stub_type::create_async(locality_, flag_.get_id());
+            stub_type::create_async(locality_, flag_promise_.get_id());
     }
 
     /// Create a new component on the target locality.
-    explicit simple_refcnt_monitor(
-        naming::id_type const& locality
-        )
-      : base_type(), flag_(),
-        locality_(naming::get_locality_from_id(locality))
+    explicit simple_refcnt_monitor(naming::id_type const& locality)
+      : base_type()
+      , flag_promise_()
+      , flag_(flag_promise_.get_future())
+      , locality_(naming::get_locality_from_id(locality))
     {
         static_cast<base_type&>(*this) =
-            stub_type::create_async(locality_, flag_.get_id());
+            stub_type::create_async(locality_, flag_promise_.get_id());
     }
 
     lcos::future<void> take_reference_async(

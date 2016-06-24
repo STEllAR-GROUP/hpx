@@ -14,8 +14,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/components/process/util/windows/executor.hpp>
 #include <hpx/components/process/util/windows/child.hpp>
+#include <hpx/components/process/util/windows/executor.hpp>
 
 #include <utility>
 

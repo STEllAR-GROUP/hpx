@@ -8,7 +8,7 @@
 #ifndef Q_MOC_RUN
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #endif
 
 class QWidget;
@@ -21,8 +21,8 @@ class widget
     Q_OBJECT
 
     public:
-        widget(boost::function<void(widget *, std::size_t)> callback,
-            QWidget *parent = 0);
+        widget(std::function<void(widget *, std::size_t)> callback,
+            QWidget *parent = nullptr);
 
         void add_label(std::size_t i, double t);
 
@@ -38,5 +38,5 @@ class widget
         hpx::lcos::local::spinlock mutex;
         QListWidget *list;
         QPushButton * run_button;
-        boost::function<void(widget *, std::size_t)> callback_;
+        std::function<void(widget *, std::size_t)> callback_;
 };

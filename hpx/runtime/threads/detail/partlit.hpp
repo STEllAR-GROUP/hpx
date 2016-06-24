@@ -13,27 +13,27 @@
 #pragma once
 #endif
 
-#include <boost/spirit/home/qi/domain.hpp>
-#include <boost/spirit/home/qi/skip_over.hpp>
-#include <boost/spirit/home/qi/detail/string_parse.hpp>
-#include <boost/spirit/home/qi/parser.hpp>
-#include <boost/spirit/home/qi/meta_compiler.hpp>
-#include <boost/spirit/home/qi/auxiliary/lazy.hpp>
-#include <boost/spirit/home/qi/detail/enable_lit.hpp>
-#include <boost/spirit/home/support/info.hpp>
-#include <boost/spirit/home/support/char_class.hpp>
-#include <boost/spirit/home/support/modify.hpp>
-#include <boost/spirit/home/support/unused.hpp>
-#include <boost/spirit/home/support/common_terminals.hpp>
-#include <boost/spirit/home/support/string_traits.hpp>
-#include <boost/spirit/home/support/detail/get_encoding.hpp>
-#include <boost/spirit/home/support/handles_container.hpp>
+#include <boost/detail/workaround.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/value_at.hpp>
-#include <boost/type_traits/add_reference.hpp>
-#include <boost/type_traits/add_const.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/detail/workaround.hpp>
+#include <boost/spirit/home/qi/auxiliary/lazy.hpp>
+#include <boost/spirit/home/qi/detail/enable_lit.hpp>
+#include <boost/spirit/home/qi/detail/string_parse.hpp>
+#include <boost/spirit/home/qi/domain.hpp>
+#include <boost/spirit/home/qi/meta_compiler.hpp>
+#include <boost/spirit/home/qi/parser.hpp>
+#include <boost/spirit/home/qi/skip_over.hpp>
+#include <boost/spirit/home/support/char_class.hpp>
+#include <boost/spirit/home/support/common_terminals.hpp>
+#include <boost/spirit/home/support/detail/get_encoding.hpp>
+#include <boost/spirit/home/support/handles_container.hpp>
+#include <boost/spirit/home/support/info.hpp>
+#include <boost/spirit/home/support/modify.hpp>
+#include <boost/spirit/home/support/string_traits.hpp>
+#include <boost/spirit/home/support/unused.hpp>
+#include <boost/type_traits/add_const.hpp>
+#include <boost/type_traits/add_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <string>
 

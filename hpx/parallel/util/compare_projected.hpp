@@ -24,7 +24,7 @@ namespace hpx { namespace parallel { namespace util
         {}
 
         template <typename T1, typename T2>
-        inline bool operator()(T1 && t1, T2 && t2)
+        inline bool operator()(T1 && t1, T2 && t2) const
         {
             return hpx::util::invoke(comp_,
                 hpx::util::invoke(proj_, t1),

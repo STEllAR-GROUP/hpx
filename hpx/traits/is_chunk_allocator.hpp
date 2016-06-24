@@ -7,19 +7,18 @@
 #define HPX_TRAITS_IS_CHUNK_ALLOCATOR_MAR_24_2015
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
 
-#include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename A, typename Enable>
+    template <typename A, typename Enable = void>
     struct is_chunk_allocator : boost::mpl::false_ {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename A, typename Enable>
+    template <typename A, typename Enable = void>
     struct default_chunk_size
     {
         static std::size_t call(A const &a) { return 0; }

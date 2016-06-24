@@ -7,10 +7,9 @@
 #define HPX_PARALLEL_TRAITS_IS_ITERATOR_MAR_05_2016_0840PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
@@ -42,7 +41,7 @@ namespace hpx { namespace traits
         };
     }
 
-    template <typename Iter, typename Enable>
+    template <typename Iter, typename Enable = void>
     struct is_iterator
       : detail::is_iterator<typename std::decay<Iter>::type>
     {};
@@ -76,31 +75,31 @@ namespace hpx { namespace traits
         {};
     }
 
-    template <typename Iter, typename Enable>
+    template <typename Iter, typename Enable = void>
     struct is_output_iterator
       : detail::has_category<
             typename std::decay<Iter>::type, std::output_iterator_tag>
     {};
 
-    template <typename Iter, typename Enable>
+    template <typename Iter, typename Enable = void>
     struct is_input_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::input_iterator_tag>
     {};
 
-    template <typename Iter, typename Enable>
+    template <typename Iter, typename Enable = void>
     struct is_forward_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::forward_iterator_tag>
     {};
 
-    template <typename Iter, typename Enable>
+    template <typename Iter, typename Enable = void>
     struct is_bidirectional_iterator
       : detail::belongs_to_category<
             typename std::decay<Iter>::type, std::bidirectional_iterator_tag>
     {};
 
-    template <typename Iter, typename Enable>
+    template <typename Iter, typename Enable = void>
     struct is_random_access_iterator
       : detail::has_category<
             typename std::decay<Iter>::type, std::random_access_iterator_tag>

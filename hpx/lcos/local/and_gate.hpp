@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -84,7 +84,8 @@ namespace hpx { namespace lcos { namespace local
     public:
         /// \brief get a future allowing to wait for the gate to fire
         future<void> get_future(std::size_t count = std::size_t(-1),
-            std::size_t* generation_value = 0, error_code& ec = hpx::throws)
+            std::size_t* generation_value = nullptr,
+            error_code& ec = hpx::throws)
         {
             std::lock_guard<mutex_type> l(mtx_);
 

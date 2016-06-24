@@ -10,13 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/state.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/spinlock.hpp>
@@ -205,7 +205,7 @@ namespace hpx { namespace threads
             pool_.report_error(num_thread, e);
         }
 
-        std::size_t get_worker_thread_num(bool* numa_sensitive = 0)
+        std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
         {
             if (get_self_ptr() == 0)
                 return std::size_t(-1);

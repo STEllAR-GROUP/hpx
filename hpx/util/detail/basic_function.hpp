@@ -10,15 +10,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/get_table.hpp>
-#include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
+#include <hpx/util/detail/vtable/vtable.hpp>
 
 #include <boost/mpl/bool.hpp>
 
+#include <cstddef>
 #include <cstring>
 #include <string>
 #include <type_traits>
@@ -160,6 +162,11 @@ namespace hpx { namespace util { namespace detail
                 other.reset();
             }
             return *this;
+        }
+
+        void assign(std::nullptr_t) HPX_NOEXCEPT
+        {
+            reset();
         }
 
         template <typename F>

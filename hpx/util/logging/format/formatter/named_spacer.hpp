@@ -176,7 +176,7 @@ namespace detail {
                     remaining = remaining.substr(idx + 1);
                     // find end of formatter name
                     idx = remaining.find('%');
-                    format_base_type * fmt = 0;
+                    format_base_type * fmt = nullptr;
                     if ( idx != string_type::npos) {
                         string_type name = remaining.substr(0, idx);
                         remaining = remaining.substr(idx + 1);

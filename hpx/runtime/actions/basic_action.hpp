@@ -12,27 +12,31 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_remote_result.hpp>
+#include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/void_guard.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/void_guard.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>

@@ -95,7 +95,7 @@ namespace hpx { namespace util
                 return result;
 
             util::section const* sec = ini.get_section("hpx.commandline.aliases");
-            if (NULL == sec)
+            if (nullptr == sec)
                 return result;     // no alias mappings are defined
 
             // we found shortcut option definitions, try to find mapping

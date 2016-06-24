@@ -225,17 +225,19 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_future_range.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -313,7 +315,7 @@ namespace hpx { namespace lcos
             void operator()(Future& future,
                 typename std::enable_if<
                     traits::is_future<Future>::value
-                >::type* = 0) const
+                >::type* = nullptr) const
             {
                 std::size_t counter =
                     when_.count_.load(boost::memory_order_seq_cst);
@@ -359,7 +361,7 @@ namespace hpx { namespace lcos
             void operator()(Sequence_& sequence,
                 typename std::enable_if<
                     traits::is_future_range<Sequence_>::value
-                >::type* = 0) const
+                >::type* = nullptr) const
             {
                 apply(sequence);
             }

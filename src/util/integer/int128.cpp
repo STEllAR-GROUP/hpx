@@ -199,7 +199,7 @@ namespace hpx { namespace util { namespace integer
         if (!divisor)
             return 1u / (unsigned int) divisor.lo;
             // or RaiseException (EXCEPTION_INT_DIVIDE_BY_ZERO,
-            //                    EXCEPTION_NONCONTINUABLE, 0, NULL);
+            //                    EXCEPTION_NONCONTINUABLE, 0, nullptr);
 
         int128 ds = (divisor < 0) ? -divisor : divisor;
         int128 dd = (*this < 0) ? -*this : *this;

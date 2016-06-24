@@ -7,13 +7,13 @@
 #define HPX_LCOS_SERVER_LATCH_APR_19_2015_0956AM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/latch.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <boost/exception_ptr.hpp>
 

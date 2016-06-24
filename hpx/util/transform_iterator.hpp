@@ -10,8 +10,8 @@
 
 #include <boost/iterator/iterator_adaptor.hpp>
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 namespace hpx { namespace util
 {

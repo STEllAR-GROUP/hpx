@@ -12,8 +12,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -1637,6 +1638,25 @@ void addressing_service::route(
   , threads::thread_priority local_priority
     )
 {
+    if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+    {
+        // reschedule this call as an HPX thread
+        void (addressing_service::*route_ptr)(
+            parcelset::parcel,
+            util::function_nonser<void(boost::system::error_code const&,
+                parcelset::parcel const&)> &&,
+            threads::thread_priority
+        ) = &addressing_service::route;
+
+        threads::register_thread_nullary(
+            util::deferred_call(
+                route_ptr, this, std::move(p), std::move(f), local_priority),
+            "addressing_service::route", threads::pending, true,
+            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_stacksize_default);
+        return;
+    }
+
     // compose request
     naming::id_type const* ids = p.destinations();
 
@@ -1851,7 +1871,7 @@ void addressing_service::decref(
         ) = &addressing_service::decref;
 
         threads::register_thread_nullary(
-            util::bind(decref_ptr, this, raw, credit, boost::ref(throws)),
+            util::deferred_call(decref_ptr, this, raw, credit, boost::ref(throws)),
             "addressing_service::decref", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default, ec);
@@ -2061,13 +2081,15 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     }
 
     lcos::promise<naming::id_type, naming::gid_type> p;
+    auto result_f = p.get_future();
+
     request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_id());
     hpx::future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
     using util::placeholders::_1;
     return f.then(util::bind(
-            util::one_shot(&detail::on_register_event), _1, p.get_future()
+            util::one_shot(&detail::on_register_event), _1, std::move(result_f)
         ));
 }
 
@@ -2177,7 +2199,7 @@ void addressing_service::update_cache_entry(
           , error_code&
         ) = &addressing_service::update_cache_entry;
         threads::register_thread_nullary(
-            util::bind(update_cache_entry_ptr, this, id, g, boost::ref(throws)),
+            util::deferred_call(update_cache_entry_ptr, this, id, g, boost::ref(throws)),
             "addressing_service::update_cache_entry", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default, ec);

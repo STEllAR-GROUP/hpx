@@ -7,9 +7,9 @@
 #define HPX_PARALLEL_UTIL_DETAIL_HANDLE_LOCAL_EXCEPTIONS_OCT_03_2014_0142PM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_finalize.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
+#include <hpx/hpx_finalize.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
 #include <boost/exception_ptr.hpp>

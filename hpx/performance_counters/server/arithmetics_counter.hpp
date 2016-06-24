@@ -7,10 +7,10 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_ARITHMETICS_COUNTER_APR_10_2013_1002AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/performance_counters/server/base_performance_counter.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
+#include <hpx/util/interval_timer.hpp>
 
 #include <string>
 #include <vector>

@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 //#include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/agas/response.hpp>
 #include <hpx/lcos/async.hpp>
+#include <hpx/runtime/agas/response.hpp>
 
 #include <vector>
 

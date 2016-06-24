@@ -10,17 +10,17 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
+#include <hpx/plugins/parcelport/ipc/data_buffer.hpp>
 #include <hpx/plugins/parcelport/ipc/interprocess_errors.hpp>
 #include <hpx/plugins/parcelport/ipc/message.hpp>
-#include <hpx/plugins/parcelport/ipc/data_buffer.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_io_object.hpp>
+#include <boost/atomic.hpp>
+#include <boost/scope_exit.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
-#include <boost/scope_exit.hpp>
-#include <boost/atomic.hpp>
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 

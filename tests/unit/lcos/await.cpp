@@ -23,14 +23,14 @@
 hpx::future<int> fib1(int n)
 {
     if (n >= 2)
-        n = __await fib1(n - 1) + __await fib1(n - 2);
+        n = co_await fib1(n - 1) + co_await fib1(n - 2);
     return n;
 }
 
 hpx::future<int> fib2(int n)
 {
     if (n >= 2)
-        n = __await hpx::async(&fib2, n - 1) + __await fib2(n - 2);
+        n = co_await hpx::async(&fib2, n - 1) + co_await fib2(n - 2);
     return n;
 }
 

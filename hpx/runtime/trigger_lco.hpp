@@ -15,8 +15,8 @@
 
 #include <boost/exception_ptr.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx
 {

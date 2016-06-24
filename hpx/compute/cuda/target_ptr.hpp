@@ -81,37 +81,57 @@ namespace hpx { namespace compute { namespace cuda
 
         explicit operator bool() const
         {
-            return p_;
+            return p_ != nullptr;
         }
 
-        bool operator==(target_ptr const& other) const
+        friend bool operator==(target_ptr const& lhs, std::nullptr_t)
         {
-            return p_ == other.p_;
+            return lhs.p_ == nullptr;
         }
 
-        bool operator!=(target_ptr const& other) const
+        friend bool operator!=(target_ptr const& lhs, std::nullptr_t)
         {
-            return p_ != other.p_;
+            return lhs.p_ != nullptr;
         }
 
-        bool operator<(target_ptr const& other) const
+        friend bool operator==(std::nullptr_t, target_ptr const& rhs)
         {
-            return p_ < other.p_;
+            return nullptr == rhs.p_;
         }
 
-        bool operator>(target_ptr const& other) const
+        friend bool operator!=(std::nullptr_t, target_ptr const& rhs)
         {
-            return p_ > other.p_;
+            return nullptr != rhs.p_;
         }
 
-        bool operator<=(target_ptr const& other) const
+        friend bool operator==(target_ptr const& lhs, target_ptr const& rhs)
         {
-            return p_ <= other.p_;
+            return lhs.p_ == rhs.p_;
         }
 
-        bool operator>=(target_ptr const& other) const
+        friend bool operator!=(target_ptr const& lhs, target_ptr const& rhs)
         {
-            return p_ >= other.p_;
+            return lhs.p_ != rhs.p_;
+        }
+
+        friend bool operator<(target_ptr const& lhs, target_ptr const& rhs)
+        {
+            return lhs.p_ < rhs.p_;
+        }
+
+        friend bool operator>(target_ptr const& lhs, target_ptr const& rhs)
+        {
+            return lhs.p_ > rhs.p_;
+        }
+
+        friend bool operator<=(target_ptr const& lhs, target_ptr const& rhs)
+        {
+            return lhs.p_ <= rhs.p_;
+        }
+
+        friend bool operator>=(target_ptr const& lhs, target_ptr const& rhs)
+        {
+            return lhs.p_ >= rhs.p_;
         }
 
         target_ptr& operator+=(std::ptrdiff_t offset)

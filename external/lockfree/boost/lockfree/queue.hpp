@@ -50,12 +50,12 @@ private:
         {
             /* increment tag to avoid ABA problem */
             tagged_node_ptr old_next = next.load(memory_order_relaxed);
-            tagged_node_ptr new_next (NULL, old_next.get_tag()+1);
+            tagged_node_ptr new_next (nullptr, old_next.get_tag()+1);
             next.store(new_next, memory_order_release);
         }
 
         node (void):
-            next(tagged_node_ptr(NULL, 0))
+            next(tagged_node_ptr(nullptr, 0))
         {}
 
         atomic<tagged_node_ptr> next;
@@ -157,7 +157,7 @@ public:
     {
         node * n = pool.construct(t);
 
-        if (n == NULL)
+        if (n == nullptr)
             return false;
 
         for (;;) {
@@ -195,7 +195,7 @@ public:
     {
         node * n = pool.construct_unsafe(t);
 
-        if (n == NULL)
+        if (n == nullptr)
             return false;
 
         for (;;)
@@ -381,7 +381,7 @@ class queue<T*, freelist_t, Alloc>:
     template <typename smart_ptr>
     bool pop_smart_ptr(smart_ptr & ptr)
     {
-        T * result = 0;
+        T * result = nullptr;
         bool success = queue_t::pop(result);
 
         if (success)

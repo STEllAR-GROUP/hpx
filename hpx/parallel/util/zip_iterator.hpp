@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/tagged_pair.hpp>
-#include <hpx/util/zip_iterator.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/util/tagged_pair.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {

@@ -24,6 +24,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/io/ios_state.hpp>
 #include <boost/ref.hpp>
@@ -421,20 +422,31 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         std::int64_t replenish_credits(gid_type& gid)
         {
+            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
+            scoped_lock l(gid);
+            return replenish_credits_locked(l, gid);
+        }
+
+        HPX_EXPORT std::int64_t replenish_credits_locked(
+            std::unique_lock<gid_type::mutex_type>& l, gid_type& gid)
+        {
             std::int64_t added_credit = 0;
 
-            {
-                typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-                scoped_lock l(gid);
-                HPX_ASSERT(0 == get_credit_from_gid(gid));
+            HPX_ASSERT(0 == get_credit_from_gid(gid));
 
-                added_credit = naming::detail::fill_credit_for_gid(gid);
-                naming::detail::set_credit_split_mask_for_gid(gid);
-            }
+            added_credit = naming::detail::fill_credit_for_gid(gid);
+            naming::detail::set_credit_split_mask_for_gid(gid);
 
             gid_type unlocked_gid = gid;        // strips lock-bit
 
-            return agas::incref(unlocked_gid, added_credit);
+            std::int64_t result = 0;
+            {
+                hpx::util::scoped_unlock<std::unique_lock<gid_type::mutex_type> >
+                    ul(l);
+                 result = agas::incref(unlocked_gid, added_credit);
+            }
+
+            return result;
         }
 
         std::int64_t add_credit_to_gid(gid_type& id, std::int64_t credits)

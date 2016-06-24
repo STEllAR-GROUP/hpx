@@ -7,7 +7,6 @@
 #define HPX_TRAITS_COMPONENT_TYPE_DATABASE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
 
 #include <cstdint>
 
@@ -19,7 +18,7 @@ namespace hpx { namespace components
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable>
+    template <typename Component, typename Enable = void>
     struct component_type_database
     {
         static components::component_type value;

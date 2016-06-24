@@ -85,12 +85,12 @@ public:
 
     //! Construct stack.
     stack(void):
-        tos(tagged_node_ptr(NULL, 0))
+        tos(tagged_node_ptr(nullptr, 0))
     {}
 
     //! Construct stack, allocate n nodes for the freelist
     explicit stack(std::size_t n):
-        tos(tagged_node_ptr(NULL, 0))
+        tos(tagged_node_ptr(nullptr, 0))
     {
         pool.reserve_unsafe(n);
     }
@@ -244,7 +244,7 @@ public:
      * */
     bool empty(void) const
     {
-        return tos.load().get_ptr() == NULL;
+        return tos.load().get_ptr() == nullptr;
     }
 
 private:

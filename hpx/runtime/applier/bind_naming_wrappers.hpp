@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 namespace hpx { namespace applier
 {

@@ -18,7 +18,7 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_APEX
     inline void apex_init()
     {
-        apex::init(NULL);
+        apex::init(nullptr);
         apex::set_node_id(hpx::get_locality_id());
     }
 
@@ -70,7 +70,7 @@ namespace hpx { namespace util
     {
         apex_wrapper_init(int argc, char **argv)
         {
-            apex::init(argc, argv, NULL);
+            apex::init(argc, argv, nullptr);
         }
         ~apex_wrapper_init()
         {

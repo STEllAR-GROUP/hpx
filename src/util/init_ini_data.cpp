@@ -54,11 +54,11 @@ namespace hpx { namespace util
         char const* file_suffix)
     {
         char const* env = getenv(env_var);
-        if (NULL != env) {
+        if (nullptr != env) {
             namespace fs = boost::filesystem;
 
             fs::path inipath (hpx::util::create_path(env));
-            if (NULL != file_suffix)
+            if (nullptr != file_suffix)
                 inipath /= hpx::util::create_path(file_suffix);
 
             if (handle_ini_file(ini, inipath.string())) {
@@ -391,7 +391,7 @@ namespace hpx { namespace util
             // retrieve/create section [hpx.components]
             if (!ini.has_section("hpx.components")) {
                 util::section* hpx_sec = ini.get_section("hpx");
-                HPX_ASSERT(NULL != hpx_sec);
+                HPX_ASSERT(nullptr != hpx_sec);
 
                 util::section comp_sec;
                 hpx_sec->add_section("components", comp_sec);

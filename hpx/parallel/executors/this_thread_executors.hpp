@@ -9,9 +9,9 @@
 #define HPX_PARALLEL_EXECUTORS_THIS_THREAD_EXECUTORS_JUL_16_2015_0809PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
+#include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {

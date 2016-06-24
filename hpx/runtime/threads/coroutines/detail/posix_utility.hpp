@@ -52,9 +52,9 @@
 #include <boost/type_traits/type_with_alignment.hpp>
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+#include <errno.h>
 #include <sys/mman.h>
 #include <sys/param.h>
-#include <errno.h>
 
 #include <stdexcept>
 #endif
@@ -82,7 +82,7 @@ namespace posix
 
     inline void* alloc_stack(std::size_t size)
     {
-        void* real_stack = ::mmap(NULL,
+        void* real_stack = ::mmap(nullptr,
             size + EXEC_PAGESIZE,
             PROT_EXEC | PROT_READ | PROT_WRITE,
 #if defined(__APPLE__)

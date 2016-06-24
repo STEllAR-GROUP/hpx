@@ -19,23 +19,23 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
     void coroutine_self::set_self(coroutine_self* self)
     {
-        HPX_ASSERT(NULL != self_.get());
+        HPX_ASSERT(nullptr != self_.get());
         *self_ = self;
     }
 
     coroutine_self* coroutine_self::get_self()
     {
-        return (NULL == self_.get()) ? NULL : *self_;
+        return (nullptr == self_.get()) ? nullptr : *self_;
     }
 
     void coroutine_self::init_self()
     {
-        HPX_ASSERT(NULL == self_.get());
-        self_.reset(new coroutine_self*(NULL));
+        HPX_ASSERT(nullptr == self_.get());
+        self_.reset(new coroutine_self*(nullptr));
     }
 
     void coroutine_self::reset_self()
     {
-        self_.reset(NULL);
+        self_.reset(nullptr);
     }
 }}}}

@@ -6,10 +6,10 @@
 #define HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
 

@@ -10,15 +10,15 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
-#include <hpx/util/pool_timer.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/pool_timer.hpp>
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
-#include <boost/preprocessor/stringize.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/preprocessor/stringize.hpp>
 
 #include <mutex>
 
