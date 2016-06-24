@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// \note This executor parameters type is equivalent to OpenMPs STATIC
     ///       scheduling directive.
     ///
-    struct static_chunk_size : executor_parameters_chunk_size_tag
+    struct static_chunk_size : executor_parameters_tag
     {
         /// Construct a \a static_chunk_size executor parameters object
         ///
@@ -50,12 +50,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         explicit static_chunk_size(std::size_t chunk_size)
           : chunk_size_(chunk_size)
         {}
-
-        template <typename Executor>
-        static bool variable_chunk_size(Executor&)
-        {
-            return false;
-        }
 
         /// \cond NOINTERNAL
         template <typename Executor, typename F>

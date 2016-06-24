@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// This executor parameters type makes sure that as many loop iterations
     /// are combined as necessary to run for the amount of time specified.
     ///
-    struct persistent_auto_chunk_size : executor_parameters_chunk_size_tag
+    struct persistent_auto_chunk_size : executor_parameters_tag
     {
     public:
         /// Construct an \a persistent_auto_chunk_size executor parameters object
@@ -66,12 +66,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
           : chunk_size_time_(time_cs.value().count()),
             min_time_(rel_time.value().count())
         {}
-
-        template <typename Executor>
-        static bool variable_chunk_size(Executor&)
-        {
-            return false;
-        }
 
         /// \cond NOINTERNAL
         // Estimate a chunk size based on number of cores used.
