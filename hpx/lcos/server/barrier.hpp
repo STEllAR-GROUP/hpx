@@ -7,14 +7,14 @@
 #define HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <boost/exception_ptr.hpp>
 

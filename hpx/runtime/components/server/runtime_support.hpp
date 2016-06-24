@@ -10,33 +10,37 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/traits/is_component.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/traits/action_capability_provider.hpp>
+#endif
+#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/plugins/plugin_factory_base.hpp>
-#include <hpx/util_fwd.hpp>
-#include <hpx/util/one_size_heap_list_base.hpp>
-#include <hpx/util/plugin.hpp>
+#include <hpx/traits/action_does_termination_detection.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
+#include <hpx/util/plugin.hpp>
 #include <hpx/util/unlock_guard.hpp>
+#include <hpx/util_fwd.hpp>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/program_options/options_description.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <list>
 #include <map>
@@ -44,8 +48,8 @@
 #include <mutex>
 #include <set>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -342,10 +346,6 @@ namespace hpx { namespace components { namespace server
             components::component_type type);
 #endif
 
-        ///////////////////////////////////////////////////////////////////////
-        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
-            components::component_type type);
-
     protected:
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,
@@ -477,7 +477,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -522,7 +522,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -576,7 +576,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance(s) of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -628,7 +628,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance(s) of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -687,7 +687,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
                 strm.str());
@@ -749,7 +749,7 @@ namespace hpx { namespace components { namespace server
                 strm << "attempt to migrate component instance of "
                     << "invalid/unknown type: "
                     << components::get_component_type_name(type)
-                    << " (map entry is NULL)";
+                    << " (map entry is nullptr)";
 
                 l.unlock();
                 HPX_THROW_EXCEPTION(hpx::bad_component_type,
@@ -818,12 +818,12 @@ HPX_ACTION_USES_LARGE_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_startup_functions_action,
     call_startup_functions_action)
-HPX_ACTION_USES_LARGE_STACK(
+HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::call_startup_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
     call_shutdown_functions_action)
-HPX_ACTION_USES_LARGE_STACK(
+HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::call_shutdown_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::free_component_action,
@@ -831,9 +831,13 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::shutdown_action,
     shutdown_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::shutdown_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::shutdown_all_action,
     shutdown_all_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::shutdown_all_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::terminate_action,
     terminate_action)
@@ -863,6 +867,8 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::dijkstra_termination_action,
     dijkstra_termination_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::dijkstra_termination_action)
 
 namespace hpx { namespace components { namespace server
 {

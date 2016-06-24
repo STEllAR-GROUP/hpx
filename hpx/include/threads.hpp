@@ -6,12 +6,12 @@
 #if !defined(HPX_THREAD_APR_17_2012_1003AM)
 #define HPX_THREAD_APR_17_2012_1003AM
 
+#include <hpx/runtime/threads/executors.hpp>
+#include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_specific_ptr.hpp>
-#include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
-#include <hpx/runtime/threads/executors.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 
 #endif
 

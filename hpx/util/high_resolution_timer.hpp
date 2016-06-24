@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/chrono/chrono.hpp>
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace util
 {

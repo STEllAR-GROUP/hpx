@@ -54,7 +54,7 @@ int main(int argc,char** argv)
 
    /*=============================================================*/
    /* Vectors and/or matrices initalisation.                      */
-   srand((unsigned)time( NULL ) + taskid);
+   srand((unsigned)time( nullptr ) + taskid);
    for(i=0;i<buffsize;i++){
        sendbuff[i]=(double)rand()/RAND_MAX;
    }

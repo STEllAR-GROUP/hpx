@@ -9,19 +9,19 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-#include <hpx/traits/is_executor.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
 
-#include <hpx/compute/vector.hpp>
 #include <hpx/compute/cuda/allocator.hpp>
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
+#include <hpx/compute/cuda/target.hpp>
+#include <hpx/compute/vector.hpp>
 
 #include <algorithm>
-#include <utility>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <boost/range/functions.hpp>

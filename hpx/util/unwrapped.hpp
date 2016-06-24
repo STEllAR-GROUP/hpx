@@ -8,13 +8,14 @@
 #define HPX_UTIL_UNWRAPPED_HPP
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 #include <boost/mpl/if.hpp>
 #include <boost/utility/enable_if.hpp>

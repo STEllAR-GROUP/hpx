@@ -16,7 +16,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action capabilities
-    template <typename Action, typename Enable>
+    template <typename Action, typename Enable = void>
     struct action_capability_provider
     {
         // return the required capabilities to invoke the given action

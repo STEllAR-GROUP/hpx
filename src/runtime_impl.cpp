@@ -57,7 +57,7 @@ namespace hpx {
     void register_pre_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
@@ -74,7 +74,7 @@ namespace hpx {
     void register_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
@@ -91,7 +91,7 @@ namespace hpx {
     void register_pre_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
@@ -108,7 +108,7 @@ namespace hpx {
     void register_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
@@ -633,7 +633,7 @@ namespace hpx {
         applier_.init_tss();
 
         // set the thread's name, if it's not already set
-        if (NULL == runtime::thread_name_.get())
+        if (nullptr == runtime::thread_name_.get())
         {
             std::string* fullname = new std::string(context);
             if (postfix && *postfix)
@@ -766,7 +766,7 @@ namespace hpx {
         register_thread(char const* name, std::size_t num, bool service_thread,
             error_code& ec)
     {
-        if (NULL != runtime::thread_name_.get())
+        if (nullptr != runtime::thread_name_.get())
             return false;       // already registered
 
         std::string thread_name(name);
@@ -782,7 +782,7 @@ namespace hpx {
     bool runtime_impl<SchedulingPolicy>::
         unregister_thread()
     {
-        if (NULL == runtime::thread_name_.get())
+        if (nullptr == runtime::thread_name_.get())
             return false;       // never registered
 
         deinit_tss();

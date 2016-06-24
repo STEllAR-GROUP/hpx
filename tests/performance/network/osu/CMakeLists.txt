@@ -24,7 +24,7 @@ foreach(benchmark ${benchmarks})
                      COMPONENT_DEPENDENCIES iostreams
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Network/${benchmark}")
+                     FOLDER "Benchmarks/Network/OSU")
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.network.osu_perf.${benchmark})

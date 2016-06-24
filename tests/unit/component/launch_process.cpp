@@ -18,8 +18,8 @@
 inline int get_arraylen(char **arr)
 {
     int count = 0;
-    if (NULL != arr) {
-        while(NULL != arr[count])
+    if (nullptr != arr) {
+        while(nullptr != arr[count])
             ++count;   // simply count the strings
     }
     return count;

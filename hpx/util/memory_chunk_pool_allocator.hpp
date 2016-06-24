@@ -7,10 +7,8 @@
 #define HPX_UTIL_MEMORY_CHUNK_POOL_ALLOCATOR_HPP
 
 #include <hpx/config.hpp>
-
-#include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-//
+
 #include <cstdlib>
 #include <vector>
 
@@ -61,7 +59,7 @@ namespace hpx { namespace util { namespace detail
             return &x;
         }
 
-        pointer allocate(size_type n, void* /*hint*/ = 0)
+        pointer allocate(size_type n, void* /*hint*/ = nullptr)
         {
             HPX_ASSERT(memory_pool_);
             return reinterpret_cast<T*>(memory_pool_->allocate(sizeof(T) * n));

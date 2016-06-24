@@ -27,7 +27,7 @@ namespace hpx { namespace threads { namespace detail
         }
         return self_id->get_scheduler_base()->get_tss_data(key);
 #endif
-        return NULL;
+        return nullptr;
     }
 
     void set_tss_data(void const* key,

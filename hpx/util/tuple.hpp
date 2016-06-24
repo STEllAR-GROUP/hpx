@@ -99,7 +99,7 @@ namespace hpx { namespace util
         struct tuple_member<I, T,
             typename std::enable_if<
                 std::is_empty<T>::value
-#if defined(HPX_HAVE_CXX11_STD_IS_FINAL)
+#if defined(HPX_HAVE_CXX14_STD_IS_FINAL)
              && !std::is_final<T>::value
 #endif
             >::type

@@ -7,8 +7,8 @@
 #define HPX_PARALLEL_TRAITS_IS_RANGE_JUL_18_2015_1017AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/range/iterator_range_core.hpp>
 

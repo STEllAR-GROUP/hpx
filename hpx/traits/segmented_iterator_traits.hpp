@@ -6,7 +6,7 @@
 #if !defined(HPX_SEGMENTED_ITERATOR_TRAITS_OCT_14_2014_0229PM)
 #define HPX_SEGMENTED_ITERATOR_TRAITS_OCT_14_2014_0229PM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
@@ -15,13 +15,13 @@
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator, typename Enable>
+    template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits
     {
         typedef std::false_type is_segmented_iterator;
     };
 
-    template <typename Iterator, typename Enable>
+    template <typename Iterator, typename Enable = void>
     struct is_segmented_iterator
       : segmented_iterator_traits<Iterator>::is_segmented_iterator
     {};
@@ -29,7 +29,7 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     // traits allowing to distinguish iterators which have a purely local
     // representation
-    template <typename Iterator, typename Enable>
+    template <typename Iterator, typename Enable = void>
     struct segmented_local_iterator_traits
     {
         typedef std::false_type is_segmented_local_iterator;
@@ -59,13 +59,13 @@ namespace hpx { namespace traits
         }
     };
 
-    template <typename Iterator, typename Enable>
+    template <typename Iterator, typename Enable = void>
     struct is_segmented_local_iterator
       : segmented_local_iterator_traits<Iterator>::is_segmented_local_iterator
     {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable>
+    template <typename T, typename Enable = void>
     struct projected_iterator
     {
         typedef typename hpx::util::decay<T>::type type;

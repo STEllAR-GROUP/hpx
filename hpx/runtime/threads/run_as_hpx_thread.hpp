@@ -9,15 +9,15 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/tuple.hpp>
 
-#include <cstdlib>
-#include <type_traits>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <chrono>
+#include <condition_variable>
+#include <cstdlib>
+#include <mutex>
+#include <thread>
+#include <type_traits>
 
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
 #include <experimental/optional>

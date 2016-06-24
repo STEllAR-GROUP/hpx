@@ -9,16 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
-#include <hpx/runtime/serialization/input_container.hpp>
-#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
+#include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/config.hpp>
 #include <boost/mpl/or.hpp>
+#include <boost/type_traits/is_enum.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
-#include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <map>
@@ -42,7 +42,7 @@ namespace hpx { namespace serialization
         template <typename Container>
         input_archive(Container & buffer,
             std::size_t inbound_data_size = 0,
-            const std::vector<serialization_chunk>* chunks = 0)
+            const std::vector<serialization_chunk>* chunks = nullptr)
           : base_type(0U)
           , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
         {
@@ -64,7 +64,7 @@ namespace hpx { namespace serialization
             bool has_filter = false;
             load(has_filter);
 
-            serialization::binary_filter* filter = 0;
+            serialization::binary_filter* filter = nullptr;
             if (has_filter && enable_compression())
             {
                 *this >> detail::raw_ptr(filter);

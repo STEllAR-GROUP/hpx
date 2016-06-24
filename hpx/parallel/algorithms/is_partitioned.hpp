@@ -9,16 +9,16 @@
 #define HPX_PARALLEL_ALGORITHMS_IS_PARTITIONED_FEB_11_2015_0331PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/is_iterator.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
 #include <functional>

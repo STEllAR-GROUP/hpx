@@ -9,16 +9,16 @@
 #define HPX_SERIALIZATION_POLYMORPHIC_ID_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/preprocessor/stringize.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/preprocessor/stringize.hpp>
 
 #include <map>
 #include <string>
@@ -118,7 +118,7 @@ namespace hpx { namespace serialization {
             void cache_id(boost::uint32_t id, ctor_t ctor)
             {
                 if (id >= cache.size()) //-V104
-                    cache.resize(id + 1, NULL); //-V106
+                    cache.resize(id + 1, nullptr); //-V106
                 cache[id] = ctor; //-V108
             }
 
@@ -149,7 +149,7 @@ namespace hpx { namespace serialization {
                       , "Unknown type descriptor " + std::to_string(id));
 
                 ctor_t ctor = vec[id]; //-V108
-                HPX_ASSERT(ctor != NULL);
+                HPX_ASSERT(ctor != nullptr);
                 return static_cast<T*>(ctor());
             }
 

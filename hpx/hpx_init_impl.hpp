@@ -175,7 +175,7 @@ namespace hpx
             shutdown_function_type(), mode);
     }
 
-    /// \fn int init(std::string const& app_name, int argc = 0, char** argv = 0)
+    /// \fn int init(std::string const& app_name, int argc = 0, char** argv = nullptr)
     ///
     /// \brief Main entry point for launching the HPX runtime system.
     ///

@@ -7,8 +7,8 @@
 #define HPX_SERIALIZATION_STRING_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <string>
 

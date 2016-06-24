@@ -12,8 +12,8 @@
 #define HPX_RUNTIME_THREADS_SCHEDULER_TSS_AUG_08_2015_0733PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <memory>
 
@@ -108,7 +108,7 @@ namespace hpx { namespace threads
             return temp;
         }
 
-        void reset(T* new_value = 0)
+        void reset(T* new_value = nullptr)
         {
             T* const current_value = get();
             if (current_value != new_value)

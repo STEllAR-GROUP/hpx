@@ -9,13 +9,13 @@
 #define HPX_PARALLEL_STATIC_CHUNK_SIZE_JUL_31_2015_0740PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_executor_parameters.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
-#include <hpx/parallel/executors/thread_executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/parallel/executors/thread_executor_information_traits.hpp>
+#include <hpx/parallel/executors/thread_executor_parameter_traits.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/is_executor_parameters.hpp>
 
 #include <cstddef>
 

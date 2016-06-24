@@ -10,9 +10,9 @@
 #define HPX_28443929_CB68_43ED_B134_F60602A344DD
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <string>

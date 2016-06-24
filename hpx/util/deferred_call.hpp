@@ -7,8 +7,8 @@
 #define HPX_UTIL_DEFERRED_CALL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>

@@ -1042,14 +1042,14 @@ namespace test
         "numanode:0",
         "core:0",
         "pu:0",
-        NULL
+        nullptr
     };
 
     void bad()
     {
         int i = 0;
         hpx::error_code ec;
-        for (char const* t = data_bad[0]; NULL != t; t = data_bad[++i])
+        for (char const* t = data_bad[0]; nullptr != t; t = data_bad[++i])
         {
             std::vector<hpx::threads::mask_type> affinities;
             hpx::threads::parse_affinity_options(t, affinities, ec);

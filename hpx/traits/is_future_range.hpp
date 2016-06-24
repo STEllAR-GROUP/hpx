@@ -19,7 +19,7 @@
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Range, typename Enable>
+    template <typename Range, typename Enable = void>
     struct is_future_range
       : boost::mpl::false_
     {};
@@ -31,7 +31,7 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Range, typename Enable>
+    template <typename Range, typename Enable = void>
     struct future_range_traits;
 
     template <typename Range>

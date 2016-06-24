@@ -10,23 +10,23 @@
 #define HPX_PARALLEL_ALGORITHM_FOR_LOOP_MAR_02_2016_1256PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -98,6 +98,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             typename hpx::util::decay<F>::type f_;
             S stride_;
             hpx::util::tuple<Ts...> args_;
+
+            template <typename F_, typename S_, typename Args>
+            part_iterations(F_&& f, S_&& stride, Args&& args)
+              : f_(std::forward<F_>(f))
+              , stride_(std::forward<S_>(stride))
+              , args_(std::forward<Args>(args))
+            {}
 
             template <typename B>
             HPX_HOST_DEVICE

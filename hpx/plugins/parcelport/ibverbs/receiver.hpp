@@ -11,17 +11,17 @@
 
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
-#include <hpx/plugins/parcelport/ibverbs/allocator.hpp>
-#include <hpx/plugins/parcelport/ibverbs/context.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/plugins/parcelport/ibverbs/allocator.hpp>
+#include <hpx/plugins/parcelport/ibverbs/context.hpp>
+#include <hpx/runtime/parcelset/decode_parcels.hpp>
+#include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/placeholders.hpp>
-#include <boost/integer/endian.hpp>
 #include <boost/atomic.hpp>
+#include <boost/integer/endian.hpp>
 
 #include <cstring>
 #include <memory>

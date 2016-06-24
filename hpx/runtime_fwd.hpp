@@ -11,9 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
@@ -25,10 +22,13 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
@@ -222,7 +222,7 @@ namespace hpx
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
     HPX_API_EXPORT void evaluate_active_counters(bool reset = false,
-        char const* description = 0, error_code& ec = throws);
+        char const* description = nullptr, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin
@@ -237,7 +237,8 @@ namespace hpx
     ///           hpx::exception.
     HPX_API_EXPORT serialization::binary_filter* create_binary_filter(
         char const* binary_filter_type, bool compress,
-        serialization::binary_filter* next_filter = 0, error_code& ec = throws);
+        serialization::binary_filter* next_filter = nullptr,
+        error_code& ec = throws);
 
 #if defined(HPX_HAVE_SODIUM)
     namespace components { namespace security

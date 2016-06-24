@@ -39,16 +39,16 @@
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/ini.hpp>
@@ -78,7 +78,7 @@ namespace hpx { namespace components
         /// \param global   [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the [settings]
         ///                 section of the global configuration file (hpx.ini)
-        ///                 This pointer may be NULL if no such section has
+        ///                 This pointer may be nullptr if no such section has
         ///                 been found.
         /// \param local    [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the section
@@ -94,9 +94,9 @@ namespace hpx { namespace components
           : isenabled_(isenabled), refcnt_(0)
         {
             // store the configuration settings
-            if (NULL != global)
+            if (nullptr != global)
                 global_settings_ = *global;
-            if (NULL != local)
+            if (nullptr != local)
                 local_settings_ = *local;
         }
 

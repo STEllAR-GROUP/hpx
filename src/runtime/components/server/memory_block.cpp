@@ -5,7 +5,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>

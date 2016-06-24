@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 namespace hpx { namespace traits
 {
     // new executor framework
-    template <typename Parameters, typename Enable>
+    template <typename Parameters, typename Enable = void>
     struct is_executor_parameters
       : parallel::v3::is_executor_parameters<Parameters>
     {};

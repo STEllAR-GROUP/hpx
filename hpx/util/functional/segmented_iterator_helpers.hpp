@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_FUNCTIONAL_SEGMENTED_ITERATOR_HELPERS_JUL_20_2015_1105AM)
 #define HPX_UTIL_FUNCTIONAL_SEGMENTED_ITERATOR_HELPERS_JUL_20_2015_1105AM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 namespace hpx { namespace util { namespace functional

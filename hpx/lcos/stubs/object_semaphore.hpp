@@ -7,10 +7,10 @@
 #if !defined(HPX_18186AAE_AF96_4ADC_88AF_215F13F18004)
 #define HPX_18186AAE_AF96_4ADC_88AF_215F13F18004
 
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/async.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
-#include <hpx/async.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
 
 namespace hpx { namespace lcos { namespace stubs
 {
@@ -53,8 +53,10 @@ struct object_semaphore : components::stub_base<
     {
         typedef typename server_type::get_action action_type;
         lcos::promise<ValueType> lco;
+        auto f = lco.get_future();
+
         hpx::apply<action_type>(gid, lco.get_id());
-        return lco.get_future();
+        return f;
     }
 
     static ValueType get_sync(naming::id_type const& gid)

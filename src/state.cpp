@@ -20,7 +20,7 @@ namespace hpx
         bool threadmanager_is(state st)
         {
             hpx::runtime* rt = get_runtime_ptr();
-            if (NULL == rt) {
+            if (nullptr == rt) {
                 // we're probably either starting or stopping
                 return st == state_starting || st == state_stopping;
             }
@@ -34,7 +34,7 @@ namespace hpx
         bool router_is(state st)
         {
             runtime* rt = get_runtime_ptr();
-            if (NULL == rt) {
+            if (nullptr == rt) {
                 // we're probably either starting or stopping
                 return st == state_starting || st == state_stopping;
             }

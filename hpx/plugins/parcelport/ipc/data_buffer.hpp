@@ -18,8 +18,8 @@
 
 #include <hpx/util/assert.hpp>
 
-#include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/containers/vector.hpp>
 #if defined(HPX_WINDOWS)
 #include <boost/interprocess/managed_windows_shared_memory.hpp>
 #else

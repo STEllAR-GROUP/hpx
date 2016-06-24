@@ -10,9 +10,9 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
+#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -26,8 +26,8 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/version.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/version.hpp>
 
 #if BOOST_VERSION < 105100
 #error Boost.Context is available only with Boost V1.51 or later

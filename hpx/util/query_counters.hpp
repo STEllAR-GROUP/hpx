@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/util/interval_timer.hpp>
 
 #include <boost/cstdint.hpp>
 
@@ -42,7 +42,7 @@ namespace hpx { namespace util
         void stop_counters(error_code& ec = throws);
         void reset_counters(error_code& ec = throws);
         bool evaluate_counters(bool reset = false,
-            char const* description = 0, error_code& ec = throws);
+            char const* description = nullptr, error_code& ec = throws);
 
     protected:
         void find_counters();

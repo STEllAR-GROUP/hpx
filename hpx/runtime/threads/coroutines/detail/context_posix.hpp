@@ -47,8 +47,8 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
+#include <boost/cstdint.hpp>
 
 #if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) \
             && _XOPEN_VERSION >= 500)
@@ -57,9 +57,9 @@
 // swapcontext() et al. Use GNU Pth workalike functions.
 #if defined(__APPLE__) && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1050)
 
-#include "pth/pth.h"
 #include <cerrno>
 #include <limits>
+#include "pth/pth.h"
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix { namespace pth
@@ -80,9 +80,9 @@ namespace posix { namespace pth
 #define HPX_COROUTINE_CREATE_CONTEXT(ctx)                                     \
     hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_create(&(ctx)))
 #define HPX_COROUTINE_MAKE_CONTEXT(ctx, stack, size, startfunc, startarg, exitto) \
-    /* const sigset_t* sigmask = NULL: we don't expect per-context signal masks */ \
+    /* const sigset_t* sigmask = nullptr: we don't expect per-context signal masks */ \
     hpx::threads::coroutines::detail::posix::pth::check(                      \
-        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), NULL,        \
+        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), nullptr,        \
         (startfunc), (startarg), (exitto)))
 #define HPX_COROUTINE_SWAP_CONTEXT(from, to)                                  \
     hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_switch(*(from), *(to)))
@@ -101,15 +101,15 @@ namespace posix { namespace pth
  * NOTE2: makecontext and friends are declared obsolescent in SuSv3, but
  * it is unlikely that they will be removed any time soon.
  */
-#include <ucontext.h>
 #include <cstddef>                  // ptrdiff_t
+#include <ucontext.h>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix { namespace ucontext
 {
     inline int make_context(::ucontext_t* ctx, void* stack, std::ptrdiff_t size,
                             void (*startfunc)(void*), void* startarg,
-                            ::ucontext_t* exitto = NULL)
+                            ::ucontext_t* exitto = nullptr)
     {
         int error = ::getcontext(ctx);
         if (error)
@@ -141,11 +141,11 @@ namespace posix { namespace ucontext
 
 #endif // generic Posix platform
 
-#include <signal.h>                 // SIGSTKSZ
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
+#include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <signal.h>                 // SIGSTKSZ
 
 namespace hpx { namespace threads { namespace coroutines
 {
@@ -218,7 +218,7 @@ namespace hpx { namespace threads { namespace coroutines
                 HPX_ASSERT(m_stack);
                 funp_ = &trampoline<Functor>;
                 int error = HPX_COROUTINE_MAKE_CONTEXT(
-                    &m_ctx, m_stack, m_stack_size, funp_, cb_, NULL);
+                    &m_ctx, m_stack, m_stack_size, funp_, cb_, nullptr);
                 HPX_UNUSED(error);
                 HPX_ASSERT(error == 0);
             }
@@ -267,7 +267,7 @@ namespace hpx { namespace threads { namespace coroutines
                     // the stack start
                     increment_stack_recycle_count();
                     int error = HPX_COROUTINE_MAKE_CONTEXT(
-                        &m_ctx, m_stack, m_stack_size, funp_, cb_, NULL);
+                        &m_ctx, m_stack, m_stack_size, funp_, cb_, nullptr);
                     HPX_UNUSED(error);
                     HPX_ASSERT(error == 0);
                 }

@@ -34,8 +34,8 @@ namespace hpx { namespace util
         std::string const& cmdline, boost::program_options::variables_map& vm,
         std::size_t node, int error_mode = return_on_error,
         hpx::runtime_mode mode = runtime_mode_default,
-        boost::program_options::options_description* visible = 0,
-        std::vector<std::string>* unregistered_options = 0);
+        boost::program_options::options_description* visible = nullptr,
+        std::vector<std::string>* unregistered_options = nullptr);
 
     HPX_API_EXPORT bool parse_commandline(
         hpx::util::section const& rtcfg,
@@ -43,8 +43,8 @@ namespace hpx { namespace util
         int argc, char** argv, boost::program_options::variables_map& vm,
         std::size_t node, int error_mode = return_on_error,
         hpx::runtime_mode mode = runtime_mode_default,
-        boost::program_options::options_description* visible = 0,
-        std::vector<std::string>* unregistered_options = 0);
+        boost::program_options::options_description* visible = nullptr,
+        std::vector<std::string>* unregistered_options = nullptr);
 
     ///////////////////////////////////////////////////////////////////////////
     // retrieve the command line arguments for the current locality

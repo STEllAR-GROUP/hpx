@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 
+#include <functional>
 #include <mutex>
 
 #include "widget.hpp"
@@ -17,7 +18,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QListWidget>
 
-widget::widget(boost::function<void(widget *, std::size_t)> callback, QWidget *parent)
+widget::widget(std::function<void(widget *, std::size_t)> callback, QWidget *parent)
     : QDialog(parent)
     , no_threads(50)
     , callback_(callback)

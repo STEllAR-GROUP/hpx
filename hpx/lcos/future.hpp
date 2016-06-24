@@ -9,17 +9,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/concepts.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -28,8 +30,6 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/void_guard.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -39,9 +39,9 @@
 #include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
-#include <iterator>
 
 namespace hpx { namespace lcos { namespace detail
 {
@@ -800,7 +800,7 @@ namespace hpx { namespace lcos
         //   - other.valid() == false.
         template <typename T>
         future(future<T>&& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = 0
+            typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
         {
             other = future<T>();
@@ -1097,7 +1097,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         template <typename T>
         shared_future(shared_future<T> const& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = 0
+            typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
         {}
 

@@ -10,8 +10,8 @@
 
 #include <hpx/util/assert.hpp>
 
-#include <boost/io/ios_state.hpp>
 #include <boost/current_function.hpp>
+#include <boost/io/ios_state.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
 // Use smart_ptr's spinlock header because this header is used by the CMake

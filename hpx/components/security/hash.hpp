@@ -10,8 +10,8 @@
 
 #if defined(HPX_HAVE_SECURITY)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace security
     public:
         hash()
         {
-            crypto_hash(bytes_.c_array(), NULL, 0);
+            crypto_hash(bytes_.c_array(), nullptr, 0);
         }
 
         hash(unsigned char const * input, std::size_t input_length)

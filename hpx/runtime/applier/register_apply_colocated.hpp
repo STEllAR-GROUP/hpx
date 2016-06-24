@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/unique_function.hpp>
 
 namespace hpx { namespace detail

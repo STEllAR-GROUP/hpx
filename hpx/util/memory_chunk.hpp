@@ -55,7 +55,7 @@ namespace hpx { namespace util
             HPX_ASSERT(free_list_.empty());
             HPX_ASSERT(!data_);
 #ifdef _POSIX_SOURCE
-            char * ptr = 0;
+            char * ptr = nullptr;
             int ret = posix_memalign(
                 reinterpret_cast<void **>(&ptr), EXEC_PAGESIZE,
                 chunk_size_);
@@ -115,7 +115,7 @@ namespace hpx { namespace util
             return false;
         }
 
-        void check_invariants(char * p = 0, std::size_t size = 0) const
+        void check_invariants(char * p = nullptr, std::size_t size = 0) const
         {
 #ifdef HPX_DEBUG
             std::lock_guard<mutex_type> l(mtx_);
@@ -123,7 +123,7 @@ namespace hpx { namespace util
 #endif
         }
 
-        void check_invariants_locked(char * p = 0, std::size_t size = 0) const
+        void check_invariants_locked(char * p = nullptr, std::size_t size = 0) const
         {
             HPX_ASSERT(allocated_ <= chunk_size_);
 #ifdef HPX_DEBUG

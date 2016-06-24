@@ -49,7 +49,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     {
         struct reset_self_on_exit
         {
-            reset_self_on_exit(coroutine_self* val, coroutine_self* old_val = 0)
+            reset_self_on_exit(coroutine_self* val,
+                    coroutine_self* old_val = nullptr)
               : old_self(old_val)
             {
                 coroutine_self::set_self(val);
@@ -155,7 +156,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     private:
         coroutine_impl* get_locked()
         {
-            coroutine_impl* result = 0;
+            coroutine_impl* result = nullptr;
             heap_.pop(result);
             return result;
         }

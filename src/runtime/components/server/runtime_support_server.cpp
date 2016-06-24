@@ -24,7 +24,6 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
@@ -51,6 +50,8 @@
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
+
+#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -321,39 +322,6 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<util::one_size_heap_list_base>
-        runtime_support::get_promise_heap(components::component_type type)
-    {
-        // locate the factory for the requested component type
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-
-        component_map_type::iterator it = components_.find(type);
-        if (it == components_.end())
-        {
-            // we don't know anything about this promise type yet
-            std::shared_ptr<components::base_lco_factory> factory(
-                new components::base_lco_factory(type));
-
-            component_factory_type data(factory);
-            std::pair<component_map_type::iterator, bool> p =
-                components_.insert(component_map_type::value_type(type, data));
-            if (!p.second)
-            {
-                l.unlock();
-                HPX_THROW_EXCEPTION(out_of_memory,
-                    "runtime_support::get_promise_heap",
-                    "could not create base_lco_factor for type " +
-                        components::get_component_type_name(type));
-            }
-
-            it = p.first;
-        }
-
-        return std::static_pointer_cast<components::base_lco_factory>(
-            (*it).second.first)->get_heap();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a memory block
     // FIXME: error code?
     naming::gid_type runtime_support::create_memory_block(
@@ -545,9 +513,14 @@ namespace hpx { namespace components { namespace server
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
+typedef
+    hpx::lcos::detail::make_broadcast_action<call_shutdown_functions_action>::type
+    call_shutdown_functions_broadcast_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action,
         call_shutdown_functions_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    call_shutdown_functions_broadcast_action)
 HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
         call_shutdown_functions_action,
         hpx::actions::broadcast_call_shutdown_functions_action_id)
@@ -1356,13 +1329,10 @@ namespace hpx { namespace components { namespace server
     // working around non-copy-ability of packaged_task
     struct indirect_packaged_task
     {
-        typedef void write_handler_type(
-            boost::system::error_code const&, parcelset::parcel const&);
-        typedef lcos::local::packaged_task<write_handler_type> packaged_task_type;
+        typedef lcos::local::packaged_task<void()> packaged_task_type;
 
         indirect_packaged_task()
-          : pt(std::make_shared<packaged_task_type>(
-                &parcelset::default_write_handler))
+          : pt(std::make_shared<packaged_task_type>([](){}))
         {}
 
         hpx::future<void> get_future()
@@ -1373,7 +1343,9 @@ namespace hpx { namespace components { namespace server
         template <typename ...Ts>
         void operator()(Ts&& ... vs)
         {
-            (*pt)(std::forward<Ts>(vs)...);
+            // This needs to be run on a HPX thread
+            hpx::apply(std::move(*pt));
+            pt.reset();
         }
 
         std::shared_ptr<packaged_task_type> pt;
@@ -1586,11 +1558,11 @@ namespace hpx { namespace components { namespace server
         try {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = NULL;
+            util::section const* glob_ini = nullptr;
             if (ini.has_section("settings"))
                 glob_ini = ini.get_section("settings");
 
-            util::section const* component_ini = NULL;
+            util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
@@ -1712,9 +1684,9 @@ namespace hpx { namespace components { namespace server
         //  key = value
         //
         util::section* sec = ini.get_section("hpx.components");
-        if (NULL == sec)
+        if (nullptr == sec)
         {
-            LRT_(error) << "NULL section found";
+            LRT_(error) << "nullptr section found";
             return 0;     // something bad happened
         }
 
@@ -2068,11 +2040,11 @@ namespace hpx { namespace components { namespace server
         try {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = NULL;
+            util::section const* glob_ini = nullptr;
             if (ini.has_section("settings"))
                 glob_ini = ini.get_section("settings");
 
-            util::section const* component_ini = NULL;
+            util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
@@ -2185,9 +2157,9 @@ namespace hpx { namespace components { namespace server
         //  key = value
         //
         util::section* sec = ini.get_section("hpx.plugins");
-        if (NULL == sec)
+        if (nullptr == sec)
         {
-            LRT_(error) << "NULL section found";
+            LRT_(error) << "nullptr section found";
             return false;     // something bad happened
         }
 
@@ -2289,11 +2261,11 @@ namespace hpx { namespace components { namespace server
         try {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = NULL;
+            util::section const* glob_ini = nullptr;
             if (ini.has_section("settings"))
                 glob_ini = ini.get_section("settings");
 
-            util::section const* plugin_ini = NULL;
+            util::section const* plugin_ini = nullptr;
             std::string plugin_section("hpx.plugins." + instance);
             if (ini.has_section(plugin_section))
                 plugin_ini = ini.get_section(plugin_section);
@@ -2426,7 +2398,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to extract capabilities for component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
 
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,

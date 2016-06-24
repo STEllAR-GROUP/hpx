@@ -12,8 +12,8 @@
 #if defined(HPX_WINDOWS)
 
 #include <boost/cstdint.hpp>
-#include <windows.h>
 #include <intrin.h>
+#include <windows.h>
 
 namespace hpx { namespace util { namespace hardware
 {

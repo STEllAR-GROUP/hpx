@@ -11,9 +11,9 @@
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unused.hpp>
@@ -40,11 +40,11 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class base_lco_with_value : public base_lco
     {
+    protected:
         typedef typename std::conditional<
             std::is_void<Result>::value, util::unused_type, Result
         >::type result_type;
 
-    protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco_with_value() {}

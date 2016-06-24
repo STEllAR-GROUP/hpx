@@ -10,13 +10,13 @@
 #define HPX_UTIL_TAGGED_PAIR_DEC_23_2015_1014AM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tagged.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/lcos/future.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util
 {

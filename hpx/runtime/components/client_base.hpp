@@ -7,19 +7,20 @@
 #define HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/action_remote_result.hpp>
-#include <hpx/traits/is_client.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/acquire_future.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/action_remote_result.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/traits/future_traits.hpp>
+#include <hpx/traits/is_client.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/lcos/future.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>

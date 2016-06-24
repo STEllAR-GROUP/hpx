@@ -13,10 +13,10 @@
 #include <numeric>
 
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/inner_product.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>

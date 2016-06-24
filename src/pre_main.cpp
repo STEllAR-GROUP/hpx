@@ -42,12 +42,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_startup_functions_action
     call_startup_functions_action;
+typedef
+    hpx::lcos::detail::make_broadcast_action<call_startup_functions_action>::type
+    call_startup_functions_broadcast_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_startup_functions_action,
-        call_startup_functions_action)
+    call_startup_functions_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    call_startup_functions_broadcast_action)
+
 HPX_REGISTER_BROADCAST_ACTION_ID(call_startup_functions_action,
-        call_startup_functions_action,
-        hpx::actions::broadcast_call_startup_functions_action_id)
+    call_startup_functions_action,
+    hpx::actions::broadcast_call_startup_functions_action_id)
 
 #endif
 
