@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2016 Marcin Copik
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -169,7 +170,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new sequential_task_execution_policy
         ///
         template <typename... Parameters, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+            typename executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             sequential_task_execution_policy, executor_type, ParametersType
         >::type
@@ -179,7 +180,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 sequential_task_execution_policy, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(executor(),
-                    ParametersType(std::forward<Parameters>(params)...));
+                join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
         /// Return the associated executor object.
@@ -298,17 +299,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new sequential_task_execution_policy_shim
         ///
         template <typename... Parameters_, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+            typename executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             sequential_task_execution_policy_shim, executor_type, ParametersType
         >::type
         with(Parameters_ &&... params) const
         {
             typedef typename rebind_executor<
-                sequential_task_execution_policy_shim, executor_type, ParametersType
+                sequential_task_execution_policy_shim, executor_type,
+                ParametersType
             >::type rebound_type;
             return rebound_type(exec_,
-                    ParametersType(std::forward<Parameters_>(params)...));
+                join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
@@ -442,7 +444,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new sequential_execution_policy
         ///
         template <typename... Parameters, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+            typename executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             sequential_execution_policy, executor_type, ParametersType
         >::type
@@ -452,7 +454,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 sequential_execution_policy, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(executor(),
-                    ParametersType(std::forward<Parameters>(params)...));
+                join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
         /// Return the associated executor object.
@@ -567,7 +569,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new sequential_execution_policy_shim
         ///
         template <typename... Parameters_, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+            typename executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             sequential_execution_policy_shim, executor_type, ParametersType
         >::type
@@ -577,7 +579,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 sequential_execution_policy_shim, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(exec_,
-                    ParametersType(std::forward<Parameters_>(params)...));
+                join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
@@ -715,7 +717,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy_shim
         ///
         template <typename... Parameters, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+            typename executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             parallel_task_execution_policy, executor_type, ParametersType
         >::type
@@ -725,7 +727,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 parallel_task_execution_policy, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(executor(),
-                    ParametersType(std::forward<Parameters>(params)...));
+                join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
         /// Return the associated executor object.
@@ -843,7 +845,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy_shim
         ///
         template <typename... Parameters_, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+            typename executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             parallel_task_execution_policy_shim, executor_type, ParametersType
         >::type
@@ -853,7 +855,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 parallel_task_execution_policy_shim, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(exec_,
-                    ParametersType(std::forward<Parameters_>(params)...));
+                join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
@@ -981,7 +983,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         template <typename... Parameters, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters...>::type>
+            typename executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
             parallel_execution_policy, executor_type, ParametersType
         >::type
@@ -991,7 +993,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 parallel_execution_policy, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(executor(),
-                    ParametersType(std::forward<Parameters>(params)...));
+                join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
         /// Return the associated executor object.
@@ -1105,7 +1107,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy_shim
         ///
         template <typename... Parameters_, typename ParametersType =
-            typename hpx::parallel::executor_parameters_join<Parameters_...>::type>
+            typename executor_parameters_join<Parameters_...>::type>
         typename rebind_executor<
             parallel_execution_policy_shim, executor_type, ParametersType
         >::type
@@ -1115,7 +1117,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 parallel_execution_policy_shim, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(exec_,
-                    ParametersType(std::forward<Parameters_>(params)...));
+                join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.

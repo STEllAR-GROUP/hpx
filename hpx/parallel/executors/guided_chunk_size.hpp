@@ -34,7 +34,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// \note This executor parameters type is equivalent to OpenMPs GUIDED
     ///       scheduling directive.
     ///
-    struct guided_chunk_size : executor_parameters_chunk_size_tag
+    struct guided_chunk_size : executor_parameters_tag
     {
         /// Construct a \a guided_chunk_size executor parameters object
         ///
