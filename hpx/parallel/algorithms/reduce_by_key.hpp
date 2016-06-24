@@ -20,12 +20,14 @@
 //
 #include <vector>
 //
+/// \cond NOINTERNAL
 #ifdef EXTRA_DEBUG
 # include <iostream>
 # define debug_reduce_by_key(a) std::cout << a
 #else
 # define debug_reduce_by_key(a)
 #endif
+/// \endcond
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {

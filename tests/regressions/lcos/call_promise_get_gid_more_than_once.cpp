@@ -14,16 +14,13 @@ int hpx_main()
 {
     {
         typedef hpx::lcos::promise<void> promise_type;
-        typedef promise_type::wrapped_type shared_state_type;
+        typedef hpx::lcos::detail::promise_data<void> shared_state_type;
 
         hpx::lcos::promise<void> promise;
         hpx::future<void> future = promise.get_future();
 
         hpx::id_type id1 = promise.get_id();
-
-        auto future_data = hpx::traits::detail::get_shared_state(future);
-        auto shared_state = boost::static_pointer_cast<shared_state_type>(future_data);
-        hpx::id_type id2 = shared_state->get_id();
+        hpx::id_type id2 = promise.get_id();
 
         HPX_TEST_EQ(id1, id2);
 

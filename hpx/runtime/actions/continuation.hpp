@@ -149,7 +149,8 @@ namespace hpx
                 local_result_type, remote_result_type
             >::set_value_action set_value_action;
 
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(),
                 naming::id_type::managed_move_credit);
@@ -179,7 +180,8 @@ namespace hpx
                 local_result_type, remote_result_type
             >::set_value_action set_value_action;
 
-        if (move_credits)
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
         {
             naming::id_type target(id.get_gid(),
                 naming::id_type::managed_move_credit);

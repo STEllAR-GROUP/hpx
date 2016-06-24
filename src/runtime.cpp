@@ -844,12 +844,6 @@ namespace hpx
             this->get_thread_manager().init(affinity_init_));
     }
 
-    std::shared_ptr<util::one_size_heap_list_base> runtime::get_promise_heap(
-        components::component_type type)
-    {
-        return runtime_support_->get_promise_heap(type);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     runtime& get_runtime()
     {
@@ -1305,15 +1299,6 @@ namespace hpx { namespace threads
         return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);
     }
 }}
-
-namespace hpx { namespace components { namespace detail
-{
-    std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
-        components::component_type type)
-    {
-        return get_runtime().get_promise_heap(type);
-    }
-}}}
 
 #if defined(HPX_HAVE_SECURITY)
 namespace hpx

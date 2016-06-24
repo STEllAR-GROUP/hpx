@@ -10,6 +10,7 @@ import re
 import subprocess
 
 app = None
+app_name = None
 application = False
 component = False
 minusc = False
@@ -89,9 +90,9 @@ while i < len(sys.argv):
         #args += ['-o',app+'.exe']
         application = True
     elif sys.argv[i].startswith('--comp='):
-        output='lib'+sys.argv[i][7:]+'.so'
+        app_name = sys.argv[i][7:]
+        output='lib'+app_name+'.so'
         app = output
-        #args += ['-o','lib'+app+'.so']
         component = True
 
     # Need to determine if this is an application,
@@ -113,7 +114,7 @@ while i < len(sys.argv):
     i += 1
 
 if application:
-    args += ["$(pkg-config --cflags --libs hpx_application" + pkgconf_suffix + ")"]
+    args += ["`pkg-config --cflags --libs hpx_application" + pkgconf_suffix + "`"]
 elif component:
     args += ["`pkg-config --cflags --libs hpx_component" + pkgconf_suffix + "`"]
 else:
@@ -133,7 +134,7 @@ if application:
     else:
         args += ['-DHPX_APPLICATION_NAME=hpx_aout']
 elif component:
-    args += ['-DHPX_COMPONENT_NAME='+app]
+    args += ['-DHPX_COMPONENT_NAME='+app_name]
 else:
     args += ['-c']
 
