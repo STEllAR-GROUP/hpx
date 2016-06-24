@@ -187,7 +187,8 @@ namespace detail {
                 }
                 else {
                     // last part
-                    info->write_steps.push_back( write_step( unescape(remaining), nullptr) );
+                    info->write_steps.push_back(
+                        write_step( unescape(remaining), nullptr) );
                     remaining.clear();
                 }
             }

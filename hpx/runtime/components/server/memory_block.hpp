@@ -303,11 +303,12 @@ namespace hpx { namespace components
 
             HPX_ASSERT(act->save_function());
             if (config) {
-                act->save_function()(data->get_ptr(), data->get_size(), ar, version,
-                    config->get_ptr());
+                act->save_function()(data->get_ptr(), data->get_size(), ar,
+                    version, config->get_ptr());
             }
             else {
-                act->save_function()(data->get_ptr(), data->get_size(), ar, version, nullptr);
+                act->save_function()(data->get_ptr(), data->get_size(), ar,
+                    version, nullptr);
             }
         }
 
