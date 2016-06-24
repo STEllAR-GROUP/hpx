@@ -55,7 +55,7 @@ namespace lcos {
     ///                  template parameter \a RemoteResult
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
-    class promise 
+    class promise
       : public detail::promise_base<
             Result, RemoteResult, detail::promise_data<Result> >
     {

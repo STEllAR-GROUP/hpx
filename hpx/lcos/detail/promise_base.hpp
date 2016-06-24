@@ -91,10 +91,10 @@ namespace lcos {
         //
         // The LCO is a component, which lifetime is completely controlled by
         // the shared state. That is, in the GID that we send along as the
-        // continuation can be unmanaged, AGAS doesn't participate in the 
-        // promise lifetime management. The LCO is being reset once the shared 
-        // state either contains a value or the data, which is set through the 
-        // LCO interface, which can go out of scope safely when the shared 
+        // continuation can be unmanaged, AGAS doesn't participate in the
+        // promise lifetime management. The LCO is being reset once the shared
+        // state either contains a value or the data, which is set through the
+        // LCO interface, which can go out of scope safely when the shared
         // state is set.
         template <typename Result, typename RemoteResult, typename SharedState>
         class promise_base
@@ -181,7 +181,7 @@ namespace lcos {
 
             naming::id_type get_id(error_code& ec = throws) const
             {
-                if (this->shared_state_ == 0)
+                if (this->shared_state_ == nullptr)
                 {
                     HPX_THROWS_IF(ec, no_state,
                         "detail::promise_base<Result, RemoteResult>::get_id",
@@ -235,8 +235,9 @@ namespace lcos {
         protected:
             void check_abandon_shared_state(const char* fun)
             {
-                if (this->shared_state_ != 0 && this->future_retrieved_ &&
-                    !(this->has_result_ || id_retrieved_))
+                if (this->shared_state_ != nullptr &&
+                    this->future_retrieved_ &&
+                    !(this->shared_state_->is_ready() || id_retrieved_))
                 {
                     this->shared_state_->set_error(broken_promise, fun,
                         "abandoning not ready shared state");
