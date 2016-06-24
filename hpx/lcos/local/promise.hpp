@@ -34,17 +34,14 @@ namespace hpx { namespace lcos { namespace local
             promise_base()
               : shared_state_(new shared_state_type())
               , future_retrieved_(false)
-              , has_result_(false)
             {}
 
             promise_base(promise_base&& other) HPX_NOEXCEPT
               : shared_state_(std::move(other.shared_state_))
               , future_retrieved_(other.future_retrieved_)
-              , has_result_(other.has_result_)
             {
-                other.shared_state_ = 0;
+                other.shared_state_ = nullptr;
                 other.future_retrieved_ = false;
-                other.has_result_ = false;
             }
 
             ~promise_base()
@@ -62,11 +59,9 @@ namespace hpx { namespace lcos { namespace local
 
                     shared_state_ = std::move(other.shared_state_);
                     future_retrieved_ = other.future_retrieved_;
-                    has_result_ = other.has_result_;
 
-                    other.shared_state_ = 0;
+                    other.shared_state_ = nullptr;
                     other.future_retrieved_ = false;
-                    other.has_result_ = false;
                 }
                 return *this;
             }
@@ -75,12 +70,11 @@ namespace hpx { namespace lcos { namespace local
             {
                 boost::swap(shared_state_, other.shared_state_);
                 boost::swap(future_retrieved_, other.future_retrieved_);
-                boost::swap(has_result_, other.has_result_);
             }
 
             bool valid() const HPX_NOEXCEPT
             {
-                return shared_state_ != 0;
+                return shared_state_ != nullptr;
             }
 
             future<R> get_future(error_code& ec = throws)
@@ -93,7 +87,7 @@ namespace hpx { namespace lcos { namespace local
                     return future<R>();
                 }
 
-                if (shared_state_ == 0)
+                if (shared_state_ == nullptr)
                 {
                     HPX_THROWS_IF(ec, no_state,
                         "local::detail::promise_base<R>::get_future",
@@ -108,15 +102,7 @@ namespace hpx { namespace lcos { namespace local
             template <typename T>
             void set_value(T&& value, error_code& ec = throws)
             {
-                if (has_result_)
-                {
-                    HPX_THROWS_IF(ec, promise_already_satisfied,
-                        "local::detail::promise_base<R>::set_value",
-                        "result has already been stored for this promise");
-                    return;
-                }
-
-                if (shared_state_ == 0)
+                if (shared_state_ == nullptr)
                 {
                     HPX_THROWS_IF(ec, no_state,
                         "local::detail::promise_base<R>::set_value",
@@ -124,7 +110,13 @@ namespace hpx { namespace lcos { namespace local
                     return;
                 }
 
-                has_result_ = true;
+                if (shared_state_->is_ready())
+                {
+                    HPX_THROWS_IF(ec, promise_already_satisfied,
+                        "local::detail::promise_base<R>::set_value",
+                        "result has already been stored for this promise");
+                    return;
+                }
 
                 shared_state_->set_value(std::forward<T>(value), ec);
                 if (ec) return;
@@ -133,15 +125,7 @@ namespace hpx { namespace lcos { namespace local
             template <typename T>
             void set_exception(T&& value, error_code& ec = throws)
             {
-                if (has_result_)
-                {
-                    HPX_THROWS_IF(ec, promise_already_satisfied,
-                        "local::detail::promise_base<R>::set_exception",
-                        "result has already been stored for this promise");
-                    return;
-                }
-
-                if (shared_state_ == 0)
+                if (shared_state_ == nullptr)
                 {
                     HPX_THROWS_IF(ec, no_state,
                         "local::detail::promise_base<R>::set_exception",
@@ -149,7 +133,13 @@ namespace hpx { namespace lcos { namespace local
                     return;
                 }
 
-                has_result_ = true;
+                if (shared_state_->is_ready())
+                {
+                    HPX_THROWS_IF(ec, promise_already_satisfied,
+                        "local::detail::promise_base<R>::set_exception",
+                        "result has already been stored for this promise");
+                    return;
+                }
 
                 shared_state_->set_exception(std::forward<T>(value), ec);
                 if (ec) return;
@@ -158,7 +148,8 @@ namespace hpx { namespace lcos { namespace local
         protected:
             void check_abandon_shared_state(const char* fun)
             {
-                if (shared_state_ != 0 && future_retrieved_ && !has_result_)
+                if (shared_state_ != nullptr && future_retrieved_ &&
+                    !shared_state_->is_ready())
                 {
                     shared_state_->set_error(broken_promise, fun,
                         "abandoning not ready shared state");
@@ -167,7 +158,6 @@ namespace hpx { namespace lcos { namespace local
 
             boost::intrusive_ptr<shared_state_type> shared_state_;
             bool future_retrieved_;
-            bool has_result_;
         };
     }
 
