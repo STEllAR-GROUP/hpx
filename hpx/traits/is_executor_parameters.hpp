@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/config/inline_namespace.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/traits.hpp>
 #include <hpx/util/decay.hpp>
 
 #if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)

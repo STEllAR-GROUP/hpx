@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -32,26 +33,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {
         /// \cond NOINTERNAL
         template <bool ... Flags>
-        struct parameter_type_counter;
+        struct parameters_type_counter;
 
         template <>
-        struct parameter_type_counter<>
+        struct parameters_type_counter<>
         {
             HPX_CONSTEXPR static int value = 0;
         };
 
         /// Return the number of parameters which are true
         template <bool Flag1, bool ... Flags>
-        struct parameter_type_counter<Flag1, Flags...>
+        struct parameters_type_counter<Flag1, Flags...>
         {
             HPX_CONSTEXPR static int value =
-                Flag1 + parameter_type_counter<Flags...>::value;
+                Flag1 + parameters_type_counter<Flags...>::value;
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct unwrapper : T
         {
+            // default constructor is needed for serialization purposes
+            unwrapper() : T() {}
+
             // generic poor-mans forwarding constructor
             template <typename U>
             unwrapper(U && u) : T(std::forward<U>(u)) {}
@@ -215,7 +219,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///////////////////////////////////////////////////////////////////////
 
 #define HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(func)                       \
-    static_assert(parameter_type_counter<                                     \
+    static_assert(parameters_type_counter<                                    \
             BOOST_PP_CAT(hpx::parallel::v3::detail::has_, func)<              \
                 typename hpx::util::decay_unwrap<Params>::type>::value...     \
         >::value <= 1,                                                        \
@@ -241,10 +245,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(processing_units_count);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(reset_thread_distribution);
 
+            executor_parameters()
+              : unwrapper<Params>()...
+            {}
+
             template <typename ... Params_>
             executor_parameters(Params_ &&... params)
               : unwrapper<Params>(params)...
             {}
+
+        private:
+            friend class hpx::serialization::access;
+
+            template <typename Archive>
+            void serialize(Archive & ar, const unsigned int version)
+            {
+                int const sequencer[] = {
+                    (ar & serialization::base_object<Params>(*this), 0)..., 0
+                };
+                (void)sequencer;
+            }
         };
 
 #undef HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY
@@ -270,6 +290,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             typename executor_parameters_join<Params...>::type
             joined_params;
         return joined_params(std::forward<Params>(params)...);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Param>
+    struct executor_parameters_join<Param>
+    {
+        typedef Param type;
+    };
+
+    template <typename Param>
+    HPX_FORCEINLINE
+    Param && join_executor_parameters(Param && param)
+    {
+        return std::forward<Param>(param);
     }
 }}}
 
