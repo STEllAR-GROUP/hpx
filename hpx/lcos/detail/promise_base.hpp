@@ -16,6 +16,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -56,6 +57,32 @@ namespace lcos {
             util::unique_function_nonser<void()> f_;
         };
 
+        ///////////////////////////////////////////////////////////////////////
+        struct set_id_helper
+        {
+            template <typename SharedState>
+            HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
+                SharedState const& shared_state, id_type const& id)
+            {
+                // by default, do nothing
+            }
+
+            template <typename SharedState>
+            HPX_FORCEINLINE static auto call(int,
+                    SharedState const& shared_state, id_type const& id)
+            ->  decltype(shared_state->set_id(id))
+            {
+                shared_state->set_id(id);
+            }
+        };
+
+        template <typename SharedState>
+        HPX_FORCEINLINE
+        void call_set_id(SharedState const& shared_state, id_type const& id)
+        {
+            set_id_helper::call(0, shared_state, id);
+        }
+
         // Promise base contains the actual implementation for the remotely
         // settable
         // promise. It consists of two parts:
@@ -63,29 +90,25 @@ namespace lcos {
         //  2) The LCO, which is used to set the promise remotely
         //
         // The LCO is a component, which lifetime is completely controlled by
-        // the
-        // shared state. That is, in the GID that we send along as the
-        // continuation
-        // can be unmanaged, AGAS doesn't participate in the promise lifetime
-        // management. The LCO is being reset once the shared state either
-        // contains
-        // a value or the data, which is set through the LCO interface, which
-        // can go
-        // out of scope safely when the shared state is set.
-        template <typename Result, typename RemoteResult>
+        // the shared state. That is, in the GID that we send along as the
+        // continuation can be unmanaged, AGAS doesn't participate in the
+        // promise lifetime management. The LCO is being reset once the shared
+        // state either contains a value or the data, which is set through the
+        // LCO interface, which can go out of scope safely when the shared
+        // state is set.
+        template <typename Result, typename RemoteResult, typename SharedState>
         class promise_base
-            : public hpx::lcos::local::detail::promise_base<Result,
-                  promise_data<Result>>
+          : public hpx::lcos::local::detail::promise_base<Result, SharedState>
         {
             HPX_MOVABLE_ONLY(promise_base);
 
-            typedef hpx::lcos::local::detail::promise_base<Result,
-                promise_data<Result>>
-                base_type;
+            typedef hpx::lcos::local::detail::promise_base<
+                    Result, SharedState
+                > base_type;
 
         protected:
             typedef Result result_type;
-            typedef lcos::detail::future_data<Result> shared_state_type;
+            typedef SharedState shared_state_type;
             typedef boost::intrusive_ptr<shared_state_type> shared_state_ptr;
 
             typedef promise_lco<Result, RemoteResult> wrapped_type;
@@ -99,8 +122,7 @@ namespace lcos {
                 // The lifetime of the LCO (component) part is completely
                 // handled by the shared state, we create the object to get our
                 // gid and then attach it to the completion handler of the
-                // shared
-                // state.
+                // shared state.
                 typedef std::unique_ptr<wrapping_type> wrapping_ptr;
                 wrapping_ptr lco_ptr(
                     new wrapping_type(new wrapped_type(this->shared_state_)));
@@ -110,12 +132,18 @@ namespace lcos {
                     lco_ptr->get_component_type(),
                     lco_ptr.get());
 
+                // Pass id to shared state if it exposes the set_id() function
+                detail::call_set_id(this->shared_state_, id_);
+
                 // This helper is used to keep the component alive until the
                 // completion handler has been called. We need to manually free
                 // the component here, since we don't rely on reference counting
                 // anymore
                 auto keep_alive = hpx::util::deferred_call(
-                    [](wrapping_ptr ptr) { delete ptr->get(); },
+                    [](wrapping_ptr ptr)
+                    {
+                        delete ptr->get();      // delete wrapped_type
+                    },
                     std::move(lco_ptr));
                 this->shared_state_->set_on_completed(std::move(keep_alive));
             }
@@ -126,6 +154,7 @@ namespace lcos {
                   id_(std::move(other.id_)),
                   addr_(std::move(other.addr_))
             {
+                other.id_retrieved_ = false;
                 other.id_ = naming::invalid_id;
                 other.addr_ = naming::address();
             }
@@ -144,6 +173,7 @@ namespace lcos {
                 id_ = std::move(other.id_);
                 addr_ = std::move(other.addr_);
 
+                other.id_retrieved_ = false;
                 other.id_ = naming::invalid_id;
                 other.addr_ = naming::address();
                 return *this;
@@ -151,7 +181,7 @@ namespace lcos {
 
             naming::id_type get_id(error_code& ec = throws) const
             {
-                if (this->shared_state_ == 0)
+                if (this->shared_state_ == nullptr)
                 {
                     HPX_THROWS_IF(ec, no_state,
                         "detail::promise_base<Result, RemoteResult>::get_id",
@@ -205,8 +235,9 @@ namespace lcos {
         protected:
             void check_abandon_shared_state(const char* fun)
             {
-                if (this->shared_state_ != 0 && this->future_retrieved_ &&
-                    !(this->has_result_ || id_retrieved_))
+                if (this->shared_state_ != nullptr &&
+                    this->future_retrieved_ &&
+                    !(this->shared_state_->is_ready() || id_retrieved_))
                 {
                     this->shared_state_->set_error(broken_promise, fun,
                         "abandoning not ready shared state");

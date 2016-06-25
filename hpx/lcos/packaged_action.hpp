@@ -22,10 +22,6 @@
 #include <hpx/util/protect.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/identity.hpp>
-#include <boost/type_traits/is_same.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -394,7 +390,6 @@ namespace lcos {
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -404,7 +399,6 @@ namespace lcos {
                 else
                 {
                     // local, direct execution
-                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
                     return;
@@ -437,7 +431,6 @@ namespace lcos {
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -447,7 +440,6 @@ namespace lcos {
                 else
                 {
                     // local, direct execution
-                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
                     return;
@@ -481,7 +473,6 @@ namespace lcos {
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -494,7 +485,6 @@ namespace lcos {
                 else
                 {
                     // local, direct execution
-                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
 
@@ -530,7 +520,6 @@ namespace lcos {
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->has_result_ = true;
                         this->shared_state_->set_data(
                             action_type::execute_function(
                                 addr.address_, std::forward<Ts>(vs)...));
@@ -543,7 +532,6 @@ namespace lcos {
                 else
                 {
                     // local, direct execution
-                    this->has_result_ = true;
                     this->shared_state_->set_data(action_type::execute_function(
                         addr.address_, std::forward<Ts>(vs)...));
 
