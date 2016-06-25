@@ -38,7 +38,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
     public:
         tss_data_node()
-          : value_(0)
+          : value_(nullptr)
         {}
 
         tss_data_node(void* val)
@@ -57,7 +57,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             value_(rhs.value_)
         {
             rhs.func_.reset();
-            rhs.value_ = 0;
+            rhs.value_ = nullptr;
         }
 #endif
 
@@ -73,7 +73,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             value_ = rhs.value_;
 
             rhs.func_.reset();
-            rhs.value_ = 0;
+            rhs.value_ = nullptr;
             return *this;
         }
 #endif
@@ -81,14 +81,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         template <typename T>
         T get_data() const
         {
-            HPX_ASSERT(value_ != 0);
+            HPX_ASSERT(value_ != nullptr);
             return *reinterpret_cast<T*>(value_);
         }
 
         template <typename T>
         void set_data(T const& val)
         {
-            if (value_ == 0)
+            if (value_ == nullptr)
                 value_ = new T(val);
             else
                 *reinterpret_cast<T*>(value_) = val;
@@ -124,14 +124,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             tss_node_data_map::const_iterator it = data_.find(key);
             if (it == data_.end())
-                return 0;
+                return nullptr;
             return &(it->second);
         }
         tss_data_node* find_entry(void const* key)
         {
             tss_node_data_map::iterator it = data_.find(key);
             if (it == data_.end())
-                return 0;
+                return nullptr;
             return &(it->second);
         }
 

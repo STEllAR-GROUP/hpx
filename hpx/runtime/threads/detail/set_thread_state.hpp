@@ -344,7 +344,7 @@ namespace hpx { namespace threads { namespace detail
             HPX_THROWS_IF(ec, null_thread_id,
                 "threads::detail::set_thread_state",
                 "null thread id encountered");
-            return 0;
+            return nullptr;
         }
 
         // this creates a new thread which creates the timer and handles the

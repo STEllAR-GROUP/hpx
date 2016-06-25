@@ -18,7 +18,7 @@ namespace hpx { namespace detail
     std::string get_locality_base_name()
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0)
+        if (rt == nullptr)
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "hpx::detail::get_locality_name",

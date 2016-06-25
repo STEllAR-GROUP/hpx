@@ -73,7 +73,7 @@ char** __argv = *_NSGetArgv();
 struct manage_global_runtime
 {
     manage_global_runtime()
-      : running_(false), rts_(0)
+      : running_(false), rts_(nullptr)
     {
 #if defined(HPX_WINDOWS)
         hpx::detail::init_winsocket();
@@ -106,7 +106,7 @@ struct manage_global_runtime
         // notify hpx_main above to tear down the runtime
         {
             std::lock_guard<hpx::lcos::local::spinlock> lk(mtx_);
-            rts_ = 0;               // reset pointer
+            rts_ = nullptr;               // reset pointer
         }
 
         cond_.notify_one();     // signal exit
@@ -145,7 +145,7 @@ protected:
         // Now, wait for destructor to be called.
         {
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
-            if (rts_ != 0)
+            if (rts_ != nullptr)
                 cond_.wait(lk);
         }
 

@@ -19,7 +19,7 @@ namespace hpx { namespace traits
         // return a new instance of a serialization filter
         static serialization::binary_filter* call(parcelset::parcel const& /*p*/)
         {
-            return 0;   // by default actions don't have a serialization filter
+            return nullptr;   // by default actions don't have a serialization filter
         }
     };
 }}

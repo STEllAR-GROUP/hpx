@@ -66,7 +66,7 @@ namespace hpx
 namespace hpx_startup
 {
     std::vector<std::string> (*user_main_config_function)(
-        std::vector<std::string> const&) = 0;
+        std::vector<std::string> const&) = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1072,7 +1072,7 @@ namespace hpx
 
             try {
                 // make sure the runtime system is not active yet
-                if (get_runtime_ptr() != 0)
+                if (get_runtime_ptr() != nullptr)
                 {
                     std::cerr << "hpx::init: can't initialize runtime system "
                         "more than once! Exiting...\n";
@@ -1266,7 +1266,7 @@ namespace hpx
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
-        if (0 == p) {
+        if (nullptr == p) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
                 "the runtime system is not active (did you already "
                 "call finalize?)");
@@ -1293,7 +1293,7 @@ namespace hpx
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
-        if (0 == p) {
+        if (nullptr == p) {
             // the runtime system is not running, just terminate
             std::terminate();
         }
@@ -1311,7 +1311,7 @@ namespace hpx
         }
 
         std::unique_ptr<runtime> rt(get_runtime_ptr());    // take ownership!
-        if (0 == rt.get()) {
+        if (nullptr == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "the runtime system is not active (did you already "
                 "call hpx::stop?)");
@@ -1359,7 +1359,7 @@ namespace hpx
             }
 
             // add a single nullptr in the end as some application rely on that
-            argv[argcount] = 0;
+            argv[argcount] = nullptr;
 
             // Invoke custom startup functions
             return f(static_cast<int>(argcount), argv.data());

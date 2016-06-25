@@ -16,7 +16,7 @@ namespace startup_shutdown { namespace server
     public:
         // constructor: initialize accumulator value
         startup_shutdown_component()
-          : arg_(0)
+          : arg_(nullptr)
         {}
 
         ///////////////////////////////////////////////////////////////////////

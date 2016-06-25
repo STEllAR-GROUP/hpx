@@ -55,7 +55,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_num_(std::size_t(-1)),
         parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
-        self_(0)
+        self_(nullptr)
     {
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
         ~on_self_reset()
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
         }
     };
 
@@ -284,7 +284,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
           : shutdown_sem_(shutdown_sem),
             self_(self)
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
         }
 
         ~this_thread_on_run_exit()

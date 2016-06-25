@@ -245,7 +245,7 @@ namespace hpx { namespace util
         // need to reschedule if not using boost::mutex
         bool reschedule(void* p, std::size_t count)
         {
-            if (0 == threads::get_self_ptr())
+            if (nullptr == threads::get_self_ptr())
             {
                 hpx::applier::register_work(
                     util::bind(&one_size_heap_list::free, this, p, count),

@@ -324,7 +324,7 @@ namespace hpx { namespace parcelset
         {
             if (0 == std::strcmp(name, io_service_pool_.get_name()))
                 return &io_service_pool_;
-            return 0;
+            return nullptr;
         }
 
         bool do_background_work(std::size_t num_thread)

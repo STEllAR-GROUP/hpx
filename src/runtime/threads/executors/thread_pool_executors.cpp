@@ -247,7 +247,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
         ~on_self_reset()
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
         }
     };
 
@@ -286,7 +286,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             shutdown_sem_(shutdown_sem),
             self_(self)
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
             ++current_concurrency_;
         }
 

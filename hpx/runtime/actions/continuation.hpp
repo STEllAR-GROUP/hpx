@@ -336,7 +336,7 @@ namespace hpx { namespace actions
         {
             try {
                 HPX_ASSERT(result.is_ready());
-                HPX_ASSERT((0 !=
+                HPX_ASSERT((nullptr !=
                     dynamic_cast<
                         typed_continuation<Result, RemoteResult>*
                     >(cont.get())));
@@ -405,7 +405,7 @@ namespace hpx { namespace actions
             std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             try {
-                HPX_ASSERT((0 !=
+                HPX_ASSERT((nullptr !=
                     dynamic_cast<
                         typed_continuation<Result, RemoteResult>*
                     >(cont.get())));
@@ -949,7 +949,7 @@ namespace hpx { namespace actions
         // for cases when Arg0 is a const&. This does not make the code invalid
         // as trigger_value (which is a virtual function) takes its argument
         // by && anyways.
-        HPX_ASSERT(0 != dynamic_cast<
+        HPX_ASSERT(nullptr != dynamic_cast<
                 typed_continuation<typename util::decay<Arg0>::type> *
             >(this));
 

@@ -198,7 +198,7 @@ namespace hpx { namespace util { namespace plugin {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory<BasePlugin>(this->m_dll, name,
                         this->m_basename, ec);
-                if (ec) return 0;
+                if (ec) return nullptr;
 
                 return r.first->create(r.second, parameters...);
             }
@@ -256,7 +256,7 @@ namespace hpx { namespace util { namespace plugin {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory_static<BasePlugin>(
                         this->f, &empty_deleter, name, "", ec);
-                if (ec) return 0;
+                if (ec) return nullptr;
 
                 return r.first->create(r.second, parameters...);
             }

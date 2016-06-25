@@ -58,7 +58,7 @@ namespace hpx { namespace actions { namespace detail
             HPX_THROW_EXCEPTION(bad_parameter,
                 "invocation_count_registry::get_invocation_counter",
                 "unknown action type");
-            return 0;
+            return nullptr;
         }
         return (*it).second;
     }

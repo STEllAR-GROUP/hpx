@@ -746,7 +746,7 @@ namespace hpx {
     runtime_impl<SchedulingPolicy>::
         get_thread_pool(char const* name)
     {
-        HPX_ASSERT(name != 0);
+        HPX_ASSERT(name != nullptr);
 
         if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;
@@ -757,7 +757,7 @@ namespace hpx {
         if (0 == std::strncmp(name, "main", 4)) //-V112
             return &main_pool_;
 
-        return 0;
+        return nullptr;
     }
 
     /// Register an external OS-thread with HPX
@@ -772,7 +772,7 @@ namespace hpx {
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(thread_name.c_str(), num, 0, service_thread, ec);
+        init_tss_ex(thread_name.c_str(), num, nullptr, service_thread, ec);
 
         return !ec ? true : false;
     }

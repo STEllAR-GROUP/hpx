@@ -68,10 +68,10 @@ namespace hpx { namespace threads { namespace coroutines
             thread_state_enum(thread_state_ex_enum)
         > functor_type;
 
-        coroutine() : m_pimpl(0) {}
+        coroutine() : m_pimpl(nullptr) {}
 
         coroutine(functor_type&& f, naming::id_type&& target,
-            thread_id_repr_type id = 0, std::ptrdiff_t stack_size =
+            thread_id_repr_type id = nullptr, std::ptrdiff_t stack_size =
             detail::default_stack_size)
           : m_pimpl(impl_type::create(
                 std::move(f), std::move(target), id, stack_size))
@@ -86,7 +86,7 @@ namespace hpx { namespace threads { namespace coroutines
         coroutine(coroutine && src)
           : m_pimpl(src.m_pimpl)
         {
-            src.m_pimpl = 0;
+            src.m_pimpl = nullptr;
         }
 
         coroutine& operator=(coroutine && src)
@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
 
         void rebind(functor_type&& f, naming::id_type&& target,
-            thread_id_repr_type id = 0)
+            thread_id_repr_type id = nullptr)
         {
             HPX_ASSERT(exited());
             impl_type::rebind(m_pimpl.get(), std::move(f),
@@ -155,7 +155,7 @@ namespace hpx { namespace threads { namespace coroutines
         typedef void(coroutine::*bool_type)();
         operator bool_type() const
         {
-            return good() ? &coroutine::bool_type_f : 0;
+            return good() ? &coroutine::bool_type_f : nullptr;
         }
 
         bool operator==(const coroutine& rhs) const
@@ -195,7 +195,7 @@ namespace hpx { namespace threads { namespace coroutines
 
         bool empty() const
         {
-            return m_pimpl == 0;
+            return m_pimpl == nullptr;
         }
 
         std::ptrdiff_t get_available_stack_space()

@@ -127,7 +127,7 @@ namespace hpx { namespace threads { namespace executors
             HPX_THROW_EXCEPTION(bad_parameter,
                 "hpx::threads::detail::get_service_executor",
                 "unknown pool executor type");
-            return 0;
+            return nullptr;
         }
         /// \endcond
     }

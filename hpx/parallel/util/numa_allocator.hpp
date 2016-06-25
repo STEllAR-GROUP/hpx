@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { namespace util
 
         // memory allocation
         pointer allocate(size_type cnt,
-            typename std::allocator<void>::const_pointer = 0)
+            typename std::allocator<void>::const_pointer = nullptr)
         {
             // allocate memory
             pointer p = reinterpret_cast<pointer>(topo_.allocate(cnt * sizeof(T)));

@@ -431,7 +431,7 @@ namespace hpx { namespace lcos { namespace detail
         future_base(future_base && other) HPX_NOEXCEPT
           : shared_state_(std::move(other.shared_state_))
         {
-            other.shared_state_ = 0;
+            other.shared_state_ = nullptr;
         }
 
         void swap(future_base& other)
@@ -453,7 +453,7 @@ namespace hpx { namespace lcos { namespace detail
             if (this != &other)
             {
                 shared_state_ = std::move(other.shared_state_);
-                other.shared_state_ = 0;
+                other.shared_state_ = nullptr;
             }
             return *this;
         }
@@ -461,27 +461,27 @@ namespace hpx { namespace lcos { namespace detail
         // Returns: true only if *this refers to a shared state.
         bool valid() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0;
+            return shared_state_ != nullptr;
         }
 
         // Returns: true if the shared state is ready, false if it isn't.
         bool is_ready() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0 && shared_state_->is_ready();
+            return shared_state_ != nullptr && shared_state_->is_ready();
         }
 
         // Returns: true if the shared state is ready and stores a value,
         //          false if it isn't.
         bool has_value() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0 && shared_state_->has_value();
+            return shared_state_ != nullptr && shared_state_->has_value();
         }
 
         // Returns: true if the shared state is ready and stores an exception,
         //          false if it isn't.
         bool has_exception() const HPX_NOEXCEPT
         {
-            return shared_state_ != 0 && shared_state_->has_exception();
+            return shared_state_ != nullptr && shared_state_->has_exception();
         }
 
         // Effects:
@@ -779,7 +779,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         //   - other.valid() == false.
         future(future<future> && other) HPX_NOEXCEPT
-          : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
+          : base_type(other.valid() ? detail::unwrap(std::move(other)) : nullptr)
         {}
 
         // Effects: constructs a future object by moving the instance referred
@@ -789,7 +789,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         //   - other.valid() == false.
         future(future<shared_future<R> > && other) HPX_NOEXCEPT
-          : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
+          : base_type(other.valid() ? detail::unwrap(std::move(other)) : nullptr)
         {}
 
         // Effects: constructs a future<void> object that will be ready when
@@ -801,7 +801,7 @@ namespace hpx { namespace lcos
         template <typename T>
         future(future<T>&& other,
             typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
-        ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
+        ) : base_type(other.valid() ? detail::make_void_continuation(other) : nullptr)
         {
             other = future<T>();
         }
@@ -1087,7 +1087,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         //   - other.valid() == false.
         shared_future(future<shared_future> && other) HPX_NOEXCEPT
-          : base_type(other.valid() ? detail::unwrap(other.share()) : 0)
+          : base_type(other.valid() ? detail::unwrap(other.share()) : nullptr)
         {}
 
         // Effects: constructs a future<void> object that will be ready when
@@ -1098,7 +1098,7 @@ namespace hpx { namespace lcos
         template <typename T>
         shared_future(shared_future<T> const& other,
             typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
-        ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
+        ) : base_type(other.valid() ? detail::make_void_continuation(other) : nullptr)
         {}
 
         // Effects:
