@@ -157,7 +157,7 @@ namespace hpx
                         ps[0].get_serialization_filter());
 
                     int archive_flags = archive_flags_;
-                    if (filter.get() != 0)
+                    if (filter.get() != nullptr)
                         archive_flags |= serialization::enable_compression;
 
                     // Get the chunk size from the allocator if it supports it
@@ -181,7 +181,7 @@ namespace hpx
 
                     {
                         // Serialize the data
-                        if (filter.get() != 0)
+                        if (filter.get() != nullptr)
                             filter->set_max_length(buffer.data_.capacity());
 
                         serialization::output_archive archive(

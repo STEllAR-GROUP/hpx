@@ -31,7 +31,7 @@ namespace hpx { namespace serialization { namespace detail
 
         operator bool() const
         {
-            return t != 0;
+            return t != nullptr;
         }
 
     private:

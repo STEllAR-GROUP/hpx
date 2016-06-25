@@ -687,12 +687,12 @@ void section::expand_brace(std::string& value, std::string::size_type begin) con
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
             char* env = getenv(to_expand.c_str());
-            value.replace(begin, end-begin+1, 0 != env ? env : "");
+            value.replace(begin, end-begin+1, nullptr != env ? env : "");
         }
         else {
             char* env = getenv(to_expand.substr(0, colon).c_str());
             value.replace(begin, end-begin+1,
-                0 != env ? std::string(env) : to_expand.substr(colon+1));
+                nullptr != env ? std::string(env) : to_expand.substr(colon+1));
         }
     }
 }
@@ -757,12 +757,12 @@ void section::expand_brace_only(std::string& value,
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
             char* env = getenv(to_expand.c_str());
-            value.replace(begin, end-begin+1, 0 != env ? env : "");
+            value.replace(begin, end-begin+1, nullptr != env ? env : "");
         }
         else {
             char* env = getenv(to_expand.substr(0, colon).c_str());
             value.replace(begin, end-begin+1,
-                0 != env ? std::string(env) : to_expand.substr(colon+1));
+                nullptr != env ? std::string(env) : to_expand.substr(colon+1));
         }
     }
 }

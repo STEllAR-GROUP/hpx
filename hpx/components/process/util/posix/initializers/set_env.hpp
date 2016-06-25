@@ -30,7 +30,7 @@ public:
     set_env_()
     {
         env_.resize(1);
-        env_[0] = 0;
+        env_[0] = nullptr;
     }
 
     explicit set_env_(const Range &envs)
@@ -42,7 +42,7 @@ public:
             string_env_[i] = envs[i];
             env_[i] = const_cast<char*>(string_env_[i].c_str());
         }
-        env_[envs.size()] = 0;
+        env_[envs.size()] = nullptr;
     }
 
     template <class PosixExecutor>
@@ -70,7 +70,7 @@ private:
         {
             env_[i] = const_cast<char*>(string_env_[i].c_str());
         }
-        env_[string_env_.size()] = 0;
+        env_[string_env_.size()] = nullptr;
     }
 
     HPX_SERIALIZATION_SPLIT_MEMBER()

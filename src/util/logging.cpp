@@ -195,7 +195,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (0 != self) {
+            if (nullptr != self) {
                 // called from inside a HPX thread
                 threads::thread_id_type id = threads::get_self_id();
                 if (id != threads::invalid_thread_id) {
@@ -223,7 +223,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (0 != self) {
+            if (nullptr != self) {
                 // called from inside a HPX thread
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase) {
@@ -274,7 +274,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_id_repr_type parent_id = threads::get_parent_id();
-            if (0 != parent_id && threads::invalid_thread_id != parent_id) {
+            if (nullptr != parent_id && threads::invalid_thread_id != parent_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(void*)*2)

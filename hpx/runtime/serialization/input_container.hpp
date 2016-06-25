@@ -49,7 +49,7 @@ namespace hpx { namespace serialization
         input_container(Container const& cont, std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
+            chunks_(nullptr), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {}
 
         input_container(Container const& cont,
@@ -57,7 +57,7 @@ namespace hpx { namespace serialization
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
+            chunks_(nullptr), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {
             if (chunks && chunks->size() != 0)
             {
@@ -129,7 +129,7 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT((boost::int64_t)count >= 0);
 
-            if (filter_.get() || chunks_ == 0 ||
+            if (filter_.get() || chunks_ == nullptr ||
                 count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
                 this->input_container::load_binary(address, count);

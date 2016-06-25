@@ -25,7 +25,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
 
 struct executor
 {
-    executor() : exe(0), cmd_line(0), env(0) {}
+    executor() : exe(nullptr), cmd_line(nullptr), env(nullptr) {}
 
     struct call_on_fork_setup
     {

@@ -76,7 +76,7 @@ template<class convert = do_convert_format::prepend> struct time_t
     }
 
     template<class msg_type> void operator()(msg_type & msg) const {
-        ::time_t val = ::time(0);
+        ::time_t val = ::time(nullptr);
         write_time(msg, val);
     }
 

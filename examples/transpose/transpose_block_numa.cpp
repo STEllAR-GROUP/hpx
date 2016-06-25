@@ -45,7 +45,7 @@ struct sub_block
 
     sub_block()
       : size_(0)
-      , data_(0)
+      , data_(nullptr)
       , mode_(reference)
     {}
 
@@ -68,7 +68,7 @@ struct sub_block
       , data_(other.data_)
       , mode_(other.mode_)
     {
-        if(mode_ == owning) { other.data_ = 0; other.size_ = 0; }
+        if(mode_ == owning) { other.data_ = nullptr; other.size_ = 0; }
     }
 
     sub_block & operator=(sub_block && other)
@@ -76,7 +76,7 @@ struct sub_block
         size_ = other.size_;
         data_ = other.data_;
         mode_ = other.mode_;
-        if(mode_ == owning) { other.data_ = 0; other.size_ = 0; }
+        if(mode_ == owning) { other.data_ = nullptr; other.size_ = 0; }
 
         return *this;
     }

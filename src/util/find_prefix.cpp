@@ -42,13 +42,13 @@ namespace hpx { namespace util
 
     void set_hpx_prefix(const char * prefix)
     {
-        if (prefix_ == 0)
+        if (prefix_ == nullptr)
             prefix_ = prefix;
     }
 
     char const* hpx_prefix()
     {
-        HPX_ASSERT(0 != prefix_);
+        HPX_ASSERT(nullptr != prefix_);
         return prefix_;
     }
 

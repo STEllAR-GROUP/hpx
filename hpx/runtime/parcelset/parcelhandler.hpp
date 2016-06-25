@@ -406,7 +406,7 @@ namespace hpx { namespace parcelset
         parcelport *find_parcelport(std::string const& type, error_code = throws) const
         {
             int priority = get_priority(type);
-            if(priority <= 0) return 0;
+            if(priority <= 0) return nullptr;
             HPX_ASSERT(pports_.find(priority) != pports_.end());
             return pports_.find(priority)->second.get();
         }

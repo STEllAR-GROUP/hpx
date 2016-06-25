@@ -178,7 +178,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             delete_tss_storage(m_thread_data);
 #endif
-            m_thread_id = 0;
+            m_thread_id = nullptr;
         }
 
 #if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
@@ -440,7 +440,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 if (!exited())
                     exit();
                 HPX_ASSERT(exited());
-                m_thread_id = 0;
+                m_thread_id = nullptr;
             }
             catch (...) {
                 /**/;

@@ -115,7 +115,7 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         /// Return whether this instance is the master instance of this
         /// memory block
-        bool is_master() const { return 0 != wrapper_; }
+        bool is_master() const { return nullptr != wrapper_; }
 
         static component_type get_component_type()
         {
@@ -303,18 +303,19 @@ namespace hpx { namespace components
 
             HPX_ASSERT(act->save_function());
             if (config) {
-                act->save_function()(data->get_ptr(), data->get_size(), ar, version,
-                    config->get_ptr());
+                act->save_function()(data->get_ptr(), data->get_size(), ar,
+                    version, config->get_ptr());
             }
             else {
-                act->save_function()(data->get_ptr(), data->get_size(), ar, version, 0);
+                act->save_function()(data->get_ptr(), data->get_size(), ar,
+                    version, nullptr);
             }
         }
 
         template <class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
-            bool has_config = config_ != 0;
+            bool has_config = config_ != nullptr;
             ar << has_config;
             if (has_config)
                 save_(ar, version, config_.get());
@@ -344,7 +345,7 @@ namespace hpx { namespace components
                     config->get_ptr());
             }
             else {
-                act->load_function()(p->get_ptr(), size, ar, version, 0); //-V522
+                act->load_function()(p->get_ptr(), size, ar, version, nullptr); //-V522
             }
 
             delete act;
@@ -450,7 +451,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Construct an empty managed_component
         memory_block()
-          : component_(0)
+          : component_(nullptr)
         {}
 
     private:
@@ -471,7 +472,7 @@ namespace hpx { namespace components { namespace server
         ///             wrapped instance.
         memory_block(std::size_t size,
                 actions::manage_object_action_base const& act)
-          : component_(0)
+          : component_(nullptr)
         {
             typedef detail::memory_block alloc_type;
             alloc_type* p = server::detail::allocate_block<alloc_type>(size);
@@ -483,7 +484,7 @@ namespace hpx { namespace components { namespace server
         ///        parameter
         memory_block(detail::memory_block_header const* rhs,
                 actions::manage_object_action_base const& act)
-          : component_(0)
+          : component_(nullptr)
         {
             std::size_t size = rhs->get_size();
             typedef detail::memory_block alloc_type;

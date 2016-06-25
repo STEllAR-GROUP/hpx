@@ -123,7 +123,7 @@ namespace hpx { namespace lcos { namespace detail
             inner_shared_state_ptr inner_state =
                 traits::detail::get_shared_state(func(std::move(future)));
 
-            if (inner_state.get() == 0)
+            if (inner_state.get() == nullptr)
             {
                 HPX_THROW_EXCEPTION(no_state,
                     "invoke_continuation",
@@ -183,7 +183,7 @@ namespace hpx { namespace lcos { namespace detail
             reset_id(continuation& target)
               : target_(target)
             {
-                if (threads::get_self_ptr() != 0)
+                if (threads::get_self_ptr() != nullptr)
                     target.set_id(threads::get_self_id());
             }
             ~reset_id()
@@ -575,7 +575,7 @@ namespace hpx { namespace lcos { namespace detail
                 inner_shared_state_ptr inner_state =
                     traits::detail::get_shared_state(outer.get());
 
-                if (inner_state.get() == 0)
+                if (inner_state.get() == nullptr)
                 {
                     HPX_THROW_EXCEPTION(no_state,
                         "unwrap_continuation<ContResult>::on_outer_ready",

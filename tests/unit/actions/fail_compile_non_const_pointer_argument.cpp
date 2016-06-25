@@ -14,7 +14,7 @@ HPX_PLAIN_ACTION(test);
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    int* ptr = 0;
+    int* ptr = nullptr;
 
     test_action act;
     hpx::apply(act, hpx::find_here(), ptr);

@@ -123,7 +123,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(data_[pos_piggy_back_flag])
                 return &data_[pos_piggy_back_data];
-            return 0;
+            return nullptr;
         }
 
     private:

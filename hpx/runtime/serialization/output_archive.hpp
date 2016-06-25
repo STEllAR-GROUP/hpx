@@ -63,7 +63,7 @@ namespace hpx { namespace serialization
             // the same assumptions about the archive format
             save(flags);
 
-            bool has_filter = filter != 0;
+            bool has_filter = filter != nullptr;
             save(has_filter);
 
             if (has_filter && enable_compression())

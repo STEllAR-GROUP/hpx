@@ -517,7 +517,7 @@ namespace hpx
 
         bool is_at_end() const
         {
-            return data_ == 0 ||
+            return data_ == nullptr ||
                 this->base_type::base_reference() == data_->partitions_.end();
         }
 
@@ -550,7 +550,7 @@ namespace hpx
 
         bool is_at_end() const
         {
-            return data_ == 0 ||
+            return data_ == nullptr ||
                 this->base_type::base_reference() == data_->partitions_.end();
         }
 

@@ -133,7 +133,7 @@ namespace hpx { namespace lcos
                 f_(std::move(rhs.f_)),
                 success_counter_(rhs.success_counter_)
             {
-                rhs.success_counter_ = 0;
+                rhs.success_counter_ = nullptr;
             }
 
             wait_each& operator= (wait_each && rhs)
@@ -144,7 +144,7 @@ namespace hpx { namespace lcos
                     rhs.ready_count_ = 0;
                     f_ = std::move(rhs.f_);
                     success_counter_ = rhs.success_counter_;
-                    rhs.success_counter_ = 0;
+                    rhs.success_counter_ = nullptr;
                 }
                 return *this;
             }

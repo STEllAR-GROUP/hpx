@@ -35,7 +35,7 @@ namespace hpx { namespace util { namespace batch_environments
       , valid_(false)
     {
         char *node_num = std::getenv("SLURM_PROCID");
-        valid_ = node_num != 0;
+        valid_ = node_num != nullptr;
         if(valid_)
         {
             // Initialize our node number

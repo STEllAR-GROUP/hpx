@@ -98,7 +98,7 @@ namespace hpx { namespace threads
             thread_state_enum newstate)
         {
             thread_data* ret = pool.allocate();
-            if (ret == 0)
+            if (ret == nullptr)
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
                     "thread_data::operator new",
@@ -372,20 +372,20 @@ namespace hpx { namespace threads
 # ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace() const
         {
-            return 0;
+            return nullptr;
         }
         char const* set_backtrace(char const*)
         {
-            return 0;
+            return nullptr;
         }
 # else
         util::backtrace const* get_backtrace() const
         {
-            return 0;
+            return nullptr;
         }
         util::backtrace const* set_backtrace(util::backtrace const*)
         {
-            return 0;
+            return nullptr;
         }
 # endif
 
@@ -584,7 +584,7 @@ namespace hpx { namespace threads
             marked_state_(unknown),
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            backtrace_(0),
+            backtrace_(nullptr),
 #endif
             priority_(init_data.priority),
             requested_interrupt_(false),
@@ -603,7 +603,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
-            if (0 == parent_thread_id_) {
+            if (nullptr == parent_thread_id_) {
                 thread_self* self = get_self_ptr();
                 if (self)
                 {
@@ -640,7 +640,7 @@ namespace hpx { namespace threads
             set_marked_state(unknown);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            backtrace_ = 0;
+            backtrace_ = nullptr;
 #endif
             priority_ = init_data.priority;
             requested_interrupt_ = false;
@@ -657,7 +657,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
-            if (0 == parent_thread_id_) {
+            if (nullptr == parent_thread_id_) {
                 thread_self* self = get_self_ptr();
                 if (self)
                 {

@@ -987,7 +987,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type const& gid, parcelset::endpoints_type const& eps)
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0) return;
+        if (rt == nullptr) return;
 
         // instruct our connection cache to drop all connections it is holding
         rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
@@ -1020,7 +1020,7 @@ namespace hpx { namespace components { namespace server
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();
-        HPX_ASSERT(0 != self);    // needs to be executed by a HPX thread
+        HPX_ASSERT(nullptr != self);    // needs to be executed by a HPX thread
 
         // give the scheduler some time to work on remaining tasks
         {
@@ -1199,7 +1199,7 @@ namespace hpx { namespace components { namespace server
                 std::vector<std::string> still_unregistered_options;
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
                     std::size_t(-1), mode,
-                    get_runtime_mode_from_name(runtime_mode), 0,
+                    get_runtime_mode_from_name(runtime_mode), nullptr,
                     &still_unregistered_options);
 
                 std::string still_unknown_commandline;
@@ -1209,7 +1209,7 @@ namespace hpx { namespace components { namespace server
                 if (!still_unknown_commandline.empty())
                 {
                     util::section* s = ini.get_section("hpx");
-                    HPX_ASSERT(s != 0);
+                    HPX_ASSERT(s != nullptr);
                     s->add_entry("unknown_cmd_line_option",
                         still_unknown_commandline);
                 }
@@ -1354,7 +1354,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::remove_here_from_connection_cache()
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0)
+        if (rt == nullptr)
             return;
 
         std::vector<naming::id_type> locality_ids = find_remote_localities();
@@ -1468,7 +1468,7 @@ namespace hpx { namespace components { namespace server
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type");
             }
-            return 0;
+            return nullptr;
         }
 
         l.unlock();
@@ -1480,14 +1480,14 @@ namespace hpx { namespace components { namespace server
 
         parcelset::policies::message_handler* mh = factory->create(action,
             pp, num_messages, interval);
-        if (0 == mh) {
+        if (nullptr == mh) {
             std::ostringstream strm;
             strm << "couldn't create message handler plugin of type: "
                  << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -1516,7 +1516,7 @@ namespace hpx { namespace components { namespace server
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         l.unlock();
@@ -1527,14 +1527,14 @@ namespace hpx { namespace components { namespace server
                 (*it).second.first));
 
         serialization::binary_filter* bf = factory->create(compress, next_filter);
-        if (0 == bf) {
+        if (nullptr == bf) {
             std::ostringstream strm;
             strm << "couldn't to create binary filter plugin of type: "
                  << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -1568,7 +1568,7 @@ namespace hpx { namespace components { namespace server
                 component_ini = ini.get_section(component_section);
 
             error_code ec(lightweight);
-            if (0 == component_ini ||
+            if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
                 util::plugin::get_plugins_list_type f;
@@ -2050,7 +2050,7 @@ namespace hpx { namespace components { namespace server
                 component_ini = ini.get_section(component_section);
 
             error_code ec(lightweight);
-            if (0 == component_ini ||
+            if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
                 // get the factory
@@ -2271,7 +2271,7 @@ namespace hpx { namespace components { namespace server
                 plugin_ini = ini.get_section(plugin_section);
 
             error_code ec(lightweight);
-            if (0 == plugin_ini ||
+            if (nullptr == plugin_ini ||
                 "0" == plugin_ini->get_entry("no_factory", "0"))
             {
                 // get the factory

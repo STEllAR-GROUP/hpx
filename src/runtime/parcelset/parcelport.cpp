@@ -23,7 +23,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini, locality const & here,
             std::string const& type)
-      : applier_(0),
+      : applier_(nullptr),
         here_(here),
         max_inbound_message_size_(ini.get_max_inbound_message_size()),
         max_outbound_message_size_(ini.get_max_outbound_message_size()),

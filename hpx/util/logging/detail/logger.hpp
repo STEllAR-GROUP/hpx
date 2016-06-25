@@ -139,7 +139,7 @@ namespace hpx { namespace util { namespace logging {
 
         typedef logger<gather_msg, write_msg> original_logger_type;
         forward_to_logger(original_logger_type *original_logger = nullptr)
-          : m_writer(0), m_original_logger( original_logger)
+          : m_writer(nullptr), m_original_logger( original_logger)
         {
             if ( m_original_logger)
                 m_writer = &m_original_logger->writer();

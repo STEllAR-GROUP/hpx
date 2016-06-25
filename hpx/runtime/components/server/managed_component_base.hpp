@@ -203,7 +203,7 @@ namespace hpx { namespace components
             "traits::managed_object_controls_lifetime>::value");
 
         managed_component_base()
-          : back_ptr_(0)
+          : back_ptr_(nullptr)
         {}
 
         managed_component_base(managed_component<Component, Wrapper>* back_ptr)
@@ -272,7 +272,7 @@ namespace hpx { namespace components
 
         void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
         {
-            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(nullptr == back_ptr_);
             HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
@@ -393,7 +393,7 @@ namespace hpx { namespace components
         ///        instance
         template <typename ...Ts>
         managed_component(Ts&&... vs)
-          : component_(0)
+          : component_(nullptr)
         {
             detail_adl_barrier::init<
                 typename traits::managed_component_ctor_policy<Component>::type

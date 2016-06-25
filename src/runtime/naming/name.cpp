@@ -219,7 +219,7 @@ namespace hpx { namespace naming
                 HPX_ASSERT(false);          // invalid management type
                 return &detail::gid_unmanaged_deleter;
             }
-            return 0;
+            return nullptr;
         }
 
         ///////////////////////////////////////////////////////////////////////
