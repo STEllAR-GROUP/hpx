@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Zahra Khatami
+//  Copyright (c) 2016 Zahra Khatami, Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/is_range.hpp>
 
 #include <algorithm>
