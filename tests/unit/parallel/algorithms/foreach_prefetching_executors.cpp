@@ -1,4 +1,5 @@
-//  Copyright (c) 2016 Zahra Khatami, Hartmut Kaiser
+//  Copyright (c) 2016 Zahra Khatami
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +11,7 @@
 #include <vector>
 
 #include "foreach_tests_prefetching.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
 void test_prefetching_executors(ExPolicy && policy)

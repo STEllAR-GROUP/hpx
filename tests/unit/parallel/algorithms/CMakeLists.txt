@@ -44,6 +44,7 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
+    foreach_prefetching_executors
     foreach_projection
     foreachn
     foreachn_exception

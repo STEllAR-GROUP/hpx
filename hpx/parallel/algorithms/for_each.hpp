@@ -22,7 +22,7 @@
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
-#include <hpx/parallel/util/prefetching.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -46,9 +46,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             void operator()(std::size_t /*part_index*/,
                 Iter part_begin, std::size_t part_size)
             {
+                typedef typename util::detail::loop_n<Iter>::type it_type;
+
                 util::loop_n(
                     part_begin, part_size,
-                    [this](Iter curr) mutable
+                    [this](it_type curr) mutable
                     {
                         hpx::util::invoke(
                             f_, hpx::util::invoke(proj_, *curr));
@@ -96,19 +98,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         },
                         [](InIter && last) -> InIter
                         {
-                            typedef typename util::detail::loop_n<
-                                    InIter
-                                >::type it_type;
-
-                            // VS2015 bails out when proj or f are captured by
-                            // ref
-                            util::loop_n(
-                                part_begin, part_size,
-                                [=](it_type curr) mutable
-                                {
-                                    hpx::util::invoke(
-                                        f, hpx::util::invoke(proj, *curr));
-                                });
                             return std::move(last);
                         });
                 }
