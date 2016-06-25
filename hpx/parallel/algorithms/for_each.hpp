@@ -222,7 +222,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static Iter
+            static InIter
             sequential(ExPolicy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
