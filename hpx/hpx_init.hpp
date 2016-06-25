@@ -13,6 +13,8 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/program_options/options_description.hpp>
@@ -113,10 +115,8 @@ namespace hpx
         > const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
-        util::function_nonser<void()> const& startup =
-            util::function_nonser<void()>(),
-        util::function_nonser<void()> const& shutdown =
-            util::function_nonser<void()>(),
+        startup_function_type startup = startup_function_type(),
+        shutdown_function_type shutdown = shutdown_function_type(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -169,10 +169,8 @@ namespace hpx
     init(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv,
-        util::function_nonser<void()> const& startup =
-            util::function_nonser<void()>(),
-        util::function_nonser<void()> const& shutdown =
-            util::function_nonser<void()>(),
+        startup_function_type startup = startup_function_type(),
+        shutdown_function_type shutdown = shutdown_function_type(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -224,10 +222,8 @@ namespace hpx
     inline int
     init(boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv,
-        util::function_nonser<void()> const& startup =
-            util::function_nonser<void()>(),
-        util::function_nonser<void()> const& shutdown =
-            util::function_nonser<void()>(),
+        startup_function_type startup = startup_function_type(),
+        shutdown_function_type shutdown = shutdown_function_type(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -285,10 +281,8 @@ namespace hpx
     inline int
     init(boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
-        util::function_nonser<void()> const& startup =
-            util::function_nonser<void()>(),
-        util::function_nonser<void()> const& shutdown =
-            util::function_nonser<void()>(),
+        startup_function_type startup = startup_function_type(),
+        shutdown_function_type shutdown = shutdown_function_type(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -455,7 +449,7 @@ namespace hpx
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
     inline int
-    init(std::string const& app_name, int argc = 0, char** argv = 0,
+    init(std::string const& app_name, int argc = 0, char** argv = nullptr,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -496,7 +490,7 @@ namespace hpx
 #if !defined(HPX_HAVE_STATIC_LINKING)
     inline
 #endif
-    int init(int argc = 0, char** argv = 0,
+    int init(int argc = 0, char** argv = nullptr,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.

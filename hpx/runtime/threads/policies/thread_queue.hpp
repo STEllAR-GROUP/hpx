@@ -9,15 +9,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
+#include <hpx/runtime/threads/policies/queue_helpers.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/policies/queue_helpers.hpp>
-#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 #   include <hpx/util/tick_counter.hpp>
@@ -157,7 +157,7 @@ namespace hpx { namespace threads { namespace policies
 
             std::ptrdiff_t stacksize = data.stacksize;
 
-            std::list<thread_id_type>* heap = 0;
+            std::list<thread_id_type>* heap = nullptr;
 
             if (stacksize == get_stack_size(thread_stacksize_small))
             {
@@ -229,7 +229,7 @@ namespace hpx { namespace threads { namespace policies
                 return 0;
 
             std::size_t added = 0;
-            task_description* task = 0;
+            task_description* task = nullptr;
             while (add_count-- && addfrom->new_tasks_.pop(task, steal))
             {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
@@ -696,7 +696,7 @@ namespace hpx { namespace threads { namespace policies
                 // created, as it might have that the current HPX thread gets
                 // suspended.
                 {
-                    typename mutex_type::scoped_lock lk(mtx_);
+                    std::unique_lock<mutex_type> lk(mtx_);
 
                     create_thread_object(thrd, data, initial_state, lk);
 
@@ -911,7 +911,7 @@ namespace hpx { namespace threads { namespace policies
         /// has to be terminated (i.e. no more work has to be done).
         inline bool wait_or_add_new(bool running,
             boost::int64_t& idle_loop_count, std::size_t& added,
-            thread_queue* addfrom_ = 0, bool steal = false) HPX_HOT
+            thread_queue* addfrom_ = nullptr, bool steal = false) HPX_HOT
         {
             // try to generate new threads from task lists, but only if our
             // own list of threads is empty

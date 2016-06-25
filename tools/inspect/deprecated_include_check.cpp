@@ -28,6 +28,7 @@ namespace boost
       { "boost/unordered_map\\.hpp", "unordered_map" },
       { "boost/unordered_set\\.hpp", "unordered_set" },
       { "boost/detail/atomic_count\\.hpp", "hpx/util/atomic_count.hpp" },
+      { "boost/function\\.hpp", "hpx/util/function.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { 0, 0 }
     };

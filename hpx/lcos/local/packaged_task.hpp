@@ -7,13 +7,13 @@
 #define HPX_LCOS_LOCAL_PACKAGED_TASK_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/util/unique_function.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/exception_ptr.hpp>
 

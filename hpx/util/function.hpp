@@ -10,10 +10,10 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
-#include <hpx/util/decay.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 

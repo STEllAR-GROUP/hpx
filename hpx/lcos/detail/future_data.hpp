@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
@@ -26,8 +26,8 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/math/common_factor_ct.hpp>
-#include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/max.hpp>
+#include <boost/mpl/sizeof.hpp>
 #include <boost/type_traits/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
@@ -299,7 +299,7 @@ namespace detail
         {
             // yields control if needed
             wait(ec);
-            if (ec) return NULL;
+            if (ec) return nullptr;
 
             // No locking is required. Once a future has been made ready, which
             // is a postcondition of wait, either:
@@ -313,7 +313,7 @@ namespace detail
                 HPX_THROWS_IF(ec, no_state,
                     "future_data::get_result",
                     "this future has no valid shared state");
-                return NULL;
+                return nullptr;
             }
 
             // the thread has been re-activated by one of the actions
@@ -332,7 +332,7 @@ namespace detail
                 else {
                     ec = make_error_code(*exception_ptr);
                 }
-                return NULL;
+                return nullptr;
             }
             return static_cast<result_type*>(storage_.address());
         }
@@ -355,26 +355,25 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
+            // We need to run the completion asynchronously if we aren't on a
+            // HPX thread
+            if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+            {
+                HPX_THROW_EXCEPTION(null_thread_id,
+                        "future_data::handle_on_completed",
+                        "null thread id encountered");
+            }
+
 #if defined(HPX_WINDOWS)
             bool recurse_asynchronously = false;
 #elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-            std::ptrdiff_t remaining_stack =
-                this_thread::get_available_stack_space();
-
-            if(remaining_stack < 0)
-            {
-                HPX_THROW_EXCEPTION(out_of_memory,
-                    "future_data::handle_on_completed",
-                    "Stack overflow");
-            }
             bool recurse_asynchronously =
-                remaining_stack < 8 * HPX_THREADS_STACK_OVERHEAD;
+                !this_thread::has_sufficient_stack_space();
 #else
             handle_continuation_recursion_count cnt;
             bool recurse_asynchronously =
                 cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
 #endif
-
             if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
@@ -740,7 +739,7 @@ namespace detail
             if (!started_test())
                 return future_status::deferred; //-V110
             return this->future_data<Result>::wait_until(abs_time, ec);
-        };
+        }
 
     private:
         bool started_test() const
@@ -802,9 +801,10 @@ namespace detail
             this->future_data<Result>::set_data(std::forward<T>(result));
         }
 
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(
+            boost::exception_ptr const& e, error_code& ec = throws)
         {
-            this->future_data<Result>::set_exception(e);
+            this->future_data<Result>::set_exception(e, ec);
         }
 
         virtual void do_run()

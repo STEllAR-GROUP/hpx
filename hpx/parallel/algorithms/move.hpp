@@ -12,15 +12,15 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 
-#include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -72,6 +72,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             auto const& iters = part_begin.get_iterator_tuple();
                             util::move_n_helper(get<0>(iters), part_size,
                                 get<1>(iters));
+                        },
+                        [](zip_iterator && last) -> zip_iterator
+                        {
+                            return std::move(last);
                         }));
             }
         };

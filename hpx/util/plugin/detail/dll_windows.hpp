@@ -8,25 +8,25 @@
 #define HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 
 #include <hpx/config.hpp>
-#include <hpx/util/plugin/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/plugin/config.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/type_traits/is_pointer.hpp>
+#include <boost/type_traits/remove_pointer.hpp>
 
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
-#include <windows.h>
 #include <Shlwapi.h>
+#include <windows.h>
 
 #if !defined(HPX_MSVC)
 #error "This file shouldn't be included directly, use the file hpx/util/plugin/dll.hpp only."
@@ -44,7 +44,7 @@ namespace hpx { namespace util { namespace plugin {
 
             void operator()(T)
             {
-                if (NULL != h)
+                if (nullptr != h)
                     FreeLibrary(h);
             }
 
@@ -56,15 +56,15 @@ namespace hpx { namespace util { namespace plugin {
     {
     public:
         dll()
-        :   dll_handle(NULL)
+        :   dll_handle(nullptr)
         {}
 
         dll(dll const& rhs)
-        :   dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(NULL)
+        :   dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(nullptr)
         {}
 
         dll(std::string const& libname)
-        :   dll_name(libname), map_name(""), dll_handle(NULL)
+        :   dll_name(libname), map_name(""), dll_handle(nullptr)
         {
             // map_name defaults to dll base name
             namespace fs = boost::filesystem;
@@ -83,7 +83,7 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         dll(std::string const& libname, std::string const& mapname)
-        :   dll_name(libname), map_name(mapname), dll_handle(NULL)
+        :   dll_name(libname), map_name(mapname), dll_handle(nullptr)
         {}
 
         dll(dll && rhs)
@@ -91,7 +91,7 @@ namespace hpx { namespace util { namespace plugin {
           , map_name(std::move(rhs.map_name))
           , dll_handle(rhs.dll_handle)
         {
-            rhs.dll_handle = NULL;
+            rhs.dll_handle = nullptr;
         }
 
         dll &operator=(dll const & rhs)
@@ -114,7 +114,7 @@ namespace hpx { namespace util { namespace plugin {
                 dll_name = std::move(rhs.dll_name);
                 map_name = std::move(rhs.map_name);
                 dll_handle = rhs.dll_handle;
-                rhs.dll_handle = NULL;
+                rhs.dll_handle = nullptr;
             }
             return *this;
         }
@@ -142,7 +142,7 @@ namespace hpx { namespace util { namespace plugin {
             // Cast the to right type.
             SymbolType address = (SymbolType)GetProcAddress
                 (dll_handle, symbol_name.c_str());
-            if (NULL == address)
+            if (nullptr == address)
             {
                 std::ostringstream str;
                 str << "Hpx.Plugin: Unable to locate the exported symbol name '"
@@ -188,7 +188,7 @@ namespace hpx { namespace util { namespace plugin {
                 if (dll_name.empty()) {
                 // load main module
                     char buffer[_MAX_PATH];
-                    ::GetModuleFileName(NULL, buffer, sizeof(buffer));
+                    ::GetModuleFileName(nullptr, buffer, sizeof(buffer));
                     dll_name = buffer;
                 }
 
@@ -243,7 +243,7 @@ namespace hpx { namespace util { namespace plugin {
     protected:
         void FreeLibrary()
         {
-            if (NULL != dll_handle)
+            if (nullptr != dll_handle)
                 ::FreeLibrary(dll_handle);
         }
 

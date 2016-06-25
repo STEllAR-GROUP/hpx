@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
+#include <hpx/include/traits.hpp>
 #include <hpx/include/unordered_map.hpp>
 #include <hpx/util/lightweight_test.hpp>
 

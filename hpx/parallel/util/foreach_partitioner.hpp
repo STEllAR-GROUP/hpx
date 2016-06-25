@@ -7,30 +7,29 @@
 #define HPX_PARALLEL_UTIL_FOREACH_PARTITIONER_OCT_03_2014_0112PM
 
 #include <hpx/config.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-#include <hpx/parallel/traits/extract_partitioner.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 #include <algorithm>
 #include <list>
+#include <memory>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,9 +43,10 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy_, typename Result = void>
         struct foreach_static_partitioner
         {
-            template <typename ExPolicy, typename FwdIter, typename F1>
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2>
             static FwdIter call(ExPolicy && policy, FwdIter first,
-                std::size_t count, F1 && f1)
+                std::size_t count, F1 && f1, F2 && f2)
             {
                 typedef typename hpx::util::decay<ExPolicy>::type::executor_type
                     executor_type;
@@ -78,12 +78,11 @@ namespace hpx { namespace parallel { namespace util
 
                     workitems.reserve(shape.size());
 
-                    using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
+                        hpx::util::bind(invoke_fused(), std::forward<F1>(f1), _1),
                         std::move(shape));
                 }
                 catch (...) {
@@ -98,7 +97,14 @@ namespace hpx { namespace parallel { namespace util
                 handle_local_exceptions<ExPolicy>::call(inititems, errors);
                 handle_local_exceptions<ExPolicy>::call(workitems, errors);
 
-                return last;
+                try {
+                    return f2(std::move(last));
+                }
+                catch (...) {
+                    // rethrow either bad_alloc or exception_list
+                    handle_local_exceptions<ExPolicy>::call(
+                        boost::current_exception());
+                }
             }
         };
 
@@ -106,9 +112,10 @@ namespace hpx { namespace parallel { namespace util
         template <typename Result>
         struct foreach_static_partitioner<parallel_task_execution_policy, Result>
         {
-            template <typename ExPolicy, typename FwdIter, typename F1>
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2>
             static hpx::future<FwdIter> call(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1)
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
                 typedef typename hpx::util::decay<ExPolicy>::type::executor_type
                     executor_type;
@@ -126,8 +133,8 @@ namespace hpx { namespace parallel { namespace util
                     > tuple_type;
 
                 // inform parameter traits
-                boost::shared_ptr<scoped_executor_parameters>
-                    scoped_param(boost::make_shared<
+                std::shared_ptr<scoped_executor_parameters>
+                    scoped_param(std::make_shared<
                             scoped_executor_parameters
                         >(policy.parameters()));
 
@@ -162,7 +169,7 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 return hpx::dataflow(
-                    [last, errors, scoped_param](
+                    [last, errors, scoped_param, f2](
                             std::vector<hpx::future<Result> > && r1,
                             std::vector<hpx::future<Result> > && r2) mutable
                     ->  FwdIter
@@ -170,7 +177,7 @@ namespace hpx { namespace parallel { namespace util
                         handle_local_exceptions<ExPolicy>::call(r1, errors);
                         handle_local_exceptions<ExPolicy>::call(r2, errors);
 
-                        return last;
+                        return f2(std::move(last));
                     },
                     std::move(inititems), std::move(workitems));
             }
@@ -195,15 +202,16 @@ namespace hpx { namespace parallel { namespace util
         struct foreach_partitioner<ExPolicy_, Result,
             parallel::traits::static_partitioner_tag>
         {
-            template <typename ExPolicy, typename FwdIter, typename F1>
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2>
             static FwdIter call(ExPolicy && policy, FwdIter first,
-                std::size_t count, F1 && f1)
+                std::size_t count, F1 && f1, F2 && f2)
             {
                 return foreach_static_partitioner<
                         typename hpx::util::decay<ExPolicy>::type, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1));
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
         };
 
@@ -211,15 +219,16 @@ namespace hpx { namespace parallel { namespace util
         struct foreach_partitioner<parallel_task_execution_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {
-            template <typename ExPolicy, typename FwdIter, typename F1>
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2>
             static hpx::future<FwdIter> call(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1)
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
                 return foreach_static_partitioner<
                         typename hpx::util::decay<ExPolicy>::type, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1));
+                        std::forward<F1>(f1), std::forward<F2>(f2));
             }
         };
 

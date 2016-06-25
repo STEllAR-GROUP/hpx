@@ -16,20 +16,20 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
-#include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/parallel/traits/projected.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -48,6 +48,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
 
+        struct copy_iteration
+        {
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(std::size_t, Iter part_begin, std::size_t part_size)
+            {
+                using hpx::util::get;
+                auto const& iters = part_begin.get_iterator_tuple();
+                util::copy_n_helper(get<0>(iters), part_size, get<1>(iters));
+            }
+        };
+
         template <typename IterPair>
         struct copy
           : public detail::algorithm<copy<IterPair>, IterPair>
@@ -60,7 +72,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
-                return util::copy_helper(first, last, dest);
+                std::pair<InIter, OutIter> result =
+                    util::copy_helper(first, last, dest);
+                util::copy_synchronize(first, dest);
+                return result;
             }
 
             template <typename ExPolicy, typename FwdIter, typename OutIter>
@@ -71,21 +86,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
-                typedef typename zip_iterator::reference reference;
 
                 return get_iter_pair(
                     util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
-                        [](std::size_t, zip_iterator part_begin,
-                            std::size_t part_size)
+                        copy_iteration(),
+                        [](zip_iterator && last) -> zip_iterator
                         {
                             using hpx::util::get;
-
-                            auto const& iters = part_begin.get_iterator_tuple();
-                            util::copy_n_helper(get<0>(iters), part_size,
-                                get<1>(iters));
+                            auto const& iters = last.get_iterator_tuple();
+                            util::copy_synchronize(get<0>(iters), get<1>(iters));
+                            return std::move(last);
                         }));
             }
         };
@@ -210,7 +223,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 OutIter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
-                typedef typename zip_iterator::reference reference;
 
                 return get_iter_pair(
                     util::foreach_partitioner<ExPolicy>::call(
@@ -224,6 +236,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             auto const& iters = part_begin.get_iterator_tuple();
                             util::copy_n_helper(get<0>(iters), part_size,
                                 get<1>(iters));
+                        },
+                        [](zip_iterator && last) -> zip_iterator
+                        {
+                            using hpx::util::get;
+                            auto const& iters = last.get_iterator_tuple();
+                            util::copy_synchronize(get<0>(iters), get<1>(iters));
+                            return std::move(last);
                         }));
             }
         };
@@ -356,7 +375,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename Pred, typename Proj = util::projection_identity>
             static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last, OutIter dest,
-                Pred && pred, Proj && proj = Proj())
+                Pred && pred, Proj && proj/* = Proj()*/)
             {
                 return sequential_copy_if(first, last, dest,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
@@ -368,7 +387,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 ExPolicy, std::pair<FwdIter, OutIter>
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                OutIter dest, Pred && pred, Proj && proj = Proj())
+                OutIter dest, Pred && pred, Proj && proj/* = Proj()*/)
             {
                 typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
                 typedef util::detail::algorithm_result<
@@ -519,7 +538,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter, typename F,
-        typename Proj = util::projection_identity,
+        typename Proj,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
@@ -532,7 +551,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f,
-        Proj && proj = Proj())
+        Proj && proj)
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter>::value),
@@ -554,6 +573,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 first, last, dest, std::forward<F>(f),
                 std::forward<Proj>(proj)));
     }
+
+    /// \cond NOINTERNAL
+    template <typename ExPolicy, typename InIter, typename OutIter, typename F,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
+        traits::is_indirect_callable<
+            F, traits::projected<util::projection_identity, InIter>
+        >::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    >::type
+    copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f)
+    {
+        return copy_if(std::forward<ExPolicy>(policy), first, last, dest,
+            std::forward<F>(f), util::projection_identity());
+    }
+    /// \endcond
 }}}
 
 #endif

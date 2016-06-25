@@ -190,10 +190,10 @@ namespace hpx { namespace threads
 
         /// This is equivalent to malloc(), except that it tries to allocate
         /// page-aligned memory from the OS.
-        virtual void* allocate(std::size_t len) = 0;
+        virtual void* allocate(std::size_t len) const = 0;
 
         /// Free memory that was previously allocated by allocate
-        virtual void deallocate(void* addr, std::size_t len) = 0;
+        virtual void deallocate(void* addr, std::size_t len) const = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();

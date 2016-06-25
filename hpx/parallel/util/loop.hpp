@@ -10,8 +10,8 @@
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <iterator>
 #include <algorithm>
+#include <iterator>
 #include <vector>
 
 namespace hpx { namespace parallel { namespace util
@@ -29,6 +29,7 @@ namespace hpx { namespace parallel { namespace util
 
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
+            HPX_HOST_DEVICE
             static Begin call(Begin it, End end, F && f)
             {
                 for (/**/; it != end; ++it)
@@ -39,6 +40,7 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename Begin, typename End, typename CancelToken,
                 typename F>
+            HPX_HOST_DEVICE
             static Begin call(Begin it, End end, CancelToken& tok, F && func)
             {
                 for (/**/; it != end; ++it)
@@ -54,14 +56,14 @@ namespace hpx { namespace parallel { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
-    HPX_FORCEINLINE Begin
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin
     loop(Begin begin, End end, F && f)
     {
         return detail::loop<Begin>::call(begin, end, std::forward<F>(f));
     }
 
     template <typename Begin, typename End, typename CancelToken, typename F>
-    HPX_FORCEINLINE Begin
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin
     loop(Begin begin, End end, CancelToken& tok, F && f)
     {
         return detail::loop<Begin>::call(begin, end, tok, std::forward<F>(f));
@@ -80,6 +82,7 @@ namespace hpx { namespace parallel { namespace util
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
             template <typename Iter, typename F>
+            HPX_HOST_DEVICE
             static Iter call(Iter it, std::size_t count, F && f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
@@ -88,6 +91,7 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE
             static Iter call(Iter it, std::size_t count, CancelToken& tok,
                 F && f)
             {
@@ -104,14 +108,14 @@ namespace hpx { namespace parallel { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename F>
-    HPX_FORCEINLINE Iter
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
     loop_n(Iter it, std::size_t count, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
     template <typename Iter, typename CancelToken, typename F>
-    HPX_FORCEINLINE Iter
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
     loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, tok, std::forward<F>(f));

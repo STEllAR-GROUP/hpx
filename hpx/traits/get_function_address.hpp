@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_GET_FUNCTION_ADDRESS_FEB_19_2016_0801PM)
 #define HPX_TRAITS_GET_FUNCTION_ADDRESS_FEB_19_2016_0801PM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -15,7 +15,7 @@ namespace hpx { namespace traits
 {
     // By default we return the address of the object which is used to invoke
     // the trait.
-    template <typename F, typename Enable>
+    template <typename F, typename Enable = void>
     struct get_function_address
     {
         static std::size_t call(F const& f) HPX_NOEXCEPT

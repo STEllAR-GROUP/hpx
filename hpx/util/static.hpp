@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/call_traits.hpp>
 #include <boost/aligned_storage.hpp>
+#include <boost/call_traits.hpp>
 
-#include <boost/utility/enable_if.hpp>
 #include <boost/utility/addressof.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/alignment_of.hpp>

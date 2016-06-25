@@ -8,8 +8,8 @@
 #if !defined(HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM)
 #define HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM
 
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 namespace hpx { namespace serialization
 {

@@ -8,7 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/action_is_target_valid.hpp>
+#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 

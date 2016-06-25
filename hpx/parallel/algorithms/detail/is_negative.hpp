@@ -6,6 +6,9 @@
 #if !defined(HPX_PARALLEL_DETAIL_IS_NEGATIVE_JUL_2014_01_0148PM)
 #define HPX_PARALLEL_DETAIL_IS_NEGATIVE_JUL_2014_01_0148PM
 
+#include <hpx/config.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
+
 #include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
@@ -19,10 +22,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct is_negative_helper<T,
         typename std::enable_if<std::is_signed<T>::value>::type>
     {
+        HPX_HOST_DEVICE HPX_FORCEINLINE
         static bool call(T const& size) { return size < 0; }
 
+        HPX_HOST_DEVICE HPX_FORCEINLINE
         static T abs(T const& val) { return val < 0 ? -val : val; }
 
+        HPX_HOST_DEVICE HPX_FORCEINLINE
         static T negate(T const& val)
         {
             return -val;
@@ -34,10 +40,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct is_negative_helper<T,
         typename std::enable_if<std::is_unsigned<T>::value>::type>
     {
+        HPX_HOST_DEVICE HPX_FORCEINLINE
         static bool call(T const&) { return false; }
 
+        HPX_HOST_DEVICE HPX_FORCEINLINE
         static T abs(T const& val) { return val; }
 
+        HPX_HOST_DEVICE HPX_FORCEINLINE
         static T negate(T const& val)
         {
             return val;
@@ -46,19 +55,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    bool is_negative(T const& val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE bool is_negative(T const& val)
     {
         return is_negative_helper<T>::call(val);
     }
 
     template <typename T>
-    T abs(T const& val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE T abs(T const& val)
     {
         return is_negative_helper<T>::abs(val);
     }
 
     template <typename T>
-    T negate(T const& val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE T negate(T const& val)
     {
         return is_negative_helper<T>::negate(val);
     }

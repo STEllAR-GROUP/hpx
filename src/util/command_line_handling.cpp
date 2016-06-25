@@ -693,6 +693,13 @@ namespace hpx { namespace util
             affinity_bind_.empty() ? 0 : 1);
         ini_config += "hpx.numa_sensitive=" + std::to_string(numa_sensitive_);
 
+        // default affinity mode is now 'balanced'
+        if (affinity_bind_.empty())
+        {
+            affinity_bind_ = "balanced";
+            ini_config += "hpx.bind!=" + affinity_bind_;
+        }
+
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
         agas_host = mapnames.map(agas_host, agas_port);

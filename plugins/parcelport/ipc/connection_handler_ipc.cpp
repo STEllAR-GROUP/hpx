@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         // load all components as described in the configuration information
         if (ini.has_section("hpx.parcel")) {
             util::section const* sec = ini.get_section("hpx.parcel");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return parcelset::locality(
                     locality(
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
@@ -76,7 +76,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
     connection_handler::~connection_handler()
     {
-        if (NULL != acceptor_) {
+        if (nullptr != acceptor_) {
             boost::system::error_code ec;
             acceptor_->close(ec);
             delete acceptor_;
@@ -96,7 +96,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
     bool connection_handler::do_run()
     {
-        if (NULL == acceptor_)
+        if (nullptr == acceptor_)
             acceptor_ = new acceptor(io_service_pool_.get_io_service(0));
 
         // initialize network
@@ -161,12 +161,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         data_buffer_cache_.clear();
 
         // cancel all pending accept operations
-        if (NULL != acceptor_)
+        if (nullptr != acceptor_)
         {
             boost::system::error_code ec;
             acceptor_->close(ec);
             delete acceptor_;
-            acceptor_ = NULL;
+            acceptor_ = nullptr;
         }
     }
 

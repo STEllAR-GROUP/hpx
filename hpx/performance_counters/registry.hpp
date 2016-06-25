@@ -7,8 +7,8 @@
 #define HPX_PERFORMANCE_COUNTERS_REGISTRY_MAR_01_2009_0424PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/function.hpp>
 
 #include <map>

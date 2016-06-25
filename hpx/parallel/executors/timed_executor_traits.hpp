@@ -10,13 +10,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -48,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static void call(hpx::traits::detail::wrap_int, Executor& exec,
-                util::steady_time_point const& abs_time, F && f, Ts &&... ts)
+                hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
             {
                 make_ready_future_at(abs_time)
                     .then(
@@ -64,7 +65,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
             ->  decltype(
                     exec.apply_execute_at(abs_time, std::forward<F>(f),
@@ -81,7 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Executor, typename F, typename ... Ts>
             static void call(hpx::traits::detail::wrap_int, Executor& exec,
-                util::steady_time_point const& abs_time, F && f, Ts &&... ts)
+                hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
             {
                 this_thread::sleep_until(abs_time);
                 call_apply_execute(exec, std::forward<F>(f),
@@ -90,7 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
             ->  decltype(exec.apply_execute_at(abs_time, std::forward<F>(f)))
             {
@@ -101,7 +102,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename Executor, typename F, typename ... Ts>
         void call_apply_execute_at(Executor& exec,
-            util::steady_time_point const& abs_time, F && f, Ts &&... ts)
+            hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
         {
             typedef typename detail::execution_category<Executor>::type tag;
             return apply_execute_at_helper<tag>::call(0, exec, abs_time,
@@ -136,7 +137,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename future_type<
@@ -166,7 +167,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
             ->  decltype(
                     exec.async_execute_at(abs_time, std::forward<F>(f),
@@ -183,7 +184,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Executor, typename F, typename ... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename future_type<
@@ -206,7 +207,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
             ->  decltype(
                     exec.async_execute_at(abs_time, std::forward<F>(f),
@@ -220,7 +221,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename Executor, typename F, typename ... Ts>
         auto call_async_execute_at(Executor& exec,
-                util::steady_time_point const& abs_time, F && f, Ts &&... ts)
+                hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
         ->  typename future_type<
                 Executor,
@@ -263,7 +264,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
@@ -288,7 +289,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
             ->  decltype(
                     exec.execute_at(abs_time, std::forward<F>(f),
@@ -305,7 +306,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Executor, typename F, typename ... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
             ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
@@ -322,7 +323,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename ... Ts>
             static auto call(int, Executor& exec,
-                    util::steady_time_point const& abs_time, F && f,
+                    hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
             ->  decltype(
                     exec.execute_at(abs_time, std::forward<F>(f),
@@ -335,7 +336,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename Executor, typename F, typename ... Ts>
         auto call_execute_at(Executor& exec,
-                util::steady_time_point const& abs_time, F && f, Ts &&... ts)
+                hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
 #if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
         ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
 #else

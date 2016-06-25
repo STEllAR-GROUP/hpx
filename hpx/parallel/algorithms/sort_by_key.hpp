@@ -8,12 +8,12 @@
 #define HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015
 
 #include <hpx/config.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/tagged_pair.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/sort.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>

@@ -6,14 +6,14 @@
 #if !defined(HPX_TRAITS_COMPONENT_TYPES_COMPATIBLE_MAR_10_2014_1131AM)
 #define HPX_TRAITS_COMPONENT_TYPES_COMPATIBLE_MAR_10_2014_1131AM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable>
+    template <typename Component, typename Enable = void>
     struct component_type_is_compatible
     {
         static bool call(naming::address const& addr)

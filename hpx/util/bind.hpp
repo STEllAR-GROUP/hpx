@@ -8,17 +8,17 @@
 #define HPX_UTIL_BIND_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/traits/get_function_address.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/type_traits/integral_constant.hpp>
 
@@ -66,7 +66,7 @@ namespace hpx { namespace util
             typedef T& type;
 
             template <typename Us>
-            static HPX_FORCEINLINE
+            static HPX_HOST_DEVICE HPX_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
             {
                 return t;
@@ -79,7 +79,7 @@ namespace hpx { namespace util
             typedef T&& type;
 
             template <typename Us>
-            static HPX_FORCEINLINE
+            static HPX_HOST_DEVICE HPX_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
             {
                 return std::forward<T>(t);
@@ -113,7 +113,7 @@ namespace hpx { namespace util
             >::type&& type;
 
             template <typename T>
-            static HPX_FORCEINLINE
+            static HPX_HOST_DEVICE HPX_FORCEINLINE
             type call(T&& /*t*/, Us&& unbound)
             {
                 return util::get<I>(std::forward<Us>(unbound));
@@ -141,7 +141,7 @@ namespace hpx { namespace util
                 T&(Us&&)
             >::type type;
 
-            static HPX_FORCEINLINE
+            static HPX_HOST_DEVICE HPX_FORCEINLINE
             type call(T& t, Us&& unbound)
             {
                 return util::invoke_fused(t, std::forward<Us>(unbound));
@@ -149,7 +149,7 @@ namespace hpx { namespace util
         };
 
         template <typename F, typename T, typename Us>
-        HPX_FORCEINLINE
+        HPX_HOST_DEVICE HPX_FORCEINLINE
         typename bind_eval_impl<F, T, Us>::type
         bind_eval(T& t, Us&& unbound)
         {
@@ -220,6 +220,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename Us, std::size_t ...Is>
+        HPX_HOST_DEVICE
         typename std::enable_if<
             !detail::is_simple_bind<Ts>::value,
             typename bound_result_of<F, Ts, Us>::type
@@ -232,6 +233,7 @@ namespace hpx { namespace util
         }
 
         template <typename F, typename Ts, typename Us, std::size_t ...Is>
+        HPX_HOST_DEVICE
         typename std::enable_if<
             detail::is_simple_bind<Ts>::value,
             typename bound_result_of<F, Ts, Us>::type
@@ -242,6 +244,7 @@ namespace hpx { namespace util
         }
 
         template <typename F, typename Ts, typename Us, std::size_t ...Is>
+        HPX_HOST_DEVICE
         typename std::enable_if<
             detail::is_simple_bind<Ts>::value,
             typename bound_result_of<one_shot_wrapper<F>, Ts, Us>::type
@@ -284,7 +287,8 @@ namespace hpx { namespace util
             HPX_DELETE_MOVE_ASSIGN(bound);
 
             template <typename ...Us>
-            inline typename bound_result_of<
+            HPX_HOST_DEVICE inline
+            typename bound_result_of<
                 typename std::decay<F>::type,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>,
                 util::tuple<Us&&...>
@@ -296,7 +300,8 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            inline typename bound_result_of<
+            HPX_HOST_DEVICE inline
+            typename bound_result_of<
                 typename std::decay<F>::type const,
                 util::tuple<typename util::decay_unwrap<Ts>::type...> const,
                 util::tuple<Us&&...>
@@ -395,7 +400,8 @@ namespace hpx { namespace util
 #           endif
 
             template <typename ...Ts>
-            inline typename util::result_of<F&&(Ts&&...)>::type
+            HPX_HOST_DEVICE inline
+            typename util::result_of<F&&(Ts&&...)>::type
             operator()(Ts&&... vs)
             {
                 check_call();

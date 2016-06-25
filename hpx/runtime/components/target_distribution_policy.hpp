@@ -9,22 +9,21 @@
 #define HPX_COMPONENTS_TARGET_DISTRIBUTION_POLICY_APR_12_2015_1245PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/traits/action_is_target_valid.hpp>
-#include <hpx/traits/extract_action.hpp>
+#include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/dataflow.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/packaged_action.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/lcos/packaged_action.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/dataflow.hpp>
-#include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/traits/extract_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -34,22 +33,22 @@ namespace hpx { namespace components
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
-    struct targeting_distribution_policy
+    struct target_distribution_policy
     {
     public:
-        /// Default-construct a new instance of a \a targeting_distribution_policy.
+        /// Default-construct a new instance of a \a target_distribution_policy.
         /// This policy will represent one locality (the local locality).
-        targeting_distribution_policy()
+        target_distribution_policy()
         {}
 
-        /// Create a new \a targeting_distribution_policy representing the given
+        /// Create a new \a target_distribution_policy representing the given
         /// locality
         ///
         /// \param loc     [in] The locality the new instance should
         ///                 represent
-        targeting_distribution_policy operator()(id_type const& id) const
+        target_distribution_policy operator()(id_type const& id) const
         {
-            return targeting_distribution_policy(id);
+            return target_distribution_policy(id);
         }
 
         /// Create one object on one of the localities associated by
@@ -206,7 +205,7 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        targeting_distribution_policy(hpx::id_type const& id)
+        target_distribution_policy(hpx::id_type const& id)
           : id_(id)
         {}
 
@@ -222,21 +221,21 @@ namespace hpx { namespace components
         /// \endcond
     };
 
-    /// A predefined instance of the \a targeting_distribution_policy. It will
+    /// A predefined instance of the \a target_distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static targeting_distribution_policy const target;
+    static target_distribution_policy const target;
 }}
 
 /// \cond NOINTERNAL
 namespace hpx
 {
-    using hpx::components::targeting_distribution_policy;
+    using hpx::components::target_distribution_policy;
     using hpx::components::target;
 
     namespace traits
     {
         template <>
-        struct is_distribution_policy<components::targeting_distribution_policy>
+        struct is_distribution_policy<components::target_distribution_policy>
           : std::true_type
         {};
     }

@@ -22,7 +22,7 @@ namespace hpx { namespace threads { namespace detail
     void thread_num_tss::init_tss(std::size_t num)
     {
         // shouldn't be initialized yet
-        if (NULL == thread_num_tss::thread_num_.get())
+        if (nullptr == thread_num_tss::thread_num_.get())
         {
             thread_num_tss::thread_num_.reset(new std::size_t);
             *thread_num_tss::thread_num_.get() = num;
@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace detail
     std::size_t thread_num_tss::set_tss_threadnum(std::size_t num)
     {
         // should have been initialized
-        HPX_ASSERT(NULL != thread_num_tss::thread_num_.get());
+        HPX_ASSERT(nullptr != thread_num_tss::thread_num_.get());
 
         std::swap(*thread_num_tss::thread_num_.get(), num);
         return num;
@@ -45,7 +45,7 @@ namespace hpx { namespace threads { namespace detail
 
     std::size_t thread_num_tss::get_worker_thread_num() const
     {
-        if (NULL != thread_num_tss::thread_num_.get())
+        if (nullptr != thread_num_tss::thread_num_.get())
             return *thread_num_tss::thread_num_;
 
         // some OS threads are not managed by the thread-manager

@@ -7,30 +7,29 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
 #include <hpx/config.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-#include <hpx/parallel/traits/extract_partitioner.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/range/functions.hpp>
 
 #include <iterator>
 #include <list>
+#include <memory>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,12 +76,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     // add the newly created workitems to the list
                     inititems.reserve(inititems.size() + workitems.size());
@@ -171,11 +171,12 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        bind(invoke_fused(), _2, _1),
+                        std::move(shape), std::forward<F1>(f1));
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
@@ -232,12 +233,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -288,8 +290,8 @@ namespace hpx { namespace parallel { namespace util
                     tuple_type;
 
                 // inform parameter traits
-                boost::shared_ptr<scoped_executor_parameters>
-                    scoped_param(boost::make_shared<
+                std::shared_ptr<scoped_executor_parameters>
+                    scoped_param(std::make_shared<
                             scoped_executor_parameters
                         >(policy.parameters()));
 
@@ -305,12 +307,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -359,8 +362,8 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename hpx::util::decay<Data>::type data_type;
 
                 // inform parameter traits
-                boost::shared_ptr<scoped_executor_parameters>
-                    scoped_param(boost::make_shared<
+                std::shared_ptr<scoped_executor_parameters>
+                    scoped_param(std::make_shared<
                             scoped_executor_parameters
                         >(policy.parameters()));
 
@@ -399,11 +402,12 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        bind(invoke_fused(), _2, _1),
+                        std::move(shape), std::forward<F1>(f1));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
@@ -446,8 +450,8 @@ namespace hpx { namespace parallel { namespace util
                     tuple_type;
 
                 // inform parameter traits
-                boost::shared_ptr<scoped_executor_parameters>
-                    scoped_param(boost::make_shared<
+                std::shared_ptr<scoped_executor_parameters>
+                    scoped_param(std::make_shared<
                             scoped_executor_parameters
                         >(policy.parameters()));
 
@@ -464,12 +468,13 @@ namespace hpx { namespace parallel { namespace util
                     using hpx::util::bind;
                     using hpx::util::functional::invoke_fused;
                     using hpx::util::placeholders::_1;
+                    using hpx::util::placeholders::_2;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), std::forward<F1>(f1), _1),
-                            std::move(shape));
+                            bind(invoke_fused(), _2, _1),
+                            std::move(shape), std::forward<F1>(f1));
 
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));

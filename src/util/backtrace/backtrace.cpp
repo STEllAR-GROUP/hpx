@@ -143,7 +143,7 @@ namespace hpx { namespace util {
             if(n>=63)
                 n=62;
 #endif
-            return RtlCaptureStackBackTrace(ULONG(0),ULONG(n),array,NULL);
+            return RtlCaptureStackBackTrace(ULONG(0),ULONG(n),array,nullptr);
         }
 
 #else
@@ -296,7 +296,7 @@ namespace hpx { namespace util {
                     hProcess = GetCurrentProcess();
                     SymSetOptions(SYMOPT_DEFERRED_LOADS);
 
-                    if (SymInitialize(hProcess, NULL, TRUE))
+                    if (SymInitialize(hProcess, nullptr, TRUE))
                     {
                         syms_ready = true;
                     }

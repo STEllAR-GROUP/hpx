@@ -15,8 +15,8 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
@@ -34,6 +34,15 @@ namespace hpx { namespace traits
         typedef typename segmented_local_iterator_traits<
                 local_iterator
             >::local_raw_iterator type;
+    };
+
+    template <typename Iterator>
+    struct projected_iterator<Iterator,
+        typename hpx::util::always_void<
+            typename hpx::util::decay<Iterator>::type::proxy_type>::type>
+    {
+        typedef typename hpx::util::decay<Iterator>::type::proxy_type
+            type;
     };
 }}
 

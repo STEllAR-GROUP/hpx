@@ -49,7 +49,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         if(ini.has_section("hpx.parcel.ibverbs"))
         {
             util::section const * sec = ini.get_section("hpx.parcel.ibverbs");
-            if(NULL != sec) {
+            if(nullptr != sec) {
                 std::string ibverbs_enabled(
                     sec->get_entry("enable", "0"));
                 if(boost::lexical_cast<int>(ibverbs_enabled))
@@ -60,7 +60,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
                     ifaddrs *ifap;
                     getifaddrs(&ifap);
-                    for(ifaddrs *cur = ifap; cur != NULL; cur = cur->ifa_next)
+                    for(ifaddrs *cur = ifap; cur != nullptr; cur = cur->ifa_next)
                     {
                         if(std::string(cur->ifa_name) == ibverbs_ifname)
                         {
@@ -108,7 +108,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         std::string ibverbs_address = get_ibverbs_address(ini);
         if (ini.has_section("hpx.parcel")) {
             util::section const* sec = ini.get_section("hpx.parcel");
-            if (NULL != sec) {
+            if (nullptr != sec) {
                 return parcelset::locality(
                     locality(
                         ibverbs_address

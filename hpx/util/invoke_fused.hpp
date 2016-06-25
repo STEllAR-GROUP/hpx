@@ -7,10 +7,10 @@
 #define HPX_UTIL_INVOKE_FUSED_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -56,6 +56,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Tuple, std::size_t ...Is>
+        HPX_HOST_DEVICE
         inline typename fused_result_of<F&&(Tuple&&)>::type
         invoke_fused_impl(F&&f, Tuple&& t, pack_c<std::size_t, Is...>)
         {
@@ -66,6 +67,7 @@ namespace hpx { namespace util
     }
 
     template <typename F, typename Tuple>
+    HPX_HOST_DEVICE
     inline typename detail::fused_result_of<F&&(Tuple&&)>::type
     invoke_fused(F&& f, Tuple&& t)
     {
@@ -81,6 +83,7 @@ namespace hpx { namespace util
         struct invoke_fused_guard
         {
             template <typename F, typename Tuple>
+            HPX_HOST_DEVICE
             inline R operator()(F&& f, Tuple&& t)
             {
                 return detail::invoke_fused_impl(
@@ -93,6 +96,7 @@ namespace hpx { namespace util
         struct invoke_fused_guard<void>
         {
             template <typename F, typename Tuple>
+            HPX_HOST_DEVICE
             inline void operator()(F&& f, Tuple&& t)
             {
                 detail::invoke_fused_impl(
@@ -103,6 +107,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename F, typename Tuple>
+    HPX_HOST_DEVICE
     inline R invoke_fused(F&& f, Tuple&& t)
     {
         return detail::invoke_fused_guard<R>()(
@@ -114,6 +119,7 @@ namespace hpx { namespace util
         struct invoke_fused
         {
             template <typename F, typename Tuple>
+            HPX_HOST_DEVICE
             typename util::detail::fused_result_of<F&&(Tuple&&)>::type
             operator()(F&& f, Tuple&& args)
             {
@@ -127,6 +133,7 @@ namespace hpx { namespace util
         struct invoke_fused_r
         {
             template <typename F, typename Tuple>
+            HPX_HOST_DEVICE
             R operator()(F&& f, Tuple&& args)
             {
                 return util::invoke_fused<R>(

@@ -35,6 +35,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -46,78 +47,78 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // There is no need to protect these global from thread concurrent access
     // as they are access during early startup only.
-    std::list<util::function_nonser<void()> > global_pre_startup_functions;
-    std::list<util::function_nonser<void()> > global_startup_functions;
+    std::list<startup_function_type> global_pre_startup_functions;
+    std::list<startup_function_type> global_startup_functions;
 
-    std::list<util::function_nonser<void()> > global_pre_shutdown_functions;
-    std::list<util::function_nonser<void()> > global_shutdown_functions;
+    std::list<shutdown_function_type> global_pre_shutdown_functions;
+    std::list<shutdown_function_type> global_shutdown_functions;
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_pre_startup_function(startup_function_type const& f)
+    void register_pre_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
                 return;
             }
-            rt->add_pre_startup_function(f);
+            rt->add_pre_startup_function(std::move(f));
         }
         else {
-            global_pre_startup_functions.push_back(f);
+            global_pre_startup_functions.push_back(std::move(f));
         }
     }
 
-    void register_startup_function(startup_function_type const& f)
+    void register_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
                     "Too late to register a new startup function.");
                 return;
             }
-            rt->add_startup_function(f);
+            rt->add_startup_function(std::move(f));
         }
         else {
-            global_startup_functions.push_back(f);
+            global_startup_functions.push_back(std::move(f));
         }
     }
 
-    void register_pre_shutdown_function(shutdown_function_type const& f)
+    void register_pre_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
                 return;
             }
-            rt->add_pre_shutdown_function(f);
+            rt->add_pre_shutdown_function(std::move(f));
         }
         else {
-            global_pre_shutdown_functions.push_back(f);
+            global_pre_shutdown_functions.push_back(std::move(f));
         }
     }
 
-    void register_shutdown_function(shutdown_function_type const& f)
+    void register_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
                 return;
             }
-            rt->add_shutdown_function(f);
+            rt->add_shutdown_function(std::move(f));
         }
         else {
-            global_shutdown_functions.push_back(f);
+            global_shutdown_functions.push_back(std::move(f));
         }
     }
 
@@ -182,27 +183,27 @@ namespace hpx {
 #endif
 
         // copy over all startup functions registered so far
-        for (util::function_nonser<void()> const& f : global_pre_startup_functions)
+        for (startup_function_type& f : global_pre_startup_functions)
         {
-            add_pre_startup_function(f);
+            add_pre_startup_function(std::move(f));
         }
         global_pre_startup_functions.clear();
 
-        for (util::function_nonser<void()> const& f : global_startup_functions)
+        for (startup_function_type& f : global_startup_functions)
         {
-            add_startup_function(f);
+            add_startup_function(std::move(f));
         }
         global_startup_functions.clear();
 
-        for (util::function_nonser<void()> const& f : global_pre_shutdown_functions)
+        for (shutdown_function_type& f : global_pre_shutdown_functions)
         {
-            add_pre_shutdown_function(f);
+            add_pre_shutdown_function(std::move(f));
         }
         global_pre_shutdown_functions.clear();
 
-        for (util::function_nonser<void()> const& f : global_shutdown_functions)
+        for (shutdown_function_type& f : global_shutdown_functions)
         {
-            add_shutdown_function(f);
+            add_shutdown_function(std::move(f));
         }
         global_shutdown_functions.clear();
 
@@ -362,7 +363,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::wait_helper(
-        boost::mutex& mtx, boost::condition& cond, bool& running)
+        boost::mutex& mtx, boost::condition_variable& cond, bool& running)
     {
         // signal successful initialization
         {
@@ -394,7 +395,7 @@ namespace hpx {
 
         // start the wait_helper in a separate thread
         boost::mutex mtx;
-        boost::condition cond;
+        boost::condition_variable cond;
         bool running = false;
 
         boost::thread t (util::bind(
@@ -404,7 +405,7 @@ namespace hpx {
 
         // wait for the thread to run
         {
-            std::unique_lock<boost::mutex> lk(mtx);
+            boost::unique_lock<boost::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -443,8 +444,8 @@ namespace hpx {
             // from a HPX thread, so it would deadlock by waiting for the thread
             // manager
             boost::mutex mtx;
-            boost::condition cond;
-            std::unique_lock<boost::mutex> l(mtx);
+            boost::condition_variable cond;
+            boost::unique_lock<boost::mutex> l(mtx);
 
             boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 boost::ref(cond), boost::ref(mtx)));
@@ -475,7 +476,7 @@ namespace hpx {
     // a HPX thread!
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::stopped(
-        bool blocking, boost::condition& cond, boost::mutex& mtx)
+        bool blocking, boost::condition_variable& cond, boost::mutex& mtx)
     {
         // wait for thread manager to exit
         runtime_support_->stopped();         // re-activate shutdown HPX-thread
@@ -621,9 +622,9 @@ namespace hpx {
     }
 
     template <typename SchedulingPolicy>
-    void runtime_impl<SchedulingPolicy>::init_tss(
+    void runtime_impl<SchedulingPolicy>::init_tss_ex(
         char const* context, std::size_t num, char const* postfix,
-        bool service_thread)
+        bool service_thread, error_code& ec)
     {
         // initialize our TSS
         this->runtime::init_tss();
@@ -632,7 +633,7 @@ namespace hpx {
         applier_.init_tss();
 
         // set the thread's name, if it's not already set
-        if (NULL == runtime::thread_name_.get())
+        if (nullptr == runtime::thread_name_.get())
         {
             std::string* fullname = new std::string(context);
             if (postfix && *postfix)
@@ -643,7 +644,7 @@ namespace hpx {
             char const* name = runtime::thread_name_.get()->c_str();
 
             // initialize thread mapping for external libraries (i.e. PAPI)
-            thread_support_->register_thread(name);
+            thread_support_->register_thread(name, ec);
 
             // initialize coroutines context switcher
             hpx::threads::coroutines::thread_startup(name);
@@ -707,30 +708,30 @@ namespace hpx {
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_pre_startup_function(util::function_nonser<void()> const& f)
+        add_pre_startup_function(startup_function_type f)
     {
-        runtime_support_->add_pre_startup_function(f);
+        runtime_support_->add_pre_startup_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_startup_function(util::function_nonser<void()> const& f)
+        add_startup_function(startup_function_type f)
     {
-        runtime_support_->add_startup_function(f);
+        runtime_support_->add_startup_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_pre_shutdown_function(util::function_nonser<void()> const& f)
+        add_pre_shutdown_function(shutdown_function_type f)
     {
-        runtime_support_->add_pre_shutdown_function(f);
+        runtime_support_->add_pre_shutdown_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
-        add_shutdown_function(util::function_nonser<void()> const& f)
+        add_shutdown_function(shutdown_function_type f)
     {
-        runtime_support_->add_shutdown_function(f);
+        runtime_support_->add_shutdown_function(std::move(f));
     }
 
     template <typename SchedulingPolicy>
@@ -762,17 +763,18 @@ namespace hpx {
     /// Register an external OS-thread with HPX
     template <typename SchedulingPolicy>
     bool runtime_impl<SchedulingPolicy>::
-        register_thread(char const* name, std::size_t num, bool service_thread)
+        register_thread(char const* name, std::size_t num, bool service_thread,
+            error_code& ec)
     {
-        if (NULL != runtime::thread_name_.get())
+        if (nullptr != runtime::thread_name_.get())
             return false;       // already registered
 
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss(thread_name.c_str(), num, 0, service_thread);
+        init_tss_ex(thread_name.c_str(), num, 0, service_thread, ec);
 
-        return true;
+        return !ec ? true : false;
     }
 
     /// Unregister an external OS-thread with HPX
@@ -780,7 +782,7 @@ namespace hpx {
     bool runtime_impl<SchedulingPolicy>::
         unregister_thread()
     {
-        if (NULL == runtime::thread_name_.get())
+        if (nullptr == runtime::thread_name_.get())
             return false;       // never registered
 
         deinit_tss();

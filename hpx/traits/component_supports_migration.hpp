@@ -7,10 +7,10 @@
 #define HPX_TRAITS_ACTION_SUPPORTS_MIGRATION_FEB_10_2016_1252PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits
 {
@@ -44,7 +44,7 @@ namespace hpx { namespace traits
         }
     }
 
-    template <typename Component, typename Enable>
+    template <typename Component, typename Enable = void>
     struct component_supports_migration
     {
         // returns whether target supports migration

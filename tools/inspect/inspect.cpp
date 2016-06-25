@@ -164,7 +164,7 @@ namespace
 //       {
 //         static const int line_max = 128;
 //         char line[line_max];
-//         while (fgets(line, line_max, fp) != NULL)
+//         while (fgets(line, line_max, fp) != nullptr)
 //         {
 //           string ln(line);
 //           string::size_type pos;

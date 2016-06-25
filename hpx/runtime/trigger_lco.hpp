@@ -15,8 +15,8 @@
 
 #include <boost/exception_ptr.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx
 {
@@ -132,7 +132,10 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     template <typename Result>
-    void set_lco_value(naming::id_type const& id, Result && t,
+    typename std::enable_if<
+        !std::is_same<typename util::decay<Result>::type, naming::address>::value
+    >::type
+    set_lco_value(naming::id_type const& id, Result && t,
         naming::id_type const& cont, bool move_credits = true)
     {
         set_lco_value(id, naming::address(), std::forward<Result>(t), cont,

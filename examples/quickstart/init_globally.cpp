@@ -31,7 +31,7 @@
 #if defined(linux) || defined(__linux) || defined(__linux__)
 
 int __argc = 0;
-char** __argv = 0;
+char** __argv = nullptr;
 
 void set_argv_argv(int argc, char* argv[], char* env[])
 {
@@ -49,9 +49,9 @@ __attribute__((section(".init_array")))
 inline int get_arraylen(char** argv)
 {
     int count = 0;
-    if (NULL != argv)
+    if (nullptr != argv)
     {
-        while(NULL != argv[count])
+        while(nullptr != argv[count])
             ++count;
     }
     return count;
@@ -118,11 +118,11 @@ struct manage_global_runtime
     // registration of external (to HPX) threads
     void register_thread(char const* name)
     {
-        rts_->register_thread(name);
+        hpx::register_thread(rts_, name);
     }
     void unregister_thread()
     {
-        rts_->unregister_thread();
+        hpx::unregister_thread(rts_);
     }
 
 protected:

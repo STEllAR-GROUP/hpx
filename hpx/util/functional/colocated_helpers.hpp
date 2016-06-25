@@ -7,13 +7,13 @@
 #define HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <memory>
 
@@ -53,10 +53,11 @@ namespace hpx { namespace util { namespace functional
         public:
             typedef typename util::decay<Bound>::type bound_type;
 
-            apply_continuation_impl() {}
+            apply_continuation_impl()
+              : bound_(), cont_() {}
 
             explicit apply_continuation_impl(Bound && bound)
-              : bound_(std::move(bound))
+              : bound_(std::move(bound)), cont_()
             {}
 
             template <typename Continuation>
@@ -154,10 +155,12 @@ namespace hpx { namespace util { namespace functional
         public:
             typedef typename util::decay<Bound>::type bound_type;
 
-            async_continuation_impl() {}
+            async_continuation_impl()
+              : bound_(), cont_()
+            {}
 
             explicit async_continuation_impl(Bound && bound)
-              : bound_(std::move(bound))
+              : bound_(std::move(bound)), cont_()
             {}
 
             template <typename Continuation>

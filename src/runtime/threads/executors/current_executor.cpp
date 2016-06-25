@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        threads::detail::create_thread(scheduler_base_, data, id,
+        threads::detail::create_thread(scheduler_base_, data, id, //-V601
             initial_state, run_now, ec);
         if (ec) return;
 

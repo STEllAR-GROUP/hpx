@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/state.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>

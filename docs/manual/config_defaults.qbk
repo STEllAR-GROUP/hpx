@@ -118,7 +118,9 @@ by section basis below.
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.
       Set by default to the value of the compile time preprocessor constant
-      `HPX_SMALL_STACK_SIZE` (defaults to `0x8000`).]]
+      `HPX_SMALL_STACK_SIZE` (defaults to `0x8000`). This value is used for all
+      __hpx__ threads by default, except for the thread running `hpx_main`
+      (which runs on a large stack).]]
     [[`hpx.stacks.medium_size`]
      [This is initialized to the medium stack size to be used by __hpx__-threads.
       Set by default to the value of the compile time preprocessor constant
@@ -126,7 +128,8 @@ by section basis below.
     [[`hpx.stacks.large_size`]
      [This is initialized to the large stack size to be used by __hpx__-threads.
       Set by default to the value of the compile time preprocessor constant
-      `HPX_LARGE_STACK_SIZE` (defaults to `0x200000`).]]
+      `HPX_LARGE_STACK_SIZE` (defaults to `0x200000`). This setting is used by
+      default for the thread running `hpx_main` only.]]
     [[`hpx.stacks.huge_size`]
      [This is initialized to the huge stack size to be used by __hpx__-threads.
       Set by default to the value of the compile time preprocessor constant

@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <climits>
 #include <cstddef>
 #include <cstdint>
-#include <climits>
 
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
             && HPX_HAVE_MAX_CPU_COUNT > 64)
@@ -102,6 +102,18 @@ namespace hpx { namespace threads
     inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
     {
         return (lhs & rhs) != 0;
+    }
+
+    // returns the number of bits set
+    // taken from https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
+    inline std::size_t count(mask_cref_type mask)
+    {
+        std::size_t c; // c accumulates the total bits set in v
+        for (c = 0; mask; c++)
+        {
+              mask &= mask - 1; // clear the least significant bit set
+        }
+        return c;
     }
 
 #define HPX_CPU_MASK_PREFIX "0x"
@@ -208,6 +220,12 @@ namespace hpx { namespace threads
             }
         }
         return false;
+    }
+
+    // returns the number of bits set
+    inline std::size_t count(mask_cref_type mask)
+    {
+        return mask.count();
     }
 #endif
     /// \endcond

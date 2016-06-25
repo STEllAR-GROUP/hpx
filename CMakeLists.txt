@@ -47,7 +47,7 @@ project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 0)
 set(HPX_MINOR_VERSION 9)
-set(HPX_PATCH_LEVEL   12)
+set(HPX_PATCH_LEVEL   99)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
@@ -221,6 +221,24 @@ endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL
   "Build and link HPX libraries and executables with full RPATHs (default: ON)"
   OFF ADVANCED)
+
+################################################################################
+# HPX Compute configuration
+################################################################################
+hpx_option(HPX_WITH_CUDA BOOL
+  "Enable CUDA support (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_WITH_CUDA_CLANG BOOL
+  "Use clang to compile CUDA code (default: OFF)" OFF ADVANCED)
+if(HPX_WITH_CUDA)
+  find_package(CUDA REQUIRED)
+  set(HPX_WITH_COMPUTE On)
+  hpx_add_config_define(HPX_HAVE_CUDA)
+  hpx_add_config_define(HPX_HAVE_COMPUTE)
+endif()
+hpx_option(HPX_WITH_HCC BOOL
+  "Enable hcc support (default: OFF)" ADVANCED)
+hpx_option(HPX_WITH_SYCL BOOL
+  "Enable sycl support (default: OFF)" ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -496,26 +514,92 @@ hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
   ON CATEGORY "Parcelport" ADVANCED)
 
 ## Profiling related build options
-hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_APEX BOOL
+  "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX)
 endif()
-hpx_option(HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_PAPI BOOL
+  "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
 if(HPX_WITH_PAPI)
   hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
-hpx_option(HPX_WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_TAU BOOL
+  "Enable TAU profiling support." OFF CATEGORY "Profiling")
 if(HPX_WITH_TAU)
   hpx_add_config_define(HPX_HAVE_TAU)
 endif()
-hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
+  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
-hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_ITTNOTIFY BOOL
+  "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 #if(HPX_WITH_ITTNOTIFY)
   #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 #endif()
+
+## External libraries/frameworks used by sme of the examples and benchmarks
+hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
+  "Enable examples requiring OpenMP support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_OPENMP)
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_OPENMP)
+  else()
+    set(HPX_WITH_EXAMPLES_OPENMP OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
+  "Enable examples requiring TBB support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_TBB)
+  find_package(TBB)
+  if(TBB_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_TBB)
+  else()
+    set(HPX_WITH_EXAMPLES_TBB OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
+  "Enable examples requiring QThreads support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_QTHREADS)
+  find_package(QThreads)
+  if(QTHREADS_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_QTHREADS)
+  else()
+    set(HPX_WITH_EXAMPLES_QTHREADS OFF)
+  endif()
+endif()
+hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
+  "Enable examples requiring HDF5 support (default: OFF)." OFF
+  CATEGORY "Tools" ADVANCED)
+if(HPX_WITH_EXAMPLES_HDF5)
+  find_package(HDF5 COMPONENTS CXX)
+  if(HDF5_FOUND)
+    hpx_add_config_define(HPX_HAVE_EXAMPLES_HDF5)
+  else()
+    set(HPX_WITH_EXAMPLES_HDF5 OFF)
+  endif()
+endif()
+
+# Disabling the Qt example on BG/Q as GUIs don't make sense there anyways
+if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
+    "Enable examples requiring Qt4 support (default: OFF)." OFF
+    CATEGORY "Tools" ADVANCED)
+  if(HPX_WITH_EXAMPLES_QT4)
+    find_package(Qt4)
+    if(QT4_FOUND)
+      hpx_add_config_define(HPX_HAVE_EXAMPLES_QT4)
+    else()
+      set(HPX_WITH_EXAMPLES_QT4 OFF)
+    endif()
+  endif()
+endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
@@ -627,7 +711,7 @@ if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
 
-# HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.12
+# HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.99
 hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
     "Enable backwards compatibility for hpx::lcos::local::dataflow() functions"
     ON ADVANCED)
@@ -635,7 +719,7 @@ if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
 endif()
 
-# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.12
+# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.99
 hpx_option(HPX_WITH_GENERIC_EXECUTION_POLICY BOOL
     "Enable the generic execution policy (default: OFF)"
     OFF ADVANCED)
@@ -702,7 +786,7 @@ endif()
 
 if(MSVC14 AND CMAKE_CL_64)
   hpx_option(HPX_WITH_AWAIT BOOL
-      "Enable the use of experimental __await functionality"
+      "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
   if(HPX_WITH_AWAIT)
     hpx_add_config_define(HPX_HAVE_AWAIT)
@@ -727,31 +811,35 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
 
 # Make sure we compile in C++11 mode (MSVC uses it automatically)
 if(NOT MSVC)
-  # Try -std=c++14 first
-  check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
-  if(HPX_WITH_CXX14)
-    set(CXX_FLAG -std=c++14)
+  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
+    hpx_add_target_compile_option(-std=c++11)
   else()
-    # ... otherwise try -std=c++0y
-    check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
-    if(HPX_WITH_CXX0Y)
-      set(CXX_FLAG -std=c++0y)
+    # Try -std=c++14 first
+    check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+    if(HPX_WITH_CXX14)
+      set(CXX_FLAG -std=c++14)
     else()
-      # ... otherwise try -std=c++11
-      check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
-      if(HPX_WITH_CXX11)
-        set(CXX_FLAG -std=c++11)
+      # ... otherwise try -std=c++0y
+      check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
+      if(HPX_WITH_CXX0Y)
+        set(CXX_FLAG -std=c++0y)
       else()
-        # ... otherwise try -std=c++0x
-        check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
-        if(HPX_WITH_CXX0X)
-          set(CXX_FLAG -std=c++0x)
+        # ... otherwise try -std=c++11
+        check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
+        if(HPX_WITH_CXX11)
+          set(CXX_FLAG -std=c++11)
+        else()
+          # ... otherwise try -std=c++0x
+          check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
+          if(HPX_WITH_CXX0X)
+            set(CXX_FLAG -std=c++0x)
+          endif()
         endif()
       endif()
     endif()
-  endif()
 
-  hpx_add_target_compile_option(${CXX_FLAG})
+    hpx_add_target_compile_option(${CXX_FLAG})
+  endif()
 endif()
 
 ################################################################################
@@ -809,7 +897,7 @@ hpx_check_for_cxx11_noexcept(
   DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
 
 hpx_check_for_cxx11_nullptr(
-  DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
+  REQUIRED "HPX needs support for C++11 nullptr")
 
 hpx_check_for_cxx11_range_based_for(
   REQUIRED "HPX needs support for C++11 range-based for-loop")
@@ -844,12 +932,6 @@ hpx_check_for_cxx11_std_initializer_list(
 
 hpx_check_for_cxx11_std_is_bind_expression(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
-
-hpx_check_for_cxx11_std_is_final(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
-
-hpx_check_for_cxx11_std_is_null_pointer(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
 
 hpx_check_for_cxx11_std_is_placeholder(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
@@ -894,6 +976,12 @@ hpx_check_for_cxx14_lambdas(
 # Check the availability of certain C++14 library features
 hpx_check_for_cxx14_std_integer_sequence(
   DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
+
+hpx_check_for_cxx14_std_is_final(
+  DEFINITIONS HPX_HAVE_CXX14_STD_IS_FINAL)
+
+hpx_check_for_cxx14_std_is_null_pointer(
+  DEFINITIONS HPX_HAVE_CXX14_STD_IS_NULL_POINTER)
 
 hpx_check_for_cxx14_std_result_of_sfinae(
   DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)

@@ -15,13 +15,13 @@
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 #include <hpx/config/asio.hpp>
 
+#include <hpx/plugins/parcelport/tcp/locality.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
-#include <hpx/plugins/parcelport/tcp/locality.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <memory>
 #include <set>

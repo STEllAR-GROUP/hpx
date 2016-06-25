@@ -31,6 +31,7 @@ set(tests
     receive_buffer_1733
     safely_destroy_promise_1481
     set_hpx_limit_798
+    shared_future_then_2166
     shared_mutex_1702
     shared_stated_leaked_1211
     wait_all_hang_1946

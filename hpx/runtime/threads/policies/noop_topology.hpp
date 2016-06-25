@@ -14,8 +14,8 @@
 #if !defined(HPX_HAVE_HWLOC)
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 
 #if defined(__ANDROID__) && defined(ANDROID)
 #include <cpu-features.h>
@@ -220,13 +220,13 @@ public:
 
     /// This is equivalent to malloc(), except that it tries to allocate
     /// page-aligned memory from the OS.
-    void* allocate(std::size_t len)
+    void* allocate(std::size_t len) const
     {
         return ::operator new(len);
     }
 
     /// Free memory that was previously allocated by allocate
-    void deallocate(void* addr, std::size_t len)
+    void deallocate(void* addr, std::size_t len) const
     {
         ::operator delete(addr/*, len*/);
     }

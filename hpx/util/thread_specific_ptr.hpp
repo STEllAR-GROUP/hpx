@@ -67,7 +67,7 @@ namespace hpx { namespace util
         }
 
         void reset(
-            T* new_value = 0
+            T* new_value = nullptr
             )
         {
             delete ptr_;
@@ -79,13 +79,13 @@ namespace hpx { namespace util
     };
 
     template <typename T, typename Tag>
-    HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = 0;
+    HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = nullptr;
 }}
 
 #else
 
-#include <pthread.h>
 #include <hpx/util/static.hpp>
+#include <pthread.h>
 
 namespace hpx { namespace util
 {
@@ -96,7 +96,7 @@ namespace hpx { namespace util
             thread_specific_ptr_key()
             {
                 //pthread_once(&key_once, &thread_specific_ptr_key::make_key);
-                pthread_key_create(&key, NULL);
+                pthread_key_create(&key, nullptr);
             }
 
             pthread_key_t key;
@@ -132,7 +132,7 @@ namespace hpx { namespace util
 
         T& operator*() const
         {
-            T* ptr = 0;
+            T* ptr = nullptr;
 
             ptr = reinterpret_cast<T *>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
@@ -141,10 +141,10 @@ namespace hpx { namespace util
         }
 
         void reset(
-            T* new_value = 0
+            T* new_value = nullptr
             )
         {
-            T* ptr = 0;
+            T* ptr = nullptr;
 
             ptr = reinterpret_cast<T *>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
@@ -188,7 +188,7 @@ namespace hpx { namespace util
         }
 
         void reset(
-            T* new_value = 0
+            T* new_value = nullptr
             )
         {
             ptr_.reset(new_value);

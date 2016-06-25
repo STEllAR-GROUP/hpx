@@ -104,7 +104,7 @@ int hpx_main(po::variables_map &vm)
           n.push_back(hpx::async<set_initialdata_action>(this_prefix,i));
         }
 
-        srand( time(NULL) );
+        srand( time(nullptr) );
 
         std::vector<lcos::future< void > > future_update;
         int N = 10; // number of random accesses to the array

@@ -10,6 +10,7 @@
 #define HPX_LCOS_FWD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 
 namespace hpx
@@ -25,7 +26,10 @@ namespace hpx
         class HPX_API_EXPORT base_lco;
 
         template <typename Result, typename RemoteResult = Result>
-        class base_lco_with_value;
+        class HPX_SINGLE_INHERITANCE base_lco_with_value;
+
+        template <>
+        class HPX_SINGLE_INHERITANCE base_lco_with_value<void, void>;
 
         template <typename Result,
             typename RemoteResult =

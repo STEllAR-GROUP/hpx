@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2016 Lukas Troska
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,12 +21,18 @@ namespace hpx
     ///
     /// \param f        The function which will be called for each of the
     ///                 input futures once the future has become ready.
+    ///
     /// \param futures  A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_each should
     ///                 wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future representing the event of all input futures
     ///           being ready.
@@ -49,7 +56,12 @@ namespace hpx
     ///                 which \a wait_each should wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future representing the event of all input futures
     ///           being ready.
@@ -70,7 +82,12 @@ namespace hpx
     ///                 \a wait_each should wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future representing the event of all input futures
     ///           being ready.
@@ -93,7 +110,12 @@ namespace hpx
     ///                 \a first.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     /// \return   Returns a future holding the iterator pointing to the first
     ///           element after the last one.
@@ -105,14 +127,19 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/when_some.hpp>
+#include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/traits/future_traits.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_future_range.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
@@ -131,6 +158,25 @@ namespace hpx { namespace lcos
 {
     namespace detail
     {
+        // call supplied callback with or without index
+        struct dispatch
+        {
+
+            template<typename F, typename IndexType, typename FutureType>
+            inline static void call(F&& f, IndexType index, FutureType&& future,
+                boost::true_type)
+            {
+                f(index, std::move(future));
+            }
+
+            template<typename F, typename IndexType, typename FutureType>
+            inline static void call(F&& f, IndexType index, FutureType&& future,
+                boost::false_type)
+            {
+                f(std::move(future));
+            }
+        };
+
         template <typename Tuple, typename F>
         struct when_each_frame //-V690
           : lcos::detail::future_data<void>
@@ -205,8 +251,13 @@ namespace hpx { namespace lcos
                         }
                     }
 
-                    f_(std::move(*next));
-                    ++count_;
+                    dispatch::call(std::forward<F>(f_), count_++,
+                        std::move(*next),
+                        typename traits::is_callable<
+                            F(std::size_t, future_type)
+                        >::type()
+                    );
+
                     if(count_ == needed_count_)
                     {
                         do_await<I + 1>(std::true_type());
@@ -269,8 +320,12 @@ namespace hpx { namespace lcos
                     }
                 }
 
-                f_(std::move(fut));
-                ++count_;
+                dispatch::call(std::forward<F>(f_), count_++, std::move(fut),
+                    typename traits::is_callable<
+                        F(std::size_t, future_type)
+                    >::type()
+                );
+
                 if(count_ == needed_count_)
                 {
                     do_await<I + 1>(std::true_type());
@@ -355,7 +410,10 @@ namespace hpx { namespace lcos
     }
 
     template <typename F, typename Iterator>
-    lcos::future<Iterator>
+    typename std::enable_if<
+        !traits::is_future<Iterator>::value,
+        lcos::future<Iterator>
+    >::type
     when_each(F&& f, Iterator begin, Iterator end)
     {
         typedef

@@ -10,15 +10,16 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
-#include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
+#include <hpx/runtime/serialization/output_container.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/mpl/or.hpp>
+#include <boost/type_traits/is_enum.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
-#include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <list>
@@ -43,9 +44,9 @@ namespace hpx { namespace serialization
         output_archive(Container & buffer,
             boost::uint32_t flags = 0U,
             boost::uint32_t dest_locality_id = ~0U,
-            std::vector<serialization_chunk>* chunks = 0,
-            binary_filter* filter = 0,
-            new_gids_map* new_gids = 0)
+            std::vector<serialization_chunk>* chunks = nullptr,
+            binary_filter* filter = nullptr,
+            new_gids_map* new_gids = nullptr)
             : base_type(flags)
             , buffer_(new output_container<Container>(buffer, chunks, filter))
             , dest_locality_id_(dest_locality_id)
@@ -145,7 +146,7 @@ namespace hpx { namespace serialization
               , boost::is_enum<T>
             >
         >::type
-        save(T t)
+        save(T t) //-V659
         {
             save_integral(t,
                 typename boost::is_unsigned<T>::type());
@@ -220,7 +221,7 @@ namespace hpx { namespace serialization
             save_integral_impl(static_cast<boost::uint64_t>(val));
         }
 
-#if defined(BOOST_HAS_INT128)
+#if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
         void save_integral(boost::int128_type t, boost::mpl::false_)
         {
             save_integral_impl(t);

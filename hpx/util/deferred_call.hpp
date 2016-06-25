@@ -7,8 +7,8 @@
 #define HPX_UTIL_DEFERRED_CALL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>
@@ -75,7 +75,8 @@ namespace hpx { namespace util
             HPX_DELETE_COPY_ASSIGN(deferred);
             HPX_DELETE_MOVE_ASSIGN(deferred);
 
-            inline typename deferred_result_of<F(Ts...)>::type
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename deferred_result_of<F(Ts...)>::type
             operator()()
             {
                 return util::invoke_fused(std::move(_f), std::move(_args));

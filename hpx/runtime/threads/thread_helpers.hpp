@@ -14,9 +14,9 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/chrono/chrono.hpp>
 
@@ -200,12 +200,13 @@ namespace hpx { namespace threads
     HPX_API_EXPORT char const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT char const* set_thread_backtrace(
-        thread_id_type const& id, char const* bt = 0, error_code& ec = throws);
+        thread_id_type const& id, char const* bt = nullptr,
+        error_code& ec = throws);
 #else
     HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
-        thread_id_type const& id, util::backtrace const* bt = 0,
+        thread_id_type const& id, util::backtrace const* bt = nullptr,
         error_code& ec = throws);
 #endif
 
@@ -559,6 +560,11 @@ namespace hpx { namespace this_thread
 
     // returns the remaining available stack space
     HPX_EXPORT std::ptrdiff_t get_available_stack_space();
+
+    // returns whether the remaining stack-space is at least as large as
+    // requested
+    HPX_EXPORT bool has_sufficient_stack_space(
+        std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

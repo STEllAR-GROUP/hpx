@@ -7,14 +7,14 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/performance_counters/server/base_performance_counter.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/util/interval_timer.hpp>
 
-#include <boost/smart_ptr/scoped_ptr.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/smart_ptr/scoped_ptr.hpp>
 
 #include <string>
 

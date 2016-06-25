@@ -14,13 +14,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/range/algorithm/copy.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
-#include <boost/range/algorithm/copy.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/shared_array.hpp>
 
 #include <sstream>

@@ -6,13 +6,13 @@
 #if !defined(HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM)
 #define HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM
 
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
 
 #include <utility>
 
 namespace hpx { namespace traits
 {
-    template <typename Result, typename RemoteResult, typename Enable>
+    template <typename Result, typename RemoteResult, typename Enable = void>
     struct get_remote_result
     {
         static Result call(RemoteResult const& rhs)

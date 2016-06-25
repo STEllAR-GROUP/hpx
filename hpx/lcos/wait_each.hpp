@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2016 Lukas Troska
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,7 +27,12 @@ namespace hpx
     ///                 wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     template <typename F, typename Future>
     void wait_each(F&& f, std::vector<Future>&& futures);
@@ -48,7 +54,12 @@ namespace hpx
     ///                 which \a wait_each should wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     template <typename F, typename Iterator>
     void wait_each(F&& f, Iterator begin, Iterator end);
@@ -67,7 +78,12 @@ namespace hpx
     ///                 \a wait_each should wait.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     template <typename F, typename ...T>
     void wait_each(F&& f, T&&... futures);
@@ -87,7 +103,12 @@ namespace hpx
     ///                 \a first.
     ///
     /// \note This function consumes the futures as they are passed on to the
-    ///       supplied function.
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
     ///
     template <typename F, typename Iterator>
     void wait_each_n(F&& f, Iterator begin, std::size_t count);
@@ -97,6 +118,7 @@ namespace hpx
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/when_each.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/detail/pack.hpp>
 
 #include <type_traits>

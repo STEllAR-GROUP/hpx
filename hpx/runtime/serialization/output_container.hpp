@@ -9,12 +9,12 @@
 #define HPX_SERIALIZATION_OUTPUT_CONTAINER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
-#include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy

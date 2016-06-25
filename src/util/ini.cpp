@@ -98,7 +98,7 @@ section::section ()
 }
 
 section::section (std::string const& filename, section* root)
-  : root_(NULL != root ? root : this_()), name_(filename)
+  : root_(nullptr != root ? root : this_()), name_(filename)
 {
     read(filename);
 }
@@ -343,7 +343,7 @@ void section::add_section (std::string const& sec_name, section& sec, section* r
     sec.parent_name_ = get_full_name();
 
     section& newsec = sections_[sec_name];
-    newsec.clone_from(sec, (NULL != root) ? root : get_root());
+    newsec.clone_from(sec, (nullptr != root) ? root : get_root());
 }
 
 bool section::has_section (std::string const& sec_name) const
@@ -383,7 +383,7 @@ section* section::get_section (std::string const& sec_name)
 
         HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
             "No such section (" + sec_name + ") in section: " + name);
-        return NULL;
+        return nullptr;
     }
 
     section_map::iterator it = sections_.find(sec_name);
@@ -392,7 +392,7 @@ section* section::get_section (std::string const& sec_name)
 
     HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
         "No such section (" + sec_name + ") in section: " + get_name());
-    return NULL;
+    return nullptr;
 }
 
 section const* section::get_section (std::string const& sec_name) const
@@ -414,7 +414,7 @@ section const* section::get_section (std::string const& sec_name) const
 
         HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
             "No such section (" + sec_name + ") in section: " + name);
-        return NULL;
+        return nullptr;
     }
 
     section_map::const_iterator it = sections_.find(sec_name);
@@ -423,7 +423,7 @@ section const* section::get_section (std::string const& sec_name) const
 
     HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
         "No such section (" + sec_name + ") in section: " + get_name());
-    return NULL;
+    return nullptr;
 }
 
 void section::add_entry (std::string const& key, std::string val)

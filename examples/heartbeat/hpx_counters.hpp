@@ -16,7 +16,7 @@ EXTERN_C DECLSPEC_SELECTANY GUID QueueLengthGuid =
    { 0x9a7a620e, 0x19d0, 0x4697, 0xb6, 0xfa, 0xa8, 0x3, 0x84, 0x5d, 0x73, 0x29 };
 
 
-EXTERN_C DECLSPEC_SELECTANY HANDLE HPXHeartBeat = NULL;
+EXTERN_C DECLSPEC_SELECTANY HANDLE HPXHeartBeat = nullptr;
 
 EXTERN_C DECLSPEC_SELECTANY struct {
     PERF_COUNTERSET_INFO CounterSet;
@@ -36,9 +36,9 @@ CounterCleanup(
     VOID
     )
 {
-    if (HPXHeartBeat != NULL) {
+    if (HPXHeartBeat != nullptr) {
         PerfStopProvider(HPXHeartBeat);
-        HPXHeartBeat = NULL;
+        HPXHeartBeat = nullptr;
     }
 }
 
@@ -65,7 +65,7 @@ CounterInitialize(
                                  &ProviderContext,
                                  &HPXHeartBeat);
     if (Status != ERROR_SUCCESS) {
-        HPXHeartBeat = NULL;
+        HPXHeartBeat = nullptr;
         return Status;
     }
 

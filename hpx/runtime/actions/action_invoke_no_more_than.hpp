@@ -7,15 +7,16 @@
 #define HPX_RUNTIME_ACTIONS_INVOKE_NO_MORE_THAN_MAR_30_2014_0616PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/util/static.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
+#include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/static.hpp>
 
 #include <boost/exception_ptr.hpp>
 
@@ -105,8 +106,7 @@ namespace hpx { namespace actions { namespace detail
         }
 
         // If the action returns a future we wait on the semaphore as well,
-        // however it will be signaled once the future gets ready only (see
-        // the traits::action_schedule_thread<> below).
+        // however it will be signaled once the future gets ready only.
         static threads::thread_state_enum thread_function_future(
             threads::thread_state_ex_enum state,
             threads::thread_function_type f)
@@ -170,8 +170,11 @@ namespace hpx { namespace actions { namespace detail
         void trigger_value(remote_result_type && result)
         {
             if(cont_)
+            {
+                HPX_ASSERT(0 != dynamic_cast<base_type *>(cont_.get()));
                 static_cast<base_type *>(cont_.get())->
                     trigger_value(std::move(result));
+            }
             construct_semaphore_type::get_sem().signal();
         }
 

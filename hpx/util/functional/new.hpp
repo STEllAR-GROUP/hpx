@@ -29,6 +29,22 @@ namespace hpx { namespace util { namespace functional
             return new (p) T(std::forward<Ts>(vs)...);
         }
     };
+
+    template <typename T>
+    struct placement_new_one
+    {
+        placement_new_one(void* p)
+          : p_(p)
+        {}
+
+        template <typename ...Ts>
+        T* operator()(Ts&&... vs) const
+        {
+            return new (p_) T(std::forward<Ts>(vs)...);
+        }
+
+        void* p_;
+    };
 }}}
 
 #endif

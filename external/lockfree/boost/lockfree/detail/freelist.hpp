@@ -46,7 +46,7 @@ class freelist_stack:
 
 public:
     freelist_stack (std::size_t n = 0):
-        pool_(tagged_node_ptr(NULL))
+        pool_(tagged_node_ptr(nullptr))
     {
         reserve_unsafe(n);
     }

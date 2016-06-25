@@ -24,6 +24,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.Parcelport Parcelport Options]
 * [link build_system.cmake_variables.Profiling Profiling Options]
 * [link build_system.cmake_variables.Debugging Debugging Options]
+* [link build_system.cmake_variables.Tools Tools Options]
 
 [#build_system.cmake_variables.Generic][h3 Generic Options]
 * [link build_system.cmake_variables.HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION]
@@ -229,6 +230,21 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_BACKTRACE] `HPX_WITH_VERIFY_LOCKS_BACKTRACE:BOOL`][Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_VERIFY_LOCKS_GLOBALLY] `HPX_WITH_VERIFY_LOCKS_GLOBALLY:BOOL`][Enable global lock verification code (default: OFF, implicitly enabled in debug builds)]]
 ] [/ Debugging Options]
+
+[#build_system.cmake_variables.Tools][h3 Tools Options]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_HDF5 HPX_WITH_EXAMPLES_HDF5]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_OPENMP HPX_WITH_EXAMPLES_OPENMP]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_QT4 HPX_WITH_EXAMPLES_QT4]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_QTHREADS HPX_WITH_EXAMPLES_QTHREADS]
+* [link build_system.cmake_variables.HPX_WITH_EXAMPLES_TBB HPX_WITH_EXAMPLES_TBB]
+
+[variablelist
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_HDF5] `HPX_WITH_EXAMPLES_HDF5:BOOL`][Enable examples requiring HDF5 support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_OPENMP] `HPX_WITH_EXAMPLES_OPENMP:BOOL`][Enable examples requiring OpenMP support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_QT4] `HPX_WITH_EXAMPLES_QT4:BOOL`][Enable examples requiring Qt4 support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_QTHREADS] `HPX_WITH_EXAMPLES_QTHREADS:BOOL`][Enable examples requiring QThreads support (default: OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES_TBB] `HPX_WITH_EXAMPLES_TBB:BOOL`][Enable examples requiring TBB support (default: OFF).]]
+] [/ Tools Options]
 
 
 

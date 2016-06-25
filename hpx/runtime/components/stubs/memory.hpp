@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {

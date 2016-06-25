@@ -7,8 +7,8 @@
 #if !defined(HPX_AGAS_CLIENT_HOSTED_FEB_05_2016_114AM)
 #define HPX_AGAS_CLIENT_HOSTED_FEB_05_2016_114AM
 
-#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
+#include <hpx/runtime/agas/detail/agas_service_client.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
@@ -77,7 +77,7 @@ namespace hpx { namespace agas { namespace detail
             return 0;
         }
 
-        naming::address::address_type get_locality_ns_ptr() const
+        naming::address::address_type get_locality_ns_ptr() const //-V524
         {
             HPX_ASSERT(false);      // shouldn't ever be called
             return 0;

@@ -7,11 +7,11 @@
 #define HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_component.hpp>
-#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/util/integer/uint128.hpp>
 
 #include <utility>

@@ -8,14 +8,14 @@
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/applier/trigger.hpp>
-#include <hpx/lcos/base_lco.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/intrusive/slist.hpp>
 
