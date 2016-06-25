@@ -739,7 +739,7 @@ namespace detail
             if (!started_test())
                 return future_status::deferred; //-V110
             return this->future_data<Result>::wait_until(abs_time, ec);
-        };
+        }
 
     private:
         bool started_test() const
