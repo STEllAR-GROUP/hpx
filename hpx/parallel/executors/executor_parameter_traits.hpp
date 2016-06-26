@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/util/always_void.hpp>
@@ -82,6 +83,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 >::call(params);
         }
 
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(processing_units_count);
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
         struct variable_chunk_size_helper
@@ -114,6 +117,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     typename hpx::util::decay_unwrap<Parameters>::type
                 >::call(params, exec);
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(variable_chunk_size);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
@@ -154,6 +159,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     typename hpx::util::decay_unwrap<Parameters>::type
                 >::call(params, exec, std::forward<F>(f), num_tasks);
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
@@ -225,6 +232,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 >::call(params, exec);
         }
 
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution);
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
         struct mark_begin_execution_helper
@@ -255,6 +264,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 >::call(params);
         }
 
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution);
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
         struct mark_end_execution_helper
@@ -284,6 +295,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     typename hpx::util::decay_unwrap<Parameters>::type
                 >::call(params);
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution);
     }
     /// \endcond
 
@@ -434,6 +447,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     template <typename T>
     struct is_executor_parameters;
+
+    template <typename T>
+    struct is_executor_parameters_chunk;
 }}}
 
 #endif
