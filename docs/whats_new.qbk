@@ -46,7 +46,7 @@ particular order):
   corresponding standardization proposal (__cpp20_p0075r1__). Please see
   [issue 2016] for a list of available algorithms.
 * We have started to implement a new prototypical functionality with
-  HPX.Compute which uniformly exposes some of the higher level APIs to
+  __hpx_compute__ which uniformly exposes some of the higher level APIs to
   heterogeneous architectures (currently CUDA). This functionality is an early
   preview and should not be considered stable. It may change considerably in
   the future.
@@ -81,17 +81,20 @@ particular order):
   depending on it. We have further decreased the dependency of __hpx__ on the
   Boost libraries by replacing part of those with facilities available from the
   standard libraries.
-* Whereever possible we have removed dependencies of our API on Boost by
+* Wherever possible we have removed dependencies of our API on Boost by
   replacing those with the equivalent facility from the C++11 standard library.
 * We have added new performance counters for parcel coalescing, file-IO, the
   AGAS cache, and overall scheduler time. Resetting performance counters has
   been overhauled and fixed.
 * We have introduced a generic client type `hpx::components::client<>` and
   added support for using it with `hpx::async`. This removes the necessity to
-  implement specific client types for every component type without loosing
+  implement specific client types for every component type without losing
   type safety. This deemphasizes the need for using the low level `hpx::id_type`
   for referencing (possibly remote) component instances. The plan is to
   deprecate the direct use of `hpx::id_type` in user code in the future.
+* We have added a special iterator which supports automatic prefetching of
+  one or more arrays for speeding up loop-like code (see
+  `hpx::parallel::util::make_prefetcher_context()`).
 
 [heading Breaking Changes]
 
@@ -130,13 +133,19 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2228] - On prefetching_test branch : adding prefetching_iterator and
+                 related tests used for prefetching containers within lambda
+                 functions
+* [pr    2227] - Support for HPXCL's opencl::event
 * [pr    2226] - Preparing for release of V0.9.99
 * [pr    2225] - fix issue when compiling components with hpxcxx
+* [pr    2224] - Compute alloc fix
 * [pr    2223] - Simplify promise
 * [pr    2222] - Replace last uses of boost::function by util::function_nonser
 * [pr    2221] - Fix config tests
 * [pr    2220] - Fixing gcc 4.6 compilation issues
 * [pr    2219] - nullptr support for [unique_]function
+* [pr    2218] - Introducing clang tidy
 * [pr    2216] - Replace NULL with nullptr
 * [issue 2214] - Let inspect flag use of NULL, suggest nullptr instead
 * [pr    2213] - Require support for nullptr
@@ -174,6 +183,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2182] - 1d_stencil seg fault
 * [issue 2181] - Setting small stack size does not change default
 * [pr    2180] - Changing default bind mode to balanced
+* [pr    2179] - adding prefetching_iterator and related tests used for
+                 prefetching containers within lambda functions
 * [issue 2176] - Launch process test fails on OSX
 * [pr    2175] - Fix unbalanced config/warnings includes, add some new ones
 * [pr    2174] - Fix test categorization : regression not unit
@@ -246,6 +257,7 @@ Here is a list of the important tickets we closed for this release.
                  continuation in dataflow
 * [issue 2109] - Warning while compiling hpx
 * [issue 2109] - Stack trace of last bug causing issues with octotiger
+* [issue 2108] - Stack trace of last bug causing issues with octotiger
 * [pr    2107] - Making sure that a missing parcel_coalescing module does not
                  cause startup exceptions
 * [pr    2106] - Stop using hpx_fwd.hpp
