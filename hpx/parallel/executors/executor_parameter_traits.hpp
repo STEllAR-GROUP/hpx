@@ -447,9 +447,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     template <typename T>
     struct is_executor_parameters;
-
-    template <typename T>
-    struct is_executor_parameters_chunk;
 }}}
 
 #endif
