@@ -7,6 +7,7 @@
 #define HPX_THREADS_RUN_AS_HPX_THREAD_MAR_12_2016_0202PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>
@@ -35,8 +36,8 @@ namespace hpx { namespace threads
         typename util::result_of<F&&(Ts&&...)>::type
         run_as_hpx_thread(std::false_type, F const& f, Ts &&... ts)
         {
-            std::mutex mtx;
-            std::condition_variable cond;
+            hpx::lcos::local::spinlock mtx;
+            std::condition_variable_any cond;
             bool stopping = false;
 
             typedef typename util::result_of<F&&(Ts&&...)>::type result_type;
@@ -70,7 +71,7 @@ namespace hpx { namespace threads
 
                     // Now signal to the waiting thread that we're done.
                     {
-                        std::lock_guard<std::mutex> lk(mtx);
+                        std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                         stopping = true;
                     }
                     cond.notify_all();
@@ -80,7 +81,7 @@ namespace hpx { namespace threads
             hpx::threads::register_thread_nullary(std::ref(wrapper));
 
             // wait for the HPX thread to exit
-            std::unique_lock<std::mutex> lk(mtx);
+            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
             while (!stopping)
                 cond.wait(lk);
 
@@ -91,8 +92,8 @@ namespace hpx { namespace threads
         template <typename F, typename... Ts>
         void run_as_hpx_thread(std::true_type, F const& f, Ts &&... ts)
         {
-            std::mutex mtx;
-            std::condition_variable cond;
+            hpx::lcos::local::spinlock mtx;
+            std::condition_variable_any cond;
             bool stopping = false;
 
             // This lambda function will be scheduled to run as an HPX
@@ -106,7 +107,7 @@ namespace hpx { namespace threads
 
                     // Now signal to the waiting thread that we're done.
                     {
-                        std::lock_guard<std::mutex> lk(mtx);
+                        std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                         stopping = true;
                     }
                     cond.notify_all();
@@ -116,7 +117,7 @@ namespace hpx { namespace threads
             hpx::threads::register_thread_nullary(std::ref(wrapper));
 
             // wait for the HPX thread to exit
-            std::unique_lock<std::mutex> lk(mtx);
+            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
             while (!stopping)
                 cond.wait(lk);
         }
@@ -127,6 +128,9 @@ namespace hpx { namespace threads
     typename util::result_of<F&&(Ts&&...)>::type
     run_as_hpx_thread(F const& f, Ts &&... vs)
     {
+        // This shouldn't be used on a HPX-thread
+        HPX_ASSERT(hpx::threads::get_self_ptr() == nullptr);
+
         typedef typename std::is_void<
                 typename util::result_of<F&&(Ts&&...)>::type
             >::type result_is_void;
