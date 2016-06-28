@@ -333,9 +333,9 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=755
-                boost.image.h=112
-                boost.image.alt="HPX - High Performance ParalleX"
+                boost.image.w=604
+                boost.image.h=90
+                boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
   AUTOINDEX_ARGS --internal-index

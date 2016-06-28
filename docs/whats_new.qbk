@@ -133,6 +133,7 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2229] - Fixed run_as_hpx_thread
 * [pr    2228] - On prefetching_test branch : adding prefetching_iterator and
                  related tests used for prefetching containers within lambda
                  functions
@@ -159,6 +160,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2206] - Call package_action::get_future before package_action::apply
 * [pr    2205] - The indirect_packaged_task::operator() needs to be run on a
                  HPX thread
+* [pr    2204] - Variadic executor parameters
 * [pr    2203] - Delay-initialize members of partitoned iterator
 * [pr    2202] - Added segmented fill for hpx::vector
 * [issue 2201] - Null Thread id encountered on partitioned_vector
@@ -355,6 +357,7 @@ Here is a list of the important tickets we closed for this release.
                  expansions in lambdas
 * [issue 2022] - gmake fail: "No rule to make target
                  /usr/lib46/libboost_context-mt.so"
+* [pr    2021] - Added Sudoku example
 * [issue 2020] - Make errors related to init_globally.cpp example while building
                  HPX out of the box
 * [pr    2019] - Fixed some compilation and cmake errors encountered in nqueen
