@@ -9,13 +9,14 @@
 
 The __stellar__ Group (pronounced as stellar) stands for "[*S]ystems [*T]echnology,
 [*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch". We are an
-international group of faculty, researchers, and students working at different
-organizations. The goal of the __stellar__ Group is to promote the development of
+international group of faculty, researchers, and students working at various
+institutions around the world. 
+The goal of the __stellar__ Group is to promote the development of
 scalable parallel applications by providing a community for ideas, a framework
 for collaboration, and a platform for communicating these concepts to the
 broader community.
 
-All of our work is centered around building technologies for
+Our work is focused on building technologies for
 scalable parallel applications. __hpx__, our general purpose C++ runtime system
 for parallel and distributed applications, is no exeption. We use __hpx__ for
 a broad range of scientific applications, helping scientists and developers
@@ -24,14 +25,15 @@ to more conventional programming models such as MPI.
 
 __hpx__ is based on /ParalleX/ which is a new
 (and still experimental) parallel execution model aiming to
-overcome the limitations imposed by the current hardware and the way we write
+overcome the limitations imposed by the current hardware and the techniques 
+we use to write
 applications today. Our group focuses on two types of applications - those
 requiring excellent strong scaling, allowing for a dramatic reduction of
 execution time for fixed workloads and those needing highest level of sustained
 performance through massive parallelism. These applications are
 presently unable (through conventional practices) to effectively exploit a
 relatively small number of cores in a multi-core system. By extention,
-these application will not be able to exploit high-end
+these application will not be able to exploit high-end exascale
 computing systems which are likely to employ hundreds of millions of such cores by the
 end of this decade.
 
@@ -214,5 +216,5 @@ __hpx__ is currently funded by the following grants:
 [endsect] [/ People]
 
 [/Proofread by:]
-[/Adrian Serio 3-13-12]
+[/Adrian Serio 6-28-16]
 [/Phillip LeBlanc 3-13-12]

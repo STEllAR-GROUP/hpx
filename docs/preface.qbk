@@ -1,5 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (c) 2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,34 +10,37 @@
 
 [heading History]
 
-The development of High Performance ParalleX (__hpx__) started back in 2007. At
-that point, Hartmut Kaiser became interested in the work done by the ParalleX
+The development of High Performance ParalleX (__hpx__) began in 2007. At
+that time, Hartmut Kaiser became interested in the work done by the ParalleX
 group at the __cct__, a multi-disciplinary research institute at __lsu__. The
-ParalleX group was developing a new and experimental execution model for future
-high performance computing architectures called ParalleX.  The first
-implementations were crude at best, and we had to dismiss those designs
-entirely. However, over time we learned quite a bit about how to design a
-parallel distributed runtime system which implements the ideas of ParalleX.
-
-Our goal is to create a high quality, freely available, open source
-implementation of the ParalleX model for conventional systems, such as
-classic Linux based Beowulf clusters or multi-socket highly parallel SMP
-nodes. At the same time, we want to have a very modular and well designed
-runtime system architecture which would allow us to port our
-implementation onto new computer system architectures. We want to use real
-world applications to drive the development of the runtime system, coining out
-required functionalities and converging onto an stable API which will provide a
-smooth migration path for developers. The API exposed by __hpx__ is modelled after
-the interfaces defined by the C++11 ISO standard and adheres to the programming
-guidelines used by the __boost__ collection of C++ libraries.
+ParalleX group was working to develop a new and experimental execution model for future
+high performance computing architectures. This model was christened ParalleX. 
+The first implementations of ParalleX were crude, 
+and many of those designs had to be discarded
+entirely. However, over time the team learned quite a bit about how to design a
+parallel, distributed runtime system which implements the concepts of ParalleX.
 
 From the very beginning, this endeavour has been a group effort. In addition to
 a handful of interested researchers, there have always been graduate and
 undergraduate students participating in the discussions, design, and implementation
 of __hpx__. In 2011 we decided to formalize our collective research efforts by
-creating the __stellar__ group. __stellar__ stands for [*S]ystems
-[*T]echnology, [*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch,
-which describes the three main focal points we center our work around.
+creating the __stellar__ group ([*S]ystems
+[*T]echnology, [*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch).
+Over time, the team grew to include researchers around the country and the 
+world. In 2014, the __stellar__ Group was reorganized to become the
+international community it is today. This
+consortium of researchers aims to develop stable, sustainable, and scalable
+tools which will enable application develpers to expoit the parallelism
+latent in the machines of today and tomorrow. 
+Our goal of the __hpx__ project is to create a high quality, freely available, 
+open source implementation of ParalleX concepts for conventional and future 
+systems by building a modular and standards conforming runtime system for 
+SMP and distributed application environments.
+The API exposed by __hpx__ is conformant to the interfaces defined 
+by the C++11/14 ISO standard and adheres to the programming
+guidelines used by the __boost__ collection of C++ libraries.
+We steer the development of __hpx__ with real world applications and aim
+to provide a smooth migration path for domain scientists.
 
 To learn more about __stellar__ and ParalleX, see __people__ and __intro__.
 
@@ -88,6 +92,6 @@ or log onto our IRC channel which can be found at __stellar_irc__.
 [endsect] [/ Preface]
 
 [/Proofread by:]
-[/Adrian Serio 3-13-12]
+[/Adrian Serio 6-28-16]
 [/Phillip LeBlanc 3-13-12]
 
