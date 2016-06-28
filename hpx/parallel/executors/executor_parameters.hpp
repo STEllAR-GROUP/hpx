@@ -38,14 +38,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <>
         struct parameters_type_counter<>
         {
-            HPX_CONSTEXPR static int value = 0;
+            static HPX_CONSTEXPR_OR_CONST int value = 0;
         };
 
         /// Return the number of parameters which are true
         template <bool Flag1, bool ... Flags>
         struct parameters_type_counter<Flag1, Flags...>
         {
-            HPX_CONSTEXPR static int value =
+            static HPX_CONSTEXPR_OR_CONST int value =
                 Flag1 + parameters_type_counter<Flags...>::value;
         };
 
