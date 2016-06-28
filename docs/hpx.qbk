@@ -68,7 +68,7 @@
 [def __unlv__                   [@http://www.unlv.edu University of Nevada, Las Vegas]]
 [def __cscs__                   [@http://www.cscs.ch Swiss National Supercomputing Centre]]
 [def __ou__                     [@http://uoregon.edu/ University of Oregon]]
-[def __llbl__                   [@http://www.lbl.gov/ Berkley Lab]]
+[def __lbnl__                   [@http://www.lbl.gov/ Lawrence Berkley National Laboratory (LBNL)]]
 
 [def __gsoc__                   [@https://developers.google.com/open-source/soc/ Google Summer of Code]]
 
