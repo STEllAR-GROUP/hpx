@@ -40,8 +40,6 @@ namespace hpx { namespace compute { namespace cuda
         {
             typedef hpx::lcos::local::spinlock mutex_type;
 
-            HPX_MOVABLE_ONLY(native_handle_type);
-
             native_handle_type(int device = 0);
 
             ~native_handle_type();

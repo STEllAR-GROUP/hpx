@@ -59,7 +59,7 @@ namespace hpx { namespace compute { namespace cuda
         typedef cuda::target target_type;
 
         allocator()
-          : target_(&cuda::get_default_target())
+          : target_(cuda::get_default_target())
         {}
 
         allocator(target_type const& tgt)

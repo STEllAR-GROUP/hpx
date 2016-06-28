@@ -108,7 +108,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         future_data::future_data(cudaStream_t stream)
-           : rt_(hpx::get_runtime_ptr())
+          : rt_(hpx::get_runtime_ptr())
         {
             // Hold on to the shared state on behalf of the cuda runtime
             // right away as the callback could be called immediately.
