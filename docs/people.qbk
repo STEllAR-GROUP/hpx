@@ -18,7 +18,7 @@ broader community.
 
 Our work is focused on building technologies for
 scalable parallel applications. __hpx__, our general purpose C++ runtime system
-for parallel and distributed applications, is no exeption. We use __hpx__ for
+for parallel and distributed applications, is no exception. We use __hpx__ for
 a broad range of scientific applications, helping scientists and developers
 to write code which scales better and shows better performance compared
 to more conventional programming models such as MPI.
@@ -32,7 +32,7 @@ requiring excellent strong scaling, allowing for a dramatic reduction of
 execution time for fixed workloads and those needing highest level of sustained
 performance through massive parallelism. These applications are
 presently unable (through conventional practices) to effectively exploit a
-relatively small number of cores in a multi-core system. By extention,
+relatively small number of cores in a multi-core system. By extension,
 these application will not be able to exploit high-end exascale
 computing systems which are likely to employ hundreds of millions of such cores by the
 end of this decade.
@@ -108,7 +108,7 @@ the project through discussions, pull requests, documentation patches, etc.
   coalescing plugin in __hpx__.
 * Lukas Troska, who reported several problems and contributed various test cases
   allowing to reproduce the corresponding issues.
-* Andreas Schaefer, who worked on intgerating his library (__lgd__) with __hpx__.
+* Andreas Schaefer, who worked on integrating his library (__lgd__) with __hpx__.
   He reported various problems and submitted several patches to fix issues
   allowing for a better integration with __lgd__.
 * Satyaki Upadhyay, who contributed several examples to __hpx__.

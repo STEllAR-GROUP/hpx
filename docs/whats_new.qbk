@@ -70,7 +70,7 @@ particular order):
   not have to be changed in any way to support this new functionality. Please
   note that this feature is currently considered experimental. See [issue 559]
   and [pr 1966] for more details.
-* The `hpx::dataflow` facility is now usable with actions. Similarily to
+* The `hpx::dataflow` facility is now usable with actions. Similarly to
   `hpx::async`, actions can be specified as an explicit template argument
   (`hpx::dataflow<Action>(target, ...)`) or as the first argument
   (`hpx::dataflow(Action(), target, ...)`). We have also enabled the use of
