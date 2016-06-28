@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -184,17 +184,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// Return the associated executor object.
-        static executor_type& executor()
+        static executor_type executor()
         {
-            static parallel::sequential_executor exec;
-            return exec;
+            return executor_type();
         }
 
         /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
+        static executor_parameters_type parameters()
         {
-            static executor_parameters_type params;
-            return params;
+            return executor_parameters_type();
         }
     };
 
@@ -458,17 +456,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// Return the associated executor object.
-        static executor_type& executor()
+        static executor_type executor()
         {
-            static parallel::sequential_executor exec;
-            return exec;
+            return executor_type();
         }
 
         /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
+        static executor_parameters_type parameters()
         {
-            static executor_parameters_type params;
-            return params;
+            return executor_parameters_type();
         }
     };
 
@@ -731,17 +727,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// Return the associated executor object.
-        static executor_type& executor()
+        static executor_type executor()
         {
-            static parallel::parallel_executor exec;
-            return exec;
+            return executor_type();
         }
 
         /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
+        static executor_parameters_type parameters()
         {
-            static executor_parameters_type params;
-            return params;
+            return executor_parameters_type();
         }
     };
 
@@ -997,17 +991,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// Return the associated executor object.
-        static executor_type& executor()
+        static executor_type executor()
         {
-            static parallel::parallel_executor exec;
-            return exec;
+            return executor_type();
         }
 
         /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
+        static executor_parameters_type parameters()
         {
-            static executor_parameters_type params;
-            return params;
+            return executor_parameters_type();
         }
     };
 
@@ -1192,17 +1184,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// Return the associated executor object.
-        static executor_type& executor()
+        static executor_type executor()
         {
-            static parallel::parallel_executor exec;
-            return exec;
+            return executor_type();
         }
 
         /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
+        static executor_parameters_type parameters()
         {
-            static executor_parameters_type params;
-            return params;
+            return executor_parameters_type();
         }
     };
 
