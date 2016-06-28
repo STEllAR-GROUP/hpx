@@ -23,25 +23,29 @@ namespace hpx { namespace compute { namespace cuda
 {
     namespace detail
     {
-        runtime_registration_wrapper::runtime_registration_wrapper(
-                hpx::runtime* rt)
-          : rt_(rt)
+        struct runtime_registration_wrapper
         {
-            HPX_ASSERT(rt);
+            runtime_registration_wrapper(hpx::runtime* rt)
+              : rt_(rt)
+            {
+                HPX_ASSERT(rt);
 
-            // Register this thread with HPX, this should be done once for
-            // each external OS-thread intended to invoke HPX functionality.
-            // Calling this function more than once on the same thread will
-            // report an error.
-            hpx::error_code ec(hpx::lightweight);       // ignore errors
-            hpx::register_thread(rt_, "cuda", ec);
-        }
-        runtime_registration_wrapper::~runtime_registration_wrapper()
-        {
-            // Unregister the thread from HPX, this should be done once in
-            // the end before the external thread exists.
-            hpx::unregister_thread(rt_);
-        }
+                // Register this thread with HPX, this should be done once for
+                // each external OS-thread intended to invoke HPX functionality.
+                // Calling this function more than once on the same thread will
+                // report an error.
+                hpx::error_code ec(hpx::lightweight);       // ignore errors
+                hpx::register_thread(rt_, "cuda", ec);
+            }
+            ~runtime_registration_wrapper()
+            {
+                // Unregister the thread from HPX, this should be done once in
+                // the end before the external thread exists.
+                hpx::unregister_thread(rt_);
+            }
+
+            hpx::runtime* rt_;
+        };
 
         ///////////////////////////////////////////////////////////////////////
         struct future_data : lcos::detail::future_data<void>
@@ -127,23 +131,45 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     target::native_handle_type::native_handle_type(int device)
-      : device_(device), stream_(0), locality_(hpx::find_here())
+      : device_(device), stream_(0)
     {}
 
     target::native_handle_type::~native_handle_type()
+    {
+        reset();
+    }
+
+    target::native_handle_type::reset()
     {
         if (stream_)
             cudaStreamDestroy(stream_);     // ignore error
     }
 
     target::native_handle_type::native_handle_type(
+            target::native_handle_type const& rhs) HPX_NOEXCEPT
+      : device_(rhs.device_),
+        stream_(0)
+    {
+    }
+
+    target::native_handle_type::native_handle_type(
             target::native_handle_type && rhs) HPX_NOEXCEPT
       : device_(rhs.device_),
-        stream_(rhs.stream_),
-        locality_(rhs.locality_)
+        stream_(rhs.stream_)
     {
         rhs.stream_ = 0;
-        rhs.locality_ = hpx::invalid_id;
+    }
+
+    target::native_handle_type& target::native_handle_type::operator=(
+        target::native_handle_type const& rhs) HPX_NOEXCEPT
+    {
+        if (this == &rhs)
+            return *this;
+
+        device_ = rhs.device_;
+        reset();
+
+        return *this;
     }
 
     target::native_handle_type& target::native_handle_type::operator=(
@@ -154,9 +180,8 @@ namespace hpx { namespace compute { namespace cuda
 
         device_ = rhs.device_;
         stream_ = rhs.stream_;
-        locality_ = rhs.locality_;
         rhs.stream_ = 0;
-        rhs.locality_ = hpx::invalid_id;
+
         return *this;
     }
 
@@ -190,6 +215,9 @@ namespace hpx { namespace compute { namespace cuda
     ///////////////////////////////////////////////////////////////////////////
     void target::synchronize() const
     {
+        // FIXME: implement remote targets
+        HPX_ASSERT(hpx::find_here() == locality_);
+
         if (handle_.stream_ == 0)
         {
             HPX_THROW_EXCEPTION(invalid_status,

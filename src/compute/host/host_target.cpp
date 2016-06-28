@@ -20,16 +20,18 @@ namespace hpx { namespace compute { namespace host
         auto const& topo = hpx::threads::get_topology();
         auto & tm = hpx::get_runtime().get_thread_manager();
         std::size_t num_os_threads = hpx::get_os_thread_count();
+        hpx::threads::mask_type mask = native_handle().get_device();
+        std::size_t mask_size = hpx::threads::mask_size(mask);
+
         std::size_t num_thread = 0;
-        std::size_t mask_size = hpx::threads::mask_size(mask_);
-        for(; num_thread != num_os_threads; ++num_thread)
+        for(/**/; num_thread != num_os_threads; ++num_thread)
         {
             if(hpx::threads::bit_and(
-                mask_, tm.get_pu_mask(topo, num_thread), mask_size))
+                    mask, tm.get_pu_mask(topo, num_thread), mask_size))
             {
                 break;
             }
         }
-        return std::make_pair(num_thread, hpx::threads::count(mask_));
+        return std::make_pair(num_thread, hpx::threads::count(mask));
     }
 }}}

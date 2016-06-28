@@ -3,14 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file cuda/target_distribution_policy.hpp
+/// \file host/target_distribution_policy.hpp
 
-#if !defined(HPX_COMPUTE_CUDA_TARGET_DISTRIBUTION_POLICY)
-#define HPX_COMPUTE_CUDA_TARGET_DISTRIBUTION_POLICY
+#if !defined(HPX_COMPUTE_HOST_TARGET_DISTRIBUTION_POLICY)
+#define HPX_COMPUTE_HOST_TARGET_DISTRIBUTION_POLICY
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_CUDA) && !defined(__CUDACC__)
 
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -19,8 +17,8 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>
+#include <hpx/compute/host/target.hpp>
 
 #include <algorithm>
 #include <map>
@@ -28,13 +26,13 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda
+namespace hpx { namespace compute { namespace host
 {
     /// A target_distribution_policy used for CPU bound localities.
     struct target_distribution_policy
-      : compute::detail::target_distribution_policy<cuda::target>
+      : compute::detail::target_distribution_policy<host::target>
     {
-        typedef compute::detail::target_distribution_policy<cuda::target>
+        typedef compute::detail::target_distribution_policy<host::target>
             base_type;
 
         /// Default-construct a new instance of a \a target_distribution_policy.
@@ -139,42 +137,56 @@ namespace hpx { namespace compute { namespace cuda
         hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts &&... ts) const
         {
-            std::vector<hpx::id_type> localities;
-            localities.reserve(this->targets_.size());
-
-            std::vector<hpx::future<hpx::id_type> > objs;
-            objs.reserve(this->targets_.size());
-
-            for(target_type& t : this->targets_)
+            // collect all targets per locality
+            std::map<hpx::id_type, std::vector<target_type> > m;
+            for(target_type const& t : this->targets_)
             {
-                hpx::id_type target_locality = t.get_locality();
+                m[t.get_locality()].push_back(t);
+            }
 
-                std::size_t num_partitions = this->get_num_items(count, t);
-                objs.push_back(components::stub_base<Component>::create_async(
-                    target_locality, num_partitions, ts..., std::move(t)));
+            std::vector<hpx::id_type> localities;
+            localities.reserve(m.size());
 
-                localities.push_back(std::move(target_locality));
+            std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
+            objs.reserve(m.size());
+
+            auto end = m.end();
+            for (auto it = m.begin(); it != end; ++it)
+            {
+                localities.push_back(std::move(it->first));
+
+                std::size_t num_partitions = 0;
+                for (target_type const& t : it->second)
+                {
+                    num_partitions += this->get_num_items(count, t);
+                }
+
+                objs.push_back(
+                    components::stub_base<Component>::bulk_create_async(
+                        localities.back(), num_partitions, ts...,
+                        std::move(it->second)));
             }
 
             return hpx::dataflow(
-                [=](std::vector<hpx::future<hpx::id_type> > && v)
+                [=](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
                     mutable -> std::vector<bulk_locality_result>
                 {
                     HPX_ASSERT(localities.size() == v.size());
 
-                    std::map<hpx::id_type, std::vector<hpx::id_type> > m;
+                    std::vector<bulk_locality_result> result;
+                    result.reserve(v.size());
+
                     for (std::size_t i = 0; i != v.size(); ++i)
                     {
-                        m[localities[i]].push_back(v[i].get());
-                    }
-
-                    std::vector<bulk_locality_result> result;
-                    result.reserve(m.size());
-
-                    auto end = m.end()
-                    for (auto it = m.begin(); it != end; ++it)
-                    {
-                        result.insert(std::move(*it));
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                        result.emplace_back(
+                                std::move(localities[i]), v[i].get()
+                            );
+#else
+                        result.push_back(std::make_pair(
+                                std::move(localities[i]), v[i].get()
+                            ));
+#endif
                     }
 
                     return result;
@@ -204,25 +216,25 @@ namespace hpx { namespace compute { namespace cuda
         /// \endcond
     };
 
-    /// A predefined instance of the \a target_distribution_policy for CUDA.
-    /// It will represent all local CUDA devices and will place all items to
-    /// create here.
+    /// A predefined instance of the \a target_distribution_policy for
+    /// localities. It will represent all NUMA domains of the given locality
+    /// and will place all items to create here.
     static target_distribution_policy const target_layout;
 }}}
 
 /// \cond NOINTERNAL
 namespace hpx { namespace traits
 {
-    template <typename Target>
-    struct is_distribution_policy<compute::cuda::target_distribution_policy>
+    template <>
+    struct is_distribution_policy<compute::host::target_distribution_policy>
       : std::true_type
     {};
 
-    template <typename Target>
-    struct num_container_partitions<compute::cuda::target_distribution_policy>
+    template <>
+    struct num_container_partitions<compute::host::target_distribution_policy>
     {
         static std::size_t
-        call(compute::cuda::target_distribution_policy const& policy)
+        call(compute::host::target_distribution_policy const& policy)
         {
             return policy.get_num_partitions();
         }
@@ -230,5 +242,4 @@ namespace hpx { namespace traits
 }}
 /// \endcond
 
-#endif
 #endif

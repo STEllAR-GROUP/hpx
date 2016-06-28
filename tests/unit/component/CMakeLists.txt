@@ -27,6 +27,7 @@ set(tests
     partitioned_vector_handle_values
     partitioned_vector_iter
     partitioned_vector_move
+    partitioned_vector_target
     partitioned_vector_transform_reduce
     partitioned_vector_fill
    )

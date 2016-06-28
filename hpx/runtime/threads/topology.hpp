@@ -90,6 +90,15 @@ namespace hpx { namespace threads
             bool numa_sensitive, error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit associated with the given NUMA node.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_numa_node_affinity_mask_from_numa_node(
+            std::size_t num_node) const = 0;
+
+        /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
         ///        the core it is running on.
         ///
