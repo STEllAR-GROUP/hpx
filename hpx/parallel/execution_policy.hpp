@@ -195,6 +195,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         executor_parameters_type const& parameters() const { return params_; }
 
     private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+        }
+
+    private:
         executor_type exec_;
         executor_parameters_type params_;
     };
@@ -471,6 +479,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         executor_parameters_type const& parameters() const { return params_; }
 
     private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+        }
+
+    private:
         executor_type exec_;
         executor_parameters_type params_;
     };
@@ -745,6 +761,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         executor_parameters_type const& parameters() const { return params_; }
 
     private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+        }
+
+    private:
         executor_type exec_;
         executor_parameters_type params_;
     };
@@ -1012,6 +1036,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         executor_parameters_type const& parameters() const { return params_; }
 
     private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+        }
+
+    private:
         executor_type exec_;
         executor_parameters_type params_;
     };
@@ -1206,6 +1238,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         executor_parameters_type& parameters() { return params_; }
         /// Return the associated executor parameters object.
         executor_parameters_type const& parameters() const { return params_; }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+        }
 
     private:
         executor_type exec_;

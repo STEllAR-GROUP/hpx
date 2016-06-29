@@ -154,7 +154,7 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch<Executor,
         typename std::enable_if<traits::is_executor<Executor>::value>::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename detail::dataflow_frame<
             Executor
@@ -163,7 +163,7 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::acquire_future<Ts>::type...
             >
         >::type
-        call(Executor& exec, F && f, Ts &&... ts)
+        call(Executor_ && exec, F && f, Ts &&... ts)
         {
             typedef
                 detail::dataflow_frame<
@@ -176,7 +176,7 @@ namespace hpx { namespace lcos { namespace detail
                 frame_type;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
-                    exec
+                    std::forward<Executor_>(exec)
                   , std::forward<F>(f)
                   , util::forward_as_tuple(
                         traits::acquire_future_disp()(std::forward<Ts>(ts))...
