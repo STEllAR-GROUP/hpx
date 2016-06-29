@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -183,19 +183,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
+    public:
         /// Return the associated executor object.
-        static executor_type& executor()
+        executor_type& executor() { return exec_; }
+        /// Return the associated executor object.
+        executor_type const& executor() const { return exec_; }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        executor_parameters_type const& parameters() const { return params_; }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
         {
-            static parallel::sequential_executor exec;
-            return exec;
         }
 
-        /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
-        {
-            static executor_parameters_type params;
-            return params;
-        }
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
     };
 
     /// Extension: The class sequential_task_execution_policy_shim is an
@@ -457,19 +466,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
+    public:
         /// Return the associated executor object.
-        static executor_type& executor()
+        /// Return the associated executor object.
+        executor_type& executor() { return exec_; }
+        /// Return the associated executor object.
+        executor_type const& executor() const { return exec_; }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        executor_parameters_type const& parameters() const { return params_; }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
         {
-            static parallel::sequential_executor exec;
-            return exec;
         }
 
-        /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
-        {
-            static executor_parameters_type params;
-            return params;
-        }
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
     };
 
     /// Default sequential execution policy object.
@@ -730,19 +749,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
+    public:
         /// Return the associated executor object.
-        static executor_type& executor()
+        executor_type& executor() { return exec_; }
+        /// Return the associated executor object.
+        executor_type const& executor() const { return exec_; }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        executor_parameters_type const& parameters() const { return params_; }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
         {
-            static parallel::parallel_executor exec;
-            return exec;
         }
 
-        /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
-        {
-            static executor_parameters_type params;
-            return params;
-        }
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
     };
 
     /// Extension: The class parallel_task_execution_policy_shim is an
@@ -996,19 +1024,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
+    public:
         /// Return the associated executor object.
-        static executor_type& executor()
+        executor_type& executor() { return exec_; }
+        /// Return the associated executor object.
+        executor_type const& executor() const { return exec_; }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        executor_parameters_type const& parameters() const { return params_; }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
         {
-            static parallel::parallel_executor exec;
-            return exec;
         }
 
-        /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
-        {
-            static executor_parameters_type params;
-            return params;
-        }
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
     };
 
     /// Default parallel execution policy object.
@@ -1191,19 +1228,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return *this;
         }
 
+    public:
         /// Return the associated executor object.
-        static executor_type& executor()
+        executor_type& executor() { return exec_; }
+        /// Return the associated executor object.
+        executor_type const& executor() const { return exec_; }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        executor_parameters_type const& parameters() const { return params_; }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
         {
-            static parallel::parallel_executor exec;
-            return exec;
         }
 
-        /// Return the associated executor parameters object
-        static executor_parameters_type& parameters()
-        {
-            static executor_parameters_type params;
-            return params;
-        }
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
     };
 
     /// Default vector execution policy object.
