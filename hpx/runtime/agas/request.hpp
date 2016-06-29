@@ -15,6 +15,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
@@ -79,6 +80,12 @@ struct HPX_EXPORT request
       , std::uint64_t count_
       , std::uint32_t num_threads_
       , naming::gid_type prefix_ = naming::gid_type()
+        );
+
+    request(
+        namespace_action_code type_
+      , std::uint64_t count_
+      , naming::address::address_type addr_
         );
 
     request(
@@ -155,6 +162,10 @@ struct HPX_EXPORT request
         error_code& ec = throws
         ) const;
 
+    naming::address::address_type get_address(
+        error_code& ec
+        ) const;
+
     std::int64_t get_credit(
         error_code& ec = throws
         ) const;
@@ -181,7 +192,7 @@ struct HPX_EXPORT request
 
     parcelset::endpoints_type get_endpoints(
         error_code& ec = throws
-    ) const;
+        ) const;
 
     naming::gid_type get_gid(
         error_code& ec = throws

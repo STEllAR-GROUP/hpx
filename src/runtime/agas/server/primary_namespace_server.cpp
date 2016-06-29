@@ -68,7 +68,7 @@ response primary_namespace::service(
             }
         case primary_ns_bind_gid:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.bind_gid_.time_
                 );
                 counter_data_.increment_bind_gid_count();
@@ -76,7 +76,7 @@ response primary_namespace::service(
             }
         case primary_ns_resolve_gid:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.resolve_gid_.time_
                 );
                 counter_data_.increment_resolve_gid_count();
@@ -84,7 +84,7 @@ response primary_namespace::service(
             }
         case primary_ns_unbind_gid:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.unbind_gid_.time_
                 );
                 counter_data_.increment_unbind_gid_count();
@@ -92,7 +92,7 @@ response primary_namespace::service(
             }
         case primary_ns_increment_credit:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.increment_credit_.time_
                 );
                 counter_data_.increment_increment_credit_count();
@@ -100,7 +100,7 @@ response primary_namespace::service(
             }
         case primary_ns_decrement_credit:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.decrement_credit_.time_
                 );
                 counter_data_.increment_decrement_credit_count();
@@ -108,7 +108,7 @@ response primary_namespace::service(
             }
         case primary_ns_allocate:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.allocate_.time_
                 );
                 counter_data_.increment_allocate_count();
@@ -116,7 +116,7 @@ response primary_namespace::service(
             }
         case primary_ns_begin_migration:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.begin_migration_.time_
                 );
                 counter_data_.increment_begin_migration_count();
@@ -124,7 +124,7 @@ response primary_namespace::service(
             }
         case primary_ns_end_migration:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.end_migration_.time_
                 );
                 counter_data_.increment_end_migration_count();
@@ -188,7 +188,7 @@ response primary_namespace::service(
                     % boost::uint16_t(req.get_action_code())));
             return response();
         }
-    };
+    }
 } // }}}
 
 // register all performance counter types exposed by this component
@@ -1418,103 +1418,9 @@ response primary_namespace::statistics_counter(
         return response();
     }
 
-    typedef primary_namespace::counter_data cd;
-
-    using util::placeholders::_1;
-    util::function_nonser<boost::int64_t(bool)> get_data_func;
-    if (target == detail::counter_target_count)
-    {
-        switch (code) {
-        case primary_ns_route:
-            get_data_func = util::bind(&cd::get_route_count, &counter_data_, _1);
-            break;
-        case primary_ns_bind_gid:
-            get_data_func = util::bind(&cd::get_bind_gid_count, &counter_data_, _1);
-            break;
-        case primary_ns_resolve_gid:
-            get_data_func = util::bind(&cd::get_resolve_gid_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_unbind_gid:
-            get_data_func = util::bind(&cd::get_unbind_gid_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_increment_credit:
-            get_data_func = util::bind(&cd::get_increment_credit_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_decrement_credit:
-            get_data_func = util::bind(&cd::get_decrement_credit_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_begin_migration:
-            get_data_func = util::bind(&cd::get_begin_migration_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_end_migration:
-            get_data_func = util::bind(&cd::get_end_migration_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_count,
-                &counter_data_, _1);
-            break;
-        default:
-            HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::statistics"
-              , "bad action code while querying statistics");
-            return response();
-        }
-    }
-    else {
-        HPX_ASSERT(detail::counter_target_time == target);
-        switch (code) {
-        case primary_ns_route:
-            get_data_func = util::bind(&cd::get_route_time, &counter_data_, _1);
-            break;
-        case primary_ns_bind_gid:
-            get_data_func = util::bind(&cd::get_bind_gid_time, &counter_data_, _1);
-            break;
-        case primary_ns_resolve_gid:
-            get_data_func = util::bind(&cd::get_resolve_gid_time, &counter_data_, _1);
-            break;
-        case primary_ns_unbind_gid:
-            get_data_func = util::bind(&cd::get_unbind_gid_time, &counter_data_, _1);
-            break;
-        case primary_ns_increment_credit:
-            get_data_func = util::bind(&cd::get_increment_credit_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_decrement_credit:
-            get_data_func = util::bind(&cd::get_decrement_credit_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_time, &counter_data_, _1);
-            break;
-        case primary_ns_begin_migration:
-            get_data_func = util::bind(&cd::get_begin_migration_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_end_migration:
-            get_data_func = util::bind(&cd::get_end_migration_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_time,
-                &counter_data_, _1);
-            break;
-        default:
-            HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::statistics"
-              , "bad action code while querying statistics");
-            return response();
-        }
-    }
+    util::function_nonser<boost::int64_t(bool)> get_data_func =
+        counter_data_.get_counter_function(target, code, ec);
+    if (ec) return response();
 
     performance_counters::counter_info info;
     performance_counters::get_counter_type(name, info, ec);
@@ -1531,170 +1437,6 @@ response primary_namespace::statistics_counter(
         ec = make_success_code();
 
     return response(component_ns_statistics_counter, gid);
-}
-
-// access current counter values
-boost::int64_t primary_namespace::counter_data::get_route_count(bool reset)
-{
-    return util::get_and_reset_value(route_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
-{
-    return util::get_and_reset_value(bind_gid_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_count(bool reset)
-{
-    return util::get_and_reset_value(resolve_gid_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
-{
-    return util::get_and_reset_value(unbind_gid_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_increment_credit_count(bool reset)
-{
-    return util::get_and_reset_value(increment_credit_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_decrement_credit_count(bool reset)
-{
-    return util::get_and_reset_value(decrement_credit_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
-{
-    return util::get_and_reset_value(allocate_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_begin_migration_count(bool reset)
-{
-    return util::get_and_reset_value(begin_migration_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_end_migration_count(bool reset)
-{
-    return util::get_and_reset_value(end_migration_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
-{
-    return util::get_and_reset_value(route_.count_, reset) +
-        util::get_and_reset_value(bind_gid_.count_, reset) +
-        util::get_and_reset_value(resolve_gid_.count_, reset) +
-        util::get_and_reset_value(unbind_gid_.count_, reset) +
-        util::get_and_reset_value(increment_credit_.count_, reset) +
-        util::get_and_reset_value(decrement_credit_.count_, reset) +
-        util::get_and_reset_value(allocate_.count_, reset) +
-        util::get_and_reset_value(begin_migration_.count_, reset) +
-        util::get_and_reset_value(end_migration_.count_, reset);
-}
-
-// access execution time counters
-boost::int64_t primary_namespace::counter_data::get_route_time(bool reset)
-{
-    return util::get_and_reset_value(route_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
-{
-    return util::get_and_reset_value(bind_gid_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_time(bool reset)
-{
-    return util::get_and_reset_value(resolve_gid_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
-{
-    return util::get_and_reset_value(unbind_gid_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_increment_credit_time(bool reset)
-{
-    return util::get_and_reset_value(increment_credit_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_decrement_credit_time(bool reset)
-{
-    return util::get_and_reset_value(decrement_credit_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
-{
-    return util::get_and_reset_value(allocate_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_begin_migration_time(bool reset)
-{
-    return util::get_and_reset_value(begin_migration_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_end_migration_time(bool reset)
-{
-    return util::get_and_reset_value(end_migration_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
-{
-    return util::get_and_reset_value(route_.time_, reset) +
-        util::get_and_reset_value(bind_gid_.time_, reset) +
-        util::get_and_reset_value(resolve_gid_.time_, reset) +
-        util::get_and_reset_value(unbind_gid_.time_, reset) +
-        util::get_and_reset_value(increment_credit_.time_, reset) +
-        util::get_and_reset_value(decrement_credit_.time_, reset) +
-        util::get_and_reset_value(allocate_.time_, reset) +
-        util::get_and_reset_value(begin_migration_.time_, reset) +
-        util::get_and_reset_value(end_migration_.time_, reset);
-}
-
-// increment counter values
-void primary_namespace::counter_data::increment_route_count()
-{
-    ++route_.count_;
-}
-
-void primary_namespace::counter_data::increment_bind_gid_count()
-{
-    ++bind_gid_.count_;
-}
-
-void primary_namespace::counter_data::increment_resolve_gid_count()
-{
-    ++resolve_gid_.count_;
-}
-
-void primary_namespace::counter_data::increment_unbind_gid_count()
-{
-    ++unbind_gid_.count_;
-}
-
-void primary_namespace::counter_data::increment_increment_credit_count()
-{
-    ++increment_credit_.count_;
-}
-
-void primary_namespace::counter_data::increment_decrement_credit_count()
-{
-    ++decrement_credit_.count_;
-}
-
-void primary_namespace::counter_data::increment_allocate_count()
-{
-    ++allocate_.count_;
-}
-
-void primary_namespace::counter_data::increment_begin_migration_count()
-{
-    ++begin_migration_.count_;
-}
-
-void primary_namespace::counter_data::increment_end_migration_count()
-{
-    ++end_migration_.count_;
 }
 
 }}}

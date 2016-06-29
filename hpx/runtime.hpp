@@ -177,7 +177,7 @@ namespace hpx
             return topology_;
         }
 
-        boost::uint32_t assign_cores(std::string const& locality_basename,
+        boost::uint32_t first_used_core(std::string const& locality_basename,
             boost::uint32_t num_threads);
 
         boost::uint32_t assign_cores();
@@ -222,10 +222,6 @@ namespace hpx
             boost::exception_ptr const& e) = 0;
 
         virtual void report_error(boost::exception_ptr const& e) = 0;
-
-        virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
-
-        virtual util::unique_id_ranges& get_id_pool() = 0;
 
         virtual void add_pre_startup_function(startup_function_type f) = 0;
 

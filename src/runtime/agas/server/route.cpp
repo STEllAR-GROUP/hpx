@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime.hpp>
@@ -20,7 +21,7 @@ namespace hpx { namespace agas { namespace server
 {
     response primary_namespace::route(parcelset::parcel && p)
     { // {{{ route implementation
-        update_time_on_exit update(
+        detail::update_time_on_exit update(
             counter_data_.route_.time_
         );
         counter_data_.increment_route_count();

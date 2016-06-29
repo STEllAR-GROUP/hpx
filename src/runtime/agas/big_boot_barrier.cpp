@@ -500,7 +500,7 @@ void register_worker(registration_header const& header)
             agas_client.get_bootstrap_symbol_ns_ptr());
 
     // assign cores to the new locality
-    boost::uint32_t first_core = rt.assign_cores(header.hostname,
+    boost::uint32_t first_core = rt.first_used_core(header.hostname,
         header.cores_needed);
 
     big_boot_barrier & bbb = get_big_boot_barrier();
@@ -672,13 +672,6 @@ void notify_worker(notification_header const& header)
       , server::symbol_namespace::get_component_type(),
         agas_client.get_hosted_symbol_ns_ptr());
     agas_client.bind_local(symbol_gid, symbol_addr);
-
-    // Assign the initial parcel gid range to the parcelport. Note that we can't
-    // get the parcelport through the parcelhandler because it isn't up yet.
-    naming::gid_type parcel_lower, parcel_upper;
-    agas_client.get_id_range(1000, parcel_lower, parcel_upper);
-
-    rt.get_id_pool().set_range(parcel_lower, parcel_upper);
 
     // store number of initial localities
     cfg.set_num_localities(header.num_localities);

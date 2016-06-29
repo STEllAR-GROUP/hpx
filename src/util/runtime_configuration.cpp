@@ -716,6 +716,23 @@ namespace hpx { namespace util
         return false;
     }
 
+    // Run purely local AGAS (application is limited to one locality)
+    bool runtime_configuration::run_purely_local_agas() const
+    {
+        if (get_num_localities() > 1)
+            return false;
+
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (nullptr == sec)
+                return false;
+
+            return hpx::util::get_entry_as<bool>(
+                *sec, "expect_connecting_localities", "1") == 0;
+        }
+        return false;
+    }
+
     bool runtime_configuration::get_itt_notify_mode() const
     {
 #if HPX_HAVE_ITTNOTIFY != 0

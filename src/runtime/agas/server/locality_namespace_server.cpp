@@ -11,6 +11,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -53,7 +54,7 @@ response locality_namespace::service(
     {
         case locality_ns_allocate:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.allocate_.time_
                 );
                 counter_data_.increment_allocate_count();
@@ -61,7 +62,7 @@ response locality_namespace::service(
             }
         case locality_ns_free:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.free_.time_
                 );
                 counter_data_.increment_free_count();
@@ -69,7 +70,7 @@ response locality_namespace::service(
             }
         case locality_ns_localities:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.localities_.time_
                 );
                 counter_data_.increment_localities_count();
@@ -77,7 +78,7 @@ response locality_namespace::service(
             }
         case locality_ns_resolve_locality:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.resolve_locality_.time_
                 );
                 counter_data_.increment_resolve_locality_count();
@@ -85,7 +86,7 @@ response locality_namespace::service(
             }
         case locality_ns_resolved_localities:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.resolved_localities_.time_
                 );
                 counter_data_.increment_resolved_localities_count();
@@ -93,7 +94,7 @@ response locality_namespace::service(
             }
         case locality_ns_num_localities:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.num_localities_.time_
                 );
                 counter_data_.increment_num_localities_count();
@@ -101,7 +102,7 @@ response locality_namespace::service(
             }
         case locality_ns_num_threads:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.num_threads_.time_
                 );
                 counter_data_.increment_num_threads_count();

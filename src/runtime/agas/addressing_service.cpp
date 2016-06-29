@@ -27,6 +27,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/detail/bootstrap_service_client.hpp>
 #include <hpx/runtime/agas/detail/hosted_service_client.hpp>
+#include <hpx/runtime/agas/detail/local_service_client.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/bind.hpp>
@@ -148,7 +149,16 @@ addressing_service::addressing_service(
 
     if (service_type == service_mode_bootstrap)
     {
-        launch_bootstrap(pp, ph.endpoints(), ini_);
+        // run purely local AGAS if one locality and no localities are expected
+        // to connect
+        if (ini_.run_purely_local_agas())
+        {
+            launch_local(ini_);
+        }
+        else
+        {
+            launch_bootstrap(pp, ph.endpoints(), ini_);
+        }
     }
 } // }}}
 
@@ -230,12 +240,11 @@ void addressing_service::launch_bootstrap(
   , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
-{ // {{{
-    std::shared_ptr<detail::bootstrap_service_client> bootstrap_client =
+{
+    std::shared_ptr<detail::bootstrap_service_client> client =
         std::make_shared<detail::bootstrap_service_client>();
 
-    client_ = std::static_pointer_cast<detail::agas_service_client>(
-        bootstrap_client);
+    client_ = std::static_pointer_cast<detail::agas_service_client>(client);
 
     runtime& rt = get_runtime();
 
@@ -244,7 +253,7 @@ void addressing_service::launch_bootstrap(
 
     // store number of cores used by other processes
     boost::uint32_t cores_needed = rt.assign_cores();
-    boost::uint32_t first_used_core = rt.assign_cores(
+    boost::uint32_t first_used_core = rt.first_used_core(
         pp ? pp->get_locality_name() : "", cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
@@ -289,15 +298,13 @@ void addressing_service::launch_bootstrap(
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
-    boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
-        ini_, "hpx.os_threads", 1u);
-    request locality_req(locality_ns_allocate, endpoints, 4, num_threads); //-V112
-    client_->service_locality(locality_req, action_priority_, throws);
-
-    naming::gid_type runtime_support_gid1(here);
-    runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
-    naming::gid_type runtime_support_gid2(here);
-    runtime_support_gid2.set_lsb(std::uint64_t(0));
+    if (!endpoints.empty())
+    {
+        boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
+            ini_, "hpx.os_threads", 1u);
+        request locality_req(locality_ns_allocate, endpoints, 4, num_threads); //-V112
+        client_->service_locality(locality_req, action_priority_, throws);
+    }
 
     gva runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
@@ -321,11 +328,7 @@ void addressing_service::launch_bootstrap(
     register_name("/0/agas/locality#0", here);
     if (is_console())
         register_name("/0/locality#console", here);
-
-    naming::gid_type lower, upper;
-    get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
-    rt.get_id_pool().set_range(lower, upper);
-} // }}}
+}
 
 void addressing_service::launch_hosted()
 {
@@ -336,6 +339,49 @@ void addressing_service::launch_hosted()
             booststrap_hosted);
 }
 
+void addressing_service::launch_local(util::runtime_configuration const& ini_)
+{
+    std::shared_ptr<detail::local_service_client> client =
+        std::make_shared<detail::local_service_client>();
+
+    client_ = std::static_pointer_cast<detail::agas_service_client>(client);
+
+    runtime& rt = get_runtime();
+    util::runtime_configuration& cfg = rt.get_config();
+
+    naming::gid_type const here =
+        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+
+    // store number of cores used by other processes
+    boost::uint32_t cores_needed = rt.assign_cores();
+    boost::uint32_t first_used_core = rt.first_used_core("<local>", cores_needed);
+    cfg.set_first_used_core(first_used_core);
+    rt.assign_cores();
+
+    locality_ns_addr_ = naming::address(here,
+        server::locality_namespace::get_component_type(),
+        client_->get_locality_ns_ptr());
+
+    primary_ns_addr_ = naming::address(here,
+        server::primary_namespace::get_component_type(),
+        client_->get_primary_ns_ptr());
+
+    component_ns_addr_ = naming::address(here,
+        server::component_namespace::get_component_type(),
+        client_->get_component_ns_ptr());
+
+    symbol_ns_addr_ = naming::address(here,
+        server::symbol_namespace::get_component_type(),
+        client_->get_symbol_ns_ptr());
+
+    set_local_locality(here);
+    rt.get_config().parse("assigned locality", "hpx.locality!=0");
+
+    register_name("/0/agas/locality#0", here);
+    register_name("/0/locality#console", here);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void addressing_service::adjust_local_cache_size(std::size_t cache_size)
 { // {{{
     // adjust the local AGAS cache size for the number of worker threads and
@@ -343,7 +389,7 @@ void addressing_service::adjust_local_cache_size(std::size_t cache_size)
     if (caching_)
     {
         std::size_t previous = gva_cache_->size();
-            gva_cache_->reserve(cache_size);
+        gva_cache_->reserve(cache_size);
 
         LAGAS_(info) << (boost::format(
             "addressing_service::adjust_local_cache_size, previous size: %1%, "
@@ -833,34 +879,28 @@ components::component_type addressing_service::register_factory(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-bool addressing_service::get_id_range(
+naming::gid_type addressing_service::get_id_range(
     boost::uint64_t count
-  , naming::gid_type& lower_bound
-  , naming::gid_type& upper_bound
+  , naming::address::address_type addr
   , error_code& ec
     )
 { // {{{ get_id_range implementation
     try {
-        // parcelset::endpoints_type() is an obsolete, dummy argument
-        request req(primary_ns_allocate
-          , parcelset::endpoints_type()
-          , count
-          , boost::uint32_t(-1));
+        HPX_ASSERT(addr == 0 || count == 1);
+
+        request req(primary_ns_allocate, count, addr);
+
         response rep = client_->service_primary(req, ec);
 
         error const s = rep.get_status();
-
         if (ec || (success != s && repeated_request != s))
-            return false;
+            return naming::gid_type();
 
-        lower_bound = rep.get_lower_bound();
-        upper_bound = rep.get_upper_bound();
-
-        return success == s;
+        return rep.get_lower_bound();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_id_range");
-        return false;
+        return naming::gid_type();
     }
 } // }}}
 

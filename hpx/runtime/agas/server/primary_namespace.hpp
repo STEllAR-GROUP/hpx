@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/runtime/agas/detail/primary_namespace_counter_data.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
@@ -162,95 +163,7 @@ struct HPX_EXPORT primary_namespace
     naming::gid_type locality_;     // our locality id
     migration_table_type migrating_objects_;
 
-    struct update_time_on_exit;
-
-    // data structure holding all counters for the omponent_namespace component
-    struct counter_data
-    {
-    private:
-        HPX_NON_COPYABLE(counter_data);
-
-    public:
-        struct api_counter_data
-        {
-            api_counter_data()
-              : count_(0)
-              , time_(0)
-            {}
-
-            boost::atomic<boost::int64_t> count_;
-            boost::atomic<boost::int64_t> time_;
-        };
-
-        counter_data()
-        {}
-
-    public:
-        // access current counter values
-        boost::int64_t get_route_count(bool);
-        boost::int64_t get_bind_gid_count(bool);
-        boost::int64_t get_resolve_gid_count(bool);
-        boost::int64_t get_unbind_gid_count(bool);
-        boost::int64_t get_increment_credit_count(bool);
-        boost::int64_t get_decrement_credit_count(bool);
-        boost::int64_t get_allocate_count(bool);
-        boost::int64_t get_begin_migration_count(bool);
-        boost::int64_t get_end_migration_count(bool);
-        boost::int64_t get_overall_count(bool);
-
-        boost::int64_t get_route_time(bool);
-        boost::int64_t get_bind_gid_time(bool);
-        boost::int64_t get_resolve_gid_time(bool);
-        boost::int64_t get_unbind_gid_time(bool);
-        boost::int64_t get_increment_credit_time(bool);
-        boost::int64_t get_decrement_credit_time(bool);
-        boost::int64_t get_allocate_time(bool);
-        boost::int64_t get_begin_migration_time(bool);
-        boost::int64_t get_end_migration_time(bool);
-        boost::int64_t get_overall_time(bool);
-
-        // increment counter values
-        void increment_route_count();
-        void increment_bind_gid_count();
-        void increment_resolve_gid_count();
-        void increment_unbind_gid_count();
-        void increment_increment_credit_count();
-        void increment_decrement_credit_count();
-        void increment_allocate_count();
-        void increment_begin_migration_count();
-        void increment_end_migration_count();
-
-    private:
-        friend struct update_time_on_exit;
-        friend struct primary_namespace;
-
-        api_counter_data route_;                // primary_ns_
-        api_counter_data bind_gid_;             // primary_ns_bind_gid
-        api_counter_data resolve_gid_;          // primary_ns_resolve_gid
-        api_counter_data unbind_gid_;           // primary_ns_unbind_gid
-        api_counter_data increment_credit_;     // primary_ns_increment_credit
-        api_counter_data decrement_credit_;     // primary_ns_decrement_credit
-        api_counter_data allocate_;             // primary_ns_allocate
-        api_counter_data begin_migration_;      // primary_ns_begin_migration
-        api_counter_data end_migration_;        // primary_ns_end_migration
-    };
-    counter_data counter_data_;
-
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
-    };
+    detail::primary_namespace_counter_data counter_data_;
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     /// Dump the credit counts of all matching ranges. Expects that \p l

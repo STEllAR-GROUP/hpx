@@ -227,6 +227,8 @@ protected:
 
     void launch_hosted();
 
+    void launch_local(util::runtime_configuration const& ini_);
+
     naming::address resolve_full_postproc(
         future<response> f
       , naming::gid_type const& id
@@ -535,26 +537,16 @@ public:
     ///                   generated for. Repeating calls using the same
     ///                   locality results in identical locality_id values.
     /// \param count      [in] The number of global ids to be generated.
-    /// \param lower_bound
-    ///                   [out] The lower bound of the assigned id range.
-    ///                   The returned value can be used as the first id
-    ///                   to assign. This is valid only, if the return
-    ///                   value of this function is true.
-    /// \param upper_bound
-    ///                   [out] The upper bound of the assigned id range.
-    ///                   The returned value can be used as the last id
-    ///                   to assign. This is valid only, if the return
-    ///                   value of this function is true.
+    /// \param addr       [in] The (optional) address of the object the gid
+    ///                   should be generated for. If addr is non-zero, count
+    ///                   must be equal to one.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    /// \returns          This function returns \a true if a new range has
-    ///                   been generated (it has been called for the first
-    ///                   time for the given locality) and returns \a false
-    ///                   if this locality already got a range assigned in
-    ///                   an earlier call. Any error results in an exception
-    ///                   thrown from this function.
+    /// \returns          This function returns the lower bound of the assigned
+    ///                   id range. The returned value can be used as the first
+    ///                   id to assign.
     ///
     /// \note             This function assigns a range of global ids usable
     ///                   by the given locality for newly created components.
@@ -567,10 +559,9 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_id_range(
+    naming::gid_type get_id_range(
         boost::uint64_t count
-      , naming::gid_type& lower_bound
-      , naming::gid_type& upper_bound
+      , naming::address::address_type addr = 0
       , error_code& ec = throws
         );
 

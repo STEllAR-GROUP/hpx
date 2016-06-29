@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components_fwd.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -293,7 +294,8 @@ HPX_API_EXPORT naming::id_type get_console_locality(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT naming::gid_type get_next_id(
-    std::size_t count
+    std::size_t count = 1
+  , naming::address::address_type addr = 0
   , error_code& ec = throws
     );
 

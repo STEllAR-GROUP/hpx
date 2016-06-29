@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -28,7 +29,7 @@ namespace hpx { namespace util
 
             {
                 unlock_guard<std::unique_lock<mutex_type> > ul(l);
-                lower = hpx::agas::get_next_id(count_);
+                lower = hpx::agas::get_next_id(count_, 0);
             }
 
             // we ignore the result if some other thread has already set the

@@ -20,7 +20,6 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
@@ -285,13 +284,6 @@ namespace hpx
             return reinterpret_cast<boost::uint64_t>(memory_.get());
         }
 
-        naming::gid_type get_next_id(std::size_t count = 1);
-
-        util::unique_id_ranges& get_id_pool()
-        {
-            return id_pool_;
-        }
-
         /// Add a function to be executed inside a HPX thread before hpx_main
         /// but guaranteed to be executed before any startup function registered
         /// with \a add_startup_function.
@@ -374,7 +366,6 @@ namespace hpx
         }
 
     private:
-        util::unique_id_ranges id_pool_;
         runtime_mode mode_;
         int result_;
         std::size_t num_threads_;

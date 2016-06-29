@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/mutex.hpp>
+#include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
@@ -68,8 +69,6 @@ struct HPX_EXPORT symbol_namespace
     std::string instance_name_;
     on_event_data_map_type on_event_data_;
 
-    struct update_time_on_exit;
-
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
     {
@@ -117,7 +116,7 @@ struct HPX_EXPORT symbol_namespace
         void increment_on_event_count();
 
     private:
-        friend struct update_time_on_exit;
+        friend struct detail::update_time_on_exit;
         friend struct symbol_namespace;
 
         api_counter_data bind_;               // symbol_ns_bind
@@ -127,22 +126,6 @@ struct HPX_EXPORT symbol_namespace
         api_counter_data on_event_;           // symbol_ns_on_event
     };
     counter_data counter_data_;
-
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
-    };
 
   public:
     symbol_namespace()

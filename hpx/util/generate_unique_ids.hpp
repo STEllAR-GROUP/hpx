@@ -8,6 +8,7 @@
 #define HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/spinlock.hpp>
 

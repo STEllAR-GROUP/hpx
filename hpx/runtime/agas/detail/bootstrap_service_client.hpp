@@ -7,15 +7,13 @@
 #if !defined(HPX_AGAS_CLIENT_BOOTSTRAP_FEB_05_2016_114AM)
 #define HPX_AGAS_CLIENT_BOOTSTRAP_FEB_05_2016_114AM
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/detail/agas_service_client.hpp>
-#include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
 
 #include <string>
 #include <vector>
@@ -31,33 +29,9 @@ namespace hpx { namespace agas { namespace detail
           , symbol_ns_server_()
         {}
 
-        void register_counter_types()
-        {
-            server::locality_namespace::register_counter_types();
-            server::locality_namespace::register_global_counter_types();
-            server::primary_namespace::register_counter_types();
-            server::primary_namespace::register_global_counter_types();
-            server::component_namespace::register_counter_types();
-            server::component_namespace::register_global_counter_types();
-            server::symbol_namespace::register_counter_types();
-            server::symbol_namespace::register_global_counter_types();
-        }
-
-        void register_server_instance(char const* servicename)
-        {
-            locality_ns_server_.register_server_instance(servicename);
-            primary_ns_server_.register_server_instance(servicename);
-            component_ns_server_.register_server_instance(servicename);
-            symbol_ns_server_.register_server_instance(servicename);
-        }
-
-        void unregister_server_instance(error_code& ec)
-        {
-            locality_ns_server_.unregister_server_instance(ec);
-            if (!ec) primary_ns_server_.unregister_server_instance(ec);
-            if (!ec) component_ns_server_.unregister_server_instance(ec);
-            if (!ec) symbol_ns_server_.unregister_server_instance(ec);
-        }
+        void register_counter_types();
+        void register_server_instance(char const* servicename);
+        void unregister_server_instance(error_code& ec);
 
         server::primary_namespace primary_ns_server_;
         server::locality_namespace locality_ns_server_;

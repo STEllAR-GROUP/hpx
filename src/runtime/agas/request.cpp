@@ -12,6 +12,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/assert.hpp>
@@ -27,7 +28,7 @@
 #include <utility>
 
 // The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 13
+#define HPX_AGAS_REQUEST_SUBTYPES 14
 
 namespace hpx { namespace agas
 {
@@ -85,6 +86,7 @@ namespace hpx { namespace agas
           , subtype_iterate_types_function  = 0xa
           , subtype_void                    = 0xb
           , subtype_name_evt_id             = 0xc
+          , subtype_count_address           = 0xd
           // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
         };
 
@@ -182,6 +184,12 @@ namespace hpx { namespace agas
               , namespace_action_code
               , bool
               , hpx::id_type
+            >
+            // 0xd
+            // subtype_count_address
+          , util::tuple<
+                std::uint64_t
+              , naming::address::address_type
             >
         > data_type;
 
@@ -308,6 +316,17 @@ namespace hpx { namespace agas
           count_, num_threads_, prefix_)))
     {
         // TODO: verification of namespace_action_code
+    }
+
+    request::request(
+        namespace_action_code type_
+      , std::uint64_t count_
+      , naming::address::address_type addr_
+        )
+      : mc(type_)
+      , data(new request_data(util::make_tuple(count_, addr_)))
+    {
+        HPX_ASSERT(type_ == primary_ns_allocate);
     }
 
     request::request(
@@ -459,9 +478,30 @@ namespace hpx { namespace agas
             case request_data::subtype_locality_count:
                 return data->get_data<request_data::subtype_locality_count, 1>(ec);
 
+            case request_data::subtype_count_address:
+                return data->get_data<request_data::subtype_count_address, 0>(ec);
+
             default: {
                 HPX_THROWS_IF(ec, bad_parameter,
                     "request::get_count",
+                    "invalid operation for request type");
+                return 0;
+            }
+        }
+    } // }}}
+
+    naming::address::address_type request::get_address(
+        error_code& ec
+        ) const
+    { // {{{
+        switch (data->which())
+        {
+            case request_data::subtype_count_address:
+                return data->get_data<request_data::subtype_count_address, 1>(ec);
+
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "request::get_address",
                     "invalid operation for request type");
                 return 0;
             }
