@@ -251,7 +251,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename ... Params_>
             executor_parameters(Params_ &&... params)
-              : unwrapper<Params>(params)...
+              : unwrapper<Params>(std::forward<Params_>(params))...
             {}
 
         private:
