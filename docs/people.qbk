@@ -1,5 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2015 Hartmut Kaiser
+    Copyright (C) 2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -69,7 +70,7 @@ our tables below.
   [[John Biddiscombe]        [__cscs__]           [[$./images/emails/biddisco.png]]]
   [[Anton Bikineev]          [__cct__, __lsu__]   [[$./images/emails/antbikineev.png]]]
   [[Martin Stumpf]           [__inf3__, __fau__]  [[$./images/emails/martinhstumpf.png]]]
-  [[Bryce Adelstein-Lelbach] [__llbl__]           []]
+  [[Bryce Adelstein-Lelbach] [__llbl__]           [[$./images/emails/balelbach.png]]]
   [[Shuangyang Yang]         [__cct__, __lsu__]   [[$./images/emails/syang16.png]]]
   [[Jeroen Habraken]         [__tue__]            [[$./images/emails/vexocide.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
