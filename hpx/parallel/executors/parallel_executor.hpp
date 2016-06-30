@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F, typename ... Ts>
         hpx::future<
             typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
-        async_execute(F && f, Ts &&... ts)
+        async_execute(F && f, Ts &&... ts) const
         {
             return hpx::async(l_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }

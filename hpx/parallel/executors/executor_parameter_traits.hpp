@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/util/always_void.hpp>
@@ -56,13 +57,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Parameters>
             static std::size_t call(hpx::traits::detail::wrap_int,
-                Parameters& params)
+                Parameters && params)
             {
                 return hpx::get_os_thread_count();
             }
 
             template <typename Parameters>
-            static auto call(int, Parameters& params)
+            static auto call(int, Parameters && params)
             ->  decltype(params.processing_units_count())
             {
                 return params.processing_units_count();
@@ -72,48 +73,66 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 return call(0, params);
             }
+
+            template <typename Parameters>
+            static std::size_t call(Parameters params)
+            {
+                return call(static_cast<Parameters_&>(params));
+            }
         };
 
         template <typename Parameters>
-        std::size_t call_processing_units_parameter_count(Parameters& params)
+        std::size_t call_processing_units_parameter_count(Parameters && params)
         {
             return processing_units_count_parameter_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(params);
+                >::call(std::forward<Parameters>(params));
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(processing_units_count);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
         struct variable_chunk_size_helper
         {
             template <typename Parameters, typename Executor>
-            static bool call(hpx::traits::detail::wrap_int, Parameters&,
-                Executor&)
+            static bool call(hpx::traits::detail::wrap_int, Parameters &&,
+                Executor &&)
             {
                 return false;       // assume constant chunk sizes
             }
 
             template <typename Parameters, typename Executor>
-            static auto call(int, Parameters& params, Executor& exec)
+            static auto call(int, Parameters && params, Executor && exec)
             ->  decltype(params.variable_chunk_size(exec))
             {
-                return params.variable_chunk_size(exec);
+                return params.variable_chunk_size(std::forward<Executor>(exec));
             }
 
             template <typename Executor>
-            static bool call(Parameters_& params, Executor& exec)
+            static bool call(Parameters_& params, Executor && exec)
             {
-                return call(0, params, exec);
+                return call(0, params, std::forward<Executor>(exec));
+            }
+
+            template <typename Parameters, typename Executor>
+            static bool call(Parameters params, Executor && exec)
+            {
+                return call(static_cast<Parameters_&>(params),
+                    std::forward<Executor>(exec));
             }
         };
 
         template <typename Parameters, typename Executor>
-        bool call_variable_chunk_size(Parameters& params, Executor& exec)
+        bool call_variable_chunk_size(Parameters && params, Executor && exec)
         {
             return variable_chunk_size_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(params, exec);
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(variable_chunk_size);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
@@ -121,39 +140,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Parameters, typename Executor, typename F>
             static std::size_t
-            call(hpx::traits::detail::wrap_int, Parameters&, Executor&, F &&,
-                std::size_t num_tasks)
+            call(hpx::traits::detail::wrap_int, Parameters &&, Executor &&,
+                F &&, std::size_t num_tasks)
             {
                 return num_tasks;       // assume sequential execution
             }
 
             template <typename Parameters, typename Executor, typename F>
-            static auto call(int, Parameters& params, Executor& exec, F && f,
-                    std::size_t num_tasks)
+            static auto call(int, Parameters && params, Executor && exec,
+                    F && f, std::size_t num_tasks)
             ->  decltype(
-                    params.get_chunk_size(exec, std::forward<F>(f), num_tasks)
+                    params.get_chunk_size(std::forward<Executor>(exec),
+                        std::forward<F>(f), num_tasks)
                 )
             {
-                return params.get_chunk_size(exec, std::forward<F>(f), num_tasks);
+                return params.get_chunk_size(std::forward<Executor>(exec),
+                    std::forward<F>(f), num_tasks);
             }
 
             template <typename Executor, typename F>
             static std::size_t
-            call(Parameters_& params, Executor& exec, F && f,
+            call(Parameters_& params, Executor && exec, F && f,
                 std::size_t num_tasks)
             {
-                return call(0, params, exec, std::forward<F>(f), num_tasks);
+                return call(0, params, std::forward<Executor>(exec),
+                    std::forward<F>(f), num_tasks);
+            }
+
+            template <typename Parameters, typename Executor, typename F>
+            static std::size_t
+            call(Parameters params, Executor && exec, F && f,
+                std::size_t num_tasks)
+            {
+                return call(static_cast<Parameters_&>(params),
+                    std::forward<Executor>(exec), std::forward<F>(f), num_tasks);
             }
         };
 
         template <typename Parameters, typename Executor, typename F>
-        std::size_t call_get_chunk_size(Parameters& params, Executor& exec,
+        std::size_t call_get_chunk_size(Parameters && params, Executor && exec,
             F && f, std::size_t num_tasks)
         {
             return get_chunk_size_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(params, exec, std::forward<F>(f), num_tasks);
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec), std::forward<F>(f), num_tasks);
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
@@ -161,37 +195,48 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Parameters, typename Executor>
             static std::size_t
-            call(hpx::traits::detail::wrap_int, Parameters&, Executor&,
+            call(hpx::traits::detail::wrap_int, Parameters &&, Executor &&,
                 std::size_t cores)
             {
                 return 4 * cores;       // assume 4 times the number of cores
             }
 
             template <typename Parameters, typename Executor>
-            static auto call(int, Parameters& params, Executor& exec,
+            static auto call(int, Parameters && params, Executor && exec,
                     std::size_t cores)
             ->  decltype(
-                    params.get_maximal_number_of_chunks(exec, cores)
+                    params.get_maximal_number_of_chunks(
+                        std::forward<Executor>(exec), cores)
                 )
             {
-                return params.get_maximal_number_of_chunks(exec, cores);
+                return params.get_maximal_number_of_chunks(
+                    std::forward<Executor>(exec), cores);
             }
 
             template <typename Executor>
             static std::size_t
-            call(Parameters_& params, Executor& exec, std::size_t cores)
+            call(Parameters_& params, Executor && exec, std::size_t cores)
             {
-                return call(0, params, exec, cores);
+                return call(0, params, std::forward<Executor>(exec), cores);
+            }
+
+            template <typename Parameters, typename Executor>
+            static std::size_t
+            call(Parameters params, Executor && exec, std::size_t cores)
+            {
+                return call(static_cast<Parameters_&>(params),
+                    std::forward<Executor>(exec), cores);
             }
         };
 
         template <typename Parameters, typename Executor>
-        std::size_t call_maximal_number_of_chunks(Parameters& params,
-            Executor& exec, std::size_t cores)
+        std::size_t call_maximal_number_of_chunks(Parameters && params,
+            Executor && exec, std::size_t cores)
         {
             return maximal_number_of_chunks_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(params, exec, cores);
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec), cores);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -199,43 +244,58 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct reset_thread_distribution_helper
         {
             template <typename Parameters, typename Executor>
-            static void call(hpx::traits::detail::wrap_int, Parameters&, Executor&)
+            static void call(hpx::traits::detail::wrap_int, Parameters &&,
+                Executor &&)
             {
             }
 
             template <typename Parameters, typename Executor>
-            static auto call(int, Parameters& params, Executor& exec)
-            ->  decltype(params.reset_thread_distribution(exec))
+            static auto call(int, Parameters && params, Executor && exec)
+            ->  decltype(
+                    params.reset_thread_distribution(
+                        std::forward<Executor>(exec))
+                )
             {
-                params.reset_thread_distribution(exec);
+                params.reset_thread_distribution(std::forward<Executor>(exec));
             }
 
             template <typename Executor>
-            static void call(Parameters_& params, Executor& exec)
+            static void call(Parameters_& params, Executor && exec)
             {
-                call(0, params, exec);
+                call(0, params, std::forward<Executor>(exec));
+            }
+
+            template <typename Parameters, typename Executor>
+            static void call(Parameters params, Executor && exec)
+            {
+                call(static_cast<Parameters_&>(params),
+                    std::forward<Executor>(exec));
             }
         };
 
         template <typename Parameters, typename Executor>
-        void call_reset_thread_distribution(Parameters& params, Executor& exec)
+        void call_reset_thread_distribution(Parameters && params,
+            Executor && exec)
         {
             reset_thread_distribution_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(params, exec);
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
         struct mark_begin_execution_helper
         {
             template <typename Parameters>
-            static void call(hpx::traits::detail::wrap_int, Parameters&)
+            static void call(hpx::traits::detail::wrap_int, Parameters &&)
             {
             }
 
             template <typename Parameters>
-            static auto call(int, Parameters& params)
+            static auto call(int, Parameters && params)
             ->  decltype(params.mark_begin_execution())
             {
                 params.mark_begin_execution();
@@ -245,27 +305,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 call(0, params);
             }
+
+            template <typename Parameters>
+            static void call(Parameters params)
+            {
+                call(static_cast<Parameters_&>(params));
+            }
         };
 
         template <typename Parameters>
-        void call_mark_begin_execution(Parameters& params)
+        void call_mark_begin_execution(Parameters && params)
         {
             mark_begin_execution_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(params);
+                >::call(std::forward<Parameters>(params));
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
         struct mark_end_execution_helper
         {
             template <typename Parameters>
-            static void call(hpx::traits::detail::wrap_int, Parameters&)
+            static void call(hpx::traits::detail::wrap_int, Parameters &&)
             {
             }
 
             template <typename Parameters>
-            static auto call(int, Parameters& params)
+            static auto call(int, Parameters && params)
             ->  decltype(params.mark_end_execution())
             {
                 params.mark_end_execution();
@@ -275,15 +343,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {
                 call(0, params);
             }
+
+            template <typename Parameters>
+            static void call(Parameters params)
+            {
+                call(static_cast<Parameters_&>(params));
+            }
         };
 
         template <typename Parameters>
-        void call_mark_end_execution(Parameters& params)
+        void call_mark_end_execution(Parameters && params)
         {
             mark_end_execution_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(params);
+                >::call(std::forward<Parameters>(params));
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution);
     }
     /// \endcond
 
@@ -306,11 +382,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls params.variable_chunk_size(exec), if available,
         ///       otherwise it returns false.
         ///
-        template <typename Executor>
-        static bool variable_chunk_size(executor_parameters_type& params,
-            Executor& exec)
+        template <typename Parameters_, typename Executor>
+        static bool variable_chunk_size(Parameters_ && params,
+            Executor && exec)
         {
-            return detail::call_variable_chunk_size(params, exec);
+            return detail::call_variable_chunk_size(
+                std::forward<Parameters_>(params), std::forward<Executor>(exec));
         }
 
         /// Return the number of invocations of the given function \a f which
@@ -331,12 +408,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///        iteration the function has already executed (i.e. which
         ///        don't have to be scheduled anymore).
         ///
-        template <typename Executor, typename F>
-        static std::size_t get_chunk_size(executor_parameters_type& params,
-            Executor& exec, F && f, std::size_t num_tasks)
+        template <typename Parameters_, typename Executor, typename F>
+        static std::size_t get_chunk_size(Parameters_ && params,
+            Executor && exec, F && f, std::size_t num_tasks)
         {
-            return detail::call_get_chunk_size(params, exec,
-                std::forward<F>(f), num_tasks);
+            return detail::call_get_chunk_size(std::forward<Parameters_>(params),
+                std::forward<Executor>(exec), std::forward<F>(f), num_tasks);
         }
 
         /// Return the largest reasonable number of chunks to create for a
@@ -350,11 +427,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param cores    [in] The number of cores the number of chunks
         ///                 should be determined for.
         ///
-        template <typename Executor>
+        template <typename Parameters_, typename Executor>
         static std::size_t maximal_number_of_chunks(
-            executor_parameters_type& params, Executor& exec, std::size_t cores)
+            Parameters_ && params, Executor && exec, std::size_t cores)
         {
-            return detail::call_maximal_number_of_chunks(params, exec, cores);
+            return detail::call_maximal_number_of_chunks(
+                std::forward<Parameters_>(params), std::forward<Executor>(exec),
+                cores);
         }
 
         /// Reset the internal round robin thread distribution scheme for the
@@ -367,11 +446,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls params.reset_thread_distribution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
-        template <typename Executor>
-        static void reset_thread_distribution(executor_parameters_type& params,
-            Executor& exec)
+        template <typename Parameters_, typename Executor>
+        static void reset_thread_distribution(Parameters_ && params,
+            Executor && exec)
         {
-            detail::call_reset_thread_distribution(params, exec);
+            detail::call_reset_thread_distribution(
+                std::forward<Parameters_>(params), std::forward<Executor>(exec));
         }
 
         /// Retrieve the number of (kernel-)threads used by the associated
@@ -386,10 +466,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise it forwards the request to the executor parameters
         ///       object.
         ///
-        static std::size_t processing_units_count(
-            executor_parameters_type& params)
+        template <typename Parameters_>
+        static std::size_t processing_units_count(Parameters_ && params)
         {
-            return detail::call_processing_units_parameter_count(params);
+            return detail::call_processing_units_parameter_count(
+                std::forward<Parameters_>(params));
         }
 
         /// Mark the begin of a parallel algorithm execution
@@ -400,9 +481,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls params.mark_begin_execution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
-        static void mark_begin_execution(executor_parameters_type& params)
+        template <typename Parameters_>
+        static void mark_begin_execution(Parameters_ && params)
         {
-            detail::call_mark_begin_execution(params);
+            detail::call_mark_begin_execution(std::forward<Parameters_>(params));
         }
 
         /// Mark the end of a parallel algorithm execution
@@ -413,9 +495,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls params.mark_end_execution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
-        static void mark_end_execution(executor_parameters_type& params)
+        template <typename Parameters_>
+        static void mark_end_execution(Parameters_ && params)
         {
-            detail::call_mark_end_execution(params);
+            detail::call_mark_end_execution(std::forward<Parameters_>(params));
         }
     };
 

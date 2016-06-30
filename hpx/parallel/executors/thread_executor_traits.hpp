@@ -66,10 +66,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             given executor.
         /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        template <typename F, typename ... Ts>
-        static void apply_execute(executor_type& sched, F && f, Ts &&... ts)
+        template <typename Executor_, typename F, typename ... Ts>
+        static void apply_execute(Executor_ && sched, F && f, Ts &&... ts)
         {
-            hpx::apply(sched, std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::apply(std::forward<Executor_>(sched), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         /// \brief Singleton form of asynchronous execution agent creation.
@@ -86,14 +87,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         /// \returns f(ts...)'s result through a future
         ///
-        template <typename F, typename ... Ts>
+        template <typename Executor_, typename F, typename ... Ts>
         static hpx::future<
             typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
         >
-        async_execute(executor_type& sched, F && f, Ts &&... ts)
+        async_execute(Executor_ && sched, F && f, Ts &&... ts)
         {
-            return hpx::async(sched, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            return hpx::async(std::forward<Executor_>(sched),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         /// \brief Singleton form of synchronous execution agent creation.
@@ -111,12 +112,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         /// \returns f(ts...)'s result through a future
         ///
-        template <typename F, typename ... Ts>
+        template <typename Executor_, typename F, typename ... Ts>
         static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-        execute(executor_type& sched, F && f, Ts &&... ts)
+        execute(Executor_ && sched, F && f, Ts &&... ts)
         {
-            return hpx::async(sched, std::forward<F>(f),
-                std::forward<Ts>(ts)...).get();
+            return hpx::async(std::forward<Executor_>(sched),
+                std::forward<F>(f), std::forward<Ts>(ts)...).get();
         }
 
         /// \brief Bulk form of asynchronous execution agent creation
@@ -143,11 +144,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///          of futures holding the returned value of each invocation
         ///          of \a f.
         ///
-        template <typename F, typename Shape, typename ... Ts>
+        template <typename Executor_, typename F, typename Shape,
+            typename ... Ts>
         static std::vector<hpx::future<
             typename detail::bulk_async_execute_result<F, Shape, Ts...>::type
         > >
-        bulk_async_execute(executor_type& sched, F && f, Shape const& shape,
+        bulk_async_execute(Executor_ && sched, F && f, Shape const& shape,
             Ts &&... ts)
         {
             std::vector<hpx::future<
@@ -190,9 +192,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///          returned value of each invocation of \a f except when
         ///          \a f returns void, which case void is returned.
         ///
-        template <typename F, typename Shape, typename ... Ts>
+        template <typename Executor_, typename F, typename Shape,
+            typename ... Ts>
         static typename detail::bulk_execute_result<F, Shape, Ts...>::type
-        bulk_execute(executor_type& sched, F && f, Shape const& shape,
+        bulk_execute(Executor_ && sched, F && f, Shape const& shape,
             Ts &&... ts)
         {
             std::vector<hpx::future<
@@ -216,7 +219,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param sched  [in] The executor object to use for querying the
         ///               number of pending tasks.
         ///
-        static bool has_pending_closures(executor_type& sched)
+        template <typename Executor_>
+        static bool has_pending_closures(Executor_ && sched)
         {
             return sched.num_pending_closures() != 0;
         }

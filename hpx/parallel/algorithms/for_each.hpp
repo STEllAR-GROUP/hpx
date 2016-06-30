@@ -46,9 +46,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             void operator()(std::size_t /*part_index*/,
                 Iter part_begin, std::size_t part_size)
             {
+                typedef typename util::detail::loop_n<Iter>::type it_type;
+
                 util::loop_n(
                     part_begin, part_size,
-                    [this](Iter curr) mutable
+                    [this](it_type curr) mutable
                     {
                         hpx::util::invoke(
                             f_, hpx::util::invoke(proj_, *curr));
@@ -71,8 +73,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy, InIter first, std::size_t count, F && f,
                 Proj && proj/* = Proj()*/)
             {
+                typedef typename util::detail::loop_n<InIter>::type it_type;
+
                 return util::loop_n(first, count,
-                    [&f, &proj](InIter curr)
+                    [&f, &proj](it_type curr)
                     {
                         hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
@@ -80,7 +84,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            static typename util::detail::algorithm_result<ExPolicy,
+                InIter>::type
             parallel(ExPolicy && policy, InIter first, std::size_t count,
                 F && f, Proj && proj/* = Proj()*/)
             {
@@ -245,29 +250,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static Iter
+            static InIter
             sequential(ExPolicy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
+                typedef typename util::detail::loop<InIter>::type it_type;
+
                 return util::loop(first, last,
-                    [&f, &proj](Iter curr)
+                    [&f, &proj](it_type curr)
                     {
                         f(hpx::util::invoke(proj, *curr));
                     });
             }
 
-            template <typename ExPolicy, typename InIter, typename F>
-            static InIter
-            sequential(ExPolicy, InIter first, InIter last, F && f,
-                util::projection_identity)
-            {
-                std::for_each(first, last, std::forward<F>(f));
-                return last;
-            }
-
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            static typename util::detail::algorithm_result<ExPolicy,
+                InIter>::type
             parallel(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
@@ -280,7 +279,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         ///////////////////////////////////////////////////////////////////////
         // non-segmented implementation
-        template <typename ExPolicy, typename InIter, typename F, typename Proj>
+        template <typename ExPolicy, typename InIter, typename F,
+            typename Proj>
         inline typename util::detail::algorithm_result<ExPolicy, InIter>::type
         for_each_(ExPolicy && policy, InIter first, InIter last, F && f,
             Proj && proj, std::false_type)
@@ -302,7 +302,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename SegIter, typename F, typename Proj>
+        template <typename ExPolicy, typename SegIter, typename F,
+            typename Proj>
         inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type);

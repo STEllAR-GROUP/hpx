@@ -42,6 +42,7 @@
 [def __version__                __0_9_99__]
 
 [def __hpx__                    /HPX/]
+[def __hpx_compute__            /HPX.Compute/]
 [def __stellar__                [@http://stellar-group.org STE||AR]]
 [def __stellar_list__           [@email:hpx-users@stellar.cct.lsu.edu hpx-users@stellar.cct.lsu.edu]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenode]]
@@ -67,6 +68,7 @@
 [def __unlv__                   [@http://www.unlv.edu University of Nevada, Las Vegas]]
 [def __cscs__                   [@http://www.cscs.ch Swiss National Supercomputing Centre]]
 [def __ou__                     [@http://uoregon.edu/ University of Oregon]]
+[def __llbl__                   [@http://www.lbl.gov/ Berkley Lab]]
 
 [def __gsoc__                   [@https://developers.google.com/open-source/soc/ Google Summer of Code]]
 
@@ -131,6 +133,8 @@
 [def __pocl__                   [@http://portablecl.org/ POCL]]
 [def __cuda__                   [@http://www.nvidia.com/object/cuda_home_new.html CUDA]]
 [def __nt2__                    [@http://www.numscale.com/nt2/ NT2]]
+[def __lgd__                    [@http://www.libgeodecomp.org/ LibGeoDecomp]]
+[def __conan__                  [@https://www.conan.io/ Conan]]
 
 [def __cpp11__                  [@http://www.open-std.org/jtc1/sc22/wg21 C++11 Standard]]
 [def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]
