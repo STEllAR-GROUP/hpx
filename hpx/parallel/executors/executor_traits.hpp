@@ -290,9 +290,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto
             call(hpx::traits::detail::wrap_int, Executor&& exec, F && f,
                     S const& shape, Ts &&... ts)
-            ->  std::vector<decltype(
-                    exec.async_execute(f, *boost::begin(shape), ts...)
-                )>
+            ->  std::vector<typename future_type<
+                        typename hpx::util::decay<Executor>::type,
+                        typename bulk_async_execute_result<F, S, Ts...>::type
+                    >::type>
             {
                 std::vector<typename future_type<
                         typename hpx::util::decay<Executor>::type,
