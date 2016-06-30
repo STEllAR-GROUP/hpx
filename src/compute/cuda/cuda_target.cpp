@@ -139,7 +139,7 @@ namespace hpx { namespace compute { namespace cuda
         reset();
     }
 
-    target::native_handle_type::reset()
+    void target::native_handle_type::reset()
     {
         if (stream_)
             cudaStreamDestroy(stream_);     // ignore error

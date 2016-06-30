@@ -27,7 +27,7 @@
 
 namespace hpx { namespace compute { namespace cuda
 {
-    std::vector<target> get_local_targets();
+    std::vector<target> get_local_targets()
     {
         int device_count = 0;
         cudaError_t error = cudaGetDeviceCount(&device_count);
@@ -51,7 +51,7 @@ namespace hpx { namespace compute { namespace cuda
     }
 }}}
 
-HPX_PLAIN_ACTION(hpx::compute::host::get_local_targets,
+HPX_PLAIN_ACTION(hpx::compute::cuda::get_local_targets,
     compute_cuda_get_targets_action);
 
 namespace hpx { namespace compute { namespace cuda

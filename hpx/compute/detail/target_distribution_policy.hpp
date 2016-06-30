@@ -9,9 +9,10 @@
 #define HPX_COMPUTE_TARGET_DISTRIBUTION_POLICY
 
 #include <hpx/config.hpp>
-
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -25,12 +26,15 @@ namespace hpx { namespace compute { namespace detail
     template <typename Target>
     struct target_distribution_policy
     {
+    private:
+        typedef hpx::lcos::local::spinlock mutex_type;
+
     public:
         typedef Target target_type;
 
         /// Default-construct a new instance of a \a target_distribution_policy.
         target_distribution_policy()
-          : targets_(Target::get_local_targets()),
+          : targets_(),
             num_partitions_(1),
             next_target_(0)
         {}
@@ -75,11 +79,18 @@ namespace hpx { namespace compute { namespace detail
         /// async operation
         target_type get_next_target() const
         {
+            std::lock_guard<mutex_type> l(mtx_);
+            if (targets_.empty())
+                targets_ = Target::get_local_targets();
             return targets_[next_target_++ % targets_.size()];
         }
 
         std::size_t get_num_partitions() const
         {
+            std::lock_guard<mutex_type> l(mtx_);
+            if (targets_.empty())
+                targets_ = Target::get_local_targets();
+
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
                 targets_.size() : num_partitions_;
             return (std::max)(num_parts, std::size_t(1));
@@ -95,6 +106,10 @@ namespace hpx { namespace compute { namespace detail
 
         std::size_t get_num_items(std::size_t items, target_type const& t) const
         {
+            std::lock_guard<mutex_type> l(mtx_);
+            if (targets_.empty())
+                targets_ = Target::get_local_targets();
+
             // this distribution policy places an equal number of items onto
             // each target
             std::size_t sites = (std::max)(std::size_t(1), targets_.size());
@@ -143,9 +158,10 @@ namespace hpx { namespace compute { namespace detail
             ar & targets_ & num_partitions_;
         }
 
-        std::vector<target_type> targets_;   // targets
+        mutable mutex_type mtx_;
+        mutable std::vector<target_type> targets_;   // targets
         std::size_t num_partitions_;
-        boost::atomic<std::size_t> next_target_;
+        std::size_t next_target_;
         /// \endcond
     };
 }}}
