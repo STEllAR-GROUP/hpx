@@ -161,10 +161,10 @@ namespace hpx { namespace parcelset {
         // reuse of classes/types. the use of pointer allocators etc is a dreadful hack and
         // needs reworking
         typedef header<RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE>  header_type;
-        typedef hpx::lcos::local::mutex                      mutex_type;
+        typedef hpx::lcos::local::spinlock                   mutex_type;
         typedef std::lock_guard<mutex_type>                  scoped_lock;
-        typedef hpx::lcos::local::condition_variable         condition_type;
-        typedef std::unique_lock<hpx::lcos::local::mutex>    unique_lock;
+        typedef hpx::lcos::local::condition_variable_any     condition_type;
+        typedef std::unique_lock<mutex_type>                 unique_lock;
 
         // note use std::mutex in stop function as HPX is terminating
         mutex_type  stop_mutex;
@@ -606,16 +606,16 @@ namespace hpx { namespace parcelset {
             if (piggy_back) {
                 if (parcel_complete) {
                     rcv_data_type wrapped_pointer(piggy_back, h->size(),
-                            boost::bind(&parcelport::delete_recv_data, this, current_recv), chunk_pool_.get(), NULL);
-                    LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
+                        boost::bind(&parcelport::delete_recv_data, this, current_recv), chunk_pool_.get(), NULL);
                     rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
-                    decode_message_with_chunks<parcelport, rcv_buffer_type>(*this, std::move(buffer), 0, recv_data.chunks);
+                    LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
+                    hpx::parcelset::decode_message_with_chunks<parcelport, rcv_buffer_type>
+                        (*this, std::move(buffer), 0, recv_data.chunks);
                     LOG_DEBUG_MSG("parcel decode called for complete NORMAL parcel");
                 }
             }
             else {
                 std::size_t size = h->GetRdmaMessageLength();
-                LOG_ERROR_MSG("@TODO implement RDMA GET of message when header too small");
                 RdmaMemoryRegion *get_region = getRdmaRegion(size);
                 get_region->setMessageLength(size);
                 recv_data.zero_copy_regions.push_back(get_region);
@@ -937,7 +937,7 @@ namespace hpx { namespace parcelset {
         }
 
         void do_stop() {
-            std::cout << "Entering verbs stop " << std::endl;
+            LOG_DEBUG_MSG("Entering verbs stop ");
             FUNC_START_DEBUG_MSG;
             if (!stopped_) {
                 bool finished = false;
@@ -946,14 +946,10 @@ namespace hpx { namespace parcelset {
                     if (!finished) {
                         LOG_ERROR_MSG("Entering STOP when not all parcels have completed");
                         std::terminate();
-//                        do_background_work(1);
                     }
                 } while (!finished && !hpx::is_stopped());
 
-
-                std::cout << "stopped checking for background work" << std::endl;
-
-                scoped_lock lock(stop_mutex);
+                unique_lock(stop_mutex);
                 LOG_DEBUG_MSG("Removing all initiated connections");
                 _rdmaController->removeAllInitiatedConnections();
 
@@ -962,8 +958,7 @@ namespace hpx { namespace parcelset {
                     _rdmaController->eventMonitor(0);
                     std::cout << "Polling before shutdown" << std::endl;
                 }
-                LOG_DEBUG_MSG("wait done");
-                std::cout << "stopped removing clients and terminating" << std::endl;
+                LOG_DEBUG_MSG("stopped removing clients and terminating");
             }
             stopped_ = true;
             // Stop receiving and sending of parcels
@@ -1307,18 +1302,17 @@ namespace hpx { namespace parcelset {
         void hpx_background_work_thread()
         {
             // repeat until no more parcels are to be sent
-            while (!hpx::is_stopped()) {
+            while (!stopped_ || !hpx::is_stopped()) {
                 hpx_background_work();
             }
-            LOG_ERROR_MSG("HPX is now stopped");
-            std::cout << "hpx background work thread stopped" << std::endl;
+            LOG_DEBUG_MSG("hpx background work thread stopped");
         }
 #endif
 
         // --------------------------------------------------------------------
         // Background work, OS thread version
         // --------------------------------------------------------------------
-        static bool OS_background_work() {
+        static inline bool OS_background_work() {
             return parcelport::get_singleton()->hpx_background_work();
         }
 
@@ -1327,11 +1321,10 @@ namespace hpx { namespace parcelset {
         // this should be thread safe as eventMonitor only polls and dispatches and is thread safe.
         // ----------------------------------------------------------------------------------------------
         bool background_work(std::size_t num_thread) {
-            if (stopped_) {
+            if (stopped_ || hpx::is_stopped()) {
                 return false;
 			            }
             return hpx::apply(&parcelport::OS_background_work);
-            return true;
         }
 
         static parcelport *get_singleton()
