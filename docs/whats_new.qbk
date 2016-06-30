@@ -1,5 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2016 Hartmut Kaiser
+    Copyright (c) 2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,14 +12,16 @@
 
 [heading General Changes]
 
-As the version number of this release hints at, we consider it to be a preview
-for the upcoming V1.0. All of the functionalities we set out to implement for
-V1.0 are in place, all of the features we wanted to have exposed are ready. We
+As the version number of this release hints, we consider this release
+to be a preview
+for the upcoming __hpx__ V1.0. All of the functionalities 
+we set out to implement for
+V1.0 are in place; all of the features we wanted to have exposed are ready. We
 are very happy with the stability and performance of __hpx__ and we would like
-to have a formal release out for people to use as a solid basis and for us to
-gather broad feedback from the community before doing the actual V1.0 release
-in a couple of months. We still expect for some minor details to change, but
-mostly this release represents what we would like to have in a V1.0.
+to present this release to the community in order for us to
+gather broad feedback before releasing V1.0.
+We still expect for some minor details to change, but
+on the whole this release represents what we would like to have in a V1.0.
 
 Overall, since the last release we have had almost 1500 commits closing almost
 400 tickets. These numbers reflect the incredible development activity we have
@@ -67,7 +70,7 @@ particular order):
   not have to be changed in any way to support this new functionality. Please
   note that this feature is currently considered experimental. See [issue 559]
   and [pr 1966] for more details.
-* The `hpx::dataflow` facility is now usable with actions. Similarily to
+* The `hpx::dataflow` facility is now usable with actions. Similarly to
   `hpx::async`, actions can be specified as an explicit template argument
   (`hpx::dataflow<Action>(target, ...)`) or as the first argument
   (`hpx::dataflow(Action(), target, ...)`). We have also enabled the use of
@@ -589,5 +592,5 @@ Here is a list of the important tickets we closed for this release.
 [endsect] [/ What's New]
 
 [/Proofread by:]
-[/Adrian Serio 3-13-15]
+[/Adrian Serio 6-28-16]
 [/Patricia Grubel 3-20-15]
