@@ -92,14 +92,13 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit wrapper_heap(
-            char const* class_name,
+                char const* class_name,
 #if defined(HPX_DEBUG)
-            std::size_t count,
+                std::size_t count,
 #else
-            std::size_t,
+                std::size_t,
 #endif
-            std::size_t step = static_cast<std::size_t>(-1)
-        )
+                std::size_t step = static_cast<std::size_t>(-1))
           : pool_(nullptr), first_free_(nullptr), step_(step), size_(0), free_size_(0),
             base_gid_(naming::invalid_gid),
             class_name_(class_name),
@@ -237,7 +236,8 @@ namespace hpx { namespace components { namespace detail
         {
             // no lock is necessary here as all involved variables are immutable
             util::itt::heap_internal_access hia; HPX_UNUSED(hia);
-            return nullptr != pool_ && nullptr != p && pool_ <= p && p < pool_ + size_;
+            return nullptr != pool_ && nullptr != p &&
+                pool_ <= p && p < pool_ + size_;
         }
 
         /// \brief Get the global id of the managed_component instance
@@ -260,13 +260,13 @@ namespace hpx { namespace components { namespace detail
                 naming::gid_type base_gid;
 
                 {
-                    // this is the first call to get_gid() for this heap - allocate
-                    // a sufficiently large range of global ids
+                    // this is the first call to get_gid() for this heap -
+                    // allocate a sufficiently large range of global ids
                     util::unlock_guard<scoped_lock> ul(l);
-                    base_gid = ids.get_id(step_, naming::address::address_type(addr));
+                    base_gid = ids.get_id(step_, naming::address(addr, type));
 
-                    // register the global ids and the base address of this heap
-                    // with the AGAS
+                    // register the global ids and the base address of this
+                    // heap with the AGAS
                     if (!applier::bind_range_local(base_gid, step_,
                             naming::address(hpx::get_locality(), type, addr),
                             sizeof(value_type)))
@@ -279,7 +279,8 @@ namespace hpx { namespace components { namespace detail
                 // heap, we ignore the result
                 if (!base_gid_)
                 {
-                    // this is the first thread succeeding in binding the new gid range
+                    // this is the first thread succeeding in binding the new
+                    // gid range
                     base_gid_ = base_gid;
                 }
                 else
@@ -290,6 +291,16 @@ namespace hpx { namespace components { namespace detail
                 }
             }
 
+            // In local only address mode (one locality) the generated id
+            // should have the original object's lva stored as its lsb.
+            if (ids.local_only_address_mode())
+            {
+                return base_gid_ + static_cast<boost::uint64_t>(
+                    reinterpret_cast<char*>(p) - reinterpret_cast<char*>(addr));
+            }
+
+            // In non-local address mode the lsb represents the direct sequence
+            // number of the object inside the heap.
             return base_gid_ + static_cast<boost::uint64_t>(
                 static_cast<value_type*>(p) - addr);
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -48,12 +48,12 @@ namespace hpx { namespace components
         component_base_lco_with_value = 5,
 
         // Synchronization latch, barrier, and flex_barrier LCOs.
-        component_latch = ((6 << 16) | component_base_lco_with_value),
-        component_barrier = ((7 << 16) | component_base_lco),
-        component_flex_barrier = ((8 << 16) | component_base_lco),
+        component_latch = ((6 << 10) | component_base_lco_with_value),
+        component_barrier = ((7 << 10) | component_base_lco),
+        component_flex_barrier = ((8 << 10) | component_base_lco),
 
         // An LCO representing a value which may not have been computed yet.
-        component_promise = ((9 << 16) | component_base_lco_with_value),
+        component_promise = ((9 << 10) | component_base_lco_with_value),
 
         // AGAS locality services.
         component_agas_locality_namespace = 10,
@@ -69,7 +69,7 @@ namespace hpx { namespace components
 
 #if defined(HPX_HAVE_SODIUM)
         // root CA, subordinate CA
-        signed_certificate_promise = ((14 << 16) | component_base_lco_with_value),
+        signed_certificate_promise = ((14 << 10) | component_base_lco_with_value),
         component_root_certificate_authority = 15,
         component_subordinate_certificate_authority = 16,
 #endif
@@ -77,8 +77,8 @@ namespace hpx { namespace components
         component_last,
         component_first_dynamic = component_last,
 
-        // Force this enum type to be at least 32 bits.
-        component_upper_bound = 0x7fffffffL //-V112
+        // Force this enum type to be at least 20 bits.
+        component_upper_bound = 0xfffffL //-V112
     };
 
     enum factory_state_enum
@@ -95,13 +95,13 @@ namespace hpx { namespace components
     /// exposing the actions.
     inline component_type get_base_type(component_type t)
     {
-        return component_type(t & 0xFFFF);
+        return component_type(t & 0x3FF);
     }
 
     /// The upper short word of the component is the actual component type
     inline component_type get_derived_type(component_type t)
     {
-        return component_type((t >> 16) & 0xFFFF);
+        return component_type((t >> 10) & 0x3FF);
     }
 
     /// A component derived from a base component exposing the actions needs to
@@ -109,7 +109,7 @@ namespace hpx { namespace components
     inline component_type
     derived_component_type(component_type derived, component_type base)
     {
-        return component_type(derived << 16 | base);
+        return component_type(derived << 10 | base);
     }
 
     /// \brief Verify the two given component types are matching (compatible)

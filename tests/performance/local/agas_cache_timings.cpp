@@ -157,7 +157,7 @@ void test_insert(gva_cache_type& cache, std::size_t num_entries)
 
     for (std::size_t i = 0; i != num_entries; ++i)
     {
-        gva_cache_key key(hpx::agas::get_next_id(), 1);
+        gva_cache_key key(hpx::agas::get_next_id(1, hpx::naming::address()), 1);
         hpx::agas::gva value(locality, ct, 1, boost::uint64_t(0), 0);
 
         boost::uint64_t t = hpx::util::high_resolution_clock::now();
@@ -228,7 +228,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     gva_cache_type cache;
     cache.reserve(cache_size);
 
-    hpx::naming::gid_type first_key = hpx::agas::get_next_id();
+    hpx::naming::gid_type first_key =
+        hpx::agas::get_next_id(1, hpx::naming::address());
 
     test_insert(cache, num_entries);
     test_get(cache, first_key);

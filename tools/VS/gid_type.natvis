@@ -12,7 +12,7 @@
   <Type Name="hpx::naming::gid_type">
     <DisplayString>{{ msb={id_msb_,x} lsb={id_lsb_,x} }}</DisplayString>
     <Expand>
-      <Item Name="[msb]">id_msb_ &amp; 0x7fffffull,x</Item>
+      <Item Name="[msb]">id_msb_ &amp; 0x1ull,x</Item>
       <Item Name="[lsb]">id_lsb_,x</Item>
       <Item Name="[has_credit]">(id_msb_ &amp; 0x40000000ull) ? true : false</Item>
       <Item Condition="(id_msb_ &amp; 0x40000000ull) != 0" Name="[log2credits]">(id_msb_ &gt;&gt; 24) &amp; 0x1full</Item>
@@ -21,6 +21,8 @@
       <Item Name="[is_locked]">(id_msb_ &amp; 0x20000000ull) ? true : false</Item>
       <Item Name="[dont_cache]">(id_msb_ &amp; 0x00800000ull) ? true : false</Item>
       <Item Condition="((id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) != 0" Name="[locality_id]">((id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1</Item>
+      <Item Name="[component_type]">(hpx::components::component_enum_type)((id_msb_ &gt;&gt; 1) &amp; 0x3ffull)</Item>
+      <Item Condition="((id_msb_ &gt;&gt; 11) &amp; 0x3ffull) != 0" Name="[derived_component_type]">(hpx::components::component_enum_type)((id_msb_ &gt;&gt; 11) &amp; 0x3ffull)</Item>
     </Expand>
   </Type>
 
@@ -31,13 +33,13 @@
       <Item Condition="gid_.px != 0" Name="[msb]">gid_.px->id_msb_ &amp; 0x7fffffull,x</Item>
       <Item Condition="gid_.px != 0" Name="[lsb]">gid_.px->id_lsb_,x</Item>
       <Item Condition="gid_.px != 0" Name="[type]">gid_.px->type_</Item>
-      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[has_credit]">(gid_.px->id_msb_ &amp; 0x40000000ull) ? true : false</Item>
-      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[log2credits]">(gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full</Item>
-      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[credits]">1ull &lt;&lt; ((gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full),x</Item>
-      <Item Condition="gid_.px != 0 &lt;&lt; (gid_.px->type_ != unmanaged) != 0" Name="[was_split]">(gid_.px->id_msb_ &amp; 0x80000000ull) ? true : false</Item>
+      <Item Condition="gid_.px != 0 &amp;&amp; (gid_.px->type_ != unmanaged) != 0" Name="[has_credit]">(gid_.px->id_msb_ &amp; 0x40000000ull) ? true : false</Item>
+      <Item Condition="gid_.px != 0 &amp;&amp; (gid_.px->type_ != unmanaged) != 0" Name="[log2credits]">(gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full</Item>
+      <Item Condition="gid_.px != 0 &amp;&amp; (gid_.px->type_ != unmanaged) != 0" Name="[credits]">1ull &lt;&lt; ((gid_.px->id_msb_ &gt;&gt; 24) &amp; 0x1full),x</Item>
+      <Item Condition="gid_.px != 0 &amp;&amp; (gid_.px->type_ != unmanaged) != 0" Name="[was_split]">(gid_.px->id_msb_ &amp; 0x80000000ull) ? true : false</Item>
       <Item Condition="gid_.px != 0" Name="[is_locked]">(gid_.px->id_msb_ &amp; 0x20000000ull) ? true : false</Item>
       <Item Condition="gid_.px != 0" Name="[dont_cache]">(gid_.px->id_msb_ &amp; 0x00800000ull) ? true : false</Item>
-      <Item Condition="gid_.px != 0 &lt;&lt; ((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) != 0" Name="[locality_id]">((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1</Item>
+      <Item Condition="gid_.px != 0 &amp;&amp; ((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) != 0" Name="[locality_id]">((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1</Item>
       <Item Condition="gid_.px != 0" Name="[count]">gid_.px->count_.value_</Item>
     </Expand>
   </Type>

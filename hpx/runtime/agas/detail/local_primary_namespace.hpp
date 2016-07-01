@@ -30,6 +30,17 @@ namespace hpx { namespace agas { namespace detail
         response bind_gid(request const& req, error_code& ec);
         response resolve_gid(request const& req, error_code& ec);
         response unbind_gid(request const& req, error_code& ec);
+        response increment_credit(request const& req, error_code& ec);
+        response decrement_credit(request const& req, error_code& ec);
+        response begin_migration(request const& req, error_code& ec);
+        response end_migration(request const& req, error_code& ec);
+
+        // overload for extracting performance counter function
+        util::function_nonser<boost::int64_t(bool)> get_counter_function(
+            counter_target target, namespace_action_code code, error_code& ec)
+        {
+            return counter_data_.get_counter_function(target, code, ec);
+        }
 
     private:
         detail::primary_namespace_counter_data counter_data_;

@@ -294,8 +294,8 @@ HPX_API_EXPORT naming::id_type get_console_locality(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT naming::gid_type get_next_id(
-    std::size_t count = 1
-  , naming::address::address_type addr = 0
+    std::size_t count
+  , naming::address const& addr
   , error_code& ec = throws
     );
 

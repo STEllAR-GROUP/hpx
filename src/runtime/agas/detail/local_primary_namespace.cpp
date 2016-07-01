@@ -56,7 +56,7 @@ namespace hpx { namespace agas { namespace detail
                         counter_data_.increment_credit_.time_
                     );
                     counter_data_.increment_increment_credit_count();
-//                     return increment_credit(req, ec);
+                    return increment_credit(req, ec);
                 }
             case primary_ns_decrement_credit:
                 {
@@ -64,7 +64,7 @@ namespace hpx { namespace agas { namespace detail
                         counter_data_.decrement_credit_.time_
                     );
                     counter_data_.increment_decrement_credit_count();
-//                     return decrement_credit(req, ec);
+                    return decrement_credit(req, ec);
                 }
             case primary_ns_allocate:
                 {
@@ -80,7 +80,7 @@ namespace hpx { namespace agas { namespace detail
                         counter_data_.begin_migration_.time_
                     );
                     counter_data_.increment_begin_migration_count();
-//                     return begin_migration(req, ec);
+                    return begin_migration(req, ec);
                 }
             case primary_ns_end_migration:
                 {
@@ -88,11 +88,10 @@ namespace hpx { namespace agas { namespace detail
                         counter_data_.end_migration_.time_
                     );
                     counter_data_.increment_end_migration_count();
-//                     return end_migration(req, ec);
+                    return end_migration(req, ec);
                 }
             case primary_ns_statistics_counter:
-//                 return statistics_counter(req, ec);
-                break;
+                return statistics_counter(req, ec);
 
             case locality_ns_allocate:
             case locality_ns_free:
@@ -172,23 +171,28 @@ namespace hpx { namespace agas { namespace detail
 
     response local_primary_namespace::route(parcelset::parcel && p)
     {
+        HPX_ASSERT(false);  // shouldn't ever be called
         return response();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    response local_primary_namespace::allocate(request const& req, error_code& ec)
+    response local_primary_namespace::
+        allocate(request const& req, error_code& ec)
     {
-        boost::uint64_t const count = req.get_count();
-        naming::address::address_type addr = req.get_address();
+        naming::address addr = req.get_address();
 
-        naming::gid_type assigned_id(
-            naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
-        assigned_id.set_lsb(addr);
+        naming::gid_type assigned_id =
+            naming::get_gid_from_locality_id(
+                HPX_AGAS_BOOTSTRAP_PREFIX, addr.address_);
+        assigned_id.set_msb(
+            naming::detail::add_component_type_to_gid(
+                assigned_id.get_msb(), addr.type_) |
+            naming::gid_type::dynamically_assigned);
 
         LAGAS_(info) << (boost::format(
             "local_primary_namespace::allocate, count(%1%), "
             "assigned(%1%), response(repeated_request)")
-            % count % assigned_id);
+            % req.get_count() % assigned_id);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -197,7 +201,8 @@ namespace hpx { namespace agas { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    response local_primary_namespace::bind_gid(request const& req, error_code& ec)
+    response local_primary_namespace::
+        bind_gid(request const& req, error_code& ec)
     {
         LAGAS_(info) << (boost::format(
             "local_primary_namespace::bind_gid, gid(%1%), gva(%2%), locality(%3%)")
@@ -210,12 +215,18 @@ namespace hpx { namespace agas { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    response local_primary_namespace::resolve_gid(request const& req, error_code& ec)
+    response local_primary_namespace::
+        resolve_gid(request const& req, error_code& ec)
     {
         naming::gid_type id = req.get_gid();
-        gva g (gva::lva_type(id.get_lsb()));
+
         naming::gid_type locality(
             naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+        gva g (
+            locality,
+            gva::lva_type(id.get_lsb()),
+            naming::detail::get_component_type_from_gid(id.get_msb())
+        );
 
         LAGAS_(info) << (boost::format(
             "local_primary_namespace::resolve_gid, gid(%1%), base(%2%), "
@@ -226,12 +237,17 @@ namespace hpx { namespace agas { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    response local_primary_namespace::unbind_gid(request const& req, error_code& ec)
+    response local_primary_namespace::
+        unbind_gid(request const& req, error_code& ec)
     {
         naming::gid_type id = req.get_gid();
-        gva g (gva::lva_type(id.get_lsb()));
         naming::gid_type locality(
             naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+        gva g (
+            locality,
+            gva::lva_type(id.get_lsb()),
+            naming::detail::get_component_type_from_gid(id.get_msb())
+        );
 
         LAGAS_(info) << (boost::format(
             "local_primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%), "
@@ -242,6 +258,40 @@ namespace hpx { namespace agas { namespace detail
             ec = make_success_code();
 
         return response(primary_ns_unbind_gid, g, locality);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    response local_primary_namespace::
+        increment_credit(request const& req, error_code& ec)
+    {
+        // this shouldn't ever be called, all generated ids are unmanaged
+        HPX_ASSERT(false);
+        return response(primary_ns_increment_credit, invalid_status);
+    }
+
+    response local_primary_namespace::
+        decrement_credit(request const& req, error_code& ec)
+    {
+        // this shouldn't ever be called, all generated ids are unmanaged
+        HPX_ASSERT(false);
+        return response(primary_ns_decrement_credit, invalid_status);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    response local_primary_namespace::
+        begin_migration(request const& req, error_code& ec)
+    {
+        // this shouldn't ever be called, all generated ids are unmanaged
+        HPX_ASSERT(false);
+        return response(primary_ns_begin_migration, invalid_status);
+    }
+
+    response local_primary_namespace::
+        end_migration(request const& req, error_code& ec)
+    {
+        // this shouldn't ever be called, all generated ids are unmanaged
+        HPX_ASSERT(false);
+        return response(primary_ns_end_migration, invalid_status);
     }
 }}}
 

@@ -30,12 +30,13 @@ namespace hpx { namespace util { namespace detail
 
     public:
         unique_id_ranges()
-          : mtx_(), lower_(0), upper_(0)
+          : unique_id_ranges_base(false),
+            mtx_(), lower_(0), upper_(0)
         {}
 
         /// Generate next unique component id
         naming::gid_type get_id(std::size_t count,
-            naming::address::address_type addr)
+            naming::address const& addr)
         {
             // create a new id
             std::unique_lock<mutex_type> l(mtx_);
@@ -50,7 +51,7 @@ namespace hpx { namespace util { namespace detail
 
                 {
                     unlock_guard<std::unique_lock<mutex_type> > ul(l);
-                    lower = hpx::agas::get_next_id(count_, 0);
+                    lower = hpx::agas::get_next_id(count_, addr);
                 }
 
                 // we ignore the result if some other thread has already set the
@@ -86,11 +87,11 @@ namespace hpx { namespace util { namespace detail
     struct unique_id_ranges_local : unique_id_ranges_base
     {
     public:
-        unique_id_ranges_local() {}
+        unique_id_ranges_local() : unique_id_ranges_base(true) {}
 
         /// Generate next unique component id
         naming::gid_type get_id(std::size_t count,
-            naming::address::address_type addr)
+            naming::address const& addr)
         {
             return hpx::agas::get_next_id(count, addr);
         }

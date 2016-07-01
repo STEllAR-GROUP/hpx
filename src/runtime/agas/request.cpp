@@ -189,7 +189,7 @@ namespace hpx { namespace agas
             // subtype_count_address
           , util::tuple<
                 std::uint64_t
-              , naming::address::address_type
+              , naming::address
             >
         > data_type;
 
@@ -321,7 +321,7 @@ namespace hpx { namespace agas
     request::request(
         namespace_action_code type_
       , std::uint64_t count_
-      , naming::address::address_type addr_
+      , naming::address const& addr_
         )
       : mc(type_)
       , data(new request_data(util::make_tuple(count_, addr_)))
@@ -490,7 +490,7 @@ namespace hpx { namespace agas
         }
     } // }}}
 
-    naming::address::address_type request::get_address(
+    naming::address request::get_address(
         error_code& ec
         ) const
     { // {{{
@@ -503,7 +503,7 @@ namespace hpx { namespace agas
                 HPX_THROWS_IF(ec, bad_parameter,
                     "request::get_address",
                     "invalid operation for request type");
-                return 0;
+                return naming::address();
             }
         }
     } // }}}

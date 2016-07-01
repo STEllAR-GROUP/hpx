@@ -428,7 +428,7 @@ boost::uint32_t get_locality_id(error_code& ec)
 ///////////////////////////////////////////////////////////////////////////////
 naming::gid_type get_next_id(
     std::size_t count
-  , naming::address::address_type addr
+  , naming::address const& addr
   , error_code& ec
     )
 {

@@ -85,7 +85,7 @@ struct HPX_EXPORT request
     request(
         namespace_action_code type_
       , std::uint64_t count_
-      , naming::address::address_type addr_
+      , naming::address const& addr_
         );
 
     request(
@@ -162,7 +162,7 @@ struct HPX_EXPORT request
         error_code& ec = throws
         ) const;
 
-    naming::address::address_type get_address(
+    naming::address get_address(
         error_code& ec = throws
         ) const;
 

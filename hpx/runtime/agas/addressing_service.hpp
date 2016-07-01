@@ -538,8 +538,7 @@ public:
     ///                   locality results in identical locality_id values.
     /// \param count      [in] The number of global ids to be generated.
     /// \param addr       [in] The (optional) address of the object the gid
-    ///                   should be generated for. If addr is non-zero, count
-    ///                   must be equal to one.
+    ///                   should be generated for.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -561,7 +560,7 @@ public:
     ///                   of hpx#exception.
     naming::gid_type get_id_range(
         boost::uint64_t count
-      , naming::address::address_type addr = 0
+      , naming::address const& addr
       , error_code& ec = throws
         );
 

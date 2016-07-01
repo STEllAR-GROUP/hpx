@@ -26,12 +26,23 @@ namespace hpx { namespace util
     {
         struct unique_id_ranges_base
         {
+            unique_id_ranges_base(bool local_only_address_mode)
+              : local_only_address_mode_(local_only_address_mode)
+            {}
+
             virtual ~unique_id_ranges_base() {}
 
             virtual naming::gid_type get_id(std::size_t count,
-                naming::address::address_type addr) = 0;
+                naming::address const& addr) = 0;
             virtual void set_range(naming::gid_type const& lower,
                 naming::gid_type const& upper) = 0;
+
+            bool local_only_address_mode() const
+            {
+                return local_only_address_mode_;
+            }
+
+            bool local_only_address_mode_;
         };
     }
 
@@ -45,8 +56,7 @@ namespace hpx { namespace util
         {}
 
         /// Generate next unique component id
-        naming::gid_type get_id(std::size_t count = 1,
-            naming::address::address_type addr = 0)
+        naming::gid_type get_id(std::size_t count, naming::address const& addr)
         {
             return data_->get_id(count, addr);
         }
@@ -55,6 +65,11 @@ namespace hpx { namespace util
             naming::gid_type const& upper)
         {
             data_->set_range(lower, upper);
+        }
+
+        bool local_only_address_mode() const
+        {
+            return data_->local_only_address_mode();
         }
 
     private:

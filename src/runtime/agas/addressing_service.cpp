@@ -887,7 +887,7 @@ components::component_type addressing_service::register_factory(
 ///////////////////////////////////////////////////////////////////////////////
 naming::gid_type addressing_service::get_id_range(
     boost::uint64_t count
-  , naming::address::address_type addr
+  , naming::address const& addr
   , error_code& ec
     )
 { // {{{ get_id_range implementation
@@ -936,7 +936,7 @@ bool addressing_service::bind_range_local(
             // Put the range into the cache.
             update_cache_entry(lower_id, g, ec);
         }
-        else
+        else if (caching_)
         {
             // Only put the first GID in the range into the cache
             gva const first_g = g.resolve(lower_id, lower_id);
@@ -968,7 +968,7 @@ bool addressing_service::bind_postproc(
         // Put the range into the cache.
         update_cache_entry(lower_id, g);
     }
-    else
+    else if (caching_)
     {
         // Only put the first GID in the range into the cache
         gva const first_g = g.resolve(lower_id, lower_id);
@@ -1313,7 +1313,7 @@ bool addressing_service::resolve_full_local(
                 // Put the range into the cache.
                 update_cache_entry(base_gid, base_gva, ec);
             }
-            else
+            else if(caching_)
             {
                 // Put the fully resolved gva into the cache.
                 update_cache_entry(id, g, ec);
@@ -1507,7 +1507,7 @@ naming::address addressing_service::resolve_full_postproc(
             // Put the range into the cache.
             update_cache_entry(base_gid, base_gva);
         }
-        else
+        else if (caching_)
         {
             // Put the fully resolved gva into the cache.
             update_cache_entry(id, g);
@@ -1614,7 +1614,7 @@ bool addressing_service::resolve_full_local(
                     // Put the range into the cache.
                     update_cache_entry(base_gid, base_gva, ec);
                 }
-                else
+                else if (caching_)
                 {
                     // Put the fully resolved gva into the cache.
                     update_cache_entry(gids[i], g, ec);

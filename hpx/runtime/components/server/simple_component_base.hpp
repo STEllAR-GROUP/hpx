@@ -138,7 +138,7 @@ namespace hpx { namespace components
                 naming::address addr(get_current_address());
                 if (!assign_gid)
                 {
-                    gid_ = agas::get_next_id(1, addr.address_);
+                    gid_ = agas::get_next_id(1, addr);
                     if (!applier::bind_gid_local(gid_, addr))
                     {
                         std::ostringstream strm;

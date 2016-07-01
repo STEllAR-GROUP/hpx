@@ -20,8 +20,6 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
@@ -206,7 +204,8 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
     void set_local_locality(naming::gid_type const& g)
     {
         locality_ = g;
-        next_id_ = naming::gid_type(g.get_msb() + 1, 0x1000);
+        next_id_ = naming::gid_type(
+            g.get_msb() | naming::gid_type::dynamically_assigned, 0x1000);
     }
 
     response service(
@@ -272,11 +271,6 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
       , error_code& ec = throws
         );
 
-    response statistics_counter(
-        request const& req
-      , error_code& ec = throws
-        );
-
   private:
     resolved_type resolve_gid_locked(
         std::unique_lock<mutex_type>& l
@@ -290,6 +284,14 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
       , std::int64_t& credits
       , error_code& ec
         );
+
+    // overload for extracting performance counter function
+    util::function_nonser<boost::int64_t(bool)> get_counter_function(
+        agas::detail::counter_target target,
+        namespace_action_code code, error_code& ec)
+    {
+        return counter_data_.get_counter_function(target, code, ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     struct free_entry
@@ -347,48 +349,9 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
       , namespace_end_migration                 = primary_ns_end_migration
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
-
-    static parcelset::policies::message_handler* get_message_handler(
-        parcelset::parcelhandler* ph
-      , parcelset::locality const& loc
-      , parcelset::parcel const& p
-        );
-
-    static serialization::binary_filter* get_serialization_filter(
-        parcelset::parcel const& p
-        );
 };
 
 }}}
-
-namespace hpx { namespace traits
-{
-    // Parcel routing forwards the message handler request to the routed action
-    template <>
-    struct action_message_handler<agas::server::primary_namespace::route_action>
-    {
-        static parcelset::policies::message_handler* call(
-            parcelset::parcelhandler* ph
-          , parcelset::locality const& loc
-          , parcelset::parcel const& p
-            )
-        {
-            return agas::server::primary_namespace::get_message_handler(
-                ph, loc, p);
-        }
-    };
-
-    // Parcel routing forwards the binary filter request to the routed action
-    template <>
-    struct action_serialization_filter<
-        agas::server::primary_namespace::route_action>
-    {
-        static serialization::binary_filter* call(parcelset::parcel const& p)
-        {
-            return agas::server::primary_namespace::get_serialization_filter(p);
-        }
-    };
-}}
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
