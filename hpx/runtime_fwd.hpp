@@ -56,7 +56,7 @@ namespace hpx
     HPX_API_EXPORT std::size_t get_runtime_instance_number();
 
     /// The function report_error reports the given exception to the console
-    HPX_API_EXPORT void report_error(std::size_t num_thread, 
+    HPX_API_EXPORT void report_error(std::size_t num_thread,
         boost::exception_ptr const& e);
 
     /// The function report_error reports the given exception to the console
@@ -231,7 +231,7 @@ namespace hpx
     ///
     /// \param binary_filter_type [in] The type of the binary filter to create
     /// \param compress     [in] The created filter should support compression
-    /// \param next_filter  [in] Use this as the filter to dispatch the 
+    /// \param next_filter  [in] Use this as the filter to dispatch the
     ///                     invocation into.
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw

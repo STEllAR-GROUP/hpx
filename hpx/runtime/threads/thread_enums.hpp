@@ -48,7 +48,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     /// This enumeration lists all possible thread-priorities for HPX threads.
-    /// 
+    ///
     enum thread_priority
     {
         thread_priority_unknown = -1,

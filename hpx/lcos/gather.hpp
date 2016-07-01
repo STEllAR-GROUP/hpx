@@ -19,7 +19,7 @@ namespace hpx { namespace lcos
     /// \param  basename    The base name identifying the gather operation
     /// \param  result      A future referring to the value to transmit to the
     ///                     central gather point from this call site.
-    /// \param  num_sites   The number of participating sites (default: all 
+    /// \param  num_sites   The number of participating sites (default: all
     ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
@@ -78,7 +78,7 @@ namespace hpx { namespace lcos
     /// \param  basename    The base name identifying the gather operation
     /// \param  result      The value to transmit to the central gather point
     ///                     from this call site.
-    /// \param  num_sites   The number of participating sites (default: all 
+    /// \param  num_sites   The number of participating sites (default: all
     ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the gather operation performed on the

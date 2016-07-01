@@ -112,7 +112,7 @@ namespace hpx { namespace threads
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
     ///
-    /// \param state    [in] This specifies the thread-state for which the 
+    /// \param state    [in] This specifies the thread-state for which the
     ///                 number of threads should be retrieved.
     ///
     /// \note If state == unknown this function will not only return the
@@ -125,9 +125,9 @@ namespace hpx { namespace threads
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
     ///
-    /// \param priority [in] This specifies the thread-priority for which the 
+    /// \param priority [in] This specifies the thread-priority for which the
     ///                 number of threads should be retrieved.
-    /// \param state    [in] This specifies the thread-state for which the 
+    /// \param state    [in] This specifies the thread-state for which the
     ///                 number of threads should be retrieved.
     ///
     /// \note If state == unknown this function will not only return the
