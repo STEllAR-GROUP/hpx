@@ -13,6 +13,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/agas/detail/primary_namespace_counter_data.hpp>
+#include <hpx/runtime/agas/detail/primary_namespace_base.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
@@ -119,12 +120,11 @@ char const* const primary_namespace_service_name = "primary/";
 ///         Address of the locality based sub-CA, xxxxxxxx is replaced with the
 ///         correct locality id
 ///
-struct HPX_EXPORT primary_namespace
-  : components::fixed_component_base<primary_namespace>
+struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
 {
     // {{{ nested types
     typedef lcos::local::spinlock mutex_type;
-    typedef components::fixed_component_base<primary_namespace> base_type;
+    typedef detail::primary_namespace_base base_type;
 
     typedef boost::int32_t component_type;
 
@@ -194,7 +194,7 @@ struct HPX_EXPORT primary_namespace
 
   public:
     primary_namespace()
-      : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
+      : base_type()
       , mutex_()
       , instance_name_()
       , next_id_(naming::invalid_gid)
@@ -209,25 +209,10 @@ struct HPX_EXPORT primary_namespace
         next_id_ = naming::gid_type(g.get_msb() + 1, 0x1000);
     }
 
-    response remote_service(
-        request const& req
-        )
-    {
-        return service(req, throws);
-    }
-
     response service(
         request const& req
       , error_code& ec
         );
-
-    /// Maps \a service over \p reqs in parallel.
-    std::vector<response> remote_bulk_service(
-        std::vector<request> const& reqs
-        )
-    {
-        return bulk_service(reqs, throws);
-    }
 
     /// Maps \a service over \p reqs in parallel.
     std::vector<response> bulk_service(
@@ -363,12 +348,6 @@ struct HPX_EXPORT primary_namespace
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
 
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service,
-        bulk_service_action);
-
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
-
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
       , parcelset::locality const& loc
@@ -381,27 +360,6 @@ struct HPX_EXPORT primary_namespace
 };
 
 }}}
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::service_action)
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::bulk_service_action)
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::route_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::service_action,
-    primary_namespace_service_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::bulk_service_action,
-    primary_namespace_bulk_service_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::route_action,
-    primary_namespace_route_action)
 
 namespace hpx { namespace traits
 {

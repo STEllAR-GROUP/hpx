@@ -163,7 +163,7 @@ struct HPX_EXPORT request
         ) const;
 
     naming::address::address_type get_address(
-        error_code& ec
+        error_code& ec = throws
         ) const;
 
     std::int64_t get_credit(

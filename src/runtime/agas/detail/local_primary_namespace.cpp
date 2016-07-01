@@ -32,7 +32,7 @@ namespace hpx { namespace agas { namespace detail
                         counter_data_.bind_gid_.time_
                     );
                     counter_data_.increment_bind_gid_count();
-//                     return bind_gid(req, ec);
+                    return bind_gid(req, ec);
                 }
             case primary_ns_resolve_gid:
                 {
@@ -40,7 +40,7 @@ namespace hpx { namespace agas { namespace detail
                         counter_data_.resolve_gid_.time_
                     );
                     counter_data_.increment_resolve_gid_count();
-//                     return resolve_gid(req, ec);
+                    return resolve_gid(req, ec);
                 }
             case primary_ns_unbind_gid:
                 {
@@ -48,7 +48,7 @@ namespace hpx { namespace agas { namespace detail
                         counter_data_.unbind_gid_.time_
                     );
                     counter_data_.increment_unbind_gid_count();
-//                     return unbind_gid(req, ec);
+                    return unbind_gid(req, ec);
                 }
             case primary_ns_increment_credit:
                 {
@@ -170,70 +170,78 @@ namespace hpx { namespace agas { namespace detail
         return r;
     }
 
+    response local_primary_namespace::route(parcelset::parcel && p)
+    {
+        return response();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     response local_primary_namespace::allocate(request const& req, error_code& ec)
     {
         boost::uint64_t const count = req.get_count();
-        boost::uint64_t const real_count = (count) ? (count - 1) : (0);
+        naming::address::address_type addr = req.get_address();
 
-//     // Just return the prefix
-//     // REVIEW: Should this be an error?
-//     if (0 == count)
-//     {
-//         LAGAS_(info) << (boost::format(
-//             "primary_namespace::allocate, count(%1%), "
-//             "lower(%1%), upper(%3%), prefix(%4%), response(repeated_request)")
-//             % count % next_id_ % next_id_
-//             % naming::get_locality_id_from_gid(next_id_));
-//
-//         if (&ec != &throws)
-//             ec = make_success_code();
-//
-//         return response(primary_ns_allocate, next_id_, next_id_
-//           , naming::get_locality_id_from_gid(next_id_), success);
-//     }
+        naming::gid_type assigned_id(
+            naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+        assigned_id.set_lsb(addr);
 
-        // Compute the new allocation.
-        naming::gid_type lower;
-        naming::gid_type upper(lower + real_count);
-
-//     // Check for overflow.
-//     if (upper.get_msb() != lower.get_msb())
-//     {
-//         // Check for address space exhaustion (we currently use 86 bits of
-//         // the gid for the actual id)
-//         if (HPX_UNLIKELY(
-//             (lower.get_msb() & naming::gid_type::virtual_memory_mask) ==
-//                 naming::gid_type::virtual_memory_mask)
-//            )
-//         {
-//             HPX_THROWS_IF(ec, internal_server_error
-//                 , "locality_namespace::allocate"
-//                 , "primary namespace has been exhausted");
-//             return response();
-//         }
-//
-//         // Otherwise, correct
-//         lower = naming::gid_type(upper.get_msb(), 0);
-//         upper = lower + real_count;
-//     }
-//
-//     // Store the new upper bound.
-//     next_id_ = upper;
-//
-//     // Set the initial credit count.
-//     naming::detail::set_credit_for_gid(lower, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
-//     naming::detail::set_credit_for_gid(upper, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
-//
-//     LAGAS_(info) << (boost::format(
-//         "primary_namespace::allocate, count(%1%), "
-//         "lower(%2%), upper(%3%), prefix(%4%), response(repeated_request)")
-//         % count % lower % upper % naming::get_locality_id_from_gid(next_id_));
+        LAGAS_(info) << (boost::format(
+            "local_primary_namespace::allocate, count(%1%), "
+            "assigned(%1%), response(repeated_request)")
+            % count % assigned_id);
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response(locality_ns_allocate, lower, upper, 0, success);
+        return response(primary_ns_allocate, assigned_id, 0, success);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    response local_primary_namespace::bind_gid(request const& req, error_code& ec)
+    {
+        LAGAS_(info) << (boost::format(
+            "local_primary_namespace::bind_gid, gid(%1%), gva(%2%), locality(%3%)")
+            % req.get_gid() % req.get_gva() % req.get_locality());
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return response(primary_ns_bind_gid);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    response local_primary_namespace::resolve_gid(request const& req, error_code& ec)
+    {
+        naming::gid_type id = req.get_gid();
+        gva g (gva::lva_type(id.get_lsb()));
+        naming::gid_type locality(
+            naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+
+        LAGAS_(info) << (boost::format(
+            "local_primary_namespace::resolve_gid, gid(%1%), base(%2%), "
+            "gva(%3%), locality(%4%)")
+            % id % id % g % locality);
+
+        return response(primary_ns_resolve_gid, id, g, locality);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    response local_primary_namespace::unbind_gid(request const& req, error_code& ec)
+    {
+        naming::gid_type id = req.get_gid();
+        gva g (gva::lva_type(id.get_lsb()));
+        naming::gid_type locality(
+            naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+
+        LAGAS_(info) << (boost::format(
+            "local_primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%), "
+            "locality(%4%)")
+            % id % req.get_count() % g % locality);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return response(primary_ns_unbind_gid, g, locality);
     }
 }}}
 

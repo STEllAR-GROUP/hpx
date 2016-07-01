@@ -46,7 +46,6 @@ struct HPX_EXPORT response
     response(
         namespace_action_code type_
       , naming::gid_type lower_
-      , naming::gid_type upper_
       , std::uint32_t prefix_
       , error status_ = success
         );
@@ -186,10 +185,6 @@ struct HPX_EXPORT response
         ) const;
 
     naming::gid_type get_lower_bound(
-        error_code& ec = throws
-        ) const;
-
-    naming::gid_type get_upper_bound(
         error_code& ec = throws
         ) const;
 

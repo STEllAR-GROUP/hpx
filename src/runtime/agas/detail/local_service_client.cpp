@@ -69,14 +69,12 @@ namespace hpx { namespace agas { namespace detail
         request const& req, error_code& ec)
     {
         return data_.primary_ns_server_.service(req, ec);
-        return response();
     }
 
     std::vector<response> local_service_client::service_primary_bulk(
         std::vector<request> const& reqs, error_code& ec)
     {
         return data_.primary_ns_server_.bulk_service(reqs, ec);
-        return std::vector<response>();
     }
 
     hpx::agas::response local_service_client::service_component(
@@ -84,7 +82,6 @@ namespace hpx { namespace agas { namespace detail
         error_code& ec)
     {
         return data_.component_ns_server_.service(req, ec);
-        return response();
     }
 
     hpx::agas::response local_service_client::service_locality(
@@ -92,7 +89,6 @@ namespace hpx { namespace agas { namespace detail
         error_code& ec)
     {
         return data_.locality_ns_server_.service(req, ec);
-        return response();
     }
 
     hpx::agas::response local_service_client::service_symbol(

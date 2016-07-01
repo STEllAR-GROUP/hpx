@@ -845,7 +845,7 @@ response primary_namespace::allocate(
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response(primary_ns_allocate, next_id_, next_id_
+        return response(primary_ns_allocate, next_id_
           , naming::get_locality_id_from_gid(next_id_), success);
     }
 
@@ -889,7 +889,7 @@ response primary_namespace::allocate(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(locality_ns_allocate, lower, upper
+    return response(primary_ns_allocate, lower
       , naming::get_locality_id_from_gid(next_id_), success);
 } // }}}
 

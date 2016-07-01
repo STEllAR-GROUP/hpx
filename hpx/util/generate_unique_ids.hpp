@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,11 +10,10 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/cstdint.hpp>
-
-#include <mutex>
+#include <memory>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -23,39 +22,46 @@
 
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        struct unique_id_ranges_base
+        {
+            virtual ~unique_id_ranges_base() {}
+
+            virtual naming::gid_type get_id(std::size_t count,
+                naming::address::address_type addr) = 0;
+            virtual void set_range(naming::gid_type const& lower,
+                naming::gid_type const& upper) = 0;
+        };
+    }
+
     /// The unique_id_ranges class is a type responsible for generating
     /// unique ids for components, parcels, threads etc.
     class HPX_EXPORT unique_id_ranges
     {
-        typedef hpx::util::spinlock mutex_type;
-
-        mutex_type mtx_;
-
-        /// size of the id range returned by command_getidrange
-        /// FIXME: is this a policy?
-        enum { range_delta = 0x100000 };
-
     public:
         unique_id_ranges()
-          : mtx_(), lower_(0), upper_(0)
+          : data_(create_implementation())
         {}
 
         /// Generate next unique component id
-        naming::gid_type get_id(std::size_t count = 1);
-
-        void set_range(
-            naming::gid_type const& lower
-          , naming::gid_type const& upper)
+        naming::gid_type get_id(std::size_t count = 1,
+            naming::address::address_type addr = 0)
         {
-            std::lock_guard<mutex_type> l(mtx_);
-            lower_ = lower;
-            upper_ = upper;
+            return data_->get_id(count, addr);
+        }
+
+        void set_range(naming::gid_type const& lower,
+            naming::gid_type const& upper)
+        {
+            data_->set_range(lower, upper);
         }
 
     private:
-        /// The range of available ids for components
-        naming::gid_type lower_;
-        naming::gid_type upper_;
+        std::shared_ptr<detail::unique_id_ranges_base> create_implementation();
+
+    private:
+        std::shared_ptr<detail::unique_id_ranges_base> data_;
     };
 }}
 

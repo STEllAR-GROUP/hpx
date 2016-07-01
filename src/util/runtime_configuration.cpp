@@ -665,6 +665,10 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_agas_caching_mode() const
     {
+        // When operating purely locally we don't use caching at all.
+        if (run_purely_local_agas())
+            return false;
+
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (nullptr != sec) {
@@ -677,6 +681,10 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_agas_range_caching_mode() const
     {
+        // When operating purely locally we don't use caching at all.
+        if (run_purely_local_agas())
+            return false;
+
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (nullptr != sec) {

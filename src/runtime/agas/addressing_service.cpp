@@ -374,6 +374,12 @@ void addressing_service::launch_local(util::runtime_configuration const& ini_)
         server::symbol_namespace::get_component_type(),
         client_->get_symbol_ns_ptr());
 
+    boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
+        ini_, "hpx.os_threads", 1u);
+    request locality_req(locality_ns_allocate, parcelset::endpoints_type(),
+        4, num_threads); //-V112
+    client_->service_locality(locality_req, action_priority_, throws);
+
     set_local_locality(here);
     rt.get_config().parse("assigned locality", "hpx.locality!=0");
 
@@ -886,10 +892,7 @@ naming::gid_type addressing_service::get_id_range(
     )
 { // {{{ get_id_range implementation
     try {
-        HPX_ASSERT(addr == 0 || count == 1);
-
         request req(primary_ns_allocate, count, addr);
-
         response rep = client_->service_primary(req, ec);
 
         error const s = rep.get_status();
