@@ -19,6 +19,8 @@
 
 #include <cuda_runtime.h>
 
+#include <boost/intrusive_ptr.hpp>
+
 namespace hpx { namespace compute { namespace cuda
 {
     namespace detail
@@ -55,7 +57,9 @@ namespace hpx { namespace compute { namespace cuda
                 cudaError_t error, void* user_data);
 
         public:
-            future_data(cudaStream_t stream);
+            future_data();
+
+            void init(cudaStream_t stream);
 
         private:
             hpx::runtime* rt_;
@@ -107,8 +111,11 @@ namespace hpx { namespace compute { namespace cuda
             );
         }
 
-        future_data::future_data(cudaStream_t stream)
+        future_data::future_data()
           : rt_(hpx::get_runtime_ptr())
+        {}
+
+        void future_data::init(cudaStream_t stream)
         {
             // Hold on to the shared state on behalf of the cuda runtime
             // right away as the callback could be called immediately.
@@ -238,8 +245,13 @@ namespace hpx { namespace compute { namespace cuda
     hpx::future<void> target::get_future() const
     {
         typedef detail::future_data shared_state_type;
-        shared_state_type* p = new shared_state_type(handle_.stream_);
-        return hpx::traits::future_access<hpx::future<void> >::create(p);
+
+        // make sure shared state stays alive even if the callback is invoked
+        // during initialization
+        boost::intrusive_ptr<shared_state_type> p(new shared_state_type());
+        p->init(handle_.stream_);
+        return hpx::traits::future_access<hpx::future<void> >::
+            create(std::move(p));
     }
 
     ///////////////////////////////////////////////////////////////////////////
