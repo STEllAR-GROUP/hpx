@@ -42,10 +42,13 @@ namespace hpx { namespace threads
                                  thread objects */
     };
 
+    /// Get the readable string representing the name of the given
+    /// thread_state constant.
     HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
 
-    ///////////////////////////////////////////////////////////////////////
-    /// \enum thread_priority
+    ///////////////////////////////////////////////////////////////////////////
+    /// This enumeration lists all possible thread-priorities for HPX threads.
+    /// 
     enum thread_priority
     {
         thread_priority_unknown = -1,
@@ -57,6 +60,8 @@ namespace hpx { namespace threads
                                           ///< invocation, normal afterwards
     };
 
+    /// Get the readable string representing the name of the given thread_priority
+    /// constant.
     HPX_API_EXPORT char const* get_thread_priority_name(thread_priority priority);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -73,17 +78,26 @@ namespace hpx { namespace threads
         wait_abort = 4      ///< The thread needs to be aborted
     };
 
+    /// Get the readable string representing the name of the given
+    /// thread_state_ex_enum constant.
     HPX_API_EXPORT char const* get_thread_state_ex_name(thread_state_ex_enum state);
 
+    /// \cond NOINTERNAL
     // special type storing both state in one tagged structure
     typedef threads::detail::combined_tagged_state<
             thread_state_enum, thread_state_ex_enum
         > thread_state;
+    /// \endcond
 
+    /// Get the readable string representing the name of the given
+    /// thread_state constant.
     HPX_API_EXPORT char const* get_thread_state_name(thread_state state);
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_stacksize
+    ///
+    /// A \a thread_stacksize references any of the possible stack-sizes for
+    /// HPX threads.
     enum thread_stacksize
     {
         thread_stacksize_unknown = -1,
@@ -97,6 +111,7 @@ namespace hpx { namespace threads
         thread_stacksize_maximal = thread_stacksize_huge,   ///< use maximally stack size
     };
 
+    /// Get the readable string representing the the given stack size constant.
     HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
 }}
 

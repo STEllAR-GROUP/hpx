@@ -157,9 +157,17 @@ namespace hpx
         naming::address && addr, boost::exception_ptr const& e,
         bool move_credits = true);
 
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id,
-    /// naming::address && addr, boost::exception_ptr const& e,
-    /// bool move_credits)
+    /// \brief Set the error state for the LCO referenced by the given id
+    ///
+    /// \param id [in] This represents the id of the LCO which should
+    ///                receive the error value.
+    /// \param addr [in] This represents the addr of the LCO which should be
+    ///                triggered.
+    /// \param e  [in] This is the error value which should be sent to
+    ///                the LCO.
+    /// \param move_credits [in] If this is set to \a true then it is ok to
+    ///                     send all credits in \a id along with the generated
+    ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         naming::address && addr, boost::exception_ptr && e,
         bool move_credits = true);
@@ -179,8 +187,15 @@ namespace hpx
         set_lco_error(id, naming::address(), e, move_credits);
     }
 
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id,
-    /// boost::exception_ptr const& e, bool move_credits)
+    /// \brief Set the error state for the LCO referenced by the given id
+    ///
+    /// \param id [in] This represents the id of the LCO which should
+    ///                receive the error value.
+    /// \param e  [in] This is the error value which should be sent to
+    ///                the LCO.
+    /// \param move_credits [in] If this is set to \a true then it is ok to
+    ///                     send all credits in \a id along with the generated
+    ///                     message. The default value is \a true.
     inline void set_lco_error(naming::id_type const& id,
         boost::exception_ptr && e, bool move_credits = true)
     {
@@ -203,9 +218,18 @@ namespace hpx
         naming::address && addr, boost::exception_ptr const& e,
         naming::id_type const& cont, bool move_credits = true);
 
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id,
-    ///  naming::address && addr boost::exception_ptr const& e,
-    ///  naming::id_type const& cont, bool move_credits)
+    /// \brief Set the error state for the LCO referenced by the given id
+    ///
+    /// \param id   [in] This represents the id of the LCO which should
+    ///                  receive the error value.
+    /// \param addr [in] This represents the addr of the LCO which should be
+    ///                triggered.
+    /// \param e    [in] This is the error value which should be sent to
+    ///                  the LCO.
+    /// \param cont [in] This represents the LCO to trigger after completion.
+    /// \param move_credits [in] If this is set to \a true then it is ok to
+    ///                     send all credits in \a id along with the generated
+    ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         naming::address && addr, boost::exception_ptr && e,
         naming::id_type const& cont, bool move_credits = true);
@@ -227,8 +251,16 @@ namespace hpx
         set_lco_error(id, naming::address(), e, cont, move_credits);
     }
 
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id,
-    ///  boost::exception_ptr const& e, naming::id_type const& cont, bool move_credits)
+    /// \brief Set the error state for the LCO referenced by the given id
+    ///
+    /// \param id   [in] This represents the id of the LCO which should
+    ///                  receive the error value.
+    /// \param e    [in] This is the error value which should be sent to
+    ///                  the LCO.
+    /// \param cont [in] This represents the LCO to trigger after completion.
+    /// \param move_credits [in] If this is set to \a true then it is ok to
+    ///                     send all credits in \a id along with the generated
+    ///                     message. The default value is \a true.
     inline void set_lco_error(naming::id_type const& id,
         boost::exception_ptr && e, naming::id_type const& cont,
         bool move_credits = true)

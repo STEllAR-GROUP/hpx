@@ -63,6 +63,11 @@ namespace hpx { namespace components
             return default_distribution_policy(locs);
         }
 
+        /// Create a new \a default_distribution policy representing the given
+        /// set of localities.
+        ///
+        /// \param locs     [in] The list of localities the new instance should
+        ///                 represent
         default_distribution_policy operator()(
             std::vector<id_type> && locs) const
         {
