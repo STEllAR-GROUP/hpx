@@ -213,12 +213,12 @@ namespace hpx { namespace compute { namespace cuda
 /// \cond NOINTERNAL
 namespace hpx { namespace traits
 {
-    template <typename Target>
+    template <>
     struct is_distribution_policy<compute::cuda::target_distribution_policy>
       : std::true_type
     {};
 
-    template <typename Target>
+    template <>
     struct num_container_partitions<compute::cuda::target_distribution_policy>
     {
         static std::size_t
