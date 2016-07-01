@@ -364,6 +364,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The executor_parameter_traits type is used to manage parameters for
+    /// an executor.
     template <typename Parameters, typename Enable>
     struct executor_parameter_traits
     {
@@ -457,8 +459,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// Retrieve the number of (kernel-)threads used by the associated
         /// executor.
         ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
         /// \param params [in] The executor parameters object to use as a
         ///              fallback if the executor does not expose
         ///

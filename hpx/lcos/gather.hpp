@@ -19,6 +19,8 @@ namespace hpx { namespace lcos
     /// \param  basename    The base name identifying the gather operation
     /// \param  result      A future referring to the value to transmit to the
     ///                     central gather point from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -26,7 +28,7 @@ namespace hpx { namespace lcos
     ///                     base name has to be performed more than once.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
@@ -57,7 +59,7 @@ namespace hpx { namespace lcos
     ///                     and defaults to 0.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future which will become ready once
     ///             the gather operation has been completed.
@@ -76,6 +78,8 @@ namespace hpx { namespace lcos
     /// \param  basename    The base name identifying the gather operation
     /// \param  result      The value to transmit to the central gather point
     ///                     from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -83,7 +87,7 @@ namespace hpx { namespace lcos
     ///                     base name has to be performed more than once.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
@@ -114,7 +118,7 @@ namespace hpx { namespace lcos
     ///                     and defaults to 0.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future which will become ready once
     ///             the gather operation has been completed.

@@ -294,6 +294,17 @@ namespace hpx { namespace components
             return binpacking_distribution_policy(locs, counter_name);
         }
 
+        /// Create a new \a default_distribution policy representing the given
+        /// set of localities.
+        ///
+        /// \param locs     [in] The list of localities the new instance should
+        ///                 represent
+        /// \param counter_name  [in] The name of the performance counter which
+        ///                      should be used as the distribution criteria
+        ///                      (by default the overall number of existing
+        ///                      instances of the given component type will be
+        ///                      used).
+        ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> && locs,
             char const* counter_name = default_binpacking_counter_name) const

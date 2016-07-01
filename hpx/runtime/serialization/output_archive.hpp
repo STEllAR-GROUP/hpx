@@ -86,8 +86,6 @@ namespace hpx { namespace serialization
         template <typename Future>
         void await_future(Future const & f)
         {
-            if(f.is_ready()) return;
-
             buffer_->await_future(
                 *hpx::traits::future_access<Future>::get_shared_state(f));
         }

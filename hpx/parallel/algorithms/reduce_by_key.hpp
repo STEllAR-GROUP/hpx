@@ -536,6 +536,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         )
     >
 
+    /// \cond NOINTERNAL
     typename util::detail::algorithm_result<ExPolicy, std::pair<OutIter, OutIter2>>::type
         reduce_by_key(ExPolicy &&policy, RanIter key_first, RanIter key_last,
             RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
@@ -572,7 +573,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<Compare>(comp),
             std::forward<Func>(func));
     }
-
+    /// \endcond
 }}}
 
 #endif
