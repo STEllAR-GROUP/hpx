@@ -419,7 +419,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto
             call(int, Executor&& exec, F && f, S const& shape, Ts &&... ts)
             ->  decltype(
-                    exec.bulk_execute(std::forward<F>(f), shape,
+                    std::declval<Executor>().bulk_execute(std::forward<F>(f), shape,
                         std::forward<Ts>(ts)...)
                 )
             {
@@ -540,7 +540,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             >::type
 #else
         ->  decltype(
-                exec.async_execute(std::forward<F>(f), std::forward<Ts>(ts)...)
+                std::declval<Executor_>().async_execute(std::forward<F>(f),
+                    std::forward<Ts>(ts)...)
             )
 #endif
         {
