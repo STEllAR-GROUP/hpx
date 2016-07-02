@@ -58,6 +58,9 @@ set(get_ptr_PARAMETERS
 
 set(launch_process_FLAGS
     DEPENDENCIES iostreams_component process_component)
+set(launch_process_PARAMETERS
+  --launch=$<TARGET_FILE:launched_process_test_exe>
+)
 
 set(migrate_component_PARAMETERS
     LOCALITIES 2
