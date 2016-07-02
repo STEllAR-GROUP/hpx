@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/runtime/agas/detail/primary_namespace_counter_data.hpp>
 #include <hpx/runtime/agas/detail/primary_namespace_base.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
@@ -160,8 +159,6 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
     naming::gid_type next_id_;      // next available gid
     naming::gid_type locality_;     // our locality id
     migration_table_type migrating_objects_;
-
-    detail::primary_namespace_counter_data counter_data_;
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     /// Dump the credit counts of all matching ranges. Expects that \p l

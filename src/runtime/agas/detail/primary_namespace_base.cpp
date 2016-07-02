@@ -79,7 +79,7 @@ namespace hpx { namespace agas { namespace detail
         }
 
         util::function_nonser<boost::int64_t(bool)> get_data_func =
-            get_counter_function(target, code, ec);
+            counter_data_.get_counter_function(target, code, ec);
         if (ec) return response();
 
         performance_counters::counter_info info;

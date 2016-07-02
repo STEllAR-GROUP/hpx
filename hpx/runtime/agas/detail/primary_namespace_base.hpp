@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/agas/detail/primary_namespace_counter_data.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
@@ -66,10 +67,6 @@ namespace hpx { namespace agas { namespace detail
             std::vector<request> const& reqs, error_code& ec) = 0;
         virtual response route(parcelset::parcel && p) = 0;
 
-        virtual util::function_nonser<boost::int64_t(bool)>
-            get_counter_function(counter_target target,
-                namespace_action_code code, error_code& ec) = 0;
-
         ///////////////////////////////////////////////////////////////////////
         static parcelset::policies::message_handler*
         get_message_handler(parcelset::parcelhandler* ph,
@@ -80,6 +77,9 @@ namespace hpx { namespace agas { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         response statistics_counter(request const& req, error_code& ec);
+
+    protected:
+        primary_namespace_counter_data counter_data_;
     };
 }}}
 

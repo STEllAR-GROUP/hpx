@@ -208,6 +208,9 @@ namespace hpx { namespace util
             "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
 #endif
 
+            "[hpx.parcel]",
+            "enabled = 1",
+
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_SIZE) "}",

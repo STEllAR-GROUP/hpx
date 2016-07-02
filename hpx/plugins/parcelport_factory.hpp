@@ -76,7 +76,7 @@ namespace hpx { namespace plugins
             fillini += "name = " HPX_PLUGIN_STRING;
             fillini += std::string("path = ") +
                 util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
-            fillini += "enable = 1";
+            fillini += "enable = $[hpx.parcel.enabled]";
 
             std::string name_uc = boost::to_upper_copy(name);
             // basic parcelport configuration ...
