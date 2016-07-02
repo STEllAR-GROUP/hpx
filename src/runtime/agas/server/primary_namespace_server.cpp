@@ -8,25 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
-#  include <memory>
-#endif
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 
 #include <cstdint>
 #include <list>
@@ -190,135 +177,6 @@ response primary_namespace::service(
         }
     }
 } // }}}
-
-// register all performance counter types exposed by this component
-void primary_namespace::register_counter_types(
-    error_code& ec
-    )
-{
-    using util::placeholders::_1;
-    using util::placeholders::_2;
-    boost::format help_count(
-        "returns the number of invocations of the AGAS service '%s'");
-    boost::format help_time(
-        "returns the overall execution time of the AGAS service '%s'");
-    performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
-      , agas::server::primary_namespace_service_name));
-
-    for (std::size_t i = 0;
-          i != detail::num_primary_namespace_services;
-          ++i)
-    {
-        // global counters are handled elsewhere
-        if (detail::primary_namespace_services[i].code_ == primary_ns_statistics_counter)
-            continue;
-
-        std::string name(detail::primary_namespace_services[i].name_);
-        std::string help;
-        std::string::size_type p = name.find_last_of('/');
-        HPX_ASSERT(p != std::string::npos);
-
-        if (detail::primary_namespace_services[i].target_
-            == detail::counter_target_count)
-            help = boost::str(help_count % name.substr(p+1));
-        else
-            help = boost::str(help_time % name.substr(p+1));
-
-        performance_counters::install_counter_type(
-            agas::performance_counter_basename + name
-          , performance_counters::counter_raw
-          , help
-          , creator
-          , &performance_counters::locality_counter_discoverer
-          , HPX_PERFORMANCE_COUNTER_V1
-          , detail::primary_namespace_services[i].uom_
-          , ec
-          );
-        if (ec) return;
-    }
-}
-
-void primary_namespace::register_global_counter_types(
-    error_code& ec
-    )
-{
-    using util::placeholders::_1;
-    using util::placeholders::_2;
-    performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
-      , agas::server::primary_namespace_service_name));
-
-    for (std::size_t i = 0;
-          i != detail::num_primary_namespace_services;
-          ++i)
-    {
-        // local counters are handled elsewhere
-        if (detail::primary_namespace_services[i].code_
-            != primary_ns_statistics_counter)
-            continue;
-
-        std::string help;
-        if (detail::primary_namespace_services[i].target_
-            == detail::counter_target_count)
-            help = "returns the overall number of invocations \
-                     of all primary AGAS services";
-        else
-            help = "returns the overall execution time of all primary AGAS services";
-
-        performance_counters::install_counter_type(
-            std::string(agas::performance_counter_basename) +
-                detail::primary_namespace_services[i].name_
-          , performance_counters::counter_raw
-          , help
-          , creator
-          , &performance_counters::locality_counter_discoverer
-          , HPX_PERFORMANCE_COUNTER_V1
-          , detail::primary_namespace_services[i].uom_
-          , ec
-          );
-        if (ec) return;
-    }
-}
-
-void primary_namespace::register_server_instance(
-    char const* servicename
-  , boost::uint32_t locality_id
-  , error_code& ec
-    )
-{
-    // set locality_id for this component
-    if (locality_id == naming::invalid_locality_id)
-        locality_id = 0;        // if not given, we're on the root
-
-    this->base_type::set_locality_id(locality_id);
-
-    // now register this AGAS instance with AGAS :-P
-    instance_name_ = agas::service_name;
-    instance_name_ += servicename;
-    instance_name_ += agas::server::primary_namespace_service_name;
-
-    // register a gid (not the id) to avoid AGAS holding a reference to this
-    // component
-    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
-}
-
-void primary_namespace::unregister_server_instance(
-    error_code& ec
-    )
-{
-    agas::unregister_name_sync(instance_name_, ec);
-    this->base_type::finalize();
-}
-
-void primary_namespace::finalize()
-{
-    if (!instance_name_.empty())
-    {
-        error_code ec(lightweight);
-        agas::unregister_name_sync(instance_name_, ec);
-    }
-}
 
 // TODO: do/undo semantics (e.g. transactions)
 std::vector<response> primary_namespace::bulk_service(

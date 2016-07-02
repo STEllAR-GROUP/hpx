@@ -48,9 +48,6 @@ HPX_EXPORT naming::id_type bootstrap_primary_namespace_id();
 namespace server
 {
 
-// Base name used to register the component
-char const* const primary_namespace_service_name = "primary/";
-
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
 /// resolved addresses.
 ///
@@ -155,7 +152,6 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
         > migration_table_type;
 #endif
 
-    std::string instance_name_;
     naming::gid_type next_id_;      // next available gid
     naming::gid_type locality_;     // our locality id
     migration_table_type migrating_objects_;
@@ -191,12 +187,9 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
     primary_namespace()
       : base_type()
       , mutex_()
-      , instance_name_()
       , next_id_(naming::invalid_gid)
       , locality_(naming::invalid_gid)
     {}
-
-    void finalize();
 
     void set_local_locality(naming::gid_type const& g)
     {
@@ -214,24 +207,6 @@ struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
     std::vector<response> bulk_service(
         std::vector<request> const& reqs
       , error_code& ec
-        );
-
-    /// Register all performance counter types exposed by this component.
-    static void register_counter_types(
-        error_code& ec = throws
-        );
-    static void register_global_counter_types(
-        error_code& ec = throws
-        );
-
-    void register_server_instance(
-        char const* servicename
-      , boost::uint32_t locality_id = naming::invalid_locality_id
-      , error_code& ec = throws
-        );
-
-    void unregister_server_instance(
-        error_code& ec = throws
         );
 
     response route(

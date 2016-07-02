@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
+#include <hpx/runtime/agas/detail/primary_namespace_base.hpp>
 #include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
@@ -68,7 +69,7 @@ struct HPX_EXPORT locality_namespace
 
     partition_table_type partitions_;
     boost::uint32_t prefix_counter_;
-    primary_namespace* primary_;
+    agas::detail::primary_namespace_base* primary_;
 
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
@@ -137,7 +138,7 @@ struct HPX_EXPORT locality_namespace
     counter_data counter_data_;
 
   public:
-    locality_namespace(primary_namespace* primary)
+    locality_namespace(agas::detail::primary_namespace_base* primary)
       : base_type(HPX_AGAS_LOCALITY_NS_MSB, HPX_AGAS_LOCALITY_NS_LSB)
       , prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
       , primary_(primary)

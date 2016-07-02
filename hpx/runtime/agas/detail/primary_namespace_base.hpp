@@ -15,15 +15,23 @@
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/util/function.hpp>
 
+#include <string>
 #include <utility>
 #include <vector>
 
+#include <boost/cstdint.hpp>
+
 namespace hpx { namespace agas { namespace detail
 {
+    // Base name used to register the component
+    char const* const primary_namespace_service_name = "primary/";
+
+    ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT primary_namespace_base
       : components::fixed_component_base<primary_namespace_base>
     {
@@ -34,6 +42,8 @@ namespace hpx { namespace agas { namespace detail
         {}
 
         virtual ~primary_namespace_base() {}
+
+        void finalize();
 
         ///////////////////////////////////////////////////////////////////////
         response remote_service(request const& req)
@@ -78,8 +88,20 @@ namespace hpx { namespace agas { namespace detail
         ///////////////////////////////////////////////////////////////////////
         response statistics_counter(request const& req, error_code& ec);
 
+        /// Register all performance counter types exposed by this component.
+        static void register_counter_types(error_code& ec = throws);
+        static void register_global_counter_types(error_code& ec = throws);
+
+        ///////////////////////////////////////////////////////////////////////
+        void register_server_instance(char const* servicename,
+            boost::uint32_t locality_id = naming::invalid_locality_id,
+            error_code& ec = throws);
+
+        void unregister_server_instance(error_code& ec = throws);
+
     protected:
         primary_namespace_counter_data counter_data_;
+        std::string instance_name_;
     };
 }}}
 

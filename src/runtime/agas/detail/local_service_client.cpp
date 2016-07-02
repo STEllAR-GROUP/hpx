@@ -14,6 +14,35 @@
 
 namespace hpx { namespace agas { namespace detail
 {
+    void local_data_type::register_counter_types()
+    {
+        server::locality_namespace::register_counter_types();
+        server::locality_namespace::register_global_counter_types();
+        primary_namespace_base::register_counter_types();
+        primary_namespace_base::register_global_counter_types();
+        server::component_namespace::register_counter_types();
+        server::component_namespace::register_global_counter_types();
+        server::symbol_namespace::register_counter_types();
+        server::symbol_namespace::register_global_counter_types();
+    }
+
+    void local_data_type::register_server_instance(char const* servicename)
+    {
+        locality_ns_server_.register_server_instance(servicename);
+        primary_ns_server_.register_server_instance(servicename);
+        component_ns_server_.register_server_instance(servicename);
+        symbol_ns_server_.register_server_instance(servicename);
+    }
+
+    void local_data_type::unregister_server_instance(error_code& ec)
+    {
+        locality_ns_server_.unregister_server_instance(ec);
+        if (!ec) primary_ns_server_.unregister_server_instance(ec);
+        if (!ec) component_ns_server_.unregister_server_instance(ec);
+        if (!ec) symbol_ns_server_.unregister_server_instance(ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void local_service_client::set_local_locality(naming::gid_type const& g)
     {
     }
