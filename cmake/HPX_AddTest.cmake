@@ -35,8 +35,8 @@ macro(add_hpx_test category name)
 
   set(args)
 
-  foreach(arg ${${name}_ARGS})
-    set(args ${args} "'${arg}'")
+  foreach(arg ${${name}_UNPARSED_ARGUMENTS})
+    set(args ${args} "${arg}")
   endforeach()
   set(args ${args} "-v" "--" ${args})
 
