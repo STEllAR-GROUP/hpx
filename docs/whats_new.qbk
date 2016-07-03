@@ -23,10 +23,11 @@ gather broad feedback before releasing V1.0.
 We still expect for some minor details to change, but
 on the whole this release represents what we would like to have in a V1.0.
 
-Overall, since the last release we have had almost 1500 commits closing almost
-400 tickets. These numbers reflect the incredible development activity we have
-seen over the last couple of months. We would like to express a big 'Thank you!'
-to all contributors and those who helped to make this release happen.
+Overall, since the last release we have had almost 1600 commits while closing
+almost 400 tickets. These numbers reflect the incredible development activity
+we have seen over the last couple of months. We would like to express a big
+'Thank you!' to all contributors and those who helped to make this release
+happen.
 
 The most notable addition in terms of new functionality available with this
 release is the full implementation of object migration (i.e. the ability to
@@ -48,6 +49,9 @@ particular order):
 * We have implemented index-based parallel for-loops based on a
   corresponding standardization proposal (__cpp20_p0075r1__). Please see
   [issue 2016] for a list of available algorithms.
+* We have added implementations for more parallel algorithms as proposed for
+  the upcoming C++ 17 Standard. See [issue 1141] for an overview of which
+  algorithms are available by now.
 * We have started to implement a new prototypical functionality with
   __hpx_compute__ which uniformly exposes some of the higher level APIs to
   heterogeneous architectures (currently CUDA). This functionality is an early
@@ -98,6 +102,8 @@ particular order):
 * We have added a special iterator which supports automatic prefetching of
   one or more arrays for speeding up loop-like code (see
   `hpx::parallel::util::make_prefetcher_context()`).
+* We have extended the interfaces exposed from executors (as proposed by
+  __cpp11_n4406__) to accept an arbitrary number of arguments.
 
 [heading Breaking Changes]
 
@@ -105,7 +111,8 @@ particular order):
   definition of `hpx::dataflow` which might create ambiguities in existing
   codes. The previous definition of this facility (`hpx::lcos::local::dataflow`)
   has been deprecated and is available only if the constant
-  `HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY` is defined at configuration time.
+  `-DHPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY=On` to __cmake __ is defined at
+  configuration time.
   Please explicitly qualify all uses of the dataflow facility if you enable
   this compatibility setting and encounter ambiguities.
 * The adaptation of the C++ Extensions for Ranges (__cpp17_n4560__) proposal
@@ -136,6 +143,8 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2231] - Fixing possible race during future awaiting in serialization
+* [pr    2230] - Fix stream nvcc
 * [pr    2229] - Fixed run_as_hpx_thread
 * [pr    2228] - On prefetching_test branch : adding prefetching_iterator and
                  related tests used for prefetching containers within lambda
@@ -190,6 +199,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2180] - Changing default bind mode to balanced
 * [pr    2179] - adding prefetching_iterator and related tests used for
                  prefetching containers within lambda functions
+* [pr    2177] - Fixing 2176
 * [issue 2176] - Launch process test fails on OSX
 * [pr    2175] - Fix unbalanced config/warnings includes, add some new ones
 * [pr    2174] - Fix test categorization : regression not unit
