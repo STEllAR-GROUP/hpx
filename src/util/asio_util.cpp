@@ -205,9 +205,9 @@ namespace hpx { namespace util
 
 #if defined(HPX_WINDOWS)
        if (boost::asio::detail::socket_ops::inet_ntop(
-          domain[i], buf, str, INET6_ADDRSTRLEN, scope_id, ec) == 0) {
+            domain[i], buf, str, INET6_ADDRSTRLEN, scope_id, ec) == 0) {
 #else
-       if (inet_ntop(domain[i], buf, str, INET6_ADDRSTRLEN) == NULL) {
+       if (inet_ntop(domain[i], buf, str, INET6_ADDRSTRLEN) == nullptr) {
 #endif
            HPX_THROW_EXCEPTION(bad_parameter, "cleanup_ip_address",
                "inet_ntop failure");
