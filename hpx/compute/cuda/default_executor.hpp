@@ -105,11 +105,9 @@ namespace hpx { namespace compute { namespace cuda
             shape_container_type shape_container(
                 boost::begin(shape), boost::end(shape), alloc_type(target_));
 
-            value_type const* p = &(*boost::begin(shape));
             detail::launch(
                 target_, num_blocks, threads_per_block,
-                [] HPX_DEVICE (F f, value_type * p,
-                    std::size_t count, Ts&... ts)
+                [] HPX_DEVICE (F f, value_type* p, std::size_t count, Ts const&... ts)
                 {
                     int idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)

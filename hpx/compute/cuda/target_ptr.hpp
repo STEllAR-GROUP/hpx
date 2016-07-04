@@ -39,7 +39,7 @@ namespace hpx { namespace compute { namespace cuda
 #endif
         typedef std::ptrdiff_t difference_type;
 
-        target_ptr()
+        HPX_HOST_DEVICE target_ptr()
           : p_(nullptr)
           , tgt_(nullptr)
         {}
@@ -49,6 +49,21 @@ namespace hpx { namespace compute { namespace cuda
           , tgt_(&tgt)
         {}
 
+        HPX_HOST_DEVICE
+        target_ptr(target_ptr const& rhs)
+          : p_(rhs.p_)
+          , tgt_(rhs.tgt_)
+        {}
+
+        HPX_HOST_DEVICE
+        target_ptr& operator=(target_ptr const& rhs)
+        {
+            p_ = rhs.p_;
+            tgt_ = rhs.tgt_;
+            return *this;
+        }
+
+        HPX_HOST_DEVICE
         target_ptr const& operator++()
         {
             HPX_ASSERT(p_);
@@ -56,6 +71,7 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
+        HPX_HOST_DEVICE
         target_ptr const& operator--()
         {
             HPX_ASSERT(p_);
@@ -63,6 +79,7 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
+        HPX_HOST_DEVICE
         target_ptr operator++(int)
         {
             target_ptr tmp(*this);
@@ -71,6 +88,7 @@ namespace hpx { namespace compute { namespace cuda
             return tmp;
         }
 
+        HPX_HOST_DEVICE
         target_ptr operator--(int)
         {
             target_ptr tmp(*this);
@@ -79,61 +97,73 @@ namespace hpx { namespace compute { namespace cuda
             return tmp;
         }
 
+        HPX_HOST_DEVICE
         explicit operator bool() const
         {
             return p_ != nullptr;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator==(target_ptr const& lhs, std::nullptr_t)
         {
             return lhs.p_ == nullptr;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator!=(target_ptr const& lhs, std::nullptr_t)
         {
             return lhs.p_ != nullptr;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator==(std::nullptr_t, target_ptr const& rhs)
         {
             return nullptr == rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator!=(std::nullptr_t, target_ptr const& rhs)
         {
             return nullptr != rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator==(target_ptr const& lhs, target_ptr const& rhs)
         {
             return lhs.p_ == rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator!=(target_ptr const& lhs, target_ptr const& rhs)
         {
             return lhs.p_ != rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator<(target_ptr const& lhs, target_ptr const& rhs)
         {
             return lhs.p_ < rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator>(target_ptr const& lhs, target_ptr const& rhs)
         {
             return lhs.p_ > rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator<=(target_ptr const& lhs, target_ptr const& rhs)
         {
             return lhs.p_ <= rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         friend bool operator>=(target_ptr const& lhs, target_ptr const& rhs)
         {
             return lhs.p_ >= rhs.p_;
         }
 
+        HPX_HOST_DEVICE
         target_ptr& operator+=(std::ptrdiff_t offset)
         {
             HPX_ASSERT(p_);
@@ -141,6 +171,7 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
+        HPX_HOST_DEVICE
         target_ptr& operator-=(std::ptrdiff_t offset)
         {
             HPX_ASSERT(p_);
@@ -148,16 +179,19 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
+        HPX_HOST_DEVICE
         std::ptrdiff_t operator-(target_ptr const& other) const
         {
             return p_ - other.p_;
         }
 
+        HPX_HOST_DEVICE
         target_ptr operator-(std::ptrdiff_t offset) const
         {
             return target_ptr(p_ - offset, *tgt_);
         }
 
+        HPX_HOST_DEVICE
         target_ptr operator+(std::ptrdiff_t offset) const
         {
             return target_ptr(p_ + offset, *tgt_);
@@ -169,27 +203,27 @@ namespace hpx { namespace compute { namespace cuda
 //             return *p_;
 //         }
 
-        T& operator*()
+        HPX_DEVICE T& operator*()
         {
             return *p_;
         }
 
-        T const& operator[](std::ptrdiff_t offset) const
+        HPX_DEVICE T const& operator[](std::ptrdiff_t offset) const
         {
             return *(p_ + offset);
         }
 
-        T& operator[](std::ptrdiff_t offset)
+        HPX_DEVICE T& operator[](std::ptrdiff_t offset)
         {
             return *(p_ + offset);
         }
 
-        operator T*() const
+        HPX_DEVICE operator T*() const
         {
             return p_;
         }
 
-        T* operator->() const
+        HPX_DEVICE T* operator->() const
         {
             return p_;
         }

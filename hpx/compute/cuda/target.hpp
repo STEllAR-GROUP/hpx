@@ -40,19 +40,23 @@ namespace hpx { namespace compute { namespace cuda
         {
             typedef hpx::lcos::local::spinlock mutex_type;
 
-            native_handle_type(int device = 0);
+            HPX_HOST_DEVICE native_handle_type(int device = 0);
 
-            ~native_handle_type();
+            HPX_HOST_DEVICE ~native_handle_type();
 
-            native_handle_type(native_handle_type const& rhs) HPX_NOEXCEPT;
-            native_handle_type(native_handle_type && rhs) HPX_NOEXCEPT;
+            HPX_HOST_DEVICE native_handle_type(
+                native_handle_type const& rhs) HPX_NOEXCEPT;
+            HPX_HOST_DEVICE native_handle_type(
+                native_handle_type && rhs) HPX_NOEXCEPT;
 
-            native_handle_type& operator=(native_handle_type const& rhs) HPX_NOEXCEPT;
-            native_handle_type& operator=(native_handle_type && rhs) HPX_NOEXCEPT;
+            HPX_HOST_DEVICE native_handle_type&
+            operator=(native_handle_type const& rhs) HPX_NOEXCEPT;
+            HPX_HOST_DEVICE native_handle_type&
+            operator=(native_handle_type && rhs) HPX_NOEXCEPT;
 
-            cudaStream_t get_stream() const;
+            HPX_HOST_DEVICE cudaStream_t get_stream() const;
 
-            int get_device() const HPX_NOEXCEPT
+            HPX_HOST_DEVICE int get_device() const HPX_NOEXCEPT
             {
                 return device_;
             }
@@ -68,30 +72,30 @@ namespace hpx { namespace compute { namespace cuda
         };
 
         // Constructs default target
-        target()
+        HPX_HOST_DEVICE target()
           : handle_(), locality_(hpx::find_here())
         {}
 
         // Constructs target from a given device ID
-        explicit target(int device)
+        explicit HPX_HOST_DEVICE target(int device)
           : handle_(device), locality_(hpx::find_here())
         {}
 
-        explicit target(hpx::id_type const& locality, int device)
+        HPX_HOST_DEVICE target(hpx::id_type const& locality, int device)
           : handle_(device), locality_(locality)
         {}
 
-        target(target const& rhs) HPX_NOEXCEPT
+        HPX_HOST_DEVICE target(target const& rhs) HPX_NOEXCEPT
           : handle_(rhs.handle_),
             locality_(rhs.locality_)
         {}
 
-        target(target && rhs) HPX_NOEXCEPT
+        HPX_HOST_DEVICE target(target && rhs) HPX_NOEXCEPT
           : handle_(std::move(rhs.handle_)),
             locality_(std::move(rhs.locality_))
         {}
 
-        target& operator=(target const& rhs) HPX_NOEXCEPT
+        HPX_HOST_DEVICE target& operator=(target const& rhs) HPX_NOEXCEPT
         {
             if (&rhs != this)
             {
@@ -101,7 +105,7 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
-        target& operator=(target && rhs) HPX_NOEXCEPT
+        HPX_HOST_DEVICE target& operator=(target && rhs) HPX_NOEXCEPT
         {
             if (&rhs != this)
             {
@@ -111,21 +115,23 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
+        HPX_HOST_DEVICE
         native_handle_type& native_handle() HPX_NOEXCEPT
         {
             return handle_;
         }
+        HPX_HOST_DEVICE
         native_handle_type const& native_handle() const HPX_NOEXCEPT
         {
             return handle_;
         }
 
-        hpx::id_type const& get_locality() const HPX_NOEXCEPT
+        HPX_HOST_DEVICE void synchronize() const;
+
+        HPX_HOST_DEVICE hpx::id_type const& get_locality() const HPX_NOEXCEPT
         {
             return locality_;
         }
-
-        void synchronize() const;
 
         hpx::future<void> get_future() const;
 

@@ -175,7 +175,7 @@ namespace hpx { namespace compute { namespace cuda
 
             detail::launch(
                 target_, num_blocks, threads_per_block,
-                [] __device__ (T* p, std::size_t count, Args const&... args)
+                [] HPX_DEVICE (T* p, std::size_t count, Args const&... args)
                 {
                     int idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
@@ -194,7 +194,7 @@ namespace hpx { namespace compute { namespace cuda
         {
             detail::launch(
                 target_, 1, 1,
-                [] __device__ (T* p, Args const&... args)
+                [] HPX_DEVICE (T* p, Args const&... args)
                 {
                     ::new (p) T (std::forward<Args>(args)...);
                 },
@@ -211,7 +211,7 @@ namespace hpx { namespace compute { namespace cuda
 
             detail::launch(
                 target_, num_blocks, threads_per_block,
-                [] __device__ (T* p, std::size_t count)
+                [] HPX_DEVICE (T* p, std::size_t count)
                 {
                     int idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
