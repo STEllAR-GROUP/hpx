@@ -183,7 +183,7 @@ namespace hpx { namespace compute { namespace host
             cancellation_token tok;
             partitioner::call(std::move(policy),
                 boost::begin(irange), count,
-                [&arguments, p, tok](iterator_type it, std::size_t part_size)
+                [&arguments, p, &tok](iterator_type it, std::size_t part_size)
                     mutable -> partition_result_type
                 {
                     iterator_type last =
