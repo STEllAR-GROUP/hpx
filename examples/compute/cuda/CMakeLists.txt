@@ -15,6 +15,7 @@ if(HPX_WITH_CUDA)
   set(data_copy_CUDA On)
   set(hello_compute_CUDA On)
   set(partitioned_vector_CUDA ON)
+  set(partitioned_vector_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
 endif()
 
 foreach(example_program ${example_programs})
