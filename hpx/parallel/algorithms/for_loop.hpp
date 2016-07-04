@@ -108,8 +108,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             template <typename B>
             HPX_HOST_DEVICE
-            void operator()(std::size_t part_index, B part_begin,
-                std::size_t part_steps)
+            void operator()(B part_begin, std::size_t part_steps,
+                std::size_t part_index)
             {
                 auto pack = typename hpx::util::detail::make_index_pack<
                     sizeof...(Ts)>::type();

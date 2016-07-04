@@ -275,8 +275,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                 call_with_index(
                     std::forward<ExPolicy>(policy), first, count, 1,
-                    [tok, pred, last](std::size_t base_idx, FwdIter part_begin,
-                    std::size_t part_size) mutable
+                    [tok, pred, last](FwdIter part_begin, std::size_t part_size,
+                        std::size_t base_idx) mutable
                     {
                         FwdIter trail = part_begin++;
                         util::loop_idx_n(++base_idx, part_begin,

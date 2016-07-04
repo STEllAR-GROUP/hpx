@@ -175,7 +175,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         hpx::parallel::parallel_execution_policy
                     >::call(par, chunks.get(), cores,
                         [buffer, dest](
-                            std::size_t, set_chunk_data* chunk, std::size_t)
+                            set_chunk_data* chunk, std::size_t, std::size_t)
                         {
                             std::copy(buffer.get() + chunk->start,
                                 buffer.get() + chunk->start + chunk->len,

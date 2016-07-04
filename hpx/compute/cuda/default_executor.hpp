@@ -15,6 +15,7 @@
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/compute/cuda/allocator.hpp>
+#include <hpx/compute/cuda/default_executor_parameters.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/vector.hpp>
@@ -30,6 +31,11 @@ namespace hpx { namespace compute { namespace cuda
 {
     struct default_executor : hpx::parallel::executor_tag
     {
+        // By default, this executor relies on a special executor parameters
+        // implementation which knows about the specifics of creating the
+        // bulk-shape ranges for the accelerator.
+        typedef default_executor_parameters executor_parameters_type;
+
         default_executor(cuda::target& target)
           : target_(target)
         {}

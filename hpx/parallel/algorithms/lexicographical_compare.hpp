@@ -83,8 +83,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     call_with_index(
                         std::forward<ExPolicy>(policy),
                         make_zip_iterator(first1, first2), count, 1,
-                        [pred, tok](std::size_t base_idx, zip_iterator it,
-                            std::size_t part_count) mutable
+                        [pred, tok](zip_iterator it, std::size_t part_count,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_count, tok,

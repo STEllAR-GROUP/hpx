@@ -44,6 +44,11 @@ namespace hpx { namespace compute { namespace cuda
           , tgt_(nullptr)
         {}
 
+        explicit HPX_HOST_DEVICE target_ptr(std::nullptr_t)
+          : p_(nullptr)
+          , tgt_(nullptr)
+        {}
+
         target_ptr(T *p, target & tgt)
           : p_(p)
           , tgt_(&tgt)

@@ -51,6 +51,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj_(std::forward<Proj_>(proj))
             {}
 
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
+            for_each_iteration(for_each_iteration const&) = default;
+            for_each_iteration(for_each_iteration&&) = default;
+#else
             HPX_HOST_DEVICE for_each_iteration(for_each_iteration const& rhs)
               : f_(rhs.f_)
               , proj_(rhs.proj_)
@@ -60,14 +64,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : f_(std::move(rhs.f_))
               , proj_(std::move(rhs.proj_))
             {}
+#endif
 
             HPX_DELETE_COPY_ASSIGN(for_each_iteration);
             HPX_DELETE_MOVE_ASSIGN(for_each_iteration);
 
             template <typename Iter>
             HPX_HOST_DEVICE
-            void operator()(std::size_t /*part_index*/,
-                Iter part_begin, std::size_t part_size)
+            void operator()(Iter part_begin, std::size_t part_size,
+                std::size_t /*part_index*/)
             {
                 typedef typename util::detail::loop_n<Iter>::type it_type;
 

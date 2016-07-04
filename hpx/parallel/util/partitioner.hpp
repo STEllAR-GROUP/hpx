@@ -56,9 +56,8 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-
-                typedef typename hpx::util::tuple<FwdIter, std::size_t>
-                    tuple_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -69,20 +68,17 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
-                        get_bulk_iteration_shape(policy, inititems, f1,
-                            first, count, 1);
-
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
-                    using hpx::util::placeholders::_2;
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), _2, _1),
-                            std::move(shape), std::forward<F1>(f1));
+                            hpx::util::bind(
+                                hpx::util::functional::invoke_fused(),
+                                std::forward<F1>(f1), hpx::util::placeholders::_1),
+                            get_bulk_iteration_shape(policy, inititems, f1,
+                                first, count, 1, has_variable_chunk_size()));
 
                     // add the newly created workitems to the list
                     inititems.reserve(inititems.size() + workitems.size());
@@ -168,15 +164,12 @@ namespace hpx { namespace parallel { namespace util
 
                     HPX_ASSERT(chunk_size_it == chunk_sizes.end());
 
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
-                    using hpx::util::placeholders::_2;
-
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), _2, _1),
-                        std::move(shape), std::forward<F1>(f1));
+                        hpx::util::bind(
+                            hpx::util::functional::invoke_fused(),
+                            std::forward<F1>(f1), hpx::util::placeholders::_1),
+                        std::move(shape));
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
@@ -213,9 +206,8 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-
-                typedef hpx::util::tuple<std::size_t, FwdIter, std::size_t>
-                    tuple_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -226,20 +218,17 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
-                        get_bulk_iteration_shape_idx(policy, inititems, f1,
-                            first, count, stride);
-
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
-                    using hpx::util::placeholders::_2;
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), _2, _1),
-                            std::move(shape), std::forward<F1>(f1));
+                            hpx::util::bind(
+                                hpx::util::functional::invoke_fused(),
+                                std::forward<F1>(f1), hpx::util::placeholders::_1),
+                            get_bulk_iteration_shape_idx(policy, inititems, f1,
+                                first, count, stride, has_variable_chunk_size()));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -283,11 +272,11 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
+
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
-
-                typedef typename hpx::util::tuple<FwdIter, std::size_t>
-                    tuple_type;
 
                 // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters>
@@ -300,20 +289,17 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
-                        get_bulk_iteration_shape(policy, inititems, f1,
-                            first, count, 1);
-
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
-                    using hpx::util::placeholders::_2;
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), _2, _1),
-                            std::move(shape), std::forward<F1>(f1));
+                            hpx::util::bind(
+                                hpx::util::functional::invoke_fused(),
+                                std::forward<F1>(f1), hpx::util::placeholders::_1),
+                            get_bulk_iteration_shape(policy, inititems, f1,
+                                first, count, 1, has_variable_chunk_size()));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -399,15 +385,12 @@ namespace hpx { namespace parallel { namespace util
                     }
                     HPX_ASSERT(chunk_size_it == chunk_sizes.end());
 
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
-                    using hpx::util::placeholders::_2;
-
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), _2, _1),
-                        std::move(shape), std::forward<F1>(f1));
+                        hpx::util::bind(
+                            hpx::util::functional::invoke_fused(),
+                            std::forward<F1>(f1), hpx::util::placeholders::_1),
+                        std::move(shape));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
@@ -443,11 +426,11 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
+
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
-
-                typedef hpx::util::tuple<std::size_t, FwdIter, std::size_t>
-                    tuple_type;
 
                 // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters>
@@ -457,24 +440,20 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::future<Result> > inititems;
                 std::list<boost::exception_ptr> errors;
-                std::vector<tuple_type> shape;
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
-                        get_bulk_iteration_shape_idx(policy, inititems, f1,
-                            first, count, stride);
-
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
-                    using hpx::util::placeholders::_2;
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
 
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            bind(invoke_fused(), _2, _1),
-                            std::move(shape), std::forward<F1>(f1));
+                            hpx::util::bind(
+                                hpx::util::functional::invoke_fused(),
+                                std::forward<F1>(f1), hpx::util::placeholders::_1),
+                            get_bulk_iteration_shape_idx(policy, inititems, f1,
+                                first, count, stride, has_variable_chunk_size()));
 
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));

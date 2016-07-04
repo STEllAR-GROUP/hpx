@@ -33,23 +33,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \a executor_traits
         typedef Parameters executor_parameters_type;
 
-        /// Returns whether the number of loop iterations to combine is
-        /// different for each of the generated chunks.
+        /// The compile-time information about whether the number of loop
+        /// iterations to combine is different for each of the generated chunks.
         ///
-        /// \param params   [in] The executor parameters object to use for
-        ///                 determining whether the chunk size is variable.
-        /// \param sched    [in] The executor object which will be used for
-        ///                 scheduling of the tasks.
+        /// \note This calls extracts parameters_type::has_variable_chunk_size,
+        ///       if available, otherwise it returns std::false_type.
         ///
-        /// \note This calls params.variable_chunk_size(exec), if available,
-        ///       otherwise it returns false.
-        ///
-        template <typename Executor>
-        static bool variable_chunk_size(executor_parameters_type& params,
-            Executor& sched)
-        {
-            return detail::call_variable_chunk_size(params, sched);
-        }
+        typedef typename detail::extract_has_variable_chunk_size<
+                executor_parameters_type
+            >::type has_variable_chunk_size;
 
         /// Return the number of invocations of the given function \a f which
         /// should be combined into a single task
@@ -61,6 +53,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                 for scheduling of the the loop iterations.
         /// \param f        [in] The function which will be optionally scheduled
         ///                 using the given executor.
+        /// \param cores    [in] The number of cores the number of chunks
+        ///                 should be determined for.
         /// \param num_tasks [in] The number of tasks the chunk size should be
         ///                 determined for
         ///
@@ -69,12 +63,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///        iteration the function has already executed (i.e. which
         ///        don't have to be scheduled anymore).
         ///
-        template <typename Executor, typename F>
-        static std::size_t get_chunk_size(executor_parameters_type& params,
-            Executor& sched, F && f, std::size_t num_tasks)
+        template <typename Parameters_, typename Executor, typename F>
+        static std::size_t get_chunk_size(Parameters_ && params,
+            Executor && sched, F && f, std::size_t cores, std::size_t num_tasks)
         {
-            return detail::call_get_chunk_size(params, sched,
-                std::forward<F>(f), num_tasks);
+            return detail::call_get_chunk_size(
+                std::forward<Parameters_>(params), std::forward<Executor>(sched),
+                std::forward<F>(f), cores, num_tasks);
+        }
+
+        /// Return the largest reasonable number of chunks to create for a
+        /// single algorithm invocation.
+        ///
+        /// \param params   [in] The executor parameters object to use for
+        ///                 determining the number of chunks for the given
+        ///                 number of \a cores.
+        /// \param exec     [in] The executor object which will be used used
+        ///                 for scheduling of the the loop iterations.
+        /// \param cores    [in] The number of cores the number of chunks
+        ///                 should be determined for.
+        /// \param num_tasks [in] The number of tasks the chunk size should be
+        ///                 determined for
+        ///
+        template <typename Parameters_, typename Executor>
+        static std::size_t maximal_number_of_chunks(
+            Parameters_ && params, Executor && sched, std::size_t cores,
+            std::size_t num_tasks)
+        {
+            return detail::call_maximal_number_of_chunks(
+                std::forward<Parameters_>(params), std::forward<Executor>(sched),
+                cores, num_tasks);
         }
 
         /// Reset the internal round robin thread distribution scheme for the
@@ -84,9 +102,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                 resetting the thread distribution scheme.
         /// \param sched    [in] The executor object to use.
         ///
-        template <typename Executor>
-        static void reset_thread_distribution(executor_parameters_type&,
-            Executor& sched)
+        template <typename Parameters_, typename Executor>
+        static void reset_thread_distribution(Parameters_ &&,
+            Executor && sched)
         {
             sched.reset_thread_distribution();
         }
@@ -103,10 +121,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise it forwards teh request to the executor parameters
         ///       object.
         ///
-        static std::size_t processing_units_count(
-            executor_parameters_type& params)
+        template <typename Parameters_>
+        static std::size_t processing_units_count(Parameters_ && params)
         {
-            return detail::call_processing_units_parameter_count(params);
+            return detail::call_processing_units_parameter_count(
+                std::forward<Parameters_>(params));
         }
 
         /// Mark the begin of a parallel algorithm execution
@@ -117,9 +136,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls params.mark_begin_execution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
-        static void mark_begin_execution(executor_parameters_type& params)
+        template <typename Parameters_>
+        static void mark_begin_execution(Parameters_ && params)
         {
-            detail::call_mark_begin_execution(params);
+            detail::call_mark_begin_execution(
+                std::forward<Parameters_>(params));
         }
 
         /// Mark the end of a parallel algorithm execution
@@ -130,9 +151,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls params.mark_end_execution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
-        static void mark_end_execution(executor_parameters_type& params)
+        template <typename Parameters_>
+        static void mark_end_execution(Parameters_ && params)
         {
-            detail::call_mark_end_execution(params);
+            detail::call_mark_end_execution(std::forward<Parameters_>(params));
         }
     };
 }}}

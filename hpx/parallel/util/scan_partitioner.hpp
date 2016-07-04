@@ -26,6 +26,7 @@
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
 #include <boost/exception_ptr.hpp>
+#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <list>
@@ -59,10 +60,8 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-
-                typedef typename hpx::util::tuple<
-                        FwdIter, std::size_t
-                    > tuple_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -85,13 +84,16 @@ namespace hpx { namespace parallel { namespace util
                     std::size_t test_chunk_size = count / 100;
 
                     // estimate a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
-                        get_bulk_iteration_shape(policy, workitems, f1,
-                            first, count, 1);
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
+
+                    auto shape = get_bulk_iteration_shape(policy, workitems,
+                        f1, first, count, 1, has_variable_chunk_size());
 
                     // schedule every chunk on a separate thread
-                    workitems.reserve(shape.size() + 1);
-                    finalitems.reserve(shape.size());
+                    std::size_t size = boost::size(shape);
+                    workitems.reserve(size + 1);
+                    finalitems.reserve(size);
 
                     // If the size of count was enough to warrant testing for a
                     // chunk, pre-initialize second intermediate result and
@@ -187,12 +189,11 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
+
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
-
-                typedef typename hpx::util::tuple<
-                        FwdIter, std::size_t
-                    > tuple_type;
 
                 // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters>
@@ -217,13 +218,16 @@ namespace hpx { namespace parallel { namespace util
                     std::size_t test_chunk_size = count / 100;
 
                     // estimate a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
-                        get_bulk_iteration_shape(policy, workitems, f1,
-                            first, count, 1);
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
+
+                    auto shape = get_bulk_iteration_shape(policy, workitems,
+                        f1, first, count, 1, has_variable_chunk_size());
 
                     // schedule every chunk on a separate thread
-                    workitems.reserve(shape.size() + 1);
-                    finalitems.reserve(shape.size());
+                    std::size_t size = boost::size(shape);
+                    workitems.reserve(size + 1);
+                    finalitems.reserve(size);
 
                     // If the size of count was enough to warrant testing for a
                     // chunk, pre-initialize second intermediate result and

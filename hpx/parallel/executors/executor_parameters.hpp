@@ -69,29 +69,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
               : wrap(std::forward<WrapperType>(wrapped_param))
             {}
 
-            template <
-                typename Executor, typename U = T,
-                typename std::enable_if<
-                    has_variable_chunk_size<U>::value
-                >::type* = nullptr>
-            auto variable_chunk_size(Executor & exec)
-            ->  decltype(std::declval<U>().variable_chunk_size(exec))
-            {
-                return wrap.get().variable_chunk_size(exec);
-            }
-
             template <typename Executor, typename F, typename U = T,
                 typename std::enable_if<
                     has_get_chunk_size<U>::value
                 >::type* = nullptr>
-            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks)
+            auto get_chunk_size(Executor & exec, F && f, std::size_t cores,
+                    std::size_t num_tasks)
             ->  decltype(
                     std::declval<U>().get_chunk_size(
-                        exec, std::forward<F>(f), num_tasks)
+                        exec, std::forward<F>(f), cores, num_tasks)
                 )
             {
                 return wrap.get().get_chunk_size(exec, std::forward<F>(f),
-                    num_tasks);
+                    cores, num_tasks);
+            }
+
+            template <typename Executor, typename F, typename U = T,
+                typename std::enable_if<
+                    has_maximal_number_of_chunks<U>::value
+                >::type* = nullptr>
+            auto maximal_number_of_chunks(Executor & exec, F && f,
+                    std::size_t cores, std::size_t num_tasks)
+            ->  decltype(
+                    std::declval<U>().maximal_number_of_chunks(
+                        exec, std::forward<F>(f), cores, num_tasks)
+                )
+            {
+                return wrap.get().maximal_number_of_chunks(exec,
+                    std::forward<F>(f), cores, num_tasks);
             }
 
             template <typename U = T,
@@ -147,28 +152,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
               : wrap(std::forward<WrapperType>(wrapped_param))
             {}
 
-            template <typename Executor, typename U = T,
-                typename std::enable_if<
-                    has_variable_chunk_size<U>::value
-                >::type* = nullptr>
-            auto variable_chunk_size(Executor & exec)
-            ->  decltype(std::declval<U>().variable_chunk_size(exec))
-            {
-                return wrap.get().variable_chunk_size(exec);
-            }
-
             template <typename Executor, typename F, typename U = T,
                 typename std::enable_if<
                     has_get_chunk_size<U>::value
                 >::type* = nullptr>
-            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks)
+            auto get_chunk_size(Executor & exec, F && f, std::size_t cores,
+                    std::size_t num_tasks)
             ->  decltype(
                     std::declval<U>().get_chunk_size(
-                        exec, std::forward<F>(f), num_tasks)
+                        exec, std::forward<F>(f), cores, num_tasks)
                 )
             {
                 return wrap.get().get_chunk_size(exec, std::forward<F>(f),
-                    num_tasks);
+                    cores, num_tasks);
+            }
+
+            template <typename Executor, typename F, typename U = T,
+                typename std::enable_if<
+                    has_maximal_number_of_chunks<U>::value
+                >::type* = nullptr>
+            auto maximal_number_of_chunks(Executor & exec, F && f,
+                    std::size_t cores, std::size_t num_tasks)
+            ->  decltype(
+                    std::declval<U>().maximal_number_of_chunks(
+                        exec, std::forward<F>(f), cores, num_tasks)
+                )
+            {
+                return wrap.get().maximal_number_of_chunks(exec,
+                    std::forward<F>(f), cores, num_tasks);
             }
 
             template <typename U = T,
@@ -238,8 +249,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 "objects"
             );
 
-            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(variable_chunk_size);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(get_chunk_size);
+            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(maximal_number_of_chunks);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_begin_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(processing_units_count);
