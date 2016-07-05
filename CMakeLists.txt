@@ -812,7 +812,7 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
 # Make sure we compile in C++11 mode (MSVC uses it automatically)
 if(NOT MSVC)
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    hpx_add_target_compile_option(-std=c++11)
+    set(CXX_FLAG -std=c++11)
   else()
     # Try -std=c++14 first
     check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
@@ -837,9 +837,8 @@ if(NOT MSVC)
         endif()
       endif()
     endif()
-
-    hpx_add_target_compile_option(${CXX_FLAG})
   endif()
+  hpx_add_target_compile_option(${CXX_FLAG})
 endif()
 
 ################################################################################
