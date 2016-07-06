@@ -9,6 +9,7 @@ set(subdirs
     agas
     build
     component
+    concurrent
     diagnostics
     lcos
     parcelset
