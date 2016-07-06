@@ -6,9 +6,11 @@
 # add tests
 set(tests
     unordered_set
-   )
+    unordered_map
+)
 
 set(unordered_set_FLAGS DEPENDENCIES iostreams_component)
+set(unordered_map_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
@@ -19,7 +21,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}_test
+  add_hpx_executable(concurrent_${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
@@ -37,5 +39,5 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.concurrent.${test}
-                              ${test}_test_exe)
+                              concurrent_${test}_test_exe)
 endforeach()
