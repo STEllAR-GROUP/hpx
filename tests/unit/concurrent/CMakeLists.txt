@@ -7,10 +7,12 @@
 set(tests
     unordered_set
     unordered_map
+    concurrent_vector
 )
 
 set(unordered_set_FLAGS DEPENDENCIES iostreams_component)
 set(unordered_map_FLAGS DEPENDENCIES iostreams_component)
+set(concurrent_vector_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
