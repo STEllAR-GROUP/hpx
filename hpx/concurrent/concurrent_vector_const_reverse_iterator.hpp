@@ -1,5 +1,11 @@
+//  Copyright (c) 2016 John Biddiscombe
+//  Copyright (c) 2012 Scott Downie, Tag Games Limited
 //
-//  concurrent_vector_forward_iterator.h
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+//
+//  concurrent_vector_const_reverse_iterator.h
 //  Chilli Source
 //  Created by Scott Downie on 19/09/2014.
 //
@@ -26,26 +32,31 @@
 //  THE SOFTWARE.
 //
 
-#ifndef _CHILLISOURCE_CORE_CONTAINER_CONCURRENTVECTORFORWARDITERATOR_H_
-#define _CHILLISOURCE_CORE_CONTAINER_CONCURRENTVECTORFORWARDITERATOR_H_
+#ifndef _HPX_CONCURRENTVECTORCONSTREVERSEITERATOR_H_
+#define _HPX_CONCURRENTVECTORCONSTREVERSEITERATOR_H_
+
+#include <hpx/lcos/local/recursive_mutex.hpp>
 
 #include <vector>
 
-namespace ChilliSource
+namespace hpx
 {
-    namespace Core
+    namespace concurrent
     {
         //------------------------------------------------------------------------
-        /// Forward iterator for the concurrent vector class.
+        /// Reverse iterator for the concurrent vector class.
         ///
         /// @author S Downie
         //------------------------------------------------------------------------
-        template <typename TType> class concurrent_vector_forward_iterator
+        template <typename TType> class concurrent_vector_const_reverse_iterator
         {
         public:
-            
+
+            typedef hpx::lcos::local::recursive_mutex recursive_mutex;
+            typedef std::unique_lock<recursive_mutex> unique_lock;
+
             using difference_type = typename std::iterator<std::forward_iterator_tag, TType>::difference_type;
-            
+
             //------------------------------------------------------------------------
             /// Constructor
             ///
@@ -54,10 +65,10 @@ namespace ChilliSource
             /// @param Data structure to iterate over
             /// @param Mutex used to protect the underlying iterable
             //------------------------------------------------------------------------
-            concurrent_vector_forward_iterator(std::vector<std::pair<TType, bool>>* in_iterable, std::recursive_mutex* in_iterableMutex)
+            concurrent_vector_const_reverse_iterator(const std::vector<std::pair<TType, bool>>* in_iterable, recursive_mutex* in_iterableMutex)
             : m_iterable(in_iterable), m_iterableMutex(in_iterableMutex)
             {
-                m_iterableIndex = find_next_occupied_index(0);
+                m_iterableIndex = find_previous_occupied_index(m_iterable->size());
             }
             //--------------------------------------------------------------------
             /// Copy constructor that creates this as a copy of the given iterator
@@ -66,7 +77,7 @@ namespace ChilliSource
             ///
             /// @param iterator to copy
             //--------------------------------------------------------------------
-            concurrent_vector_forward_iterator(const concurrent_vector_forward_iterator& in_toCopy)
+            concurrent_vector_const_reverse_iterator(const concurrent_vector_const_reverse_iterator& in_toCopy)
             : m_iterableIndex(in_toCopy.m_iterableIndex), m_iterable(in_toCopy.m_iterable), m_iterableMutex(in_toCopy.m_iterableMutex)
             {
             }
@@ -79,12 +90,12 @@ namespace ChilliSource
             ///
             /// @return This as a copy
             //--------------------------------------------------------------------
-            concurrent_vector_forward_iterator& operator=(const concurrent_vector_forward_iterator& in_toCopy)
+            concurrent_vector_const_reverse_iterator& operator=(const concurrent_vector_const_reverse_iterator& in_toCopy)
             {
                 m_iterableIndex = in_toCopy.m_iterableIndex;
                 m_iterable = in_toCopy.m_iterable;
                 m_iterableMutex = in_toCopy.m_iterableMutex;
-                
+
                 return *this;
             }
             //--------------------------------------------------------------------
@@ -94,7 +105,7 @@ namespace ChilliSource
             ///
             /// @param iterator to move
             //--------------------------------------------------------------------
-            concurrent_vector_forward_iterator(concurrent_vector_forward_iterator&& in_toMove)
+            concurrent_vector_const_reverse_iterator(concurrent_vector_const_reverse_iterator&& in_toMove)
             : m_iterableIndex(in_toMove.m_iterableIndex), m_iterable(in_toMove.m_iterable), m_iterableMutex(in_toMove.m_iterableMutex)
             {
                 in_toMove.m_iterableIndex = 0;
@@ -110,7 +121,7 @@ namespace ChilliSource
             ///
             /// @return This having taken ownership of the given iterator
             //--------------------------------------------------------------------
-            concurrent_vector_forward_iterator& operator=(concurrent_vector_forward_iterator&& in_toMove)
+            concurrent_vector_const_reverse_iterator& operator=(concurrent_vector_const_reverse_iterator&& in_toMove)
             {
                 m_iterableIndex = in_toMove.m_iterableIndex;
                 in_toMove.m_iterableIndex = 0;
@@ -118,24 +129,24 @@ namespace ChilliSource
                 in_toMove.m_iterable = nullptr;
                 m_iterableMutex = in_toMove.m_iterableMutex;
                 in_toMove.m_iterableMutex = nullptr;
-                
+
                 return *this;
             }
             //------------------------------------------------------------------------
-            /// Moves the iterator to point to the next element in the vector
+            /// Moves the iterator to point to the previous element in the vector
             ///
             /// @author S Downie
             ///
             /// @return Updated iterator
             //------------------------------------------------------------------------
-            concurrent_vector_forward_iterator& operator++()
+            concurrent_vector_const_reverse_iterator& operator++()
             {
-                m_iterableIndex = find_next_occupied_index(m_iterableIndex + 1);
+                m_iterableIndex = find_previous_occupied_index(m_iterableIndex);
                 return *this;
             }
             //------------------------------------------------------------------------
             /// Moves the iterator to point to the element in the vector at the given
-            /// offset from the current iterator
+            /// negative offset from the current iterator
             ///
             /// @author S Downie
             ///
@@ -143,9 +154,9 @@ namespace ChilliSource
             ///
             /// @return Updated iterator
             //------------------------------------------------------------------------
-            concurrent_vector_forward_iterator& operator+=(difference_type in_stride)
+            concurrent_vector_const_reverse_iterator& operator+=(difference_type in_stride)
             {
-                m_iterableIndex = find_next_occupied_index(m_iterableIndex + in_stride);
+                m_iterableIndex = find_previous_occupied_index(m_iterableIndex - (in_stride - 1));
                 return *this;
             }
             //------------------------------------------------------------------------
@@ -158,20 +169,10 @@ namespace ChilliSource
             ///
             /// @return New iterator
             //------------------------------------------------------------------------
-            concurrent_vector_forward_iterator operator+(difference_type in_stride)
+            concurrent_vector_const_reverse_iterator operator+(difference_type in_stride)
             {
-                auto iterableIndex = find_next_occupied_index(m_iterableIndex + in_stride);
-                return concurrent_vector_forward_iterator(m_iterable, m_iterableMutex, iterableIndex);
-            }
-            //------------------------------------------------------------------------
-            /// @author S Downie
-            ///
-            /// @return Pointer to the object pointed to by the iterator
-            //------------------------------------------------------------------------
-            TType* operator->()
-            {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
-                return &((*m_iterable)[m_iterableIndex].first);
+                auto iterableIndex = find_previous_occupied_index(m_iterableIndex - (in_stride - 1));
+                return concurrent_vector_const_reverse_iterator(m_iterable, m_iterableMutex, iterableIndex);
             }
             //------------------------------------------------------------------------
             /// @author S Downie
@@ -180,18 +181,8 @@ namespace ChilliSource
             //------------------------------------------------------------------------
             const TType* operator->() const
             {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
+                unique_lock scopedLock(*m_iterableMutex);
                 return &((*m_iterable)[m_iterableIndex].first);
-            }
-            //------------------------------------------------------------------------
-            /// @author S Downie
-            ///
-            /// @return The object pointed to by the iterator
-            //------------------------------------------------------------------------
-            TType& operator*()
-            {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
-                return (*m_iterable)[m_iterableIndex].first;
             }
             //------------------------------------------------------------------------
             /// @author S Downie
@@ -200,7 +191,7 @@ namespace ChilliSource
             //------------------------------------------------------------------------
             const TType& operator*() const
             {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
+                unique_lock scopedLock(*m_iterableMutex);
                 return (*m_iterable)[m_iterableIndex].first;
             }
             //------------------------------------------------------------------------
@@ -210,7 +201,7 @@ namespace ChilliSource
             ///
             /// @return Whether the iterators are considered equal
             //------------------------------------------------------------------------
-            bool operator==(const concurrent_vector_forward_iterator& in_toCompare) const
+            bool operator==(const concurrent_vector_const_reverse_iterator& in_toCompare) const
             {
                 return m_iterableIndex == in_toCompare.m_iterableIndex;
             }
@@ -221,7 +212,7 @@ namespace ChilliSource
             ///
             /// @return Whether the iterators are considered unequal
             //------------------------------------------------------------------------
-            bool operator!=(const concurrent_vector_forward_iterator& in_toCompare) const
+            bool operator!=(const concurrent_vector_const_reverse_iterator& in_toCompare) const
             {
                 return m_iterableIndex != in_toCompare.m_iterableIndex;
             }
@@ -232,7 +223,7 @@ namespace ChilliSource
             ///
             /// @return Whether this iterator points to an element after the given iterator
             //------------------------------------------------------------------------
-            bool operator>(const concurrent_vector_forward_iterator& in_toCompare) const
+            bool operator>(const concurrent_vector_const_reverse_iterator& in_toCompare) const
             {
                 return m_iterableIndex > in_toCompare.m_iterableIndex;
             }
@@ -243,7 +234,7 @@ namespace ChilliSource
             ///
             /// @return Whether this iterator points to an element after or the same as the given iterator
             //------------------------------------------------------------------------
-            bool operator>=(const concurrent_vector_forward_iterator& in_toCompare) const
+            bool operator>=(const concurrent_vector_const_reverse_iterator& in_toCompare) const
             {
                 return m_iterableIndex >= in_toCompare.m_iterableIndex;
             }
@@ -254,7 +245,7 @@ namespace ChilliSource
             ///
             /// @return Whether this iterator points to an element before the given iterator
             //------------------------------------------------------------------------
-            bool operator<(const concurrent_vector_forward_iterator& in_toCompare) const
+            bool operator<(const concurrent_vector_const_reverse_iterator& in_toCompare) const
             {
                 return m_iterableIndex < in_toCompare.m_iterableIndex;
             }
@@ -265,7 +256,7 @@ namespace ChilliSource
             ///
             /// @return Whether this iterator points to an element before or the same as the given iterator
             //------------------------------------------------------------------------
-            bool operator<=(const concurrent_vector_forward_iterator& in_toCompare) const
+            bool operator<=(const concurrent_vector_const_reverse_iterator& in_toCompare) const
             {
                 return m_iterableIndex <= in_toCompare.m_iterableIndex;
             }
@@ -281,7 +272,7 @@ namespace ChilliSource
             {
                 return m_iterableIndex;
             }
-            
+
         private:
             //------------------------------------------------------------------------
             /// Constructor
@@ -292,42 +283,47 @@ namespace ChilliSource
             /// @param Mutex used to protect the underlying iterable
             /// @param Initial index
             //------------------------------------------------------------------------
-            concurrent_vector_forward_iterator(std::vector<std::pair<TType, bool>>* in_iterable, std::recursive_mutex* in_iterableMutex, difference_type in_initialIndex)
+            concurrent_vector_const_reverse_iterator(const std::vector<std::pair<TType, bool>>* in_iterable, recursive_mutex* in_iterableMutex, difference_type in_initialIndex)
             : m_iterable(in_iterable), m_iterableMutex(in_iterableMutex), m_iterableIndex(in_initialIndex)
             {
-                
+
             }
             //------------------------------------------------------------------------
-            /// Find the next element index (inclusive of given index) that is not
+            /// Find the previous element index (exclusive of given index) that is not
             /// flagged for removal
             ///
             /// @author S Downie
             ///
-            /// @param Index to begin at (inclusive)
+            /// @param Index to begin at (exclusive)
             ///
-            /// @return Index of next element (or end if none)
-            //------------------------------------------------------------------------
-            difference_type find_next_occupied_index(difference_type in_beginIndex) const
+            /// @return Index of previous element (or start if none)
+            //-----------------------------------------------------------------------
+            difference_type find_previous_occupied_index(difference_type in_beginIndex) const
             {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
-                auto size = m_iterable->size();
-                
-                for(std::size_t i = in_beginIndex; i < size; ++i)
+                if(in_beginIndex == 0)
+                {
+                    return -1;
+                }
+
+                in_beginIndex--;
+
+                unique_lock scopedLock(*m_iterableMutex);
+                for(auto i=in_beginIndex; i>=0; --i)
                 {
                     if((*m_iterable)[i].second == false)
                     {
                         return i;
                     }
                 }
-                
-                return size;
+
+                return -1;
             }
-            
+
         private:
-            
+
             difference_type m_iterableIndex = 0;
-            std::vector<std::pair<TType, bool>>* m_iterable;
-            std::recursive_mutex* m_iterableMutex;
+            const std::vector<std::pair<TType, bool>>* m_iterable;
+            recursive_mutex* m_iterableMutex;
         };
     }
 }

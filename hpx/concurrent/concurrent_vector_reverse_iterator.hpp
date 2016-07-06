@@ -1,3 +1,9 @@
+//  Copyright (c) 2016 John Biddiscombe
+//  Copyright (c) 2012 Scott Downie, Tag Games Limited
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 //
 //  concurrent_vector_reverse_iterator.h
 //  Chilli Source
@@ -26,14 +32,16 @@
 //  THE SOFTWARE.
 //
 
-#ifndef _CHILLISOURCE_CORE_CONTAINER_CONCURRENTVECTORREVERSEITERATOR_H_
-#define _CHILLISOURCE_CORE_CONTAINER_CONCURRENTVECTORREVERSEITERATOR_H_
+#ifndef _HPX_CONCURRENTVECTORREVERSEITERATOR_H_
+#define _HPX_CONCURRENTVECTORREVERSEITERATOR_H_
+
+#include <hpx/lcos/local/recursive_mutex.hpp>
 
 #include <vector>
 
-namespace ChilliSource
+namespace hpx
 {
-    namespace Core
+    namespace concurrent
     {
         //------------------------------------------------------------------------
         /// Reverse iterator for the concurrent vector class that is read only
@@ -43,9 +51,12 @@ namespace ChilliSource
         template <typename TType> class concurrent_vector_reverse_iterator
         {
         public:
-            
+
+            typedef hpx::lcos::local::recursive_mutex recursive_mutex;
+            typedef std::unique_lock<recursive_mutex> unique_lock;
+
             using difference_type = typename std::iterator<std::forward_iterator_tag, TType>::difference_type;
-            
+
             //------------------------------------------------------------------------
             /// Constructor
             ///
@@ -54,7 +65,7 @@ namespace ChilliSource
             /// @param Data structure to iterate over
             /// @param Mutex used to protect the underlying iterable
             //------------------------------------------------------------------------
-            concurrent_vector_reverse_iterator(std::vector<std::pair<TType, bool>>* in_iterable, std::recursive_mutex* in_iterableMutex)
+            concurrent_vector_reverse_iterator(std::vector<std::pair<TType, bool>>* in_iterable, recursive_mutex* in_iterableMutex)
             : m_iterable(in_iterable), m_iterableMutex(in_iterableMutex)
             {
                 m_iterableIndex = find_previous_occupied_index(m_iterable->size());
@@ -84,7 +95,7 @@ namespace ChilliSource
                 m_iterableIndex = in_toCopy.m_iterableIndex;
                 m_iterable = in_toCopy.m_iterable;
                 m_iterableMutex = in_toCopy.m_iterableMutex;
-                
+
                 return *this;
             }
             //--------------------------------------------------------------------
@@ -118,7 +129,7 @@ namespace ChilliSource
                 in_toMove.m_iterable = nullptr;
                 m_iterableMutex = in_toMove.m_iterableMutex;
                 in_toMove.m_iterableMutex = nullptr;
-                
+
                 return *this;
             }
             //------------------------------------------------------------------------
@@ -170,7 +181,7 @@ namespace ChilliSource
             //------------------------------------------------------------------------
             const TType* operator->() const
             {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
+                unique_lock scopedLock(*m_iterableMutex);
                 return &((*m_iterable)[m_iterableIndex].first);
             }
             //------------------------------------------------------------------------
@@ -180,7 +191,7 @@ namespace ChilliSource
             //------------------------------------------------------------------------
             TType* operator->()
             {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
+                unique_lock scopedLock(*m_iterableMutex);
                 return &((*m_iterable)[m_iterableIndex].first);
             }
             //------------------------------------------------------------------------
@@ -190,7 +201,7 @@ namespace ChilliSource
             //------------------------------------------------------------------------
             const TType& operator*() const
             {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
+                unique_lock scopedLock(*m_iterableMutex);
                 return (*m_iterable)[m_iterableIndex].first;
             }
             //------------------------------------------------------------------------
@@ -200,7 +211,7 @@ namespace ChilliSource
             //------------------------------------------------------------------------
             TType& operator*()
             {
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
+                unique_lock scopedLock(*m_iterableMutex);
                 return (*m_iterable)[m_iterableIndex].first;
             }
             //------------------------------------------------------------------------
@@ -281,7 +292,7 @@ namespace ChilliSource
             {
                 return m_iterableIndex;
             }
-            
+
         private:
             //------------------------------------------------------------------------
             /// Constructor
@@ -292,7 +303,7 @@ namespace ChilliSource
             /// @param Mutex used to protect the underlying iterable
             /// @param Initial index
             //------------------------------------------------------------------------
-            concurrent_vector_reverse_iterator(std::vector<std::pair<TType, bool>>* in_iterable, std::recursive_mutex* in_iterableMutex, difference_type in_initialIndex)
+            concurrent_vector_reverse_iterator(std::vector<std::pair<TType, bool>>* in_iterable, recursive_mutex* in_iterableMutex, difference_type in_initialIndex)
             : m_iterable(in_iterable), m_iterableMutex(in_iterableMutex), m_iterableIndex(in_initialIndex)
             {
 
@@ -313,10 +324,10 @@ namespace ChilliSource
                 {
                     return -1;
                 }
-                
+
                 in_beginIndex--;
-                
-                std::unique_lock<std::recursive_mutex> scopedLock(*m_iterableMutex);
+
+                unique_lock scopedLock(*m_iterableMutex);
                 for(auto i=in_beginIndex; i>=0; --i)
                 {
                     if((*m_iterable)[i].second == false)
@@ -324,15 +335,15 @@ namespace ChilliSource
                         return i;
                     }
                 }
-                
+
                 return -1;
             }
-            
+
         private:
-            
+
             difference_type m_iterableIndex = 0;
             std::vector<std::pair<TType, bool>>* m_iterable;
-            std::recursive_mutex* m_iterableMutex;
+            recursive_mutex* m_iterableMutex;
         };
     }
 }
