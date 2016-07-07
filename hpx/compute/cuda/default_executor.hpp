@@ -120,12 +120,12 @@ namespace hpx { namespace compute { namespace cuda
 
             detail::launch(
                 target_, num_blocks, threads_per_block,
-                [] HPX_DEVICE (F f, value_type* p, std::size_t count, Ts const&... ts)
+                [] HPX_DEVICE (F f, value_type* p, std::size_t count, Ts&... ts)
                 {
                     int idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
                     {
-                        hpx::util::invoke(f, *(p + idx), std::forward<Ts>(ts)...);
+                        hpx::util::invoke(f, *(p + idx), ts...);
                     }
                 },
                 std::forward<F>(f), shape_container.data(), count,
