@@ -137,11 +137,21 @@ namespace hpx { namespace compute
 
         ~vector()
         {
-            if(data_ != nullptr)
-            {
+            if(data_ == nullptr)
+                return;
+
+#if !defined(__CUDA_ARCH__)
+            try {
+#endif
                 alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
+#if !defined(__CUDA_ARCH__)
             }
+            catch(...) {
+                // make sure no exception escapes this destructor
+                hpx::report_error(boost::current_exception());
+            }
+#endif
         }
 
         vector& operator=(vector const& other)
