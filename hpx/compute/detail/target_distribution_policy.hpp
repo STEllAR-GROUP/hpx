@@ -161,7 +161,7 @@ namespace hpx { namespace compute { namespace detail
         mutable mutex_type mtx_;
         mutable std::vector<target_type> targets_;   // targets
         std::size_t num_partitions_;
-        std::size_t next_target_;
+        mutable std::size_t next_target_;
         /// \endcond
     };
 }}}
