@@ -19,6 +19,7 @@
 #include <boost/atomic.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
+#include <algorithm>
 #include <iterator>
 #include <vector>
 
@@ -124,7 +125,13 @@ namespace hpx { namespace compute { namespace host
                         F, Shape, Ts...
                     >::type
             > > results;
+// Before Boost V1.56 boost::size() does not respect the iterator category of
+// its argument.
+#if BOOST_VERSION < 105600
+            std::size_t cnt = std::distance(boost::begin(shape), boost::end(shape));
+#else
             std::size_t cnt = boost::size(shape);
+#endif
             std::size_t part_size = cnt / executors_.size();
 
             results.reserve(cnt);
@@ -168,7 +175,13 @@ namespace hpx { namespace compute { namespace host
             typename hpx::parallel::v3::detail::bulk_execute_result<
                     F, Shape, Ts...
                 >::type results;
+// Before Boost V1.56 boost::size() does not respect the iterator category of
+// its argument.
+#if BOOST_VERSION < 105600
+            std::size_t cnt = std::distance(boost::begin(shape), boost::end(shape));
+#else
             std::size_t cnt = boost::size(shape);
+#endif
             std::size_t part_size = cnt / executors_.size();
 
             results.reserve(cnt);

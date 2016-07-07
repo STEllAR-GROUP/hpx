@@ -94,7 +94,14 @@ namespace hpx { namespace compute { namespace cuda
         template <typename F, typename Shape, typename ... Ts>
         void bulk_launch(F && f, Shape const& shape, Ts &&... ts) const
         {
+// Before Boost V1.56 boost::size() does not respect the iterator category of
+// its argument.
+#if BOOST_VERSION < 105600
+            std::size_t count =
+                std::distance(boost::begin(shape), boost::end(shape));
+#else
             std::size_t count = boost::size(shape);
+#endif
 
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
