@@ -17,6 +17,7 @@
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>
@@ -65,7 +66,7 @@ namespace hpx { namespace lcos
                 // future.
                 boost::intrusive_ptr<split_continuation> this_(this);
                 shared_state_ptr const& state =
-                    traits::detail::get_shared_state(future);
+                    hpx::traits::detail::get_shared_state(future);
 
                 state->execute_deferred();
                 state->set_on_completed(util::deferred_call(
@@ -74,14 +75,15 @@ namespace hpx { namespace lcos
             }
         };
 
-        template <std::size_t I, typename ... Ts>
+        template <std::size_t I, typename Tuple>
         inline typename hpx::traits::detail::shared_state_ptr<
-            typename hpx::util::detail::at_index<I, Ts...>::type
+            typename hpx::util::tuple_element<I, Tuple>::type
         >::type
-        extract_continuation(hpx::future<hpx::util::tuple<Ts...> >& future)
+        extract_nth_continuation(hpx::future<Tuple>& future)
         {
-            typedef typename hpx::util::detail::at_index<I, Ts...>::type
-                result_type;
+            typedef typename hpx::util::tuple_element<
+                    I, Tuple
+                >::type result_type;
             typedef split_continuation<result_type> shared_state;
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type
@@ -91,36 +93,56 @@ namespace hpx { namespace lcos
             return p;
         }
 
-        template <std::size_t I, typename ... Ts>
+        template <std::size_t I, typename Tuple>
         HPX_FORCEINLINE
-        future<typename hpx::util::detail::at_index<I, Ts...>::type>
-        extract_nth_future(hpx::future<util::tuple<Ts...> >& future)
+        hpx::future<typename hpx::util::tuple_element<I, Tuple>::type>
+        extract_nth_future(hpx::future<Tuple>& future)
         {
-            typedef typename hpx::util::detail::at_index<I, Ts...>::type
-                result_type;
+            typedef typename hpx::util::tuple_element<
+                    I, Tuple
+                >::type result_type;
 
-            return hpx::traits::future_access<hpx::future<result_type> >::
-                create(extract_continuation<I>(future));
+            return hpx::traits::future_access<
+                    hpx::future<result_type>
+                >::create(extract_nth_continuation<I>(future));
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ... Ts, std::size_t ... Is>
-        inline hpx::util::tuple<hpx::future<Ts>...>
+        HPX_FORCEINLINE
+        hpx::util::tuple<hpx::future<Ts>...>
         split_all_helper(hpx::future<hpx::util::tuple<Ts...> > && f,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
             return hpx::util::make_tuple(extract_nth_future<Is>(f)...);
         }
+
+        template <typename T1, typename T2>
+        HPX_FORCEINLINE
+        std::pair<hpx::future<T1>, hpx::future<T2> >
+        split_all_helper(hpx::future<std::pair<T1, T2> > && f)
+        {
+            return std::make_pair(extract_nth_future<0>(f),
+                extract_nth_future<1>(f));
+        }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename ... Ts>
-    inline hpx::util::tuple<future<Ts>...>
+    inline hpx::util::tuple<hpx::future<Ts>...>
     split_all(hpx::future<hpx::util::tuple<Ts...> > && f)
     {
         return detail::split_all_helper(
                 std::move(f),
                 typename hpx::util::detail::make_index_pack<sizeof...(Ts)>::type()
             );
+    }
+
+    template <typename T1, typename T2>
+    inline std::pair<hpx::future<T1>, hpx::future<T2> >
+    split_all(hpx::future<std::pair<T1, T2> > && f)
+    {
+        return detail::split_all_helper(std::move(f));
     }
 }}
 

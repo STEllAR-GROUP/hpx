@@ -89,12 +89,34 @@ void test_split_all3()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+std::pair<int, int> make_pair_slowly()
+{
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+    return std::make_pair(42, 43);
+}
+
+void test_split_allpair()
+{
+    hpx::lcos::local::futures_factory<std::pair<int, int>()> pt(
+        make_pair_slowly);
+    pt.apply();
+
+    std::pair<hpx::future<int>, hpx::future<int> > result =
+        hpx::lcos::split_all(pt.get_future());
+
+    HPX_TEST_EQ(result.first.get(), 42);
+    HPX_TEST_EQ(result.second.get(), 43);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
     test_split_all0();
     test_split_all1();
     test_split_all2();
     test_split_all3();
+
+    test_split_allpair();
 
     hpx::finalize();
     return hpx::util::report_errors();
