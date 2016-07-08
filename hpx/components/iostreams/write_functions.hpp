@@ -45,6 +45,7 @@ inline void
 std_ostream_write_function(std::vector<char> const& in, std::ostream& os)
 {
     std::copy(in.begin(), in.end(), std::ostream_iterator<char>(os));
+    os.flush();
 }
 
 // Factory function

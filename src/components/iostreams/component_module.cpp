@@ -41,8 +41,7 @@ HPX_REGISTER_ACTION_ID(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register a startup function which will be called as a HPX-thread during
-// runtime startup. We use this function to register our performance counter
-// type and performance counter instances.
+// runtime startup.
 namespace hpx { namespace iostreams { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -55,9 +54,9 @@ namespace hpx { namespace iostreams { namespace detail
 
     void unregister_ostreams()
     {
-        hpx::cout.uninitialize();
-        hpx::cerr.uninitialize();
-        hpx::consolestream.uninitialize();
+        hpx::cout.uninitialize(iostreams::detail::cout_tag());
+        hpx::cerr.uninitialize(iostreams::detail::cerr_tag());
+        hpx::consolestream.uninitialize(iostreams::detail::consolestream_tag());
     }
 
     ///////////////////////////////////////////////////////////////////////////
