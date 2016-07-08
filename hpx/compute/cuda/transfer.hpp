@@ -18,15 +18,130 @@
 
 namespace hpx { namespace traits
 {
-    struct trivially_cuda_copyable_pointer_tag : general_pointer_tag{};
-    struct trivially_cuda_copyable_pointer_tag_to_host : general_pointer_tag {};
-    struct trivially_cuda_copyable_pointer_tag_to_device : general_pointer_tag {};
+    struct cuda_pointer_tag : general_pointer_tag{};
+
+    struct cuda_copyable_pointer_tag : cuda_pointer_tag{};
+    struct cuda_copyable_pointer_tag_to_host : cuda_pointer_tag {};
+    struct cuda_copyable_pointer_tag_to_device : cuda_pointer_tag {};
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct pointer_category<
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+        typename std::enable_if<
+           !std::is_trivially_copyable<T>::value
+
+        >::type
+#else
+        void
+#endif
+    >
+    {
+        typedef cuda_copyable_pointer_tag type;
+    };
+
+
+    template <typename Source, typename T>
+    struct pointer_category<
+        Source,
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        typename std::enable_if<
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+           !std::is_trivially_copyable<T>::value &&
+#endif
+           !std::is_same<Source, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+        >::type
+    >
+    {
+        // FIXME: turn into proper pointer category
+        static_assert(std::is_same<
+                T, typename std::iterator_traits<Source>::value_type
+            >::value, "The value types of the iterators must match");
+
+        typedef cuda_copyable_pointer_tag_to_device type;
+    };
+
+    template <typename T, typename Dest>
+    struct pointer_category<
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        Dest,
+        typename std::enable_if<
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+           !std::is_trivially_copyable<T>::value &&
+#endif
+           !std::is_same<Dest, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+        >::type
+    >
+    {
+        // FIXME: turn into proper pointer category
+        static_assert(std::is_same<
+                T, typename std::iterator_traits<Dest>::value_type
+            >::value, "The value types of the iterators must match");
+
+        typedef cuda_copyable_pointer_tag_to_host type;
+    };
+
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+    struct trivially_cuda_copyable_pointer_tag : cuda_copyable_pointer_tag{};
+    struct trivially_cuda_copyable_pointer_tag_to_host : cuda_copyable_pointer_tag_to_host {};
+    struct trivially_cuda_copyable_pointer_tag_to_device : cuda_copyable_pointer_tag_to_device {};
+
+    template <typename T>
+    struct pointer_category<
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        typename std::enable_if<
+           std::is_trivially_copyable<T>::value
+        >::type
+    >
+    {
+        typedef trivially_cuda_copyable_pointer_tag type;
+    };
+
+    template <typename Source, typename T>
+    struct pointer_category<
+        Source,
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        typename std::enable_if<
+           std::is_trivially_copyable<T>::value &&
+           !std::is_same<Source, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+        >::type
+    >
+    {
+        // FIXME: turn into proper pointer category
+        static_assert(std::is_same<
+                T, typename std::iterator_traits<Source>::value_type
+            >::value, "The value types of the iterators must match");
+
+        typedef trivially_cuda_copyable_pointer_tag_to_device type;
+    };
+
+    template <typename T, typename Dest>
+    struct pointer_category<
+        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        Dest,
+        typename std::enable_if<
+           std::is_trivially_copyable<T>::value &&
+           !std::is_same<Dest, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+        >::type
+    >
+    {
+        // FIXME: turn into proper pointer category
+        static_assert(std::is_same<
+                T, typename std::iterator_traits<Dest>::value_type
+            >::value, "The value types of the iterators must match");
+
+        typedef trivially_cuda_copyable_pointer_tag_to_host type;
+    };
+#endif
 }}
 
 namespace hpx { namespace parallel { namespace util { namespace detail
 {
-    template <>
-    struct copy_helper<hpx::traits::trivially_cuda_copyable_pointer_tag>
+    template <typename Dummy>
+    struct copy_helper<hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -39,8 +154,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
-                bytes, cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().get_stream());
+                bytes, cudaMemcpyDeviceToDevice);
+// FIXME: make get_stream() available on the device
+//                 dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyDeviceToDevice,
@@ -52,9 +168,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    template <>
+    template <typename Dummy>
     struct copy_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host>
+        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -67,8 +183,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyDeviceToHost,
-                first.target().native_handle().get_stream());
+                cudaMemcpyDeviceToHost);
+// FIXME: make get_stream() available on the device
+//                 first.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToHost,
@@ -80,9 +197,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    template <>
+    template <typename Dummy>
     struct copy_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device>
+        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -95,8 +212,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyHostToDevice,
-                dest.target().native_handle().get_stream());
+                cudaMemcpyHostToDevice);
+// FIXME: make get_stream() available on the device
+//                 dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
@@ -109,9 +227,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <>
+    template <typename Dummy>
     struct copy_n_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag>
+        hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -123,8 +241,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().get_stream());
+                cudaMemcpyDeviceToDevice);
+// FIXME: make get_stream() available on the device
+//                 dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToDevice,
@@ -137,9 +256,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    template <>
+    template <typename Dummy>
     struct copy_n_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host>
+        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -151,8 +270,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyDeviceToHost,
-                first.target().native_handle().get_stream());
+                cudaMemcpyDeviceToHost);
+// FIXME: make get_stream() available on the device
+//                 first.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
                 cudaMemcpyDeviceToHost,
@@ -165,9 +285,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    template <>
+    template <typename Dummy>
     struct copy_n_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device>
+        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -179,8 +299,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
 #if defined(__CUDA_ARCH__)
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyHostToDevice,
-                dest.target().native_handle().get_stream());
+                cudaMemcpyHostToDevice);
+// FIXME: make get_stream() available on the device
+//                 dest.target().native_handle().get_stream());
 #else
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
@@ -195,9 +316,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     // Customization point for copy-synchronize operations
-    template <>
+    template <typename Dummy>
     struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag>
+        hpx::traits::cuda_copyable_pointer_tag, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static void
@@ -207,9 +328,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    template <>
+    template <typename Dummy>
     struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host>
+        hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
+    {
+        template <typename InIter, typename OutIter>
+        HPX_FORCEINLINE static void
+        call(InIter const&, OutIter const& dest)
+        {
+            dest.target().synchronize();
+        }
+    };
+
+    template <typename Dummy>
+    struct copy_synchronize_helper<
+        hpx::traits::cuda_copyable_pointer_tag_to_host, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static void
@@ -219,9 +352,33 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    template <>
+    template <typename Dummy>
     struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device>
+        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
+    {
+        template <typename InIter, typename OutIter>
+        HPX_FORCEINLINE static void
+        call(InIter const& first, OutIter const&)
+        {
+            first.target().synchronize();
+        }
+    };
+
+    template <typename Dummy>
+    struct copy_synchronize_helper<
+        hpx::traits::cuda_copyable_pointer_tag_to_device, Dummy>
+    {
+        template <typename InIter, typename OutIter>
+        HPX_FORCEINLINE static void
+        call(InIter const&, OutIter const& dest)
+        {
+            dest.target().synchronize();
+        }
+    };
+
+    template <typename Dummy>
+    struct copy_synchronize_helper<
+        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static void
@@ -231,59 +388,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 }}}}
-
-namespace hpx { namespace traits
-{
-    ///////////////////////////////////////////////////////////////////////
-    template <typename T>
-    inline trivially_cuda_copyable_pointer_tag
-    get_pointer_category(
-        compute::detail::iterator<T, compute::cuda::allocator<T> > const&,
-        compute::detail::iterator<T, compute::cuda::allocator<T> > const&)
-    {
-        // FIXME: turn into proper pointer category
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-        static_assert(std::is_trivially_copyable<T>::value,
-            "T must be trivially copyable");
-#endif
-        return trivially_cuda_copyable_pointer_tag();
-    }
-
-    template <typename Source, typename T>
-    inline trivially_cuda_copyable_pointer_tag_to_device
-    get_pointer_category(Source const&,
-        compute::detail::iterator<T, compute::cuda::allocator<T> > const&)
-    {
-        // FIXME: turn into proper pointer category
-        static_assert(std::is_same<
-                T, typename std::iterator_traits<Source>::value_type
-            >::value, "The value types of the iterators must match");
-
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-        static_assert(std::is_trivially_copyable<T>::value,
-            "T must be trivially copyable");
-#endif
-        return trivially_cuda_copyable_pointer_tag_to_device();
-    }
-
-    template <typename T, typename Dest>
-    inline trivially_cuda_copyable_pointer_tag_to_host
-    get_pointer_category(
-        compute::detail::iterator<T, compute::cuda::allocator<T> > const&,
-        Dest const&)
-    {
-        // FIXME: turn into proper pointer category
-        static_assert(std::is_same<
-                T, typename std::iterator_traits<Dest>::value_type
-            >::value, "The value types of the iterators must match");
-
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-        static_assert(std::is_trivially_copyable<T>::value,
-            "T must be trivially copyable");
-#endif
-        return trivially_cuda_copyable_pointer_tag_to_host();
-    }
-}}
 
 #endif
 #endif
