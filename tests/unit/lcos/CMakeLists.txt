@@ -46,6 +46,7 @@ set(tests
     remote_latch
     run_guarded
     shared_future
+    split_all
     unwrapped
     when_all
     when_any
