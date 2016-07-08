@@ -18,13 +18,13 @@
 
 namespace hpx { namespace traits
 {
-    struct cuda_pointer_tag : general_pointer_tag{};
+    struct cuda_pointer_tag : general_pointer_tag {};
 
-    struct cuda_copyable_pointer_tag : cuda_pointer_tag{};
+    struct cuda_copyable_pointer_tag : cuda_pointer_tag {};
     struct cuda_copyable_pointer_tag_to_host : cuda_pointer_tag {};
     struct cuda_copyable_pointer_tag_to_device : cuda_pointer_tag {};
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct pointer_category<
         compute::detail::iterator<T, compute::cuda::allocator<T> >,
@@ -42,7 +42,6 @@ namespace hpx { namespace traits
         typedef cuda_copyable_pointer_tag type;
     };
 
-
     template <typename Source, typename T>
     struct pointer_category<
         Source,
@@ -51,7 +50,10 @@ namespace hpx { namespace traits
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
            !std::is_trivially_copyable<T>::value &&
 #endif
-           !std::is_same<Source, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+           !std::is_same<
+                Source,
+                compute::detail::iterator<T, compute::cuda::allocator<T> >
+            >::value
         >::type
     >
     {
@@ -71,7 +73,10 @@ namespace hpx { namespace traits
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
            !std::is_trivially_copyable<T>::value &&
 #endif
-           !std::is_same<Dest, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+           !std::is_same<
+                Dest,
+                compute::detail::iterator<T, compute::cuda::allocator<T> >
+            >::value
         >::type
     >
     {
@@ -84,9 +89,15 @@ namespace hpx { namespace traits
     };
 
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-    struct trivially_cuda_copyable_pointer_tag : cuda_copyable_pointer_tag{};
-    struct trivially_cuda_copyable_pointer_tag_to_host : cuda_copyable_pointer_tag_to_host {};
-    struct trivially_cuda_copyable_pointer_tag_to_device : cuda_copyable_pointer_tag_to_device {};
+    struct trivially_cuda_copyable_pointer_tag
+      : cuda_copyable_pointer_tag
+    {};
+    struct trivially_cuda_copyable_pointer_tag_to_host
+      : cuda_copyable_pointer_tag_to_host
+    {};
+    struct trivially_cuda_copyable_pointer_tag_to_device
+      : cuda_copyable_pointer_tag_to_device
+    {};
 
     template <typename T>
     struct pointer_category<
@@ -106,7 +117,10 @@ namespace hpx { namespace traits
         compute::detail::iterator<T, compute::cuda::allocator<T> >,
         typename std::enable_if<
            std::is_trivially_copyable<T>::value &&
-           !std::is_same<Source, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+           !std::is_same<
+                Source,
+                compute::detail::iterator<T, compute::cuda::allocator<T> >
+            >::value
         >::type
     >
     {
@@ -124,7 +138,10 @@ namespace hpx { namespace traits
         Dest,
         typename std::enable_if<
            std::is_trivially_copyable<T>::value &&
-           !std::is_same<Dest, compute::detail::iterator<T, compute::cuda::allocator<T> > >::value
+           !std::is_same<
+                Dest,
+                compute::detail::iterator<T, compute::cuda::allocator<T> >
+            >::value
         >::type
     >
     {
@@ -226,7 +243,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Dummy>
     struct copy_n_helper<
         hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
@@ -314,7 +331,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Customization point for copy-synchronize operations
     template <typename Dummy>
     struct copy_synchronize_helper<
