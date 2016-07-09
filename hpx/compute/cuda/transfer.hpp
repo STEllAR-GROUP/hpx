@@ -157,6 +157,7 @@ namespace hpx { namespace traits
 
 namespace hpx { namespace parallel { namespace util { namespace detail
 {
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     template <typename Dummy>
     struct copy_helper<hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
     {
@@ -330,24 +331,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return std::make_pair(first, dest);
         }
     };
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for copy-synchronize operations
     template <typename Dummy>
     struct copy_synchronize_helper<
         hpx::traits::cuda_copyable_pointer_tag, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void
-        call(InIter const&, OutIter const& dest)
-        {
-            dest.target().synchronize();
-        }
-    };
-
-    template <typename Dummy>
-    struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
     {
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static void
@@ -371,18 +361,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
     template <typename Dummy>
     struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void
-        call(InIter const& first, OutIter const&)
-        {
-            first.target().synchronize();
-        }
-    };
-
-    template <typename Dummy>
-    struct copy_synchronize_helper<
         hpx::traits::cuda_copyable_pointer_tag_to_device, Dummy>
     {
         template <typename InIter, typename OutIter>
@@ -390,6 +368,31 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         call(InIter const&, OutIter const& dest)
         {
             dest.target().synchronize();
+        }
+    };
+
+#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+    template <typename Dummy>
+    struct copy_synchronize_helper<
+        hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
+    {
+        template <typename InIter, typename OutIter>
+        HPX_FORCEINLINE static void
+        call(InIter const&, OutIter const& dest)
+        {
+            dest.target().synchronize();
+        }
+    };
+
+    template <typename Dummy>
+    struct copy_synchronize_helper<
+        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
+    {
+        template <typename InIter, typename OutIter>
+        HPX_FORCEINLINE static void
+        call(InIter const& first, OutIter const&)
+        {
+            first.target().synchronize();
         }
     };
 
@@ -404,6 +407,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             dest.target().synchronize();
         }
     };
+#endif
 }}}}
 
 #endif
