@@ -8,7 +8,9 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <string>
 #include <strstream>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 std::string expected_output;
@@ -22,6 +24,8 @@ void generate_output(Ts &&... ts)
     {
         (stream << ts, 0)..., 0
     };
+    (void)sequencer;
+
     stream << std::endl;
 
     std::string str = stream.str();
@@ -68,8 +72,8 @@ struct collector_data
       , cid(hpx::naming::invalid_id)
       , minor_id(0)
       , phantom_count(0)
-      , wc(0)
       , rcc(0)
+      , wc(0)
       , rephantomize(false)
       , start_over_recovery(false)
       , rerecover(false)
