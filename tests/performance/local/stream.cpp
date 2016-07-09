@@ -314,7 +314,7 @@ run_benchmark(
     {
         // Copy
         timing[0][iteration] = mysecond();
-        hpx::parallel::copy(policy, a.begin(), a.end(), c.begin());
+        hpx::parallel::copy(hpx::parallel::par, a.begin(), a.end(), c.begin());
         timing[0][iteration] = mysecond() - timing[0][iteration];
 
         // Scale
@@ -343,7 +343,7 @@ run_benchmark(
     }
 
     // Check Results ...
-    check_results(iterations, a, b, c);
+//     check_results(iterations, a, b, c);
 
     std::cout
         << "-------------------------------------------------------------\n"
@@ -358,6 +358,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
+    std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
 
     std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
 
@@ -435,7 +436,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             timing =
                 run_benchmark<allocator_type, executor_type>(
                     iterations, vector_size, std::move(target),
-                    hpx::parallel::static_chunk_size());
+                    hpx::parallel::static_chunk_size(chunk_size));
         }
     }
     else
@@ -600,6 +601,10 @@ int main(int argc, char* argv[])
             boost::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
             "possible values: dynamic, auto, guided. (default: default)")
+        (   "chunk_size",
+             boost::program_options::value<std::size_t>()->default_value(0),
+            "size of vector (default: 1024)")
+
 #if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",
             "Use this flag to run the stream benchmark on the GPU")
