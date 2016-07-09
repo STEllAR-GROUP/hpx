@@ -247,8 +247,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
+        struct base_member_helper
+        {
+            base_member_helper(T const& t)
+              : member_(t)
+            {}
+
+            base_member_helper(T && t)
+              : member_(std::move(t))
+            {}
+
+            T member_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
         struct unwrapper< ::boost::reference_wrapper<T> >
-          : variable_chunk_size_call_helper<T, boost::reference_wrapper<T> >
+          : base_member_helper<boost::reference_wrapper<T> >
+          , variable_chunk_size_call_helper<T, boost::reference_wrapper<T> >
           , maximal_number_of_chunks_call_helper<T, boost::reference_wrapper<T> >
           , get_chunk_size_call_helper<T, boost::reference_wrapper<T> >
           , mark_begin_execution_call_helper<T, boost::reference_wrapper<T> >
@@ -260,24 +276,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename WrapperType>
             unwrapper(WrapperType && wrapped_param)
-              : wrap_(std::forward<WrapperType>(wrapped_param))
-              , variable_chunk_size_call_helper<T, wrapper_type>(wrap_)
-              , maximal_number_of_chunks_call_helper<T, wrapper_type>(wrap_)
-              , get_chunk_size_call_helper<T, wrapper_type>(wrap_)
-              , mark_begin_execution_call_helper<T, wrapper_type>(wrap_)
-              , mark_end_execution_call_helper<T, wrapper_type>(wrap_)
-              , processing_units_count_call_helper<T, wrapper_type>(wrap_)
-              , reset_thread_distribution_call_helper<T, wrapper_type>(wrap_)
+              : base_member_helper<wrapper_type>(
+                    std::forward<WrapperType>(wrapped_param))
+              , variable_chunk_size_call_helper<T, wrapper_type>(member_)
+              , maximal_number_of_chunks_call_helper<T, wrapper_type>(member_)
+              , get_chunk_size_call_helper<T, wrapper_type>(member_)
+              , mark_begin_execution_call_helper<T, wrapper_type>(member_)
+              , mark_end_execution_call_helper<T, wrapper_type>(member_)
+              , processing_units_count_call_helper<T, wrapper_type>(member_)
+              , reset_thread_distribution_call_helper<T, wrapper_type>(member_)
             {}
-
-        private:
-            wrapper_type wrap_;
         };
 
 #if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
         template <typename T>
         struct unwrapper< ::std::reference_wrapper<T> >
-          : variable_chunk_size_call_helper<T, std::reference_wrapper<T> >
+          : base_member_helper<std::reference_wrapper<T> >
+          , variable_chunk_size_call_helper<T, std::reference_wrapper<T> >
           , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T> >
           , get_chunk_size_call_helper<T, std::reference_wrapper<T> >
           , mark_begin_execution_call_helper<T, std::reference_wrapper<T> >
@@ -289,18 +304,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename WrapperType>
             unwrapper(WrapperType && wrapped_param)
-              : wrap_(std::forward<WrapperType>(wrapped_param))
-              , variable_chunk_size_call_helper<T, wrapper_type>(wrap_)
-              , maximal_number_of_chunks_call_helper<T, wrapper_type>(wrap_)
-              , get_chunk_size_call_helper<T, wrapper_type>(wrap_)
-              , mark_begin_execution_call_helper<T, wrapper_type>(wrap_)
-              , mark_end_execution_call_helper<T, wrapper_type>(wrap_)
-              , processing_units_count_call_helper<T, wrapper_type>(wrap_)
-              , reset_thread_distribution_call_helper<T, wrapper_type>(wrap_)
+              : base_member_helper<wrapper_type>(
+                    std::forward<WrapperType>(wrapped_param))
+              , variable_chunk_size_call_helper<T, wrapper_type>(member_)
+              , maximal_number_of_chunks_call_helper<T, wrapper_type>(member_)
+              , get_chunk_size_call_helper<T, wrapper_type>(member_)
+              , mark_begin_execution_call_helper<T, wrapper_type>(member_)
+              , mark_end_execution_call_helper<T, wrapper_type>(member_)
+              , processing_units_count_call_helper<T, wrapper_type>(member_)
+              , reset_thread_distribution_call_helper<T, wrapper_type>(member_)
             {}
-
-        private:
-            wrapper_type wrap_;
         };
 #endif
 
