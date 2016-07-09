@@ -114,20 +114,6 @@ namespace hpx { namespace components { namespace stubs
         call_startup_functions_async(gid, pre_startup).get();
     }
 
-//     lcos::future<void>
-//     runtime_support::call_shutdown_functions_async(naming::id_type const& gid,
-//         bool pre_shutdown)
-//     {
-//         typedef server::runtime_support::call_shutdown_functions_action action_type;
-//         return hpx::async<action_type>(gid, pre_shutdown);
-//     }
-//
-//     void runtime_support::call_shutdown_functions(naming::id_type const& gid,
-//         bool pre_shutdown)
-//     {
-//         call_shutdown_functions_async(gid, pre_shutdown).get();
-//     }
-
     void runtime_support::free_component_sync(agas::gva const& g,
         naming::gid_type const& gid, boost::uint64_t count)
     {

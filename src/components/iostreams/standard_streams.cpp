@@ -5,11 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/component.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
@@ -115,7 +116,7 @@ namespace hpx { namespace iostreams
 
     std::stringstream const& get_consolestream()
     {
-        if (!agas::is_console())
+        if (get_runtime_ptr() != 0 && !agas::is_console())
         {
             HPX_THROW_EXCEPTION(service_unavailable,
                 "hpx::iostreams::get_consolestream",

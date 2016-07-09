@@ -611,7 +611,17 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
+
+            while (tm.get_thread_count() > 1)
+                this_thread::yield();
+
             return 0;
+        }
 
         std::size_t count = 0;      // keep track of number of trials
 
@@ -731,7 +741,17 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
+
+            while (tm.get_thread_count() > 1)
+                this_thread::yield();
+
             return 0;
+        }
 
         boost::uint32_t initiating_locality_id = get_locality_id();
 
@@ -781,7 +801,7 @@ namespace hpx { namespace components { namespace server
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "runtime_support::shutdown_all",
-                "shutdown_all shut be invoked on the troot locality only");
+                "shutdown_all should be invoked on the root locality only");
             return;
         }
 

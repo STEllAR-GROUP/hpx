@@ -503,20 +503,8 @@ HPX_REGISTER_ACTION(gc::server::collectable::recover_done_action,
     gc_collectable_recover_done_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-bool on_shutdown_executed = false;
-
-void on_shutdown(std::string const& expected)
-{
-    std::stringstream const& console_strm = hpx::get_consolestream();
-    HPX_TEST_EQ(console_strm.str(), expected);
-    on_shutdown_executed = true;
-}
-
 int hpx_main()
 {
-    hpx::register_shutdown_function(
-        hpx::util::bind(&on_shutdown, expected_output));
-
     generate_output("Here1");
     {
         auto loc = hpx::find_here();
@@ -537,7 +525,8 @@ int main(int argc, char **argv)
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
 
-    HPX_TEST(on_shutdown_executed);
+    std::stringstream const& console_strm = hpx::get_consolestream();
+    HPX_TEST_EQ(console_strm.str(), expected_output);
 
     return hpx::util::report_errors();
 }

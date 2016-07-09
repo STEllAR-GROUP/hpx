@@ -25,10 +25,6 @@ namespace hpx { namespace iostreams { namespace detail
         typedef std::pair<boost::uint64_t, output_data_type> data_type;
         typedef std::map<boost::uint32_t, data_type> output_data_map_type;
 
-        ~order_output()
-        {
-        }
-
         template <typename F, typename Mutex>
         void output(boost::uint32_t locality_id, boost::uint64_t count,
             detail::buffer in, F const& write_f, Mutex& mtx)

@@ -285,10 +285,6 @@ namespace hpx { namespace iostreams
           , generational_count_(0)
         {}
 
-        ~ostream()
-        {
-        }
-
         // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
         {
