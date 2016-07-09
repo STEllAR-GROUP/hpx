@@ -132,7 +132,7 @@ void test_split_future_array0()
 std::array<int, 3> make_array_slowly()
 {
     hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
-    return std::array<int, 3>{42, 43, 44};
+    return std::array<int, 3>{{42, 43, 44}};
 }
 
 void test_split_future_array()
