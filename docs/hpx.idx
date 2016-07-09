@@ -449,6 +449,9 @@ fold_with_index                       "" "header\.hpx\.lcos\.fold.*"
 inverse_fold                          "" "header\.hpx\.lcos\.fold.*"
 inverse_fold_with_index               "" "header\.hpx\.lcos\.fold.*"
 
+# hpx/lcos/split_future.hpp
+split_future                          "" "header\.hpx\.lcos\.split_future.*"
+
 # hpx/lcos/wait_all.hpp
 wait_all                              "" "header\.hpx\.lcos\.wait_all.*"
 wait_all_n                            "" "header\.hpx\.lcos\.wait_all.*"
