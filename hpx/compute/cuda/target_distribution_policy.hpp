@@ -171,7 +171,7 @@ namespace hpx { namespace compute { namespace cuda
                     std::vector<bulk_locality_result> result;
                     result.reserve(m.size());
 
-                    auto end = m.end()
+                    auto end = m.end();
                     for (auto it = m.begin(); it != end; ++it)
                     {
                         result.insert(std::move(*it));
