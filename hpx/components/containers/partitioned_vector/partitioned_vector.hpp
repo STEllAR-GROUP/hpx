@@ -1257,7 +1257,7 @@ namespace hpx
         void set_values_sync(size_type part, std::vector<size_type> const& pos,
             std::vector<T> const& val)
         {
-            set_value(pos, val).get();
+            set_values(pos, val).get();
         }
 
         /// Asynchronously set the element at position \a pos in
@@ -1361,7 +1361,7 @@ namespace hpx
         void set_values_sync(std::vector<size_type> const& pos,
             std::vector<T> const& val)
         {
-            return set_value(pos, val).get();
+            return set_values(pos, val).get();
         }
 
 //   //CLEAR
