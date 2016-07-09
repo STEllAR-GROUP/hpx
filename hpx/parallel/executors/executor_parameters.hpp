@@ -77,7 +77,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {}
 
             template <typename Executor>
-            bool variable_chunk_size(Executor && exec)
+            HPX_FORCEINLINE bool variable_chunk_size(Executor && exec)
             {
                 return wrap_.get().variable_chunk_size(
                     std::forward<Executor>(exec));
@@ -105,8 +105,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {}
 
             template <typename Executor>
-            std::size_t maximal_number_of_chunks(Executor && exec,
-                std::size_t cores)
+            HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
+                Executor && exec, std::size_t cores)
             {
                 return wrap_.get().maximal_number_of_chunks(
                     std::forward<Executor>(exec), cores);
@@ -132,7 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {}
 
             template <typename Executor, typename F>
-            std::size_t get_chunk_size(Executor && exec, F && f,
+            HPX_FORCEINLINE std::size_t get_chunk_size(Executor && exec, F && f,
                 std::size_t num_tasks)
             {
                 return wrap_.get().get_chunk_size(std::forward<Executor>(exec),
@@ -158,7 +158,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
               : wrap_(wrap)
             {}
 
-            void mark_begin_execution()
+            HPX_FORCEINLINE void mark_begin_execution()
             {
                 wrap_.get().mark_begin_execution();
             }
@@ -182,7 +182,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
               : wrap_(wrap)
             {}
 
-            void mark_end_execution()
+            HPX_FORCEINLINE void mark_end_execution()
             {
                 wrap_.get().mark_end_execution();
             }
@@ -208,7 +208,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
               : wrap_(wrap)
             {}
 
-            std::size_t processing_units_count()
+            HPX_FORCEINLINE std::size_t processing_units_count()
             {
                 return wrap_.get().processing_units_count();
             }
@@ -235,7 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {}
 
             template <typename Executor>
-            void reset_thread_distribution(Executor && exec)
+            HPX_FORCEINLINE void reset_thread_distribution(Executor && exec)
             {
                 wrap_.get().reset_thread_distribution(
                     std::forward<Executor>(exec));
@@ -249,10 +249,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename T>
         struct base_member_helper
         {
-            base_member_helper(T const& t)
-              : member_(t)
-            {}
-
             base_member_helper(T && t)
               : member_(std::move(t))
             {}
@@ -274,17 +270,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             typedef boost::reference_wrapper<T> wrapper_type;
 
-            template <typename WrapperType>
-            unwrapper(WrapperType && wrapped_param)
-              : base_member_helper<wrapper_type>(
-                    std::forward<WrapperType>(wrapped_param))
-              , variable_chunk_size_call_helper<T, wrapper_type>(member_)
-              , maximal_number_of_chunks_call_helper<T, wrapper_type>(member_)
-              , get_chunk_size_call_helper<T, wrapper_type>(member_)
-              , mark_begin_execution_call_helper<T, wrapper_type>(member_)
-              , mark_end_execution_call_helper<T, wrapper_type>(member_)
-              , processing_units_count_call_helper<T, wrapper_type>(member_)
-              , reset_thread_distribution_call_helper<T, wrapper_type>(member_)
+            unwrapper(wrapper_type wrapped_param)
+              : base_member_helper<wrapper_type>(std::move(wrapped_param))
+              , variable_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , maximal_number_of_chunks_call_helper<T, wrapper_type>(this->member_)
+              , get_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , mark_begin_execution_call_helper<T, wrapper_type>(this->member_)
+              , mark_end_execution_call_helper<T, wrapper_type>(this->member_)
+              , processing_units_count_call_helper<T, wrapper_type>(this->member_)
+              , reset_thread_distribution_call_helper<T, wrapper_type>(this->member_)
             {}
         };
 
@@ -302,17 +296,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             typedef std::reference_wrapper<T> wrapper_type;
 
-            template <typename WrapperType>
-            unwrapper(WrapperType && wrapped_param)
-              : base_member_helper<wrapper_type>(
-                    std::forward<WrapperType>(wrapped_param))
-              , variable_chunk_size_call_helper<T, wrapper_type>(member_)
-              , maximal_number_of_chunks_call_helper<T, wrapper_type>(member_)
-              , get_chunk_size_call_helper<T, wrapper_type>(member_)
-              , mark_begin_execution_call_helper<T, wrapper_type>(member_)
-              , mark_end_execution_call_helper<T, wrapper_type>(member_)
-              , processing_units_count_call_helper<T, wrapper_type>(member_)
-              , reset_thread_distribution_call_helper<T, wrapper_type>(member_)
+            unwrapper(wrapper_type wrapped_param)
+              : base_member_helper<wrapper_type>(std::move(wrapped_param))
+              , variable_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , maximal_number_of_chunks_call_helper<T, wrapper_type>(this->member_)
+              , get_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , mark_begin_execution_call_helper<T, wrapper_type>(this->member_)
+              , mark_end_execution_call_helper<T, wrapper_type>(this->member_)
+              , processing_units_count_call_helper<T, wrapper_type>(this->member_)
+              , reset_thread_distribution_call_helper<T, wrapper_type>(this->member_)
             {}
         };
 #endif
@@ -320,7 +312,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///////////////////////////////////////////////////////////////////////
 
 #define HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(func)                       \
-    static_assert(parameters_type_counter<                                    \
+    static_assert(                                                            \
+        parameters_type_counter<                                              \
             BOOST_PP_CAT(hpx::parallel::v3::detail::has_, func)<              \
                 typename hpx::util::decay_unwrap<Params>::type>::value...     \
         >::value <= 1,                                                        \
