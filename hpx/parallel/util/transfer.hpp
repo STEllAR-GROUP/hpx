@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/pointer_category.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <algorithm>
 #include <cstring> // for std::memmove

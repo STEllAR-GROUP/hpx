@@ -13,6 +13,7 @@
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/parallel/util/transfer.hpp>
+#include <hpx/runtime/report_error.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
 
