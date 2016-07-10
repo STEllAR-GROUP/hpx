@@ -91,7 +91,14 @@ namespace hpx { namespace parallel { namespace util
                         f1, first, count, 1, has_variable_chunk_size());
 
                     // schedule every chunk on a separate thread
+// Before Boost V1.56 boost::size() does not respect the iterator category of
+// its argument.
+#if BOOST_VERSION < 105600
+                    std::size_t size =
+                        std::distance(boost::begin(shape), boost::end(shape));
+#else
                     std::size_t size = boost::size(shape);
+#endif
                     workitems.reserve(size + 1);
                     finalitems.reserve(size);
 
@@ -225,7 +232,14 @@ namespace hpx { namespace parallel { namespace util
                         f1, first, count, 1, has_variable_chunk_size());
 
                     // schedule every chunk on a separate thread
+// Before Boost V1.56 boost::size() does not respect the iterator category of
+// its argument.
+#if BOOST_VERSION < 105600
+                    std::size_t size =
+                        std::distance(boost::begin(shape), boost::end(shape));
+#else
                     std::size_t size = boost::size(shape);
+#endif
                     workitems.reserve(size + 1);
                     finalitems.reserve(size);
 
