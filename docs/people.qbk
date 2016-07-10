@@ -1,5 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2015 Hartmut Kaiser
+    Copyright (C) 2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,29 +10,31 @@
 
 The __stellar__ Group (pronounced as stellar) stands for "[*S]ystems [*T]echnology,
 [*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch". We are an
-international group of faculty, researchers, and students working at different
-organizations. The goal of the __stellar__ Group is to promote the development of
+international group of faculty, researchers, and students working at various
+institutions around the world. 
+The goal of the __stellar__ Group is to promote the development of
 scalable parallel applications by providing a community for ideas, a framework
 for collaboration, and a platform for communicating these concepts to the
 broader community.
 
-All of our work is centered around building technologies for
+Our work is focused on building technologies for
 scalable parallel applications. __hpx__, our general purpose C++ runtime system
-for parallel and distributed applications, is no exeption. We use __hpx__ for
+for parallel and distributed applications, is no exception. We use __hpx__ for
 a broad range of scientific applications, helping scientists and developers
 to write code which scales better and shows better performance compared
 to more conventional programming models such as MPI.
 
 __hpx__ is based on /ParalleX/ which is a new
 (and still experimental) parallel execution model aiming to
-overcome the limitations imposed by the current hardware and the way we write
+overcome the limitations imposed by the current hardware and the techniques 
+we use to write
 applications today. Our group focuses on two types of applications - those
 requiring excellent strong scaling, allowing for a dramatic reduction of
 execution time for fixed workloads and those needing highest level of sustained
 performance through massive parallelism. These applications are
 presently unable (through conventional practices) to effectively exploit a
-relatively small number of cores in a multi-core system. By extention,
-these application will not be able to exploit high-end
+relatively small number of cores in a multi-core system. By extension,
+these application will not be able to exploit high-end exascale
 computing systems which are likely to employ hundreds of millions of such cores by the
 end of this decade.
 
@@ -64,10 +67,10 @@ our tables below.
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
   [[Agustin Berge]           [__cct__, __lsu__]   [[$./images/emails/aberge.png]]]
-  [[John Biddiscombe]        [__cscs__]           []]
+  [[John Biddiscombe]        [__cscs__]           [[$./images/emails/biddisco.png]]]
   [[Anton Bikineev]          [__cct__, __lsu__]   [[$./images/emails/antbikineev.png]]]
   [[Martin Stumpf]           [__inf3__, __fau__]  [[$./images/emails/martinhstumpf.png]]]
-  [[Bryce Adelstein-Lelbach] [__llbl__]           []]
+  [[Bryce Adelstein-Lelbach] [__lbnl__]           [[$./images/emails/balelbach.png]]]
   [[Shuangyang Yang]         [__cct__, __lsu__]   [[$./images/emails/syang16.png]]]
   [[Jeroen Habraken]         [__tue__]            [[$./images/emails/vexocide.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
@@ -106,7 +109,7 @@ the project through discussions, pull requests, documentation patches, etc.
   coalescing plugin in __hpx__.
 * Lukas Troska, who reported several problems and contributed various test cases
   allowing to reproduce the corresponding issues.
-* Andreas Schaefer, who worked on intgerating his library (__lgd__) with __hpx__.
+* Andreas Schaefer, who worked on integrating his library (__lgd__) with __hpx__.
   He reported various problems and submitted several patches to fix issues
   allowing for a better integration with __lgd__.
 * Satyaki Upadhyay, who contributed several examples to __hpx__.
@@ -214,5 +217,5 @@ __hpx__ is currently funded by the following grants:
 [endsect] [/ People]
 
 [/Proofread by:]
-[/Adrian Serio 3-13-12]
+[/Adrian Serio 6-28-16]
 [/Phillip LeBlanc 3-13-12]

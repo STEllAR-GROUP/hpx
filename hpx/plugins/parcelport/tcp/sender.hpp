@@ -22,6 +22,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/util/asio_util.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -84,8 +85,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // when the runtime is in state_shutdown
             if(!ec)
             {
-                HPX_ASSERT(impl.address() ==
-                    endpoint.address().to_string());
+                HPX_ASSERT(hpx::util::cleanup_ip_address(impl.address())
+                  == hpx::util::cleanup_ip_address(endpoint.address().to_string()));
                 HPX_ASSERT(impl.port() ==
                     endpoint.port());
             }

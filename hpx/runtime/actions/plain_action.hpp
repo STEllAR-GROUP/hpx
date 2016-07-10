@@ -83,6 +83,7 @@ namespace hpx { namespace actions
 
 namespace hpx { namespace traits
 {
+    /// \cond NOINTERNAL
     template <> HPX_ALWAYS_EXPORT
     inline components::component_type
     component_type_database<hpx::actions::detail::plain_function>::get()
@@ -90,7 +91,6 @@ namespace hpx { namespace traits
         return hpx::components::component_plain_function;
     }
 
-    /// \cond NOINTERNAL
     template <> HPX_ALWAYS_EXPORT
     inline void
     component_type_database<hpx::actions::detail::plain_function>::set(

@@ -222,6 +222,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin
     ///
+    /// \param binary_filter_type [in] The type of the binary filter to create
+    /// \param compress     [in] The created filter should support compression
+    /// \param next_filter  [in] Use this as the filter to dispatch the
+    ///                     invocation into.
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.

@@ -1,6 +1,7 @@
 [/==============================================================================
     Copyright (C) 2007-2016 Hartmut Kaiser
-    Copyright (C) 2012 Bryce Adelstein-Lelbach and Adrian Serio
+    Copyright (C) 2012 Bryce Adelstein-Lelbach
+    Copyright (c) 2012-2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -68,7 +69,7 @@
 [def __unlv__                   [@http://www.unlv.edu University of Nevada, Las Vegas]]
 [def __cscs__                   [@http://www.cscs.ch Swiss National Supercomputing Centre]]
 [def __ou__                     [@http://uoregon.edu/ University of Oregon]]
-[def __llbl__                   [@http://www.lbl.gov/ Berkley Lab]]
+[def __lbnl__                   [@http://www.lbl.gov/ Lawrence Berkley National Laboratory (LBNL)]]
 
 [def __gsoc__                   [@https://developers.google.com/open-source/soc/ Google Summer of Code]]
 

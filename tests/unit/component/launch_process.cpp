@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
 #include <hpx/include/process.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -43,8 +43,8 @@ std::vector<std::string> get_environment()
     return env;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+// ----------------------------------------------------------------------------
+int hpx_main(boost::program_options::variables_map &vm)
 {
     namespace process = hpx::components::process;
     namespace fs = boost::filesystem;
@@ -54,6 +54,16 @@ int main(int argc, char* argv[])
     base_dir /= "bin";
 
     fs::path exe = base_dir / "launched_process_test" HPX_EXECUTABLE_EXTENSION;
+
+    std::string launch_target = "";
+    if (vm.count("launch")) {
+        launch_target = vm["launch"].as < std::string > ();
+      std::cout << "using launch: " << launch_target << std::endl;
+      exe = launch_target;
+    }
+    else {
+      std::cout << "using launch (def) : " << exe << std::endl;
+    }
 
     // set up command line for launched executable
     std::vector<std::string> args;
@@ -117,6 +127,25 @@ int main(int argc, char* argv[])
         HPX_TEST_EQ(localities.size(), std::size_t(1));
     }
 
-    return 0;
+    return hpx::finalize();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int main(int argc, char* argv[])
+{
+    // add command line option which controls the random number generator seed
+    using namespace boost::program_options;
+    options_description desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+
+    desc_commandline.add_options()("launch,l", value<std::string>(),
+        "the process that will be launched and connect back");
+
+    std::vector<std::string> cfg;
+    HPX_TEST_EQ_MSG(
+        hpx::init(desc_commandline, argc, argv, cfg), 0,
+        "HPX main exited with non-zero status"
+    );
+
+    return hpx::util::report_errors();
 }
 

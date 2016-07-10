@@ -38,7 +38,7 @@ macro(add_hpx_test category name)
   foreach(arg ${${name}_UNPARSED_ARGUMENTS})
     set(args ${args} "${arg}")
   endforeach()
-  set(args ${args} "-v" "--" ${args})
+  set(args "-v" "--" ${args})
 
   set(cmd "${PYTHON_EXECUTABLE}"
           "${CMAKE_BINARY_DIR}/bin/hpxrun.py"

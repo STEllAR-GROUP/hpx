@@ -36,6 +36,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // for_each_n
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename F, typename Proj>
         struct for_each_iteration
         {
@@ -85,7 +86,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        /// \cond NOINTERNAL
         template <typename Iter>
         struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {

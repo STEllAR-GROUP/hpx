@@ -435,7 +435,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto
             call(int, Executor&& exec, F && f, S const& shape, Ts &&... ts)
             ->  decltype(
-                    exec.bulk_execute(std::forward<F>(f), shape,
+                    std::declval<Executor>().bulk_execute(std::forward<F>(f), shape,
                         std::forward<Ts>(ts)...)
                 )
             {
@@ -515,7 +515,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This calls exec.apply_execute(f, ts...), if available, otherwise
         ///       it calls exec.async_execute() while discarding the returned
@@ -537,7 +537,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note Executors have to implement only `async_execute()`. All other
         ///       functions will be emulated by this `executor_traits` in terms
@@ -556,7 +556,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             >::type
 #else
         ->  decltype(
-                exec.async_execute(std::forward<F>(f), std::forward<Ts>(ts)...)
+                std::declval<Executor_>().async_execute(std::forward<F>(f),
+                    std::forward<Ts>(ts)...)
             )
 #endif
         {
@@ -573,7 +574,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function \a f.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns f(ts...)'s result
         ///
@@ -612,7 +613,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///              given executor.
         /// \param shape [in] The shape objects which defines the iteration
         ///              boundaries for the arguments to be passed to \a f.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts    [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns The return type of \a executor_type::async_execute if
         ///          defined by \a executor_type. Otherwise a vector
@@ -661,7 +662,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///              given executor.
         /// \param shape [in] The shape objects which defines the iteration
         ///              boundaries for the arguments to be passed to \a f.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts    [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns The return type of \a executor_type::execute if defined
         ///          by \a executor_type. Otherwise a vector holding the

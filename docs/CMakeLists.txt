@@ -53,7 +53,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/exception.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_list.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/throw_exception.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
@@ -126,10 +125,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/agas_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_localities.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_colocation_id.hpp"
@@ -141,8 +138,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_thread_name.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_worker_thread_num.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/launch_policy.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/naming_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/parcelset_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/runtime_mode.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/shutdown_function.hpp"
@@ -161,7 +156,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/gather.hpp"
@@ -333,9 +327,9 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=755
-                boost.image.h=112
-                boost.image.alt="HPX - High Performance ParalleX"
+                boost.image.w=604
+                boost.image.h=90
+                boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
   AUTOINDEX_ARGS --internal-index

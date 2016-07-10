@@ -183,7 +183,7 @@ namespace hpx { namespace lcos
                 index = rhs.index;
                 futures = rhs.futures;
             }
-            return true;
+            return *this;
         }
 
         when_any_result& operator=(when_any_result && rhs)
@@ -194,7 +194,7 @@ namespace hpx { namespace lcos
                 rhs.index = index_error();
                 futures = std::move(rhs.futures);
             }
-            return true;
+            return *this;
         }
 
         std::size_t index;
