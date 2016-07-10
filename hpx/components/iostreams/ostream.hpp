@@ -130,14 +130,14 @@ namespace hpx { namespace iostreams
                 detail::get_outstream(tag));
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        void release_ostream(char const* name, naming::id_type const& id);
-
-        template <typename Tag>
-        void release_ostream(Tag tag, naming::id_type const& id)
-        {
-            release_ostream(get_outstream_name(tag), id);
-        }
+//         ///////////////////////////////////////////////////////////////////////
+//         void release_ostream(char const* name, naming::id_type const& id);
+//
+//         template <typename Tag>
+//         void release_ostream(Tag tag, naming::id_type const& id)
+//         {
+//             release_ostream(get_outstream_name(tag), id);
+//         }
 
         ///////////////////////////////////////////////////////////////////////
         void register_ostreams();
@@ -273,7 +273,9 @@ namespace hpx { namespace iostreams
             {
                 streaming_operator_sync(hpx::async_flush, l);   // unlocks
             }
-            detail::release_ostream(tag, this->get_id());
+
+            // FIXME: find a later spot to invoke this
+//             detail::release_ostream(tag, this->get_id());
             this->base_type::free();
         }
 

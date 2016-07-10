@@ -59,23 +59,17 @@ namespace hpx { namespace iostreams { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void release_ostream(char const* name, naming::id_type const& id)
-    {
-        LRT_(info) << "detail::release_ostream: destroying '"
-                   << name << "' stream object";
-
-        if (agas::is_console())
-        {
-            // tell the object to flush remaining entries
-            buffer empty;
-
-            typedef server::output_stream::write_async_action action_type;
-            hpx::async<action_type>(id, hpx::get_locality_id(), ~0x0, empty).get();
-
-            // now unregister the object from AGAS
-            agas::unregister_name_sync(name);
-        }
-    }
+//     void release_ostream(char const* name, naming::id_type const& id)
+//     {
+//         LRT_(info) << "detail::release_ostream: destroying '"
+//                    << name << "' stream object";
+//
+//         if (agas::is_console())
+//         {
+//             // now unregister the object from AGAS
+//             agas::unregister_name_sync(name);
+//         }
+//     }
 }}}
 
 namespace hpx { namespace iostreams
