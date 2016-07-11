@@ -65,24 +65,24 @@ namespace hpx { namespace traits
         typedef cuda_copyable_pointer_tag_to_device type;
     };
 
-    template <typename T, typename Dest>
+    template <typename T, typename U, typename Dest>
     struct pointer_category<
-        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        compute::detail::iterator<T, compute::cuda::allocator<U> >,
         Dest,
         typename std::enable_if<
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-           !std::is_trivially_copyable<T>::value &&
+           !std::is_trivially_copyable<typename hpx::util::decay<T>::type>::value &&
 #endif
            !std::is_same<
                 Dest,
-                compute::detail::iterator<T, compute::cuda::allocator<T> >
+                compute::detail::iterator<T, compute::cuda::allocator<U> >
             >::value
         >::type
     >
     {
         // FIXME: turn into proper pointer category
         static_assert(std::is_same<
-                T, typename std::iterator_traits<Dest>::value_type
+                typename hpx::util::decay<T>::type, typename std::iterator_traits<Dest>::value_type
             >::value, "The value types of the iterators must match");
 
         typedef cuda_copyable_pointer_tag_to_host type;
@@ -132,22 +132,23 @@ namespace hpx { namespace traits
         typedef trivially_cuda_copyable_pointer_tag_to_device type;
     };
 
-    template <typename T, typename Dest>
+    template <typename T, typename U, typename Dest>
     struct pointer_category<
-        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        compute::detail::iterator<T, compute::cuda::allocator<U> >,
         Dest,
         typename std::enable_if<
-           std::is_trivially_copyable<T>::value &&
+           std::is_trivially_copyable<typename hpx::util::decay<T>::type>::value &&
            !std::is_same<
                 Dest,
-                compute::detail::iterator<T, compute::cuda::allocator<T> >
+                compute::detail::iterator<T, compute::cuda::allocator<U> >
             >::value
         >::type
     >
     {
         // FIXME: turn into proper pointer category
         static_assert(std::is_same<
-                T, typename std::iterator_traits<Dest>::value_type
+                typename hpx::util::decay<T>::type,
+                typename std::iterator_traits<Dest>::value_type
             >::value, "The value types of the iterators must match");
 
         typedef trivially_cuda_copyable_pointer_tag_to_host type;
@@ -166,23 +167,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
+#if defined(__CUDA_ARCH__)
+            return copy_helper<hpx::traits::general_pointer_tag>::call(
+                first, last, dest);
+#else
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-#if defined(__CUDA_ARCH__)
-            cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
-                bytes, cudaMemcpyDeviceToDevice);
-// FIXME: make get_stream() available on the device
-//                 dest.target().native_handle().get_stream());
-#else
             cudaMemcpyAsync(&(*dest), &(*first), bytes,
                 cudaMemcpyDeviceToDevice,
                 dest.target().native_handle().get_stream());
-#endif
 
             std::advance(dest, count);
             return std::make_pair(last, dest);
+#endif
         }
     };
 
@@ -195,23 +194,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
+#if defined(__CUDA_ARCH__)
+            return copy_helper<hpx::traits::general_pointer_tag>::call(
+                first, last, dest);
+#else
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-#if defined(__CUDA_ARCH__)
-            cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyDeviceToHost);
-// FIXME: make get_stream() available on the device
-//                 first.target().native_handle().get_stream());
-#else
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToHost,
                 first.target().native_handle().get_stream());
-#endif
 
             std::advance(dest, count);
             return std::make_pair(last, dest);
+#endif
         }
     };
 
@@ -224,23 +221,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
+#if defined(__CUDA_ARCH__)
+            return copy_helper<hpx::traits::general_pointer_tag>::call(
+                first, last, dest);
+#else
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-#if defined(__CUDA_ARCH__)
-            cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyHostToDevice);
-// FIXME: make get_stream() available on the device
-//                 dest.target().native_handle().get_stream());
-#else
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
                 dest.target().native_handle().get_stream());
-#endif
 
             std::advance(dest, count);
             return std::make_pair(last, dest);
+#endif
         }
     };
 
@@ -254,23 +249,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
+#if defined(__CUDA_ARCH__)
+            return copy_n_helper<hpx::traits::general_pointer_tag>::call(
+                first, count, dest);
+#else
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-#if defined(__CUDA_ARCH__)
-            cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyDeviceToDevice);
-// FIXME: make get_stream() available on the device
-//                 dest.target().native_handle().get_stream());
-#else
             cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToDevice,
                 dest.target().native_handle().get_stream());
-#endif
 
             std::advance(first, count);
             std::advance(dest, count);
             return std::make_pair(first, dest);
+#endif
         }
     };
 
@@ -283,23 +276,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
+#if defined(__CUDA_ARCH__)
+            return copy_n_helper<hpx::traits::general_pointer_tag>::call(
+                first, count, dest);
+#else
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-#if defined(__CUDA_ARCH__)
-            cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyDeviceToHost);
-// FIXME: make get_stream() available on the device
-//                 first.target().native_handle().get_stream());
-#else
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
                 cudaMemcpyDeviceToHost,
                 first.target().native_handle().get_stream());
-#endif
 
             std::advance(first, count);
             std::advance(dest, count);
             return std::make_pair(first, dest);
+#endif
         }
     };
 
@@ -312,23 +303,21 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
+#if defined(__CUDA_ARCH__)
+            return copy_n_helper<hpx::traits::general_pointer_tag>::call(
+                first, count, dest);
+#else
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-#if defined(__CUDA_ARCH__)
-            cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyHostToDevice);
-// FIXME: make get_stream() available on the device
-//                 dest.target().native_handle().get_stream());
-#else
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
                 dest.target().native_handle().get_stream());
-#endif
 
             std::advance(first, count);
             std::advance(dest, count);
             return std::make_pair(first, dest);
+#endif
         }
     };
 #endif

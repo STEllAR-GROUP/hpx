@@ -74,8 +74,16 @@ int checktick()
 
 template <typename Vector>
 void check_results(std::size_t iterations,
-    Vector const & a, Vector const & b, Vector const & c)
+    Vector const & a_res, Vector const & b_res, Vector const & c_res)
 {
+    std::vector<STREAM_TYPE> a(a_res.size());
+    std::vector<STREAM_TYPE> b(b_res.size());
+    std::vector<STREAM_TYPE> c(c_res.size());
+
+    hpx::parallel::copy(hpx::parallel::par, a_res.begin(), a_res.end(), a.begin());
+    hpx::parallel::copy(hpx::parallel::par, b_res.begin(), b_res.end(), b.begin());
+    hpx::parallel::copy(hpx::parallel::par, c_res.begin(), c_res.end(), c.begin());
+
     STREAM_TYPE aj,bj,cj,scalar;
     STREAM_TYPE aSumErr,bSumErr,cSumErr;
     STREAM_TYPE aAvgErr,bAvgErr,cAvgErr;
@@ -239,10 +247,10 @@ struct triad_step
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Allocator, typename Executor, typename Target, typename Chunker>
+template <typename Allocator, typename Executor, typename Target, typename... Targets>
 std::vector<std::vector<double> >
 run_benchmark(
-    std::size_t iterations, std::size_t size, Target target, Chunker chunker)
+    std::size_t iterations, std::size_t size, Target target, Targets... targets)
 {
     // Creating our allocator ...
     Allocator alloc(target);
@@ -255,10 +263,13 @@ run_benchmark(
     vector_type c(size, alloc);
 
     // Creating our executor ....
-    Executor exec(target);
+    Executor exec(target, targets...);
 
     // Creating the policy used in the parallel algorithms
-    auto policy = hpx::parallel::par.on(exec).with(chunker);
+    typedef
+        typename hpx::parallel::v3::detail::extract_executor_parameters<Executor>::type
+        chunker_type;
+    auto policy = hpx::parallel::par.on(exec).with(chunker_type());
 
     // Initialize arrays
     hpx::parallel::fill(policy, a.begin(), a.end(), 1.0);
@@ -314,7 +325,7 @@ run_benchmark(
     {
         // Copy
         timing[0][iteration] = mysecond();
-        hpx::parallel::copy(hpx::parallel::par, a.begin(), a.end(), c.begin());
+        hpx::parallel::copy(policy, a.begin(), a.end(), c.begin());
         timing[0][iteration] = mysecond() - timing[0][iteration];
 
         // Scale
@@ -343,7 +354,7 @@ run_benchmark(
     }
 
     // Check Results ...
-//     check_results(iterations, a, b, c);
+    check_results(iterations, a, b, c);
 
     std::cout
         << "-------------------------------------------------------------\n"
@@ -400,83 +411,37 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(use_accel)
     {
 #if defined(HPX_HAVE_CUDA)
-        // Get the targets we want to run on
+        // Get the cuda targets we want to run on
         hpx::compute::cuda::target target;
 
-        typedef hpx::compute::cuda::default_executor executor_type;
+        // Get the host targets we want to run on
+        auto host_targets = hpx::compute::host::get_local_targets();
+
+        typedef hpx::compute::cuda::concurrent_executor<> executor_type;
+        //typedef hpx::compute::cuda::default_executor executor_type;
         typedef hpx::compute::cuda::allocator<STREAM_TYPE> allocator_type;
 #else
 #error "The STREAM benchmark currently requires CUDA to run on an accelerator"
 #endif
-
         // perform benchmark
-//         if(chunker == "auto")
-//         {
-//             timing =
-//                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target),
-//                     hpx::parallel::auto_chunk_size());
-//         }
-//         else if(chunker == "guided")
-//         {
-//             timing =
-//                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target),
-//                     hpx::parallel::guided_chunk_size());
-//         }
-//         else if(chunker == "dynamic")
-//         {
-//             timing =
-//                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target),
-//                     hpx::parallel::dynamic_chunk_size());
-//         }
-//         else
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, std::move(target),
-                    hpx::parallel::static_chunk_size(chunk_size));
-        }
+        timing =
+            run_benchmark<allocator_type, executor_type>(
+                iterations, vector_size, std::move(target), std::move(host_targets));
+                //iterations, vector_size, std::move(target));
     }
     else
 #endif
     {
-        // Get the targets we want to run on
-        auto numa_nodes = hpx::compute::host::numa_domains();
-
         typedef hpx::compute::host::block_executor<> executor_type;
         typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
 
+        // Get the numa targets we want to run on
+        auto numa_nodes = hpx::compute::host::numa_domains();
+
         // perform benchmark
-        if(chunker == "auto")
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::auto_chunk_size());
-        }
-        else if(chunker == "guided")
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::guided_chunk_size());
-        }
-        else if(chunker == "dynamic")
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::dynamic_chunk_size());
-        }
-        else
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::static_chunk_size());
-        }
+        timing =
+            run_benchmark<allocator_type, executor_type>(
+                iterations, vector_size, numa_nodes);
     }
     time_total = mysecond() - time_total;
 

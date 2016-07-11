@@ -52,32 +52,45 @@ namespace hpx { namespace compute { namespace detail
             typename traits::allocator_traits<Allocator>::target_type
             target_type;
 
-        iterator()
+        HPX_HOST_DEVICE iterator()
           : p_(nullptr)
           , target_(nullptr)
         {}
 
         // FIXME: should be private
-        iterator(pointer p, std::size_t pos, target_type const& target)
+        HPX_HOST_DEVICE iterator(pointer p, std::size_t pos, target_type const& target)
           : p_(p + pos)
           , target_(&target)
         {}
 
-        iterator const& operator++()
+        HPX_HOST_DEVICE iterator(iterator const& other)
+          : p_(other.p_)
+          , target_(other.target_)
+        {}
+
+        HPX_HOST_DEVICE iterator& operator=(iterator const& other)
+        {
+            p_ = other.p_;
+            target_ = other.target_;
+
+            return *this;
+        }
+
+        HPX_HOST_DEVICE iterator const& operator++()
         {
             HPX_ASSERT(p_);
             ++p_;
             return *this;
         }
 
-        iterator const& operator--()
+        HPX_HOST_DEVICE iterator const& operator--()
         {
             HPX_ASSERT(p_);
             --p_;
             return *this;
         }
 
-        iterator operator++(int)
+        HPX_HOST_DEVICE iterator operator++(int)
         {
             iterator tmp(*this);
             HPX_ASSERT(p_);
@@ -85,7 +98,7 @@ namespace hpx { namespace compute { namespace detail
             return tmp;
         }
 
-        iterator operator--(int)
+        HPX_HOST_DEVICE iterator operator--(int)
         {
             iterator tmp(*this);
             HPX_ASSERT(p_);
@@ -93,88 +106,88 @@ namespace hpx { namespace compute { namespace detail
             return tmp;
         }
 
-        bool operator==(iterator const& other) const
+        HPX_HOST_DEVICE bool operator==(iterator const& other) const
         {
             return p_ == other.p_;
         }
 
-        bool operator!=(iterator const& other) const
+        HPX_HOST_DEVICE bool operator!=(iterator const& other) const
         {
             return p_ != other.p_;
         }
 
-        bool operator<(iterator const& other) const
+        HPX_HOST_DEVICE bool operator<(iterator const& other) const
         {
             return p_ < other.p_;
         }
 
-        bool operator>(iterator const& other) const
+        HPX_HOST_DEVICE bool operator>(iterator const& other) const
         {
             return p_ > other.p_;
         }
 
-        bool operator<=(iterator const& other) const
+        HPX_HOST_DEVICE bool operator<=(iterator const& other) const
         {
             return p_ <= other.p_;
         }
 
-        bool operator>=(iterator const& other) const
+        HPX_HOST_DEVICE bool operator>=(iterator const& other) const
         {
             return p_ >= other.p_;
         }
 
-        iterator& operator+=(std::ptrdiff_t offset)
+        HPX_HOST_DEVICE iterator& operator+=(std::ptrdiff_t offset)
         {
             HPX_ASSERT(p_);
             p_ += offset;
             return *this;
         }
 
-        iterator& operator-=(std::ptrdiff_t offset)
+        HPX_HOST_DEVICE iterator& operator-=(std::ptrdiff_t offset)
         {
             HPX_ASSERT(p_);
             p_ -= offset;
             return *this;
         }
 
-        iterator operator+(std::ptrdiff_t offset) const
+        HPX_HOST_DEVICE iterator operator+(std::ptrdiff_t offset) const
         {
             iterator tmp(*this);
             tmp += offset;
             return tmp;
         }
 
-        iterator operator-(std::ptrdiff_t offset) const
+        HPX_HOST_DEVICE iterator operator-(std::ptrdiff_t offset) const
         {
             iterator tmp(*this);
             tmp -= offset;
             return tmp;
         }
 
-        std::ptrdiff_t operator-(iterator const& other) const
+        HPX_HOST_DEVICE std::ptrdiff_t operator-(iterator const& other) const
         {
             return p_ - other.p_;
         }
 
-        reference operator*() const
+        HPX_HOST_DEVICE reference operator*() const
         {
             HPX_ASSERT(p_);
             return *p_;
         }
 
-        pointer operator->() const
+        HPX_HOST_DEVICE pointer operator->() const
         {
             HPX_ASSERT(p_);
             return p_;
         }
 
-        reference operator[](std::size_t pos) const
+        HPX_HOST_DEVICE reference operator[](std::size_t pos) const
         {
             HPX_ASSERT(p_);
             return *(p_ + pos);
         }
 
-        target_type const& target() const
+        HPX_HOST_DEVICE target_type const& target() const
         {
             return *target_;
         }

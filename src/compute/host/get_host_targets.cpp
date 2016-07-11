@@ -6,9 +6,12 @@
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
@@ -21,16 +24,18 @@ namespace hpx { namespace compute { namespace host
     std::vector<target> get_local_targets()
     {
         hpx::threads::topology const& topo = hpx::threads::get_topology();
-        std::size_t numa_nodes = topo.get_number_of_numa_nodes();
+        std::size_t num_os_threads = hpx::get_os_thread_count();
 
         std::vector<target> targets;
-        targets.reserve(numa_nodes);
+        targets.reserve(num_os_threads);
 
-        for(std::size_t i = 0; i != numa_nodes; ++i)
+        auto & tm = hpx::get_runtime().get_thread_manager();
+        for(std::size_t num_thread = 0; num_thread != num_os_threads; ++num_thread)
         {
-            targets.emplace_back(
-                target(topo.get_numa_node_affinity_mask_from_numa_node(i))
-            );
+            std::size_t pu_num = tm.get_pu_num(num_thread);
+
+            auto const& mask = topo.get_thread_affinity_mask(pu_num, true);
+            targets.emplace_back(mask);
         }
 
         return targets;

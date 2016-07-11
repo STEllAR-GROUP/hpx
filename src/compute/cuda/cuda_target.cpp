@@ -137,9 +137,49 @@ namespace hpx { namespace compute { namespace cuda
         }
     }
 
+    void target::native_handle_type::init_processing_units()
+    {
+        cudaDeviceProp props;
+        cudaError_t error = cudaGetDeviceProperties(&props, device_);
+        if (error != cudaSuccess)
+        {
+            // report error
+            HPX_THROW_EXCEPTION(kernel_error,
+                "cuda::default_executor::processing_units_count()",
+                std::string("cudaGetDeviceProperties failed: ") +
+                    cudaGetErrorString(error));
+        }
+
+        std::size_t mp = props.multiProcessorCount;
+        switch(props.major)
+        {
+            case 2:
+                if(props.minor == 1)
+                {
+                    mp = mp * 48;
+                }
+                else
+                {
+                    mp = mp * 32;
+                }
+                break;
+            case 3:
+                mp = mp * 192;
+                break;
+            case 5:
+                mp = mp * 128;
+                break;
+            default:
+                break;
+        }
+        processing_units_ = mp;
+    }
+
     target::native_handle_type::native_handle_type(int device)
       : device_(device), stream_(0)
-    {}
+    {
+        init_processing_units();
+    }
 
     target::native_handle_type::~native_handle_type()
     {
@@ -155,6 +195,7 @@ namespace hpx { namespace compute { namespace cuda
     target::native_handle_type::native_handle_type(
             target::native_handle_type const& rhs) HPX_NOEXCEPT
       : device_(rhs.device_),
+        processing_units_(rhs.processing_units_),
         stream_(0)
     {
     }
@@ -162,6 +203,7 @@ namespace hpx { namespace compute { namespace cuda
     target::native_handle_type::native_handle_type(
             target::native_handle_type && rhs) HPX_NOEXCEPT
       : device_(rhs.device_),
+        processing_units_(rhs.processing_units_),
         stream_(rhs.stream_)
     {
         rhs.stream_ = 0;
@@ -174,6 +216,7 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
 
         device_ = rhs.device_;
+        processing_units_ = rhs.processing_units_;
         reset();
 
         return *this;
@@ -186,6 +229,7 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
 
         device_ = rhs.device_;
+        processing_units_ = rhs.processing_units_;
         stream_ = rhs.stream_;
         rhs.stream_ = 0;
 
@@ -225,14 +269,16 @@ namespace hpx { namespace compute { namespace cuda
         // FIXME: implement remote targets
         HPX_ASSERT(hpx::find_here() == locality_);
 
-        if (handle_.stream_ == 0)
+        cudaStream_t stream = handle_.get_stream();
+
+        if (stream == 0)
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "cuda::target::synchronize",
                 "no stream available");
         }
 
-        cudaError_t error = cudaStreamSynchronize(handle_.stream_);
+        cudaError_t error = cudaStreamSynchronize(stream);
         if(error != cudaSuccess)
         {
             HPX_THROW_EXCEPTION(kernel_error,
@@ -249,7 +295,7 @@ namespace hpx { namespace compute { namespace cuda
         // make sure shared state stays alive even if the callback is invoked
         // during initialization
         boost::intrusive_ptr<shared_state_type> p(new shared_state_type());
-        p->init(handle_.stream_);
+        p->init(handle_.get_stream());
         return hpx::traits::future_access<hpx::future<void> >::
             create(std::move(p));
     }

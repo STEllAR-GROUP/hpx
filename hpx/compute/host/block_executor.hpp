@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -37,6 +38,8 @@ namespace hpx { namespace compute { namespace host
         typedef hpx::parallel::executor_traits<Executor> executor_traits;
 
     public:
+        typedef hpx::parallel::static_chunk_size executor_parameters_type;
+
         block_executor(std::vector<host::target> const& targets)
           : targets_(targets)
           , current_(0)

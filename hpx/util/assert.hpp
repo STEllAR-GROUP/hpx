@@ -23,6 +23,10 @@
 
 #undef HPX_ASSERT
 
+#if defined(__CUDA_ARCH__)
+#define HPX_ASSERT(expr) ((void)0)
+#else
+
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
 
 #if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
@@ -52,12 +56,17 @@ namespace hpx
 # include <assert.h> // .h to support old libraries w/o <cassert> - effect is the same
 # define HPX_ASSERT(expr) assert(expr)
 #endif
+#endif
 
 //-------------------------------------------------------------------------- //
 //                                   HPX_ASSERT_MSG                          //
 //-------------------------------------------------------------------------- //
 
 # undef HPX_ASSERT_MSG
+
+#if defined(__CUDA_ARCH__)
+#define HPX_ASSERT_MSG(expr) ((void)0)
+#else
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
 
@@ -130,6 +139,7 @@ namespace hpx { namespace assertion { namespace detail
     ? ((void)0) \
     : ::hpx::assertion::detail::assertion_failed_msg(#expr, msg, \
           BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
+#endif
 #endif
 
 //---------------------------------------------------------------------------//
