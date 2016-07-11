@@ -10,7 +10,6 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
@@ -37,6 +36,20 @@ namespace hpx { namespace parallel { namespace util
 {
     namespace detail
     {
+        template <typename F>
+        struct foreach_partitioner_iteration
+        {
+            typename hpx::util::decay<F>::type f_;
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            auto operator()(T&&t)
+            -> decltype(hpx::util::invoke_fused(f_, std::forward<T>(t)))
+            {
+                return hpx::util::invoke_fused(f_, std::forward<T>(t));
+            }
+        };
+
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
@@ -75,9 +88,7 @@ namespace hpx { namespace parallel { namespace util
 
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        hpx::util::bind(
-                            hpx::util::functional::invoke_fused(),
-                            std::forward<F1>(f1), hpx::util::placeholders::_1),
+                        foreach_partitioner_iteration<F1>{std::forward<F1>(f1)},
                         get_bulk_iteration_shape_idx(
                             policy, inititems, f1, first, count, 1,
                             has_variable_chunk_size()));
@@ -146,9 +157,7 @@ namespace hpx { namespace parallel { namespace util
 
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        hpx::util::bind(
-                            hpx::util::functional::invoke_fused(),
-                            std::forward<F1>(f1), hpx::util::placeholders::_1),
+                        foreach_partitioner_iteration<F1>{std::forward<F1>(f1)},
                         get_bulk_iteration_shape_idx(
                             policy, inititems, f1, first, count, 1,
                             has_variable_chunk_size()));

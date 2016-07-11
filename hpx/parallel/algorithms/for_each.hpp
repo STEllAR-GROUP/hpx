@@ -71,7 +71,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             HPX_DELETE_MOVE_ASSIGN(for_each_iteration);
 
             template <typename Iter>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             void operator()(Iter part_begin, std::size_t part_size,
                 std::size_t /*part_index*/)
             {

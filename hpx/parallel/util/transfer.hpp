@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { namespace util
         struct copy_helper
         {
             template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest)
             {
                 while (first != last)
@@ -108,7 +108,7 @@ namespace hpx { namespace parallel { namespace util
         struct copy_n_helper
         {
             template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
             call(InIter first, std::size_t count, OutIter dest)
             {
                 for (std::size_t i = 0; i != count; ++i)
