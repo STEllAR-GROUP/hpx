@@ -30,8 +30,10 @@ namespace hpx { namespace compute { namespace cuda
         typedef host::block_executor<Executor> host_executor_type;
         typedef cuda::default_executor cuda_executor_type;
 
-        typedef hpx::parallel::executor_traits<host_executor_type> host_executor_traits;
-        typedef hpx::parallel::executor_traits<cuda_executor_type> cuda_executor_traits;
+        typedef hpx::parallel::executor_traits<host_executor_type>
+            host_executor_traits;
+        typedef hpx::parallel::executor_traits<cuda_executor_type>
+            cuda_executor_traits;
 
     public:
         // By default, this executor relies on a special executor parameters
@@ -40,7 +42,8 @@ namespace hpx { namespace compute { namespace cuda
         typedef concurrent_executor_parameters executor_parameters_type;
 
         concurrent_executor(
-            cuda::target const& cuda_target, std::vector<host::target> const& host_targets)
+                cuda::target const& cuda_target,
+                std::vector<host::target> const& host_targets)
           : host_executor_(host_targets),
             current_(0)
         {
@@ -158,18 +161,20 @@ namespace hpx { namespace compute { namespace cuda
             for (auto const& s: shape)
             {
                 std::size_t current = ++current_ % cuda_executors_.size();
-                result.push_back(host_executor_traits::async_execute(host_executor_,
+                result.push_back(host_executor_traits::async_execute(
+                    host_executor_,
                     [this, current, s](F&& f, Ts&&... ts) mutable
                     {
-                        std::array<typename hpx::util::decay<decltype(s)>::type, 1> cuda_shape{{s}};
-//                         return cuda_executor_traits::bulk_async_execute(cuda_executors_[current],
-//                             std::forward<F>(f), cuda_shape, std::forward<Ts>(ts)...);
-                        cuda_executors_[current].bulk_launch(std::forward<F>(f), cuda_shape, std::forward<Ts>(ts)...);
-//                         return cuda_executors_[current].target().get_future();
+                        typedef typename hpx::util::decay<decltype(s)>::type
+                            shape_type;
+
+                        std::array<shape_type, 1> cuda_shape{{s}};
+                        cuda_executors_[current].bulk_launch(
+                            std::forward<F>(f), cuda_shape,
+                            std::forward<Ts>(ts)...);
                         cuda_executors_[current].target().synchronize();
                     },
                     std::forward<F>(f), std::forward<Ts>(ts)...));
-
             }
             return result;
         }

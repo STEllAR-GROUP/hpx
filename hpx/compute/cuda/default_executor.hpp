@@ -78,17 +78,18 @@ namespace hpx { namespace compute { namespace cuda
                 std::size_t base_idx = hpx::util::get<2>(s);
 
                 // FIXME: make the 1024 to be configurable...
-                int threads_per_block = (std::min)(1024, static_cast<int>(chunk_size));
-                int num_blocks =
-                    static_cast<int>((chunk_size + threads_per_block - 1) / threads_per_block);
+                int threads_per_block =
+                    (std::min)(1024, static_cast<int>(chunk_size));
+                int num_blocks = static_cast<int>(
+                    (chunk_size + threads_per_block - 1) / threads_per_block);
 
                 detail::launch(
                     target_, num_blocks, threads_per_block,
-                    [begin]
-                    HPX_DEVICE (F f, Ts&... ts)
+                    [begin] HPX_DEVICE (F f, Ts&... ts)
                     {
                         int idx = blockIdx.x * blockDim.x + threadIdx.x;
-                        hpx::util::invoke(f, value_type(begin + idx, 1, idx), ts...);
+                        hpx::util::invoke(f, value_type(begin + idx, 1, idx),
+                            ts...);
                     },
                     std::forward<F>(f), std::forward<Ts>(ts)...
                 );

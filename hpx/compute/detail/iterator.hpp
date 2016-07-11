@@ -58,7 +58,8 @@ namespace hpx { namespace compute { namespace detail
         {}
 
         // FIXME: should be private
-        HPX_HOST_DEVICE iterator(pointer p, std::size_t pos, target_type const& target)
+        HPX_HOST_DEVICE
+        iterator(pointer p, std::size_t pos, target_type const& target)
           : p_(p + pos)
           , target_(&target)
         {}
