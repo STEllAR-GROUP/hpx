@@ -18,9 +18,8 @@
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 
-#if !defined(__CUDA_ARCH__)
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#endif
+
 #include <cuda_runtime.h>
 
 #include <mutex>
@@ -152,7 +151,6 @@ namespace hpx { namespace compute { namespace cuda
         }
 
     private:
-#if !defined(__CUDA_ARCH__)
         friend class hpx::serialization::access;
 
         template <typename Archive>
@@ -160,7 +158,7 @@ namespace hpx { namespace compute { namespace cuda
         {
             ar & handle_.device_ & locality_;
         }
-#endif
+
         native_handle_type handle_;
         hpx::id_type locality_;
     };

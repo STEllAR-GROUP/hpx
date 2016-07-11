@@ -512,10 +512,10 @@ namespace hpx
         {}
 
         // Return the pinned pointer to the underlying component
-        std::shared_ptr<server::partitioned_vector<T> > get_ptr() const
+        std::shared_ptr<server::partitioned_vector<T, Data> > get_ptr() const
         {
             error_code ec(lightweight);
-            return hpx::get_ptr<server::partitioned_vector<T> >(
+            return hpx::get_ptr<server::partitioned_vector<T, Data> >(
                 this->get_id()).get(ec);
         }
 

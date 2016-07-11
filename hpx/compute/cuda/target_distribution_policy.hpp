@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && !defined(__CUDACC__)
+#if defined(HPX_HAVE_CUDA)
 
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -174,7 +174,7 @@ namespace hpx { namespace compute { namespace cuda
                     auto end = m.end();
                     for (auto it = m.begin(); it != end; ++it)
                     {
-                        result.insert(std::move(*it));
+                        result.push_back(std::move(*it));
                     }
 
                     return result;
