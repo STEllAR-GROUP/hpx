@@ -71,7 +71,9 @@ namespace hpx { namespace traits
         Dest,
         typename std::enable_if<
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-           !std::is_trivially_copyable<typename hpx::util::decay<T>::type>::value &&
+           !std::is_trivially_copyable<
+                typename hpx::util::decay<T>::type
+            >::value &&
 #endif
            !std::is_same<
                 Dest,
@@ -82,7 +84,8 @@ namespace hpx { namespace traits
     {
         // FIXME: turn into proper pointer category
         static_assert(std::is_same<
-                typename hpx::util::decay<T>::type, typename std::iterator_traits<Dest>::value_type
+                typename hpx::util::decay<T>::type,
+                typename std::iterator_traits<Dest>::value_type
             >::value, "The value types of the iterators must match");
 
         typedef cuda_copyable_pointer_tag_to_host type;
@@ -137,7 +140,9 @@ namespace hpx { namespace traits
         compute::detail::iterator<T, compute::cuda::allocator<U> >,
         Dest,
         typename std::enable_if<
-           std::is_trivially_copyable<typename hpx::util::decay<T>::type>::value &&
+            std::is_trivially_copyable<
+                typename hpx::util::decay<T>::type
+            >::value &&
            !std::is_same<
                 Dest,
                 compute::detail::iterator<T, compute::cuda::allocator<U> >
