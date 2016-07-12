@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/iterator_adaptor.hpp>
 
 #include <hpx/compute/detail/get_proxy_type.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
@@ -20,30 +21,25 @@ namespace hpx { namespace compute { namespace detail
 {
     template <typename T, typename Allocator>
     struct iterator
-      : std::iterator<
-            std::random_access_iterator_tag,
-            T,
-            std::ptrdiff_t,
+      : hpx::util::iterator_adaptor<
+            iterator<T, Allocator>,
             typename traits::allocator_traits<Allocator>::pointer,
+            typename traits::allocator_traits<Allocator>::value_type,
+            std::random_access_iterator_tag,
             typename traits::allocator_traits<Allocator>::reference
         >
     {
+        typedef hpx::util::iterator_adaptor<
+                iterator<T, Allocator>,
+                typename traits::allocator_traits<Allocator>::pointer,
+                typename traits::allocator_traits<Allocator>::value_type,
+                std::random_access_iterator_tag,
+                typename traits::allocator_traits<Allocator>::reference
+            > base_type;
+
         typedef
             typename get_proxy_type<T>::type *
             proxy_type;
-
-        typedef
-            typename traits::allocator_traits<Allocator>::value_type
-            value_type;
-        typedef
-            typename traits::allocator_traits<Allocator>::pointer
-            pointer;
-        typedef
-            typename traits::allocator_traits<Allocator>::reference
-            reference;
-
-        typedef std::random_access_iterator_tag iterator_category;
-        typedef std::ptrdiff_t difference_type;
 
         typedef
             typename traits::allocator_traits<Allocator>::const_reference
@@ -53,139 +49,29 @@ namespace hpx { namespace compute { namespace detail
             target_type;
 
         HPX_HOST_DEVICE iterator()
-          : p_(nullptr)
+          : base_type(nullptr)
           , target_(nullptr)
         {}
 
         // FIXME: should be private
         HPX_HOST_DEVICE
-        iterator(pointer p, std::size_t pos, target_type const& target)
-          : p_(p + pos)
+        iterator(typename traits::allocator_traits<Allocator>::pointer p,
+                std::size_t pos, target_type const& target)
+          : base_type(p + pos)
           , target_(&target)
         {}
 
         HPX_HOST_DEVICE iterator(iterator const& other)
-          : p_(other.p_)
+          : base_type(other)
           , target_(other.target_)
         {}
 
         HPX_HOST_DEVICE iterator& operator=(iterator const& other)
         {
-            p_ = other.p_;
+            this->base_type::operator=(other);
             target_ = other.target_;
 
             return *this;
-        }
-
-        HPX_HOST_DEVICE iterator const& operator++()
-        {
-            HPX_ASSERT(p_);
-            ++p_;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE iterator const& operator--()
-        {
-            HPX_ASSERT(p_);
-            --p_;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE iterator operator++(int)
-        {
-            iterator tmp(*this);
-            HPX_ASSERT(p_);
-            ++p_;
-            return tmp;
-        }
-
-        HPX_HOST_DEVICE iterator operator--(int)
-        {
-            iterator tmp(*this);
-            HPX_ASSERT(p_);
-            --p_;
-            return tmp;
-        }
-
-        HPX_HOST_DEVICE bool operator==(iterator const& other) const
-        {
-            return p_ == other.p_;
-        }
-
-        HPX_HOST_DEVICE bool operator!=(iterator const& other) const
-        {
-            return p_ != other.p_;
-        }
-
-        HPX_HOST_DEVICE bool operator<(iterator const& other) const
-        {
-            return p_ < other.p_;
-        }
-
-        HPX_HOST_DEVICE bool operator>(iterator const& other) const
-        {
-            return p_ > other.p_;
-        }
-
-        HPX_HOST_DEVICE bool operator<=(iterator const& other) const
-        {
-            return p_ <= other.p_;
-        }
-
-        HPX_HOST_DEVICE bool operator>=(iterator const& other) const
-        {
-            return p_ >= other.p_;
-        }
-
-        HPX_HOST_DEVICE iterator& operator+=(std::ptrdiff_t offset)
-        {
-            HPX_ASSERT(p_);
-            p_ += offset;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE iterator& operator-=(std::ptrdiff_t offset)
-        {
-            HPX_ASSERT(p_);
-            p_ -= offset;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE iterator operator+(std::ptrdiff_t offset) const
-        {
-            iterator tmp(*this);
-            tmp += offset;
-            return tmp;
-        }
-
-        HPX_HOST_DEVICE iterator operator-(std::ptrdiff_t offset) const
-        {
-            iterator tmp(*this);
-            tmp -= offset;
-            return tmp;
-        }
-
-        HPX_HOST_DEVICE std::ptrdiff_t operator-(iterator const& other) const
-        {
-            return p_ - other.p_;
-        }
-
-        HPX_HOST_DEVICE reference operator*() const
-        {
-            HPX_ASSERT(p_);
-            return *p_;
-        }
-
-        HPX_HOST_DEVICE pointer operator->() const
-        {
-            HPX_ASSERT(p_);
-            return p_;
-        }
-
-        HPX_HOST_DEVICE reference operator[](std::size_t pos) const
-        {
-            HPX_ASSERT(p_);
-            return *(p_ + pos);
         }
 
         HPX_HOST_DEVICE target_type const& target() const
@@ -194,7 +80,6 @@ namespace hpx { namespace compute { namespace detail
         }
 
     private:
-        pointer p_;
         target_type const* target_;
     };
 

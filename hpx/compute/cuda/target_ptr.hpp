@@ -13,6 +13,7 @@
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 
 #include <hpx/util/assert.hpp>
+#include <hpx/util/iterator_adaptor.hpp>
 
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
@@ -22,245 +23,118 @@ namespace hpx { namespace compute { namespace cuda
 {
     template <typename T>
     class target_ptr
+      : public hpx::util::iterator_adaptor<
+            target_ptr<T>, T*,
+#if defined(__CUDA_ARCH__)
+            T, std::random_access_iterator_tag, T&, std::ptrdiff_t, T*
+#else
+            value_proxy<T>, std::random_access_iterator_tag, value_proxy<T>,
+            std::ptrdiff_t, T*
+#endif
+        >
     {
+        typedef hpx::util::iterator_adaptor<
+                target_ptr<T>, T*,
+#if defined(__CUDA_ARCH__)
+                T, std::random_access_iterator_tag, T&, std::ptrdiff_t, T*
+#else
+                value_proxy<T>, std::random_access_iterator_tag, value_proxy<T>,
+                std::ptrdiff_t, T*
+#endif
+            > base_type;
+
     public:
         typedef
             typename compute::detail::get_proxy_type<T>::type *
             proxy_type;
-        typedef std::random_access_iterator_tag iterator_category;
-#if defined(__CUDA_ARCH__)
-        typedef T value_type;
-        typedef T* pointer;
-        typedef T& reference;
-#else
-        typedef value_proxy<T> value_type;
-        typedef T* pointer;
-        typedef value_proxy<T> reference;
-#endif
-        typedef std::ptrdiff_t difference_type;
 
         HPX_HOST_DEVICE target_ptr()
-          : p_(nullptr)
+          : base_type(nullptr)
           , tgt_(nullptr)
         {}
 
         explicit HPX_HOST_DEVICE target_ptr(std::nullptr_t)
-          : p_(nullptr)
+          : base_type(nullptr)
           , tgt_(nullptr)
         {}
 
-        target_ptr(T *p, target & tgt)
-          : p_(p)
+        target_ptr(T* p, target & tgt)
+          : base_type(p)
           , tgt_(&tgt)
         {}
 
         HPX_HOST_DEVICE
         target_ptr(target_ptr const& rhs)
-          : p_(rhs.p_)
+          : base_type(rhs)
           , tgt_(rhs.tgt_)
         {}
 
         HPX_HOST_DEVICE
         target_ptr& operator=(target_ptr const& rhs)
         {
-            p_ = rhs.p_;
+            this->base_type::operator=(rhs);
             tgt_ = rhs.tgt_;
             return *this;
         }
 
         HPX_HOST_DEVICE
-        target_ptr const& operator++()
-        {
-            HPX_ASSERT(p_);
-            ++p_;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE
-        target_ptr const& operator--()
-        {
-            HPX_ASSERT(p_);
-            --p_;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE
-        target_ptr operator++(int)
-        {
-            target_ptr tmp(*this);
-            HPX_ASSERT(p_);
-            ++p_;
-            return tmp;
-        }
-
-        HPX_HOST_DEVICE
-        target_ptr operator--(int)
-        {
-            target_ptr tmp(*this);
-            HPX_ASSERT(p_);
-            --p_;
-            return tmp;
-        }
-
-        HPX_HOST_DEVICE
         explicit operator bool() const
         {
-            return p_ != nullptr;
+            return this->base() != nullptr;
         }
 
         HPX_HOST_DEVICE
         friend bool operator==(target_ptr const& lhs, std::nullptr_t)
         {
-            return lhs.p_ == nullptr;
+            return lhs.base() == nullptr;
         }
 
         HPX_HOST_DEVICE
         friend bool operator!=(target_ptr const& lhs, std::nullptr_t)
         {
-            return lhs.p_ != nullptr;
+            return lhs.base() != nullptr;
         }
 
         HPX_HOST_DEVICE
         friend bool operator==(std::nullptr_t, target_ptr const& rhs)
         {
-            return nullptr == rhs.p_;
+            return nullptr == rhs.base();
         }
 
         HPX_HOST_DEVICE
         friend bool operator!=(std::nullptr_t, target_ptr const& rhs)
         {
-            return nullptr != rhs.p_;
+            return nullptr != rhs.base();
         }
 
-        HPX_HOST_DEVICE
-        friend bool operator==(target_ptr const& lhs, target_ptr const& rhs)
-        {
-            return lhs.p_ == rhs.p_;
-        }
-
-        HPX_HOST_DEVICE
-        friend bool operator!=(target_ptr const& lhs, target_ptr const& rhs)
-        {
-            return lhs.p_ != rhs.p_;
-        }
-
-        HPX_HOST_DEVICE
-        friend bool operator<(target_ptr const& lhs, target_ptr const& rhs)
-        {
-            return lhs.p_ < rhs.p_;
-        }
-
-        HPX_HOST_DEVICE
-        friend bool operator>(target_ptr const& lhs, target_ptr const& rhs)
-        {
-            return lhs.p_ > rhs.p_;
-        }
-
-        HPX_HOST_DEVICE
-        friend bool operator<=(target_ptr const& lhs, target_ptr const& rhs)
-        {
-            return lhs.p_ <= rhs.p_;
-        }
-
-        HPX_HOST_DEVICE
-        friend bool operator>=(target_ptr const& lhs, target_ptr const& rhs)
-        {
-            return lhs.p_ >= rhs.p_;
-        }
-
-        HPX_HOST_DEVICE
-        target_ptr& operator+=(std::ptrdiff_t offset)
-        {
-            HPX_ASSERT(p_);
-            p_ += offset;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE
-        target_ptr& operator-=(std::ptrdiff_t offset)
-        {
-            HPX_ASSERT(p_);
-            p_ -= offset;
-            return *this;
-        }
-
-        HPX_HOST_DEVICE
-        std::ptrdiff_t operator-(target_ptr const& other) const
-        {
-            return p_ - other.p_;
-        }
-
-        HPX_HOST_DEVICE
-        target_ptr operator-(std::ptrdiff_t offset) const
-        {
-            return target_ptr(p_ - offset, *tgt_);
-        }
-
-        HPX_HOST_DEVICE
-        target_ptr operator+(std::ptrdiff_t offset) const
-        {
-            return target_ptr(p_ + offset, *tgt_);
-        }
-
+    public:
 #if defined(__CUDA_ARCH__)
-//         T const& operator*() const
-//         {
-//             return *p_;
-//         }
-
-        HPX_DEVICE T& operator*()
-        {
-            return *p_;
-        }
-
-        HPX_DEVICE T const& operator[](std::ptrdiff_t offset) const
-        {
-            return *(p_ + offset);
-        }
-
-        HPX_DEVICE T& operator[](std::ptrdiff_t offset)
-        {
-            return *(p_ + offset);
-        }
-
         HPX_DEVICE operator T*() const
         {
-            return p_;
-        }
-
-        HPX_DEVICE T* operator->() const
-        {
-            return p_;
+            return this->base();
         }
 #else
-        value_proxy<T> operator*() const
-        {
-            return value_proxy<T>(p_, *tgt_);
-        }
-
-        value_proxy<T> operator[](std::ptrdiff_t offset)
-        {
-            return value_proxy<T>(p_ + offset, *tgt_);
-        }
-
         explicit operator T*() const
         {
-            return p_;
-        }
-
-        T* operator->() const
-        {
-            return p_;
-        }
-#endif
-
-        T* device_ptr() const
-        {
-            return p_;
+            return this->base();
         }
 
     private:
-        T* p_;
+        friend class hpx::util::iterator_core_access;
+
+        typename base_type::reference dereference() const
+        {
+            return value_proxy<T>(this->base(), *tgt_);
+        }
+#endif
+
+    public:
+        T* device_ptr() const
+        {
+            return this->base();
+        }
+
+    private:
         target* tgt_;
     };
 }}}

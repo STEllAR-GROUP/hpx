@@ -463,6 +463,17 @@ namespace tests
             >());
     }
 
+    template <class T>
+    class static_object
+    {
+    public:
+        static T& get()
+        {
+            static char d[sizeof(T)];
+            return *reinterpret_cast<T*>(d);
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class input_output_iterator_archetype
@@ -556,17 +567,6 @@ namespace tests
         self operator++(int)
         {
             return *this;
-        }
-    };
-
-    template <class T>
-    class static_object
-    {
-    public:
-        static T& get()
-        {
-            static char d[sizeof(T)];
-            return *reinterpret_cast<T*>(d);
         }
     };
 
