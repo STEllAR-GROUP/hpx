@@ -50,10 +50,9 @@ namespace hpx { namespace util
             it.decrement();
         }
 
-        template <typename Iterator>
+        template <typename Reference, typename Iterator>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static auto dereference(Iterator const& it)
-        ->  decltype(it.dereference())
+        static Reference dereference(Iterator const& it)
         {
             return it.dereference();
         }
@@ -67,8 +66,8 @@ namespace hpx { namespace util
 
         template <typename Iterator1, typename Iterator2>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static auto distance_to(Iterator1 const& lhs, Iterator2 const& rhs)
-        ->  decltype(lhs.distance_to(rhs))
+        static typename std::iterator_traits<Iterator1>::difference_type
+        distance_to(Iterator1 const& lhs, Iterator2 const& rhs)
         {
             return lhs.distance_to(rhs);
         }
@@ -148,7 +147,8 @@ namespace hpx { namespace util
         public:
             HPX_HOST_DEVICE reference operator*() const
             {
-                return iterator_core_access::dereference(this->derived());
+                return iterator_core_access::
+                    template dereference<reference>(this->derived());
             }
 
             HPX_HOST_DEVICE pointer operator->() const
@@ -304,8 +304,6 @@ namespace hpx { namespace util
             > iterator_adaptor_;
 
     public:
-        typedef base_type iterator_core_access;
-
         HPX_HOST_DEVICE iterator_facade()
           : base_type()
         {
@@ -520,7 +518,7 @@ namespace hpx { namespace util
         static_assert(
             hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
-        return 0 <=
+        return 0 <
             iterator_core_access::distance_to(
                 static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
@@ -531,7 +529,7 @@ namespace hpx { namespace util
         static_assert(
             hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
-        return 0 >=
+        return 0 >
             iterator_core_access::distance_to(
                 static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
@@ -542,7 +540,7 @@ namespace hpx { namespace util
         static_assert(
             hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
-        return 0 <
+        return 0 <=
             iterator_core_access::distance_to(
                 static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
@@ -557,6 +555,17 @@ namespace hpx { namespace util
             iterator_core_access::distance_to(
                 static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
+    }
+
+    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, -,
+        typename std::iterator_traits<Derived2>::difference_type)
+    {
+        static_assert(
+            hpx::traits::is_random_access_iterator<Derived1>::value,
+            "Iterator needs to be random access");
+        return iterator_core_access::distance_to(
+            static_cast<Derived1 const&>(rhs),
+            static_cast<Derived2 const&>(lhs));
     }
 
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD

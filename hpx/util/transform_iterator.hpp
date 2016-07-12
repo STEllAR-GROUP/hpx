@@ -6,9 +6,9 @@
 #if !defined(HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM)
 #define HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM
 
+#include <hpx/config.hpp>
 #include <hpx/util/result_of.hpp>
-
-#include <boost/iterator/iterator_adaptor.hpp>
+#include <hpx/util/iterator_adaptor.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -41,7 +41,7 @@ namespace hpx { namespace util
             typedef typename std::iterator_traits<Iterator>::iterator_category
                 iterator_category;
 
-            typedef boost::iterator_adaptor<
+            typedef hpx::util::iterator_adaptor<
                 transform_iterator<Iterator, Transformer, Reference, Value>,
                 Iterator, value_type, iterator_category, reference_type
             > type;
@@ -93,7 +93,7 @@ namespace hpx { namespace util
         }
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         typename base_type::reference dereference() const
         {

@@ -12,10 +12,9 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
+#include <hpx/util/iterator_facade.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
-
-#include <boost/iterator/iterator_facade.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -284,7 +283,7 @@ namespace hpx { namespace util
         ///////////////////////////////////////////////////////////////////////
         template <typename IteratorTuple, typename Derived>
         class zip_iterator_base
-          : public boost::iterator_facade<
+          : public hpx::util::iterator_facade<
                 Derived
               , typename zip_iterator_value<IteratorTuple>::type
               , typename zip_iterator_category<IteratorTuple>::type
@@ -292,7 +291,7 @@ namespace hpx { namespace util
             >
         {
             typedef
-                boost::iterator_facade<
+                hpx::util::iterator_facade<
                     zip_iterator_base<IteratorTuple, Derived>
                   , typename zip_iterator_value<IteratorTuple>::type
                   , typename zip_iterator_category<IteratorTuple>::type
@@ -324,7 +323,7 @@ namespace hpx { namespace util
             }
 
         private:
-            friend class boost::iterator_core_access;
+            friend class hpx::util::iterator_core_access;
 
             HPX_HOST_DEVICE bool equal(zip_iterator_base const& other) const
             {

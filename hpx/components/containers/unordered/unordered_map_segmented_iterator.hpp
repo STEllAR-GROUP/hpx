@@ -11,11 +11,12 @@
 /// \brief This file contains the implementation of iterators for hpx::unordered_map.
 
  // The idea for these iterators is taken from
- // http://afstern.org/matt/segmented.pdf.
+ // http://lafstern.org/matt/segmented.pdf.
 
 #include <hpx/config.hpp>
 //#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/iterator_adaptor.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 
@@ -27,9 +28,6 @@
 #include <vector>
 
 #include <boost/integer.hpp>
-// #include <boost/iterator/iterator_facade.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
-// #include <boost/iterator/filter_iterator.hpp>
 
 namespace hpx
 {
@@ -52,13 +50,13 @@ namespace hpx
     template <typename Key, typename T, typename Hash, typename KeyEqual,
         typename BaseIter>
     class segment_unordered_map_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             segment_unordered_map_iterator<Key, T, Hash, KeyEqual, BaseIter>,
             BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
                 segment_unordered_map_iterator<Key, T, Hash, KeyEqual, BaseIter>,
                 BaseIter
             > base_type;
@@ -91,14 +89,14 @@ namespace hpx
     template <typename Key, typename T, typename Hash, typename KeyEqual,
         typename BaseIter>
     class const_segment_unordered_map_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             const_segment_unordered_map_iterator<
                 Key, T, Hash, KeyEqual, BaseIter>,
             BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
                 const_segment_unordered_map_iterator<
                     Key, T, Hash, KeyEqual, BaseIter>,
                 BaseIter
@@ -152,13 +150,13 @@ namespace hpx
 //     /// This class implement the local segmented iterator for the hpx::vector
 //     template <typename T, typename BaseIter>
 //     class local_segment_vector_iterator
-//       : public boost::iterator_adaptor<
+//       : public hpx::util::iterator_adaptor<
 //             local_segment_vector_iterator<T, BaseIter>, BaseIter,
 //             std::vector<T>, std::forward_iterator_tag
 //         >
 //     {
 //     private:
-//         typedef boost::iterator_adaptor<
+//         typedef hpx::util::iterator_adaptor<
 //                 local_segment_vector_iterator<T, BaseIter>, BaseIter,
 //                 std::vector<T>, std::forward_iterator_tag
 //             > base_type;
@@ -183,7 +181,7 @@ namespace hpx
 //         }
 //
 //     private:
-//         friend class boost::iterator_core_access;
+//         friend class hpx::util::iterator_core_access;
 //
 //         typename base_type::reference dereference() const
 //         {

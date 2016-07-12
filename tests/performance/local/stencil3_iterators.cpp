@@ -213,7 +213,7 @@ namespace hpx { namespace experimental
         {}
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(stencil3_iterator_full const& other) const
         {
@@ -308,7 +308,7 @@ namespace hpx { namespace experimental
         {}
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(stencil3_iterator_v1 const& other) const
         {
