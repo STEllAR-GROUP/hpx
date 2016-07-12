@@ -415,6 +415,14 @@ namespace hpx { namespace util
           : base_type(std::move(t))
         {}
 
+        HPX_HOST_DEVICE zip_iterator(zip_iterator const& other)
+          : base_type(other)
+        {}
+
+        HPX_HOST_DEVICE zip_iterator(zip_iterator&& other)
+          : base_type(std::move(other))
+        {}
+
         HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator const& other)
         {
             base_type::operator=(other);
@@ -475,6 +483,14 @@ namespace hpx { namespace util
 
         HPX_HOST_DEVICE explicit zip_iterator(tuple<Ts...> && t)
           : base_type(std::move(t))
+        {}
+
+        HPX_HOST_DEVICE zip_iterator(zip_iterator const& other)
+          : base_type(other)
+        {}
+
+        HPX_HOST_DEVICE zip_iterator(zip_iterator&& other)
+          : base_type(std::move(other))
         {}
 
         HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator const& other)
