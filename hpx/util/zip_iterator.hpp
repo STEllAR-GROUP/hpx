@@ -301,14 +301,24 @@ namespace hpx { namespace util
                 base_type;
 
         public:
-            zip_iterator_base() {}
+            HPX_HOST_DEVICE zip_iterator_base() {}
 
-            explicit zip_iterator_base(IteratorTuple iterators)
-              : iterators_(iterators) {}
+            HPX_HOST_DEVICE
+            zip_iterator_base(IteratorTuple const& iterators)
+              : iterators_(iterators)
+            {}
+            HPX_HOST_DEVICE
+            zip_iterator_base(IteratorTuple && iterators)
+              : iterators_(std::move(iterators))
+            {}
 
             typedef IteratorTuple iterator_tuple_type;
 
-            iterator_tuple_type const& get_iterator_tuple() const
+            HPX_HOST_DEVICE iterator_tuple_type get_iterator_tuple()
+            {
+                return iterators_;
+            }
+            HPX_HOST_DEVICE iterator_tuple_type const& get_iterator_tuple() const
             {
                 return iterators_;
             }
@@ -316,12 +326,12 @@ namespace hpx { namespace util
         private:
             friend class boost::iterator_core_access;
 
-            bool equal(zip_iterator_base const& other) const
+            HPX_HOST_DEVICE bool equal(zip_iterator_base const& other) const
             {
                 return iterators_ == other.iterators_;
             }
 
-            typename base_type::reference dereference() const
+            HPX_HOST_DEVICE typename base_type::reference dereference() const
             {
                 return dereference_iterator<IteratorTuple>::call(
                     typename detail::make_index_pack<
@@ -329,21 +339,22 @@ namespace hpx { namespace util
                     >::type(), iterators_);
             }
 
-            void increment()
+            HPX_HOST_DEVICE void increment()
             {
                 this->apply(increment_iterator());
             }
 
-            void decrement()
+            HPX_HOST_DEVICE void decrement()
             {
                 this->apply(decrement_iterator());
             }
 
-            void advance(std::ptrdiff_t n)
+            HPX_HOST_DEVICE void advance(std::ptrdiff_t n)
             {
                 this->apply(advance_iterator(n));
             }
 
+            HPX_HOST_DEVICE
             std::ptrdiff_t distance_to(zip_iterator_base const& other) const
             {
                 return util::get<0>(other.iterators_) - util::get<0>(iterators_);
@@ -351,6 +362,7 @@ namespace hpx { namespace util
 
         private:
             template <typename F, std::size_t ...Is>
+            HPX_HOST_DEVICE
             void apply(F&& f, detail::pack_c<std::size_t, Is...>)
             {
                 int const _sequencer[]= {
@@ -360,7 +372,7 @@ namespace hpx { namespace util
             }
 
             template <typename F>
-            void apply(F&& f)
+            HPX_HOST_DEVICE void apply(F&& f)
             {
                 return apply(std::forward<F>(f),
                     detail::make_index_pack<
@@ -382,34 +394,145 @@ namespace hpx { namespace util
         };
     }
 
-    template<typename ...Ts>
+    template <typename ...Ts>
     class zip_iterator
       : public detail::zip_iterator_base<
-            tuple<Ts...>, zip_iterator<Ts...> >
+            tuple<Ts...>, zip_iterator<Ts...>
+        >
     {
-        typedef detail::zip_iterator_base<tuple<Ts...>, zip_iterator<Ts...> >
-            base_type;
+        typedef detail::zip_iterator_base<
+                tuple<Ts...>, zip_iterator<Ts...>
+            > base_type;
 
     public:
-        zip_iterator() : base_type() {}
+        HPX_HOST_DEVICE zip_iterator() : base_type() {}
 
-        explicit zip_iterator(Ts const&... vs)
+        HPX_HOST_DEVICE explicit zip_iterator(Ts const&... vs)
           : base_type(util::tie(vs...))
         {}
 
-        explicit zip_iterator(tuple<Ts...> && t)
+        HPX_HOST_DEVICE explicit zip_iterator(tuple<Ts...> && t)
           : base_type(std::move(t))
         {}
+
+        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator const& other)
+        {
+            base_type::operator=(other);
+            return *this;
+        }
+        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator && other)
+        {
+            base_type::operator=(std::move(other));
+            return *this;
+        }
+
+        template <typename ... Ts_>
+        HPX_HOST_DEVICE
+        typename std::enable_if<
+                detail::are_tuples_compatible_not_same<
+                    typename zip_iterator::iterator_tuple_type,
+                    typename zip_iterator<Ts_...>::iterator_tuple_type&&
+                >::value,
+                zip_iterator&
+            >::type
+        operator=(zip_iterator<Ts_...> const& other)
+        {
+            base_type::operator=(base_type(other.get_iterator_tuple()));
+            return *this;
+        }
+        template <typename ... Ts_>
+        HPX_HOST_DEVICE
+        typename std::enable_if<
+                detail::are_tuples_compatible_not_same<
+                    typename zip_iterator::iterator_tuple_type,
+                    typename zip_iterator<Ts_...>::iterator_tuple_type&&
+                >::value,
+                zip_iterator&
+            >::type
+        operator=(zip_iterator<Ts_...> && other)
+        {
+            base_type::operator=(base_type(std::move(other.get_iterator_tuple())));
+            return *this;
+        }
     };
 
     template <typename ...Ts>
-    zip_iterator<typename decay<Ts>::type...>
+    class zip_iterator<tuple<Ts...> >
+      : public detail::zip_iterator_base<
+            tuple<Ts...>, zip_iterator<tuple<Ts...> >
+        >
+    {
+        typedef detail::zip_iterator_base<
+                tuple<Ts...>, zip_iterator<tuple<Ts...> >
+            > base_type;
+
+    public:
+        HPX_HOST_DEVICE zip_iterator() : base_type() {}
+
+        HPX_HOST_DEVICE explicit zip_iterator(Ts const&... vs)
+          : base_type(util::tie(vs...))
+        {}
+
+        HPX_HOST_DEVICE explicit zip_iterator(tuple<Ts...> && t)
+          : base_type(std::move(t))
+        {}
+
+        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator const& other)
+        {
+            base_type::operator=(other);
+            return *this;
+        }
+        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator && other)
+        {
+            base_type::operator=(std::move(other));
+            return *this;
+        }
+
+        template <typename ... Ts_>
+        HPX_HOST_DEVICE
+        typename std::enable_if<
+                detail::are_tuples_compatible_not_same<
+                    typename zip_iterator::iterator_tuple_type,
+                    typename zip_iterator<Ts_...>::iterator_tuple_type&&
+                >::value,
+                zip_iterator&
+            >::type
+        operator=(zip_iterator<Ts_...> const& other)
+        {
+            base_type::operator=(base_type(other.get_iterator_tuple()));
+            return *this;
+        }
+        template <typename ... Ts_>
+        HPX_HOST_DEVICE
+        typename std::enable_if<
+                detail::are_tuples_compatible_not_same<
+                    typename zip_iterator::iterator_tuple_type,
+                    typename zip_iterator<Ts_...>::iterator_tuple_type&&
+                >::value,
+                zip_iterator&
+            >::type
+        operator=(zip_iterator<Ts_...> && other)
+        {
+            base_type::operator=(base_type(std::move(other.get_iterator_tuple())));
+            return *this;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ...Ts>
+    HPX_HOST_DEVICE zip_iterator<typename decay<Ts>::type...>
     make_zip_iterator(Ts&&... vs)
     {
         typedef zip_iterator<typename decay<Ts>::type...> result_type;
 
         return result_type(std::forward<Ts>(vs)...);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ZipIter>
+    struct zip_iterator_category
+      : detail::zip_iterator_category<typename ZipIter::iterator_tuple_type>
+    {};
 }}
 
 namespace hpx { namespace traits
