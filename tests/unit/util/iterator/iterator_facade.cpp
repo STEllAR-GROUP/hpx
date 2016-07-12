@@ -15,6 +15,8 @@
 #include <hpx/util/iterator_facade.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include "iterator_tests.hpp"
+
 #include <type_traits>
 #include <utility>
 
@@ -143,112 +145,15 @@ void same_type(U const&)
     HPX_TEST((std::is_same<T, U>::value));
 }
 
-namespace traits
-{
-    template <typename T, typename Enable = void>
-    struct is_incrementable
-      : std::false_type
-    {};
-
-    template <typename T>
-    struct is_incrementable<T,
-            typename hpx::util::always_void<
-                decltype(++std::declval<T&>())
-            >::type>
-      : std::true_type
-    {};
-
-    template <typename T, typename Enable = void>
-    struct is_postfix_incrementable
-      : std::false_type
-    {};
-
-    template <typename T>
-    struct is_postfix_incrementable<T,
-            typename hpx::util::always_void<
-                decltype(std::declval<T&>()++)
-            >::type>
-      : std::true_type
-    {};
-}
-
-// Preconditions: *i == v
-// Do separate tests for *i++ so we can treat, e.g., smart pointers,
-// as readable and/or writable iterators.
-template <typename Iterator, typename T>
-void readable_iterator_traversal_test(Iterator i1, T v, std::true_type)
-{
-    T v2(*i1++);
-    HPX_TEST(v == v2);
-}
-
-template <typename Iterator, typename T>
-void readable_iterator_traversal_test(const Iterator i1, T v, std::false_type)
-{
-}
-
-template <typename Iterator, typename T>
-void readable_iterator_test(const Iterator i1, T v)
-{
-    typedef typename std::iterator_traits<Iterator>::reference ref_t;
-
-    Iterator i2(i1); // Copy Constructible
-    ref_t r1 = *i1;
-    ref_t r2 = *i2;
-    T v1 = r1;
-    T v2 = r2;
-    HPX_TEST(v1 == v);
-    HPX_TEST(v2 == v);
-
-    readable_iterator_traversal_test(
-        i1, v,
-        typename std::integral_constant<bool,
-            traits::is_postfix_incrementable<Iterator>::value
-        >::type());
-
-    // I think we don't really need this as it checks the same things as
-    // the above code.
-    HPX_TEST(!hpx::traits::is_output_iterator<Iterator>::value);
-}
-
-template <typename Iterator, typename T>
-void writable_iterator_traversal_test(Iterator i1, T v, std::true_type)
-{
-    ++i1;           // we just wrote into that position
-    *i1++ = v;
-
-    Iterator x(i1++);
-    (void)x;
-}
-
-template <class Iterator, class T>
-void writable_iterator_traversal_test(const Iterator i1, T v, std::false_type)
-{
-}
-
-template <class Iterator, class T>
-void writable_iterator_test(Iterator i, T v, T v2)
-{
-    Iterator i2(i); // Copy Constructible
-    *i2 = v;
-
-    writable_iterator_traversal_test(
-        i, v2,
-        typename std::integral_constant<bool,
-            traits::is_incrementable<Iterator>::value &&
-            traits::is_postfix_incrementable<Iterator>::value
-        >());
-}
-
 int main()
 {
     {
         int state = 0;
-        readable_iterator_test(counter_iterator<int const&>(&state), 0);
+        tests::readable_iterator_test(counter_iterator<int const&>(&state), 0);
 
         state = 3;
-        readable_iterator_test(counter_iterator<proxy>(&state), 3);
-        writable_iterator_test(counter_iterator<proxy>(&state), 9, 7);
+        tests::readable_iterator_test(counter_iterator<proxy>(&state), 3);
+        tests::writable_iterator_test(counter_iterator<proxy>(&state), 9, 7);
 
         HPX_TEST_EQ(state, 8);
     }

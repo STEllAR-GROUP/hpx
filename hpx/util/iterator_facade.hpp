@@ -23,6 +23,57 @@
 
 namespace hpx { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Helper class to gain access to the implementation functions in the
+    // derived (user-defined) iterator classes.
+    class iterator_core_access
+    {
+    public:
+        template <typename Iterator1, typename Iterator2>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static bool equal(Iterator1 const& lhs, Iterator2 const& rhs)
+        {
+            return lhs.equal(rhs);
+        }
+
+        template <typename Iterator>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void increment(Iterator& it)
+        {
+            it.increment();
+        }
+
+        template <typename Iterator>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void decrement(Iterator& it)
+        {
+            it.decrement();
+        }
+
+        template <typename Iterator>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static auto dereference(Iterator const& it)
+        ->  decltype(it.dereference())
+        {
+            return it.dereference();
+        }
+
+        template <typename Iterator, typename Distance>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void advance(Iterator& it, Distance n)
+        {
+            it.advance(n);
+        }
+
+        template <typename Iterator1, typename Iterator2>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static auto distance_to(Iterator1 const& lhs, Iterator2 const& rhs)
+        ->  decltype(lhs.distance_to(rhs))
+        {
+            return lhs.distance_to(rhs);
+        }
+    };
+
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -31,19 +82,21 @@ namespace hpx { namespace util
         {
             struct proxy
             {
+                HPX_HOST_DEVICE
                 explicit proxy(Reference const& x)
-                  : m_ref(x)
+                  : ref_(x)
                 {
                 }
-                Reference* operator->()
+                HPX_HOST_DEVICE HPX_FORCEINLINE Reference* operator->()
                 {
-                    return std::addressof(m_ref);
+                    return std::addressof(ref_);
                 }
-                Reference m_ref;
+                Reference ref_;
             };
 
             typedef proxy type;
 
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             static type call(Reference const& x)
             {
                 return type(x);
@@ -55,21 +108,14 @@ namespace hpx { namespace util
         {
             typedef T* type;
 
-            static type call(T& x)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static type call(T& x)
             {
                 return std::addressof(x);
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Derived,
-            typename T,
-            typename Category,
-            typename Reference,
-            typename Distance>
-        class iterator_facade_base;
-
-        // Implementation for forward iterators
+        // Implementation for input and forward iterators
         template <typename Derived,
             typename T,
             typename Category,
@@ -79,7 +125,7 @@ namespace hpx { namespace util
         {
         public:
             typedef Category iterator_category;
-            typedef T value_type;
+            typedef typename std::remove_const<T>::type value_type;
             typedef Distance difference_type;
             typedef typename arrow_dispatch<Reference>::type pointer;
             typedef Reference reference;
@@ -102,7 +148,7 @@ namespace hpx { namespace util
         public:
             HPX_HOST_DEVICE reference operator*() const
             {
-                return this->derived().dereference();
+                return iterator_core_access::dereference(this->derived());
             }
 
             HPX_HOST_DEVICE pointer operator->() const
@@ -113,7 +159,7 @@ namespace hpx { namespace util
             HPX_HOST_DEVICE Derived& operator++()
             {
                 Derived& this_ = this->derived();
-                this_.increment();
+                iterator_core_access::increment(this_);
                 return this_;
             }
         };
@@ -143,9 +189,9 @@ namespace hpx { namespace util
 
         public:
             typedef std::bidirectional_iterator_tag iterator_category;
-            typedef T value_type;
+            typedef typename std::remove_const<T>::type value_type;
             typedef Distance difference_type;
-            typedef value_type* pointer;
+            typedef typename arrow_dispatch<Reference>::type pointer;
             typedef Reference reference;
 
             HPX_HOST_DEVICE iterator_facade_base()
@@ -156,7 +202,7 @@ namespace hpx { namespace util
             HPX_HOST_DEVICE Derived& operator--()
             {
                 Derived& this_ = this->derived();
-                this_.decrement();
+                iterator_core_access::decrement(this_);
                 return this_;
             }
 
@@ -193,9 +239,9 @@ namespace hpx { namespace util
 
         public:
             typedef std::random_access_iterator_tag iterator_category;
-            typedef T value_type;
+            typedef typename std::remove_const<T>::type value_type;
             typedef Distance difference_type;
-            typedef value_type* pointer;
+            typedef typename arrow_dispatch<Reference>::type pointer;
             typedef Reference reference;
 
             HPX_HOST_DEVICE iterator_facade_base()
@@ -211,7 +257,7 @@ namespace hpx { namespace util
             HPX_HOST_DEVICE Derived& operator+=(difference_type n)
             {
                 Derived& this_ = this->derived();
-                this_.advance(n);
+                iterator_core_access::advance(this_, n);
                 return this_;
             }
 
@@ -224,7 +270,7 @@ namespace hpx { namespace util
             HPX_HOST_DEVICE Derived& operator-=(difference_type n)
             {
                 Derived& this_ = this->derived();
-                this_.advance(-n);
+                iterator_core_access::advance(this_, -n);
                 return this_;
             }
 
@@ -236,12 +282,13 @@ namespace hpx { namespace util
         };
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Derived,
         typename T,
         typename Category,
-        typename Reference,
-        typename Distance>
-    struct iterator_core_access
+        typename Reference = T&,
+        typename Distance = std::ptrdiff_t>
+    struct iterator_facade
         : detail::
               iterator_facade_base<Derived, T, Category, Reference, Distance>
     {
@@ -250,27 +297,15 @@ namespace hpx { namespace util
             iterator_facade_base<Derived, T, Category, Reference, Distance>
                 base_type;
 
-    public:
-        HPX_HOST_DEVICE iterator_core_access()
-          : base_type()
-        {
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived,
-        typename T,
-        typename Category,
-        typename Reference = T&,
-        typename Distance = std::ptrdiff_t>
-    struct iterator_facade
-        : iterator_core_access<Derived, T, Category, Reference, Distance>
-    {
-    private:
-        typedef iterator_core_access<Derived, T, Category, Reference, Distance>
-            base_type;
+    protected:
+        // for convenience in derived classes
+        typedef iterator_facade<
+                Derived, T, Category, Reference, Distance
+            > iterator_adaptor_;
 
     public:
+        typedef base_type iterator_core_access;
+
         HPX_HOST_DEVICE iterator_facade()
           : base_type()
         {
@@ -291,7 +326,7 @@ namespace hpx { namespace util
                 typename std::iterator_traits<Iterator>::value_type value_type;
 
         public:
-            explicit postfix_increment_proxy(Iterator const& x)
+            HPX_HOST_DEVICE explicit postfix_increment_proxy(Iterator const& x)
               : stored_value(*x)
             {
             }
@@ -300,7 +335,7 @@ namespace hpx { namespace util
             // but it imposes fewer assumptions about the behavior of the
             // value_type. In particular, recall that (*r).mutate() is legal if
             // operator* returns by value.
-            value_type& operator*() const
+            HPX_HOST_DEVICE value_type& operator*() const
             {
                 return this->stored_value;
             }
@@ -319,6 +354,7 @@ namespace hpx { namespace util
                 typename std::iterator_traits<Iterator>::value_type value_type;
 
         public:
+            HPX_HOST_DEVICE
             explicit writable_postfix_increment_proxy(Iterator const& x)
               : stored_value(*x)
               , stored_iterator(x)
@@ -328,20 +364,21 @@ namespace hpx { namespace util
             // Dereferencing must return a proxy so that both *r++ = o and
             // value_type(*r++) can work.  In this case, *r is the same as *r++,
             // and the conversion operator below is used to ensure readability.
+            HPX_HOST_DEVICE
             writable_postfix_increment_proxy const& operator*() const
             {
                 return *this;
             }
 
             // Provides readability of *r++
-            operator value_type&() const
+            HPX_HOST_DEVICE operator value_type&() const
             {
                 return stored_value;
             }
 
             // Provides writability of *r++
             template <typename T>
-            T const& operator=(T const& x) const
+            HPX_HOST_DEVICE T const& operator=(T const& x) const
             {
                 *this->stored_iterator = x;
                 return x;
@@ -349,14 +386,14 @@ namespace hpx { namespace util
 
             // This overload just in case only non-const objects are writable
             template <typename T>
-            T& operator=(T& x) const
+            HPX_HOST_DEVICE T& operator=(T& x) const
             {
                 *this->stored_iterator = x;
                 return x;
             }
 
             // Provides X(r++)
-            operator Iterator const&() const
+            HPX_HOST_DEVICE operator Iterator const&() const
             {
                 return stored_iterator;
             }
@@ -381,7 +418,7 @@ namespace hpx { namespace util
         //          *r++ < *s++
         //
         // If *r++ returns a proxy (as required if r is writable but not
-        // multipass), this sort of expression will fail unless the proxy
+        // multi-pass), this sort of expression will fail unless the proxy
         // supports the operator<.  Since there are any number of such
         // operations, we're not going to try to support them.  Therefore,
         // even if r++ returns a proxy, *r++ will only return a proxy if *r
@@ -394,21 +431,24 @@ namespace hpx { namespace util
         };
 
         template <typename Iterator, typename Value, typename Reference>
-        struct postfix_increment_result<Iterator, Value, Reference,
-                typename std::enable_if<
-                    traits::is_input_iterator<Iterator>::value &&
-                    is_non_proxy_reference<Reference, Value>::value
-                >::type>
+        struct postfix_increment_result<
+            Iterator, Value, Reference,
+            typename std::enable_if<
+               !traits::is_forward_iterator<Iterator>::value &&
+               !traits::is_output_iterator<Iterator>::value &&
+                is_non_proxy_reference<Reference, Value>::value
+            >::type>
         {
             typedef postfix_increment_proxy<Iterator> type;
         };
 
         template <typename Iterator, typename Value, typename Reference>
         struct postfix_increment_result<Iterator, Value, Reference,
-                typename std::enable_if<
-                    traits::is_input_iterator<Iterator>::value &&
-                   !is_non_proxy_reference<Reference, Value>::value
-                >::type>
+            typename std::enable_if<
+                !traits::is_forward_iterator<Iterator>::value &&
+                !traits::is_output_iterator<Iterator>::value &&
+                !is_non_proxy_reference<Reference, Value>::value
+            >::type>
         {
             typedef writable_postfix_increment_proxy<Iterator> type;
         };
@@ -435,56 +475,117 @@ namespace hpx { namespace util
         return tmp;
     }
 
-#define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(prefix, op, result_type)         \
-    template <typename Derived,                                                \
-        typename Category,                                                     \
-        typename T,                                                            \
-        typename Distance,                                                     \
-        typename Reference>                                                    \
-    HPX_HOST_DEVICE prefix result_type operator op(                            \
-        iterator_facade<Derived, Category, T, Reference, Distance> const& lhs, \
-        iterator_facade<Derived, Category, T, Reference, Distance> const& rhs) \
+    namespace detail
+    {
+        template <typename Facade1, typename Facade2, typename Return>
+        struct enable_operator_interoperable
+          : std::enable_if<
+                std::is_convertible<Facade1, Facade2>::value ||
+                    std::is_convertible<Facade2, Facade1>::value,
+                Return>
+        {};
+    }
+
+#define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(prefix, op, result_type)        \
+    template <                                                                \
+        typename Derived1, typename T1, typename Category1,                   \
+        typename Reference1, typename Distance1,                              \
+        typename Derived2, typename T2, typename Category2,                   \
+        typename Reference2, typename Distance2>                              \
+    HPX_HOST_DEVICE prefix                                                    \
+    typename hpx::util::detail::enable_operator_interoperable<                \
+        Derived1, Derived2, result_type                                       \
+    >::type                                                                   \
+    operator op(                                                              \
+        iterator_facade<Derived1, T1, Category1, Reference1, Distance1> const& lhs,\
+        iterator_facade<Derived2, T2, Category2, Reference2, Distance2> const& rhs)\
 /**/
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, ==, bool)
     {
-        return lhs.equal(rhs);
+        return iterator_core_access::equal(
+            static_cast<Derived1 const&>(lhs),
+            static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, !=, bool)
     {
-        return !lhs.equal(rhs);
+        return !iterator_core_access::equal(
+            static_cast<Derived1 const&>(lhs),
+            static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, <, bool)
     {
-        static_assert(hpx::traits::is_random_access_iterator<Derived>::value,
+        static_assert(
+            hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
-        return 0 > rhs.distance_to(lhs);
+        return 0 <=
+            iterator_core_access::distance_to(
+                static_cast<Derived1 const&>(lhs),
+                static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, >, bool)
     {
-        static_assert(hpx::traits::is_random_access_iterator<Derived>::value,
+        static_assert(
+            hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
-        return 0 < rhs.distance_to(lhs);
+        return 0 >=
+            iterator_core_access::distance_to(
+                static_cast<Derived1 const&>(lhs),
+                static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, <=, bool)
     {
-        static_assert(hpx::traits::is_random_access_iterator<Derived>::value,
+        static_assert(
+            hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
-        return 0 >= rhs.distance_to(lhs);
+        return 0 <
+            iterator_core_access::distance_to(
+                static_cast<Derived1 const&>(lhs),
+                static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, >=, bool)
     {
-        static_assert(hpx::traits::is_random_access_iterator<Derived>::value,
+        static_assert(
+            hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
-        return 0 <= rhs.distance_to(lhs);
+        return 0 >=
+            iterator_core_access::distance_to(
+                static_cast<Derived1 const&>(lhs),
+                static_cast<Derived2 const&>(rhs));
     }
 
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD
+
+    template <typename Derived,
+        typename T,
+        typename Category,
+        typename Reference,
+        typename Distance>
+    HPX_HOST_DEVICE inline Derived operator+(
+        iterator_facade<Derived, T, Category, Reference, Distance> const& it,
+        typename Derived::difference_type n)
+    {
+        Derived tmp(static_cast<Derived const&>(it));
+        return tmp += n;
+    }
+
+    template <typename Derived,
+        typename T,
+        typename Category,
+        typename Reference,
+        typename Distance>
+    HPX_HOST_DEVICE inline Derived operator+(
+        typename Derived::difference_type n,
+        iterator_facade<Derived, T, Category, Reference, Distance> const& it)
+    {
+        Derived tmp(static_cast<Derived const&>(it));
+        return tmp += n;
+    }
 }}
 
 #endif
