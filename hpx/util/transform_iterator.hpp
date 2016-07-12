@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -72,6 +72,19 @@ namespace hpx { namespace util
         {}
         transform_iterator(Iterator const& it, Transformer const& f)
           : base_type(it), transformer_(f)
+        {}
+
+        template <typename OtherIterator, typename OtherTransformer,
+            typename OtherReference, typename OtherValue>
+        transform_iterator(
+                transform_iterator<
+                    OtherIterator, OtherTransformer,  OtherReference, OtherValue
+                > const& t,
+                typename std::enable_if<
+                    std::is_convertible<OtherIterator, Iterator>::value &&
+                    std::is_convertible<OtherTransformer, Transformer>::value
+                >::type* = 0)
+          : base_type(t.base()), transformer_(t.transformer())
         {}
 
         Transformer const& transformer() const
