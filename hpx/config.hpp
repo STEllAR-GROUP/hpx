@@ -462,7 +462,11 @@
 #    if defined(HPX_DEBUG)
 #      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #    else
-#      define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte
+#      if defined(__powerpc__)
+#         define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
+#      else
+#         define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte
+#      endif
 #    endif
 #  endif
 #endif
