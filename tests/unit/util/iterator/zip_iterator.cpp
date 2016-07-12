@@ -32,7 +32,8 @@ void category_test()
 
     hpx::util::make_zip_iterator(
         hpx::util::make_tuple(
-            hpx::util::make_transform_iterator(rng1.begin(), &to_value), // BidirectionalInput
+            // BidirectionalInput
+            hpx::util::make_transform_iterator(rng1.begin(), &to_value),
             rng2.begin() // RandomAccess
         )
     );
@@ -424,7 +425,9 @@ int main(void)
     zip_it_half_const = ++zip_it_non_const;
     zip_it_const = zip_it_half_const;
     ++zip_it_const;
-    //  zip_it_non_const = ++zip_it_const;  // Error: can't convert from const to non-const
+
+    // Error: can't convert from const to non-const
+    //  zip_it_non_const = ++zip_it_const;
 
     HPX_TEST(
         54 == hpx::util::get<0>(*zip_it_const) &&
