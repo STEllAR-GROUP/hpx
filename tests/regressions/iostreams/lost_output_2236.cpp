@@ -50,6 +50,7 @@ void generate_output_no_endl(Ts &&... ts)
     {
         (stream << ts, 0)..., 0
     };
+    (void)sequencer;
 
     std::string str = stream.str();
 
