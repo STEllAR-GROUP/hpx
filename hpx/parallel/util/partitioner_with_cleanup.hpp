@@ -10,7 +10,6 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 
@@ -20,6 +19,7 @@
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -71,14 +71,15 @@ namespace hpx { namespace parallel { namespace util
                     typedef typename parameters_traits::has_variable_chunk_size
                         has_variable_chunk_size;
 
+                    auto shapes =
+                        get_bulk_iteration_shape(policy, inititems, f1,
+                            first, count, 1, has_variable_chunk_size());
+
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            hpx::util::bind(
-                                hpx::util::functional::invoke_fused(),
-                                std::forward<F1>(f1), hpx::util::placeholders::_1),
-                            get_bulk_iteration_shape(policy, inititems, f1,
-                                first, count, 1, has_variable_chunk_size()));
+                            partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                            std::move(shapes));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -145,14 +146,15 @@ namespace hpx { namespace parallel { namespace util
                     typedef typename parameters_traits::has_variable_chunk_size
                         has_variable_chunk_size;
 
+                    auto shapes =
+                        get_bulk_iteration_shape(policy, inititems, f1,
+                            first, count, 1, has_variable_chunk_size());
+
                     std::vector<hpx::future<Result> > workitems =
                         executor_traits::bulk_async_execute(
                             policy.executor(),
-                            hpx::util::bind(
-                                hpx::util::functional::invoke_fused(),
-                                std::forward<F1>(f1), hpx::util::placeholders::_1),
-                            get_bulk_iteration_shape(policy, inititems, f1,
-                                first, count, 1, has_variable_chunk_size()));
+                            partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                            std::move(shapes));
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),

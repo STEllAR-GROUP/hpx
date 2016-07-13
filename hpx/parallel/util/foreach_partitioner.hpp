@@ -12,7 +12,6 @@
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -22,6 +21,7 @@
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -36,20 +36,6 @@ namespace hpx { namespace parallel { namespace util
 {
     namespace detail
     {
-        template <typename F>
-        struct foreach_partitioner_iteration
-        {
-            typename hpx::util::decay<F>::type f_;
-
-            template <typename T>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            auto operator()(T&&t)
-            -> decltype(hpx::util::invoke_fused(f_, std::forward<T>(t)))
-            {
-                return hpx::util::invoke_fused(f_, std::forward<T>(t));
-            }
-        };
-
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
@@ -86,12 +72,15 @@ namespace hpx { namespace parallel { namespace util
                     typedef typename parameters_traits::has_variable_chunk_size
                         has_variable_chunk_size;
 
-                    workitems = executor_traits::bulk_async_execute(
-                        policy.executor(),
-                        foreach_partitioner_iteration<F1>{std::forward<F1>(f1)},
+                    auto shapes =
                         get_bulk_iteration_shape_idx(
                             policy, inititems, f1, first, count, 1,
-                            has_variable_chunk_size()));
+                            has_variable_chunk_size());
+
+                    workitems = executor_traits::bulk_async_execute(
+                        policy.executor(),
+                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                        std::move(shapes));
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
@@ -155,12 +144,15 @@ namespace hpx { namespace parallel { namespace util
                     typedef typename parameters_traits::has_variable_chunk_size
                         has_variable_chunk_size;
 
-                    workitems = executor_traits::bulk_async_execute(
-                        policy.executor(),
-                        foreach_partitioner_iteration<F1>{std::forward<F1>(f1)},
+                    auto shapes =
                         get_bulk_iteration_shape_idx(
                             policy, inititems, f1, first, count, 1,
-                            has_variable_chunk_size()));
+                            has_variable_chunk_size());
+
+                    workitems = executor_traits::bulk_async_execute(
+                        policy.executor(),
+                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                        std::move(shapes));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<FwdIter>(
