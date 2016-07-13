@@ -36,6 +36,10 @@ void generate_output(Ts &&... ts)
     }
 
     hpx::consolestream << str;
+    HPX_TEST(hpx::consolestream);
+
+    hpx::cout << str;
+    HPX_TEST(hpx::cout);
 }
 
 template <typename ... Ts>
@@ -54,7 +58,12 @@ void generate_output_no_endl(Ts &&... ts)
         expected_output += str;
     }
 
+
     hpx::consolestream << str;
+    HPX_TEST(hpx::consolestream);
+
+    hpx::cout << str;
+    HPX_TEST(hpx::cout);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
