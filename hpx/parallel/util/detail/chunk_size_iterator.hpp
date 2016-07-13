@@ -8,10 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/iterator_facade.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-
-#include <boost/iterator/iterator_facade.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -23,19 +22,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     struct chunk_size_iterator
-      : public boost::iterator_facade<
+      : public hpx::util::iterator_facade<
             chunk_size_iterator<Iterator>,
             hpx::util::tuple<Iterator, std::size_t> const,
             std::forward_iterator_tag>
     {
     private:
-        typedef boost::iterator_facade<
+        typedef hpx::util::iterator_facade<
                 chunk_size_iterator<Iterator>,
                 hpx::util::tuple<Iterator, std::size_t> const,
                 std::forward_iterator_tag
             > base_type;
 
     public:
+        HPX_HOST_DEVICE
         chunk_size_iterator(Iterator it, std::size_t chunk_size,
                 std::size_t count = 0)
           : data_(it, (std::min)(chunk_size, count))
@@ -44,28 +44,32 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         {}
 
     private:
+        HPX_HOST_DEVICE
         Iterator& iterator() { return hpx::util::get<0>(data_); }
+        HPX_HOST_DEVICE
         Iterator iterator() const { return hpx::util::get<0>(data_); }
 
+        HPX_HOST_DEVICE
         std::size_t& chunk() { return hpx::util::get<1>(data_); }
+        HPX_HOST_DEVICE
         std::size_t chunk() const { return hpx::util::get<1>(data_); }
 
     protected:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
-        bool equal(chunk_size_iterator const& other) const
+        HPX_HOST_DEVICE bool equal(chunk_size_iterator const& other) const
         {
             return iterator() == other.iterator() &&
                 count_ == other.count_ &&
                 chunk_size_ == other.chunk_size_;
         }
 
-        typename base_type::reference dereference() const
+        HPX_HOST_DEVICE typename base_type::reference dereference() const
         {
             return data_;
         }
 
-        void increment()
+        HPX_HOST_DEVICE void increment()
         {
             // prepare next value
             count_ -= chunk();
@@ -83,19 +87,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     struct chunk_size_idx_iterator
-      : public boost::iterator_facade<
+      : public hpx::util::iterator_facade<
             chunk_size_idx_iterator<Iterator>,
             hpx::util::tuple<Iterator, std::size_t, std::size_t> const,
             std::forward_iterator_tag>
     {
     private:
-        typedef boost::iterator_facade<
+        typedef hpx::util::iterator_facade<
                 chunk_size_idx_iterator<Iterator>,
                 hpx::util::tuple<Iterator, std::size_t, std::size_t> const,
                 std::forward_iterator_tag
             > base_type;
 
     public:
+        HPX_HOST_DEVICE
         chunk_size_idx_iterator(Iterator it, std::size_t chunk_size,
                 std::size_t count = 0, std::size_t base_idx = 0)
           : data_(it, (std::min)(chunk_size, count), base_idx)
@@ -104,30 +109,35 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         {}
 
     private:
+        HPX_HOST_DEVICE
         Iterator& iterator() { return hpx::util::get<0>(data_); }
+        HPX_HOST_DEVICE
         Iterator iterator() const { return hpx::util::get<0>(data_); }
 
+        HPX_HOST_DEVICE
         std::size_t& chunk() { return hpx::util::get<1>(data_); }
+        HPX_HOST_DEVICE
         std::size_t chunk() const { return hpx::util::get<1>(data_); }
 
+        HPX_HOST_DEVICE
         std::size_t& base_index() { return hpx::util::get<2>(data_); }
 
     protected:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
-        bool equal(chunk_size_idx_iterator const& other) const
+        HPX_HOST_DEVICE bool equal(chunk_size_idx_iterator const& other) const
         {
             return iterator() == other.iterator() &&
                 count_ == other.count_ &&
                 chunk_size_ == other.chunk_size_;
         }
 
-        typename base_type::reference dereference() const
+        HPX_HOST_DEVICE typename base_type::reference dereference() const
         {
             return data_;
         }
 
-        void increment()
+        HPX_HOST_DEVICE void increment()
         {
             // prepare next value
             count_ -= chunk();
