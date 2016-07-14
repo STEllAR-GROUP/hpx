@@ -83,9 +83,10 @@ namespace hpx { namespace lcos
                     state)
             {
                 try {
-                    this->base_type::set_value(hpx::util::get<I>(
-                        traits::future_access<T>::create(state).get())
-                    );
+                    typedef typename traits::future_traits<T>::type result_type;
+                    result_type* result = state->get_result();
+                    this->base_type::set_value(
+                        std::move(hpx::util::get<I>(*result)));
                 }
                 catch (...) {
                     this->base_type::set_exception(boost::current_exception());
@@ -188,9 +189,9 @@ namespace hpx { namespace lcos
                     state)
             {
                 try {
-                    this->base_type::set_value(
-                        (traits::future_access<T>::create(state).get())[i]
-                    );
+                    typedef typename traits::future_traits<T>::type result_type;
+                    result_type* result = state->get_result();
+                    this->base_type::set_value(std::move((*result)[i]));
                 }
                 catch (...) {
                     this->base_type::set_exception(boost::current_exception());

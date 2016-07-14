@@ -34,6 +34,7 @@ set(tests
     shared_future_then_2166
     shared_mutex_1702
     shared_stated_leaked_1211
+    split_future_2246
     wait_all_hang_1946
     wait_for_1751
     when_all_vectors_1623
