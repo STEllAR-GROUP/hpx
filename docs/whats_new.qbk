@@ -14,7 +14,7 @@
 
 As the version number of this release hints, we consider this release
 to be a preview
-for the upcoming __hpx__ V1.0. All of the functionalities 
+for the upcoming __hpx__ V1.0. All of the functionalities
 we set out to implement for
 V1.0 are in place; all of the features we wanted to have exposed are ready. We
 are very happy with the stability and performance of __hpx__ and we would like
@@ -143,6 +143,12 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2250] - change default chunker of parallel executor to static one
+* [pr    2247] - HPX on ppc64le
+* [pr    2244] - Fixing MSVC problems
+* [pr    2238] - Fixing small typos
+* [pr    2237] - Fixing small typos
+* [pr    2234] - Fix broken add test macro when extra args are passed in
 * [pr    2231] - Fixing possible race during future awaiting in serialization
 * [pr    2230] - Fix stream nvcc
 * [pr    2229] - Fixed run_as_hpx_thread
