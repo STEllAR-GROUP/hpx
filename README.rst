@@ -51,8 +51,8 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.11) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.11/html/index.html>`_.
+The documentation for the latest release of HPX (currently V0.9.99) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.99/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
 .. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.33656.svg
@@ -64,7 +64,7 @@ Additionally, we regularly upload the current status of the documentation
 single-page version of the documentation `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.11) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
+(currently HPX V0.9.99) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
@@ -125,7 +125,7 @@ Linux
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.11
+            ~/downloads/hpx_0.9.99
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -181,7 +181,7 @@ OS X (Mac)
       cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
             -DBOOST_ROOT=~/packages/boost \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.11
+            ~/downloads/hpx_0.9.99
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -354,6 +354,7 @@ The following images are currently available:
   `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
   build status)
 * ``stellargroup/hpx:latest``   (latest release)
+* ``stellargroup/hpx:0.9.99``   (release v0.9.99)
 * ``stellargroup/hpx:0.9.11``   (release v0.9.11)
 * ``stellargroup/hpx:0.9.10``   (release v0.9.10)
 
@@ -424,3 +425,7 @@ HPX is currently funded by
 
 * The Bavarian Research Foundation (Bayerische Forschungsstfitung) through
   the grant AZ-987-11.
+
+* The European Commission's Horizon 2020 programme through the grant
+  H2020-EU.1.2.2. 671603 (AllScale). 
+
