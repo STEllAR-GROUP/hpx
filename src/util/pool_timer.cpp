@@ -16,9 +16,9 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -38,7 +38,7 @@ namespace hpx { namespace util { namespace detail
         pool_timer();
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
+            std::chrono::steady_clock::time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown);
 
@@ -56,14 +56,14 @@ namespace hpx { namespace util { namespace detail
 
     private:
         typedef boost::asio::basic_deadline_timer<
-            boost::chrono::steady_clock,
-            util::chrono_traits<boost::chrono::steady_clock>
+            std::chrono::steady_clock,
+            util::chrono_traits<std::chrono::steady_clock>
         > deadline_timer;
 
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_; ///< function to call
         util::function_nonser<void()> on_term_; ///< function to call on termination
-        boost::chrono::steady_clock::time_point abs_time_;    ///< time interval
+        std::chrono::steady_clock::time_point abs_time_;    ///< time interval
         std::string description_;     ///< description of this interval timer
 
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
@@ -86,7 +86,7 @@ namespace hpx { namespace util { namespace detail
 
     pool_timer::pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
+            std::chrono::steady_clock::time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(on_term),

@@ -914,7 +914,7 @@ hpx_check_for_cxx11_std_array(
   DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
 
 hpx_check_for_cxx11_std_chrono(
-  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
+  REQUIRED "HPX needs support for C++11 std::chrono")
 
 hpx_check_for_cxx11_std_cstdint(
   DEFINITIONS HPX_HAVE_CXX11_STD_CSTDINT)

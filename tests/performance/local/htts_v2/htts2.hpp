@@ -8,16 +8,14 @@
 
 #include <hpx/config.hpp>
 
-#include <iostream>
-#include <boost/format.hpp>
-
 #include <boost/assert.hpp>
-
-#include <cmath>
 #include <boost/cstdint.hpp>
+#include <boost/format.hpp>
+#include <boost/mpl/or.hpp>
 
 #include <chrono>
-#include <boost/chrono.hpp>
+#include <cmath>
+#include <iostream>
 
 namespace htts2
 {
@@ -38,12 +36,10 @@ struct clocksource
 
     static_assert(base_clock::is_steady == true,
         "base_clock is not steady");
-#if !defined(HPX_MSVC)
     static_assert(
             std::ratio_equal<period, std::nano>::value ||
             boost::ratio_equal<period, boost::nano>::value,
         "base_clock does not use a nanosecond period");
-#endif
 
     // Returns: current time in nanoseconds.
     static rep now()
@@ -82,7 +78,7 @@ payload(typename clocksource<BaseClock>::rep expected)
     }
 }
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct timer : clocksource<BaseClock>
 {
     typedef typename clocksource<BaseClock>::rep rep;

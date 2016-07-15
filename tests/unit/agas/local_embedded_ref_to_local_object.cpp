@@ -7,8 +7,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/chrono.hpp>
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -23,7 +23,7 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;

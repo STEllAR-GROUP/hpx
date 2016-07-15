@@ -26,6 +26,7 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -577,7 +578,7 @@ namespace detail
         }
 
         virtual future_status
-        wait_until(boost::chrono::steady_clock::time_point const& abs_time,
+        wait_until(std::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(mtx_);
@@ -650,7 +651,7 @@ namespace detail
 
         template <typename Result_>
         timed_future_data(
-            boost::chrono::steady_clock::time_point const& abs_time,
+            std::chrono::steady_clock::time_point const& abs_time,
             Result_&& init)
         {
             boost::intrusive_ptr<timed_future_data> this_(this);
@@ -725,7 +726,7 @@ namespace detail
         }
 
         virtual future_status
-        wait_until(boost::chrono::steady_clock::time_point const& abs_time,
+        wait_until(std::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
             if (!started_test())

@@ -8,7 +8,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
+#include <chrono>
 
 struct test
 {
@@ -61,13 +61,13 @@ int hpx_main(int argc, char* argv[])
                 hpx::cout << local_promise_id << hpx::endl;
             }
 
-            hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             promise_id = p.get_id();
             hpx::cout << promise_id << hpx::endl;
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         HPX_TEST(!f.is_ready());
         // This segfaults, because the promise is not alive any more.
@@ -86,13 +86,13 @@ int hpx_main(int argc, char* argv[])
                 hpx::cout << local_promise_id << hpx::endl;
             }
 
-            hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             promise_id = p.get_id();
             hpx::cout << promise_id << hpx::endl;
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         // This segfaults, because the promise is not alive any more.
         // It SHOULD get kept alive by AGAS though.

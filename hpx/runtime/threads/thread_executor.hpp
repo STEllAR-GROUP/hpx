@@ -17,9 +17,9 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -226,7 +226,7 @@ namespace hpx { namespace threads
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
             virtual void add_at(
-                boost::chrono::steady_clock::time_point const& abs_time,
+                std::chrono::steady_clock::time_point const& abs_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -242,7 +242,7 @@ namespace hpx { namespace threads
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
             virtual void add_after(
-                boost::chrono::steady_clock::duration const& rel_time,
+                std::chrono::steady_clock::duration const& rel_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -381,7 +381,7 @@ namespace hpx { namespace threads
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
         void add_at(
-            boost::chrono::steady_clock::time_point const& abs_time,
+            std::chrono::steady_clock::time_point const& abs_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
@@ -408,7 +408,7 @@ namespace hpx { namespace threads
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
         void add_after(
-            boost::chrono::steady_clock::duration const& rel_time,
+            std::chrono::steady_clock::duration const& rel_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)

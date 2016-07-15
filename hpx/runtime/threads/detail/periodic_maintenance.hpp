@@ -16,10 +16,10 @@
 
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/atomic.hpp>
-#include <boost/chrono/system_clocks.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/ref.hpp>
 
+#include <chrono>
 #include <type_traits>
 
 namespace hpx { namespace threads { namespace detail
@@ -48,13 +48,13 @@ namespace hpx { namespace threads { namespace detail
         {
             // create timer firing in correspondence with given time
             typedef boost::asio::basic_deadline_timer<
-                boost::chrono::steady_clock
-              , util::chrono_traits<boost::chrono::steady_clock>
+                std::chrono::steady_clock
+              , util::chrono_traits<std::chrono::steady_clock>
             > deadline_timer;
 
             deadline_timer t(
                 get_thread_pool("timer-thread")->get_io_service(),
-                boost::chrono::milliseconds(1000));
+                std::chrono::milliseconds(1000));
 
             void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
                 std::true_type) =
@@ -79,13 +79,13 @@ namespace hpx { namespace threads { namespace detail
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
-            boost::chrono::steady_clock
-          , util::chrono_traits<boost::chrono::steady_clock>
+            std::chrono::steady_clock
+          , util::chrono_traits<std::chrono::steady_clock>
         > deadline_timer;
 
         deadline_timer t (
             get_thread_pool("io-thread")->get_io_service(),
-            boost::chrono::milliseconds(1000));
+            std::chrono::milliseconds(1000));
 
         void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
             std::true_type) =

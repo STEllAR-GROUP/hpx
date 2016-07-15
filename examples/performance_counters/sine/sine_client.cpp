@@ -113,7 +113,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 
         // give up control to the thread manager, we will be resumed after
         // 'pause' ms
-        hpx::this_thread::suspend(boost::chrono::milliseconds(pause));
+        hpx::this_thread::suspend(std::chrono::milliseconds(pause));
     }
     return 0;
 }

@@ -18,8 +18,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/chrono/chrono.hpp>
-
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 
@@ -539,7 +538,7 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(boost::chrono::milliseconds(ms), description, ec);
+        return suspend(std::chrono::milliseconds(ms), description, ec);
     }
 
     /// Returns a reference to the executor which was used to create the current

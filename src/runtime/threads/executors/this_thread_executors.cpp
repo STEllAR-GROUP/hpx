@@ -28,8 +28,8 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono/chrono.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -159,7 +159,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_at(
-        boost::chrono::steady_clock::time_point const& abs_time,
+        std::chrono::steady_clock::time_point const& abs_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -203,11 +203,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_after(
-        boost::chrono::steady_clock::duration const& rel_time,
+        std::chrono::steady_clock::duration const& rel_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
-        return add_at(boost::chrono::steady_clock::now() + rel_time,
+        return add_at(std::chrono::steady_clock::now() + rel_time,
             std::move(f), desc, stacksize, ec);
     }
 

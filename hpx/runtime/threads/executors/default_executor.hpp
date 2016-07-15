@@ -15,8 +15,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/chrono/chrono.hpp>
-
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -48,7 +47,7 @@ namespace hpx { namespace threads { namespace executors
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
             void add_at(
-                boost::chrono::steady_clock::time_point const& abs_time,
+                std::chrono::steady_clock::time_point const& abs_time,
                 closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
@@ -56,11 +55,11 @@ namespace hpx { namespace threads { namespace executors
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
             inline void add_after(
-                boost::chrono::steady_clock::duration const& rel_time,
+                std::chrono::steady_clock::duration const& rel_time,
                 closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
-                return add_at(boost::chrono::steady_clock::now() + rel_time,
+                return add_at(std::chrono::steady_clock::now() + rel_time,
                     std::move(f), description, stacksize, ec);
             }
 

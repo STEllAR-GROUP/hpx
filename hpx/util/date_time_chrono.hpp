@@ -14,19 +14,17 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/thread/thread_time.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_CHRONO)
 #include <chrono>
-#endif
 
 namespace hpx { namespace util
 {
     template <typename Clock, typename Duration>
     boost::posix_time::ptime
-    to_ptime(boost::chrono::time_point<Clock, Duration> const& from)
+    to_ptime(std::chrono::time_point<Clock, Duration> const& from)
     {
-        typedef boost::chrono::nanoseconds duration_type;
+        typedef std::chrono::nanoseconds duration_type;
         typedef duration_type::rep rep_type;
-        rep_type d = boost::chrono::duration_cast<duration_type>(
+        rep_type d = std::chrono::duration_cast<duration_type>(
             from.time_since_epoch()).count();
         rep_type sec = d / 1000000000;
         rep_type nsec = d % 1000000000;
@@ -42,11 +40,11 @@ namespace hpx { namespace util
 
     template <typename Clock, typename Duration>
     boost::posix_time::time_duration
-    to_time_duration(boost::chrono::duration<Clock, Duration> const& from)
+    to_time_duration(std::chrono::duration<Clock, Duration> const& from)
     {
-        typedef boost::chrono::nanoseconds duration_type;
+        typedef std::chrono::nanoseconds duration_type;
         typedef duration_type::rep rep_type;
-        rep_type d = boost::chrono::duration_cast<duration_type>(from).count();
+        rep_type d = std::chrono::duration_cast<duration_type>(from).count();
         rep_type sec = d / 1000000000;
         rep_type nsec = d % 1000000000;
         return boost::posix_time::seconds(static_cast<long>(sec)) +
@@ -61,9 +59,9 @@ namespace hpx { namespace util
     struct posix_clock
     {
         typedef boost::int_least64_t rep;
-        typedef boost::nano period;
-        typedef boost::chrono::duration<rep, period> duration;
-        typedef boost::chrono::time_point<posix_clock, duration> time_point;
+        typedef std::nano period;
+        typedef std::chrono::duration<rep, period> duration;
+        typedef std::chrono::time_point<posix_clock, duration> time_point;
         HPX_STATIC_CONSTEXPR bool is_steady = false;
 
         static HPX_FORCEINLINE time_point now() HPX_NOEXCEPT
@@ -90,7 +88,7 @@ namespace hpx { namespace util
 
     class steady_time_point
     {
-        typedef boost::chrono::steady_clock::time_point value_type;
+        typedef std::chrono::steady_clock::time_point value_type;
 
     public:
         steady_time_point(value_type const& abs_time)
@@ -98,27 +96,25 @@ namespace hpx { namespace util
         {}
 
         template <typename Clock, typename Duration>
-        steady_time_point(boost::chrono::time_point<Clock, Duration> const& abs_time)
-          : _abs_time(boost::chrono::steady_clock::now()
+        steady_time_point(std::chrono::time_point<Clock, Duration> const& abs_time)
+          : _abs_time(std::chrono::steady_clock::now()
               + (abs_time - Clock::now()))
         {}
 
+        template <typename Clock, typename Duration>
+        steady_time_point(boost::chrono::time_point<Clock, Duration> const& abs_time)
+        {
+            std::chrono::nanoseconds duration(
+                boost::chrono::duration_cast<boost::chrono::nanoseconds>(
+                    abs_time - Clock::now()).count());
+
+            _abs_time = std::chrono::steady_clock::now() + duration;
+        }
+
         steady_time_point(boost::posix_time::ptime const& abs_time)
-          : _abs_time(boost::chrono::steady_clock::now()
+          : _abs_time(std::chrono::steady_clock::now()
               + (posix_clock::from_ptime(abs_time) - posix_clock::now()))
         {}
-
-#if defined(HPX_HAVE_CXX11_STD_CHRONO)
-        template <typename Clock, typename Duration>
-        steady_time_point(std::chrono::time_point<Clock, Duration> const& std_abs_time)
-        {
-            boost::chrono::nanoseconds rel_time(
-                std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    std_abs_time - Clock::now()).count());
-
-            _abs_time = boost::chrono::steady_clock::now() + rel_time;
-        }
-#endif
 
         value_type const& value() const HPX_NOEXCEPT
         {
@@ -131,7 +127,7 @@ namespace hpx { namespace util
 
     class steady_duration
     {
-        typedef boost::chrono::steady_clock::duration value_type;
+        typedef std::chrono::steady_clock::duration value_type;
 
     public:
         steady_duration(value_type const& rel_time)
@@ -139,8 +135,8 @@ namespace hpx { namespace util
         {}
 
         template <typename Rep, typename Period>
-        steady_duration(boost::chrono::duration<Rep, Period> const& rel_time)
-          : _rel_time(boost::chrono::duration_cast<value_type>(rel_time))
+        steady_duration(std::chrono::duration<Rep, Period> const& rel_time)
+          : _rel_time(std::chrono::duration_cast<value_type>(rel_time))
         {
             if (_rel_time < rel_time)
                 ++_rel_time;
@@ -150,28 +146,26 @@ namespace hpx { namespace util
           : _rel_time(rel_time.total_nanoseconds())
         {}
 
-#if defined(HPX_HAVE_CXX11_STD_CHRONO)
         template <typename Rep, typename Period>
-        steady_duration(std::chrono::duration<Rep, Period> const& std_rel_time)
+        steady_duration(boost::chrono::duration<Rep, Period> const& rel_time)
         {
-            boost::chrono::nanoseconds rel_time(
-                std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    std_rel_time).count());
+            std::chrono::nanoseconds duration(
+                boost::chrono::duration_cast<boost::chrono::nanoseconds>(
+                    rel_time).count());
 
-            _rel_time = boost::chrono::duration_cast<value_type>(rel_time);
-            if (_rel_time < rel_time)
+            _rel_time = std::chrono::duration_cast<value_type>(duration);
+            if (_rel_time < duration)
                 ++_rel_time;
         }
-#endif
 
         value_type const& value() const HPX_NOEXCEPT
         {
             return _rel_time;
         }
 
-        boost::chrono::steady_clock::time_point from_now() const HPX_NOEXCEPT
+        std::chrono::steady_clock::time_point from_now() const HPX_NOEXCEPT
         {
-            return boost::chrono::steady_clock::now() + _rel_time;
+            return std::chrono::steady_clock::now() + _rel_time;
         }
 
     private:
@@ -209,10 +203,10 @@ namespace hpx { namespace util
         {
 #ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
             return boost::posix_time::nanoseconds(
-                boost::chrono::duration_cast<boost::chrono::nanoseconds>(d).count());
+                std::chrono::duration_cast<std::chrono::nanoseconds>(d).count());
 #else
             return boost::posix_time::microseconds(
-                boost::chrono::duration_cast<boost::chrono::microseconds>(d).count());
+                std::chrono::duration_cast<std::chrono::microseconds>(d).count());
 #endif
         }
     };

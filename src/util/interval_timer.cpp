@@ -12,6 +12,7 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -247,7 +248,7 @@ namespace hpx { namespace util { namespace detail
 
         // schedule this thread to be run after the given amount of seconds
         threads::set_thread_state(id,
-            boost::chrono::microseconds(microsecs_),
+            std::chrono::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
             threads::thread_priority_boost, ec);
 

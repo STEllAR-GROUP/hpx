@@ -24,6 +24,7 @@
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/atomic.hpp>
 
+#include <chrono>
 #include <memory>
 
 namespace hpx { namespace threads { namespace detail
@@ -269,7 +270,7 @@ namespace hpx { namespace threads { namespace detail
     /// behalf of one of the threads#detail#set_thread_state functions).
     template <typename SchedulingPolicy>
     thread_state_enum at_timer(SchedulingPolicy& scheduler,
-        boost::chrono::steady_clock::time_point& abs_time,
+        std::chrono::steady_clock::time_point& abs_time,
         thread_id_type const& thrd, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority)
     {
@@ -299,8 +300,8 @@ namespace hpx { namespace threads { namespace detail
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
-            boost::chrono::steady_clock
-          , util::chrono_traits<boost::chrono::steady_clock>
+            std::chrono::steady_clock
+          , util::chrono_traits<std::chrono::steady_clock>
         > deadline_timer;
 
         deadline_timer t (

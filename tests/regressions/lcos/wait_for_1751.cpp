@@ -8,18 +8,19 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <boost/chrono.hpp>
+
+#include <chrono>
 
 int hpx_main()
 {
-    auto overall_start_time = boost::chrono::high_resolution_clock::now();
+    auto overall_start_time = std::chrono::high_resolution_clock::now();
 
     while(true)
     {
-        auto start_time = boost::chrono::high_resolution_clock::now();
+        auto start_time = std::chrono::high_resolution_clock::now();
 
         // run for 3 seconds max
-        boost::chrono::duration<double> overall_dif = start_time - overall_start_time;
+        std::chrono::duration<double> overall_dif = start_time - overall_start_time;
         if (overall_dif.count() > 3.0)
             break;
 
@@ -28,12 +29,12 @@ int hpx_main()
         if (f.wait_for(boost::posix_time::seconds(1)) ==
             hpx::lcos::future_status::timeout)
         {
-            auto now = boost::chrono::high_resolution_clock::now();
+            auto now = std::chrono::high_resolution_clock::now();
             overall_dif = now - overall_start_time;
-            boost::chrono::duration<double> dif = now - start_time;
+            std::chrono::duration<double> dif = now - start_time;
 
             std::cout << "Future timed out after "
-                      << dif.count() << " (" << overall_dif << ") seconds.\n";
+                      << dif.count() << " (" << overall_dif.count() << ") seconds.\n";
             break;
         }
         else
@@ -41,11 +42,11 @@ int hpx_main()
             f.get();
         }
 
-        auto now = boost::chrono::high_resolution_clock::now();
+        auto now = std::chrono::high_resolution_clock::now();
         overall_dif = now - overall_start_time;
-        boost::chrono::duration<double> dif = now - start_time;
+        std::chrono::duration<double> dif = now - start_time;
         std::cout << "Future took "
-                  << dif.count() << " (" << overall_dif << ") seconds.\n";
+                  << dif.count() << " (" << overall_dif.count() << ") seconds.\n";
     }
 
     return hpx::finalize();

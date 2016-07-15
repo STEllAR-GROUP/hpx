@@ -17,8 +17,8 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>
-#include <boost/chrono/chrono.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -103,8 +103,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     typedef boost::asio::basic_deadline_timer<
-        boost::chrono::steady_clock
-        , util::chrono_traits<boost::chrono::steady_clock>
+        std::chrono::steady_clock
+        , util::chrono_traits<std::chrono::steady_clock>
     > steady_clock_deadline_timer;
 
     struct delayed_add_helper
@@ -115,7 +115,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             service_executor* exec
           , service_executor::closure_type&& f
           , boost::asio::io_service& io_service
-          , boost::chrono::steady_clock::time_point const& abs_time
+          , std::chrono::steady_clock::time_point const& abs_time
         ) : exec_(exec)
           , f_(std::move(f))
           , timer_(io_service, abs_time)
@@ -135,7 +135,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // than time abs_time. This call never blocks, and may violate
     // bounds on the executor's queue size.
     void service_executor::add_at(
-        boost::chrono::steady_clock::time_point const& abs_time,
+        std::chrono::steady_clock::time_point const& abs_time,
         closure_type&& f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -153,11 +153,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // than time rel_time from now. This call never blocks, and may
     // violate bounds on the executor's queue size.
     void service_executor::add_after(
-        boost::chrono::steady_clock::duration const& rel_time,
+        std::chrono::steady_clock::duration const& rel_time,
         closure_type&& f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
-        return add_at(boost::chrono::steady_clock::now() + rel_time,
+        return add_at(std::chrono::steady_clock::now() + rel_time,
             std::move(f), desc, stacksize, ec);
     }
 
