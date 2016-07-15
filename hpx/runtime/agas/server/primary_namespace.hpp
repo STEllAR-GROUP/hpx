@@ -28,10 +28,6 @@
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
-#  include <memory>
-#endif
-
 #include <cstdint>
 #include <list>
 #include <map>
@@ -142,20 +138,10 @@ struct HPX_EXPORT primary_namespace
 
     gva_table_type gvas_;
     refcnt_table_type refcnts_;
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     typedef std::map<
             naming::gid_type,
             hpx::util::tuple<bool, std::size_t, lcos::local::condition_variable_any>
         > migration_table_type;
-#else
-    typedef std::map<
-            naming::gid_type,
-            hpx::util::tuple<
-                bool, std::size_t,
-                std::shared_ptr<lcos::local::condition_variable_any>
-            >
-        > migration_table_type;
-#endif
 
     std::string instance_name_;
     naming::gid_type next_id_;      // next available gid

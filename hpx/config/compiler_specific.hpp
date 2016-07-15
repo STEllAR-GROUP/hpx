@@ -11,9 +11,7 @@
 // macros to facilitate handling of compiler-specific issues
 #  define HPX_GCC_VERSION (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__)
 
-#  if HPX_GCC_VERSION >= 40600
-#    define HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS 1
-#  endif
+#  define HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS 1
 
 #  undef HPX_CLANG_VERSION
 #  undef HPX_INTEL_VERSION

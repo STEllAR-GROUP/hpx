@@ -14,19 +14,4 @@ struct foo {
     ~foo() = default;
 };
 
-// GCC4.6 doesn't get it quite right
-struct bar {
-  bar() {}
-  bar(bar const&) {};
-};
-
-template <typename T>
-struct baz : bar {
-  baz() {}
-  baz(baz const&) = default;
-  baz(baz&&) = default; // deleted
-};
-
-int main() {
-  baz<int> x, y(static_cast<baz<int>&&>(x));
-}
+int main() {}

@@ -120,18 +120,10 @@ namespace hpx { namespace serialization { namespace detail
             auto it = map_.find(class_name);
             auto jt = typeinfo_map_.find(typeinfo.name());
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
             if(it == map_.end())
                 map_.emplace(class_name, bunch);
             if(jt == typeinfo_map_.end())
                 typeinfo_map_.emplace(typeinfo.name(), class_name);
-#else
-            if(it == map_.end())
-                map_.insert(serializer_map_type::value_type(class_name, bunch));
-            if(jt == typeinfo_map_.end())
-                typeinfo_map_.insert(serializer_typeinfo_map_type::value_type(
-                    typeinfo.name(), class_name));
-#endif
         }
 
         // the following templates are defined in *.ipp file
