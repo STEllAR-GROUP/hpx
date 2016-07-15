@@ -337,56 +337,6 @@ For more detailed information about building HPX for the Xeon/Phi please refer t
 the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.intel_mic_installation>`_.
 
 
-
-******************
- Docker
-******************
-
-We also provide several HPX docker images.
-Those can be used for rapid prototyping, demonstrations or writing minimal
-examples for issue reports. This also provides an HPX build environment for
-continuous integration of external projects.
-
-The following images are currently available:
-
-* ``stellargroup/hpx:dev``      (HEAD, updated on every commit to master which
-  builds successfully, see
-  `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
-  build status)
-* ``stellargroup/hpx:latest``   (latest release)
-* ``stellargroup/hpx:0.9.99``   (release v0.9.99)
-* ``stellargroup/hpx:0.9.11``   (release v0.9.11)
-* ``stellargroup/hpx:0.9.10``   (release v0.9.10)
-
-While a more detailed introduction to docker can be found at the official
-`docker homepage <https://docs.docker.com/userguide/>`_, here are some easy
-steps that explain how to use a docker image::
-
-    # Download/Update the image
-    docker pull stellargroup/hpx:dev
-
-    # Run a command.
-    # NOTICE: Docker images are read-only and will be reset after execution.
-    docker run stellargroup/hpx:dev hello_world
-
-    # Mount a host directory to make changes persistent.
-    # In this case, mount the current host directory $PWD to /hpx in the
-    # dockerfile via '-v'.
-    # Also, make /hpx the current working directory with '-w'.
-    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev <command> <arguments>
-
-    # For example, build the binary "example" from "example.cpp" using
-    # the built-in hpx compilation script "hpxcxx". Note that hpx libraries
-    # other than the core library have to be linked explicitly (like hpx_iostreams).
-    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev \
-        hpxcxx example.cpp --exe=example -lhpx_iostreams
-
-    # Now run the resulting program:
-    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev ./example
-
-
-
-
 ******************
  Acknowledgements
 ******************
