@@ -15,7 +15,6 @@
 
 #include <boost/format.hpp>
 #include <boost/asio/ip/host_name.hpp>
-#include <boost/assign/list_of.hpp>
 #include <boost/generator_iterator.hpp>
 
 #include <map>
@@ -31,15 +30,15 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     // PAPI domain handling
 
     // PAPI domain description strings
-    const std::map<std::string, int> papi_domain_map = boost::assign::map_list_of
-        ("user",   PAPI_DOM_USER)
-        ("kernel", PAPI_DOM_KERNEL)
-        ("other",  PAPI_DOM_OTHER)
-        ("super",  PAPI_DOM_SUPERVISOR)
-        ("all",    PAPI_DOM_ALL)
-        ("min",    PAPI_DOM_MIN)
-        ("max",    PAPI_DOM_MAX)
-        ;
+    std::map<std::string, int> const papi_domain_map = {
+        {"user",   PAPI_DOM_USER}
+        {"kernel", PAPI_DOM_KERNEL}
+        {"other",  PAPI_DOM_OTHER}
+        {"super",  PAPI_DOM_SUPERVISOR}
+        {"all",    PAPI_DOM_ALL}
+        {"min",    PAPI_DOM_MIN}
+        {"max",    PAPI_DOM_MAX}
+    };
 
     // map domain string into PAPI handle
     int map_domain(std::string const& s)

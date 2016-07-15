@@ -15,8 +15,6 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign.hpp>
-
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -104,10 +102,10 @@ int hpx_main (int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=" +
+            std::to_string(hpx::threads::hardware_concurrency())
+    };
 
     // Initialize and run HPX
     return hpx::init(argc, argv, cfg);

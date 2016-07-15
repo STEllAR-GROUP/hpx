@@ -15,7 +15,6 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/assign/std/vector.hpp>
 #include <boost/scoped_array.hpp>
 
 #include <string>
@@ -108,10 +107,10 @@ int main(
         ;
 
     // We force this test to use all available threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=" +
+            std::to_string(hpx::threads::hardware_concurrency())
+    };
 
     // Initialize and run HPX.
     return hpx::init(cmdline, argc, argv, cfg);

@@ -879,9 +879,6 @@ hpx_check_for_cxx11_extended_friend_declarations(
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
-hpx_check_for_cxx11_initializer_list(
-  DEFINITIONS HPX_HAVE_CXX11_INITIALIZER_LIST)
-
 hpx_check_for_cxx11_inline_namespaces(
   DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
 
@@ -923,7 +920,7 @@ hpx_check_for_cxx11_std_cstdint(
   DEFINITIONS HPX_HAVE_CXX11_STD_CSTDINT)
 
 hpx_check_for_cxx11_std_initializer_list(
-  DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
+  REQUIRED "HPX needs support for C++11 std::initializer_list")
 
 hpx_check_for_cxx11_std_is_bind_expression(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)

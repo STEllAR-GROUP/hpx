@@ -16,8 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/assign/std/vector.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 template<unsigned id>
 unsigned make_unsigned_slowly()
@@ -667,10 +665,10 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=" +
+            std::to_string(hpx::threads::hardware_concurrency())
+    };
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

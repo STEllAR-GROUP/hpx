@@ -176,11 +176,11 @@ int main(int argc, char* argv[])
         ;
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
-    cfg += "hpx.run_hpx_main!=1";
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=" +
+            std::to_string(hpx::threads::hardware_concurrency()),
+        "hpx.run_hpx_main!=1"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

@@ -14,8 +14,6 @@
 
 #include "htts2.hpp"
 
-#include <boost/assign/std/vector.hpp>
-
 #include <string>
 #include <vector>
 
@@ -29,11 +27,11 @@ struct hpx_driver : htts2::driver
 
     void run()
     {
-        using namespace boost::assign;
-        std::vector<std::string> cfg;
-        cfg += "hpx.os_threads=" + std::to_string(osthreads_);
-        cfg += "hpx.run_hpx_main!=0";
-        cfg += "hpx.commandline.allow_unknown!=1";
+        std::vector<std::string> const cfg = {
+            "hpx.os_threads=" + std::to_string(osthreads_),
+            "hpx.run_hpx_main!=0",
+            "hpx.commandline.allow_unknown!=1"
+        };
 
         hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
         boost::program_options::options_description desc;
