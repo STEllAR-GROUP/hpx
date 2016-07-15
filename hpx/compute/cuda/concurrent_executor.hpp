@@ -53,7 +53,7 @@ namespace hpx { namespace compute { namespace cuda
             {
                 cuda::target t(cuda_target.native_handle().get_device());
                 t.native_handle().get_stream();
-                cuda_executors_.emplace_back(t);
+                cuda_executors_.emplace_back(std::move(t));
             }
         }
 
@@ -105,8 +105,9 @@ namespace hpx { namespace compute { namespace cuda
             host_executor_traits::apply_execute(host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable
                 {
-                    cuda_executor_traits::apply_execute(cuda_executors_[current],
-                        std::forward<F>(f), std::forward<Ts>(ts)...);
+                    cuda_executor_traits::apply_execute(
+                        cuda_executors_[current], std::forward<F>(f),
+                        std::forward<Ts>(ts)...);
                 },
                 std::forward<F>(f), std::forward<Ts>(ts)...
             );
@@ -119,10 +120,9 @@ namespace hpx { namespace compute { namespace cuda
             return host_executor_traits::async_execute(host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable
                 {
-                    cuda_executor_traits::apply_execute(cuda_executors_[current],
-                        std::forward<F>(f), std::forward<Ts>(ts)...);
-
-                    return cuda_executors_[current].target().get_future();
+                    return cuda_executor_traits::async_execute(
+                        cuda_executors_[current], std::forward<F>(f),
+                        std::forward<Ts>(ts)...);
                 },
                 std::forward<F>(f), std::forward<Ts>(ts)...
             );
@@ -135,10 +135,9 @@ namespace hpx { namespace compute { namespace cuda
             host_executor_traits::execute(host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable
                 {
-                    cuda_executor_traits::apply_execute(cuda_executors_[current],
-                        std::forward<F>(f), std::forward<Ts>(ts)...);
-
-                    cuda_executors_[current].target().synchronize();
+                    cuda_executor_traits::execute(
+                        cuda_executors_[current], std::forward<F>(f),
+                        std::forward<Ts>(ts)...);
                 },
                 std::forward<F>(f), std::forward<Ts>(ts)...
             );
@@ -169,10 +168,9 @@ namespace hpx { namespace compute { namespace cuda
                             shape_type;
 
                         std::array<shape_type, 1> cuda_shape{{s}};
-                        cuda_executors_[current].bulk_launch(
-                            std::forward<F>(f), cuda_shape,
-                            std::forward<Ts>(ts)...);
-                        cuda_executors_[current].target().synchronize();
+                        cuda_executor_traits::bulk_execute(
+                            cuda_executors_[current], std::forward<F>(f),
+                            cuda_shape, std::forward<Ts>(ts)...);
                     },
                     std::forward<F>(f), std::forward<Ts>(ts)...));
             }
