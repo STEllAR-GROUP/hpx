@@ -327,8 +327,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=470
-                boost.image.h=120
+                boost.image.w=562
+                boost.image.h=104
                 boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

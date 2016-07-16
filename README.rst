@@ -55,8 +55,8 @@ The documentation for the latest release of HPX (currently V0.9.99) can be
 `found here <http://stellar.cct.lsu.edu/files/hpx-0.9.99/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.33656.svg
-     :target: http://dx.doi.org/10.5281/zenodo.33656
+.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.58027.svg
+     :target: http://dx.doi.org/10.5281/zenodo.58027
 
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
@@ -377,5 +377,5 @@ HPX is currently funded by
   the grant AZ-987-11.
 
 * The European Commission's Horizon 2020 programme through the grant
-  H2020-EU.1.2.2. 671603 (AllScale). 
+  H2020-EU.1.2.2. 671603 (AllScale).
 

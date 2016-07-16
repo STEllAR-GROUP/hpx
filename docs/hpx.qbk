@@ -37,10 +37,10 @@
 [def __0_9_9__                  [link hpx.whats_new.hpx_previous.hpx_0_9_9  V0.9.9]]
 [def __0_9_10__                 [link hpx.whats_new.hpx_previous.hpx_0_9_10 V0.9.10]]
 [def __0_9_11__                 [link hpx.whats_new.hpx_previous.hpx_0_9_11 V0.9.11]]
-[def __0_9_99__                 [link hpx.whats_new.hpx_0_9_99 V0.9.99]]
+[def __0_9_99__                 [link hpx.whats_new.hpx_previous.hpx_0_9_99 V0.9.99]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __1_0_00__]
+[def __version__                __1_0_0__]
 
 [def __hpx__                    /HPX/]
 [def __hpx_compute__            /HPX.Compute/]
