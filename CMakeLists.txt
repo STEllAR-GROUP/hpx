@@ -846,7 +846,7 @@ endif()
 
 # Check the availability of certain C++11 language features
 hpx_check_for_cxx11_alias_templates(
-  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+  REQUIRED "HPX needs support for C++11 alias templates")
 
 hpx_check_for_cxx11_auto(
   REQUIRED "HPX needs support for C++11 auto")
