@@ -48,8 +48,8 @@ namespace hpx { namespace threads { namespace detail
         {
             // create timer firing in correspondence with given time
             typedef boost::asio::basic_deadline_timer<
-                std::chrono::steady_clock
-              , util::chrono_traits<std::chrono::steady_clock>
+                util::steady_clock
+              , util::chrono_traits<util::steady_clock>
             > deadline_timer;
 
             deadline_timer t(
@@ -79,8 +79,8 @@ namespace hpx { namespace threads { namespace detail
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
-            std::chrono::steady_clock
-          , util::chrono_traits<std::chrono::steady_clock>
+            util::steady_clock
+          , util::chrono_traits<util::steady_clock>
         > deadline_timer;
 
         deadline_timer t (

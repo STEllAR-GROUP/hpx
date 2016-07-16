@@ -1,11 +1,11 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c) 2014 Agustin Berge
+//  Copyright (c) 2014-2016 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_DATE_TIME_CHRONO_APR_10_2012_0449PM)
-#define HPX_UTIL_DATE_TIME_CHRONO_APR_10_2012_0449PM
+#ifndef HPX_UTIL_STEADY_CLOCK_HPP
+#define HPX_UTIL_STEADY_CLOCK_HPP
 
 #include <hpx/config.hpp>
 
@@ -17,9 +17,11 @@
 
 namespace hpx { namespace util
 {
+    using std::chrono::steady_clock;
+
     class steady_time_point
     {
-        typedef std::chrono::steady_clock::time_point value_type;
+        typedef steady_clock::time_point value_type;
 
     public:
         steady_time_point(value_type const& abs_time)
@@ -28,7 +30,7 @@ namespace hpx { namespace util
 
         template <typename Clock, typename Duration>
         steady_time_point(std::chrono::time_point<Clock, Duration> const& abs_time)
-          : _abs_time(std::chrono::steady_clock::now()
+          : _abs_time(steady_clock::now()
               + (abs_time - Clock::now()))
         {}
 
@@ -40,7 +42,7 @@ namespace hpx { namespace util
                 boost::chrono::duration_cast<boost::chrono::nanoseconds>(
                     abs_time - Clock::now()).count());
 
-            _abs_time = std::chrono::steady_clock::now() + duration;
+            _abs_time = steady_clock::now() + duration;
         }
 #endif
 
@@ -55,7 +57,7 @@ namespace hpx { namespace util
 
     class steady_duration
     {
-        typedef std::chrono::steady_clock::duration value_type;
+        typedef steady_clock::duration value_type;
 
     public:
         steady_duration(value_type const& rel_time)
@@ -89,9 +91,9 @@ namespace hpx { namespace util
             return _rel_time;
         }
 
-        std::chrono::steady_clock::time_point from_now() const HPX_NOEXCEPT
+        steady_clock::time_point from_now() const HPX_NOEXCEPT
         {
-            return std::chrono::steady_clock::now() + _rel_time;
+            return steady_clock::now() + _rel_time;
         }
 
     private:
@@ -99,4 +101,4 @@ namespace hpx { namespace util
     };
 }}
 
-#endif
+#endif /*HPX_UTIL_STEADY_CLOCK_HPP*/
