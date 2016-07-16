@@ -12,7 +12,6 @@
 #if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
 #  include <boost/chrono/chrono.hpp>
 #endif
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #include <chrono>
 
@@ -97,45 +96,6 @@ namespace hpx { namespace util
 
     private:
         value_type _rel_time;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Clock>
-    struct chrono_traits
-    {
-        typedef typename Clock::duration duration_type;
-        typedef typename Clock::time_point time_type;
-
-        static time_type now() HPX_NOEXCEPT
-        {
-            return Clock::now();
-        }
-
-        static time_type add(time_type t, duration_type d)
-        {
-            return t + d;
-        }
-
-        static duration_type subtract(time_type t1, time_type t2)
-        {
-            return t1 - t2;
-        }
-
-        static bool less_than(time_type t1, time_type t2)
-        {
-            return t1 < t2;
-        }
-
-        static boost::posix_time::time_duration to_posix_duration(duration_type d)
-        {
-#ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
-            return boost::posix_time::nanoseconds(
-                std::chrono::duration_cast<std::chrono::nanoseconds>(d).count());
-#else
-            return boost::posix_time::microseconds(
-                std::chrono::duration_cast<std::chrono::microseconds>(d).count());
-#endif
-        }
     };
 }}
 

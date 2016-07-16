@@ -11,7 +11,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>

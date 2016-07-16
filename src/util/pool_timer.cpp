@@ -10,6 +10,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
