@@ -738,6 +738,14 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
+# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0
+hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
+    "Enable support for boost::chrono (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################

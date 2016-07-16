@@ -8,7 +8,10 @@
 #define HPX_UTIL_DATE_TIME_CHRONO_APR_10_2012_0449PM
 
 #include <hpx/config.hpp>
-#include <boost/chrono/chrono.hpp>
+
+#if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
+#  include <boost/chrono/chrono.hpp>
+#endif
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #include <chrono>
@@ -30,6 +33,7 @@ namespace hpx { namespace util
               + (abs_time - Clock::now()))
         {}
 
+#if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
         template <typename Clock, typename Duration>
         steady_time_point(boost::chrono::time_point<Clock, Duration> const& abs_time)
         {
@@ -39,6 +43,7 @@ namespace hpx { namespace util
 
             _abs_time = std::chrono::steady_clock::now() + duration;
         }
+#endif
 
         value_type const& value() const HPX_NOEXCEPT
         {
@@ -66,6 +71,7 @@ namespace hpx { namespace util
                 ++_rel_time;
         }
 
+#if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
         template <typename Rep, typename Period>
         steady_duration(boost::chrono::duration<Rep, Period> const& rel_time)
         {
@@ -77,6 +83,7 @@ namespace hpx { namespace util
             if (_rel_time < duration)
                 ++_rel_time;
         }
+#endif
 
         value_type const& value() const HPX_NOEXCEPT
         {
