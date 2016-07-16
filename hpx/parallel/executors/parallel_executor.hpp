@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/auto_chunk_size.hpp>
+#include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {
         /// Associate the auto_chunk_size executor parameters type as a default
         /// with this executor.
-        typedef auto_chunk_size executor_parameters_type;
+        typedef static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
         explicit parallel_executor(launch l = launch::async)
