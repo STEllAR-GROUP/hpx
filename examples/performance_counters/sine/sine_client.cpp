@@ -8,7 +8,6 @@
 
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
-#include <boost/date_time.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // This example demonstrates the creation and use of different types of
