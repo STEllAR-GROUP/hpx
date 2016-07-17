@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,10 +23,15 @@ namespace hpx { namespace performance_counters { namespace stubs
             naming::id_type const& targetid);
         static lcos::future<counter_value> get_value_async(
             naming::id_type const& targetid, bool reset = false);
+        static lcos::future<counter_values_array> get_values_array_async(
+            naming::id_type const& targetid, bool reset = false);
 
         static counter_info get_info(naming::id_type const& targetid,
             error_code& ec = throws);
         static counter_value get_value(naming::id_type const& targetid,
+            bool reset = false, error_code& ec = throws);
+        static counter_values_array get_values_array(
+            naming::id_type const& targetid,
             bool reset = false, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////

@@ -49,9 +49,26 @@ namespace hpx { namespace util
         bool find_counter(performance_counters::counter_info const& info,
             error_code& ec);
 
+        bool print_raw_counters(bool destination_is_cout, bool reset,
+            char const* description, std::vector<id_type> const& ids,
+            error_code& ec);
+        bool print_array_counters(bool destination_is_cout, bool reset,
+            char const* description, std::vector<id_type> const& ids,
+            error_code& ec);
+
+        template <typename Stream>
+        void print_headers(Stream& output);
+
+        template <typename Stream, typename Future>
+        void print_values(Stream& output, std::vector<Future> &&);
+
         template <typename Stream>
         void print_value(Stream& out, std::string const& name,
             performance_counters::counter_value const& value,
+            std::string const& uom);
+        template <typename Stream>
+        void print_value(Stream& out, std::string const& name,
+            performance_counters::counter_values_array const& value,
             std::string const& uom);
 
         template <typename Stream>
@@ -61,6 +78,9 @@ namespace hpx { namespace util
         template <typename Stream>
         void print_value_csv(Stream& out,
             performance_counters::counter_value const& value);
+        template <typename Stream>
+        void print_value_csv(Stream& out,
+            performance_counters::counter_values_array const& value);
 
         template <typename Stream>
         void print_name_csv_short(Stream& out,
@@ -74,6 +94,7 @@ namespace hpx { namespace util
         std::vector<std::string> names_;      // counter instance names
         std::vector<naming::id_type> ids_;    // gids of counter instances
         std::vector<std::string> uoms_;       // units of measure
+        std::vector<performance_counters::counter_type> types_; // counter type
 
         std::string destination_;
         std::string format_;

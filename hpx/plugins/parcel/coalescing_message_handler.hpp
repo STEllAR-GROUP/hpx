@@ -13,14 +13,16 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/histogram.hpp>
 #include <hpx/util/pool_timer.hpp>
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <mutex>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -54,6 +56,12 @@ namespace hpx { namespace plugins { namespace parcel
         boost::int64_t get_messages_count(bool reset);
         boost::int64_t get_parcels_per_message_count(bool reset);
         boost::int64_t get_average_time_between_parcels(bool reset);
+        std::vector<boost::int64_t>
+            get_time_between_parcels_histogram(bool reset);
+        util::function_nonser<std::vector<boost::int64_t>(bool)>
+            get_time_between_parcels_histogram_creator(
+                boost::int64_t min_boundary, boost::int64_t max_boundary,
+                boost::int64_t num_buckets);
 
         // register the given action
         static void register_action(char const* action, error_code& ec);
@@ -71,6 +79,7 @@ namespace hpx { namespace plugins { namespace parcel
         util::pool_timer timer_;
         bool stopped_;
         bool allow_background_flush_;
+        std::string action_name_;
 
         // performance counter data
         boost::int64_t num_parcels_;
@@ -81,6 +90,17 @@ namespace hpx { namespace plugins { namespace parcel
         boost::int64_t reset_num_parcels_per_message_messages_;
         boost::int64_t started_at_;
         boost::int64_t reset_time_num_parcels_;
+        boost::int64_t last_parcel_time_;
+
+        typedef boost::accumulators::accumulator_set<
+                boost::int64_t,
+                boost::accumulators::features<hpx::util::tag::histogram>
+            > histogram_collector_type;
+
+        std::unique_ptr<histogram_collector_type> time_between_parcels_;
+        boost::int64_t histogram_min_boundary_;
+        boost::int64_t histogram_max_boundary_;
+        boost::int64_t histogram_num_buckets_;
     };
 }}}
 

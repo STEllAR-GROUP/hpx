@@ -14,6 +14,7 @@
 #include <hpx/util/cache/entries/lfu_entry.hpp>
 #include <hpx/util/cache/local_cache.hpp>
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
+#include <hpx/util/histogram.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
@@ -26,8 +27,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "histogram.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Below is a copy of the original AGAS cache
@@ -114,15 +113,15 @@ void calculate_histogram(std::string const& prefix,
 {
     auto minmax = std::minmax_element(timings.begin(), timings.end());
 
-    using namespace boost::accumulators;
-    typedef accumulator_set<
-            boost::uint64_t, features<tag::histogram>
+    typedef boost::accumulators::accumulator_set<
+            boost::uint64_t,
+            boost::accumulators::features<hpx::util::tag::histogram>
         > histogram_collector_type;
 
     histogram_collector_type hist(
-        tag::histogram::num_bins = 20,
-        tag::histogram::min_range = *minmax.first,
-        tag::histogram::max_range = *minmax.second);
+        hpx::util::tag::histogram::num_bins = 20,
+        hpx::util::tag::histogram::min_range = *minmax.first,
+        hpx::util::tag::histogram::max_range = *minmax.second);
 
     for (boost::int64_t t : timings)
     {
@@ -132,7 +131,7 @@ void calculate_histogram(std::string const& prefix,
     std::cout << prefix << ": ";
 
     bool first = true;
-    auto data = histogram(hist);
+    auto data = hpx::util::histogram(hist);
     for (auto const& item : data)
     {
         if (!first)

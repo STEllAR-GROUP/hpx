@@ -52,6 +52,14 @@ namespace hpx { namespace performance_counters
             error_code& ec = throws);
         counter_value get_counter_value_sync(error_code& ec = throws) const;
 
+        future<counter_values_array> get_counter_values_array(bool reset = false);
+        future<counter_values_array> get_counter_values_array() const;
+
+        counter_values_array get_counter_values_array_sync(bool reset = false,
+            error_code& ec = throws);
+        counter_values_array get_counter_values_array_sync(
+            error_code& ec = throws) const;
+
         ///////////////////////////////////////////////////////////////////////
         future<bool> start();
         bool start_sync(error_code& ec = throws);
