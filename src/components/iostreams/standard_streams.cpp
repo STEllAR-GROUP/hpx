@@ -5,11 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/component.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
@@ -56,6 +57,19 @@ namespace hpx { namespace iostreams { namespace detail
         // the console locality will create the ostream during startup
         return agas::on_symbol_namespace_event(cout_name, agas::symbol_ns_bind, true);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+//     void release_ostream(char const* name, naming::id_type const& id)
+//     {
+//         LRT_(info) << "detail::release_ostream: destroying '"
+//                    << name << "' stream object";
+//
+//         if (agas::is_console())
+//         {
+//             // now unregister the object from AGAS
+//             agas::unregister_name_sync(name);
+//         }
+//     }
 }}}
 
 namespace hpx { namespace iostreams
@@ -96,7 +110,7 @@ namespace hpx { namespace iostreams
 
     std::stringstream const& get_consolestream()
     {
-        if (!agas::is_console())
+        if (get_runtime_ptr() != 0 && !agas::is_console())
         {
             HPX_THROW_EXCEPTION(service_unavailable,
                 "hpx::iostreams::get_consolestream",
