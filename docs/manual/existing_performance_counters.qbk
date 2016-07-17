@@ -1,5 +1,5 @@
 [/=============================================================================
-    Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (C) 2007-2016 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +15,7 @@ system and application performance.
 [teletype]
 [/////////////////////////////////////////////////////////////////////////////]
 [table AGAS Performance Counters
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/agas/count/<agas_service>`
 
           where:[br] `<agas_service>` is one of the following:[br]
@@ -190,7 +190,7 @@ system and application performance.
 
 [/////////////////////////////////////////////////////////////////////////////]
 [table Parcel Layer Performance Counters
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/data/count/<connection_type>/<operation>`
 
           where:[br] `<operation>` is one of the following:
@@ -534,7 +534,7 @@ system and application performance.
 
 [/////////////////////////////////////////////////////////////////////////////]
 [table Thread Manager Performance Counters
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/threads/count/cumulative`]
         [`locality#*/total` or[br]
          `locality#*/worker-thread#*`
@@ -1160,7 +1160,7 @@ system and application performance.
 
 [/////////////////////////////////////////////////////////////////////////////]
 [table General Performance Counters exposing Characteristics of Localities
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/runtime/count/component`]
         [`locality#*/total`
 
@@ -1333,7 +1333,7 @@ system and application performance.
 
 [/////////////////////////////////////////////////////////////////////////////]
 [table Performance Counters for General Statistics
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/statistics/average`]
         [Any full performance counter name. The referenced performance counter
          is queried at fixed time intervals as specified by the first parameter.]
@@ -1403,7 +1403,7 @@ system and application performance.
 
 [/////////////////////////////////////////////////////////////////////////////]
 [table Performance Counters for Elementary Arithmetic Operations
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/arithmetics/add`]
         [None]
         [Returns the sum calculated based on the values queried from the
@@ -1468,7 +1468,7 @@ system and application performance.
 
 [/////////////////////////////////////////////////////////////////////////////]
 [table Performance Counters Tracking Parcel Coalescing
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/coalescing/count/parcels`]
         [`locality#*/total`
 
@@ -1530,12 +1530,42 @@ system and application performance.
          [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`]
         ]
     ]
+    [   [`/coalescing/time/parcel-arrival-histogram`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the average time
+          between parcels for the given action should be queried for. The
+          locality id is a (zero based) number identifying the locality.]
+        [Returns a histogram representing the times between arriving parcels
+         for the action which is given by the counter parameter.
+
+         This counter returns an array of values, where the first three values
+         represent the three parameters used for the histogram followed by
+         one value for each of the histogram buckets.
+
+         The unit of measure displayed for this counter (`[ns]`) refers to the
+         lower and upper boundary values in the returned histogram data only.
+        ]
+        [The action type. This is the string which has been used
+         while registering the action with __hpx__, e.g. which has been
+         passed as the second parameter to the macro
+         [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
+         [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
+         The action type may be follwowed by a comma separated list of up-to
+         three numbers: the lower and upper boundaries for the collected
+         histogram, and the number of buckets for the histogram. By default
+         these three numbers will be assumed to be `0` (`[ns]`, lower bound),
+         `1000000` (`[ns]`, upper bound), and `20` (number of buckets to
+         generate).
+        ]
+    ]
 ]
 
 [note The performance counters related to parcel coalescing are available only
       if the configuration time constant `HPX_WITH_PARCEL_COALESCING` is set to
       `ON` (default: ON). However, even in this case it will be available only
-      for those actions, which are enabled for parcel coalescing (see the macro
+      for those actions, which are enabled for parcel coalescing (see the macros
+      [macroref HPX_ACTION_USES_MESSAGE_COALESCING `HPX_ACTION_USES_MESSAGE_COALESCING`] and
       [macroref HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW `HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW`]).
 ]
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,6 +49,11 @@ HPX_REGISTER_ACTION_ID(
     ::base_performance_counter::get_counter_value_action,
     performance_counter_get_counter_value_action,
     hpx::actions::performance_counter_get_counter_value_action_id)
+HPX_REGISTER_ACTION_ID(
+    hpx::performance_counters::server
+    ::base_performance_counter::get_counter_values_array_action,
+    performance_counter_get_counter_values_array_action,
+    hpx::actions::performance_counter_get_counter_values_array_action_id)
 HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server
     ::base_performance_counter::set_counter_value_action,
@@ -478,13 +483,14 @@ namespace hpx { namespace performance_counters
             "counter_average_count",
             "counter_aggregating",
             "counter_average_timer",
-            "counter_elapsed_time"
+            "counter_elapsed_time",
+            "counter_histogram",
         };
     }
 
     char const* get_counter_type_name(counter_type type)
     {
-        if (type < counter_text || type > counter_elapsed_time)
+        if (type < counter_text || type > counter_histogram)
             return "unknown";
         return strings::counter_type_names[type];
     }
@@ -626,6 +632,26 @@ namespace hpx { namespace performance_counters
 
         naming::gid_type create_raw_counter(counter_info const& info,
             hpx::util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
+        {
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().create_raw_counter(
+                info, f, gid, ec);
+            return gid;
+        }
+
+        naming::gid_type create_raw_counter(counter_info const& info,
+            hpx::util::function_nonser<std::vector<boost::int64_t>()> const& f,
+            error_code& ec)
+        {
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().create_raw_counter(
+                info, f, gid, ec);
+            return gid;
+        }
+
+        naming::gid_type create_raw_counter(counter_info const& info,
+            hpx::util::function_nonser<std::vector<boost::int64_t>(bool)> const& f,
+            error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
