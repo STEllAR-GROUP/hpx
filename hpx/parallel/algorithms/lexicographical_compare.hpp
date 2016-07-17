@@ -117,98 +117,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses operator< to comapre elements.
-    ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation <, where N1 = std::distance(first1, last)
-    ///         and N2 = std::distance(first2, last2).
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \note     Lexicographical comparison is an operation
-    ///           with the following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///
-    template <typename ExPolicy, typename InIter1, typename InIter2>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2)
-    {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
-            > is_seq;
-
-        return detail::lexicographical_compare().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, detail::less());
-    }
-
-    /// Checks if the first range [first1, last1) is lexicographically less than
     /// the second range [first2, last2). uses a provided predicate to comapre
     /// elements.
     ///
@@ -228,8 +136,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam Pred        comparison function object that returns true if the
-    ///                     first argument is \a less than the second
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a lexicographical_compare requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -280,13 +191,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           it returns false.
     /// range [first2, last2), it returns false.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename Pred>
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename Pred = detail::less>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, Pred && pred)
+        InIter2 first2, InIter2 last2, Pred && pred = Pred())
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter1>::value),
@@ -303,8 +215,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2,
-            std::forward<Pred>(pred));
+            first1, last1, first2, last2, std::forward<Pred>(pred));
     }
 }}}
 
