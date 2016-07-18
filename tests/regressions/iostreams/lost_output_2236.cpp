@@ -22,7 +22,7 @@ void generate_output(Ts &&... ts)
     std::stringstream stream;
     int const sequencer[] =
     {
-        (stream << ts, 0)..., 0
+        0, (stream << ts, 0)...
     };
     (void)sequencer;
 
@@ -48,7 +48,7 @@ void generate_output_no_endl(Ts &&... ts)
     std::stringstream stream;
     int const sequencer[] =
     {
-        (stream << ts, 0)..., 0
+        0, (stream << ts, 0)...
     };
     (void)sequencer;
 
