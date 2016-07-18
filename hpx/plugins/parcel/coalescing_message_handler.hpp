@@ -13,6 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/histogram.hpp>
 #include <hpx/util/pool_timer.hpp>
 
@@ -59,10 +60,10 @@ namespace hpx { namespace plugins { namespace parcel
         boost::int64_t get_average_time_between_parcels(bool reset);
         std::vector<boost::int64_t>
             get_time_between_parcels_histogram(bool reset);
-        util::function_nonser<std::vector<boost::int64_t>(bool)>
-            get_time_between_parcels_histogram_creator(
-                boost::int64_t min_boundary, boost::int64_t max_boundary,
-                boost::int64_t num_buckets);
+        void get_time_between_parcels_histogram_creator(
+            boost::int64_t min_boundary, boost::int64_t max_boundary,
+            boost::int64_t num_buckets,
+            util::function_nonser<std::vector<boost::int64_t>(bool)>& result);
 
         // register the given action
         static void register_action(char const* action, error_code& ec);

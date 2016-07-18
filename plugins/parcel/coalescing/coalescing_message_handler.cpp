@@ -116,6 +116,7 @@ namespace hpx { namespace plugins { namespace parcel
         using util::placeholders::_1;
         using util::placeholders::_2;
         using util::placeholders::_3;
+        using util::placeholders::_4;
         coalescing_counter_registry::instance().register_action(action_name,
             util::bind(&coalescing_message_handler::get_parcels_count, this, _1),
             util::bind(&coalescing_message_handler::get_messages_count, this, _1),
@@ -124,7 +125,7 @@ namespace hpx { namespace plugins { namespace parcel
             util::bind(&coalescing_message_handler::
                 get_average_time_between_parcels, this, _1),
             util::bind(&coalescing_message_handler::
-                get_time_between_parcels_histogram_creator, this, _1, _2, _3));
+                get_time_between_parcels_histogram_creator, this, _1, _2, _3, _4));
     }
 
     void coalescing_message_handler::put_parcel(
@@ -353,10 +354,11 @@ namespace hpx { namespace plugins { namespace parcel
         return result;
     }
 
-    util::function_nonser<std::vector<boost::int64_t>(bool)>
+    void
     coalescing_message_handler::get_time_between_parcels_histogram_creator(
         boost::int64_t min_boundary, boost::int64_t max_boundary,
-        boost::int64_t num_buckets)
+        boost::int64_t num_buckets,
+        util::function_nonser<std::vector<boost::int64_t>(bool)>& result)
     {
         std::unique_lock<mutex_type> l(mtx_);
         if (time_between_parcels_)
@@ -366,7 +368,8 @@ namespace hpx { namespace plugins { namespace parcel
                     "get_time_between_parcels_histogram_creator",
                 "parcel-arrival-histogram counter already created for "
                 "action type: " + action_name_);
-            return &coalescing_counter_registry::empty_histogram;
+            result = &coalescing_counter_registry::empty_histogram;
+            return;
         }
 
         histogram_min_boundary_ = min_boundary;
@@ -379,9 +382,8 @@ namespace hpx { namespace plugins { namespace parcel
             hpx::util::tag::histogram::max_range = max_boundary);
         last_parcel_time_ = util::high_resolution_clock::now();
 
-        return util::bind(&coalescing_message_handler::
-                get_time_between_parcels_histogram, this,
-                util::placeholders::_1);
+        result = util::bind(&coalescing_message_handler::
+            get_time_between_parcels_histogram, this, util::placeholders::_1);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -163,8 +163,10 @@ namespace hpx { namespace plugins { namespace parcel
         if ((*it).second.time_between_parcels_histogram_creator.empty())
             return &coalescing_counter_registry::empty_histogram;
 
-        return (*it).second.time_between_parcels_histogram_creator(
-            min_boundary, max_boundary, num_buckets);
+        coalescing_counter_registry::get_counter_values_type result;
+        (*it).second.time_between_parcels_histogram_creator(
+            min_boundary, max_boundary, num_buckets, result);
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////

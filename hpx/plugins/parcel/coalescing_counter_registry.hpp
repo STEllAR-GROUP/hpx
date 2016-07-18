@@ -37,7 +37,8 @@ namespace hpx { namespace plugins { namespace parcel
         typedef util::function_nonser<std::vector<boost::int64_t>(bool)>
             get_counter_values_type;
         typedef util::function_nonser<
-                get_counter_values_type(boost::int64_t, boost::int64_t, boost::int64_t)
+                void(boost::int64_t, boost::int64_t, boost::int64_t,
+                    get_counter_values_type&)
             > get_counter_values_creator_type;
 
         struct counter_functions
