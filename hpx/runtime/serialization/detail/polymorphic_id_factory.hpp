@@ -45,6 +45,8 @@ namespace hpx { namespace serialization {
             void register_factory_function(const std::string& type_name,
                 ctor_t ctor)
             {
+                HPX_ASSERT(ctor != nullptr);
+
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                 typename_to_ctor.emplace(type_name, ctor);
 #else
@@ -62,6 +64,8 @@ namespace hpx { namespace serialization {
             void register_typename(const std::string& type_name,
                 boost::uint32_t id)
             {
+                HPX_ASSERT(id != invalid_id);
+
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                 typename_to_id.emplace(type_name, id);
 #else
@@ -139,15 +143,18 @@ namespace hpx { namespace serialization {
 
         public:
             template <class T>
-            static T* create(boost::uint32_t id)
+            static T* create(boost::uint32_t id, std::string const* name = nullptr)
             {
                 const cache_t& vec = id_registry::instance().cache;
 
                 if (id >= vec.size()) //-V104
                 {
+                    std::string msg("Unknown type descriptor " + std::to_string(id));
+                    if (name != nullptr)
+                        msg += ", for typename " + *name;
+
                     HPX_THROW_EXCEPTION(serialization_error
-                      , "polymorphic_id_factory::create"
-                      , "Unknown type descriptor " + std::to_string(id));
+                      , "polymorphic_id_factory::create", msg);
                 }
 
                 ctor_t ctor = vec[id]; //-V108

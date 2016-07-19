@@ -78,12 +78,24 @@ namespace hpx { namespace serialization
             {
                 static Pointer call(input_archive& ar)
                 {
+#if !defined(HPX_DEBUG)
                     boost::uint32_t id;
                     ar >> id;
 
                     Pointer t(polymorphic_id_factory::create<referred_type>(id));
                     ar >> *t;
                     return t;
+#else
+                    boost::uint32_t id;
+                    std::string name;
+                    ar >> name;
+                    ar >> id;
+
+                    Pointer t(
+                        polymorphic_id_factory::create<referred_type>(id, &name));
+                    ar >> *t;
+                    return t;
+#endif
                 }
             };
 
@@ -140,11 +152,20 @@ namespace hpx { namespace serialization
             {
                 static void call(output_archive& ar, const Pointer& ptr)
                 {
+#if !defined(HPX_DEBUG)
                     const boost::uint32_t id =
                         polymorphic_id_factory::get_id(
                             access::get_name(ptr.get()));
                     ar << id;
                     ar << *ptr;
+#else
+                    std::string const name(access::get_name(ptr.get()));
+                    const boost::uint32_t id =
+                        polymorphic_id_factory::get_id(name);
+                    ar << name;
+                    ar << id;
+                    ar << *ptr;
+#endif
                 }
             };
 
