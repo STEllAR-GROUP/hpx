@@ -16,8 +16,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
 #include <map>
@@ -42,74 +40,23 @@ namespace hpx { namespace serialization {
 
             HPX_STATIC_CONSTEXPR boost::uint32_t invalid_id = ~0u;
 
-            void register_factory_function(const std::string& type_name,
-                ctor_t ctor)
-            {
-                HPX_ASSERT(ctor != nullptr);
+            HPX_EXPORT void register_factory_function(
+                const std::string& type_name, ctor_t ctor);
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-                typename_to_ctor.emplace(type_name, ctor);
-#else
-                typename_to_ctor.insert(
-                    typename_to_ctor_t::value_type(type_name, ctor)
-                );
-#endif
-                // populate cache
-                typename_to_id_t::const_iterator it =
-                    typename_to_id.find(type_name);
-                if (it != typename_to_id.end())
-                    cache_id(it->second, ctor);
-            }
+            HPX_EXPORT void register_typename(
+                const std::string& type_name, boost::uint32_t id);
 
-            void register_typename(const std::string& type_name,
-                boost::uint32_t id)
-            {
-                HPX_ASSERT(id != invalid_id);
+            HPX_EXPORT void fill_missing_typenames();
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-                typename_to_id.emplace(type_name, id);
-#else
-                typename_to_id.insert(
-                    typename_to_id_t::value_type(type_name, id)
-                );
-#endif
-                // populate cache
-                typename_to_ctor_t::const_iterator it =
-                    typename_to_ctor.find(type_name);
-                if (it != typename_to_ctor.end())
-                    cache_id(id, it->second);
-
-                if (id > max_id) max_id = id;
-            }
-
-            boost::uint32_t try_get_id(const std::string& type_name) const
-            {
-                typename_to_id_t::const_iterator it =
-                    typename_to_id.find(type_name);
-                if (it == typename_to_id.end())
-                    return invalid_id;
-
-                return it->second;
-            }
+            HPX_EXPORT boost::uint32_t try_get_id(
+                const std::string& type_name) const;
 
             boost::uint32_t get_max_registered_id() const
             {
                 return max_id;
             }
 
-            std::vector<std::string> get_unassigned_typenames() const
-            {
-                typedef typename_to_ctor_t::value_type value_type;
-
-                std::vector<std::string> result;
-
-                // O(Nlog(M)) ?
-                for (const value_type& v : typename_to_ctor)
-                    if (!typename_to_id.count(v.first))
-                        result.push_back(v.first);
-
-                return result;
-            }
+            HPX_EXPORT std::vector<std::string> get_unassigned_typenames() const;
 
             HPX_EXPORT static id_registry& instance();
 
@@ -119,12 +66,7 @@ namespace hpx { namespace serialization {
             friend struct ::hpx::util::static_<id_registry>;
             friend class polymorphic_id_factory;
 
-            void cache_id(boost::uint32_t id, ctor_t ctor)
-            {
-                if (id >= cache.size()) //-V104
-                    cache.resize(id + 1, nullptr); //-V106
-                cache[id] = ctor; //-V108
-            }
+            HPX_EXPORT void cache_id(boost::uint32_t id, ctor_t ctor);
 
             boost::uint32_t max_id;
             typename_to_ctor_t typename_to_ctor;
@@ -149,9 +91,13 @@ namespace hpx { namespace serialization {
 
                 if (id >= vec.size()) //-V104
                 {
-                    std::string msg("Unknown type descriptor " + std::to_string(id));
+                    std::string msg(
+                        "Unknown type descriptor " + std::to_string(id));
                     if (name != nullptr)
-                        msg += ", for typename " + *name;
+                    {
+                        msg += ", for typename " + *name + "\n";
+                        msg += collect_registered_typenames();
+                    }
 
                     HPX_THROW_EXCEPTION(serialization_error
                       , "polymorphic_id_factory::create", msg);
@@ -162,23 +108,14 @@ namespace hpx { namespace serialization {
                 return static_cast<T*>(ctor());
             }
 
-            static boost::uint32_t get_id(const std::string& type_name)
-            {
-                boost::uint32_t id = id_registry::instance().
-                    try_get_id(type_name);
-
-                if (id == id_registry::invalid_id)
-                    HPX_THROW_EXCEPTION(serialization_error
-                      , "polymorphic_id_factory::get_id"
-                      , "Unknown typename: " + type_name);
-
-                return id;
-            }
+            HPX_EXPORT static boost::uint32_t get_id(
+                const std::string& type_name);
 
         private:
             polymorphic_id_factory() {}
 
             HPX_EXPORT static polymorphic_id_factory& instance();
+            HPX_EXPORT static std::string collect_registered_typenames();
 
             friend struct hpx::util::static_<polymorphic_id_factory>;
         };
