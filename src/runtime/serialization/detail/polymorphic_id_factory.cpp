@@ -109,8 +109,8 @@ namespace hpx { namespace serialization { namespace detail
         {
             typename_to_id_t::const_iterator it =
                 typename_to_id.find(d.first);
-            if (it != typename_to_id.end())
-                cache_id(it->second, d.second);
+            HPX_ASSERT(it != typename_to_id.end());
+            cache_id(it->second, d.second);
         }
     }
 
