@@ -122,9 +122,9 @@ int hpx_main(boost::program_options::variables_map &vm)
         HPX_TEST_EQ(f.get(), std::string("initialized"));
 
         // Invoking the set_message action here is a workaround for a problem
-        // in HPX which causes actions to be properly registered for serialization 
+        // in HPX which causes actions to be properly registered for serialization
         // only if they are actually invoked. If this is removed the launch-tests
-        // fail with obscure serialization errors. 
+        // fail with obscure serialization errors.
         hpx::async(launch_process_set_message_action(), t, "initialized").get();
 
         // register the component instance with AGAS
