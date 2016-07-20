@@ -19,12 +19,18 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2255] - Coalescing histogram
 * [pr    2252] - Prepare V1.0
 * [pr    2251] - Convert to 0.9.99
+* [pr    2245] - Add an example for handing over a component instance to
+                 a dynamically launched locality
+* [issue 2243] - Add example demonstrating AGAS symbolic name registration
 * [issue 2242] - pkgconfig test broken on CentOS 7 / Boost 1.61
 * [issue 2241] - Compilation error for partitioned vector in hpx_compute branch
 * [pr    2240] - Fixing termination detection on one locality
 * [issue 2236] - hpx::cout vs. std::cout
+* [issue 1754] - Running with TCP parcelport causes immediate crash or freeze
+* [issue  668] - Implement ispc task interface
 
 [endsect]
 
