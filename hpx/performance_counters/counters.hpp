@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/function.hpp>
 
@@ -136,7 +137,20 @@ namespace hpx { namespace performance_counters
         ///           number of time units that elapse in one second.
         /// Average:  (Dx - N0) / F
         /// Type:     Difference
-        counter_elapsed_time
+        counter_elapsed_time,
+
+        /// \a counter_histogram exposes a histogram of the measured values
+        /// instead of a single value as many of the other counter types.
+        /// Counters of this type expose a \a counter_value_array instead of a
+        /// \a counter_value. Those will also not implement the
+        /// \a get_counter_value() functionality. The results are exposed
+        /// through a separate \a get_counter_values_array() function.
+        ///
+        /// The first three values in the returned array represent the lower
+        /// and upper boundaries, and the size of the histogram buckets. All
+        /// remaining values in the returned array represent the number of
+        /// measurements for each of the buckets in the histogram.
+        counter_histogram
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -450,6 +464,87 @@ namespace hpx { namespace performance_counters
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct counter_values_array
+    {
+        counter_values_array(boost::int64_t scaling = 1,
+                bool scale_inverse = false)
+          : time_(), count_(0), values_(), scaling_(scaling),
+            status_(status_new_data),
+            scale_inverse_(scale_inverse)
+        {}
+
+        counter_values_array(std::vector<boost::int64_t> && values,
+                boost::int64_t scaling = 1, bool scale_inverse = false)
+          : time_(), count_(0), values_(std::move(values)), scaling_(scaling),
+            status_(status_new_data),
+            scale_inverse_(scale_inverse)
+        {}
+
+        counter_values_array(std::vector<boost::int64_t> const& values,
+                boost::int64_t scaling = 1, bool scale_inverse = false)
+          : time_(), count_(0), values_(values), scaling_(scaling),
+            status_(status_new_data),
+            scale_inverse_(scale_inverse)
+        {}
+
+        boost::uint64_t time_;      ///< The local time when data was collected
+        boost::uint64_t count_;     ///< The invocation counter for the data
+        std::vector<boost::int64_t> values_;  ///< The current counter values
+        boost::int64_t scaling_;    ///< The scaling of the current counter values
+        counter_status status_;     ///< The status of the counter value
+        bool scale_inverse_;        ///< If true, value_ needs to be divided by
+                                    ///< scaling_, otherwise it has to be
+                                    ///< multiplied.
+
+        /// \brief Retrieve the 'real' value of the counter_value, converted to
+        ///        the requested type \a T
+        template <typename T>
+        T get_value(std::size_t index, error_code& ec = throws) const
+        {
+            if (!status_is_valid(status_)) {
+                HPX_THROWS_IF(ec, invalid_status,
+                    "counter_values_array::get_value<T>",
+                    "counter value is in invalid status");
+                return T();
+            }
+            if (index >= values_.size()) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "counter_values_array::get_value<T>",
+                    "index out of bounds");
+                return T();
+            }
+
+            T val = static_cast<T>(values_[index]);
+
+            if (scaling_ != 1) {
+                if (scaling_ == 0) {
+                    HPX_THROWS_IF(ec, uninitialized_value,
+                        "counter_values_array::get_value<T>",
+                        "scaling should not be zero");
+                    return T();
+                }
+
+                // calculate and return the real counter value
+                if (scale_inverse_)
+                    return val / static_cast<T>(scaling_);
+
+                return val * static_cast<T>(scaling_);
+            }
+            return val;
+        }
+
+    private:
+        // serialization support
+        friend class hpx::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int)
+        {
+            ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////
     /// \brief Add a new performance counter type to the (local) registry
     HPX_API_EXPORT counter_status add_counter_type(counter_info const& info,
@@ -586,6 +681,18 @@ namespace hpx { namespace performance_counters
         // returning the counter value.
         HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
             hpx::util::function_nonser<boost::int64_t(bool)> const&, error_code&);
+
+        // Helper function for creating counters encapsulating a function
+        // returning the counter values array.
+        HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
+            hpx::util::function_nonser<std::vector<boost::int64_t>()> const&,
+            error_code&);
+
+        // Helper function for creating counters encapsulating a function
+        // returning the counter values array.
+        HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
+            hpx::util::function_nonser<std::vector<boost::int64_t>(bool)> const&,
+            error_code&);
 
         // Helper function for creating a new performance counter instance
         // based on a given counter value.

@@ -23,7 +23,7 @@ bandwidth usage from other network traffic increases or decreases.
 
 Performance Counters are __hpx__ parallel processes which expose a predefined
 interface. __hpx__ exposes special API functions that allow one to create, manage,
-read the counter data, and release instances of Performance Counters. 
+read the counter data, and release instances of Performance Counters.
 Performance Counter instances are accessed by name,
 and these names have a predefined structure which is
 described in the section __counter_names__. The advantage of this is that

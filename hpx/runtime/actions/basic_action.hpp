@@ -592,6 +592,7 @@ namespace hpx { namespace actions
         output_stream_write_sync_action_id,
         performance_counter_get_counter_info_action_id,
         performance_counter_get_counter_value_action_id,
+        performance_counter_get_counter_values_array_action_id,
         performance_counter_set_counter_value_action_id,
         performance_counter_reset_counter_value_action_id,
         performance_counter_start_action_id,
