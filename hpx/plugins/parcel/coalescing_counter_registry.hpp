@@ -48,6 +48,7 @@ namespace hpx { namespace plugins { namespace parcel
             get_counter_type num_parcels_per_message;
             get_counter_type average_time_between_parcels;
             get_counter_values_creator_type time_between_parcels_histogram_creator;
+            boost::int64_t min_boundary, max_boundary, num_buckets;
         };
 
         typedef std::unordered_map<
@@ -72,7 +73,7 @@ namespace hpx { namespace plugins { namespace parcel
             std::string const& name) const;
         get_counter_values_type get_time_between_parcels_histogram_counter(
             std::string const& name, boost::int64_t min_boundary,
-            boost::int64_t max_boundary, boost::int64_t num_buckets) const;
+            boost::int64_t max_boundary, boost::int64_t num_buckets);
 
         bool counter_discoverer(
             performance_counters::counter_info const& info,

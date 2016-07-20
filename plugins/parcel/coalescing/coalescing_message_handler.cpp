@@ -348,7 +348,7 @@ namespace hpx { namespace plugins { namespace parcel
         auto data = hpx::util::histogram(*time_between_parcels_);
         for (auto const& item : data)
         {
-            result.push_back(boost::int64_t(item.second));
+            result.push_back(boost::int64_t(item.second * 1000));
         }
 
         return result;
@@ -363,12 +363,8 @@ namespace hpx { namespace plugins { namespace parcel
         std::unique_lock<mutex_type> l(mtx_);
         if (time_between_parcels_)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
-                "coalescing_message_handler::"
-                    "get_time_between_parcels_histogram_creator",
-                "parcel-arrival-histogram counter already created for "
-                "action type: " + action_name_);
-            result = &coalescing_counter_registry::empty_histogram;
+            result = util::bind(&coalescing_message_handler::
+                get_time_between_parcels_histogram, this, util::placeholders::_1);
             return;
         }
 
@@ -377,9 +373,9 @@ namespace hpx { namespace plugins { namespace parcel
         histogram_num_buckets_ = num_buckets;
 
         time_between_parcels_ = std::make_unique<histogram_collector_type>(
-            hpx::util::tag::histogram::num_bins = num_buckets,
-            hpx::util::tag::histogram::min_range = min_boundary,
-            hpx::util::tag::histogram::max_range = max_boundary);
+            hpx::util::tag::histogram::num_bins = double(num_buckets),
+            hpx::util::tag::histogram::min_range = double(min_boundary),
+            hpx::util::tag::histogram::max_range = double(max_boundary));
         last_parcel_time_ = util::high_resolution_clock::now();
 
         result = util::bind(&coalescing_message_handler::

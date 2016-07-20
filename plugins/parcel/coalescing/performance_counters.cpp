@@ -555,7 +555,7 @@ namespace hpx { namespace plugins { namespace parcel
               HPX_PERFORMANCE_COUNTER_V1,
               &time_between_parcels_histogram_counter_creator,
               &counter_discoverer,
-              "[ns]"
+              "ns/0.1%"
             }
         };
 

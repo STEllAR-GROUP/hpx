@@ -224,22 +224,58 @@ namespace hpx { namespace util
     void query_counters::print_headers(Stream& output)
     {
         if (csv_header_) {
-            if (format_ == "csv") {
+            if (format_ == "csv")
+            {
+                // first print raw value counters
+                bool first = true;
                 for (std::size_t i = 0; i != names_.size(); ++i)
                 {
-                    print_name_csv(output, names_[i]);
-                    if (i != names_.size()-1)
+                    if (types_[i] != performance_counters::counter_raw)
+                        continue;
+                    if (!first)
                         output << ",";
+                    first = false;
+                    print_name_csv(output, names_[i]);
                 }
+
+                // now print array value counters
+                for (std::size_t i = 0; i != names_.size(); ++i)
+                {
+                    if (types_[i] != performance_counters::counter_histogram)
+                        continue;
+                    if (!first)
+                        output << ",";
+                    first = false;
+                    print_name_csv(output, names_[i]);
+                }
+
                 output << "\n";
             }
-            else if (format_ == "csv-short") {
+            else if (format_ == "csv-short")
+            {
+                // first print raw value counters
+                bool first = true;
                 for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
                 {
-                    print_name_csv_short(output, counter_shortnames_[i]);
-                    if (i != counter_shortnames_.size()-1)
+                    if (types_[i] != performance_counters::counter_raw)
+                        continue;
+                    if (!first)
                         output << ",";
+                    first = false;
+                    print_name_csv_short(output, counter_shortnames_[i]);
                 }
+
+                // now print array value counters
+                for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
+                {
+                    if (types_[i] != performance_counters::counter_histogram)
+                        continue;
+                    if (!first)
+                        output << ",";
+                    first = false;
+                    print_name_csv_short(output, counter_shortnames_[i]);
+                }
+
                 output << "\n";
             }
             csv_header_ = false;
@@ -248,20 +284,28 @@ namespace hpx { namespace util
 
     template <typename Stream, typename Future>
     void query_counters::print_values(Stream& output,
-        std::vector<Future> && values)
+        std::vector<Future> && values, std::vector<std::size_t> && indicies)
     {
-        if (format_ == "csv" || format_ == "csv-short") {
+        if (format_ == "csv" || format_ == "csv-short")
+        {
+            bool first = true;
             for (std::size_t i = 0; i != values.size(); ++i)
             {
-                print_value_csv(output, values[i].get());
-                if (i != values.size()-1)
+                if (!first)
                     output << ",";
+                first = false;
+                print_value_csv(output, values[i].get());
             }
             output << "\n";
         }
-        else {
-            for (std::size_t i = 0; i != values.size(); ++i)
-                print_value(output, names_[i], values[i].get(), uoms_[i]);
+        else
+        {
+            std::size_t idx = 0;
+            for (std::size_t i : indicies)
+            {
+                print_value(output, names_[i], values[idx].get(), uoms_[i]);
+                ++idx;
+            }
         }
     }
 
@@ -429,13 +473,17 @@ namespace hpx { namespace util
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
         std::vector<future<performance_counters::counter_value> > values;
+        std::vector<std::size_t> indicies;
 
         values.reserve(ids.size());
+        indicies.reserve(ids.size());
+
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
             if (types_[i] != performance_counters::counter_raw)
                 continue;
             values.push_back(performance_counter::get_value_async(ids[i], reset));
+            indicies.push_back(i);
         }
 
         if (values.empty())
@@ -447,7 +495,7 @@ namespace hpx { namespace util
 
         // Output the performance counter value.
         print_headers(output);
-        print_values(output, std::move(values));
+        print_values(output, std::move(values), std::move(indicies));
 
         if (destination_is_cout) {
             std::cout << output.str() << std::flush;
@@ -468,14 +516,18 @@ namespace hpx { namespace util
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
         std::vector<future<performance_counters::counter_values_array> > values;
+        std::vector<std::size_t> indicies;
 
         values.reserve(ids.size());
+        indicies.reserve(ids.size());
+
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
             if (types_[i] != performance_counters::counter_histogram)
                 continue;
             values.push_back(
                 performance_counter::get_values_array_async(ids[i], reset));
+            indicies.push_back(i);
         }
 
         if (values.empty())
@@ -487,7 +539,7 @@ namespace hpx { namespace util
 
         // Output the performance counter value.
         print_headers(output);
-        print_values(output, std::move(values));
+        print_values(output, std::move(values), std::move(indicies));
 
         if (destination_is_cout) {
             std::cout << output.str() << std::flush;

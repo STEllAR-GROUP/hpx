@@ -95,7 +95,7 @@ namespace hpx { namespace plugins { namespace parcel
         boost::int64_t last_parcel_time_;
 
         typedef boost::accumulators::accumulator_set<
-                boost::int64_t,
+                double,     // collects percentiles
                 boost::accumulators::features<hpx::util::tag::histogram>
             > histogram_collector_type;
 

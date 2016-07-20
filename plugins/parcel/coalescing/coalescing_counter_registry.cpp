@@ -29,7 +29,7 @@ namespace hpx { namespace plugins { namespace parcel
     void coalescing_counter_registry::register_action(
         std::string const& name,
         get_counter_type num_parcels, get_counter_type num_messages,
-        get_counter_type time_between_parcels,
+        get_counter_type num_parcels_per_message,
         get_counter_type average_time_between_parcels,
         get_counter_values_creator_type time_between_parcels_histogram_creator)
     {
@@ -40,16 +40,17 @@ namespace hpx { namespace plugins { namespace parcel
                 "Cannot register an action with an empty name");
         }
 
-        counter_functions data =
-        {
-            num_parcels, num_messages,
-            time_between_parcels, average_time_between_parcels,
-            time_between_parcels_histogram_creator
-        };
-
         auto it = map_.find(name);
         if (it == map_.end())
         {
+            counter_functions data =
+            {
+                num_parcels, num_messages,
+                num_parcels_per_message, average_time_between_parcels,
+                time_between_parcels_histogram_creator,
+                0, 0, 1
+            };
+
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
             map_.emplace(name, std::move(data));
 #else
@@ -59,7 +60,22 @@ namespace hpx { namespace plugins { namespace parcel
         else
         {
             // replace the existing functions
-            (*it).second = data;
+            (*it).second.num_parcels = num_parcels;
+            (*it).second.num_messages = num_messages;
+            (*it).second.num_parcels_per_message = num_parcels_per_message;
+            (*it).second.average_time_between_parcels =
+                average_time_between_parcels;
+            (*it).second.time_between_parcels_histogram_creator =
+                time_between_parcels_histogram_creator;
+
+            if ((*it).second.min_boundary != (*it).second.max_boundary)
+            {
+                // instantiate actual histogram collection
+                coalescing_counter_registry::get_counter_values_type result;
+                time_between_parcels_histogram_creator(
+                    (*it).second.min_boundary, (*it).second.max_boundary,
+                    (*it).second.num_buckets, result);
+            }
         }
     }
 
@@ -148,9 +164,9 @@ namespace hpx { namespace plugins { namespace parcel
     coalescing_counter_registry::get_counter_values_type
         coalescing_counter_registry::get_time_between_parcels_histogram_counter(
             std::string const& name, boost::int64_t min_boundary,
-            boost::int64_t max_boundary, boost::int64_t num_buckets) const
+            boost::int64_t max_boundary, boost::int64_t num_buckets)
     {
-        map_type::const_iterator it = map_.find(name);
+        map_type::iterator it = map_.find(name);
         if (it == map_.end())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -161,7 +177,13 @@ namespace hpx { namespace plugins { namespace parcel
         }
 
         if ((*it).second.time_between_parcels_histogram_creator.empty())
-            return &coalescing_counter_registry::empty_histogram;
+        {
+            // no parcel of this type has been sent yet
+            (*it).second.min_boundary = min_boundary;
+            (*it).second.max_boundary = max_boundary;
+            (*it).second.num_buckets = num_buckets;
+            return coalescing_counter_registry::get_counter_values_type();
+        }
 
         coalescing_counter_registry::get_counter_values_type result;
         (*it).second.time_between_parcels_histogram_creator(

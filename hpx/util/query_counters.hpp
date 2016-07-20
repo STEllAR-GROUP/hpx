@@ -60,7 +60,8 @@ namespace hpx { namespace util
         void print_headers(Stream& output);
 
         template <typename Stream, typename Future>
-        void print_values(Stream& output, std::vector<Future> &&);
+        void print_values(Stream& output, std::vector<Future> &&,
+            std::vector<std::size_t> && indicies);
 
         template <typename Stream>
         void print_value(Stream& out, std::string const& name,

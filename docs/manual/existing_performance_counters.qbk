@@ -1543,20 +1543,26 @@ system and application performance.
          represent the three parameters used for the histogram followed by
          one value for each of the histogram buckets.
 
-         The unit of measure displayed for this counter (`[ns]`) refers to the
-         lower and upper boundary values in the returned histogram data only.
+         The first unit of measure displayed for this counter (`[ns]`) refers to
+         the lower and upper boundary values in the returned histogram data only.
+         The second unit of mesure displayed (`[0.1%]`) refers to the actual
+         histogram data.
+
+         For each bucket the counter shows a value between `0` and `1000`,
+         which corresponds to a percentage value between `0%` and `100%`.
         ]
-        [The action type. This is the string which has been used
-         while registering the action with __hpx__, e.g. which has been
-         passed as the second parameter to the macro
+        [The action type and optional histogram parameters. The action type is
+         the string which has been used while registering the action with
+         __hpx__, e.g. which has been passed as the second parameter to the macro
          [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
          [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
+
          The action type may be follwowed by a comma separated list of up-to
          three numbers: the lower and upper boundaries for the collected
-         histogram, and the number of buckets for the histogram. By default
-         these three numbers will be assumed to be `0` (`[ns]`, lower bound),
-         `1000000` (`[ns]`, upper bound), and `20` (number of buckets to
-         generate).
+         histogram, and the number of buckets for the histogram to generate.
+         By default these three numbers will be assumed to be `0` (`[ns]`,
+         lower bound), `1000000` (`[ns]`, upper bound), and `20` (number of
+         buckets to generate).
         ]
     ]
 ]
