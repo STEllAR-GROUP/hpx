@@ -46,12 +46,16 @@ set(tests
     remote_latch
     run_guarded
     shared_future
-    split_future
     unwrapped
     when_all
     when_any
     when_some
    )
+
+if(NOT MSVC12)
+  # MSVC12 can't cope with split_future
+  set(tests ${tests} split_future)
+endif()
 
 if(HPX_WITH_AWAIT)
   set(tests ${tests} await)
