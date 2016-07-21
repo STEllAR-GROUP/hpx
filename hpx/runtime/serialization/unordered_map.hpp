@@ -14,10 +14,6 @@
 
 #include <unordered_map>
 
-#include <boost/mpl/and.hpp>
-#include <boost/type_traits/add_reference.hpp>
-#include <boost/type_traits/remove_const.hpp>
-
 namespace hpx
 {
     namespace serialization

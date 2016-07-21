@@ -15,12 +15,13 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/util/identity.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/eval_if.hpp>
 
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace serialization
@@ -118,19 +119,19 @@ namespace hpx { namespace serialization
             };
 
         public:
-            typedef typename boost::mpl::eval_if<
-                hpx::traits::is_serialized_with_id<referred_type>,
-                    boost::mpl::identity<polymorphic_with_id>,
-                    boost::mpl::eval_if<
-                        hpx::traits::is_intrusive_polymorphic<referred_type>,
-                            boost::mpl::identity<intrusive_polymorphic>,
-                            boost::mpl::eval_if<
-                                hpx::traits::is_nonintrusive_polymorphic<referred_type>,
-                                    boost::mpl::identity<nonintrusive_polymorphic>,
-                                    boost::mpl::identity<usual>
-                        >
-                    >
-                >::type type;
+            typedef typename std::conditional<
+                hpx::traits::is_serialized_with_id<referred_type>::value,
+                hpx::util::identity<polymorphic_with_id>,
+                std::conditional<
+                    hpx::traits::is_intrusive_polymorphic<referred_type>::value,
+                    intrusive_polymorphic,
+                    typename std::conditional<
+                        hpx::traits::is_nonintrusive_polymorphic<referred_type>::value,
+                        nonintrusive_polymorphic,
+                        usual
+                    >::type
+                >
+            >::type::type type;
         };
 
         template <class Pointer>
@@ -178,15 +179,15 @@ namespace hpx { namespace serialization
             };
 
         public:
-            typedef typename boost::mpl::if_<
-                hpx::traits::is_serialized_with_id<referred_type>,
-                    polymorphic_with_id,
-                    typename boost::mpl::if_<
-                        hpx::traits::is_intrusive_polymorphic<referred_type>,
-                            intrusive_polymorphic,
-                            usual
-                    >::type
-                >::type type;
+            typedef typename std::conditional<
+                hpx::traits::is_serialized_with_id<referred_type>::value,
+                polymorphic_with_id,
+                typename std::conditional<
+                    hpx::traits::is_intrusive_polymorphic<referred_type>::value,
+                    intrusive_polymorphic,
+                    usual
+                >::type
+            >::type type;
         };
 
         // forwarded serialize pointer functions

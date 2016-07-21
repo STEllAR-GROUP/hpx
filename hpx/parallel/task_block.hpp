@@ -140,9 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         {
             typedef typename util::detail::algorithm_result<ExPolicy>::type
                 result_type;
-            typedef std::integral_constant<
-                    bool, hpx::traits::is_future<result_type>::value
-                > is_fut;
+            typedef hpx::traits::is_future<result_type> is_fut;
             wait_for_completion(is_fut());
         }
 

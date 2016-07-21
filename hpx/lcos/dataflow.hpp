@@ -29,11 +29,11 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -70,6 +70,15 @@ namespace hpx { namespace lcos { namespace detail
         typename std::enable_if<
             traits::is_future_or_future_range<Future>::value
         >::type operator()(boost::reference_wrapper<Future>& future) const
+        {
+            future.get() = Future();
+        }
+
+        template <typename Future>
+        HPX_FORCEINLINE
+        typename std::enable_if<
+            traits::is_future_or_future_range<Future>::value
+        >::type operator()(std::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
         }
@@ -262,7 +271,7 @@ namespace hpx { namespace lcos { namespace detail
 
         template <std::size_t I>
         HPX_FORCEINLINE
-        void await_next(boost::mpl::false_, boost::mpl::false_)
+        void await_next(std::false_type, std::false_type)
         {
             do_await<I + 1>(is_end<I + 1>());
         }
@@ -325,7 +334,7 @@ namespace hpx { namespace lcos { namespace detail
         // Current element is a range (vector) of futures
         template <std::size_t I>
         HPX_FORCEINLINE
-        void await_next(boost::mpl::false_, boost::mpl::true_)
+        void await_next(std::false_type, std::true_type)
         {
             typedef
                 typename util::tuple_element<I, Futures>::type
@@ -341,7 +350,7 @@ namespace hpx { namespace lcos { namespace detail
         // Current element is a simple future
         template <std::size_t I>
         HPX_FORCEINLINE
-        void await_next(boost::mpl::true_, boost::mpl::false_)
+        void await_next(std::true_type, std::false_type)
         {
             typedef
                 typename util::tuple_element<I, Futures>::type
@@ -365,7 +374,7 @@ namespace hpx { namespace lcos { namespace detail
                 if (!next_future_data->is_ready())
                 {
                     void (dataflow_frame::*f)(
-                            boost::mpl::true_, boost::mpl::false_
+                            std::true_type, std::false_type
                         ) = &dataflow_frame::await_next_respawn<I>;
 
                     boost::intrusive_ptr<dataflow_frame> this_(this);
@@ -373,8 +382,8 @@ namespace hpx { namespace lcos { namespace detail
                         util::deferred_call(
                             f
                           , std::move(this_)
-                          , boost::mpl::true_()
-                          , boost::mpl::false_()
+                          , std::true_type()
+                          , std::false_type()
                         )
                     );
                     return;
@@ -393,13 +402,8 @@ namespace hpx { namespace lcos { namespace detail
                 typename util::tuple_element<I, Futures>::type
                 future_type;
 
-            typedef typename traits::is_future<
-                future_type
-            >::type is_future;
-
-            typedef typename traits::is_future_range<
-                future_type
-            >::type is_range;
+            typedef traits::is_future<future_type> is_future;
+            typedef traits::is_future_range<future_type> is_range;
 
             await_next<I>(is_future(), is_range());
         }

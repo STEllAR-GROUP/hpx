@@ -16,9 +16,9 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <iterator>
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace traits
@@ -70,7 +70,7 @@ namespace hpx { namespace traits
     {
         template <typename T>
         struct acquire_shared_state_impl<T,
-            typename boost::disable_if_c<is_future_or_future_range<T>::value>::type>
+            typename std::enable_if<!is_future_or_future_range<T>::value>::type>
         {
             typedef T type;
 
@@ -84,7 +84,7 @@ namespace hpx { namespace traits
 
         template <typename T>
         struct acquire_shared_state_impl<T,
-            typename boost::enable_if_c<is_future<T>::value>::type>
+            typename std::enable_if<is_future<T>::value>::type>
         {
             typedef typename traits::detail::shared_state_ptr<
                 typename traits::future_traits<T>::type
@@ -99,7 +99,7 @@ namespace hpx { namespace traits
 
         template <typename Range>
         struct acquire_shared_state_impl<Range,
-            typename boost::enable_if_c<traits::is_future_range<Range>::value>::type>
+            typename std::enable_if<traits::is_future_range<Range>::value>::type>
         {
             typedef typename traits::future_range_traits<Range>::future_type
                 future_type;

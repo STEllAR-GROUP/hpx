@@ -19,7 +19,7 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -47,7 +47,7 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<naming::id_type>
 #else
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_component<Component>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
         future<naming::id_type>
@@ -86,7 +86,7 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     Derived
 #else
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value, Derived
     >::type
 #endif
@@ -119,8 +119,8 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<naming::id_type>
 #else
-    inline typename boost::enable_if<
-        traits::is_component<Component>, future<naming::id_type>
+    inline typename std::enable_if<
+        traits::is_component<Component>::value, future<naming::id_type>
     >::type
 #endif
     migrate(naming::id_type const& to_migrate,

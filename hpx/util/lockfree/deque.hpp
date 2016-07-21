@@ -30,6 +30,8 @@
 #include <hpx/util/lockfree/detail/tagged_ptr_pair.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
+#include <type_traits>
+
 namespace boost { namespace lockfree
 {
 
@@ -159,8 +161,8 @@ struct deque
 
     typedef typename Alloc::template rebind<node>::other node_allocator;
 
-    typedef typename boost::mpl::if_<
-        boost::is_same<freelist_t, caching_freelist_t>,
+    typedef typename std::conditional<
+        std::is_same<freelist_t, caching_freelist_t>::value,
         caching_freelist<node, node_allocator>,
         static_freelist<node, node_allocator>
     >::type pool;

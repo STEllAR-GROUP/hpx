@@ -39,7 +39,7 @@ struct data_get_action
             data_get_action<T, Data, Derived>, Derived
         >::type>
 {
-    typedef boost::mpl::false_ direct_execution;
+    typedef std::false_type direct_execution;
 
     typedef typename boost::remove_pointer<T>::type data_type;
 
@@ -68,7 +68,7 @@ struct data_set_action
 {
     typedef typename boost::remove_pointer<T>::type data_type;
 
-    typedef boost::mpl::false_ direct_execution;
+    typedef std::false_type direct_execution;
 
     // Return the referenced data
     static void invoke(

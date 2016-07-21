@@ -19,7 +19,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 
 #include <memory>
 #include <string>
@@ -61,7 +60,7 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
-        typedef boost::mpl::false_ has_periodic_maintenance;
+        typedef std::false_type has_periodic_maintenance;
 
         typedef thread_queue<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing

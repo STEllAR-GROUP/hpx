@@ -21,12 +21,13 @@
 
 #include <boost/format.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace detail
 {
     template <typename Action, typename Continuation, typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_continuation<Continuation>::value, bool
     >::type
     apply_impl(Continuation && c, hpx::id_type const& id,
@@ -71,7 +72,7 @@ namespace hpx { namespace detail
             std::forward<Continuation>(c), id, priority, std::forward<Ts>(vs)...);
     }
     template <typename Action, typename Continuation, typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_continuation<Continuation>::value, bool
     >::type
     apply_impl(Continuation && c, hpx::id_type const& id, naming::address&& addr,
@@ -212,7 +213,7 @@ namespace hpx { namespace detail
     }
 
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_continuation<Continuation>::value, bool
     >::type
     apply_cb_impl(Continuation && c, hpx::id_type const& id,

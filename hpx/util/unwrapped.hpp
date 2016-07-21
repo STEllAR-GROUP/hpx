@@ -17,9 +17,6 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/mpl/if.hpp>
-#include <boost/utility/enable_if.hpp>
-
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -35,22 +32,22 @@ namespace hpx { namespace util
         template <typename T>
         struct unwrap_impl<
             T,
-            typename boost::enable_if<traits::is_future<T> >::type
+            typename std::enable_if<traits::is_future<T>::value>::type
         >
         {
             typedef typename traits::future_traits<T>::type value_type;
-            typedef typename boost::is_void<value_type>::type is_void;
+            typedef std::is_void<value_type> is_void;
 
             typedef typename traits::future_traits<T>::result_type type;
 
             template <typename Future>
-            static type call(Future& future, /*is_void=*/boost::mpl::false_)
+            static type call(Future& future, /*is_void=*/std::false_type)
             {
                 return future.get();
             }
 
             template <typename Future>
-            static type call(Future& future, /*is_void=*/boost::mpl::true_)
+            static type call(Future& future, /*is_void=*/std::true_type)
             {
                 future.get();
             }
@@ -66,19 +63,19 @@ namespace hpx { namespace util
         template <typename T>
         struct unwrap_impl<
             T,
-            typename boost::enable_if<traits::is_future_range<T> >::type
+            typename std::enable_if<traits::is_future_range<T>::value>::type
         >
         {
             typedef typename T::value_type future_type;
             typedef typename traits::future_traits<future_type>::type value_type;
-            typedef typename boost::is_void<value_type>::type is_void;
+            typedef std::is_void<value_type> is_void;
 
-            typedef typename boost::mpl::if_<
-                is_void, void, std::vector<value_type>
+            typedef typename std::conditional<
+                is_void::value, void, std::vector<value_type>
             >::type type;
 
             template <typename Range>
-            static type call(Range& range, /*is_void=*/boost::mpl::false_)
+            static type call(Range& range, /*is_void=*/std::false_type)
             {
                 type result;
                 for (typename Range::value_type& f : range)
@@ -90,7 +87,7 @@ namespace hpx { namespace util
             }
 
             template <typename Range>
-            static type call(Range& range, /*is_void=*/boost::mpl::true_)
+            static type call(Range& range, /*is_void=*/std::true_type)
             {
                 for (typename Range::value_type& f : range)
                 {
@@ -171,7 +168,7 @@ namespace hpx { namespace util
         template <typename T>
         struct unwrap_impl<
             T,
-            typename boost::enable_if<traits::is_future_tuple<T> >::type
+            typename std::enable_if<traits::is_future_tuple<T>::value>::type
         >
         {
             typedef typename unwrap_tuple_fold<T>::type type;
@@ -192,7 +189,7 @@ namespace hpx { namespace util
         template <typename F, typename T, typename TD>
         struct unwrapped_impl_result<
             F, T, TD,
-            typename boost::enable_if<traits::is_future<TD> >::type
+            typename std::enable_if<traits::is_future<TD>::value>::type
         > : util::detail::fused_result_of<
                 F(typename unwrap_impl<util::tuple<TD> >::type)
             >
@@ -201,9 +198,9 @@ namespace hpx { namespace util
         template <typename F, typename T, typename TD>
         struct unwrapped_impl_result<
             F, T, TD,
-            typename boost::enable_if<traits::is_future_range<TD> >::type
-        > : boost::mpl::if_<
-                typename unwrap_impl<TD>::is_void
+            typename std::enable_if<traits::is_future_range<TD>::value>::type
+        > : std::conditional<
+                unwrap_impl<TD>::is_void::value
               , util::detail::fused_result_of<
                     F(util::tuple<>)
                 >
@@ -216,7 +213,7 @@ namespace hpx { namespace util
         template <typename F, typename T, typename TD>
         struct unwrapped_impl_result<
             F, T, TD,
-            typename boost::enable_if<traits::is_future_tuple<TD> >::type
+            typename std::enable_if<traits::is_future_tuple<TD>::value>::type
         > : util::detail::fused_result_of<
                 F(typename unwrap_impl<TD>::type)
             >
@@ -265,10 +262,10 @@ namespace hpx { namespace util
             // future
             template <typename T0>
             HPX_FORCEINLINE
-            typename boost::lazy_enable_if_c<
+            typename std::enable_if<
                 traits::is_future<typename decay<T0>::type>::value
               , unwrapped_impl_result<F, T0>
-            >::type operator()(T0&& t0)
+            >::type::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<util::tuple<typename decay<T0>::type> >
@@ -281,11 +278,11 @@ namespace hpx { namespace util
             // future-range
             template <typename T0>
             HPX_FORCEINLINE
-            typename boost::lazy_enable_if_c<
+            typename std::enable_if<
                 traits::is_future_range<typename decay<T0>::type>::value
              && !unwrap_impl<typename decay<T0>::type>::is_void::value
               , unwrapped_impl_result<F, T0>
-            >::type operator()(T0&& t0)
+            >::type::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<typename decay<T0>::type>
@@ -297,11 +294,11 @@ namespace hpx { namespace util
 
             template <typename T0>
             HPX_FORCEINLINE
-            typename boost::lazy_enable_if_c<
+            typename std::enable_if<
                 traits::is_future_range<typename decay<T0>::type>::value
              && unwrap_impl<typename decay<T0>::type>::is_void::value
               , unwrapped_impl_result<F, T0>
-            >::type operator()(T0&& t0)
+            >::type::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<typename decay<T0>::type>
@@ -315,10 +312,10 @@ namespace hpx { namespace util
             // future-tuple
             template <typename T0>
             HPX_FORCEINLINE
-            typename boost::lazy_enable_if_c<
+            typename std::enable_if<
                 traits::is_future_tuple<typename decay<T0>::type>::value
               , unwrapped_impl_result<F, T0>
-            >::type operator()(T0&& t0)
+            >::type::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<typename decay<T0>::type>
@@ -351,12 +348,12 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    typename boost::lazy_enable_if_c<
+    typename std::enable_if<
         traits::is_future<typename decay<Future>::type>::value
      || traits::is_future_range<typename decay<Future>::type>::value
      || traits::is_future_tuple<typename decay<Future>::type>::value
       , detail::unwrap_impl<typename decay<Future>::type>
-    >::type unwrapped(Future&& f)
+    >::type::type unwrapped(Future&& f)
     {
         typedef
             detail::unwrap_impl<typename decay<Future>::type>
@@ -366,28 +363,28 @@ namespace hpx { namespace util
     }
 
     template <typename F>
-    typename boost::disable_if_c<
-        traits::is_future<typename decay<F>::type>::value
-     || traits::is_future_range<typename decay<F>::type>::value
-     || traits::is_future_tuple<typename decay<F>::type>::value
-      , detail::unwrapped_impl<typename std::decay<F>::type >
+    typename std::enable_if<
+        !traits::is_future<typename decay<F>::type>::value
+     && !traits::is_future_range<typename decay<F>::type>::value
+     && !traits::is_future_tuple<typename decay<F>::type>::value
+      , detail::unwrapped_impl<typename std::decay<F>::type>
     >::type unwrapped(F && f)
     {
-        detail::unwrapped_impl<typename std::decay<F>::type >
+        detail::unwrapped_impl<typename std::decay<F>::type>
             res(std::forward<F>(f));
 
         return res;
     }
 
     template <typename ...Ts>
-    typename boost::lazy_enable_if_c<
+    typename std::enable_if<
         traits::is_future_tuple<util::tuple<
             typename std::decay<Ts>::type...
         > >::value
       , detail::unwrap_impl<util::tuple<
             typename std::decay<Ts>::type...
         > >
-    >::type unwrapped(Ts&&... vs)
+    >::type::type unwrapped(Ts&&... vs)
     {
         typedef detail::unwrap_impl<util::tuple<
             typename std::decay<Ts>::type...
@@ -399,23 +396,23 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    typename boost::lazy_enable_if_c<
+    typename std::enable_if<
         traits::is_future<typename decay<Future>::type>::value
      || traits::is_future_range<typename decay<Future>::type>::value
      || traits::is_future_tuple<typename decay<Future>::type>::value
       , detail::unwrap_impl<typename detail::unwrap_impl<
             typename decay<Future>::type
         > >
-    >::type unwrapped2(Future&& f)
+    >::type::type unwrapped2(Future&& f)
     {
         return unwrapped(unwrapped(std::forward<Future>(f)));
     }
 
     template <typename F>
-    typename boost::disable_if_c<
-        traits::is_future<typename decay<F>::type>::value
-     || traits::is_future_range<typename decay<F>::type>::value
-     || traits::is_future_tuple<typename decay<F>::type>::value
+    typename std::enable_if<
+        !traits::is_future<typename decay<F>::type>::value
+     && !traits::is_future_range<typename decay<F>::type>::value
+     && !traits::is_future_tuple<typename decay<F>::type>::value
       , detail::unwrapped_impl<detail::unwrapped_impl<
             typename std::decay<F>::type
         > >

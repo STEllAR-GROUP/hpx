@@ -8,9 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
@@ -25,7 +23,7 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
     struct is_component
-      : boost::mpl::false_
+      : std::false_type
     {};
 
     template <typename Component>
@@ -37,31 +35,31 @@ namespace hpx { namespace traits
     // Simple components are components
     template <typename Component>
     struct is_component<Component,
-            typename boost::enable_if<
-                boost::is_base_and_derived<
+            typename std::enable_if<
+                std::is_base_of<
                     detail::simple_component_tag, Component
-                > >::type>
-      : boost::mpl::true_
+                >::value>::type>
+      : std::true_type
     {};
 
     // Fixed components are components
     template <typename Component>
     struct is_component<Component,
-            typename boost::enable_if<
-                boost::is_base_and_derived<
+            typename std::enable_if<
+                std::is_base_of<
                     detail::fixed_component_tag, Component
-                > >::type>
-      : boost::mpl::true_
+                >::value>::type>
+      : std::true_type
     {};
 
     // Managed components are components
     template <typename Component>
     struct is_component<Component,
-            typename boost::enable_if<
-                boost::is_base_and_derived<
+            typename std::enable_if<
+                std::is_base_of<
                     detail::managed_component_tag, Component
-                > >::type>
-      : boost::mpl::true_
+                >::value>::type>
+      : std::true_type
     {};
 
     ///////////////////////////////////////////////////////////////////////////

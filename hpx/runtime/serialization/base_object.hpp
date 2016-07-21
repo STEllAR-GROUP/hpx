@@ -38,7 +38,7 @@ namespace hpx { namespace serialization
     // specify non-virtual calls of virtual functions in
     // intrusively serialized base classes.
     template <typename Derived, typename Base>
-    struct base_object_type<Derived, Base, boost::mpl::true_>
+    struct base_object_type<Derived, Base, std::true_type>
     {
         base_object_type(Derived & d) : d_(d) {}
         Derived & d_;

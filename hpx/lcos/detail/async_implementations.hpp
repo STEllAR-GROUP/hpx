@@ -19,8 +19,6 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
 
-#include <boost/mpl/bool.hpp>
-
 namespace hpx { namespace detail
 {
     /// \cond NOINTERNAL

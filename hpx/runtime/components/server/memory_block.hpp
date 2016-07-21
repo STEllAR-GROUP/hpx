@@ -20,6 +20,7 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <sstream>
@@ -704,7 +705,7 @@ namespace hpx { namespace traits
     // memory_block is a (hand-rolled) component
     template <>
     struct is_component<components::server::memory_block>
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

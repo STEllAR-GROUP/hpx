@@ -19,6 +19,8 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 
+#include <type_traits>
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -97,7 +99,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Cont, typename DistPolicy,
         typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value,
         lcos::future<
             typename traits::promise_local_result<
@@ -119,7 +121,7 @@ namespace hpx
     template <
         typename Component, typename Signature, typename Derived,
         typename Cont, typename DistPolicy, typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value,
         lcos::future<
             typename traits::promise_local_result<

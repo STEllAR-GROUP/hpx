@@ -17,8 +17,6 @@
 #include <hpx/components/security/capability.hpp>
 #include <hpx/components/security/public_key.hpp>
 
-#include <boost/mpl/bool.hpp>
-
 namespace hpx { namespace components { namespace security
 {
 #if defined(HPX_MSVC)
@@ -104,14 +102,8 @@ namespace hpx { namespace components { namespace security
 #endif
 }}}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct is_bitwise_serializable<
-            hpx::components::security::certificate_signing_request>
-       : boost::mpl::true_
-    {};
-}}
+HPX_IS_BITWISE_SERIALIZABLE(
+    hpx::components::security::certificate_signing_request)
 
 #endif
 

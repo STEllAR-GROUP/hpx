@@ -18,7 +18,6 @@
 #include <boost/atomic.hpp>
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/ref.hpp>
 
 namespace hpx { namespace threads { namespace detail
@@ -32,13 +31,13 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::mpl::false_)
+        boost::atomic<hpx::state>& global_state, std::false_type)
     {
     }
 
     template <typename SchedulingPolicy>
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::mpl::true_)
+        boost::atomic<hpx::state>& global_state, std::true_type)
     {
         bool running = is_running_state(global_state.load());
         scheduler.periodic_maintenance(running);
@@ -56,23 +55,23 @@ namespace hpx { namespace threads { namespace detail
                 boost::chrono::milliseconds(1000));
 
             void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
-                boost::mpl::true_) =
+                std::true_type) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
             t.async_wait(util::bind(handler, boost::ref(scheduler),
-                boost::ref(global_state), boost::mpl::true_()));
+                boost::ref(global_state), std::true_type()));
         }
     }
 
     template <typename SchedulingPolicy>
     inline void start_periodic_maintenance(SchedulingPolicy&,
-        boost::atomic<hpx::state>& global_state, boost::mpl::false_)
+        boost::atomic<hpx::state>& global_state, std::false_type)
     {
     }
 
     template <typename SchedulingPolicy>
     inline void start_periodic_maintenance(SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::mpl::true_)
+        boost::atomic<hpx::state>& global_state, std::true_type)
     {
         scheduler.periodic_maintenance(is_running_state(global_state.load()));
 
@@ -87,11 +86,11 @@ namespace hpx { namespace threads { namespace detail
             boost::chrono::milliseconds(1000));
 
         void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
-            boost::mpl::true_) =
+            std::true_type) =
             &periodic_maintenance_handler<SchedulingPolicy>;
 
         t.async_wait(util::bind(handler, boost::ref(scheduler),
-            boost::ref(global_state), boost::mpl::true_()));
+            boost::ref(global_state), std::true_type()));
     }
 }}}
 
