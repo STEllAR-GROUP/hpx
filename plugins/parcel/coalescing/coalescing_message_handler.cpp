@@ -372,10 +372,10 @@ namespace hpx { namespace plugins { namespace parcel
         histogram_max_boundary_ = max_boundary;
         histogram_num_buckets_ = num_buckets;
 
-        time_between_parcels_ = std::make_unique<histogram_collector_type>(
+        time_between_parcels_.reset(new histogram_collector_type(
             hpx::util::tag::histogram::num_bins = double(num_buckets),
             hpx::util::tag::histogram::min_range = double(min_boundary),
-            hpx::util::tag::histogram::max_range = double(max_boundary));
+            hpx::util::tag::histogram::max_range = double(max_boundary)));
         last_parcel_time_ = util::high_resolution_clock::now();
 
         result = util::bind(&coalescing_message_handler::
