@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
@@ -54,10 +55,6 @@
 
 namespace hpx { namespace actions
 {
-    // transfer_action forward declaration
-    template <typename Action>
-    struct transfer_action;
-
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -719,6 +716,9 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    namespace hpx { namespace actions {                                       \
+        template struct transfer_action<action>;                              \
+    }}                                                                        \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
