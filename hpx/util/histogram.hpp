@@ -91,10 +91,10 @@ namespace hpx { namespace util
                     args[histogram_max_range] - args[histogram_min_range],
                     args[histogram_num_bins])
                 ),
-                samples_in_bin_(args[histogram_num_bins] + 2, 0.),
+                samples_in_bin_(std::size_t(args[histogram_num_bins] + 2), 0.),
                 bin_positions_(args[histogram_num_bins] + 2),
                 histogram_(
-                   args[histogram_num_bins] + 2,
+                   std::size_t(args[histogram_num_bins] + 2),
                    std::make_pair(0, 1)
                 ),
                 is_dirty_(true)
