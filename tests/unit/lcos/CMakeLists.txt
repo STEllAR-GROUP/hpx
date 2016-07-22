@@ -52,6 +52,13 @@ set(tests
     when_some
    )
 
+if(NOT MSVC12)
+  # MSVC12 can't cope with split_future
+  set(tests ${tests}
+      split_future
+      split_shared_future)
+endif()
+
 if(HPX_WITH_AWAIT)
   set(tests ${tests} await)
   set(await_PARAMETERS THREADS_PER_LOCALITY 4)
