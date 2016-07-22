@@ -1200,7 +1200,7 @@ namespace hpx { namespace lcos
     // Allow to convert any shared_future<U> into any other future<R> based on
     // an existing conversion path U --> R.
     template <typename R, typename U>
-    hpx::shared_future<R>
+    hpx::future<R>
     make_future(hpx::shared_future<U> f)
     {
         static_assert(
