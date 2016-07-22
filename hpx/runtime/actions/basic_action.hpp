@@ -690,6 +690,33 @@ namespace hpx { namespace serialization
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \def HPX_DECLARE_ACTION(func, name)
+/// \brief Declares an action type
+///
+#define HPX_DECLARE_ACTION(...)                                               \
+    HPX_DECLARE_ACTION_(__VA_ARGS__)                                          \
+    /**/
+
+/// \cond NOINTERNAL
+
+#define HPX_DECLARE_DIRECT_ACTION(...)                                        \
+    HPX_DECLARE_ACTION(__VA_ARGS__)                                           \
+    /**/
+
+#define HPX_DECLARE_ACTION_(...)                                              \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DECLARE_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                    \
+    )(__VA_ARGS__))                                                           \
+    /**/
+
+#define HPX_DECLARE_ACTION_1(func)                                            \
+    HPX_DECLARE_ACTION_2(func, BOOST_PP_CAT(func, _action))                   \
+    /**/
+
+#define HPX_DECLARE_ACTION_2(func, name) struct name;                         \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \

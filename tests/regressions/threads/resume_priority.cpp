@@ -15,8 +15,9 @@ void low_priority()
     HPX_TEST_EQ(hpx::threads::thread_priority_low,
         hpx::this_thread::get_priority());
 }
-HPX_PLAIN_ACTION(low_priority);
+HPX_DECLARE_ACTION(low_priority);
 HPX_ACTION_HAS_LOW_PRIORITY(low_priority_action);
+HPX_PLAIN_ACTION(low_priority);
 
 void normal_priority()
 {
@@ -26,8 +27,9 @@ void normal_priority()
     HPX_TEST_EQ(hpx::threads::thread_priority_normal,
         hpx::this_thread::get_priority());
 }
-HPX_PLAIN_ACTION(normal_priority);
+HPX_DECLARE_ACTION(normal_priority);
 HPX_ACTION_HAS_NORMAL_PRIORITY(normal_priority_action);
+HPX_PLAIN_ACTION(normal_priority);
 
 void high_priority()
 {
@@ -37,8 +39,9 @@ void high_priority()
     HPX_TEST_EQ(hpx::threads::thread_priority_critical,
         hpx::this_thread::get_priority());
 }
-HPX_PLAIN_ACTION(high_priority);
+HPX_DECLARE_ACTION(high_priority);
 HPX_ACTION_HAS_CRITICAL_PRIORITY(high_priority_action);
+HPX_PLAIN_ACTION(high_priority);
 
 int hpx_main(int argc, char ** argv)
 {
