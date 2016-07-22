@@ -22,6 +22,8 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////

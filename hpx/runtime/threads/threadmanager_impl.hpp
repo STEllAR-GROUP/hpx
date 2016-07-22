@@ -28,6 +28,7 @@
 #include <memory>
 #include <mutex>
 #include <numeric>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>

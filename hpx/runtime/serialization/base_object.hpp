@@ -17,6 +17,8 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace serialization
 {
     template <typename Derived, typename Base, typename Enable =

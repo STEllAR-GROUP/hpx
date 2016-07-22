@@ -24,6 +24,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <sstream>
+#include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
 

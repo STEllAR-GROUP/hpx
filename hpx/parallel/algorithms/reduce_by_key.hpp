@@ -18,6 +18,7 @@
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/util/tuple.hpp>
 //
+#include <type_traits>
 #include <vector>
 //
 /// \cond NOINTERNAL

@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace components

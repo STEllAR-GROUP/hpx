@@ -26,6 +26,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>

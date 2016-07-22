@@ -6,6 +6,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
+#include <type_traits>
+
 ///////////////////////////////////////////////////////////////////////////////
 /// placeholder type allowing to integrate the data action templates below
 /// with the existing component based action template infrastructure

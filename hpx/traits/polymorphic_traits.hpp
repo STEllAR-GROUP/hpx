@@ -11,6 +11,8 @@
 #include <hpx/traits/has_xxx.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace traits
 {
     namespace detail

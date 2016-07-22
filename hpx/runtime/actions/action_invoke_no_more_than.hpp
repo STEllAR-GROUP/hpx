@@ -21,6 +21,7 @@
 #include <boost/exception_ptr.hpp>
 
 #include <memory>
+#include <type_traits>
 
 namespace hpx { namespace actions { namespace detail
 {

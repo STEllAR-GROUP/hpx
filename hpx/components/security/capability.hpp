@@ -16,6 +16,7 @@
 #include <boost/cstdint.hpp>
 
 #include <climits>
+#include <type_traits>
 
 namespace hpx { namespace components { namespace security
 {

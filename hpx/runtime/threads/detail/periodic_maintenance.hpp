@@ -20,6 +20,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/ref.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////

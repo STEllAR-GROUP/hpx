@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <set>
+#include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
 
