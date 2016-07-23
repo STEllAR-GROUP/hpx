@@ -9,11 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40703
-// this needs to go first to workaround a weird GCC4.6 ICE
-#include <hpx/util/reinitializable_static.hpp>
-#endif
-
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>

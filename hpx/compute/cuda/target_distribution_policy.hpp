@@ -145,12 +145,7 @@ namespace hpx { namespace components
                     for (hpx::id_type const& locality : localities)
                     {
                         hpx::id_type locality = t.native_handle().get_locality();
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                         result.emplace_back(std::move(locality), v[i].get());
-#else
-                        result.push_back(std::make_pair(
-                            std::move(locality), v[i].get()));
-#endif
                     }
                     return result;
                 });

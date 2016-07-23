@@ -605,35 +605,15 @@ namespace hpx { namespace parcelset
             {
                 util::get<0>(e) = std::make_shared<std::vector<parcel> >();
                 HPX_ASSERT(util::get<1>(e).empty());
-#if HPX_GCC_VERSION < 40700
-                // GCC4.6 gets incredibly confused
-                std::swap(
-                    *util::get<0>(e),
-                    static_cast<std::vector<parcel>&>(parcels));
-                std::swap(
-                    util::get<1>(e),
-                    static_cast<std::vector<write_handler_type>&>(handlers));
-#else
                 std::swap(*util::get<0>(e), parcels);
                 std::swap(util::get<1>(e), handlers);
-#endif
             }
 #else
             if (util::get<0>(e).empty())
             {
                 HPX_ASSERT(util::get<1>(e).empty());
-#if HPX_GCC_VERSION < 40700
-                // GCC4.6 gets incredibly confused
-                std::swap(
-                    util::get<0>(e),
-                    static_cast<std::vector<parcel>&>(parcels));
-                std::swap(
-                    util::get<1>(e),
-                    static_cast<std::vector<write_handler_type>&>(handlers));
-#else
                 std::swap(util::get<0>(e), parcels);
                 std::swap(util::get<1>(e), handlers);
-#endif
             }
 #endif
             else

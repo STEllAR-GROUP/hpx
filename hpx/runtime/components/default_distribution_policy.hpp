@@ -163,15 +163,9 @@ namespace hpx { namespace components
 
                         for (std::size_t i = 0; i != v.size(); ++i)
                         {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                             result.emplace_back(
                                     std::move(localities_[i]), v[i].get()
                                 );
-#else
-                            result.push_back(std::make_pair(
-                                    std::move(localities_[i]), v[i].get()
-                                ));
-#endif
                         }
                         return result;
                     },
@@ -190,11 +184,7 @@ namespace hpx { namespace components
                     -> std::vector<bulk_locality_result>
                 {
                     std::vector<bulk_locality_result> result;
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                     result.emplace_back(id, f.get());
-#else
-                    result.push_back(std::make_pair(id, f.get()));
-#endif
                     return result;
                 });
         }
