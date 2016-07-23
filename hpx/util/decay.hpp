@@ -11,9 +11,7 @@
 
 #include <boost/ref.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 #include <functional>
-#endif
 #include <type_traits>
 #include <utility>
 
@@ -38,13 +36,11 @@ namespace hpx { namespace util
             typedef X& type;
         };
 
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
         template <typename X>
         struct decay_unwrap_impl< ::std::reference_wrapper<X> >
         {
             typedef X& type;
         };
-#endif
     }
 
     template <typename T>

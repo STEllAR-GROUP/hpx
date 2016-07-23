@@ -16,9 +16,7 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <cstdarg>
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 #include <functional>
-#endif
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -282,7 +280,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             {}
         };
 
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
         template <typename T>
         struct unwrapper< ::std::reference_wrapper<T> >
           : base_member_helper<std::reference_wrapper<T> >
@@ -307,7 +304,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
               , reset_thread_distribution_call_helper<T, wrapper_type>(this->member_)
             {}
         };
-#endif
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -334,7 +330,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 hpx::util::detail::all_of<
                     hpx::traits::is_executor_parameters<Params>...
                 >::value,
-                "All passed parameters must be a proper executor parameters "
+                "All passed parameters must be proper executor parameters "
                 "objects"
             );
             static_assert(sizeof...(Params) >= 2,
