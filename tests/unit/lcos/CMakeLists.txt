@@ -22,6 +22,8 @@ set(tests
     async_remote_client
     broadcast
     broadcast_apply
+    channel
+    channel_local
     client_then
     condition_variable
     counting_semaphore

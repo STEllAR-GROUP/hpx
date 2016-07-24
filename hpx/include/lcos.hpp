@@ -16,6 +16,7 @@
 #include <hpx/lcos/packaged_action.hpp>
 
 #include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/channel.hpp>
 #include <hpx/lcos/gather.hpp>
 #include <hpx/lcos/latch.hpp>
 #include <hpx/lcos/queue.hpp>

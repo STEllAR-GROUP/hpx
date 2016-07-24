@@ -7,8 +7,6 @@
 // equally named feature in the Go language.
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/hpx_init.hpp>
-
 #include <hpx/include/apply.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>

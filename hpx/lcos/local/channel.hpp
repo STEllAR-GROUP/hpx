@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
@@ -38,7 +39,10 @@ namespace hpx { namespace lcos { namespace local
 
             virtual ~channel_base() {}
 
-            virtual hpx::future<T> get(std::size_t generation) = 0;
+            virtual hpx::future<T> get(std::size_t generation,
+                bool blocking = false) = 0;
+            virtual bool try_get(std::size_t generation,
+                hpx::future<T>* f = nullptr) = 0;
             virtual void set(std::size_t generation, T && t) = 0;
             virtual void close() = 0;
 
@@ -77,29 +81,80 @@ namespace hpx { namespace lcos { namespace local
             {}
 
         protected:
-            hpx::future<T> get(std::size_t generation)
+            hpx::future<T> get(std::size_t generation, bool blocking)
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                if (buffer_.empty() && closed_)
+                if (buffer_.empty())
                 {
-                    l.unlock();
-                    return hpx::make_exceptional_future<T>(
-                        HPX_GET_EXCEPTION(hpx::invalid_status,
-                            "hpx::lcos::local::channel::get",
-                            "this channel is empty and was closed"));
+                    if (closed_)
+                    {
+                        l.unlock();
+                        return hpx::make_exceptional_future<T>(
+                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                                "hpx::lcos::local::channel::get",
+                                "this channel is empty and was closed"));
+                    }
+
+                    if (blocking && this->use_count() == 1)
+                    {
+                        l.unlock();
+                        return hpx::make_exceptional_future<T>(
+                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                                "hpx::lcos::local::channel::get",
+                                "this channel is empty and is not accessible "
+                                "by any other thread causing a deadlock"));
+                    }
                 }
 
                 ++get_generation_;
                 if (generation == std::size_t(-1))
                     generation = get_generation_;
 
+                if (closed_)
+                {
+                    // the requested item must be available, otherwise this
+                    // would create a deadlock
+                    hpx::future<T> f;
+                    if (!buffer_.try_receive(generation, &f))
+                    {
+                        return hpx::make_exceptional_future<T>(
+                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                                "hpx::lcos::local::channel::get",
+                                "this channel is closed and the requested value"
+                                "has not been received yet"));
+                    }
+                    return f;
+                }
                 return buffer_.receive(generation);
+            }
+
+            bool try_get(std::size_t generation, hpx::future<T>* f = nullptr)
+            {
+                std::lock_guard<mutex_type> l(mtx_);
+
+                if (buffer_.empty() && closed_)
+                    return false;
+
+                ++get_generation_;
+                if (generation == std::size_t(-1))
+                    generation = get_generation_;
+
+                if (f != nullptr)
+                    *f = buffer_.receive(generation);
+
+                return true;
             }
 
             void set(std::size_t generation, T && t)
             {
                 std::lock_guard<mutex_type> l(mtx_);
+                if(closed_)
+                {
+                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                        "hpx::lcos::local::channel::set",
+                        "attempting to write to a closed channel");
+                }
 
                 ++set_generation_;
                 if (generation == std::size_t(-1))
@@ -124,18 +179,18 @@ namespace hpx { namespace lcos { namespace local
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T = void> class channel;
     template <typename T = void> class receive_channel;
     template <typename T = void> class send_channel;
-    template <typename T = void> class channel;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class channel_iterator
       : public hpx::util::iterator_facade<
-            channel_iterator<T>, T const, std::forward_iterator_tag>
+            channel_iterator<T>, T const, std::input_iterator_tag>
     {
         typedef hpx::util::iterator_facade<
-                channel_iterator<T>, T const, std::forward_iterator_tag
+                channel_iterator<T>, T const, std::input_iterator_tag
             > base_type;
 
     public:
@@ -150,12 +205,12 @@ namespace hpx { namespace lcos { namespace local
     private:
         std::pair<T, bool> get_checked() const
         {
-            hpx::future<T> f = channel_->get(std::size_t(-1));
-            f.wait();
-
-            if (f.has_exception())
-                return std::make_pair(T(), false);
-            return std::make_pair(f.get(), true);
+            hpx::future<T> f;
+            if (channel_->try_get(std::size_t(-1), &f))
+            {
+                return std::make_pair(f.get(), true);
+            }
+            return std::make_pair(T(), false);
         }
 
         friend class hpx::util::iterator_core_access;
@@ -163,8 +218,8 @@ namespace hpx { namespace lcos { namespace local
         bool equal(channel_iterator const& rhs) const
         {
             return (channel_ == rhs.channel_ && data_.second == rhs.data_.second) ||
-                !data_.second && rhs.channel_ == nullptr ||
-                channel_ == nullptr && !rhs.data_.second;
+                (!data_.second && rhs.channel_ == nullptr) ||
+                (channel_ == nullptr && !rhs.data_.second);
         }
 
         void increment()
@@ -188,11 +243,11 @@ namespace hpx { namespace lcos { namespace local
     class channel_iterator<void>
       : public hpx::util::iterator_facade<
             channel_iterator<void>, util::unused_type const,
-            std::forward_iterator_tag>
+            std::input_iterator_tag>
     {
         typedef hpx::util::iterator_facade<
                 channel_iterator<void>, util::unused_type const,
-                std::forward_iterator_tag
+                std::input_iterator_tag
             > base_type;
 
     public:
@@ -207,9 +262,13 @@ namespace hpx { namespace lcos { namespace local
     private:
         bool get_checked()
         {
-            hpx::future<util::unused_type> f = channel_->get(std::size_t(-1));
-            f.wait();
-            return !f.has_exception();
+            hpx::future<util::unused_type> f;
+            if (channel_->try_get(std::size_t(-1), &f))
+            {
+                f.get();
+                return true;
+            }
+            return false;
         }
 
         friend class hpx::util::iterator_core_access;
@@ -217,8 +276,8 @@ namespace hpx { namespace lcos { namespace local
         bool equal(channel_iterator const& rhs) const
         {
             return (channel_ == rhs.channel_ && data_ == rhs.data_) ||
-                !data_ && rhs.channel_ == nullptr ||
-                channel_ == nullptr && !rhs.data_;
+                (!data_ && rhs.channel_ == nullptr) ||
+                (channel_ == nullptr && !rhs.data_);
         }
 
         void increment()
@@ -254,15 +313,13 @@ namespace hpx { namespace lcos { namespace local
         }
         T get(std::size_t generation = std::size_t(-1)) const
         {
-            return channel_->get(generation).get();
+            return channel_->get(generation, true).get();
         }
         std::pair<T, bool>
         get_checked(std::size_t generation = std::size_t(-1)) const
         {
-            hpx::future<T> f = channel_->get(generation);
-            f.wait();
-
-            if (f.has_exception())
+            hpx::future<T> f;
+            if (!channel_->try_get(generation, &f))
                 return std::make_pair(T(), false);
             return std::make_pair(f.get(), true);
         }
@@ -309,7 +366,7 @@ namespace hpx { namespace lcos { namespace local
     class receive_channel
     {
     public:
-        receive_channel(channel<T> c)
+        receive_channel(channel<T> const& c)
           : channel_(c.channel_)
         {}
 
@@ -320,16 +377,14 @@ namespace hpx { namespace lcos { namespace local
         }
         T get(std::size_t generation = std::size_t(-1)) const
         {
-            return channel_->get(generation).get();
+            return channel_->get(generation, true).get();
         }
 
         std::pair<T, bool>
         get_checked(std::size_t generation = std::size_t(-1)) const
         {
-            hpx::future<T> f = channel_->get(generation);
-            f.wait();
-
-            if (f.has_exception())
+            hpx::future<T> f;
+            if (channel_->try_get(generation, &f))
                 return std::make_pair(T(), false);
             return std::make_pair(f.get(), true);
         }
@@ -364,7 +419,7 @@ namespace hpx { namespace lcos { namespace local
     class send_channel
     {
     public:
-        send_channel(channel<T> c)
+        send_channel(channel<T> const& c)
           : channel_(c.channel_)
         {}
 
@@ -373,22 +428,9 @@ namespace hpx { namespace lcos { namespace local
             channel_->set(generation, std::move(val));
         }
 
-        channel_iterator<T> begin() const
+        void close()
         {
-            return channel_iterator<T>(this);
-        }
-        channel_iterator<T> end() const
-        {
-            return channel_iterator<T>();
-        }
-
-        channel_iterator<T> rbegin() const
-        {
-            return channel_iterator<T>(this);
-        }
-        channel_iterator<T> rend() const
-        {
-            return channel_iterator<T>();
+            channel_->close();
         }
 
     private:
@@ -432,13 +474,16 @@ namespace hpx { namespace lcos { namespace local
         }
         void get(std::size_t generation = std::size_t(-1)) const
         {
-            channel_->get(generation).get();
+            channel_->get(generation, true).get();
         }
         bool get_checked(std::size_t generation = std::size_t(-1)) const
         {
-            hpx::future<util::unused_type> f = channel_->get(generation);
-            f.wait();
-            return !f.has_exception();
+            hpx::future<util::unused_type> f;
+            if (!channel_->try_get(generation, &f))
+                return false;
+
+            f.get();
+            return true;
         }
 
         void set(std::size_t generation = std::size_t(-1))
@@ -449,6 +494,24 @@ namespace hpx { namespace lcos { namespace local
         void close()
         {
             channel_->close();
+        }
+
+        channel_iterator<void> begin() const
+        {
+            return channel_iterator<void>(this);
+        }
+        channel_iterator<void> end() const
+        {
+            return channel_iterator<void>();
+        }
+
+        channel_iterator<void> rbegin() const
+        {
+            return channel_iterator<void>(this);
+        }
+        channel_iterator<void> rend() const
+        {
+            return channel_iterator<void>();
         }
 
     private:
@@ -476,13 +539,34 @@ namespace hpx { namespace lcos { namespace local
         }
         void get(std::size_t generation = std::size_t(-1)) const
         {
-            channel_->get(generation).get();
+            channel_->get(generation, true).get();
         }
         bool get_checked(std::size_t generation = std::size_t(-1)) const
         {
-            hpx::future<util::unused_type> f = channel_->get(generation);
-            f.wait();
-            return !f.has_exception();
+            hpx::future<util::unused_type> f;
+            if (channel_->try_get(generation, &f))
+                return false;
+
+            f.get();
+            return true;
+        }
+
+        channel_iterator<void> begin() const
+        {
+            return channel_iterator<void>(this);
+        }
+        channel_iterator<void> end() const
+        {
+            return channel_iterator<void>();
+        }
+
+        channel_iterator<void> rbegin() const
+        {
+            return channel_iterator<void>(this);
+        }
+        channel_iterator<void> rend() const
+        {
+            return channel_iterator<void>();
         }
 
     private:

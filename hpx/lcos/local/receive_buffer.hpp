@@ -122,6 +122,35 @@ namespace hpx { namespace lcos { namespace local
             return it->second->get_future();
         }
 
+        bool try_receive(std::size_t step, hpx::future<T>* f = nullptr)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator it = buffer_map_.find(step);
+            if (it == buffer_map_.end())
+                return false;
+
+            // if the value was already set we delete the entry after
+            // retrieving the future
+            if (it->second->can_be_deleted_)
+            {
+                if (f != nullptr)
+                {
+                    erase_on_exit t(buffer_map_, it);
+                    *f = it->second->get_future();
+                }
+                return true;
+            }
+
+            // otherwise mark the entry as to be deleted once the value was set
+            if (f != nullptr)
+            {
+                it->second->can_be_deleted_ = true;
+                *f = it->second->get_future();
+            }
+            return true;
+        }
+
         void store_received(std::size_t step, T && val)
         {
             std::shared_ptr<entry_data> entry;
@@ -280,6 +309,35 @@ namespace hpx { namespace lcos { namespace local
             // otherwise mark the entry as to be deleted once the value was set
             it->second->can_be_deleted_ = true;
             return it->second->get_future();
+        }
+
+        bool try_receive(std::size_t step, hpx::future<void>* f = nullptr)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator it = buffer_map_.find(step);
+            if (it == buffer_map_.end())
+                return false;
+
+            // if the value was already set we delete the entry after
+            // retrieving the future
+            if (it->second->can_be_deleted_)
+            {
+                if (f != nullptr)
+                {
+                    erase_on_exit t(buffer_map_, it);
+                    *f = it->second->get_future();
+                }
+                return true;
+            }
+
+            // otherwise mark the entry as to be deleted once the value was set
+            if (f != nullptr)
+            {
+                it->second->can_be_deleted_ = true;
+                *f = it->second->get_future();
+            }
+            return true;
         }
 
         void store_received(std::size_t step)
