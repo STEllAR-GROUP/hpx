@@ -140,8 +140,9 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, enforce connect mode as we connect to an existing
     // application.
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     hpx::util::function_nonser<void()> const empty;
     return hpx::init(desc_commandline, argc, argv, cfg, empty,

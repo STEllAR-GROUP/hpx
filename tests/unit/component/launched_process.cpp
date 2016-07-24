@@ -68,15 +68,15 @@ int main(int argc, char* argv[])
         ("set_message,s", value<std::string>(), "the message to set in the component")
         ;
 
-    std::vector<std::string> cfg;
+    std::vector<std::string> const cfg = {
+        // Make sure hpx_main above will be executed even if this is not the
+        // console locality.
+        "hpx.run_hpx_main!=1",
 
-    // Make sure hpx_main above will be executed even if this is not the
-    // console locality.
-    cfg.push_back("hpx.run_hpx_main!=1");
-
-    // This explicitly enables the component we depend on (it is disabled by
-    // default to avoid being loaded outside of this test).
-    cfg.push_back("hpx.components.launch_process_test_server.enabled!=1");
+        // This explicitly enables the component we depend on (it is disabled by
+        // default to avoid being loaded outside of this test).
+        "hpx.components.launch_process_test_server.enabled!=1"
+    };
 
     // Note: this uses runtime_mode_connect to instruct this locality to
     // connect to the existing HPX applications

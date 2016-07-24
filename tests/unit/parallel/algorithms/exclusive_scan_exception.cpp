@@ -150,9 +150,10 @@ int main(int argc, char* argv[])
         "the random number generator seed to use for this run")
         ;
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=" +
+            std::to_string(hpx::threads::hardware_concurrency())
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
