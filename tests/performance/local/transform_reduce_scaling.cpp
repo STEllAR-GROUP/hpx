@@ -107,8 +107,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     std::vector<std::string> const cfg = {
-        "hpx.os_threads=" +
-            std::to_string(hpx::threads::hardware_concurrency())
+        "hpx.os_threads=all"
     };
 
     boost::program_options::options_description cmdline(

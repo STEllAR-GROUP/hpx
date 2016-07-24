@@ -139,8 +139,7 @@ int main(int argc, char* argv[])
 
     // initialize program
     std::vector<std::string> const cfg = {
-        "hpx.os_threads=" +
-            std::to_string(hpx::threads::hardware_concurrency()),
+        "hpx.os_threads=all",
         "hpx.run_hpx_main=1"
     };
 

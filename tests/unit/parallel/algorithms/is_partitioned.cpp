@@ -521,8 +521,7 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     std::vector<std::string> const cfg = {
-        "hpx.os_threads=" +
-            std::to_string(hpx::threads::hardware_concurrency())
+        "hpx.os_threads=all"
     };
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
