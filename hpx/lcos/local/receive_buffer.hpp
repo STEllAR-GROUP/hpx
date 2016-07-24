@@ -152,6 +152,11 @@ namespace hpx { namespace lcos { namespace local
             entry->set_value(std::move(val));
         }
 
+        bool empty() const
+        {
+            return buffer_map_.empty();
+        }
+
     protected:
         iterator get_buffer_entry(std::size_t step)
         {
@@ -305,6 +310,11 @@ namespace hpx { namespace lcos { namespace local
 
             // set value in promise, but only after the lock went out of scope
             entry->set_value();
+        }
+
+        bool empty() const
+        {
+            return buffer_map_.empty();
         }
 
     protected:
