@@ -22,6 +22,10 @@ struct test_server
         hpx::components::component_base<test_server>
     >
 {
+    typedef hpx::components::migration_support<
+            hpx::components::component_base<test_server>
+        > base_type;
+
     test_server(int data = 0) : data_(data) {}
     ~test_server() {}
 
@@ -44,8 +48,13 @@ struct test_server
     // be Serializable and CopyConstructable. Components can be
     // MoveConstructable in which case the serialized data is moved into the
     // components constructor.
-    test_server(test_server const& rhs) : data_(rhs.data_) {}
-    test_server(test_server && rhs) : data_(rhs.data_) {}
+    test_server(test_server const& rhs)
+      : base_type(rhs), data_(rhs.data_)
+    {}
+
+    test_server(test_server && rhs)
+      : base_type(std::move(rhs)), data_(rhs.data_)
+    {}
 
     test_server& operator=(test_server const & rhs)
     {
