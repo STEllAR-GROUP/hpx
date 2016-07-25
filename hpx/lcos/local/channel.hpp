@@ -18,6 +18,7 @@
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/unused.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstdlib>
