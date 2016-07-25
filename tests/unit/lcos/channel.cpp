@@ -105,6 +105,159 @@ void pingpong_void(hpx::id_type const& loc)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+std::pair<int, bool>
+dispatched_work(hpx::lcos::channel<int> jobs, hpx::lcos::channel<> done)
+{
+    int received_jobs = 0;
+    bool was_closed = false;
+
+    while(true)
+    {
+        hpx::error_code ec(hpx::lightweight);
+        int job = jobs.get(ec);
+
+        if (!ec)
+        {
+            ++received_jobs;
+        }
+        else
+        {
+            done.set();
+            was_closed = true;
+            break;
+        }
+    }
+
+    return std::make_pair(received_jobs, was_closed);
+}
+HPX_PLAIN_ACTION(dispatched_work);
+
+void dispatch_work(hpx::id_type const& loc)
+{
+    hpx::lcos::channel<int> jobs(loc);
+    hpx::lcos::channel<> done(loc);
+
+    hpx::future<std::pair<int, bool> > f =
+        hpx::async(dispatched_work_action(), loc, jobs, done);
+
+    for (int j = 1; j <= 3; ++j)
+    {
+        jobs.set(j);
+    }
+
+    jobs.close();
+    done.get();
+
+    auto p = f.get();
+
+    HPX_TEST_EQ(p.first, 3);
+    HPX_TEST(p.second);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void channel_range(hpx::id_type const& loc)
+{
+    boost::atomic<int> received_elements(0);
+
+    hpx::lcos::channel<std::string> queue(loc);
+    queue.set("one");
+    queue.set("two");
+    queue.set("three");
+    queue.close();
+
+    for (auto const& elem : queue)
+    {
+        ++received_elements;
+    }
+
+    HPX_TEST_EQ(received_elements.load(), 3);
+}
+
+void channel_range_void(hpx::id_type const& loc)
+{
+    boost::atomic<int> received_elements(0);
+
+    hpx::lcos::channel<> queue(loc);
+    queue.set();
+    queue.set();
+    queue.set();
+    queue.close();
+
+    for (auto const& elem : queue)
+    {
+        ++received_elements;
+    }
+
+    HPX_TEST_EQ(received_elements.load(), 3);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// void deadlock_test(hpx::id_type const& loc)
+// {
+//     bool caught_exception = false;
+//     try {
+//         hpx::lcos::channel<int> c(loc);
+//         int value = c.get();
+//         HPX_TEST(false);
+//     }
+//     catch(hpx::exception const&) {
+//         caught_exception = true;
+//     }
+//     HPX_TEST(caught_exception);
+// }
+
+void closed_channel_get(hpx::id_type const& loc)
+{
+    bool caught_exception = false;
+    try {
+        hpx::lcos::channel<int> c(loc);
+        c.close();
+
+        int value = c.get();
+        HPX_TEST(false);
+    }
+    catch(hpx::exception const&) {
+        caught_exception = true;
+    }
+    HPX_TEST(caught_exception);
+}
+
+void closed_channel_get_generation(hpx::id_type const& loc)
+{
+    bool caught_exception = false;
+    try {
+        hpx::lcos::channel<int> c(loc);
+        c.set(42, 122);         // setting value for generation 122
+        c.close();
+
+        HPX_TEST_EQ(c.get(122), 42);
+
+        int value = c.get(123); // asking for generation 123
+        HPX_TEST(false);
+    }
+    catch(hpx::exception const&) {
+        caught_exception = true;
+    }
+    HPX_TEST(caught_exception);
+}
+
+void closed_channel_set(hpx::id_type const& loc)
+{
+    bool caught_exception = false;
+    try {
+        hpx::lcos::channel<int> c(loc);
+        c.close();
+
+        c.set(42);
+        HPX_TEST(false);
+    }
+    catch(hpx::exception const&) {
+        caught_exception = true;
+    }
+    HPX_TEST(caught_exception);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     hpx::id_type here = hpx::find_here();
@@ -112,14 +265,14 @@ int main(int argc, char* argv[])
     calculate_sum(here);
     pingpong(here);
     pingpong_void(here);
-//     dispatch_work();
-//     channel_range();
-//     channel_range_void();
-//
-//     deadlock_test();
-//     closed_channel_get();
-//     closed_channel_get_generation();
-//     closed_channel_set();
+    dispatch_work(here);
+    channel_range(here);
+    channel_range_void(here);
+
+//     deadlock_test(here);
+    closed_channel_get(here);
+    closed_channel_get_generation(here);
+    closed_channel_set(here);
 
     return hpx::util::report_errors();
 }

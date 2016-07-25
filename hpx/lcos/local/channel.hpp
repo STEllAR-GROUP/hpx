@@ -15,6 +15,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/iterator_facade.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -126,6 +127,7 @@ namespace hpx { namespace lcos { namespace local
                     }
                     return f;
                 }
+
                 return buffer_.receive(generation);
             }
 
@@ -165,8 +167,31 @@ namespace hpx { namespace lcos { namespace local
 
             void close()
             {
-                std::lock_guard<mutex_type> l(mtx_);
+                std::unique_lock<mutex_type> l(mtx_);
+                if(closed_)
+                {
+                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                        "hpx::lcos::local::channel::close",
+                        "attempting to close an already closed channel");
+                }
+
                 closed_ = true;
+
+                if (buffer_.empty())
+                    return;
+
+                boost::exception_ptr e;
+
+                {
+                    util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                    e = HPX_GET_EXCEPTION(hpx::future_cancelled,
+                            "hpx::lcos::local::close",
+                            "canceled waiting on this entry");
+                }
+
+                // all pending requests which can't be satisfied have to be
+                // canceled at this point
+                buffer_.cancel_waiting(e);
             }
 
         private:
@@ -200,7 +225,6 @@ namespace hpx { namespace lcos { namespace local
 
         inline channel_iterator(channel<T> const* c);
         inline channel_iterator(receive_channel<T> const* c);
-        inline channel_iterator(send_channel<T> const* c);
 
     private:
         std::pair<T, bool> get_checked() const
@@ -257,7 +281,6 @@ namespace hpx { namespace lcos { namespace local
 
         inline channel_iterator(channel<void> const* c);
         inline channel_iterator(receive_channel<void> const* c);
-        inline channel_iterator(send_channel<void> const* c);
 
     private:
         bool get_checked()
@@ -452,12 +475,6 @@ namespace hpx { namespace lcos { namespace local
         data_(c ? get_checked() : std::make_pair(T(), false))
     {}
 
-    template <typename T>
-    inline channel_iterator<T>::channel_iterator(send_channel<T> const* c)
-      : channel_(c ? c->channel_ : nullptr),
-        data_(c ? get_checked() : std::make_pair(T(), false))
-    {}
-
     ///////////////////////////////////////////////////////////////////////////
     template <>
     class channel<void>
@@ -608,11 +625,6 @@ namespace hpx { namespace lcos { namespace local
     {}
 
     inline channel_iterator<void>::channel_iterator(receive_channel<void> const* c)
-      : channel_(c ? c->channel_ : nullptr),
-        data_(c ? get_checked() : false)
-    {}
-
-    inline channel_iterator<void>::channel_iterator(send_channel<void> const* c)
       : channel_(c ? c->channel_ : nullptr),
         data_(c ? get_checked() : false)
     {}

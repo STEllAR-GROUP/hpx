@@ -19,13 +19,142 @@
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = void>
+    template <typename T = void> class channel;
+    template <typename T = void> class receive_channel;
+    template <typename T = void> class send_channel;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Channel>
+    class channel_iterator
+      : public hpx::util::iterator_facade<
+            channel_iterator<T, Channel>, T const, std::input_iterator_tag>
+    {
+        typedef hpx::util::iterator_facade<
+                channel_iterator<T, Channel>, T const, std::input_iterator_tag
+            > base_type;
+
+    public:
+        channel_iterator()
+          : channel_(nullptr), data_(T(), false)
+        {}
+
+        channel_iterator(Channel const& c)
+          : channel_(&c), data_(get_checked())
+        {}
+
+    private:
+        std::pair<T, bool> get_checked() const
+        {
+            hpx::future<T> f = channel_->get_async();
+            f.wait();
+            if (!f.has_exception())
+            {
+                return std::make_pair(f.get(), true);
+            }
+            return std::make_pair(T(), false);
+        }
+
+        friend class hpx::util::iterator_core_access;
+
+        bool equal(channel_iterator const& rhs) const
+        {
+            return (data_.second == rhs.data_.second &&
+                        (channel_ == rhs.channel_ ||
+                            (channel_ != nullptr && rhs.channel_ != nullptr &&
+                             channel_->get_id() == rhs.channel_->get_id())
+                        )
+                    ) ||
+                (!data_.second && rhs.channel_ == nullptr) ||
+                (channel_ == nullptr && !rhs.data_.second);
+        }
+
+        void increment()
+        {
+            if (channel_)
+                data_ = get_checked();
+        }
+
+        typename base_type::reference dereference() const
+        {
+            HPX_ASSERT(data_.second);
+            return data_.first;
+        }
+
+    private:
+        Channel const* channel_;
+        std::pair<T, bool> data_;
+    };
+
+    template <typename Channel>
+    class channel_iterator<void, Channel>
+      : public hpx::util::iterator_facade<
+            channel_iterator<void, Channel>, util::unused_type const,
+            std::input_iterator_tag>
+    {
+        typedef hpx::util::iterator_facade<
+                channel_iterator<void, Channel>, util::unused_type const,
+                std::input_iterator_tag
+            > base_type;
+
+    public:
+        channel_iterator()
+          : channel_(nullptr), data_(false)
+        {}
+
+        channel_iterator(Channel const& c)
+          : channel_(&c), data_(get_checked())
+        {}
+
+    private:
+        bool get_checked()
+        {
+            hpx::future<void> f = channel_->get_async();
+            f.wait();
+            return !f.has_exception();
+        }
+
+        friend class hpx::util::iterator_core_access;
+
+        bool equal(channel_iterator const& rhs) const
+        {
+            return (data_ == rhs.data_ &&
+                        (channel_ == rhs.channel_ ||
+                            (channel_ != nullptr && rhs.channel_ != nullptr &&
+                             channel_->get_id() == rhs.channel_->get_id())
+                        )
+                    ) ||
+                (!data_ && rhs.channel_ == nullptr) ||
+                (channel_ == nullptr && !rhs.data_);
+        }
+
+        void increment()
+        {
+            if (channel_)
+                data_ = get_checked();
+        }
+
+        typename base_type::reference dereference() const
+        {
+            HPX_ASSERT(data_);
+            return util::unused;
+        }
+
+    private:
+        Channel const* channel_;
+        bool data_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
     class channel
       : public components::client_base<channel<T>, lcos::server::channel<T> >
     {
         typedef components::client_base<
                 channel<T>, lcos::server::channel<T>
             > base_type;
+
+        HPX_CONSTEXPR_OR_CONST
+        static std::size_t default_generation = std::size_t(-1);
 
     public:
         channel()
@@ -39,22 +168,30 @@ namespace hpx { namespace lcos
           : base_type(std::move(f))
         {}
 
+        ///////////////////////////////////////////////////////////////////////
         hpx::future<T>
-        get_async(std::size_t generation = std::size_t(-1)) const
+        get_async(std::size_t generation = default_generation) const
         {
             typedef typename lcos::server::channel<T>::get_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), generation);
         }
-        T get(std::size_t generation = std::size_t(-1)) const
+        T get(std::size_t generation = default_generation,
+            hpx::error_code& ec = hpx::throws) const
         {
-            return get_async(generation).get();
+            return get_async(generation).get(ec);
+        }
+        T get(hpx::error_code& ec,
+            std::size_t generation = default_generation) const
+        {
+            return get_async(generation).get(ec);
         }
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename U, typename U2 = T, typename Enable =
             typename std::enable_if<!std::is_void<U2>::value>::type>
         hpx::future<void>
-        set_async(U val, std::size_t generation = std::size_t(-1))
+        set_async(U val, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
@@ -63,7 +200,7 @@ namespace hpx { namespace lcos
         }
         template <typename U, typename U2 = T, typename Enable =
             typename std::enable_if<!std::is_void<U2>::value>::type>
-        void set(U val, std::size_t generation = std::size_t(-1))
+        void set(U val, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
@@ -73,7 +210,7 @@ namespace hpx { namespace lcos
         template <typename U = T, typename Enable =
             typename std::enable_if<std::is_void<U>::value>::type>
         hpx::future<void>
-        set_async(std::size_t generation = std::size_t(-1))
+        set_async(std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<
                     void
@@ -83,7 +220,7 @@ namespace hpx { namespace lcos
         }
         template <typename U = T, typename Enable =
             typename std::enable_if<std::is_void<U>::value>::type>
-        void set(std::size_t generation = std::size_t(-1))
+        void set(std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<
                     void
@@ -91,6 +228,7 @@ namespace hpx { namespace lcos
             return action_type()(this->get_id(), util::unused, generation);
         }
 
+        ///////////////////////////////////////////////////////////////////////
         hpx::future<void> close_async()
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
@@ -100,10 +238,29 @@ namespace hpx { namespace lcos
         {
             close_async().get();
         }
-    };
+
+        ///////////////////////////////////////////////////////////////////////
+        channel_iterator<T, channel<T> > begin() const
+        {
+            return channel_iterator<T, channel<T> >(*this);
+        }
+        channel_iterator<T, channel<T> > end() const
+        {
+            return channel_iterator<T, channel<T> >();
+        }
+
+        channel_iterator<T, channel<T> > rbegin() const
+        {
+            return channel_iterator<T, channel<T> >(*this);
+        }
+        channel_iterator<T, channel<T> > rend() const
+        {
+            return channel_iterator<T, channel<T> >();
+        }
+   };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = void>
+    template <typename T>
     class receive_channel
       : public components::client_base<
             receive_channel<T>, lcos::server::channel<T> >
@@ -111,6 +268,9 @@ namespace hpx { namespace lcos
         typedef components::client_base<
                 receive_channel<T>, lcos::server::channel<T>
             > base_type;
+
+        HPX_CONSTEXPR_OR_CONST
+        static std::size_t default_generation = std::size_t(-1);
 
     public:
         receive_channel()
@@ -120,21 +280,47 @@ namespace hpx { namespace lcos
           : base_type(c.get_id())
         {}
 
+        ///////////////////////////////////////////////////////////////////////
         hpx::future<T>
-        get_async(std::size_t generation = std::size_t(-1)) const
+        get_async(std::size_t generation = default_generation) const
         {
             typedef typename lcos::server::channel<T>::get_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), generation);
         }
-        T get(std::size_t generation = std::size_t(-1)) const
+        T get(std::size_t generation = default_generation,
+            hpx::error_code& ec = hpx::throws) const
         {
-            return get_async(generation).get();
+            return get_async(generation).get(ec);
+        }
+        T get(hpx::error_code& ec,
+            std::size_t generation = default_generation) const
+        {
+            return get_async(generation).get(ec);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        channel_iterator<T, channel<T> > begin() const
+        {
+            return channel_iterator<T, channel<T> >(*this);
+        }
+        channel_iterator<T, channel<T> > end() const
+        {
+            return channel_iterator<T, channel<T> >();
+        }
+
+        channel_iterator<T, channel<T> > rbegin() const
+        {
+            return channel_iterator<T, channel<T> >(*this);
+        }
+        channel_iterator<T, channel<T> > rend() const
+        {
+            return channel_iterator<T, channel<T> >();
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = void>
+    template <typename T>
     class send_channel
       : public components::client_base<
             send_channel<T>, lcos::server::channel<T> >
@@ -142,6 +328,9 @@ namespace hpx { namespace lcos
         typedef components::client_base<
                 send_channel<T>, lcos::server::channel<T>
             > base_type;
+
+        HPX_CONSTEXPR_OR_CONST
+        static std::size_t default_generation = std::size_t(-1);
 
     public:
         send_channel()
@@ -151,10 +340,11 @@ namespace hpx { namespace lcos
           : base_type(c.get_id())
         {}
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename U, typename U2 = T, typename Enable =
             typename std::enable_if<!std::is_void<U2>::value>::type>
         hpx::future<void>
-        set_async(U val, std::size_t generation = std::size_t(-1))
+        set_async(U val, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
@@ -163,7 +353,7 @@ namespace hpx { namespace lcos
         }
         template <typename U, typename U2 = T, typename Enable =
             typename std::enable_if<!std::is_void<U2>::value>::type>
-        void set(U val, std::size_t generation = std::size_t(-1))
+        void set(U val, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
@@ -173,7 +363,7 @@ namespace hpx { namespace lcos
         template <typename U = T, typename Enable =
             typename std::enable_if<std::is_void<U>::value>::type>
         hpx::future<void>
-        set_async(std::size_t generation = std::size_t(-1))
+        set_async(std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<
                     void
@@ -183,7 +373,7 @@ namespace hpx { namespace lcos
         }
         template <typename U = T, typename Enable =
             typename std::enable_if<std::is_void<U>::value>::type>
-        void set(std::size_t generation = std::size_t(-1))
+        void set(std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<
                     void
@@ -191,6 +381,7 @@ namespace hpx { namespace lcos
             return action_type()(this->get_id(), util::unused, generation);
         }
 
+        ///////////////////////////////////////////////////////////////////////
         hpx::future<void> close_async()
         {
             typedef typename lcos::server::channel<T>::close_action action_type;

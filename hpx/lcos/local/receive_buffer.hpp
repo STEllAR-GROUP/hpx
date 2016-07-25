@@ -32,16 +32,11 @@ namespace hpx { namespace lcos { namespace local
         struct entry_data
         {
         private:
-            HPX_MOVABLE_ONLY(entry_data);
+            HPX_NON_COPYABLE(entry_data);
 
         public:
             entry_data()
-              : can_be_deleted_(false)
-            {}
-
-            entry_data(entry_data && rhs)
-              : promise_(std::move(rhs.promise_)),
-                can_be_deleted_(rhs.can_be_deleted_)
+              : can_be_deleted_(false), value_set_(false)
             {}
 
             hpx::future<T> get_future()
@@ -52,11 +47,24 @@ namespace hpx { namespace lcos { namespace local
             template <typename Val>
             void set_value(Val && val)
             {
+                value_set_ = true;
                 promise_.set_value(std::forward<Val>(val));
+            }
+
+            bool cancel(boost::exception_ptr const& e)
+            {
+                HPX_ASSERT(can_be_deleted_);
+                if (!value_set_)
+                {
+                    promise_.set_exception(e);
+                    return true;
+                }
+                return false;
             }
 
             buffer_promise_type promise_;
             bool can_be_deleted_;
+            bool value_set_;
         };
 
         typedef std::map<std::size_t, std::shared_ptr<entry_data> >
@@ -186,6 +194,21 @@ namespace hpx { namespace lcos { namespace local
             return buffer_map_.empty();
         }
 
+        void cancel_waiting(boost::exception_ptr const& e)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator end = buffer_map_.end();
+            for (iterator it = buffer_map_.begin(); it != end; /**/)
+            {
+                iterator to_delete = it++;
+                if (to_delete->second->cancel(e))
+                {
+                    buffer_map_.erase(to_delete);
+                }
+            }
+        }
+
     protected:
         iterator get_buffer_entry(std::size_t step)
         {
@@ -222,16 +245,11 @@ namespace hpx { namespace lcos { namespace local
         struct entry_data
         {
         private:
-            HPX_MOVABLE_ONLY(entry_data);
+            HPX_NON_COPYABLE(entry_data);
 
         public:
             entry_data()
-              : can_be_deleted_(false)
-            {}
-
-            entry_data(entry_data && rhs)
-              : promise_(std::move(rhs.promise_)),
-                can_be_deleted_(rhs.can_be_deleted_)
+              : can_be_deleted_(false), value_set_(false)
             {}
 
             hpx::future<void> get_future()
@@ -241,11 +259,24 @@ namespace hpx { namespace lcos { namespace local
 
             void set_value()
             {
+                value_set_ = true;
                 promise_.set_value();
+            }
+
+            bool cancel(boost::exception_ptr const& e)
+            {
+                HPX_ASSERT(can_be_deleted_);
+                if (!value_set_)
+                {
+                    promise_.set_exception(e);
+                    return true;
+                }
+                return false;
             }
 
             buffer_promise_type promise_;
             bool can_be_deleted_;
+            bool value_set_;
         };
 
         typedef std::map<std::size_t, std::shared_ptr<entry_data> >
@@ -373,6 +404,21 @@ namespace hpx { namespace lcos { namespace local
         bool empty() const
         {
             return buffer_map_.empty();
+        }
+
+        void cancel_waiting(boost::exception_ptr const& e)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator end = buffer_map_.end();
+            for (iterator it = buffer_map_.begin(); it != end; /**/)
+            {
+                iterator to_delete = it++;
+                if (to_delete->second->cancel(e))
+                {
+                    buffer_map_.erase(to_delete);
+                }
+            }
         }
 
     protected:
