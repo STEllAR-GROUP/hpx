@@ -68,7 +68,10 @@ namespace hpx { namespace util
               : _value()
             {}
 
-            template <typename U>
+            template <typename U, typename =
+                typename std::enable_if<
+                    !std::is_same<tuple_member, typename std::decay<U>::type>::value
+                >::type>
             explicit HPX_HOST_DEVICE HPX_CONSTEXPR tuple_member(U&& value)
               : _value(std::forward<U>(value))
             {}
@@ -110,7 +113,10 @@ namespace hpx { namespace util
               : T()
             {}
 
-            template <typename U>
+            template <typename U, typename =
+                typename std::enable_if<
+                    !std::is_same<tuple_member, typename std::decay<U>::type>::value
+                >::type>
             explicit HPX_HOST_DEVICE HPX_CONSTEXPR tuple_member(U&& value)
               : T(std::forward<U>(value))
             {}
