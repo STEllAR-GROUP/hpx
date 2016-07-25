@@ -39,8 +39,8 @@ void calculate_sum(hpx::id_type const& loc)
     hpx::apply(sum_action(), loc,
         std::vector<int>(s.begin() + s.size()/2, s.end()), c);
 
-    int x = c.get();    // receive from c
-    int y = c.get();
+    int x = c.get_sync();    // receive from c
+    int y = c.get_sync();
 
     int expected = std::accumulate(s.begin(), s.end(), 0);
     HPX_TEST_EQ(expected, x + y);
@@ -58,7 +58,7 @@ void pong(
     hpx::lcos::receive_channel<std::string> pings,
     hpx::lcos::send_channel<std::string> pongs)
 {
-    std::string msg = pings.get();
+    std::string msg = pings.get_sync();
     pongs.set(msg);
 }
 
@@ -70,7 +70,7 @@ void pingpong(hpx::id_type const& loc)
     ping(pings, "passed message");
     pong(pings, pongs);
 
-    std::string result = pongs.get();
+    std::string result = pongs.get_sync();
     HPX_TEST_EQ(std::string("passed message"), result);
 }
 
@@ -85,7 +85,7 @@ void pong_void(
     hpx::lcos::send_channel<> pongs,
     bool& pingponged)
 {
-    pings.get();
+    pings.get_sync();
     pongs.set();
     pingponged = true;
 }
@@ -100,7 +100,7 @@ void pingpong_void(hpx::id_type const& loc)
     ping_void(pings);
     pong_void(pings, pongs, pingponged);
 
-    pongs.get();
+    pongs.get_sync();
     HPX_TEST(pingponged);
 }
 
@@ -114,7 +114,7 @@ dispatched_work(hpx::lcos::channel<int> jobs, hpx::lcos::channel<> done)
     while(true)
     {
         hpx::error_code ec(hpx::lightweight);
-        int job = jobs.get(ec);
+        int job = jobs.get_sync(ec);
 
         if (!ec)
         {
@@ -146,7 +146,7 @@ void dispatch_work(hpx::id_type const& loc)
     }
 
     jobs.close();
-    done.get();
+    done.get_sync();
 
     auto p = f.get();
 
@@ -213,7 +213,7 @@ void closed_channel_get(hpx::id_type const& loc)
         hpx::lcos::channel<int> c(loc);
         c.close();
 
-        int value = c.get();
+        int value = c.get_sync();
         HPX_TEST(false);
     }
     catch(hpx::exception const&) {
@@ -230,9 +230,9 @@ void closed_channel_get_generation(hpx::id_type const& loc)
         c.set(42, 122);         // setting value for generation 122
         c.close();
 
-        HPX_TEST_EQ(c.get(122), 42);
+        HPX_TEST_EQ(c.get_sync(122), 42);
 
-        int value = c.get(123); // asking for generation 123
+        int value = c.get_sync(123); // asking for generation 123
         HPX_TEST(false);
     }
     catch(hpx::exception const&) {

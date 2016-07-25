@@ -45,7 +45,7 @@ namespace hpx { namespace lcos
     private:
         std::pair<T, bool> get_checked() const
         {
-            hpx::future<T> f = channel_->get_async();
+            hpx::future<T> f = channel_->get();
             f.wait();
             if (!f.has_exception())
             {
@@ -108,7 +108,7 @@ namespace hpx { namespace lcos
     private:
         bool get_checked()
         {
-            hpx::future<void> f = channel_->get_async();
+            hpx::future<void> f = channel_->get();
             f.wait();
             return !f.has_exception();
         }
@@ -170,21 +170,21 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<T>
-        get_async(std::size_t generation = default_generation) const
+        get(std::size_t generation = default_generation) const
         {
             typedef typename lcos::server::channel<T>::get_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), generation);
         }
-        T get(std::size_t generation = default_generation,
+        T get_sync(std::size_t generation = default_generation,
             hpx::error_code& ec = hpx::throws) const
         {
-            return get_async(generation).get(ec);
+            return get(generation).get(ec);
         }
-        T get(hpx::error_code& ec,
+        T get_sync(hpx::error_code& ec,
             std::size_t generation = default_generation) const
         {
-            return get_async(generation).get(ec);
+            return get(generation).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -281,22 +281,21 @@ namespace hpx { namespace lcos
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<T>
-        get_async(std::size_t generation = default_generation) const
+        hpx::future<T> get(std::size_t generation = default_generation) const
         {
             typedef typename lcos::server::channel<T>::get_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), generation);
         }
-        T get(std::size_t generation = default_generation,
+        T get_sync(std::size_t generation = default_generation,
             hpx::error_code& ec = hpx::throws) const
         {
-            return get_async(generation).get(ec);
+            return get(generation).get(ec);
         }
-        T get(hpx::error_code& ec,
+        T get_sync(hpx::error_code& ec,
             std::size_t generation = default_generation) const
         {
-            return get_async(generation).get(ec);
+            return get(generation).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////

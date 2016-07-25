@@ -29,8 +29,8 @@ void calculate_sum()
     hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size()/2), c);
     hpx::apply(&sum, std::vector<int>(s.begin() + s.size()/2, s.end()), c);
 
-    int x = c.get();    // receive from c
-    int y = c.get();
+    int x = c.get_sync();    // receive from c
+    int y = c.get_sync();
 
     hpx::cout << "sum: " << x + y << std::endl;
 }
@@ -47,7 +47,7 @@ void pong(
     hpx::lcos::local::receive_channel<std::string> pings,
     hpx::lcos::local::send_channel<std::string> pongs)
 {
-    std::string msg = pings.get();
+    std::string msg = pings.get_sync();
     pongs.set(msg);
 }
 
@@ -59,7 +59,7 @@ void pingpong()
     ping(pings, "passed message");
     pong(pings, pongs);
 
-    hpx::cout << "ping-ponged: " << pongs.get() << std::endl;
+    hpx::cout << "ping-ponged: " << pongs.get_sync() << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ void dispatch_work()
     jobs.close();
     hpx::cout << "sent all jobs" << std::endl;
 
-    done.get();
+    done.get_sync();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -73,13 +73,13 @@ namespace hpx { namespace lcos { namespace server
         // Retrieve the next value from the channel
         result_type get_value(error_code& ec = throws)
         {
-            return channel_.get();
+            return channel_.get_sync();
         }
 
         // Additional functionality exposed by the channel component
         hpx::future<T> get_generation(std::size_t generation)
         {
-            return channel_.get_async(generation);
+            return channel_.get(generation);
         }
         HPX_DEFINE_COMPONENT_ACTION(channel, get_generation);
 
