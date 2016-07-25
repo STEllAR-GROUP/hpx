@@ -224,8 +224,8 @@ namespace hpx { namespace lcos { namespace local
           : channel_(nullptr), data_(T(), false)
         {}
 
-        inline channel_iterator(channel<T> const* c);
-        inline channel_iterator(receive_channel<T> const* c);
+        inline explicit channel_iterator(channel<T> const& c);
+        inline explicit channel_iterator(receive_channel<T> const& c);
 
     private:
         std::pair<T, bool> get_checked() const
@@ -280,8 +280,8 @@ namespace hpx { namespace lcos { namespace local
           : channel_(nullptr), data_(false)
         {}
 
-        inline channel_iterator(channel<void> const* c);
-        inline channel_iterator(receive_channel<void> const* c);
+        inline explicit channel_iterator(channel<void> const& c);
+        inline explicit channel_iterator(receive_channel<void> const& c);
 
     private:
         bool get_checked()
@@ -360,7 +360,7 @@ namespace hpx { namespace lcos { namespace local
 
         channel_iterator<T> begin() const
         {
-            return channel_iterator<T>(this);
+            return channel_iterator<T>(*this);
         }
         channel_iterator<T> end() const
         {
@@ -369,7 +369,7 @@ namespace hpx { namespace lcos { namespace local
 
         channel_iterator<T> rbegin() const
         {
-            return channel_iterator<T>(this);
+            return channel_iterator<T>(*this);
         }
         channel_iterator<T> rend() const
         {
@@ -415,7 +415,7 @@ namespace hpx { namespace lcos { namespace local
 
         channel_iterator<T> begin() const
         {
-            return channel_iterator<T>(this);
+            return channel_iterator<T>(*this);
         }
         channel_iterator<T> end() const
         {
@@ -424,7 +424,7 @@ namespace hpx { namespace lcos { namespace local
 
         channel_iterator<T> rbegin() const
         {
-            return channel_iterator<T>(this);
+            return channel_iterator<T>(*this);
         }
         channel_iterator<T> rend() const
         {
@@ -464,17 +464,98 @@ namespace hpx { namespace lcos { namespace local
         boost::intrusive_ptr<detail::channel_base<T> > channel_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    inline channel_iterator<T>::channel_iterator(channel<T> const* c)
-      : channel_(c ? c->channel_ : nullptr),
-        data_(c ? get_checked() : std::make_pair(T(), false))
+    inline channel_iterator<T>::channel_iterator(channel<T> const& c)
+      : channel_(c.channel_),
+        data_(get_checked())
     {}
 
     template <typename T>
-    inline channel_iterator<T>::channel_iterator(receive_channel<T> const* c)
-      : channel_(c ? c->channel_ : nullptr),
-        data_(c ? get_checked() : std::make_pair(T(), false))
+    inline channel_iterator<T>::channel_iterator(receive_channel<T> const& c)
+      : channel_(c.channel_),
+        data_(get_checked())
     {}
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <> class channel<void>;
+    template <> class receive_channel<void>;
+    template <> class send_channel<void>;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    class receive_channel<void>
+    {
+    public:
+        receive_channel(channel<void> const& c);
+
+        hpx::future<void>
+        get_async(std::size_t generation = std::size_t(-1)) const
+        {
+            return channel_->get(generation);
+        }
+        void get(std::size_t generation = std::size_t(-1)) const
+        {
+            channel_->get(generation, true).get();
+        }
+        bool get_checked(std::size_t generation = std::size_t(-1)) const
+        {
+            hpx::future<util::unused_type> f;
+            if (channel_->try_get(generation, &f))
+                return false;
+
+            f.get();
+            return true;
+        }
+
+        channel_iterator<void> begin() const
+        {
+            return channel_iterator<void>(*this);
+        }
+        channel_iterator<void> end() const
+        {
+            return channel_iterator<void>();
+        }
+
+        channel_iterator<void> rbegin() const
+        {
+            return channel_iterator<void>(*this);
+        }
+        channel_iterator<void> rend() const
+        {
+            return channel_iterator<void>();
+        }
+
+    private:
+        friend class channel_iterator<void>;
+
+    private:
+        boost::intrusive_ptr<detail::channel_base<util::unused_type> > channel_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    class send_channel<void>
+    {
+    public:
+        send_channel(channel<void> const& c);
+
+        void set(std::size_t generation = std::size_t(-1))
+        {
+            channel_->set(generation, util::unused_type());
+        }
+
+        void close()
+        {
+            channel_->close();
+        }
+
+    private:
+        friend class channel_iterator<void>;
+
+    private:
+        boost::intrusive_ptr<detail::channel_base<util::unused_type> > channel_;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -516,7 +597,7 @@ namespace hpx { namespace lcos { namespace local
 
         channel_iterator<void> begin() const
         {
-            return channel_iterator<void>(this);
+            return channel_iterator<void>(*this);
         }
         channel_iterator<void> end() const
         {
@@ -525,7 +606,7 @@ namespace hpx { namespace lcos { namespace local
 
         channel_iterator<void> rbegin() const
         {
-            return channel_iterator<void>(this);
+            return channel_iterator<void>(*this);
         }
         channel_iterator<void> rend() const
         {
@@ -542,92 +623,22 @@ namespace hpx { namespace lcos { namespace local
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class receive_channel<void>
-    {
-    public:
-        receive_channel(channel<void> const& c)
-          : channel_(c.channel_)
-        {}
-
-        hpx::future<void>
-        get_async(std::size_t generation = std::size_t(-1)) const
-        {
-            return channel_->get(generation);
-        }
-        void get(std::size_t generation = std::size_t(-1)) const
-        {
-            channel_->get(generation, true).get();
-        }
-        bool get_checked(std::size_t generation = std::size_t(-1)) const
-        {
-            hpx::future<util::unused_type> f;
-            if (channel_->try_get(generation, &f))
-                return false;
-
-            f.get();
-            return true;
-        }
-
-        channel_iterator<void> begin() const
-        {
-            return channel_iterator<void>(this);
-        }
-        channel_iterator<void> end() const
-        {
-            return channel_iterator<void>();
-        }
-
-        channel_iterator<void> rbegin() const
-        {
-            return channel_iterator<void>(this);
-        }
-        channel_iterator<void> rend() const
-        {
-            return channel_iterator<void>();
-        }
-
-    private:
-        friend class channel_iterator<void>;
-
-    private:
-        boost::intrusive_ptr<detail::channel_base<util::unused_type> > channel_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class send_channel<void>
-    {
-    public:
-        send_channel(channel<void> const& c)
-          : channel_(c.channel_)
-        {}
-
-        void set(std::size_t generation = std::size_t(-1))
-        {
-            channel_->set(generation, util::unused_type());
-        }
-
-        void close()
-        {
-            channel_->close();
-        }
-
-    private:
-        friend class channel_iterator<void>;
-
-    private:
-        boost::intrusive_ptr<detail::channel_base<util::unused_type> > channel_;
-    };
-
-    inline channel_iterator<void>::channel_iterator(channel<void> const* c)
-      : channel_(c ? c->channel_ : nullptr),
-        data_(c ? get_checked() : false)
+    inline receive_channel<void>::receive_channel(channel<void> const& c)
+      : channel_(c.channel_)
     {}
 
-    inline channel_iterator<void>::channel_iterator(receive_channel<void> const* c)
-      : channel_(c ? c->channel_ : nullptr),
-        data_(c ? get_checked() : false)
+    inline send_channel<void>::send_channel(channel<void> const& c)
+      : channel_(c.channel_)
+    {}
+
+    inline channel_iterator<void>::channel_iterator(channel<void> const& c)
+      : channel_(c.channel_),
+        data_(get_checked())
+    {}
+
+    inline channel_iterator<void>::channel_iterator(receive_channel<void> const& c)
+      : channel_(c.channel_),
+        data_(get_checked())
     {}
 }}}
 

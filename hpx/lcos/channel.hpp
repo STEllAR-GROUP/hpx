@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
           : channel_(nullptr), data_(T(), false)
         {}
 
-        channel_iterator(Channel const& c)
+        explicit channel_iterator(Channel const& c)
           : channel_(&c), data_(get_checked())
         {}
 
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos
           : channel_(nullptr), data_(false)
         {}
 
-        channel_iterator(Channel const& c)
+        explicit channel_iterator(Channel const& c)
           : channel_(&c), data_(get_checked())
         {}
 
@@ -161,12 +161,12 @@ namespace hpx { namespace lcos
         {}
 
         // create a new instance of a channel component
-        channel(naming::id_type const& loc)
+        explicit channel(naming::id_type const& loc)
           : base_type(hpx::new_<lcos::server::channel<T> >(loc))
         {}
-        channel(lcos::future<naming::id_type> f)
-          : base_type(std::move(f))
-        {}
+//         channel(lcos::future<naming::id_type> f)
+//           : base_type(std::move(f))
+//         {}
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<T>
