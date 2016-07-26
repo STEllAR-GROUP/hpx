@@ -151,8 +151,10 @@ namespace detail
         // determine the required alignment, define aligned storage of proper
         // size
         HPX_STATIC_CONSTEXPR std::size_t max_alignment =
-            (alignof(value_type) > alignof(error_type)) ?
-                alignof(value_type) : alignof(error_type);
+            (std::alignment_of<value_type>::value >
+             std::alignment_of<error_type>::value) ?
+            std::alignment_of<value_type>::value
+          : std::alignment_of<error_type>::value;
 
         HPX_STATIC_CONSTEXPR std::size_t max_size =
                 (sizeof(value_type) > sizeof(error_type)) ?

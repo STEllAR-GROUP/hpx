@@ -157,7 +157,7 @@ namespace hpx { namespace util
         }
 
         typedef typename std::aligned_storage<sizeof(value_type),
-            alignof(value_type)>::type storage_type;
+            std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_;
         static boost::once_flag constructed_;
