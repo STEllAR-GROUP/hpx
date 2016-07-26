@@ -16,6 +16,7 @@
 #include <hpx/util/tuple.hpp>
 
 #include <functional>
+#include <type_traits>
 
 namespace hpx { namespace util
 {

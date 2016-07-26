@@ -148,6 +148,7 @@ namespace hpx { namespace lcos
 
 #include <mutex>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace lcos

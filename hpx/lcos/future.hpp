@@ -20,24 +20,19 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/identity.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_void.hpp>
-#include <boost/utility/declval.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -54,8 +49,8 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        !std::is_void<typename hpx::traits::future_traits<Future>::type>::value
     >::type serialize_future_load(Archive& ar, Future& f)
     {
         typedef typename hpx::traits::future_traits<Future>::type value_type;
@@ -88,8 +83,8 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        std::is_void<typename hpx::traits::future_traits<Future>::type>::value
     >::type serialize_future_load(Archive& ar, Future& f) //-V659
     {
         typedef lcos::detail::future_data<void> shared_state;
@@ -118,8 +113,8 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        !std::is_void<typename hpx::traits::future_traits<Future>::type>::value
     >::type serialize_future_save(Archive& ar, Future const& f)
     {
         typedef typename hpx::traits::future_traits<Future>::result_type value_type;
@@ -182,8 +177,8 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        std::is_void<typename hpx::traits::future_traits<Future>::type>::value
     >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
         if(ar.is_future_awaiting())
@@ -247,7 +242,7 @@ namespace hpx { namespace lcos { namespace detail
 
             ~continuation_not_callable()
             {
-                error(boost::declval<Future>(), boost::declval<F&>());
+                error(std::declval<Future>(), std::declval<F&>());
             }
         } type;
     };
@@ -262,11 +257,11 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename hpx::util::result_of<F(Future)>::type cont_result;
 
-        typedef typename boost::mpl::eval_if<
-            hpx::traits::detail::is_unique_future<cont_result>
+        typedef typename std::conditional<
+            hpx::traits::detail::is_unique_future<cont_result>::value
           , hpx::traits::future_traits<cont_result>
-          , boost::mpl::identity<cont_result>
-        >::type result_type;
+          , hpx::util::identity<cont_result>
+        >::type::type result_type;
 
         typedef lcos::future<result_type> type;
     };
@@ -536,12 +531,12 @@ namespace hpx { namespace lcos { namespace detail
         //   - valid() == false on original future object immediately after it
         //     returns.
         template <typename F>
-        typename boost::lazy_disable_if_c<
-            hpx::traits::is_launch_policy<F>::value ||
-            hpx::traits::is_threads_executor<F>::value ||
-            hpx::traits::is_executor<F>::value
+        typename std::enable_if<
+            !hpx::traits::is_launch_policy<F>::value &&
+            !hpx::traits::is_threads_executor<F>::value &&
+            !hpx::traits::is_executor<F>::value
           , future_then_result<Derived, F>
-        >::type
+        >::type::type
         then(F && f, error_code& ec = throws) const
         {
             return then(launch::all, std::forward<F>(f), ec);
@@ -608,10 +603,10 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Executor, typename F>
-        typename boost::lazy_enable_if_c<
+        typename std::enable_if<
             hpx::traits::is_executor<Executor>::value
           , future_then_result<Derived, F>
-        >::type
+        >::type::type
         then(Executor& exec, F && f, error_code& ec = throws) const
         {
             typedef
@@ -800,7 +795,7 @@ namespace hpx { namespace lcos
         //   - other.valid() == false.
         template <typename T>
         future(future<T>&& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
+            typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : nullptr)
         {
             other = future<T>();
@@ -890,12 +885,12 @@ namespace hpx { namespace lcos
         using base_type::has_exception;
 
         template <typename F>
-        typename boost::lazy_disable_if_c<
-            hpx::traits::is_launch_policy<F>::value ||
-            hpx::traits::is_threads_executor<F>::value ||
-            hpx::traits::is_executor<F>::value
+        typename std::enable_if<
+            !hpx::traits::is_launch_policy<F>::value &&
+            !hpx::traits::is_threads_executor<F>::value &&
+            !hpx::traits::is_executor<F>::value
           , detail::future_then_result<future, F>
-        >::type
+        >::type::type
         then(F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
@@ -919,10 +914,10 @@ namespace hpx { namespace lcos
         }
 
         template <typename Executor, typename F>
-        typename boost::lazy_enable_if_c<
+        typename std::enable_if<
             hpx::traits::is_executor<Executor>::value
           , detail::future_then_result<future, F>
-        >::type
+        >::type::type
         then(Executor& exec, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
@@ -1097,7 +1092,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         template <typename T>
         shared_future(shared_future<T> const& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = nullptr
+            typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : nullptr)
         {}
 

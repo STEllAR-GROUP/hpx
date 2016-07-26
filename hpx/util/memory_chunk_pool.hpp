@@ -17,6 +17,7 @@
 #include <cstring>
 #include <map>
 #include <mutex>
+#include <type_traits>
 #include <vector>
 
 // forward declare pool
@@ -38,7 +39,7 @@ namespace hpx { namespace traits
                 T, util::memory_chunk_pool<M>, M
             >
         >
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

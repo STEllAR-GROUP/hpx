@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <string>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 #include <boost/range/functions.hpp>

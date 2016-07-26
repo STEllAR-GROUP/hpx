@@ -14,6 +14,7 @@
 #if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 #include <functional>
 #endif
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace util

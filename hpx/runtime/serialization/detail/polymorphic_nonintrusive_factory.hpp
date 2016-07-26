@@ -18,12 +18,10 @@
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_abstract.hpp>
-
 #include <memory>
 #include <string>
 #include <typeinfo>
+#include <type_traits>
 #include <unordered_map>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -78,12 +76,12 @@ namespace hpx { namespace serialization { namespace detail
         }
 
     private:
-        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::true_)
+        static void load_polymorphic(T *t, input_archive& ar, std::true_type)
         {
             serialize(ar, *t, 0);
         }
 
-        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::false_)
+        static void load_polymorphic(T *t, input_archive& ar, std::false_type)
         {
             ar >> *t;
         }
@@ -205,7 +203,7 @@ namespace hpx { namespace serialization { namespace detail
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
         struct needs_automatic_registration<action>                           \
-          : boost::mpl::false_                                                \
+          : std::false_type                                                   \
         {};                                                                   \
     }}                                                                        \
     HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class);                               \

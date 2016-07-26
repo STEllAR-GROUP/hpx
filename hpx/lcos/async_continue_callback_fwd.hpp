@@ -11,7 +11,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 
 #ifndef HPX_MSVC
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 #endif
 
 namespace hpx
@@ -58,7 +58,7 @@ namespace hpx
 #ifndef HPX_MSVC
     template <typename Action, typename Cont, typename DistPolicy,
         typename Callback, typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value,
         lcos::future<
             typename traits::promise_local_result<
@@ -71,7 +71,7 @@ namespace hpx
     template <
         typename Component, typename Signature, typename Derived,
         typename Cont, typename DistPolicy, typename Callback, typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value,
         lcos::future<
             typename traits::promise_local_result<

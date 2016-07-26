@@ -26,6 +26,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -42,9 +43,9 @@ namespace hpx { namespace parcelset {
     struct connection_handler_traits<policies::ibverbs::connection_handler>
     {
         typedef policies::ibverbs::sender connection_type;
-        typedef boost::mpl::false_  send_early_parcel;
-        typedef boost::mpl::true_ do_background_work;
-        typedef boost::mpl::false_ do_enable_parcel_handling;
+        typedef std::false_type  send_early_parcel;
+        typedef std::true_type do_background_work;
+        typedef std::false_type do_enable_parcel_handling;
 
         static const char * type()
         {

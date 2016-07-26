@@ -122,8 +122,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a first2.
     ///
     template <typename ExPolicy, typename ForwardIter1, typename ForwardIter2>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
+    inline typename std::enable_if<
+        is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, ForwardIter2>::type
     >::type
     swap_ranges(ExPolicy && policy, ForwardIter1 first1, ForwardIter1 last1,

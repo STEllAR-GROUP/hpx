@@ -17,11 +17,11 @@
 #include <hpx/util/static.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
 #include <map>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -174,8 +174,8 @@ namespace hpx { namespace serialization {
         };
 
         template <class T>
-        struct register_class_name<T, typename boost::enable_if<
-            traits::is_serialized_with_id<T> >::type>
+        struct register_class_name<T, typename std::enable_if<
+            traits::is_serialized_with_id<T>::value>::type>
         {
             register_class_name()
             {
@@ -198,10 +198,10 @@ namespace hpx { namespace serialization {
         };
 
         template <class T>
-        register_class_name<T, typename boost::enable_if<
-            traits::is_serialized_with_id<T> >::type>
-                register_class_name<T, typename boost::enable_if<
-                    traits::is_serialized_with_id<T> >::type>::instance;
+        register_class_name<T, typename std::enable_if<
+            traits::is_serialized_with_id<T>::value>::type>
+                register_class_name<T, typename std::enable_if<
+                    traits::is_serialized_with_id<T>::value>::type>::instance;
 
         template <boost::uint32_t desc>
         std::string get_constant_entry_name();

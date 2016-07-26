@@ -11,13 +11,11 @@
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <iterator>
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace traits
@@ -47,8 +45,8 @@ namespace hpx { namespace traits
     {
         template <typename T>
         struct acquire_future_impl<T,
-            typename boost::disable_if_c<
-                is_future_or_future_range<T>::value
+            typename std::enable_if<
+                !is_future_or_future_range<T>::value
             >::type>
         {
             typedef T type;
@@ -96,14 +94,14 @@ namespace hpx { namespace traits
         template <typename Future, typename Range>
         HPX_FORCEINLINE
         void reserve_if_random_access(std::vector<Future>&, Range const&,
-            boost::mpl::false_)
+            std::false_type)
         {
         }
 
         template <typename Future, typename Range>
         HPX_FORCEINLINE
         void reserve_if_random_access(std::vector<Future>& v, Range const& r,
-            boost::mpl::true_)
+            std::true_type)
         {
             v.reserve(boost::size(r));
         }
@@ -123,9 +121,9 @@ namespace hpx { namespace traits
                     typename Range::iterator
                 >::iterator_category iterator_category;
 
-            typedef typename boost::is_same<
+            typedef std::is_same<
                     iterator_category, std::random_access_iterator_tag
-                >::type is_random_access;
+                > is_random_access;
 
             reserve_if_random_access(v, r, is_random_access());
         }
@@ -146,7 +144,7 @@ namespace hpx { namespace traits
         ///////////////////////////////////////////////////////////////////////
         template <typename Range>
         struct acquire_future_impl<Range,
-            typename boost::enable_if_c<
+            typename std::enable_if<
                 traits::is_future_range<Range>::value
             >::type>
         {

@@ -6,6 +6,9 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
+
+// make inspect happy: hpxinspect:nodeprecatedinclude hpxinspect:nodeprecatedname
+
 #if !defined(HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM)
 #define HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM
 

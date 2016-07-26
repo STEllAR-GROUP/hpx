@@ -16,12 +16,6 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <boost/mpl/or.hpp>
-#include <boost/type_traits/is_enum.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
-#include <boost/utility/enable_if.hpp>
-
 #include <list>
 #include <map>
 #include <memory>
@@ -123,31 +117,23 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename boost::disable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
+        typename std::enable_if<
+            !std::is_integral<T>::value && !std::is_enum<T>::value
         >::type
         save(T const & t)
         {
-            typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<T>::value> use_optimized;
+            typedef hpx::traits::is_bitwise_serializable<T> use_optimized;
 
             save_bitwise(t, use_optimized());
         }
 
         template <typename T>
-        typename boost::enable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
+        typename std::enable_if<
+            std::is_integral<T>::value || std::is_enum<T>::value
         >::type
         save(T t) //-V659
         {
-            save_integral(t,
-                typename boost::is_unsigned<T>::type());
+            save_integral(t, std::is_unsigned<T>());
         }
 
         void save(float f)
@@ -183,7 +169,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void save_bitwise(T const & t, std::true_type)
         {
-            static_assert(!boost::is_abstract<T>::value,
+            static_assert(!std::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {
@@ -196,36 +182,36 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void save_nonintrusively_polymorphic(T const & t, boost::mpl::false_)
+        void save_nonintrusively_polymorphic(T const & t, std::false_type)
         {
             access::serialize(*this, t, 0);
         }
 
         template <typename T>
-        void save_nonintrusively_polymorphic(T const & t, boost::mpl::true_)
+        void save_nonintrusively_polymorphic(T const & t, std::true_type)
         {
             detail::polymorphic_nonintrusive_factory::instance().save(*this, t);
         }
 
         template <typename T>
-        void save_integral(T val, boost::mpl::false_)
+        void save_integral(T val, std::false_type)
         {
             save_integral_impl(static_cast<boost::int64_t>(val));
         }
 
         template <typename T>
-        void save_integral(T val, boost::mpl::true_)
+        void save_integral(T val, std::true_type)
         {
             save_integral_impl(static_cast<boost::uint64_t>(val));
         }
 
 #if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
-        void save_integral(boost::int128_type t, boost::mpl::false_)
+        void save_integral(boost::int128_type t, std::false_type)
         {
             save_integral_impl(t);
         }
 
-        void save_integral(boost::uint128_type t, boost::mpl::true_)
+        void save_integral(boost::uint128_type t, std::true_type)
         {
             save_integral_impl(t);
         }

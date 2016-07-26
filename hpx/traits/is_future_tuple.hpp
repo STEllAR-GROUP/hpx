@@ -10,13 +10,13 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
     template <typename Tuple, typename Enable = void>
     struct is_future_tuple
-      : boost::mpl::false_
+      : std::false_type
     {};
 
     template <typename ...Ts>

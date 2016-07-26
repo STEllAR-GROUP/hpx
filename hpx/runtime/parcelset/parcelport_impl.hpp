@@ -33,6 +33,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -454,10 +455,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::enable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            connection_handler_traits<
                 ConnectionHandler_
-            >::send_early_parcel
+            >::send_early_parcel::value
         >::type
         send_early_parcel_impl(locality const & dest, parcel p)
         {
@@ -474,10 +475,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::disable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            !connection_handler_traits<
                 ConnectionHandler_
-            >::send_early_parcel
+            >::send_early_parcel::value
         >::type
         send_early_parcel_impl(locality const & dest, parcel p)
         {
@@ -486,10 +487,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::enable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            connection_handler_traits<
                 ConnectionHandler_
-            >::do_background_work,
+            >::do_background_work::value,
             bool
         >::type
         do_background_work_impl(std::size_t num_thread)
@@ -498,10 +499,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::disable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            !connection_handler_traits<
                 ConnectionHandler_
-            >::do_background_work,
+            >::do_background_work::value,
             bool
         >::type
         do_background_work_impl(std::size_t)
