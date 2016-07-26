@@ -53,22 +53,24 @@ namespace hpx { namespace compute { namespace cuda
 
             HPX_MOVABLE_ONLY(native_handle_type);
 
-            native_handle_type(int device = 0);
+            HPX_HOST_DEVICE native_handle_type(int device = 0);
 
-            ~native_handle_type();
+            HPX_HOST_DEVICE ~native_handle_type();
 
-            native_handle_type(native_handle_type && rhs) HPX_NOEXCEPT;
+            HPX_HOST_DEVICE native_handle_type(
+                native_handle_type && rhs) HPX_NOEXCEPT;
 
-            native_handle_type& operator=(native_handle_type && rhs) HPX_NOEXCEPT;
+            HPX_HOST_DEVICE native_handle_type&
+            operator=(native_handle_type && rhs) HPX_NOEXCEPT;
 
-            cudaStream_t get_stream() const;
+            HPX_HOST_DEVICE cudaStream_t get_stream() const;
 
-            int get_device() const HPX_NOEXCEPT
+            HPX_HOST_DEVICE int get_device() const HPX_NOEXCEPT
             {
                 return device_;
             }
 
-            hpx::id_type const& get_locality() const HPX_NOEXCEPT
+            HPX_HOST_DEVICE hpx::id_type const& get_locality() const HPX_NOEXCEPT
             {
                 return locality_;
             }
@@ -83,31 +85,31 @@ namespace hpx { namespace compute { namespace cuda
         };
 
         // Constructs default target
-        target() HPX_NOEXCEPT {}
+        HPX_HOST_DEVICE target() HPX_NOEXCEPT {}
 
         // Constructs target from a given device ID
-        explicit target(int device)
+        explicit HPX_HOST_DEVICE target(int device)
           : handle_(device)
         {}
 
-        target(target && rhs) HPX_NOEXCEPT
+        HPX_HOST_DEVICE target(target && rhs) HPX_NOEXCEPT
           : handle_(std::move(rhs.handle_))
         {}
 
-        target& operator=(target && rhs) HPX_NOEXCEPT
+        HPX_HOST_DEVICE target& operator=(target && rhs) HPX_NOEXCEPT
         {
             handle_ = std::move(rhs.handle_);
             return *this;
         }
 
-        native_handle_type const& native_handle() const
+        HPX_HOST_DEVICE native_handle_type const& native_handle() const
         {
             return handle_;
         }
 
-        void synchronize() const;
+        HPX_HOST_DEVICE void synchronize() const;
 
-        hpx::future<void> get_future() const;
+        HPX_HOST_DEVICE hpx::future<void> get_future() const;
 
     private:
 #if !defined(__CUDA_ARCH__)

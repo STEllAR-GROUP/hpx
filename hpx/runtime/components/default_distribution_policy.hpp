@@ -63,6 +63,11 @@ namespace hpx { namespace components
             return default_distribution_policy(locs);
         }
 
+        /// Create a new \a default_distribution policy representing the given
+        /// set of localities.
+        ///
+        /// \param locs     [in] The list of localities the new instance should
+        ///                 represent
         default_distribution_policy operator()(
             std::vector<id_type> && locs) const
         {
@@ -158,15 +163,9 @@ namespace hpx { namespace components
 
                         for (std::size_t i = 0; i != v.size(); ++i)
                         {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                             result.emplace_back(
                                     std::move(localities_[i]), v[i].get()
                                 );
-#else
-                            result.push_back(std::make_pair(
-                                    std::move(localities_[i]), v[i].get()
-                                ));
-#endif
                         }
                         return result;
                     },
@@ -185,11 +184,7 @@ namespace hpx { namespace components
                     -> std::vector<bulk_locality_result>
                 {
                     std::vector<bulk_locality_result> result;
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                     result.emplace_back(id, f.get());
-#else
-                    result.push_back(std::make_pair(id, f.get()));
-#endif
                     return result;
                 });
         }

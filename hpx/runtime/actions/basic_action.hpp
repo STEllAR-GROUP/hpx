@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
@@ -54,10 +55,6 @@
 
 namespace hpx { namespace actions
 {
-    // transfer_action forward declaration
-    template <typename Action>
-    struct transfer_action;
-
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -592,6 +589,7 @@ namespace hpx { namespace actions
         output_stream_write_sync_action_id,
         performance_counter_get_counter_info_action_id,
         performance_counter_get_counter_value_action_id,
+        performance_counter_get_counter_values_array_action_id,
         performance_counter_set_counter_value_action_id,
         performance_counter_reset_counter_value_action_id,
         performance_counter_start_action_id,
@@ -692,6 +690,33 @@ namespace hpx { namespace serialization
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \def HPX_DECLARE_ACTION(func, name)
+/// \brief Declares an action type
+///
+#define HPX_DECLARE_ACTION(...)                                               \
+    HPX_DECLARE_ACTION_(__VA_ARGS__)                                          \
+    /**/
+
+/// \cond NOINTERNAL
+
+#define HPX_DECLARE_DIRECT_ACTION(...)                                        \
+    HPX_DECLARE_ACTION(__VA_ARGS__)                                           \
+    /**/
+
+#define HPX_DECLARE_ACTION_(...)                                              \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DECLARE_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                    \
+    )(__VA_ARGS__))                                                           \
+    /**/
+
+#define HPX_DECLARE_ACTION_1(func)                                            \
+    HPX_DECLARE_ACTION_2(func, BOOST_PP_CAT(func, _action))                   \
+    /**/
+
+#define HPX_DECLARE_ACTION_2(func, name) struct name;                         \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
@@ -718,6 +743,9 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    namespace hpx { namespace actions {                                       \
+        template struct transfer_action<action>;                              \
+    }}                                                                        \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////

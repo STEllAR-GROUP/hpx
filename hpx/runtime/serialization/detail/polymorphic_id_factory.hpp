@@ -45,13 +45,10 @@ namespace hpx { namespace serialization {
             void register_factory_function(const std::string& type_name,
                 ctor_t ctor)
             {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                HPX_ASSERT(ctor != nullptr);
+
                 typename_to_ctor.emplace(type_name, ctor);
-#else
-                typename_to_ctor.insert(
-                    typename_to_ctor_t::value_type(type_name, ctor)
-                );
-#endif
+
                 // populate cache
                 typename_to_id_t::const_iterator it =
                     typename_to_id.find(type_name);
@@ -62,13 +59,10 @@ namespace hpx { namespace serialization {
             void register_typename(const std::string& type_name,
                 boost::uint32_t id)
             {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                HPX_ASSERT(id != invalid_id);
+
                 typename_to_id.emplace(type_name, id);
-#else
-                typename_to_id.insert(
-                    typename_to_id_t::value_type(type_name, id)
-                );
-#endif
+
                 // populate cache
                 typename_to_ctor_t::const_iterator it =
                     typename_to_ctor.find(type_name);
@@ -139,14 +133,19 @@ namespace hpx { namespace serialization {
 
         public:
             template <class T>
-            static T* create(boost::uint32_t id)
+            static T* create(boost::uint32_t id, std::string const* name = nullptr)
             {
                 const cache_t& vec = id_registry::instance().cache;
 
-                if (id > vec.size()) //-V104
+                if (id >= vec.size()) //-V104
+                {
+                    std::string msg("Unknown type descriptor " + std::to_string(id));
+                    if (name != nullptr)
+                        msg += ", for typename " + *name;
+
                     HPX_THROW_EXCEPTION(serialization_error
-                      , "polymorphic_id_factory::create"
-                      , "Unknown type descriptor " + std::to_string(id));
+                      , "polymorphic_id_factory::create", msg);
+                }
 
                 ctor_t ctor = vec[id]; //-V108
                 HPX_ASSERT(ctor != nullptr);

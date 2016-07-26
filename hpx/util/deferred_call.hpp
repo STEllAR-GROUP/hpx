@@ -58,15 +58,15 @@ namespace hpx { namespace util
         public:
             deferred() {} // needed for serialization
 
-            explicit deferred(F&& f, Ts&&... vs)
+            explicit HPX_HOST_DEVICE deferred(F&& f, Ts&&... vs)
               : _f(std::forward<F>(f))
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
             deferred(deferred&&) = default;
 #else
-            deferred(deferred&& other)
+            HPX_HOST_DEVICE deferred(deferred&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {}

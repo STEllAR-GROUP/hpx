@@ -4,6 +4,8 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+add_subdirectory(components)
+
 set(tests
     action_invoke_no_more_than
     copy_component
@@ -36,7 +38,8 @@ add_hpx_executable(launched_process_test
   SOURCES launched_process.cpp
   EXCLUDE_FROM_ALL
   HPX_PREFIX ${HPX_BUILD_PREFIX}
-  FOLDER "Tests/Unit/Components")
+  FOLDER "Tests/Unit/Components"
+  COMPONENT_DEPENDENCIES launch_process_test_server)
 
 set(action_invoke_no_more_than_PARAMETERS
     LOCALITIES 2
@@ -57,7 +60,11 @@ set(get_ptr_PARAMETERS
     THREADS_PER_LOCALITY 2)
 
 set(launch_process_FLAGS
-    DEPENDENCIES iostreams_component process_component)
+    DEPENDENCIES iostreams_component process_component
+                 launch_process_test_server_component)
+set(launch_process_PARAMETERS
+  --launch=$<TARGET_FILE:launched_process_test_exe>
+)
 
 set(migrate_component_PARAMETERS
     LOCALITIES 2

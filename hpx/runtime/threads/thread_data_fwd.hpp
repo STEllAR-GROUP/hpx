@@ -112,6 +112,9 @@ namespace hpx { namespace threads
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
     ///
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 number of threads should be retrieved.
+    ///
     /// \note If state == unknown this function will not only return the
     ///       number of currently existing threads, but will add the number
     ///       of registered task descriptions (which have not been
@@ -119,7 +122,18 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::int64_t get_thread_count(
         thread_state_enum state = unknown);
 
-    /// \copydoc get_thread_count(thread_state_enum state)
+    /// The function \a get_thread_count returns the number of currently
+    /// known threads.
+    ///
+    /// \param priority [in] This specifies the thread-priority for which the
+    ///                 number of threads should be retrieved.
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 number of threads should be retrieved.
+    ///
+    /// \note If state == unknown this function will not only return the
+    ///       number of currently existing threads, but will add the number
+    ///       of registered task descriptions (which have not been
+    ///       converted into threads yet).
     HPX_API_EXPORT std::int64_t get_thread_count(
         thread_priority priority, thread_state_enum state = unknown);
 }}

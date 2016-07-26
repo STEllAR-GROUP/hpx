@@ -39,6 +39,10 @@ namespace hpx { namespace util
     HPX_API_EXPORT bool split_ip_address(std::string const& v,
         std::string& host, boost::uint16_t& port);
 
+    ///////////////////////////////////////////////////////////////////////
+    // Take an ip v4 or v6 address and "standardize" it for comparison checks
+    HPX_API_EXPORT std::string cleanup_ip_address(const std::string &addr);
+
     typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
 
     endpoint_iterator_type HPX_EXPORT connect_begin(

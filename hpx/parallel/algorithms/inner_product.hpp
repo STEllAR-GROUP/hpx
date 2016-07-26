@@ -244,7 +244,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     it.
     ///                     The type \a Ret must be
     ///                     such that it can be implicitly converted to a type
-    ///                     of \tT.
+    ///                     of \a T.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy

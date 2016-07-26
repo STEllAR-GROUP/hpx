@@ -270,12 +270,6 @@ namespace hpx { namespace components { namespace stubs
         static void call_startup_functions(naming::id_type const& gid,
             bool pre_startup);
 
-        static lcos::future<void>
-        call_shutdown_functions_async(naming::id_type const& gid,
-            bool pre_shutdown);
-
-        static void call_shutdown_functions(naming::id_type const& gid,
-            bool pre_shutdown);
         static void free_component_sync(agas::gva const& g,
             naming::gid_type const& gid, boost::uint64_t count = 1);
         static void free_component_locally(agas::gva const& g,

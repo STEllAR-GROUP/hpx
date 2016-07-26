@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,14 +15,25 @@ namespace hpx { namespace performance_counters { namespace stubs
     lcos::future<counter_info> performance_counter::get_info_async(
         naming::id_type const& targetid)
     {
-        typedef server::base_performance_counter::get_counter_info_action action_type;
+        typedef server::base_performance_counter::
+            get_counter_info_action action_type;
         return hpx::async<action_type>(targetid);
     }
 
     lcos::future<counter_value> performance_counter::get_value_async(
         naming::id_type const& targetid, bool reset)
     {
-        typedef server::base_performance_counter::get_counter_value_action action_type;
+        typedef server::base_performance_counter::
+            get_counter_value_action action_type;
+        return hpx::async<action_type>(targetid, reset);
+    }
+
+    lcos::future<counter_values_array>
+    performance_counter::get_values_array_async(
+        naming::id_type const& targetid, bool reset)
+    {
+        typedef server::base_performance_counter::
+            get_counter_values_array_action action_type;
         return hpx::async<action_type>(targetid, reset);
     }
 
@@ -36,6 +47,13 @@ namespace hpx { namespace performance_counters { namespace stubs
         bool reset, error_code& ec)
     {
         return get_value_async(targetid, reset).get(ec);
+    }
+
+    counter_values_array
+    performance_counter::get_values_array(naming::id_type const& targetid,
+        bool reset, error_code& ec)
+    {
+        return get_values_array_async(targetid, reset).get(ec);
     }
 
     lcos::future<bool> performance_counter::start_async(

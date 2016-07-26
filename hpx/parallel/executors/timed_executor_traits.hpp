@@ -25,10 +25,6 @@
 
 #include <boost/ref.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
-#define HPX_ENABLE_WORKAROUND_FOR_GCC46
-#endif
-
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     namespace detail
@@ -120,19 +116,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template <typename Executor, typename F, typename ... Ts>
             auto operator()(hpx::future<void> && fut, Executor& exec, F && f,
                     Ts &&... ts) const
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename future_type<
-                    Executor,
-                    typename hpx::util::detail::deferred_result_of<
-                        F(Ts&&...)
-                    >::type
-                >::type
-#else
             ->  decltype(
                     exec.async_execute(std::forward<F>(f),
                         std::forward<Ts>(ts)...)
                 )
-#endif
             {
                 fut.get();        // rethrow exceptions
                 return exec.async_execute(std::forward<F>(f),
@@ -143,19 +130,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(hpx::traits::detail::wrap_int, Executor && exec,
                     hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename future_type<
-                    typename hpx::util::decay<Executor>::type,
-                    typename hpx::util::detail::deferred_result_of<
-                        F(Ts&&...)
-                    >::type
-                >::type
-#else
             ->  decltype(
                     exec.async_execute(std::forward<F>(f),
                         std::forward<Ts>(ts)...)
                 )
-#endif
             {
                 return make_ready_future_at(abs_time)
                     .then(
@@ -190,19 +168,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(hpx::traits::detail::wrap_int, Executor && exec,
                     hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename future_type<
-                    typename hpx::util::decay<Executor>::type,
-                    typename hpx::util::detail::deferred_result_of<
-                        F(Ts&&...)
-                    >::type
-                >::type
-#else
             ->  decltype(
                     exec.async_execute(std::forward<F>(f),
                         std::forward<Ts>(ts)...)
                 )
-#endif
             {
                 this_thread::sleep_until(abs_time);
                 return exec.async_execute(std::forward<F>(f),
@@ -226,12 +195,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F, typename ... Ts>
         auto call_async_execute_at(Executor && exec,
                 hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename future_type<
-                typename hpx::util::decay<Executor>::type,
-                typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-            >::type
-#else
         ->  decltype(
                 async_execute_at_helper<
                         typename detail::execution_category<
@@ -240,7 +203,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     >::call(0, std::forward<Executor>(exec), abs_time,
                         std::forward<F>(f), std::forward<Ts>(ts)...)
             )
-#endif
         {
             typedef typename detail::execution_category<
                     typename hpx::util::decay<Executor>::type
@@ -257,14 +219,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template <typename Executor, typename F, typename ... Ts>
             auto operator()(hpx::future<void> && fut, Executor& exec, F && f,
                     Ts &&... ts) const
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-#else
             ->  decltype(
                     call_execute(exec, std::forward<F>(f),
                         std::forward<Ts>(ts)...)
                 )
-#endif
             {
                 fut.get();        // rethrow exceptions
                 return call_execute(std::forward<Executor>(exec),
@@ -275,14 +233,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(hpx::traits::detail::wrap_int, Executor && exec,
                     hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-#else
             ->  decltype(
                     call_execute(std::forward<Executor>(exec),
                         std::forward<F>(f), std::forward<Ts>(ts)...)
                 )
-#endif
             {
                 return make_ready_future_at(abs_time)
                     .then(
@@ -317,13 +271,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(hpx::traits::detail::wrap_int, Executor && exec,
                     hpx::util::steady_time_point const& abs_time, F && f,
                     Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-            ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-#else
             ->  decltype(
                     call_execute(std::forward<Executor>(exec),
                         std::forward<F>(f), std::forward<Ts>(ts)...))
-#endif
             {
                 this_thread::sleep_until(abs_time);
                 return call_execute(std::forward<Executor>(exec),
@@ -346,9 +296,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F, typename ... Ts>
         auto call_execute_at(Executor && exec,
                 hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-#else
         ->  decltype(
                 execute_at_helper<
                         typename detail::execution_category<
@@ -357,7 +304,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     >::call(0, std::forward<Executor>(exec), abs_time,
                         std::forward<F>(f), std::forward<Ts>(ts)...)
             )
-#endif
         {
             typedef typename detail::execution_category<
                     typename hpx::util::decay<Executor>::type
@@ -418,7 +364,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             scheduled at to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This calls exec.apply_execute_at(abs_time, f), if available,
         ///       otherwise it emulates timed scheduling by delaying calling
@@ -446,7 +392,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function should be scheduled to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This calls exec.apply_execute_at(abs_time, f), if available,
         ///       otherwise it emulates timed scheduling by delaying calling
@@ -473,7 +419,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             scheduled at to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This calls exec.async_execute_at(abs_time, f), if available,
         ///       otherwise it emulates timed scheduling by delaying calling
@@ -486,16 +432,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         static auto async_execute_at(Executor_ && exec,
                 hpx::util::steady_time_point const& abs_time, F && f,
                 Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename future<
-                typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-            >::type
-#else
         ->  decltype(
                 detail::call_async_execute_at(std::forward<Executor_>(exec),
                     abs_time, std::forward<F>(f), std::forward<Ts>(ts)...)
             )
-#endif
         {
             return detail::call_async_execute_at(std::forward<Executor_>(exec),
                 abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -513,7 +453,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function should be scheduled to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This calls exec.async_execute_at(abs_time, f), if available,
         ///       otherwise it emulates timed scheduling by delaying calling
@@ -526,17 +466,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         static auto async_execute_after(Executor_ && exec,
                 hpx::util::steady_duration const& rel_time, F && f,
                 Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename future<
-                typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-            >::type
-#else
         ->  decltype(
                 detail::call_async_execute_at(std::forward<Executor_>(exec),
                     rel_time.from_now(), std::forward<F>(f),
                     std::forward<Ts>(ts)...)
             )
-#endif
         {
             return detail::call_async_execute_at(std::forward<Executor_>(exec),
                 rel_time.from_now(), std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -555,7 +489,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             scheduled at to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns f(ts...)'s result
         ///
@@ -569,13 +503,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         execute_at(Executor_ && exec,
                 hpx::util::steady_time_point const& abs_time, F && f,
                 Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-#else
         ->  decltype(
                 detail::call_execute_at(std::forward<Executor_>(exec), abs_time,
                     std::forward<F>(f), std::forward<Ts>(ts)...))
-#endif
         {
             return detail::call_execute_at(std::forward<Executor_>(exec),
                 abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -594,7 +524,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///             function should be scheduled to run.
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
-        /// \param ts... [in] Additional arguments to use to invoke \a f.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \returns f(ts...)'s result
         ///
@@ -608,15 +538,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         execute_after(Executor_ && exec,
                 hpx::util::steady_duration const& rel_time, F && f,
                 Ts &&... ts)
-#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
-        ->  typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-#else
         ->  decltype(
                 detail::call_execute_at(std::forward<Executor_>(exec),
                     rel_time.from_now(), std::forward<F>(f),
                     std::forward<Ts>(ts)...)
             )
-#endif
         {
             return detail::call_execute_at(std::forward<Executor_>(exec),
                 rel_time.from_now(), std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -637,7 +563,5 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     template <typename T>
     struct is_timed_executor;   // defined in hpx/traits/is_timed_executor.hpp
 }}}
-
-#undef HPX_ENABLE_WORKAROUND_FOR_GCC46
 
 #endif

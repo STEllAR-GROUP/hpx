@@ -205,11 +205,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(int, Parameters && params, Executor && exec,
                     std::size_t cores)
             ->  decltype(
-                    params.get_maximal_number_of_chunks(
+                    params.maximal_number_of_chunks(
                         std::forward<Executor>(exec), cores)
                 )
             {
-                return params.get_maximal_number_of_chunks(
+                return params.maximal_number_of_chunks(
                     std::forward<Executor>(exec), cores);
             }
 
@@ -238,6 +238,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 >::call(std::forward<Parameters>(params),
                     std::forward<Executor>(exec), cores);
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
@@ -364,6 +366,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The executor_parameter_traits type is used to manage parameters for
+    /// an executor.
     template <typename Parameters, typename Enable>
     struct executor_parameter_traits
     {
@@ -457,8 +461,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// Retrieve the number of (kernel-)threads used by the associated
         /// executor.
         ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
         /// \param params [in] The executor parameters object to use as a
         ///              fallback if the executor does not expose
         ///

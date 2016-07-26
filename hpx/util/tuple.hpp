@@ -68,22 +68,25 @@ namespace hpx { namespace util
               : _value()
             {}
 
-            template <typename U>
+            template <typename U, typename =
+                typename std::enable_if<
+                    !std::is_same<tuple_member, typename std::decay<U>::type>::value
+                >::type>
             explicit HPX_HOST_DEVICE HPX_CONSTEXPR tuple_member(U&& value)
               : _value(std::forward<U>(value))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
-            HPX_HOST_DEVICE
-            HPX_CONSTEXPR tuple_member(tuple_member const& other)
+            HPX_HOST_DEVICE HPX_CONSTEXPR
+            tuple_member(tuple_member const& other)
               : _value(other.value())
             {}
 
-            HPX_HOST_DEVICE
-            HPX_CONSTEXPR tuple_member(tuple_member&& other)
+            HPX_HOST_DEVICE HPX_CONSTEXPR
+            tuple_member(tuple_member&& other)
               : _value(std::forward<T>(other.value()))
             {}
 #endif
@@ -110,22 +113,25 @@ namespace hpx { namespace util
               : T()
             {}
 
-            template <typename U>
+            template <typename U, typename =
+                typename std::enable_if<
+                    !std::is_same<tuple_member, typename std::decay<U>::type>::value
+                >::type>
             explicit HPX_HOST_DEVICE HPX_CONSTEXPR tuple_member(U&& value)
               : T(std::forward<U>(value))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
-            HPX_HOST_DEVICE
-            HPX_CONSTEXPR tuple_member(tuple_member const& other)
+            HPX_HOST_DEVICE HPX_CONSTEXPR
+            tuple_member(tuple_member const& other)
               : T(other.value())
             {}
 
-            HPX_HOST_DEVICE
-            HPX_CONSTEXPR tuple_member(tuple_member&& other)
+            HPX_HOST_DEVICE HPX_CONSTEXPR
+            tuple_member(tuple_member&& other)
               : T(std::forward<T>(other.value()))
             {}
 #endif
@@ -208,17 +214,17 @@ namespace hpx { namespace util
               : tuple_member<Is, Ts>(std::forward<Us>(vs))...
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
             tuple_impl(tuple_impl const&) = default;
             tuple_impl(tuple_impl&&) = default;
 #else
-            HPX_HOST_DEVICE
-            HPX_CONSTEXPR tuple_impl(tuple_impl const& other)
+            HPX_HOST_DEVICE HPX_CONSTEXPR
+            tuple_impl(tuple_impl const& other)
               : tuple_member<Is, Ts>(static_cast<tuple_member<Is, Ts> const&>(other))...
             {}
 
-            HPX_HOST_DEVICE
-            HPX_CONSTEXPR tuple_impl(tuple_impl&& other)
+            HPX_HOST_DEVICE HPX_CONSTEXPR
+            tuple_impl(tuple_impl&& other)
               : tuple_member<Is, Ts>(static_cast<tuple_member<Is, Ts>&&>(other))...
             {}
 #endif
@@ -402,7 +408,7 @@ namespace hpx { namespace util
           : _impl(std::forward<U>(v), std::forward<Us>(vs)...)
         {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
@@ -416,14 +422,14 @@ namespace hpx { namespace util
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
-        HPX_CONSTEXPR tuple(tuple const& other)
+        HPX_HOST_DEVICE HPX_CONSTEXPR tuple(tuple const& other)
           : _impl(other._impl)
         {}
 
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
-        HPX_CONSTEXPR tuple(tuple&& other)
+        HPX_HOST_DEVICE HPX_CONSTEXPR tuple(tuple&& other)
           : _impl(std::move(other._impl))
         {}
 #endif

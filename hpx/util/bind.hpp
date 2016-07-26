@@ -268,16 +268,16 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
             bound(bound const&) = default;
             bound(bound&&) = default;
 #else
-            bound(bound const& other)
+            HPX_HOST_DEVICE bound(bound const& other)
               : _f(other._f)
               , _args(other._args)
             {}
 
-            bound(bound&& other)
+            HPX_HOST_DEVICE bound(bound&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {}

@@ -45,9 +45,9 @@ endif()
 ################################################################################
 project(HPX CXX C)
 
-set(HPX_MAJOR_VERSION 0)
-set(HPX_MINOR_VERSION 9)
-set(HPX_PATCH_LEVEL   99)
+set(HPX_MAJOR_VERSION 1)
+set(HPX_MINOR_VERSION 0)
+set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
@@ -262,10 +262,6 @@ endif()
 ################################################################################
 set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6.99
-      AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-    set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
-  endif()
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
     set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
   endif()
@@ -754,8 +750,8 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Check if the selected compiler versions are supposed to work with our codebase
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.4.4)
-    hpx_error("GCC 4.4.5 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
+    hpx_error("GCC 4.8 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -812,7 +808,7 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
 # Make sure we compile in C++11 mode (MSVC uses it automatically)
 if(NOT MSVC)
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    hpx_add_target_compile_option(-std=c++11)
+    set(CXX_FLAG -std=c++11)
   else()
     # Try -std=c++14 first
     check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
@@ -837,9 +833,8 @@ if(NOT MSVC)
         endif()
       endif()
     endif()
-
-    hpx_add_target_compile_option(${CXX_FLAG})
   endif()
+  hpx_add_target_compile_option(${CXX_FLAG})
 endif()
 
 ################################################################################
@@ -848,7 +843,7 @@ endif()
 
 # Check the availability of certain C++11 language features
 hpx_check_for_cxx11_alias_templates(
-  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+  REQUIRED "HPX needs support for C++11 alias templates")
 
 hpx_check_for_cxx11_auto(
   REQUIRED "HPX needs support for C++11 auto")
@@ -996,6 +991,7 @@ hpx_check_for_cxx_experimental_std_optional(
 if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
   hpx_libraries(cudadevrt)
   if(NOT MSVC)
+    hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 #     set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-std=c++11;-Xcompiler=-g,-O0)
 #     set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O3;-std=c++11;-g;-Xcompiler=-g,-O3)
@@ -1003,8 +999,9 @@ if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
 #     set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O3;-std=c++11;-Xcompiler=-O3)
   else()
     set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+    hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
-    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-Xcompiler=-MDd,-Od,-Zi)
+    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G;-Xcompiler=-MDd;-Xcompiler=-Od;-Xcompiler=-Zi)
     set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi)
     set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1)
     set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox)
@@ -1022,6 +1019,7 @@ endif()
 if(HPX_WITH_CUDA AND HPX_WITH_CUDA_CLANG)
   hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR})
   hpx_libraries(cudart)
+  hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
   link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 endif()
 
@@ -1207,13 +1205,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Werror=reorder)
     hpx_add_compile_flag_if_available(-Werror=return-type)
     hpx_add_compile_flag_if_available(-Werror=sequence-point)
-
-    if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
-      # Uninitialized variables are bad, earlier compilers issue spurious
-      # warnings
-      hpx_add_compile_flag_if_available(-Werror=uninitialized)
-    endif()
-
+    hpx_add_compile_flag_if_available(-Werror=uninitialized)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
@@ -1234,9 +1226,8 @@ else()
   # in GCC.
   hpx_add_compile_flag_if_available(-Werror=return-type LANGUAGES CXX C)
 
-  # We get false positives all over the place with this. Also, detection for
-  # this flag fails with GCC 4.4 and 4.5.
-  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.5)
+  # We get false positives all over the place with this.
+  if(CMAKE_COMPILER_IS_GNUCXX)
     hpx_add_compile_flag_if_available(-Wno-unused-but-set-parameter LANGUAGES CXX C)
     hpx_add_compile_flag_if_available(-Wno-unused-but-set-variable LANGUAGES CXX C)
     # Uninitialized variables are bad, earlier compilers issue spurious warnings
@@ -1248,9 +1239,8 @@ else()
   hpx_add_compile_flag_if_available(-Wno-sync-nand LANGUAGES CXX C)
 
   # Silence warnings about deleting polymorphic objects with non-virtual dtors.
-  # These come from within Boost. Detection for this flag fails with GCC 4.4,
-  # 4.5 and 4.6.
-  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6)
+  # These come from within Boost.
+  if(CMAKE_COMPILER_IS_GNUCXX)
     hpx_add_compile_flag_if_available(-Wno-delete-non-virtual-dtor LANGUAGES CXX)
   endif()
 

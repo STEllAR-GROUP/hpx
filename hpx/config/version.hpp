@@ -26,13 +26,13 @@
 //  HPX_VERSION_DATE   YYYYMMDD is the date of the release
 //                               (estimated release date for master branch)
 //
-#define HPX_VERSION_FULL         0x000999
+#define HPX_VERSION_FULL         0x001000
 
-#define HPX_VERSION_MAJOR        0
-#define HPX_VERSION_MINOR        9
-#define HPX_VERSION_SUBMINOR     99
+#define HPX_VERSION_MAJOR        1
+#define HPX_VERSION_MINOR        0
+#define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20160701
+#define HPX_VERSION_DATE         20161031
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30

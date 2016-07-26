@@ -14,6 +14,7 @@
 #include <boost/regex.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel
@@ -28,8 +29,9 @@ namespace hpx { namespace plugins { namespace parcel
     void coalescing_counter_registry::register_action(
         std::string const& name,
         get_counter_type num_parcels, get_counter_type num_messages,
-        get_counter_type time_between_parcels,
-        get_counter_type average_time_between_parcels)
+        get_counter_type num_parcels_per_message,
+        get_counter_type average_time_between_parcels,
+        get_counter_values_creator_type time_between_parcels_histogram_creator)
     {
         if (name.empty())
         {
@@ -38,25 +40,38 @@ namespace hpx { namespace plugins { namespace parcel
                 "Cannot register an action with an empty name");
         }
 
-        counter_functions data =
-        {
-            num_parcels, num_messages,
-            time_between_parcels, average_time_between_parcels
-        };
-
         auto it = map_.find(name);
         if (it == map_.end())
         {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+            counter_functions data =
+            {
+                num_parcels, num_messages,
+                num_parcels_per_message, average_time_between_parcels,
+                time_between_parcels_histogram_creator,
+                0, 0, 1
+            };
+
             map_.emplace(name, std::move(data));
-#else
-            map_.insert(map_type::value_type(name, std::move(data)));
-#endif
         }
         else
         {
             // replace the existing functions
-            (*it).second = data;
+            (*it).second.num_parcels = num_parcels;
+            (*it).second.num_messages = num_messages;
+            (*it).second.num_parcels_per_message = num_parcels_per_message;
+            (*it).second.average_time_between_parcels =
+                average_time_between_parcels;
+            (*it).second.time_between_parcels_histogram_creator =
+                time_between_parcels_histogram_creator;
+
+            if ((*it).second.min_boundary != (*it).second.max_boundary)
+            {
+                // instantiate actual histogram collection
+                coalescing_counter_registry::get_counter_values_type result;
+                time_between_parcels_histogram_creator(
+                    (*it).second.min_boundary, (*it).second.max_boundary,
+                    (*it).second.num_buckets, result);
+            }
         }
     }
 
@@ -72,11 +87,7 @@ namespace hpx { namespace plugins { namespace parcel
         auto it = map_.find(name);
         if (it == map_.end())
         {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
             map_.emplace(name, counter_functions());
-#else
-            map_.insert(map_type::value_type(name, counter_functions()));
-#endif
         }
     }
 
@@ -142,6 +153,36 @@ namespace hpx { namespace plugins { namespace parcel
         return (*it).second.average_time_between_parcels;
     }
 
+    coalescing_counter_registry::get_counter_values_type
+        coalescing_counter_registry::get_time_between_parcels_histogram_counter(
+            std::string const& name, boost::int64_t min_boundary,
+            boost::int64_t max_boundary, boost::int64_t num_buckets)
+    {
+        map_type::iterator it = map_.find(name);
+        if (it == map_.end())
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "coalescing_counter_registry::"
+                    "get_time_between_parcels_histogram_counter",
+                "unknown action type");
+            return &coalescing_counter_registry::empty_histogram;
+        }
+
+        if ((*it).second.time_between_parcels_histogram_creator.empty())
+        {
+            // no parcel of this type has been sent yet
+            (*it).second.min_boundary = min_boundary;
+            (*it).second.max_boundary = max_boundary;
+            (*it).second.num_buckets = num_buckets;
+            return coalescing_counter_registry::get_counter_values_type();
+        }
+
+        coalescing_counter_registry::get_counter_values_type result;
+        (*it).second.time_between_parcels_histogram_creator(
+            min_boundary, max_boundary, num_buckets, result);
+        return result;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     bool coalescing_counter_registry::counter_discoverer(
         performance_counters::counter_info const& info,
@@ -181,11 +222,21 @@ namespace hpx { namespace plugins { namespace parcel
             p.parameters_ = "*";
         }
 
-        if (p.parameters_.find_first_of("*?[]") != std::string::npos)
+        std::string parameters = p.parameters_;
+        std::string additional_parameters;
+
+        std::string::size_type pos = parameters.find_first_of(",");
+        if (pos != std::string::npos)
+        {
+            additional_parameters = parameters.substr(pos);
+            parameters = parameters.substr(0, pos);
+        }
+
+        if (parameters.find_first_of("*?[]") != std::string::npos)
         {
             std::string str_rx(
                 performance_counters::detail::regex_from_pattern(
-                    p.parameters_, ec));
+                    parameters, ec));
             if (ec) return false;
 
             bool found_one = false;
@@ -202,6 +253,8 @@ namespace hpx { namespace plugins { namespace parcel
                 std::string fullname;
                 performance_counters::counter_path_elements cp = p;
                 cp.parameters_ = (*it).first;
+                if (!additional_parameters.empty())
+                    cp.parameters_ += additional_parameters;
 
                 performance_counters::get_counter_name(cp, fullname, ec);
                 if (ec) return false;
@@ -238,7 +291,7 @@ namespace hpx { namespace plugins { namespace parcel
         }
 
         // use given action type directly
-        map_type::const_iterator it = map_.find(p.parameters_);
+        map_type::const_iterator it = map_.find(parameters);
         if (it == map_.end())
         {
             // compose a list of known action types

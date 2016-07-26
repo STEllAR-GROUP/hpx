@@ -10,7 +10,6 @@
 #if !defined(HPX_WINDOWS)
 #if defined(__x86_64__) || defined(__amd64)                                    \
     || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) \
-    || defined(__powerpc__)                                                    \
     || defined(__arm__)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER
 #endif
@@ -28,7 +27,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #elif defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
         asm("movl %%esp, %0" : "=r"(stack_ptr));
 #elif defined(__powerpc__)
-        std::size_t stack_ptr_p = &stack_ptr;
+        std::size_t stack_ptr_p = (std::size_t)&stack_ptr;
         asm("stw %%r1, 0(%0)" : "=&r"(stack_ptr_p));
 #elif defined(__arm__)
         asm("mov %0, sp" : "=r"(stack_ptr));

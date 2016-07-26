@@ -47,7 +47,7 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename Allocator, typename Enable = void>
         struct get_reference_type
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+#if defined(HPX_NATIVE_MIC)
         ;
 #else
         {
@@ -67,7 +67,7 @@ namespace hpx { namespace compute { namespace traits
 
         template <typename Allocator, typename Enable = void>
         struct get_const_reference_type
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+#if defined(HPX_NATIVE_MIC)
         ;
 #else
         {
@@ -218,11 +218,11 @@ namespace hpx { namespace compute { namespace traits
 
     template <typename Allocator>
     struct allocator_traits
-#if !(defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) && !defined(HPX_NATIVE_MIC)
+#if !defined(HPX_NATIVE_MIC)
       : std::allocator_traits<Allocator>
 #endif
     {
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+#if defined(HPX_NATIVE_MIC)
     public:
         typedef typename Allocator::value_type value_type;
         typedef typename Allocator::pointer pointer;
