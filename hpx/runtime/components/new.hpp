@@ -17,6 +17,7 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/util/lazy_enable_if.hpp>
 
 #include <algorithm>
 #include <type_traits>
@@ -272,10 +273,10 @@ namespace hpx { namespace components
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename ...Ts>
-    inline typename std::enable_if<
+    inline typename util::lazy_enable_if<
         traits::is_component_or_component_array<Component>::value,
         detail::new_component<Component>
-    >::type::type
+    >::type
     new_(id_type const& locality, Ts&&... vs)
     {
         return detail::new_component<Component>::call(
@@ -283,11 +284,11 @@ namespace hpx { namespace components
     }
 
     template <typename Component, typename DistPolicy, typename ...Ts>
-    inline typename std::enable_if<
+    inline typename util::lazy_enable_if<
         traits::is_component_or_component_array<Component>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
         detail::new_component<Component>
-    >::type::type
+    >::type
     new_(DistPolicy const& policy, Ts&&... vs)
     {
         return detail::new_component<Component>::call(
@@ -348,10 +349,10 @@ namespace hpx { namespace components
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Client, typename ...Ts>
-    inline typename std::enable_if<
+    inline typename util::lazy_enable_if<
         traits::is_client_or_client_array<Client>::value,
         detail::new_client<Client>
-    >::type::type
+    >::type
     new_(id_type const& locality, Ts&&... vs)
     {
         return detail::new_client<Client>::call(
@@ -359,11 +360,11 @@ namespace hpx { namespace components
     }
 
     template <typename Client, typename DistPolicy, typename ...Ts>
-    inline typename std::enable_if<
+    inline typename util::lazy_enable_if<
         traits::is_client_or_client_array<Client>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
         detail::new_client<Client>
-    >::type::type
+    >::type
     new_(DistPolicy const& policy, Ts&&... vs)
     {
         return detail::new_client<Client>::call(

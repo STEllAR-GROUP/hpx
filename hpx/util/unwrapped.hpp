@@ -14,6 +14,7 @@
 #include <hpx/traits/is_future_tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/lazy_enable_if.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -262,10 +263,10 @@ namespace hpx { namespace util
             // future
             template <typename T0>
             HPX_FORCEINLINE
-            typename std::enable_if<
+            typename util::lazy_enable_if<
                 traits::is_future<typename decay<T0>::type>::value
               , unwrapped_impl_result<F, T0>
-            >::type::type operator()(T0&& t0)
+            >::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<util::tuple<typename decay<T0>::type> >
@@ -278,11 +279,11 @@ namespace hpx { namespace util
             // future-range
             template <typename T0>
             HPX_FORCEINLINE
-            typename std::enable_if<
+            typename util::lazy_enable_if<
                 traits::is_future_range<typename decay<T0>::type>::value
              && !unwrap_impl<typename decay<T0>::type>::is_void::value
               , unwrapped_impl_result<F, T0>
-            >::type::type operator()(T0&& t0)
+            >::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<typename decay<T0>::type>
@@ -294,11 +295,11 @@ namespace hpx { namespace util
 
             template <typename T0>
             HPX_FORCEINLINE
-            typename std::enable_if<
+            typename util::lazy_enable_if<
                 traits::is_future_range<typename decay<T0>::type>::value
              && unwrap_impl<typename decay<T0>::type>::is_void::value
               , unwrapped_impl_result<F, T0>
-            >::type::type operator()(T0&& t0)
+            >::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<typename decay<T0>::type>
@@ -312,10 +313,10 @@ namespace hpx { namespace util
             // future-tuple
             template <typename T0>
             HPX_FORCEINLINE
-            typename std::enable_if<
+            typename util::lazy_enable_if<
                 traits::is_future_tuple<typename decay<T0>::type>::value
               , unwrapped_impl_result<F, T0>
-            >::type::type operator()(T0&& t0)
+            >::type operator()(T0&& t0)
             {
                 typedef
                     unwrap_impl<typename decay<T0>::type>
@@ -348,12 +349,12 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    typename std::enable_if<
+    typename util::lazy_enable_if<
         traits::is_future<typename decay<Future>::type>::value
      || traits::is_future_range<typename decay<Future>::type>::value
      || traits::is_future_tuple<typename decay<Future>::type>::value
       , detail::unwrap_impl<typename decay<Future>::type>
-    >::type::type unwrapped(Future&& f)
+    >::type unwrapped(Future&& f)
     {
         typedef
             detail::unwrap_impl<typename decay<Future>::type>
@@ -377,14 +378,14 @@ namespace hpx { namespace util
     }
 
     template <typename ...Ts>
-    typename std::enable_if<
+    typename util::lazy_enable_if<
         traits::is_future_tuple<util::tuple<
             typename std::decay<Ts>::type...
         > >::value
       , detail::unwrap_impl<util::tuple<
             typename std::decay<Ts>::type...
         > >
-    >::type::type unwrapped(Ts&&... vs)
+    >::type unwrapped(Ts&&... vs)
     {
         typedef detail::unwrap_impl<util::tuple<
             typename std::decay<Ts>::type...
@@ -396,14 +397,14 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    typename std::enable_if<
+    typename util::lazy_enable_if<
         traits::is_future<typename decay<Future>::type>::value
      || traits::is_future_range<typename decay<Future>::type>::value
      || traits::is_future_tuple<typename decay<Future>::type>::value
       , detail::unwrap_impl<typename detail::unwrap_impl<
             typename decay<Future>::type
         > >
-    >::type::type unwrapped2(Future&& f)
+    >::type unwrapped2(Future&& f)
     {
         return unwrapped(unwrapped(std::forward<Future>(f)));
     }

@@ -16,6 +16,7 @@
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/identity.hpp>
+#include <hpx/util/lazy_conditional.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -119,7 +120,7 @@ namespace hpx { namespace serialization
             };
 
         public:
-            typedef typename std::conditional<
+            typedef typename util::lazy_conditional<
                 hpx::traits::is_serialized_with_id<referred_type>::value,
                 hpx::util::identity<polymorphic_with_id>,
                 std::conditional<
@@ -131,7 +132,7 @@ namespace hpx { namespace serialization
                         usual
                     >::type
                 >
-            >::type::type type;
+            >::type type;
         };
 
         template <class Pointer>

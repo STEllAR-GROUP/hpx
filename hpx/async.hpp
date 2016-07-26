@@ -17,6 +17,7 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/lazy_enable_if.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -41,10 +42,12 @@ namespace hpx { namespace detail
 
     template <typename F>
     HPX_FORCEINLINE
-    typename std::enable_if<
-        std::is_reference<typename util::detail::deferred_result_of<F&&()>::type>::value
+    typename util::lazy_enable_if<
+        std::is_reference<
+            typename util::detail::deferred_result_of<F&&()>::type
+        >::value
       , detail::create_future<F&&()>
-    >::type::type
+    >::type
     call_sync(F&& f, std::false_type)
     {
         typedef typename util::detail::deferred_result_of<F&&()>::type result_type;
@@ -59,10 +62,12 @@ namespace hpx { namespace detail
 
     template <typename F>
     HPX_FORCEINLINE
-    typename std::enable_if<
-        !std::is_reference<typename util::detail::deferred_result_of<F&&()>::type>::value
+    typename util::lazy_enable_if<
+       !std::is_reference<
+            typename util::detail::deferred_result_of<F&&()>::type
+        >::value
       , detail::create_future<F()>
-    >::type::type
+    >::type
     call_sync(F&& f, std::false_type) //-V659
     {
         typedef typename util::detail::deferred_result_of<F()>::type result_type;

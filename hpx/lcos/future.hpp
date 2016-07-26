@@ -28,6 +28,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/identity.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/lazy_conditional.hpp>
+#include <hpx/util/lazy_enable_if.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/void_guard.hpp>
 
@@ -257,11 +259,11 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename hpx::util::result_of<F(Future)>::type cont_result;
 
-        typedef typename std::conditional<
+        typedef typename util::lazy_conditional<
             hpx::traits::detail::is_unique_future<cont_result>::value
           , hpx::traits::future_traits<cont_result>
           , hpx::util::identity<cont_result>
-        >::type::type result_type;
+        >::type result_type;
 
         typedef lcos::future<result_type> type;
     };
@@ -531,12 +533,12 @@ namespace hpx { namespace lcos { namespace detail
         //   - valid() == false on original future object immediately after it
         //     returns.
         template <typename F>
-        typename std::enable_if<
+        typename util::lazy_enable_if<
             !hpx::traits::is_launch_policy<F>::value &&
             !hpx::traits::is_threads_executor<F>::value &&
             !hpx::traits::is_executor<F>::value
           , future_then_result<Derived, F>
-        >::type::type
+        >::type
         then(F && f, error_code& ec = throws) const
         {
             return then(launch::all, std::forward<F>(f), ec);
@@ -603,10 +605,10 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Executor, typename F>
-        typename std::enable_if<
+        typename util::lazy_enable_if<
             hpx::traits::is_executor<Executor>::value
           , future_then_result<Derived, F>
-        >::type::type
+        >::type
         then(Executor& exec, F && f, error_code& ec = throws) const
         {
             typedef
@@ -885,12 +887,12 @@ namespace hpx { namespace lcos
         using base_type::has_exception;
 
         template <typename F>
-        typename std::enable_if<
+        typename util::lazy_enable_if<
             !hpx::traits::is_launch_policy<F>::value &&
             !hpx::traits::is_threads_executor<F>::value &&
             !hpx::traits::is_executor<F>::value
           , detail::future_then_result<future, F>
-        >::type::type
+        >::type
         then(F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
@@ -914,10 +916,10 @@ namespace hpx { namespace lcos
         }
 
         template <typename Executor, typename F>
-        typename std::enable_if<
+        typename util::lazy_enable_if<
             hpx::traits::is_executor<Executor>::value
           , detail::future_then_result<future, F>
-        >::type::type
+        >::type
         then(Executor& exec, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
