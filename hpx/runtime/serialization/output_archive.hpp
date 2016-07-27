@@ -215,6 +215,29 @@ namespace hpx { namespace serialization
         {
             save_integral_impl(t);
         }
+
+        // On some platforms (gcc) std::is_integral<int128>::value
+        // evaluates to false. Thus these functions re-route the 
+        // serialization for those types to the proper implementation
+        void save_bitwise(boost::int128_type t, std::false_type)
+        {
+            save_integral_impl(t);
+        }
+
+        void save_bitwise(boost::int128_type t, std::true_type)
+        {
+            save_integral_impl(t);
+        }
+
+        void save_bitwise(boost::uint128_type t, std::false_type)
+        {
+            save_integral_impl(t);
+        }
+
+        void save_bitwise(boost::uint128_type t, std::true_type)
+        {
+            save_integral_impl(t);
+        }
 #endif
 
         template <class Promoted>
