@@ -163,14 +163,14 @@ namespace hpx { namespace lcos
 
             template<typename F, typename IndexType, typename FutureType>
             inline static void call(F&& f, IndexType index, FutureType&& future,
-                boost::true_type)
+                std::true_type)
             {
                 f(index, std::move(future));
             }
 
             template<typename F, typename IndexType, typename FutureType>
             inline static void call(F&& f, IndexType index, FutureType&& future,
-                boost::false_type)
+                std::false_type)
             {
                 f(std::move(future));
             }

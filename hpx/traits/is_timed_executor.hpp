@@ -14,8 +14,6 @@
 
 #include <type_traits>
 
-#include <boost/type_traits/is_base_of.hpp>
-
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -26,7 +24,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \cond NOINTERNAL
         template <typename T>
         struct is_timed_executor
-          : boost::is_base_of<timed_executor_tag, T>
+          : std::is_base_of<timed_executor_tag, T>
         {};
 
         template <>

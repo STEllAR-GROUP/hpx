@@ -39,7 +39,10 @@ namespace boost
       { "(\\bboost\\s*::\\s*lazy_enable_if_c\\b)", "std::enable_if" },
       { "(\\bboost\\s*::\\s*lazy_disable_if_c\\b)", "std::enable_if" },
       { "(\\bboost\\s*::\\s*mpl\\b)", "no specific replacement" },
-//       { "(\\bboost\\s*::\\s*(is_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(is_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(add_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(remove_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*((false)|(true)_type\\b))", "std::\\2" },
       { "(\\bboost\\s*::\\s*lock_guard\\b)", "std::lock_guard" },
       { "(\\bboost\\s*::\\s*unordered_map\\b)", "std::unordered_map" },
       { "(\\bboost\\s*::\\s*unordered_multimap\\b)", "std::unordered_multimap" },
@@ -107,8 +110,13 @@ namespace boost
           {
             // avoid errors to be reported twice
             std::string found_name(m[1].first, m[1].second);
+
             if (found_names.find(found_name) == found_names.end())
             {
+              std::string tag("hpxinspect:" "nodeprecatedname:" + found_name);
+              if (contents.find(tag) != string::npos)
+                continue;
+
               // name was found
               found_names.insert(found_name);
 

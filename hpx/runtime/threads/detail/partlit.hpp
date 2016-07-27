@@ -1,13 +1,15 @@
 /*=============================================================================
     Copyright (c) 2001-2011 Joel de Guzman
-    Copyright (c) 2001-2013 Hartmut Kaiser
+    Copyright (c) 2001-2016 Hartmut Kaiser
     Copyright (c)      2010 Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-// make inspect happy: hpxinspect:nodeprecatedinclude hpxinspect:nodeprecatedname
+// make inspect happy:
+//      hpxinspect:nodeprecatedname::boost::mpl::false_type
+//      hpxinspect:nodeprecatedname::boost::mpl::true_type
 
 #if !defined(HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM)
 #define HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM
@@ -16,10 +18,9 @@
 #pragma once
 #endif
 
-#include <boost/detail/workaround.hpp>
+#include <hpx/config.hpp>
+
 #include <boost/fusion/include/at.hpp>
-#include <boost/fusion/include/value_at.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/spirit/home/qi/auxiliary/lazy.hpp>
 #include <boost/spirit/home/qi/detail/enable_lit.hpp>
 #include <boost/spirit/home/qi/detail/string_parse.hpp>
@@ -35,10 +36,9 @@
 #include <boost/spirit/home/support/modify.hpp>
 #include <boost/spirit/home/support/string_traits.hpp>
 #include <boost/spirit/home/support/unused.hpp>
-#include <boost/type_traits/add_const.hpp>
-#include <boost/type_traits/add_reference.hpp>
-#include <boost/utility/enable_if.hpp>
+
 #include <string>
+#include <type_traits>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -148,7 +148,7 @@ namespace boost { namespace spirit
     template <typename A0>
     struct use_terminal<qi::domain
           , terminal_ex<hpx::threads::detail::tag::partlit, fusion::vector1<A0> >
-          , typename enable_if<traits::is_string<A0> >::type>
+          , typename std::enable_if<traits::is_string<A0>::value>::type>
       : mpl::true_ {};
 }}
 
@@ -162,21 +162,22 @@ namespace hpx { namespace threads { namespace detail
       : boost::spirit::qi::primitive_parser<
             partial_literal_string<String, no_attribute> >
     {
-        typedef typename boost::remove_const<
+        typedef typename std::remove_const<
             typename boost::spirit::traits::char_type_of<String>::type
         >::type char_type;
         typedef std::basic_string<char_type> string_type;
 
-        partial_literal_string(typename boost::add_reference<String>::type str_)
+        partial_literal_string(
+                typename std::add_lvalue_reference<String>::type str_)
           : str(str_)
         {}
 
         template <typename Context, typename Iterator>
         struct attribute
         {
-            typedef typename boost::mpl::if_c<
-                no_attribute, boost::spirit::unused_type, string_type>::type
-            type;
+            typedef typename std::conditional<
+                    no_attribute, boost::spirit::unused_type, string_type
+                >::type type;
         };
 
         template <typename Iterator, typename Context
@@ -206,7 +207,7 @@ namespace hpx { namespace threads { namespace detail
       : boost::spirit::qi::primitive_parser<
             no_case_partial_literal_string<String, no_attribute> >
     {
-        typedef typename boost::remove_const<
+        typedef typename std::remove_const<
             typename boost::spirit::traits::char_type_of<String>::type
         >::type char_type;
         typedef std::basic_string<char_type> string_type;
@@ -231,9 +232,9 @@ namespace hpx { namespace threads { namespace detail
         template <typename Context, typename Iterator>
         struct attribute
         {
-            typedef typename boost::mpl::if_c<
-                no_attribute, boost::spirit::unused_type, string_type>::type
-            type;
+            typedef typename std::conditional<
+                    no_attribute, boost::spirit::unused_type, string_type
+                >::type type;
         };
 
         template <typename Iterator, typename Context
@@ -265,13 +266,13 @@ namespace boost { namespace spirit { namespace qi
     struct make_primitive<
         terminal_ex<hpx::threads::detail::tag::partlit, fusion::vector1<A0> >
       , Modifiers
-      , typename enable_if<traits::is_string<A0> >::type>
+      , typename std::enable_if<traits::is_string<A0>::value>::type>
     {
         typedef has_modifier<Modifiers, tag::char_code_base<tag::no_case> > no_case;
 
         typedef typename add_const<A0>::type const_string;
-        typedef typename mpl::if_<
-            no_case
+        typedef typename std::conditional<
+            no_case::value
           , hpx::threads::detail::no_case_partial_literal_string<const_string, true>
           , hpx::threads::detail::partial_literal_string<const_string, true>
         >::type result_type;

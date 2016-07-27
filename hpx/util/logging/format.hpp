@@ -25,14 +25,15 @@
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
-#include <hpx/util/logging/format_fwd.hpp>
-#include <hpx/util/logging/format/op_equal.hpp>
 #include <hpx/util/logging/format/array.hpp>
+#include <hpx/util/logging/format/op_equal.hpp>
+#include <hpx/util/logging/format_fwd.hpp>
+
 #include <memory>
 #include <set>
 #include <string>
+#include <type_traits>
 #include <vector>
-#include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -470,12 +471,12 @@ thread-safe access to an instance of this clas (used internally).
         public:
 
             template<class formatter> route & fmt(formatter f) {
-                fmt_impl(f, boost::is_base_of<hpx::util::logging::manipulator
+                fmt_impl(f, std::is_base_of<hpx::util::logging::manipulator
                     ::is_generic,formatter>() );
                 return *this;
             }
             template<class destination> route & dest(destination d) {
-                dest_impl(d, boost::is_base_of<hpx::util::logging::manipulator
+                dest_impl(d, std::is_base_of<hpx::util::logging::manipulator
                     ::is_generic,destination>() );
                 return *this;
             }
@@ -487,28 +488,28 @@ thread-safe access to an instance of this clas (used internally).
         private:
             // not generic
             template<class formatter> void fmt_impl(formatter f,
-                const boost::false_type& ) {
+                const std::false_type& ) {
                 m_items.push_back( item().fmt( m_self.formats().get_ptr(f) )) ;
             }
             // not generic
             template<class destination> void dest_impl(destination d,
-                const boost::false_type&) {
+                const std::false_type&) {
                 m_items.push_back( item().dest( m_self.destinations().get_ptr(d) ));
             }
 
             // generic
             template<class formatter> void fmt_impl(formatter f,
-                const boost::true_type& ) {
+                const std::true_type& ) {
                 typedef hpx::util::logging::manipulator::detail
                     ::generic_holder<formatter,formatter_base> holder;
-                fmt_impl( holder(f) , boost::false_type() );
+                fmt_impl( holder(f) , std::false_type() );
             }
             // generic
             template<class destination> void dest_impl(destination d,
-                const boost::true_type&) {
+                const std::true_type&) {
                 typedef hpx::util::logging::manipulator::detail
                     ::generic_holder<destination,destination_base> holder;
-                dest_impl( holder(d) , boost::false_type() );
+                dest_impl( holder(d) , std::false_type() );
             }
         protected:
             self_type & m_self;

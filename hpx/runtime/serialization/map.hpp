@@ -14,9 +14,6 @@
 #include <map>
 #include <type_traits>
 
-#include <boost/type_traits/add_reference.hpp>
-#include <boost/type_traits/remove_const.hpp>
-
 namespace hpx
 {
     namespace traits
@@ -40,8 +37,8 @@ namespace hpx
                 std::false_type)
             {
                 ar >> const_cast<
-                    typename boost::add_reference<
-                        typename boost::remove_const<Key>::type
+                    typename std::add_lvalue_reference<
+                        typename std::remove_const<Key>::type
                     >::type>(t.first);
                 ar >> t.second;
             }
