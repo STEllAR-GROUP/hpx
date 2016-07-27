@@ -66,9 +66,7 @@ namespace hpx { namespace agas { namespace detail
         hpx::serialization::detail::id_registry& registry =
             hpx::serialization::detail::id_registry::instance();
 
-        boost::uint32_t max_id = registry.get_max_registered_id();
-        for (const std::string& str : registry.get_unassigned_typenames())
-            registry.register_typename(str, ++max_id);
+        registry.fill_missing_typenames();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -160,6 +158,10 @@ namespace hpx { namespace agas { namespace detail
             {
                 registry.register_typename(typenames[k], ids[k]);
             }
+
+            // fill in holes which might have been caused by initialization
+            // order problems
+            registry.fill_missing_typenames();
         }
 
         std::vector<boost::uint32_t> ids;
