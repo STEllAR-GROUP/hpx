@@ -6,10 +6,10 @@
 #ifndef HPX_UTIL_LAZY_ENABLE_IF_HPP
 #define HPX_UTIL_LAZY_ENABLE_IF_HPP
 
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     template <bool Enable, typename T>
-    struct lazy_enable_if 
+    struct lazy_enable_if
     {
     };
 
