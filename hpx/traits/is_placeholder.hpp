@@ -23,7 +23,7 @@ namespace hpx { namespace traits
     struct is_placeholder
 #ifdef HPX_HAVE_CXX11_STD_IS_PLACEHOLDER
       : std::integral_constant<
-            bool,
+            int,
             std::is_placeholder<T>::value != 0
                 ? std::is_placeholder<T>::value
                 : boost::is_placeholder<T>::value
