@@ -938,7 +938,7 @@ hpx_check_for_cxx11_std_lock_guard(
   REQUIRED "HPX needs support for C++11 std::lock_guard")
 
 hpx_check_for_cxx11_std_reference_wrapper(
-  DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
+  REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
 
 hpx_check_for_cxx11_std_shared_ptr(
   REQUIRED "HPX needs support for C++11 std::shared_ptr")

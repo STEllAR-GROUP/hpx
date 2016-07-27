@@ -48,9 +48,7 @@ template <typename ... Parameters>
 void parameters_test(Parameters &&... params)
 {
     parameters_test_impl(boost::ref(params)...);
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
     parameters_test_impl(std::ref(params)...);
-#endif
     parameters_test_impl(std::forward<Parameters>(params)...);
 }
 
