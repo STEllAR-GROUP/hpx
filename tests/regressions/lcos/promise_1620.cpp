@@ -8,6 +8,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <chrono>
 
 struct test

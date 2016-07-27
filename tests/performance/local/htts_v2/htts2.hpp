@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/chrono.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/mpl/or.hpp>
