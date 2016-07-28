@@ -68,7 +68,7 @@ namespace hpx { namespace agas
 
         enum subtype
         {
-            subtype_gid_gid_prefix      = 0x0
+            subtype_gid_prefix          = 0x0
           , subtype_gid_gva_prefix      = 0x1
           , subtype_gva                 = 0x2
           , subtype_ctype               = 0x3
@@ -91,8 +91,7 @@ namespace hpx { namespace agas
             // primary_ns_allocate
             util::tuple<
                 naming::gid_type // lower bound
-              , naming::gid_type // upper bound
-              , std::uint32_t  // prefix
+              , std::uint32_t    // prefix
             >
             // 0x1
             // primary_ns_resolve_gid
@@ -232,15 +231,14 @@ namespace hpx { namespace agas
     response::response(
         namespace_action_code type_
       , naming::gid_type lower_
-      , naming::gid_type upper_
       , std::uint32_t prefix_
       , error status_
         )
       : mc(type_)
       , status(status_)
-      , data(new response_data(util::make_tuple(lower_, upper_, prefix_)))
+      , data(new response_data(util::make_tuple(lower_, prefix_)))
     {
-        // TODO: verification of namespace_action_code
+        HPX_ASSERT(type_ == primary_ns_allocate);
     }
 
     response::response(
@@ -497,8 +495,8 @@ namespace hpx { namespace agas
                 return naming::get_locality_id_from_gid(
                     data->get_data<response_data::subtype_gid_gva_prefix, 2>(ec));
 
-            case response_data::subtype_gid_gid_prefix:
-                return data->get_data<response_data::subtype_gid_gid_prefix, 2>(ec);
+            case response_data::subtype_gid_prefix:
+                return data->get_data<response_data::subtype_gid_prefix, 1>(ec);
 
             case response_data::subtype_prefix:
                 return data->get_data<response_data::subtype_prefix, 0>(ec);
@@ -562,14 +560,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
-        return data->get_data<response_data::subtype_gid_gid_prefix, 0>(ec);
-    }
-
-    naming::gid_type response::get_upper_bound(
-        error_code& ec
-        ) const
-    {
-        return data->get_data<response_data::subtype_gid_gid_prefix, 1>(ec);
+        return data->get_data<response_data::subtype_gid_prefix, 0>(ec);
     }
 
     std::string response::get_component_typename(

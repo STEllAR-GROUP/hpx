@@ -13,6 +13,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
@@ -74,8 +75,6 @@ struct HPX_EXPORT component_namespace
     component_id_type type_counter;
     std::string instance_name_;
 
-    struct update_time_on_exit;
-
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
     {
@@ -129,7 +128,7 @@ struct HPX_EXPORT component_namespace
         void increment_num_localities_count();
 
     private:
-        friend struct update_time_on_exit;
+        friend struct detail::update_time_on_exit;
         friend struct component_namespace;
 
         api_counter_data bind_prefix_;          // component_ns_bind_prefix
@@ -142,22 +141,6 @@ struct HPX_EXPORT component_namespace
         api_counter_data num_localities_;  // component_ns_num_localities
     };
     counter_data counter_data_;
-
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
-    };
 
   public:
     component_namespace()

@@ -208,6 +208,9 @@ namespace hpx { namespace util
             "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
 #endif
 
+            "[hpx.parcel]",
+            "enabled = 1",
+
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_SIZE) "}",
@@ -665,6 +668,10 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_agas_caching_mode() const
     {
+        // When operating purely locally we don't use caching at all.
+        if (run_purely_local_agas())
+            return false;
+
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (nullptr != sec) {
@@ -677,6 +684,10 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_agas_range_caching_mode() const
     {
+        // When operating purely locally we don't use caching at all.
+        if (run_purely_local_agas())
+            return false;
+
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (nullptr != sec) {
@@ -712,6 +723,23 @@ namespace hpx { namespace util
                 return hpx::util::get_entry_as<int>(
                     *sec, "dedicated_server", 0) != 0;
             }
+        }
+        return false;
+    }
+
+    // Run purely local AGAS (application is limited to one locality)
+    bool runtime_configuration::run_purely_local_agas() const
+    {
+        if (get_num_localities() > 1)
+            return false;
+
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (nullptr == sec)
+                return false;
+
+            return hpx::util::get_entry_as<bool>(
+                *sec, "expect_connecting_localities", "1") == 0;
         }
         return false;
     }

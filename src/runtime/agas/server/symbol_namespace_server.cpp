@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/util/bind.hpp>
@@ -53,7 +54,7 @@ response symbol_namespace::service(
     {
         case symbol_ns_bind:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.bind_.time_
                 );
                 counter_data_.increment_bind_count();
@@ -61,7 +62,7 @@ response symbol_namespace::service(
             }
         case symbol_ns_resolve:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.resolve_.time_
                 );
                 counter_data_.increment_resolve_count();
@@ -69,7 +70,7 @@ response symbol_namespace::service(
             }
         case symbol_ns_unbind:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.unbind_.time_
                 );
                 counter_data_.increment_unbind_count();
@@ -77,7 +78,7 @@ response symbol_namespace::service(
             }
         case symbol_ns_iterate_names:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.iterate_names_.time_
                 );
                 counter_data_.increment_iterate_names_count();
@@ -85,7 +86,7 @@ response symbol_namespace::service(
             }
         case symbol_ns_on_event:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.on_event_.time_
                 );
                 counter_data_.increment_on_event_count();

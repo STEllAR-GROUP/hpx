@@ -28,6 +28,8 @@ described in the table below:
     [[`--hpx:connect`]          [run this instance in worker mode, but connecting
                                  late]]
     [[`--hpx:run-agas-server`]  [run AGAS server as part of this runtime instance]]
+    [[`--hpx:run-locally`]      [the application will run fully locally (no distributed
+                                 functionality is available, all networking is disabled)]]
     [[`--hpx:run-hpx-main`]     [run the hpx_main function, regardless of locality
                                  mode]]
     [[`--hpx:hpx arg`]          [the IP address the __hpx__ parcelport is listening
@@ -54,10 +56,12 @@ described in the table below:
     [[`--hpx:node arg`]         [number of the node this locality is run on
                                  (must be unique)]]
     [[`--hpx:ignore-batch-env`] [ignore batch environment variables]]
-    [[`--hpx:expect-connecting-localities`]
+    [[`--hpx:expect-connecting-localities arg`]
                                 [this locality expects other localities to
-                                 dynamically connect (this is implied if the
-                                 number of initial localities is larger than 1)]]
+                                 dynamically connect if `arg` is `1` (this is implied if the
+                                 number of initial localities is larger than 1);
+                                 setting `arg` to `0` will assume that no more localities
+                                 will connect]]
     [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
                                  run on (default: 0), valid for
                                  `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,

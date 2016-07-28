@@ -700,13 +700,6 @@ namespace hpx {
     }
 
     template <typename SchedulingPolicy>
-    naming::gid_type
-    runtime_impl<SchedulingPolicy>::get_next_id(std::size_t count)
-    {
-        return id_pool_.get_id(count);
-    }
-
-    template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::
         add_pre_startup_function(startup_function_type f)
     {

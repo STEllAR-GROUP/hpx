@@ -8,21 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 
 #include <cstdint>
 #include <list>
@@ -64,7 +55,7 @@ response primary_namespace::service(
             }
         case primary_ns_bind_gid:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.bind_gid_.time_
                 );
                 counter_data_.increment_bind_gid_count();
@@ -72,7 +63,7 @@ response primary_namespace::service(
             }
         case primary_ns_resolve_gid:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.resolve_gid_.time_
                 );
                 counter_data_.increment_resolve_gid_count();
@@ -80,7 +71,7 @@ response primary_namespace::service(
             }
         case primary_ns_unbind_gid:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.unbind_gid_.time_
                 );
                 counter_data_.increment_unbind_gid_count();
@@ -88,7 +79,7 @@ response primary_namespace::service(
             }
         case primary_ns_increment_credit:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.increment_credit_.time_
                 );
                 counter_data_.increment_increment_credit_count();
@@ -96,7 +87,7 @@ response primary_namespace::service(
             }
         case primary_ns_decrement_credit:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.decrement_credit_.time_
                 );
                 counter_data_.increment_decrement_credit_count();
@@ -104,7 +95,7 @@ response primary_namespace::service(
             }
         case primary_ns_allocate:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.allocate_.time_
                 );
                 counter_data_.increment_allocate_count();
@@ -112,7 +103,7 @@ response primary_namespace::service(
             }
         case primary_ns_begin_migration:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.begin_migration_.time_
                 );
                 counter_data_.increment_begin_migration_count();
@@ -120,7 +111,7 @@ response primary_namespace::service(
             }
         case primary_ns_end_migration:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.end_migration_.time_
                 );
                 counter_data_.increment_end_migration_count();
@@ -184,168 +175,8 @@ response primary_namespace::service(
                     % boost::uint16_t(req.get_action_code())));
             return response();
         }
-    };
+    }
 } // }}}
-
-// register all performance counter types exposed by this component
-void primary_namespace::register_counter_types(
-    error_code& ec
-    )
-{
-    using util::placeholders::_1;
-    using util::placeholders::_2;
-    boost::format help_count(
-        "returns the number of invocations of the AGAS service '%s'");
-    boost::format help_time(
-        "returns the overall execution time of the AGAS service '%s'");
-    performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
-      , agas::server::primary_namespace_service_name));
-
-    for (std::size_t i = 0;
-          i != detail::num_primary_namespace_services;
-          ++i)
-    {
-        // global counters are handled elsewhere
-        if (detail::primary_namespace_services[i].code_ == primary_ns_statistics_counter)
-            continue;
-
-        std::string name(detail::primary_namespace_services[i].name_);
-        std::string help;
-        std::string::size_type p = name.find_last_of('/');
-        HPX_ASSERT(p != std::string::npos);
-
-        if (detail::primary_namespace_services[i].target_
-            == detail::counter_target_count)
-            help = boost::str(help_count % name.substr(p+1));
-        else
-            help = boost::str(help_time % name.substr(p+1));
-
-        performance_counters::install_counter_type(
-            agas::performance_counter_basename + name
-          , performance_counters::counter_raw
-          , help
-          , creator
-          , &performance_counters::locality_counter_discoverer
-          , HPX_PERFORMANCE_COUNTER_V1
-          , detail::primary_namespace_services[i].uom_
-          , ec
-          );
-        if (ec) return;
-    }
-}
-
-void primary_namespace::register_global_counter_types(
-    error_code& ec
-    )
-{
-    using util::placeholders::_1;
-    using util::placeholders::_2;
-    performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
-      , agas::server::primary_namespace_service_name));
-
-    for (std::size_t i = 0;
-          i != detail::num_primary_namespace_services;
-          ++i)
-    {
-        // local counters are handled elsewhere
-        if (detail::primary_namespace_services[i].code_
-            != primary_ns_statistics_counter)
-            continue;
-
-        std::string help;
-        if (detail::primary_namespace_services[i].target_
-            == detail::counter_target_count)
-            help = "returns the overall number of invocations \
-                     of all primary AGAS services";
-        else
-            help = "returns the overall execution time of all primary AGAS services";
-
-        performance_counters::install_counter_type(
-            std::string(agas::performance_counter_basename) +
-                detail::primary_namespace_services[i].name_
-          , performance_counters::counter_raw
-          , help
-          , creator
-          , &performance_counters::locality_counter_discoverer
-          , HPX_PERFORMANCE_COUNTER_V1
-          , detail::primary_namespace_services[i].uom_
-          , ec
-          );
-        if (ec) return;
-    }
-}
-
-void primary_namespace::register_server_instance(
-    char const* servicename
-  , boost::uint32_t locality_id
-  , error_code& ec
-    )
-{
-    // set locality_id for this component
-    if (locality_id == naming::invalid_locality_id)
-        locality_id = 0;        // if not given, we're on the root
-
-    this->base_type::set_locality_id(locality_id);
-
-    // now register this AGAS instance with AGAS :-P
-    instance_name_ = agas::service_name;
-    instance_name_ += servicename;
-    instance_name_ += agas::server::primary_namespace_service_name;
-
-    // register a gid (not the id) to avoid AGAS holding a reference to this
-    // component
-    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
-}
-
-void primary_namespace::unregister_server_instance(
-    error_code& ec
-    )
-{
-    agas::unregister_name_sync(instance_name_, ec);
-    this->base_type::finalize();
-}
-
-void primary_namespace::finalize()
-{
-    if (!instance_name_.empty())
-    {
-        error_code ec(lightweight);
-        agas::unregister_name_sync(instance_name_, ec);
-    }
-}
-
-// Parcel routing forwards the message handler request to the routed action
-parcelset::policies::message_handler* primary_namespace::get_message_handler(
-    parcelset::parcelhandler* ph
-  , parcelset::locality const& loc
-  , parcelset::parcel const& p
-    )
-{
-    typedef hpx::actions::transfer_action<
-        server::primary_namespace::route_action
-    > action_type;
-
-    action_type * act = static_cast<action_type *>(p.get_action());
-
-    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
-    return routed_p.get_message_handler(ph, loc);
-}
-
-serialization::binary_filter* primary_namespace::get_serialization_filter(
-    parcelset::parcel const& p
-    )
-{
-    typedef hpx::actions::transfer_action<
-        server::primary_namespace::route_action
-    > action_type;
-
-    action_type * act = static_cast<action_type *>(p.get_action());
-
-    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
-    return routed_p.get_serialization_filter();
-}
 
 // TODO: do/undo semantics (e.g. transactions)
 std::vector<response> primary_namespace::bulk_service(
@@ -823,7 +654,7 @@ response primary_namespace::allocate(
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response(primary_ns_allocate, next_id_, next_id_
+        return response(primary_ns_allocate, next_id_
           , naming::get_locality_id_from_gid(next_id_), success);
     }
 
@@ -867,7 +698,7 @@ response primary_namespace::allocate(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(locality_ns_allocate, lower, upper
+    return response(primary_ns_allocate, lower
       , naming::get_locality_id_from_gid(next_id_), success);
 } // }}}
 
@@ -1352,328 +1183,6 @@ primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
 
     return resolved_type(naming::invalid_gid, gva(), naming::invalid_gid);
 } // }}}
-
-response primary_namespace::statistics_counter(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ statistics_counter implementation
-    LAGAS_(info) << "primary_namespace::statistics_counter";
-
-    std::string name(req.get_statistics_counter_name());
-
-    performance_counters::counter_path_elements p;
-    performance_counters::get_counter_path_elements(name, p, ec);
-    if (ec) return response();
-
-    if (p.objectname_ != "agas")
-    {
-        HPX_THROWS_IF(ec, bad_parameter,
-            "primary_namespace::statistics_counter",
-            "unknown performance counter (unrelated to AGAS)");
-        return response();
-    }
-
-    namespace_action_code code = invalid_request;
-    detail::counter_target target = detail::counter_target_invalid;
-    for (std::size_t i = 0;
-          i != detail::num_primary_namespace_services;
-          ++i)
-    {
-        if (p.countername_ == detail::primary_namespace_services[i].name_)
-        {
-            code = detail::primary_namespace_services[i].code_;
-            target = detail::primary_namespace_services[i].target_;
-            break;
-        }
-    }
-
-    if (code == invalid_request || target == detail::counter_target_invalid)
-    {
-        HPX_THROWS_IF(ec, bad_parameter,
-            "primary_namespace::statistics_counter",
-            "unknown performance counter (unrelated to AGAS?)");
-        return response();
-    }
-
-    typedef primary_namespace::counter_data cd;
-
-    using util::placeholders::_1;
-    util::function_nonser<boost::int64_t(bool)> get_data_func;
-    if (target == detail::counter_target_count)
-    {
-        switch (code) {
-        case primary_ns_route:
-            get_data_func = util::bind(&cd::get_route_count, &counter_data_, _1);
-            break;
-        case primary_ns_bind_gid:
-            get_data_func = util::bind(&cd::get_bind_gid_count, &counter_data_, _1);
-            break;
-        case primary_ns_resolve_gid:
-            get_data_func = util::bind(&cd::get_resolve_gid_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_unbind_gid:
-            get_data_func = util::bind(&cd::get_unbind_gid_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_increment_credit:
-            get_data_func = util::bind(&cd::get_increment_credit_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_decrement_credit:
-            get_data_func = util::bind(&cd::get_decrement_credit_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_begin_migration:
-            get_data_func = util::bind(&cd::get_begin_migration_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_end_migration:
-            get_data_func = util::bind(&cd::get_end_migration_count,
-                &counter_data_, _1);
-            break;
-        case primary_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_count,
-                &counter_data_, _1);
-            break;
-        default:
-            HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::statistics"
-              , "bad action code while querying statistics");
-            return response();
-        }
-    }
-    else {
-        HPX_ASSERT(detail::counter_target_time == target);
-        switch (code) {
-        case primary_ns_route:
-            get_data_func = util::bind(&cd::get_route_time, &counter_data_, _1);
-            break;
-        case primary_ns_bind_gid:
-            get_data_func = util::bind(&cd::get_bind_gid_time, &counter_data_, _1);
-            break;
-        case primary_ns_resolve_gid:
-            get_data_func = util::bind(&cd::get_resolve_gid_time, &counter_data_, _1);
-            break;
-        case primary_ns_unbind_gid:
-            get_data_func = util::bind(&cd::get_unbind_gid_time, &counter_data_, _1);
-            break;
-        case primary_ns_increment_credit:
-            get_data_func = util::bind(&cd::get_increment_credit_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_decrement_credit:
-            get_data_func = util::bind(&cd::get_decrement_credit_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_time, &counter_data_, _1);
-            break;
-        case primary_ns_begin_migration:
-            get_data_func = util::bind(&cd::get_begin_migration_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_end_migration:
-            get_data_func = util::bind(&cd::get_end_migration_time,
-                &counter_data_, _1);
-            break;
-        case primary_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_time,
-                &counter_data_, _1);
-            break;
-        default:
-            HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::statistics"
-              , "bad action code while querying statistics");
-            return response();
-        }
-    }
-
-    performance_counters::counter_info info;
-    performance_counters::get_counter_type(name, info, ec);
-    if (ec) return response();
-
-    performance_counters::complement_counter_info(info, ec);
-    if (ec) return response();
-
-    using performance_counters::detail::create_raw_counter;
-    naming::gid_type gid = create_raw_counter(info, get_data_func, ec);
-    if (ec) return response();
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_statistics_counter, gid);
-}
-
-// access current counter values
-boost::int64_t primary_namespace::counter_data::get_route_count(bool reset)
-{
-    return util::get_and_reset_value(route_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
-{
-    return util::get_and_reset_value(bind_gid_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_count(bool reset)
-{
-    return util::get_and_reset_value(resolve_gid_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
-{
-    return util::get_and_reset_value(unbind_gid_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_increment_credit_count(bool reset)
-{
-    return util::get_and_reset_value(increment_credit_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_decrement_credit_count(bool reset)
-{
-    return util::get_and_reset_value(decrement_credit_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
-{
-    return util::get_and_reset_value(allocate_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_begin_migration_count(bool reset)
-{
-    return util::get_and_reset_value(begin_migration_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_end_migration_count(bool reset)
-{
-    return util::get_and_reset_value(end_migration_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
-{
-    return util::get_and_reset_value(route_.count_, reset) +
-        util::get_and_reset_value(bind_gid_.count_, reset) +
-        util::get_and_reset_value(resolve_gid_.count_, reset) +
-        util::get_and_reset_value(unbind_gid_.count_, reset) +
-        util::get_and_reset_value(increment_credit_.count_, reset) +
-        util::get_and_reset_value(decrement_credit_.count_, reset) +
-        util::get_and_reset_value(allocate_.count_, reset) +
-        util::get_and_reset_value(begin_migration_.count_, reset) +
-        util::get_and_reset_value(end_migration_.count_, reset);
-}
-
-// access execution time counters
-boost::int64_t primary_namespace::counter_data::get_route_time(bool reset)
-{
-    return util::get_and_reset_value(route_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
-{
-    return util::get_and_reset_value(bind_gid_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_time(bool reset)
-{
-    return util::get_and_reset_value(resolve_gid_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
-{
-    return util::get_and_reset_value(unbind_gid_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_increment_credit_time(bool reset)
-{
-    return util::get_and_reset_value(increment_credit_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_decrement_credit_time(bool reset)
-{
-    return util::get_and_reset_value(decrement_credit_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
-{
-    return util::get_and_reset_value(allocate_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_begin_migration_time(bool reset)
-{
-    return util::get_and_reset_value(begin_migration_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_end_migration_time(bool reset)
-{
-    return util::get_and_reset_value(end_migration_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
-{
-    return util::get_and_reset_value(route_.time_, reset) +
-        util::get_and_reset_value(bind_gid_.time_, reset) +
-        util::get_and_reset_value(resolve_gid_.time_, reset) +
-        util::get_and_reset_value(unbind_gid_.time_, reset) +
-        util::get_and_reset_value(increment_credit_.time_, reset) +
-        util::get_and_reset_value(decrement_credit_.time_, reset) +
-        util::get_and_reset_value(allocate_.time_, reset) +
-        util::get_and_reset_value(begin_migration_.time_, reset) +
-        util::get_and_reset_value(end_migration_.time_, reset);
-}
-
-// increment counter values
-void primary_namespace::counter_data::increment_route_count()
-{
-    ++route_.count_;
-}
-
-void primary_namespace::counter_data::increment_bind_gid_count()
-{
-    ++bind_gid_.count_;
-}
-
-void primary_namespace::counter_data::increment_resolve_gid_count()
-{
-    ++resolve_gid_.count_;
-}
-
-void primary_namespace::counter_data::increment_unbind_gid_count()
-{
-    ++unbind_gid_.count_;
-}
-
-void primary_namespace::counter_data::increment_increment_credit_count()
-{
-    ++increment_credit_.count_;
-}
-
-void primary_namespace::counter_data::increment_decrement_credit_count()
-{
-    ++decrement_credit_.count_;
-}
-
-void primary_namespace::counter_data::increment_allocate_count()
-{
-    ++allocate_.count_;
-}
-
-void primary_namespace::counter_data::increment_begin_migration_count()
-{
-    ++begin_migration_.count_;
-}
-
-void primary_namespace::counter_data::increment_end_migration_count()
-{
-    ++end_migration_.count_;
-}
 
 }}}
 

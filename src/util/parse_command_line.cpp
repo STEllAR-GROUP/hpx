@@ -376,6 +376,9 @@ namespace hpx { namespace util
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
                 ("hpx:run-agas-server-only", "run only the AGAS server")
+                ("hpx:run-locally",
+                  "the application will run fully locally (no distributed "
+                  "functionality is available, all networking is disabled)")
                 ("hpx:hpx", value<std::string>(),
                   "the IP address the HPX parcelport is listening on, "
                   "expected format: `address:port' (default: "
@@ -405,8 +408,10 @@ namespace hpx { namespace util
                   "(must be unique, alternatively: -0, -1, ..., -9)")
                 ("hpx:ignore-batch-env", "ignore batch environment variables")
                 ("hpx:expect-connecting-localities",
+                  value<bool>()->implicit_value(true),
                   "this locality expects other localities to dynamically connect "
-                  "(implied if the number of initial localities is larger than 1)")
+                  "if `arg` is true (this is implied if the number of initial "
+                  "localities is larger than 1)")
 #if defined(HPX_HAVE_HWLOC) || defined(HPX_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "

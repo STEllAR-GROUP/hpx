@@ -85,6 +85,17 @@ namespace hpx { namespace naming
         // don't cache this id in the AGAS caches
         static std::uint64_t const dont_cache_mask = 0x800000ull; //-V112
 
+        // Bit 64 is set for all dynamically assigned ids (if this is not set
+        // then the lsb corresponds to the lva of the referenced object).
+        static std::uint64_t const dynamically_assigned = 0x1ull;
+
+        // Bits 65-84 are used to store the component type (20 bits) if the
+        // application is run in local-only-agas mode.
+        static std::uint64_t const component_type_base_mask = 0xfffffull;
+        static std::uint64_t const component_type_shift = 1ull;
+        static std::uint64_t const component_type_mask =
+            component_type_base_mask << component_type_shift;
+
         static std::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
         static std::uint64_t const internal_bits_mask =
@@ -390,14 +401,15 @@ namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
-    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id)
-        HPX_SUPER_PURE;
+    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id,
+        std::uint64_t lsb = 0) HPX_SUPER_PURE;
 
-    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id)
+    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id,
+        std::uint64_t lsb)
     {
         return gid_type(
             std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
-            0);
+            lsb);
     }
 
     inline std::uint32_t get_locality_id_from_gid(std::uint64_t msb) HPX_PURE;
@@ -551,9 +563,24 @@ namespace hpx { namespace naming
         }
 
         inline std::uint64_t strip_internal_bits_and_locality_from_gid(
-                std::uint64_t msb)
+            std::uint64_t msb)
         {
             return msb & ~gid_type::special_bits_mask;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline std::uint32_t get_component_type_from_gid(std::uint64_t msb)
+        {
+            return (msb >> gid_type::component_type_shift) &
+                gid_type::component_type_base_mask;
+        }
+
+        inline std::uint64_t add_component_type_to_gid(std::uint64_t msb,
+            std::uint32_t type)
+        {
+            return (msb & ~gid_type::component_type_mask) |
+                ((type << gid_type::component_type_shift) &
+                    gid_type::component_type_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////

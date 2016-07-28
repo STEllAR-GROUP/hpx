@@ -88,6 +88,9 @@ namespace hpx { namespace util
         bool load_application_configuration(char const* filename,
             error_code& ec = throws);
 
+        // Run purely local AGAS (application is limited to one locality)
+        bool run_purely_local_agas() const;
+
         // Can be set to true if we want to use the ITT notify tools API.
         bool get_itt_notify_mode() const;
 

@@ -12,14 +12,13 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/runtime/agas/detail/primary_namespace_base.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
@@ -44,9 +43,6 @@ HPX_EXPORT naming::id_type bootstrap_primary_namespace_id();
 
 namespace server
 {
-
-// Base name used to register the component
-char const* const primary_namespace_service_name = "primary/";
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
 /// resolved addresses.
@@ -114,12 +110,11 @@ char const* const primary_namespace_service_name = "primary/";
 ///         Address of the locality based sub-CA, xxxxxxxx is replaced with the
 ///         correct locality id
 ///
-struct HPX_EXPORT primary_namespace
-  : components::fixed_component_base<primary_namespace>
+struct HPX_EXPORT primary_namespace : detail::primary_namespace_base
 {
     // {{{ nested types
     typedef lcos::local::spinlock mutex_type;
-    typedef components::fixed_component_base<primary_namespace> base_type;
+    typedef detail::primary_namespace_base base_type;
 
     typedef boost::int32_t component_type;
 
@@ -143,100 +138,9 @@ struct HPX_EXPORT primary_namespace
             hpx::util::tuple<bool, std::size_t, lcos::local::condition_variable_any>
         > migration_table_type;
 
-    std::string instance_name_;
     naming::gid_type next_id_;      // next available gid
     naming::gid_type locality_;     // our locality id
     migration_table_type migrating_objects_;
-
-    struct update_time_on_exit;
-
-    // data structure holding all counters for the omponent_namespace component
-    struct counter_data
-    {
-    private:
-        HPX_NON_COPYABLE(counter_data);
-
-    public:
-        struct api_counter_data
-        {
-            api_counter_data()
-              : count_(0)
-              , time_(0)
-            {}
-
-            boost::atomic<boost::int64_t> count_;
-            boost::atomic<boost::int64_t> time_;
-        };
-
-        counter_data()
-        {}
-
-    public:
-        // access current counter values
-        boost::int64_t get_route_count(bool);
-        boost::int64_t get_bind_gid_count(bool);
-        boost::int64_t get_resolve_gid_count(bool);
-        boost::int64_t get_unbind_gid_count(bool);
-        boost::int64_t get_increment_credit_count(bool);
-        boost::int64_t get_decrement_credit_count(bool);
-        boost::int64_t get_allocate_count(bool);
-        boost::int64_t get_begin_migration_count(bool);
-        boost::int64_t get_end_migration_count(bool);
-        boost::int64_t get_overall_count(bool);
-
-        boost::int64_t get_route_time(bool);
-        boost::int64_t get_bind_gid_time(bool);
-        boost::int64_t get_resolve_gid_time(bool);
-        boost::int64_t get_unbind_gid_time(bool);
-        boost::int64_t get_increment_credit_time(bool);
-        boost::int64_t get_decrement_credit_time(bool);
-        boost::int64_t get_allocate_time(bool);
-        boost::int64_t get_begin_migration_time(bool);
-        boost::int64_t get_end_migration_time(bool);
-        boost::int64_t get_overall_time(bool);
-
-        // increment counter values
-        void increment_route_count();
-        void increment_bind_gid_count();
-        void increment_resolve_gid_count();
-        void increment_unbind_gid_count();
-        void increment_increment_credit_count();
-        void increment_decrement_credit_count();
-        void increment_allocate_count();
-        void increment_begin_migration_count();
-        void increment_end_migration_count();
-
-    private:
-        friend struct update_time_on_exit;
-        friend struct primary_namespace;
-
-        api_counter_data route_;                // primary_ns_
-        api_counter_data bind_gid_;             // primary_ns_bind_gid
-        api_counter_data resolve_gid_;          // primary_ns_resolve_gid
-        api_counter_data unbind_gid_;           // primary_ns_unbind_gid
-        api_counter_data increment_credit_;     // primary_ns_increment_credit
-        api_counter_data decrement_credit_;     // primary_ns_decrement_credit
-        api_counter_data allocate_;             // primary_ns_allocate
-        api_counter_data begin_migration_;      // primary_ns_begin_migration
-        api_counter_data end_migration_;        // primary_ns_end_migration
-    };
-    counter_data counter_data_;
-
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
-    };
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     /// Dump the credit counts of all matching ranges. Expects that \p l
@@ -267,26 +171,17 @@ struct HPX_EXPORT primary_namespace
 
   public:
     primary_namespace()
-      : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
+      : base_type()
       , mutex_()
-      , instance_name_()
       , next_id_(naming::invalid_gid)
       , locality_(naming::invalid_gid)
     {}
 
-    void finalize();
-
     void set_local_locality(naming::gid_type const& g)
     {
         locality_ = g;
-        next_id_ = naming::gid_type(g.get_msb() + 1, 0x1000);
-    }
-
-    response remote_service(
-        request const& req
-        )
-    {
-        return service(req, throws);
+        next_id_ = naming::gid_type(
+            g.get_msb() | naming::gid_type::dynamically_assigned, 0x1000);
     }
 
     response service(
@@ -295,35 +190,9 @@ struct HPX_EXPORT primary_namespace
         );
 
     /// Maps \a service over \p reqs in parallel.
-    std::vector<response> remote_bulk_service(
-        std::vector<request> const& reqs
-        )
-    {
-        return bulk_service(reqs, throws);
-    }
-
-    /// Maps \a service over \p reqs in parallel.
     std::vector<response> bulk_service(
         std::vector<request> const& reqs
       , error_code& ec
-        );
-
-    /// Register all performance counter types exposed by this component.
-    static void register_counter_types(
-        error_code& ec = throws
-        );
-    static void register_global_counter_types(
-        error_code& ec = throws
-        );
-
-    void register_server_instance(
-        char const* servicename
-      , boost::uint32_t locality_id = naming::invalid_locality_id
-      , error_code& ec = throws
-        );
-
-    void unregister_server_instance(
-        error_code& ec = throws
         );
 
     response route(
@@ -360,11 +229,6 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec = throws
         );
 
-    response statistics_counter(
-        request const& req
-      , error_code& ec = throws
-        );
-
   private:
     resolved_type resolve_gid_locked(
         std::unique_lock<mutex_type>& l
@@ -378,6 +242,14 @@ struct HPX_EXPORT primary_namespace
       , std::int64_t& credits
       , error_code& ec
         );
+
+    // overload for extracting performance counter function
+    util::function_nonser<boost::int64_t(bool)> get_counter_function(
+        agas::detail::counter_target target,
+        namespace_action_code code, error_code& ec)
+    {
+        return counter_data_.get_counter_function(target, code, ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     struct free_entry
@@ -435,75 +307,9 @@ struct HPX_EXPORT primary_namespace
       , namespace_end_migration                 = primary_ns_end_migration
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
-
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service,
-        bulk_service_action);
-
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
-
-    static parcelset::policies::message_handler* get_message_handler(
-        parcelset::parcelhandler* ph
-      , parcelset::locality const& loc
-      , parcelset::parcel const& p
-        );
-
-    static serialization::binary_filter* get_serialization_filter(
-        parcelset::parcel const& p
-        );
 };
 
 }}}
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::service_action)
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::bulk_service_action)
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::route_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::service_action,
-    primary_namespace_service_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::bulk_service_action,
-    primary_namespace_bulk_service_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::route_action,
-    primary_namespace_route_action)
-
-namespace hpx { namespace traits
-{
-    // Parcel routing forwards the message handler request to the routed action
-    template <>
-    struct action_message_handler<agas::server::primary_namespace::route_action>
-    {
-        static parcelset::policies::message_handler* call(
-            parcelset::parcelhandler* ph
-          , parcelset::locality const& loc
-          , parcelset::parcel const& p
-            )
-        {
-            return agas::server::primary_namespace::get_message_handler(
-                ph, loc, p);
-        }
-    };
-
-    // Parcel routing forwards the binary filter request to the routed action
-    template <>
-    struct action_serialization_filter<
-        agas::server::primary_namespace::route_action>
-    {
-        static serialization::binary_filter* call(parcelset::parcel const& p)
-        {
-            return agas::server::primary_namespace::get_serialization_filter(p);
-        }
-    };
-}}
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

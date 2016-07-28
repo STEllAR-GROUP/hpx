@@ -26,11 +26,6 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail
-{
-    HPX_API_EXPORT naming::gid_type get_next_id(std::size_t count = 1);
-}}
-
 namespace hpx { namespace components
 {
     template <typename Component>
@@ -141,7 +136,7 @@ namespace hpx { namespace components
                 naming::address addr(get_current_address());
                 if (!assign_gid)
                 {
-                    gid_ = hpx::detail::get_next_id();
+                    gid_ = agas::get_next_id(1, addr);
                     if (!applier::bind_gid_local(gid_, addr))
                     {
                         std::ostringstream strm;

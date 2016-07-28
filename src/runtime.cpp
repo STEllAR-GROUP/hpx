@@ -15,7 +15,6 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp> // EXPORTS get_next_id
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
@@ -813,8 +812,8 @@ namespace hpx
             sizeof(arithmetic_counter_types)/sizeof(arithmetic_counter_types[0]));
     }
 
-    boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
-        boost::uint32_t cores_needed)
+    boost::uint32_t runtime::first_used_core(
+        std::string const& locality_basename, boost::uint32_t cores_needed)
     {
         std::lock_guard<boost::mutex> l(mtx_);
 
@@ -1109,15 +1108,6 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        naming::gid_type get_next_id(std::size_t count)
-        {
-            if (nullptr == get_runtime_ptr())
-                return naming::invalid_gid;
-
-            return get_runtime().get_next_id(count);
-        }
-
-        ///////////////////////////////////////////////////////////////////////////
         void dijkstra_make_black()
         {
             get_runtime_support_ptr()->dijkstra_make_black();

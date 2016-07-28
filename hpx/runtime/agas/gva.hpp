@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -41,16 +41,23 @@ struct gva
         offset(o) {}
 
     gva(naming::gid_type const& p, component_type t, boost::uint64_t c, void* a,
-        boost::uint64_t o = 0)
+            boost::uint64_t o = 0)
       : prefix(p),
         type(t),
         count(c),
         lva_(reinterpret_cast<lva_type>(a)),
         offset(o) {}
 
-    explicit gva(lva_type a)
-      : type(components::component_invalid),
-        count(0),
+    explicit gva(naming::gid_type const& p, lva_type a, component_type t)
+      : prefix(p),
+        type(t),
+        count(1),
+        lva_(a),
+        offset(0) {}
+
+    explicit gva(lva_type a, component_type t = components::component_invalid)
+      : type(t),
+        count(1),
         lva_(a),
         offset(0) {}
 

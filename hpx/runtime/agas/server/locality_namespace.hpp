@@ -12,6 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
+#include <hpx/runtime/agas/detail/primary_namespace_base.hpp>
+#include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
@@ -67,9 +69,7 @@ struct HPX_EXPORT locality_namespace
 
     partition_table_type partitions_;
     boost::uint32_t prefix_counter_;
-    primary_namespace* primary_;
-
-    struct update_time_on_exit;
+    agas::detail::primary_namespace_base* primary_;
 
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
@@ -124,7 +124,7 @@ struct HPX_EXPORT locality_namespace
         void increment_resolved_localities_count();
 
     private:
-        friend struct update_time_on_exit;
+        friend struct detail::update_time_on_exit;
         friend struct locality_namespace;
 
         api_counter_data allocate_;             // locality_ns_allocate
@@ -137,24 +137,8 @@ struct HPX_EXPORT locality_namespace
     };
     counter_data counter_data_;
 
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
-    };
-
   public:
-    locality_namespace(primary_namespace* primary)
+    locality_namespace(agas::detail::primary_namespace_base* primary)
       : base_type(HPX_AGAS_LOCALITY_NS_MSB, HPX_AGAS_LOCALITY_NS_LSB)
       , prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
       , primary_(primary)

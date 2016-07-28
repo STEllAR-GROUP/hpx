@@ -104,17 +104,21 @@ namespace hpx { namespace parcelset
         count_routed_(0),
         write_handler_(&default_write_handler)
     {
-        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
+        // enable parcel-ports if networking is not globally disabled
+        if (cfg.get_entry("hpx.parcel.enabled", "1") != "0")
         {
-            std::shared_ptr<parcelport> pp;
-            pp.reset(
-                factory->create(
-                    cfg
-                  , on_start_thread
-                  , on_stop_thread
-                )
-            );
-            attach_parcelport(pp);
+            for (plugins::parcelport_factory_base* factory :
+                    get_parcelport_factories())
+            {
+                std::shared_ptr<parcelport> pp(
+                    factory->create(
+                        cfg
+                      , on_start_thread
+                      , on_stop_thread
+                    )
+                );
+                attach_parcelport(pp);
+            }
         }
     }
 

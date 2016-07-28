@@ -428,6 +428,7 @@ boost::uint32_t get_locality_id(error_code& ec)
 ///////////////////////////////////////////////////////////////////////////////
 naming::gid_type get_next_id(
     std::size_t count
+  , naming::address const& addr
   , error_code& ec
     )
 {
@@ -439,8 +440,8 @@ naming::gid_type get_next_id(
     }
 
     naming::resolver_client& agas_ = naming::get_agas_client();
-    naming::gid_type lower_bound, upper_bound;
-    agas_.get_id_range(count, lower_bound, upper_bound, ec);
+
+    naming::gid_type lower_bound = agas_.get_id_range(count, addr, ec);
     if (ec) return naming::invalid_gid;
 
     return lower_bound;

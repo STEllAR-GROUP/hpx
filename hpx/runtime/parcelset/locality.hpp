@@ -14,6 +14,7 @@
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/traits/is_iterator.hpp>
 
+#include <iosfwd>
 #include <map>
 #include <memory>
 #include <string>

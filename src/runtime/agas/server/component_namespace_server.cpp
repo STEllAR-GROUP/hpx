@@ -11,6 +11,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/detail/update_time_on_exit.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -51,7 +52,7 @@ response component_namespace::service(
     {
         case component_ns_bind_prefix:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.bind_prefix_.time_
                 );
                 counter_data_.increment_bind_prefix_count();
@@ -59,7 +60,7 @@ response component_namespace::service(
             }
         case component_ns_bind_name:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.bind_name_.time_
                 );
                 counter_data_.increment_bind_name_count();
@@ -67,7 +68,7 @@ response component_namespace::service(
             }
         case component_ns_resolve_id:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.resolve_id_.time_
                 );
                 counter_data_.increment_resolve_id_count();
@@ -75,7 +76,7 @@ response component_namespace::service(
             }
         case component_ns_unbind_name:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.unbind_name_.time_
                 );
                 counter_data_.increment_unbind_name_ount();
@@ -83,7 +84,7 @@ response component_namespace::service(
             }
         case component_ns_iterate_types:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.iterate_types_.time_
                 );
                 counter_data_.increment_iterate_types_count();
@@ -91,7 +92,7 @@ response component_namespace::service(
             }
         case component_ns_get_component_type_name:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.get_component_type_name_.time_
                 );
                 counter_data_.increment_get_component_type_name_count();
@@ -99,7 +100,7 @@ response component_namespace::service(
             }
         case component_ns_num_localities:
             {
-                update_time_on_exit update(
+                detail::update_time_on_exit update(
                     counter_data_.num_localities_.time_
                 );
                 counter_data_.increment_num_localities_count();

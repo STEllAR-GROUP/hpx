@@ -517,6 +517,61 @@ namespace hpx { namespace util
         num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
             using_nodelist, num_localities_);
 
+
+        // handle run-locally-only and expect-connecting-localities
+        bool expect_connections = false;
+        if (num_localities_ == 1)
+        {
+            // we expect dynamic connections if:
+            //  - --hpx:expect-connecting-localities or
+            //  - hpx.expect_connecting_localities=1 is given, or
+            //  - num_localities > 1
+            expect_connections =
+                cfgmap.get_value<int>("hpx.expect_connecting_localities", 1) ?
+                    true : false;
+
+            // if this instance is forced to run locally only
+            if (vm.count("hpx:run-locally"))
+            {
+                if (node != std::size_t(-1) && node != 0)
+                {
+                    throw hpx::detail::command_line_error(
+                        "Command line option --hpx:run-locally can't be "
+                        "specified if the application should run on more than "
+                        "one locality");
+                }
+                expect_connections = false;
+                ini_config += std::string("hpx.parcel.enabled!=0");
+            }
+        }
+        else
+        {
+            // we expect dynamic connections if:
+            //  - --hpx:expect-connecting-localities or
+            //  - hpx.expect_connecting_localities=1 is given, or
+            //  - num_localities > 1
+            expect_connections =
+                cfgmap.get_value<int>("hpx.expect_connecting_localities",
+                    num_localities_ > 1 ? 0 : 1) ? true : false;
+
+            // if this instance is forced to run locally only
+            if (vm.count("hpx:run-locally"))
+            {
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:run-locally can't be "
+                    "specified if the application should run on more than "
+                    "one locality");
+            }
+        }
+
+        if (vm.count("hpx:expect-connecting-localities") &&
+            vm["hpx:expect-connecting-localities"].as<bool>())
+        {
+            expect_connections = true;
+        }
+        ini_config += std::string("hpx.expect_connecting_localities=") +
+            (expect_connections ? "1" : "0");
+
         // Determine our network port, use arbitrary port if running on one
         // locality.
         std::string hpx_host =
@@ -524,20 +579,6 @@ namespace hpx { namespace util
                 env.host_name(
                     rtcfg_.get_entry("hpx.parcel.address", HPX_INITIAL_IP_ADDRESS)
                 ));
-
-        // we expect dynamic connections if:
-        //  - --hpx:expect-connecting-localities or
-        //  - hpx.expect_connecting_localities=1 is given, or
-        //  - num_localities > 1
-        bool expect_connections =
-            cfgmap.get_value<int>("hpx.expect_connecting_localities",
-                num_localities_ > 1 ? 0 : 1) ? true : false;
-
-        if (vm.count("hpx:expect-connecting-localities"))
-            expect_connections = true;
-
-        ini_config += std::string("hpx.expect_connecting_localities=") +
-            (expect_connections ? "1" : "0");
 
         std::uint16_t initial_hpx_port = 0;
         if (num_localities_ != 1 || expect_connections)
@@ -650,8 +691,7 @@ namespace hpx { namespace util
             // worker and the node number is zero
             if (!vm.count("hpx:worker") || node != 0)
             {
-                ini_config += "hpx.locality!=" +
-                    std::to_string(node);
+                ini_config += "hpx.locality!=" + std::to_string(node);
             }
         }
 
