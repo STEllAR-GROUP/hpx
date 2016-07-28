@@ -12,11 +12,11 @@
 #include <cstdlib>
 #include <numeric>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <boost/range/functions.hpp>
-#include <boost/type_traits/is_same.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id async_test(int passed_through)
@@ -114,7 +114,7 @@ void test_executor()
             Executor
         >::execution_category execution_category;
 
-    HPX_TEST((boost::is_same<
+    HPX_TEST((std::is_same<
             hpx::parallel::parallel_execution_tag, execution_category
         >::value));
 

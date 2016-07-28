@@ -25,18 +25,6 @@ namespace hpx { namespace util
     // Default template argument handling for iterator_adaptor
     namespace detail
     {
-        template <typename T>
-        struct add_reference
-        {
-            typedef T& type;
-        };
-
-        template <>
-        struct add_reference<void>
-        {
-            typedef void type;
-        };
-
         // A meta-function which computes an iterator_adaptor's base class,
         // a specialization of iterator_facade.
         template <typename Derived, typename Base, typename Value,
@@ -58,7 +46,7 @@ namespace hpx { namespace util
                     typename std::conditional<
                         std::is_void<Value>::value,
                         typename std::iterator_traits<Base>::reference,
-                        typename add_reference<Value>::type
+                        typename std::add_lvalue_reference<Value>::type
                     >::type,
                     Reference
                 >::type reference_type;

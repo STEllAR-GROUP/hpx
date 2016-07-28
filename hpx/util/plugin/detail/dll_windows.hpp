@@ -17,12 +17,11 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
 
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include <Shlwapi.h>
@@ -136,8 +135,8 @@ namespace hpx { namespace util { namespace plugin {
             if (ec) return std::pair<SymbolType, Deleter>();
 
             static_assert(
-                boost::is_pointer<SymbolType>::value,
-                "boost::is_pointer<SymbolType>::value");
+                std::is_pointer<SymbolType>::value,
+                "std::is_pointer<SymbolType>::value");
 
             // Cast the to right type.
             SymbolType address = (SymbolType)GetProcAddress

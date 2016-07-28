@@ -229,7 +229,7 @@ int main()
         HPX_TEST((std::is_same<Iter1::pointer, int*>::value));
         HPX_TEST((std::is_same<Iter1::difference_type, std::ptrdiff_t>::value));
 
-        HPX_TEST((boost::is_convertible<Iter1::iterator_category,
+        HPX_TEST((std::is_convertible<Iter1::iterator_category,
             std::random_access_iterator_tag>::value));
     }
 
@@ -317,7 +317,7 @@ int main()
                 BaseIter
             >::value));
 
-        typedef modify_traversal<BaseIter, boost::incrementable_traversal_tag>
+        typedef modify_traversal<BaseIter, std::forward_iterator_tag>
             IncrementableIter;
 
         HPX_TEST((std::is_same<IncrementableIter::base_type, BaseIter>::value));

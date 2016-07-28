@@ -25,16 +25,15 @@
 #pragma warning ( disable : 4355)
 #endif
 
-
-
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
+#include <hpx/util/logging/format/array.hpp>    // array
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
-#include <hpx/util/logging/format/array.hpp> // array
-#include <boost/type_traits/is_base_of.hpp>
+
 #include <map>
 #include <memory>
 #include <sstream>
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
@@ -68,7 +67,7 @@ namespace detail {
             // care about if generic or not
             typedef hpx::util::logging::manipulator::is_generic is_generic;
             add_impl<destination_type>( name, dest,
-                boost::is_base_of<is_generic,destination_type>() );
+                std::is_base_of<is_generic,destination_type>() );
             compute_write_steps();
         }
 
@@ -107,17 +106,17 @@ namespace detail {
     private:
         // non-generic
         template<class destination_type> void add_impl(const string_type & name,
-            destination_type dest, const boost::false_type& ) {
+            destination_type dest, const std::false_type& ) {
             typename data::write info(m_data);
             destination_base_type * p = info->destinations.append(dest);
             info->name_to_destination[name] = p;
         }
         // generic manipulator
         template<class destination_type> void add_impl(const string_type & name,
-            destination_type dest, const boost::true_type& ) {
+            destination_type dest, const std::true_type& ) {
             typedef hpx::util::logging::manipulator::detail
                 ::generic_holder<destination_type,destination_base_type> holder;
-            add_impl( name, holder(dest), boost::false_type() );
+            add_impl( name, holder(dest), std::false_type() );
         }
 
         // recomputes the write steps - note taht this takes place after each operation

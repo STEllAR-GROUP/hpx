@@ -18,11 +18,11 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
 
 #include <sstream>
 #include <string>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace util { namespace plugin {
@@ -36,7 +36,7 @@ namespace hpx { namespace util { namespace plugin {
             std::string const &class_name, std::string const& libname = "",
             error_code& ec = throws)
         {
-            typedef typename boost::remove_pointer<get_plugins_list_type>
+            typedef typename std::remove_pointer<get_plugins_list_type>
                 ::type PointedType;
 
             exported_plugins_type& e = *f();
