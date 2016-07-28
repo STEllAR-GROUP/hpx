@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
@@ -37,7 +39,7 @@ std::string search(int start, int end, std::string const &word)
         //just a quick check, because the list is not perfectly symmetrical
         {
             int pos = mid/2;
-            
+
             int size;
             //if our value is lower than start, we disregard it.
             if (word.length() >= check.length())
@@ -67,7 +69,8 @@ std::string search(int start, int end, std::string const &word)
                 else
                     pos++;
                 if (check.find(part) == std::string::npos)
-                    return word + " was not found in this dictionary, " + check + " was the closest match.\n";
+                    return word + " was not found in this dictionary, " +
+                        check + " was the closest match.\n";
             }
             return word + " was found in this dictionary.\n";
         }
@@ -97,7 +100,6 @@ std::string search(int start, int end, std::string const &word)
 }
 int hpx_main()
 {
-    
     {
         using namespace std;
         ifstream fin;
@@ -112,7 +114,8 @@ int hpx_main()
                 wordlist_path.push_back(path[i]);
             }
         }
-        //list of American English words in alphabetical order. Provided by Kevin at http://wordlist.sourceforge.net/
+        // list of American English words in alphabetical order.
+        // Provided by Kevin at http://wordlist.sourceforge.net/
         wordlist_path = wordlist_path + "5desk.txt";
         fin.open(wordlist_path);
         int wordcount = 0;
@@ -138,7 +141,8 @@ int hpx_main()
         }
         fin.close();
         char* word = new char[1024];
-        cout << "Enter the words you would like to spellcheck, separated by a \"Space\", and then press \"Enter\".\n";
+        cout << "Enter the words you would like to spellcheck, separated by a "
+            "\"Space\", and then press \"Enter\".\n";
         cin.getline(word,1024, '\n');
         vector<bool> contraction;
         vector<string> strs;
@@ -155,7 +159,8 @@ int hpx_main()
                     if (temp[i].size() - j - 1 == 2)
                     {
                     //if this is a contraction, ignore the rest of it...
-                        if (temp[i][j+1] == '\'' && temp[i][j] == 'n' && temp[i][j+2] == 't')
+                        if (temp[i][j+1] == '\'' && temp[i][j] == 'n' &&
+                            temp[i][j+2] == 't')
                         {
                             //but label this as a contraction
                             isContraction = true;
@@ -183,7 +188,7 @@ int hpx_main()
             wordRun.reserve(strs.size());
             for (string::size_type i = 0; i < strs.size(); ++i)
             {
-                string& single = strs[i]; 
+                string& single = strs[i];
                 int start = 0;
                 hpx::naming::id_type const locality_id = hpx::find_here();
                 search_action temp;
@@ -197,7 +202,8 @@ int hpx_main()
             {
                 cout << "Word number " << i + 1 << ":\n";
                 if (contraction[i])
-                    cout << "Note: This word seems to be a contraction.\nThe last two letters have been ignored.\n";
+                    cout << "Note: This word seems to be a contraction.\n"
+                        "The last two letters have been ignored.\n";
                 cout << wordRun[i].get();
             }
         }

@@ -30,20 +30,20 @@ struct plain_data
 template <typename T, typename Derived>
 struct data_get_action_base
     : public hpx::actions::basic_action<plain_data<Derived>,
-        typename boost::remove_pointer<T>::type(), Derived>
+        typename std::remove_pointer<T>::type(), Derived>
 {};
 
 template <typename T, T Data, typename Derived = hpx::actions::detail::this_type>
 struct data_get_action
     : public data_get_action_base<
-        typename boost::remove_pointer<T>::type,
+        typename std::remove_pointer<T>::type,
         typename hpx::actions::detail::action_type<
             data_get_action<T, Data, Derived>, Derived
         >::type>
 {
     typedef std::false_type direct_execution;
 
-    typedef typename boost::remove_pointer<T>::type data_type;
+    typedef typename std::remove_pointer<T>::type data_type;
 
     // Return the referenced data
     static data_type invoke(
@@ -63,12 +63,12 @@ struct data_set_action_base
 template <typename T, T Data, typename Derived = hpx::actions::detail::this_type>
 struct data_set_action
     : public data_set_action_base<
-        typename boost::remove_pointer<T>::type,
+        typename std::remove_pointer<T>::type,
         typename hpx::actions::detail::action_type<
             data_set_action<T, Data, Derived>, Derived
         >::type>
 {
-    typedef typename boost::remove_pointer<T>::type data_type;
+    typedef typename std::remove_pointer<T>::type data_type;
 
     typedef std::false_type direct_execution;
 
