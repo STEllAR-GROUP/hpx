@@ -539,18 +539,18 @@ namespace hpx { namespace plugins { namespace parcel
               &counter_discoverer,
               ""
             },
-            // /coalescing(...)/time/average-parcel-arrival@action-name
-            { "/coalescing/time/average-parcel-arrival", counter_raw,
-              "returns the average time between arriving parcels for the "
+            // /coalescing(...)/time/between-parcels-average@action-name
+            { "/coalescing/time/between-parcels-average", counter_raw,
+              "returns the average time between parcels for the "
               "action which is given by the counter parameter",
               HPX_PERFORMANCE_COUNTER_V1,
               &average_time_between_parcels_counter_creator,
               &counter_discoverer,
               "ns"
             },
-            // /coalescing(...)/time/parcel-arrival-histogram@action-name,min,max,buckets
-            { "/coalescing/time/parcel-arrival-histogram", counter_histogram,
-              "returns the histogram for the  time between arriving parcels for "
+            // /coalescing(...)/time/between-parcels-histogram@action-name,min,max,buckets
+            { "/coalescing/time/between-parcels-histogram", counter_histogram,
+              "returns the histogram for the times between parcels for "
               "the action which is given by the counter parameter",
               HPX_PERFORMANCE_COUNTER_V1,
               &time_between_parcels_histogram_counter_creator,
