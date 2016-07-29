@@ -24,6 +24,7 @@
 
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace traits

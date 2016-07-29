@@ -11,6 +11,8 @@
 
 #include "server/template_accumulator.hpp"
 
+#include <utility>
+
 namespace examples
 {
     ///////////////////////////////////////////////////////////////////////////

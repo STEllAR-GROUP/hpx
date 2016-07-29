@@ -13,6 +13,7 @@
 #include <numeric>
 #include <random>
 #include <string>
+#include <utility>
 #include <vector>
 //
 #include <hpx/hpx_init.hpp>

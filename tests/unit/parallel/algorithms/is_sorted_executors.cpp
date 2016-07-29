@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "is_sorted_tests.hpp"

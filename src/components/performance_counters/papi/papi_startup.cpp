@@ -11,6 +11,7 @@
 #include <cctype>
 #include <set>
 #include <string>
+#include <utility>
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>

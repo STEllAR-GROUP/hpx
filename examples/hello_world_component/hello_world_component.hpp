@@ -13,6 +13,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <utility>
+
 namespace examples { namespace server
 {
     struct HPX_COMPONENT_EXPORT hello_world

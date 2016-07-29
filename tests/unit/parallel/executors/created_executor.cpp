@@ -16,6 +16,7 @@
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <boost/range/iterator_range.hpp>

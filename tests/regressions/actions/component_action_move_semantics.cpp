@@ -12,6 +12,7 @@
 #include <boost/assign/std/vector.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <tests/regressions/actions/components/action_move_semantics.hpp>

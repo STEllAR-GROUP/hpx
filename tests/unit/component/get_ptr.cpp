@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

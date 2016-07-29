@@ -17,6 +17,7 @@
 #include <hpx/util/register_locks.hpp>
 
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace local
 {

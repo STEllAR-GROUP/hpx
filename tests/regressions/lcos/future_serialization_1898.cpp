@@ -12,6 +12,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <utility>
+
 struct test_server
     : hpx::components::component_base<test_server>
 {

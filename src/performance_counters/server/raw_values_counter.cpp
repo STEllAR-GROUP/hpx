@@ -11,6 +11,7 @@
 #include <hpx/performance_counters/server/raw_values_counter.hpp>
 #include <hpx/util/function.hpp>
 
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

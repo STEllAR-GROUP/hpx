@@ -8,6 +8,7 @@
 #include <hpx/hpx.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "uninitialized_copy_tests.hpp"

@@ -17,6 +17,7 @@
 #include <hpx/exception.hpp>
 
 #include <string>
+#include <utility>
 
 namespace hpx { namespace parcelset
 {

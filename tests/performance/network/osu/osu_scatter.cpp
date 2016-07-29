@@ -13,6 +13,7 @@
 #include <boost/assert.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <benchmarks/network/osu_coll.hpp>

@@ -10,6 +10,8 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/util/function.hpp>
 
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail
 {

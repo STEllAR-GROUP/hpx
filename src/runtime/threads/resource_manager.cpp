@@ -12,7 +12,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <mutex>
-
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace threads

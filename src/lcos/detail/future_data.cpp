@@ -9,6 +9,8 @@
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 
+#include <utility>
+
 namespace hpx { namespace lcos { namespace detail
 {
     bool run_on_completed_on_new_thread(

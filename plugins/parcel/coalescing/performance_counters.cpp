@@ -21,6 +21,7 @@
 #include <boost/algorithm/string/split.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace plugins { namespace parcel
