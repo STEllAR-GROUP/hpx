@@ -42,7 +42,7 @@ namespace boost
       { "(\\bstd\\s*::\\s*integral_constant\\b)", "std::integral_constant", "type_traits" },
       { "(\\bstd\\s*::\\s*bool_constant\\b)", "std::bool_constant", "type_traits" },
       { "(\\bstd\\s*::\\s*(is_[^\\s]*?\\b))", "std::\\2", "type_traits" },
-      { "(\\bstd\\s*::\\s*has_trivial_destructor\\b)", "std::has_trivial_destructor", "type_traits" },
+      { "(\\bstd\\s*::\\s*has_virtual_destructor\\b)", "std::has_virtual_destructor", "type_traits" },
       { "(\\bstd\\s*::\\s*alignment_of\\b)", "std::alignment_of", "type_traits" },
       { "(\\bstd\\s*::\\s*aligned_storage\\b)", "std::aligned_storage", "type_traits" },
       { "(\\bstd\\s*::\\s*aligned_union\\b)", "std::aligned_union", "type_traits" },
