@@ -13,23 +13,53 @@
 
 [heading General Changes]
 
+Here are some of the main highlights and changes for this release (in no
+particular order):
+
+* Added the facility `hpx::split_future` which allows to convert a
+  `future<tuple<Ts...>>` into a `tuple<future<Ts>...>`.
+* Added a new type of performance counter which allows to return a list of
+  values for each invocation. We also added a first counter of this type which
+  collects a histogram of the times between parcels being created.
+
 [heading Breaking Changes]
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2269] - Added inspect check for now obsolete boost type traits
+* [pr    2268] - Moving more code into source files
+* [issue 2267] - Add inspect support to deprecate Boost.TypeTraits
+* [pr    2264] - Make support for std::ref mandatory
+* [pr    2263] - Constrain tuple_member forwarding constructor
+* [issue 2261] - OS X: Error: no matching constructor for initialization of
+                 'hpx::lcos::local::condition_variable_any'
+* [issue 2260] - Make support for std::ref mandatory
+* [pr    2259] - Remove most of Boost.MPL, Boost.EnableIf and Boost.TypeTraits
+* [pr    2258] - Fixing #2256
+* [pr    2257] - Fixing launch process
+* [issue 2256] - Actions are not registered if not invoked
 * [pr    2255] - Coalescing histogram
+* [pr    2254] - Silence explicit initialization in copy-constructor warnings
+* [pr    2253] - Drop support for GCC 4.6 and 4.7
 * [pr    2252] - Prepare V1.0
 * [pr    2251] - Convert to 0.9.99
+* [pr    2249] - Adding iterator_facade and iterator_adaptor
+* [pr    2246] - Adding split_future
 * [pr    2245] - Add an example for handing over a component instance to
                  a dynamically launched locality
 * [issue 2243] - Add example demonstrating AGAS symbolic name registration
 * [issue 2242] - pkgconfig test broken on CentOS 7 / Boost 1.61
 * [issue 2241] - Compilation error for partitioned vector in hpx_compute branch
 * [pr    2240] - Fixing termination detection on one locality
+* [issue 2239] - Create a new facility lcos::split_all
 * [issue 2236] - hpx::cout vs. std::cout
+* [pr    2232] - Implement local-only primary namespace service
 * [issue 1754] - Running with TCP parcelport causes immediate crash or freeze
+* [issue 1655] - Enable zip_iterator to be used with Boost traversal iterator
+                 categories
+* [issue 1591] - Optimize AGAS for shared memory only operation
 * [issue  668] - Implement ispc task interface
 
 [endsect]
