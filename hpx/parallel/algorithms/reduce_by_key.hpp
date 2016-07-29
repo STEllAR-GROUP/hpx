@@ -19,6 +19,7 @@
 #include <hpx/util/tuple.hpp>
 //
 #include <type_traits>
+#include <utility>
 #include <vector>
 //
 /// \cond NOINTERNAL

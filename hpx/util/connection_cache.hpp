@@ -31,6 +31,7 @@
 #include <mutex>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

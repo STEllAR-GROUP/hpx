@@ -17,6 +17,8 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
+#include <utility>
+
 namespace hpx { namespace lcos { namespace local
 {
     namespace detail

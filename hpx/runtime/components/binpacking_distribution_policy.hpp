@@ -26,6 +26,7 @@
 #include <iterator>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components

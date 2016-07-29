@@ -19,6 +19,8 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
 
+#include <utility>
+
 namespace hpx { namespace detail
 {
     /// \cond NOINTERNAL

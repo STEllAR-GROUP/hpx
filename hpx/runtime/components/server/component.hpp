@@ -10,6 +10,8 @@
 
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
+#include <utility>
+
 namespace hpx { namespace components {
     template <typename Component>
     class component

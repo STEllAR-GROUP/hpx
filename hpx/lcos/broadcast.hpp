@@ -153,6 +153,7 @@ namespace hpx { namespace lcos
 #include <boost/preprocessor/cat.hpp>
 
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #if !defined(HPX_BROADCAST_FANOUT)

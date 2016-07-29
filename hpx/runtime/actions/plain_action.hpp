@@ -28,6 +28,7 @@
 #if defined(__NVCC__)
 #include <type_traits>
 #endif
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 

@@ -35,6 +35,7 @@
 #include <memory>
 #include <mutex>
 #include <unordered_set>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std

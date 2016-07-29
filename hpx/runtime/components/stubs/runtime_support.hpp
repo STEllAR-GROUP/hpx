@@ -22,6 +22,7 @@
 #include <hpx/util/ini.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components { namespace stubs

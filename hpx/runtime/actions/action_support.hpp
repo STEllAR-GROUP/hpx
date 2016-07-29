@@ -29,6 +29,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 

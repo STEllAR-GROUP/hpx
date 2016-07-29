@@ -17,6 +17,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/throw_exception.hpp>
 
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

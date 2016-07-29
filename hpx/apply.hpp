@@ -20,6 +20,7 @@
 #include <hpx/util/thread_description.hpp>
 
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail

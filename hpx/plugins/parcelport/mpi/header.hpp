@@ -21,6 +21,7 @@
 #include <boost/array.hpp>
 
 #include <cstring>
+#include <utility>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {

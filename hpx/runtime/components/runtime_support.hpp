@@ -10,6 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components

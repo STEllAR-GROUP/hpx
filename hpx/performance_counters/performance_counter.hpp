@@ -14,6 +14,7 @@
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

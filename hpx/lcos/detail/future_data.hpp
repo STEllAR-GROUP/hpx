@@ -30,6 +30,7 @@
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos

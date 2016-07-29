@@ -16,6 +16,7 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace components
 {
