@@ -30,8 +30,8 @@ namespace hpx { namespace util
 
         template <typename Clock, typename Duration>
         steady_time_point(std::chrono::time_point<Clock, Duration> const& abs_time)
-          : _abs_time(steady_clock::now()
-              + (abs_time - Clock::now()))
+          : _abs_time(std::chrono::time_point_cast<value_type::duration>(
+                steady_clock::now() + (abs_time - Clock::now())))
         {}
 
 #if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
