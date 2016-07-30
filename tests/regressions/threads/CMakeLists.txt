@@ -18,7 +18,7 @@ if(HPX_HAVE_THREAD_LOCAL_STORAGE)
   set(tests ${tests} thread_data_1111)
 endif()
 
-if(HPX_HAVE_LOCAL_SCHEDULER OR HPX_HAVE_ALL_SCHEDULERS)
+if(HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
   set(tests ${tests}
     thread_pool_executor_1114
     )
