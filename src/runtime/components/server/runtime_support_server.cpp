@@ -1549,7 +1549,7 @@ namespace hpx { namespace components { namespace server
         serialization::binary_filter* bf = factory->create(compress, next_filter);
         if (nullptr == bf) {
             std::ostringstream strm;
-            strm << "couldn't to create binary filter plugin of type: "
+            strm << "couldn't create binary filter plugin of type: "
                  << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
@@ -1561,7 +1561,7 @@ namespace hpx { namespace components { namespace server
             ec = make_success_code();
 
         // log result if requested
-        LRT_(info) << "successfully binary filter handler plugin of type: "
+        LRT_(info) << "successfully created binary filter handler plugin of type: "
                     << binary_filter_type;
         return bf;
     }
