@@ -12,6 +12,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace lcos

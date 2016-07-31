@@ -23,6 +23,7 @@
 #include <hpx/util/result_of.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {

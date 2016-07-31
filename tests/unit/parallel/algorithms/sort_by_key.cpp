@@ -13,6 +13,7 @@
 //
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 //
 #if defined(HPX_DEBUG)

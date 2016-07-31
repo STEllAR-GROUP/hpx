@@ -35,6 +35,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -18,8 +18,8 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <mutex>
-
 #include <string>
+#include <utility>
 #include <vector>
 
 // TODO: Remove the use of the name "prefix"

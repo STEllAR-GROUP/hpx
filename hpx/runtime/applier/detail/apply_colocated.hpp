@@ -19,6 +19,7 @@
 #include <hpx/util/functional/colocated_helpers.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace detail
 {

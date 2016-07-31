@@ -23,6 +23,7 @@
 #include <hpx/util/bind.hpp>
 
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail

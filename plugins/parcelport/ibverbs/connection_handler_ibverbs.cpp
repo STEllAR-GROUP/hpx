@@ -28,6 +28,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 
 #if (defined(__linux) || defined(linux) || defined(__linux__))
 #include <ifaddrs.h>

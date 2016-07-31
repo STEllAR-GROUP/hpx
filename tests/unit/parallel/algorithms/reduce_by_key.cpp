@@ -11,6 +11,7 @@
 //
 #include <boost/random/uniform_int_distribution.hpp>
 //
+#include <utility>
 #include <vector>
 #ifdef EXTRA_DEBUG
 # include <string>

@@ -14,6 +14,7 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

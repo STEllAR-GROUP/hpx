@@ -20,6 +20,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail

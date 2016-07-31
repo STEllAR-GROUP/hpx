@@ -22,6 +22,7 @@
 #include <boost/accumulators/statistics_fwd.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,7 @@
 #include <memory>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace server

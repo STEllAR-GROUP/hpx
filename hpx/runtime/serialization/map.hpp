@@ -13,6 +13,7 @@
 
 #include <map>
 #include <type_traits>
+#include <utility>
 
 namespace hpx
 {

@@ -27,6 +27,7 @@
 #include <boost/range/functions.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifndef STREAM_TYPE

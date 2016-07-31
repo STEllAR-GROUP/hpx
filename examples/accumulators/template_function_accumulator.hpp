@@ -12,6 +12,8 @@
 
 #include "server/template_function_accumulator.hpp"
 
+#include <utility>
+
 namespace examples
 {
     ///////////////////////////////////////////////////////////////////////////

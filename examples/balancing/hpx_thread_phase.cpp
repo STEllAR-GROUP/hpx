@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 using boost::lockfree::queue;

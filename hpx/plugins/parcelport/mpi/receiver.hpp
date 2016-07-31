@@ -15,11 +15,13 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver_connection.hpp>
 
+#include <algorithm>
 #include <iterator>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <set>
+#include <utility>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {

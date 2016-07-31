@@ -13,6 +13,8 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {

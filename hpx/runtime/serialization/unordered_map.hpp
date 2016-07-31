@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 
 #include <unordered_map>
+#include <utility>
 
 namespace hpx
 {

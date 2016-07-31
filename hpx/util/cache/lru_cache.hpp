@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <list>
 #include <map>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache

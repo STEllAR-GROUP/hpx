@@ -16,6 +16,7 @@
 #include <hpx/util/result_of.hpp>
 
 #include <memory>
+#include <utility>
 
 #include <boost/format.hpp>
 

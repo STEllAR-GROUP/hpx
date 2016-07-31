@@ -11,13 +11,14 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 
-#include <type_traits>
-
-#include <boost/cstdint.hpp>
-
 #include <hpx/components/process/export_definitions.hpp>
 #include <hpx/components/process/util/child.hpp>
 #include <hpx/components/process/util/execute.hpp>
+
+#include <boost/cstdint.hpp>
+
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace components { namespace process { namespace server
 {

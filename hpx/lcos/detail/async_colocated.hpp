@@ -24,6 +24,7 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace detail
 {

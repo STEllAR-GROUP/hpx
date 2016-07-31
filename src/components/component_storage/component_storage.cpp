@@ -9,6 +9,7 @@
 
 #include <hpx/components/component_storage/component_storage.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components

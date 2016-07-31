@@ -8,6 +8,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

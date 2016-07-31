@@ -33,6 +33,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 /// The hpx::unordered_map and its API's are defined here.

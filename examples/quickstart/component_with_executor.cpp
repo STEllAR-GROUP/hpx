@@ -9,6 +9,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/thread_executors.hpp>
 
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
 struct hello_world_server

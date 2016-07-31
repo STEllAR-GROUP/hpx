@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <set>
+#include <utility>
 
 namespace hpx { namespace serialization
 {

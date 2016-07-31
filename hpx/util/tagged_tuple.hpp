@@ -16,6 +16,8 @@
 #include <hpx/util/tagged.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <utility>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////

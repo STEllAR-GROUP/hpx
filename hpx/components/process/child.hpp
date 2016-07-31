@@ -15,6 +15,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <utility>
+
 namespace hpx { namespace components { namespace process
 {
     ///////////////////////////////////////////////////////////////////////////

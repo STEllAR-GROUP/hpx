@@ -15,6 +15,7 @@
 #include <boost/atomic.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 using boost::program_options::variables_map;
