@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/chrono.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/mpl/or.hpp>
@@ -31,21 +30,18 @@ template <typename BaseClock>
 struct clocksource
 {
     typedef BaseClock base_clock;
-    typedef typename base_clock::duration duration;
-    typedef typename base_clock::period period;
     typedef typename base_clock::rep rep;
+    typedef typename std::nano period;
+    typedef std::chrono::duration<rep, period> duration;
 
     static_assert(base_clock::is_steady == true,
         "base_clock is not steady");
-    static_assert(
-            std::ratio_equal<period, std::nano>::value ||
-            boost::ratio_equal<period, boost::nano>::value,
-        "base_clock does not use a nanosecond period");
 
     // Returns: current time in nanoseconds.
     static rep now()
     {
-        duration d = base_clock::now().time_since_epoch();
+        duration d = std::chrono::duration_cast<duration>(
+            base_clock::now().time_since_epoch());
         rep t = d.count();
         BOOST_ASSERT(t >= 0);
         return t;
