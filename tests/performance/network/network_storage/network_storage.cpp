@@ -905,8 +905,9 @@ int main(int argc, char* argv[])
     hpx::register_startup_function(&find_barrier_startup);
 
     // Initialize and run HPX, this test requires to run hpx_main on all localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }

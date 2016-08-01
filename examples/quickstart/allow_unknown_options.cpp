@@ -23,9 +23,10 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.commandline.aliasing=0");        // disable aliasing
-    cfg.push_back("hpx.commandline.allow_unknown=1");   // allow for unknown options
+    std::vector<std::string> const cfg = {
+        "hpx.commandline.aliasing=0",       // disable aliasing
+        "hpx.commandline.allow_unknown=1"   // allow for unknown options
+    };
 
     return hpx::init(argc, argv, cfg);
 }

@@ -566,18 +566,13 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
-
-    cfg.push_back("hpx.numa_sensitive=2");  // no-cross NUMA stealing
-
-    // block all cores of requested number of NUMA-domains
-    cfg.push_back(boost::str(
-        boost::format("hpx.cores=%d") % (numa_nodes * num_cores)
-    ));
-    cfg.push_back(boost::str(
-        boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second)
-    ));
+    std::vector<std::string> cfg = {
+        "hpx.run_hpx_main!=1",
+        "hpx.numa_sensitive=2",  // no-cross NUMA stealing
+        // block all cores of requested number of NUMA-domains
+        boost::str(boost::format("hpx.cores=%d") % (numa_nodes * num_cores)),
+        boost::str(boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second))
+    };
 
     std::string node_name("numanode");
     if (topo.get_number_of_numa_nodes() == 0)

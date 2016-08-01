@@ -12,7 +12,6 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign.hpp>
 #include <boost/atomic.hpp>
 
 #include <string>
@@ -218,10 +217,9 @@ int main(
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
