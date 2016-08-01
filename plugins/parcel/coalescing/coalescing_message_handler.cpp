@@ -94,8 +94,7 @@ namespace hpx { namespace plugins { namespace parcel
       : pp_(pp), buffer_(detail::get_num_messages(num)),
         timer_(
             util::bind(&coalescing_message_handler::timer_flush, this_()),
-            util::bind(&coalescing_message_handler::flush, this_(),
-                parcelset::policies::message_handler::flush_mode_timer, true),
+            util::bind(&coalescing_message_handler::flush_terminate, this_()),
             boost::chrono::microseconds(detail::get_interval(interval)),
             std::string(action_name) + "_timer",
             true),
@@ -158,22 +157,22 @@ namespace hpx { namespace plugins { namespace parcel
 
         switch(s) {
         case detail::message_buffer::first_message:
-            l.unlock();
             timer_.start(false);        // start deadline timer to flush buffer
+            l.unlock();
             break;
 
         case detail::message_buffer::normal:
             if (timer_.is_started())
                 break;
 
-            l.unlock();
             timer_.start(false);        // start deadline timer to flush buffer
+            l.unlock();
             break;
 
         case detail::message_buffer::buffer_now_full:
             flush_locked(l,
                 parcelset::policies::message_handler::flush_mode_buffer_full,
-                false);
+                false, true);
             break;
 
         default:
@@ -193,7 +192,7 @@ namespace hpx { namespace plugins { namespace parcel
         {
             flush_locked(l,
                 parcelset::policies::message_handler::flush_mode_timer,
-                false);
+                false, false);
         }
 
         // do not restart timer for now, will be restarted on next parcel
@@ -205,13 +204,19 @@ namespace hpx { namespace plugins { namespace parcel
         bool stop_buffering)
     {
         std::unique_lock<mutex_type> l(mtx_);
-        return flush_locked(l, mode, stop_buffering);
+        return flush_locked(l, mode, stop_buffering, true);
+    }
+
+    void coalescing_message_handler::flush_terminate()
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        flush_locked(l, parcelset::policies::message_handler::flush_mode_timer, true, true);
     }
 
     bool coalescing_message_handler::flush_locked(
         std::unique_lock<mutex_type>& l,
         parcelset::policies::message_handler::flush_mode mode,
-        bool stop_buffering)
+        bool stop_buffering, bool cancel_timer)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -225,8 +230,13 @@ namespace hpx { namespace plugins { namespace parcel
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
 
-            util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+            //util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             timer_.stop();              // interrupt timer
+        }
+
+        if (cancel_timer)
+        {
+            timer_.stop();
         }
 
         if (buffer_.empty())

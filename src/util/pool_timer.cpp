@@ -36,9 +36,15 @@ namespace hpx { namespace util { namespace detail
 
     public:
         pool_timer();
+        //pool_timer(util::function_nonser<bool()> const& f,
+        //    util::function_nonser<void()> const& on_term,
+        //    boost::chrono::steady_clock::time_point const& abs_time,
+        //    std::string const& description,
+        //    bool pre_shutdown);
+
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
+            boost::chrono::microseconds const& time_duration,
             std::string const& description,
             bool pre_shutdown);
 
@@ -49,7 +55,7 @@ namespace hpx { namespace util { namespace detail
 
         bool is_started() const { return is_started_; }
         bool is_terminated() const { return is_terminated_; }
-        void timer_handler();
+        void timer_handler(const boost::system::error_code&);
 
         void terminate();             // handle system shutdown
         bool stop_locked();
@@ -63,7 +69,7 @@ namespace hpx { namespace util { namespace detail
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_; ///< function to call
         util::function_nonser<void()> on_term_; ///< function to call on termination
-        boost::chrono::steady_clock::time_point abs_time_;    ///< time interval
+        boost::chrono::microseconds time_duration_;    ///< time interval
         std::string description_;     ///< description of this interval timer
 
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
@@ -84,13 +90,27 @@ namespace hpx { namespace util { namespace detail
         )
     {}
 
+    //pool_timer::pool_timer(util::function_nonser<bool()> const& f,
+    //        util::function_nonser<void()> const& on_term,
+    //        boost::chrono::steady_clock::time_point const& abs_time,
+    //        std::string const& description,
+    //        bool pre_shutdown)
+    //  : f_(f), on_term_(on_term),
+    //    abs_time_(abs_time), description_(description),
+    //    pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
+    //    is_terminated_(false), is_stopped_(false),
+    //    timer_(new deadline_timer(
+    //        hpx::get_runtime().get_thread_pool("timer_pool")->get_io_service())
+    //    )
+    //{}
+
     pool_timer::pool_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
-            std::string const& description,
-            bool pre_shutdown)
-      : f_(f), on_term_(on_term),
-        abs_time_(abs_time), description_(description),
+        util::function_nonser<void()> const& on_term,
+        boost::chrono::microseconds const& time_duration,
+        std::string const& description,
+        bool pre_shutdown)
+        : f_(f), on_term_(on_term),
+        time_duration_(time_duration), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false), is_stopped_(false),
         timer_(new deadline_timer(
@@ -98,12 +118,13 @@ namespace hpx { namespace util { namespace detail
         )
     {}
 
-    void pool_timer::timer_handler()
+    void pool_timer::timer_handler(const boost::system::error_code& err)
     {
         if(!is_stopped_ || !is_terminated_)
         {
             is_started_ = false;
-            f_();
+            if(!err)
+                f_();
         }
     }
 
@@ -136,9 +157,9 @@ namespace hpx { namespace util { namespace detail
             is_started_ = true;
 
             HPX_ASSERT(timer_ != nullptr);
-            timer_->expires_at(abs_time_);
+            timer_->expires_from_now(time_duration_);
             timer_->async_wait(util::bind(&pool_timer::timer_handler,
-                this->shared_from_this()));
+                this->shared_from_this(), util::placeholders::_1));
 
             return true;
         }
@@ -195,22 +216,31 @@ namespace hpx { namespace util
 {
     pool_timer::pool_timer() {}
 
-    pool_timer::pool_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            hpx::util::steady_time_point const& abs_time,
-            std::string const& description,
-            bool pre_shutdown)
-      : timer_(std::make_shared<detail::pool_timer>(
-            f, on_term, abs_time.value(), description, pre_shutdown))
-    {}
+    //pool_timer::pool_timer(util::function_nonser<bool()> const& f,
+    //        util::function_nonser<void()> const& on_term,
+    //        hpx::util::steady_time_point const& abs_time,
+    //        std::string const& description,
+    //        bool pre_shutdown)
+    //  : timer_(std::make_shared<detail::pool_timer>(
+    //        f, on_term, abs_time.value(), description, pre_shutdown))
+    //{}
+
+    //pool_timer::pool_timer(util::function_nonser<bool()> const& f,
+    //        util::function_nonser<void()> const& on_term,
+    //        hpx::util::steady_duration const& rel_time,
+    //        std::string const& description,
+    //        bool pre_shutdown)
+    //  : timer_(std::make_shared<detail::pool_timer>(
+    //        f, on_term, rel_time.from_now(), description, pre_shutdown))
+    //{}
 
     pool_timer::pool_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            hpx::util::steady_duration const& rel_time,
-            std::string const& description,
-            bool pre_shutdown)
-      : timer_(std::make_shared<detail::pool_timer>(
-            f, on_term, rel_time.from_now(), description, pre_shutdown))
+        util::function_nonser<void()> const& on_term,
+        boost::chrono::microseconds const& time_duration,
+        std::string const& description,
+        bool pre_shutdown)
+        : timer_(std::make_shared<detail::pool_timer>(
+            f, on_term, time_duration, description, pre_shutdown))
     {}
 
     pool_timer::~pool_timer()

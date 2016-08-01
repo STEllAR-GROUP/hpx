@@ -53,6 +53,8 @@ namespace hpx { namespace plugins { namespace parcel
         bool flush(parcelset::policies::message_handler::flush_mode mode,
             bool stop_buffering = false);
 
+        void flush_terminate();
+
         // access performance counter data
         boost::int64_t get_parcels_count(bool reset);
         boost::int64_t get_messages_count(bool reset);
@@ -72,7 +74,7 @@ namespace hpx { namespace plugins { namespace parcel
         bool timer_flush();
         bool flush_locked(std::unique_lock<mutex_type>& l,
             parcelset::policies::message_handler::flush_mode mode,
-            bool stop_buffering);
+            bool stop_buffering, bool cancel_timer);
 
     private:
         mutable mutex_type mtx_;
