@@ -164,9 +164,6 @@ namespace hpx { namespace lcos
         explicit channel(naming::id_type const& loc)
           : base_type(hpx::new_<lcos::server::channel<T> >(loc))
         {}
-//         channel(lcos::future<naming::id_type> f)
-//           : base_type(std::move(f))
-//         {}
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<T>
@@ -190,6 +187,15 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         template <typename U, typename U2 = T, typename Enable =
             typename std::enable_if<!std::is_void<U2>::value>::type>
+        bool set_apply(U val, std::size_t generation = default_generation)
+        {
+            typedef typename lcos::server::channel<T>::set_generation_action
+                action_type;
+            return hpx::apply(action_type(), this->get_id(), std::move(val),
+                generation);
+        }
+        template <typename U, typename U2 = T, typename Enable =
+            typename std::enable_if<!std::is_void<U2>::value>::type>
         hpx::future<void>
         set_async(U val, std::size_t generation = default_generation)
         {
@@ -209,12 +215,20 @@ namespace hpx { namespace lcos
 
         template <typename U = T, typename Enable =
             typename std::enable_if<std::is_void<U>::value>::type>
+        bool set_apply(std::size_t generation = default_generation)
+        {
+            typedef typename lcos::server::channel<void>::set_generation_action
+                action_type;
+            return hpx::apply(action_type(), this->get_id(), util::unused,
+                generation);
+        }
+        template <typename U = T, typename Enable =
+            typename std::enable_if<std::is_void<U>::value>::type>
         hpx::future<void>
         set_async(std::size_t generation = default_generation)
         {
-            typedef typename lcos::server::channel<
-                    void
-                >::set_generation_action action_type;
+            typedef typename lcos::server::channel<void>::set_generation_action
+                action_type;
             return hpx::async(action_type(), this->get_id(), util::unused,
                 generation);
         }
@@ -222,9 +236,8 @@ namespace hpx { namespace lcos
             typename std::enable_if<std::is_void<U>::value>::type>
         void set(std::size_t generation = default_generation)
         {
-            typedef typename lcos::server::channel<
-                    void
-                >::set_generation_action action_type;
+            typedef typename lcos::server::channel<void>::set_generation_action
+                action_type;
             return action_type()(this->get_id(), util::unused, generation);
         }
 
@@ -342,6 +355,15 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         template <typename U, typename U2 = T, typename Enable =
             typename std::enable_if<!std::is_void<U2>::value>::type>
+        bool set_apply(U val, std::size_t generation = default_generation)
+        {
+            typedef typename lcos::server::channel<T>::set_generation_action
+                action_type;
+            return hpx::apply(action_type(), this->get_id(), std::move(val),
+                generation);
+        }
+        template <typename U, typename U2 = T, typename Enable =
+            typename std::enable_if<!std::is_void<U2>::value>::type>
         hpx::future<void>
         set_async(U val, std::size_t generation = default_generation)
         {
@@ -361,12 +383,20 @@ namespace hpx { namespace lcos
 
         template <typename U = T, typename Enable =
             typename std::enable_if<std::is_void<U>::value>::type>
+        bool set_apply(std::size_t generation = default_generation)
+        {
+            typedef typename lcos::server::channel<void>::set_generation_action
+                action_type;
+            return hpx::apply(action_type(), this->get_id(), util::unused,
+                generation);
+        }
+        template <typename U = T, typename Enable =
+            typename std::enable_if<std::is_void<U>::value>::type>
         hpx::future<void>
         set_async(std::size_t generation = default_generation)
         {
-            typedef typename lcos::server::channel<
-                    void
-                >::set_generation_action action_type;
+            typedef typename lcos::server::channel<void>::set_generation_action
+                action_type;
             return hpx::async(action_type(), this->get_id(), util::unused,
                 generation);
         }
@@ -374,9 +404,8 @@ namespace hpx { namespace lcos
             typename std::enable_if<std::is_void<U>::value>::type>
         void set(std::size_t generation = default_generation)
         {
-            typedef typename lcos::server::channel<
-                    void
-                >::set_generation_action action_type;
+            typedef typename lcos::server::channel<void>::set_generation_action
+                action_type;
             return action_type()(this->get_id(), util::unused, generation);
         }
 
