@@ -305,7 +305,7 @@ namespace hpx { namespace detail
     {
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(launch const& launch_policy, F && f, Ts &&... ts)
+        call(launch launch_policy, F && f, Ts &&... ts)
         ->  decltype(detail::async_launch_policy_dispatch<
                 typename util::decay<F>::type
             >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...))

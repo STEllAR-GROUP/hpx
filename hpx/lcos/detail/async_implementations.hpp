@@ -24,12 +24,6 @@
 namespace hpx { namespace detail
 {
     /// \cond NOINTERNAL
-    HPX_FORCEINLINE bool has_async_policy(launch policy)
-    {
-        return (static_cast<int>(policy) &
-            static_cast<int>(launch::async_policies)) ? true : false;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     struct keep_id_alive
     {
