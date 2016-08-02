@@ -164,6 +164,26 @@ namespace hpx
           : detail::policy_holder{ph}
         {}
 
+        HPX_CONSTEXPR launch(detail::async_policy) HPX_NOEXCEPT
+          : detail::policy_holder{detail::launch_policy::async}
+        {}
+
+        HPX_CONSTEXPR launch(detail::fork_policy) HPX_NOEXCEPT
+          : detail::policy_holder{detail::launch_policy::fork}
+        {}
+
+        HPX_CONSTEXPR launch(detail::sync_policy) HPX_NOEXCEPT
+          : detail::policy_holder{detail::launch_policy::sync}
+        {}
+
+        HPX_CONSTEXPR launch(detail::deferred_policy) HPX_NOEXCEPT
+          : detail::policy_holder{detail::launch_policy::deferred}
+        {}
+
+        HPX_CONSTEXPR launch(detail::apply_policy) HPX_NOEXCEPT
+          : detail::policy_holder{detail::launch_policy::apply}
+        {}
+
         HPX_EXPORT static const detail::async_policy async;
         HPX_EXPORT static const detail::fork_policy fork;
         HPX_EXPORT static const detail::sync_policy sync;
