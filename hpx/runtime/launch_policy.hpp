@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 namespace hpx
 {
@@ -47,6 +48,26 @@ namespace hpx
             }
 
             launch_policy policy_;
+
+        private:
+            friend class serialization::access;
+
+            template <typename Archive>
+            void load(Archive& ar, unsigned version)
+            {
+                int value = 0;
+                ar & value;
+                policy_ = static_cast<launch_policy>(value);
+            }
+
+            template <typename Archive>
+            void save(Archive& ar, unsigned version) const
+            {
+                int value = static_cast<int>(policy_);
+                ar & value;
+            }
+
+            HPX_SERIALIZATION_SPLIT_MEMBER()
         };
 
         struct async_policy : policy_holder

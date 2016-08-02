@@ -41,7 +41,7 @@ hpx::lcos::latch create_latch(std::size_t num_threads, std::size_t generation)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    boost::uint32_t num_localities = hpx::get_num_localities_sync();
+    boost::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
 
     // count_down_and_wait
     {

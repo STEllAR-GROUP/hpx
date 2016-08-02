@@ -66,7 +66,7 @@ namespace examples
 
             typedef typename server::template_accumulator<T>::reset_action
                 action_type;
-            hpx::async<action_type>(hpx::launch::sync, this->get_id()).get();
+            action_type()(this->get_id());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ namespace examples
 
             typedef typename server::template_accumulator<T>::add_action
                 action_type;
-            hpx::apply<action_type>(hpx::launch::sync, this->get_id(), arg);
+            hpx::apply<action_type>(this->get_id(), arg);
         }
 
         /// Add \p arg to the accumulator's value.
@@ -93,7 +93,7 @@ namespace examples
 
             typedef typename server::template_accumulator<T>::add_action
                 action_type;
-            hpx::async<action_type>(this->get_id(), arg).get();
+            action_type()(this->get_id(), arg);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ namespace examples
 
             typedef typename server::template_accumulator<T>::query_action
                 action_type;
-            return action_type()(hpx::launch::sync, this->get_id());
+            return action_type()(this->get_id());
         }
     };
 }

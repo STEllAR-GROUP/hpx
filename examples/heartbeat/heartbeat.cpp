@@ -77,7 +77,8 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
 
         // Query the performance counter.
         using namespace hpx::performance_counters;
-        counter_value value = stubs::performance_counter::get_value(id);
+        counter_value value =
+            stubs::performance_counter::get_value(hpx::launch::sync, id);
 
         if (status_is_valid(value.status_))
         {

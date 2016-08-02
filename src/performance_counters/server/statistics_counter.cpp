@@ -7,6 +7,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -379,7 +380,8 @@ namespace hpx { namespace performance_counters { namespace server
         if (!base_counter_id_ && !ensure_base_counter())
             return false;
 
-        value = stubs::performance_counter::get_value(base_counter_id_);
+        value = stubs::performance_counter::get_value(
+            launch::sync, base_counter_id_);
         return true;
     }
 
@@ -394,7 +396,8 @@ namespace hpx { namespace performance_counters { namespace server
             if (!base_counter_id_ && !ensure_base_counter())
                 return false;
 
-            bool result = stubs::performance_counter::start(base_counter_id_);
+            bool result = stubs::performance_counter::start(
+                launch::sync, base_counter_id_);
             if (result) {
                 // acquire the current value of the base counter
                 counter_value base_value;
@@ -426,7 +429,8 @@ namespace hpx { namespace performance_counters { namespace server
 
             if (!base_counter_id_ && !ensure_base_counter())
                 return false;
-            return stubs::performance_counter::stop(base_counter_id_);
+            return stubs::performance_counter::stop(
+                launch::sync, base_counter_id_);
         }
         return false;
     }

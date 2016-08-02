@@ -190,7 +190,7 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            p.apply(launch::async);
+            p.apply(launch::fork);
             hpx::this_thread::yield();  // make sure this thread is executed last
             return p.get_future();
         }

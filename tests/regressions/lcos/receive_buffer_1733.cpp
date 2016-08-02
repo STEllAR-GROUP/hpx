@@ -20,7 +20,7 @@ inline std::size_t idx(std::size_t i, int dir)
 {
     HPX_ASSERT(dir == 1 || dir == -1);
 
-    std::size_t size = hpx::get_num_localities_sync();
+    std::size_t size = hpx::get_num_localities(hpx::launch::sync);
 
     if (i == 0 && dir == -1)
         return size - 1;

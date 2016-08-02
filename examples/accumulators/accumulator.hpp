@@ -68,7 +68,7 @@ namespace examples
             HPX_ASSERT(this->get_id());
 
             typedef server::accumulator::reset_action action_type;
-            hpx::async<action_type>(hpx::launch::sync, this->get_id()).get();
+            action_type()(this->get_id());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ namespace examples
             HPX_ASSERT(this->get_id());
 
             typedef server::accumulator::add_action action_type;
-            hpx::async<action_type>(hpx::launch::sync, this->get_id(), arg);
+            action_type()(this->get_id(), arg);
         }
         //]
 

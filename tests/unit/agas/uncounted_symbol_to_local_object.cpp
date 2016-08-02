@@ -32,8 +32,8 @@ using hpx::naming::gid_type;
 using hpx::naming::get_management_type_name;
 using hpx::naming::detail::get_stripped_gid;
 
-using hpx::agas::register_name_sync;
-using hpx::agas::unregister_name_sync;
+using hpx::agas::register_name;
+using hpx::agas::unregister_name;
 
 using hpx::test::simple_refcnt_monitor;
 using hpx::test::managed_refcnt_monitor;
@@ -75,7 +75,7 @@ void hpx_test_main(
         // should not reference-count the name, as the GID we're passing has
         // no credits.
         gid_type raw_gid = get_stripped_gid(monitor.get_raw_gid());
-        HPX_TEST_EQ(true, register_name_sync(name, raw_gid));
+        HPX_TEST_EQ(true, register_name(hpx::launch::sync, name, raw_gid));
 
         {
             // Detach the reference.
@@ -93,7 +93,7 @@ void hpx_test_main(
         HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
 
         // Remove the symbolic name.
-        HPX_TEST_EQ(raw_gid, unregister_name_sync(name).get_gid());
+        HPX_TEST_EQ(raw_gid, unregister_name(hpx::launch::sync, name).get_gid());
 
         // The component should be out of scope now.
         HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
