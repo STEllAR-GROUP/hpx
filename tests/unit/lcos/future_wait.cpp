@@ -190,9 +190,16 @@ int hpx_main(
             futures.reserve(64);
 
             for (std::size_t i = 0; i < 64; ++i)
-                futures.push_back(async(
-                    i % 3 ? hpx::launch::async : hpx::launch::deferred, &null_thread));
-
+            {
+                if (i % 3)
+                {
+                    futures.push_back(async(hpx::launch::async, &null_thread));
+                }
+                else
+                {
+                    futures.push_back(async(hpx::launch::deferred, &null_thread));
+                }
+            }
             wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
