@@ -53,11 +53,11 @@ int hpx_main()
             {
                 // try to interpret the entered command
                 if (cmd[0] == "reset") {
-                    accu.reset_sync();
+                    accu.reset();
                 }
                 else if (cmd[0] == "add") {
                     if (cmd.size() == 2) {
-                        accu.add_sync(boost::lexical_cast<argument_type>(cmd[1]));
+                        accu.add(boost::lexical_cast<argument_type>(cmd[1]));
                     }
                     else {
                         std::cout << "error: invalid command '"
@@ -66,7 +66,7 @@ int hpx_main()
                     }
                 }
                 else if (cmd[0] == "query") {
-                    std::cout << accu.query_sync() << std::endl;
+                    std::cout << accu.query() << std::endl;
                 }
                 else if (cmd[0] == "help") {
                     std::cout << help << std::endl;

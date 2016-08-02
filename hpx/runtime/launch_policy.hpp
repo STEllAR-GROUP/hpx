@@ -156,6 +156,7 @@ namespace hpx
     // Launch policies for \a hpx::async etc.
     struct launch : detail::policy_holder
     {
+        ///////////////////////////////////////////////////////////////////////
         HPX_CONSTEXPR launch() HPX_NOEXCEPT
           : detail::policy_holder{detail::launch_policy::all}
         {}
@@ -184,6 +185,14 @@ namespace hpx
           : detail::policy_holder{detail::launch_policy::apply}
         {}
 
+        ///////////////////////////////////////////////////////////////////////
+        using async_policy = detail::async_policy;
+        using fork_policy = detail::fork_policy;
+        using sync_policy = detail::sync_policy;
+        using deferred_policy = detail::deferred_policy;
+        using apply_policy = detail::apply_policy;
+
+        ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT static const detail::async_policy async;
         HPX_EXPORT static const detail::fork_policy fork;
         HPX_EXPORT static const detail::sync_policy sync;

@@ -47,7 +47,7 @@ namespace examples
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        void reset_non_blocking()
+        void reset(hpx::launch::apply_policy)
         {
             HPX_ASSERT(this->get_id());
 
@@ -59,13 +59,13 @@ namespace examples
         /// Reset the accumulator's value to 0.
         ///
         /// \note This function is fully synchronous.
-        void reset_sync()
+        void reset()
         {
             HPX_ASSERT(this->get_id());
 
             typedef server::template_function_accumulator::reset_action
                 action_type;
-            hpx::async<action_type>(this->get_id()).get();
+            hpx::async<action_type>(hpx::launch::sync, this->get_id()).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ namespace examples
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         template <typename T>
-        void add_non_blocking(T arg)
+        void add(hpx::launch::apply_policy, T arg)
         {
             HPX_ASSERT(this->get_id());
 
@@ -88,13 +88,13 @@ namespace examples
         ///
         /// \note This function is fully synchronous.
         template <typename T>
-        void add_sync(T arg)
+        void add(T arg)
         {
             HPX_ASSERT(this->get_id());
 
             typedef typename server::template_function_accumulator::add_action<T>
                  action_type;
-            hpx::async<action_type>(this->get_id(), arg).get();
+            hpx::async<action_type>(hpx::launch::sync, this->get_id(), arg).get();
         }
         //]
 
@@ -106,23 +106,25 @@ namespace examples
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
-        hpx::future<double> query_async()
+        hpx::future<double> query(hpx::launch::async_policy)
         {
             HPX_ASSERT(this->get_id());
 
             typedef server::template_function_accumulator::query_action
                 action_type;
-            return hpx::async<action_type>(this->get_id());
+            return hpx::async<action_type>(hpx::launch::async, this->get_id());
         }
 
         /// Query the current value of the accumulator.
         ///
         /// \note This function is fully synchronous.
-        double query_sync()
+        double query(hpx::launch::sync_policy = hpx::launch::sync)
         {
             HPX_ASSERT(this->get_id());
 
-            return query_async().get();
+            typedef server::template_function_accumulator::query_action
+                action_type;
+            return action_type()(hpx::launch::sync, this->get_id());
         }
     };
 }
