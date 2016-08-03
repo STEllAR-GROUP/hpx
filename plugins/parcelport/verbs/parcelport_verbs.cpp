@@ -320,19 +320,8 @@ namespace hpx { namespace parcelset {
                 send_data.message_region = NULL;
             }
             for (auto r : send_data.zero_copy_regions) {
-                // if this region was registered on the fly, then don't return it to the pool
-                if (r->isTempRegion()) {
-                    LOG_DEBUG_MSG("Deleting " << hexpointer(r));
-                    delete r;
-                }
-                else if (r->isUserRegion()) {
-                    LOG_DEBUG_MSG("Deleting " << hexpointer(r));
-                    delete r;
-                }
-                else {
-                    LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
-                    chunk_pool_->deallocate(r);
-                }
+                LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
+                chunk_pool_->deallocate(r);
             }
             //
             // when a parcel is deleted, it takes a lock, since we are locking before delete
@@ -363,19 +352,8 @@ namespace hpx { namespace parcelset {
             chunk_pool_->deallocate(recv_data.header_region);
             LOG_DEBUG_MSG("Zero copy regions size is (delete) " << decnumber(recv_data.zero_copy_regions.size()));
             for (auto r : recv_data.zero_copy_regions) {
-                // if this region was registered on the fly, then don't return it to the pool
-                if (r->isTempRegion()) {
-                    LOG_DEBUG_MSG("Deleting " << hexpointer(r));
-                    delete r;
-                }
-                else if (r->isUserRegion()) {
-                    LOG_DEBUG_MSG("Deleting " << hexpointer(r));
-                    delete r;
-                }
-                else {
-                    LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
-                    chunk_pool_->deallocate(r);
-                }
+                LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
+                chunk_pool_->deallocate(r);
             }
             {
                 scoped_lock lock(active_recv_mutex);
