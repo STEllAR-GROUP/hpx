@@ -57,9 +57,15 @@ namespace hpx { namespace components
             threads::thread_state_ex_enum(threads::thread_state_enum)
         > yield_decorator_type;
 
-        struct undecorate_wrapper
+        struct decorate_wrapper
         {
-            ~undecorate_wrapper()
+            template <typename F>
+            decorate_wrapper(F && f)
+            {
+                threads::get_self().decorate_yield(std::forward<F>(f));
+            }
+
+            ~decorate_wrapper()
             {
                 threads::get_self().undecorate_yield();
             }
@@ -87,26 +93,25 @@ namespace hpx { namespace components
 
             {
                 // register our yield decorator
-                using util::placeholders::_1;
-                threads::get_self().decorate_yield(
-                    util::bind(&locking_hook::yield_function, this, _1));
-
-                undecorate_wrapper yield_undecorator;
-                (void)yield_undecorator;       // silence gcc warnings
+                decorate_wrapper yield_decorator(
+                    util::bind(&locking_hook::yield_function, this,
+                        util::placeholders::_1));
 
                 result = f(state);
+
+                (void)yield_decorator;       // silence gcc warnings
             }
 
             return result;
         }
 
-        struct decorate_wrapper
+        struct undecorate_wrapper
         {
-            decorate_wrapper()
+            undecorate_wrapper()
               : yield_decorator_(threads::get_self().undecorate_yield())
             {}
 
-            ~decorate_wrapper()
+            ~undecorate_wrapper()
             {
                 threads::get_self().decorate_yield(std::move(yield_decorator_));
             }
@@ -121,7 +126,7 @@ namespace hpx { namespace components
         {
             // We un-decorate the yield function as the lock handling may
             // suspend, which causes an infinite recursion otherwise.
-            decorate_wrapper yield_decorator;
+            undecorate_wrapper yield_decorator;
             threads::thread_state_ex_enum result = threads::wait_unknown;
 
             {
