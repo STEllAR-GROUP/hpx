@@ -241,6 +241,7 @@ namespace hpx { namespace parcelset {
 
         active_recv_list_type active_recvs;
         mutex_type       active_recv_mutex;
+        std::atomic<int> total_receives;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -252,6 +253,7 @@ namespace hpx { namespace parcelset {
               , stopped_(false)
               , active_send_count_(0)
               , connection_started(ATOMIC_FLAG_INIT)
+              , total_receives(0)
               // , parcels_sent_(0)
 
         {
@@ -343,7 +345,7 @@ namespace hpx { namespace parcelset {
 //                util::ignore_while_checking<unique_lock> il(&lock);
                 active_sends.erase(send);
                 --active_send_count_;
-                LOG_DEBUG_MSG("Active send after erase size " << active_send_count_ );
+                LOG_DEBUG_MSG("Active send after erase size " << hexnumber(active_send_count_) );
                 lock.unlock();
                 active_send_condition.notify_one();
             }
@@ -378,7 +380,7 @@ namespace hpx { namespace parcelset {
             {
                 scoped_lock lock(active_recv_mutex);
                 active_recvs.erase(recv);
-                LOG_DEBUG_MSG("Active recv after erase size " << active_recvs.size() );
+                LOG_DEBUG_MSG("Active recv after erase size " << hexnumber(active_recvs.size()) );
             }
         }
 
@@ -516,7 +518,7 @@ namespace hpx { namespace parcelset {
                 scoped_lock lock(active_recv_mutex);
                 active_recvs.emplace_back();
                 current_recv = std::prev(active_recvs.end());
-                LOG_DEBUG_MSG("Active recv after insert size " << active_recvs.size());
+                LOG_DEBUG_MSG("Active recv after insert size " << hexnumber(active_recvs.size()));
             }
             parcel_recv_data &recv_data = *current_recv;
             // get the header of the new message/parcel
@@ -543,6 +545,7 @@ namespace hpx { namespace parcelset {
                     << " chunkdata " << decnumber((h->chunk_data()!=NULL))
                     << " piggyback " << decnumber((h->piggy_back()!=NULL))
                     << " tag " << hexuint32(h->tag())
+                    << " total receives " << decnumber(++total_receives)
             );
 
             // setting this flag to false - if more data is needed - disables final parcel receive call
@@ -686,6 +689,10 @@ namespace hpx { namespace parcelset {
             }
             //
             _rdmaController->refill_client_receives();
+
+            LOG_DEBUG_MSG( "received IBV_WC_RECV handle_tag_recv_completion "
+                    << " total receives " << decnumber(++total_receives)
+            );
 
         }
 
@@ -1082,7 +1089,7 @@ namespace hpx { namespace parcelset {
                     // if more than N parcels are currently queued, then yield
                     // otherwise we can fill the send queues with so many requests
                     // that memory buffers are exhausted.
-                    LOG_DEBUG_MSG("HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << active_sends.size());
+                    LOG_DEBUG_MSG("HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
                     active_send_condition.wait(lock, [this] {
                       return (active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
                     });
@@ -1090,7 +1097,7 @@ namespace hpx { namespace parcelset {
                     active_sends.emplace_back();
                     current_send = std::prev(active_sends.end());
                     ++active_send_count_;
-                    LOG_DEBUG_MSG("Active send after insert size " << active_send_count_);
+                    LOG_DEBUG_MSG("Active send after insert size " << hexnumber(active_send_count_));
                 }
                 parcel_send_data &send_data = *current_send;
                 send_data.tag            = tag;
