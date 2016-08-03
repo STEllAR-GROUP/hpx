@@ -3,6 +3,9 @@
 //
 #include <hpx/hpx.hpp>
 //
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+//
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
@@ -22,7 +25,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 {
 class custom_scheduler {
 private:
-  typedef boost::mutex mutex_type;
+//    typedef hpx::lcos::local::mutex      mutex_type;
+    typedef boost::mutex      mutex_type;
+  typedef std::unique_lock<mutex_type> unique_lock;
 
 public:
   //    typedef static_queue_scheduler<
@@ -76,7 +81,7 @@ public:
 
   //----------------------------------------------------------------------------
   void init() {
-    boost::unique_lock<mutex_type> lk(mtx_);
+    unique_lock lk(mtx_);
 
     init_affinity_data affinity_data;
     pool_.init(1, affinity_data);
@@ -86,7 +91,7 @@ public:
   //----------------------------------------------------------------------------
   void stop()
   {
-    boost::unique_lock<mutex_type> lk(mtx_);
+    unique_lock lk(mtx_);
     pool_.stop(lk, true);
   }
 
