@@ -92,7 +92,7 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_PREPOSTS STRING
   endif()
 
   # build rdma helperlibrary with HPX support
-  add_definitions(-DRDMAHELPER_HAVE_HPX)
+#  add_definitions(-DRDMAHELPER_HAVE_HPX)
   
   add_subproject(rdmahelper rdmahelper)
 
