@@ -84,9 +84,9 @@
 // a background thread can be spawned to check for ready futures and remove
 // them from the waiting list. The vars are used for this bookkeeping task.
 //
-// #define USE_CLEANING_THREAD
+//#define USE_CLEANING_THREAD
 //#define USE_PARCELPORT_THREAD
-#define USE_ASYNC_CB
+//#define USE_ASYNC_CB
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
@@ -94,7 +94,7 @@
 
 //----------------------------------------------------------------------------
 // control the amount of debug messaging that is output
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 9
 
 //----------------------------------------------------------------------------
 // if we have access to boost logging via the verbs aprcelport include this
@@ -155,8 +155,10 @@ void delete_local_storage()
 }
 
 //----------------------------------------------------------------------------
-void release_storage_lock()
+void release_storage_lock(char *p)
 {
+    DEBUG_OUTPUT(6,"Release lock and delete memory");
+    delete []p;
 //  storage_mutex.unlock();
 }
 
@@ -262,7 +264,6 @@ private:
 // it in one of these buffers
 typedef hpx::serialization::serialize_buffer<char> general_buffer_type;
 
-
 // When receiving data, we receive a hpx::serialize_buffer, we try to minimize
 // copying of data by providing a receive buffer with a fixed data pointer
 // so that data is placed directly into it.
@@ -327,14 +328,20 @@ namespace Storage {
         // we can't use the remote buffer supplied because it is a handle to memory on
         // the (possibly) remote node. We allocate here using
         // a nullptr deleter so the array will
-        // not be released by the shared_pointer
+        // not be released by the shared_pointer.
+         //
+        // The memory must be freed after final use.
         std::allocator<char> local_allocator;
         boost::shared_array<char> local_buffer(local_allocator.allocate(length),
-            [](char*){});
+            [](char*){
+                DEBUG_OUTPUT(6,"Not deleting memory");
+            }
+        );
 
         // allow the storage class to asynchronously copy the data into buffer
-        hpx::future<int> fut = copy_from_local_storage(local_buffer.get(),
-            address, length);
+        hpx::future<int> fut =
+            copy_from_local_storage(local_buffer.get(), address, length);
+        DEBUG_OUTPUT(6, "create local buffer count " << local_buffer.use_count());
 
         // wrap the remote buffer pointer in an allocator for return
         pointer_allocator<char> return_allocator(
@@ -344,13 +351,16 @@ namespace Storage {
 //        storage_mutex.lock();
 
         return fut.then(
-//            hpx::launch::async,
+            hpx::launch::sync,
             // return the data in a transfer buffer
             [=](hpx::future<int> fut) -> transfer_buffer_type {
+                DEBUG_OUTPUT(6, ".then local buffer count " << local_buffer.use_count());
                 return transfer_buffer_type(
                     local_buffer.get(), length,
                     transfer_buffer_type::take,
-                    hpx::util::bind(&release_storage_lock),
+                    [](char *p) {
+                        release_storage_lock(p);
+                    },
                     return_allocator);
             }
         );
@@ -366,7 +376,7 @@ HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
 HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
-HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
+//HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 
 // and these in a cpp
 HPX_REGISTER_ACTION(CopyToStorage_action);
@@ -501,6 +511,8 @@ void test_write(
             else {
               send_rank = static_cast<int>(i % nranks);
             }
+//            send_rank = rank;
+
             // get the pointer to the current packet send buffer
             char *buffer = &local_storage[i*options.transfer_size_B];
             // Get the HPX locality from the dest rank
@@ -589,7 +601,9 @@ void test_write(
         int numwait = static_cast<int>(final_list.size());
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
+#ifdef USE_CLEANING_THREAD
         int total = numwait+removed;
+#endif
         DEBUG_OUTPUT(3,
             "Future wait, rank " << rank << " waiting on " << numwait
         );
@@ -606,10 +620,10 @@ void test_write(
     double IOPs_s    = IOPS/writeTime;
     if(rank == 0) {
         std::cout << "Total time         : " << writeTime << "\n";
-        std::cout << "Memory Transferred : " << writeMB   << "MB\n";
+        std::cout << "Memory Transferred : " << writeMB   << " MB\n";
         std::cout << "Number of IOPs     : " << IOPS      << "\n";
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
-        std::cout << "Aggregate BW Write : " << writeBW   << "MB/s" << std::endl;
+        std::cout << "Aggregate BW Write : " << writeBW   << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
         char const* msg = "CSVData, write, network, \
             %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, \
@@ -624,18 +638,20 @@ void test_write(
 // Copy the data once into the destination buffer if the get() operation was
 // entirely local (no data copies have been made so far).
 static void transfer_data(general_buffer_type recv,
-  hpx::future<transfer_buffer_type> f)
+  hpx::future<transfer_buffer_type> &&f)
 {
-  transfer_buffer_type buffer(f.get());
-  if (buffer.data() != recv.data())
+  transfer_buffer_type buffer(std::move(f.get()));
+//  if (buffer.data() != recv.data())
   {
     std::copy(buffer.data(), buffer.data() + buffer.size(), recv.data());
   }
+/*
   else {
-    DEBUG_OUTPUT(5,
+    DEBUG_OUTPUT(2,
       "Skipped copy due to matching pointers"
     );
   }
+  */
 }
 
 //----------------------------------------------------------------------------
@@ -697,6 +713,7 @@ void test_read(
             else {
               send_rank = static_cast<int>(i % nranks);
             }
+//            send_rank = rank;
 
             // get the pointer to the current packet send buffer
 //            char *buffer = &local_storage[i*options.transfer_size_B];
@@ -708,7 +725,6 @@ void test_read(
             int memory_slot = random_slot(gen);
             uint32_t memory_offset =
                 static_cast<uint32_t>(memory_slot*options.transfer_size_B);
-
 
             // create a transfer buffer object to receive the data being returned to us
             general_buffer_type general_buffer(&local_storage[memory_offset],
@@ -734,7 +750,9 @@ void test_read(
                         options.transfer_size_B, buffer_address
                     ).then(
                         hpx::launch::sync,
-                        hpx::util::bind(&transfer_data, general_buffer, _1)
+                        [=](hpx::future<transfer_buffer_type> &&buffer) -> void {
+                            return transfer_data(general_buffer, std::move(buffer));
+                        }
                     ).then(
                         hpx::launch::sync,
                         [=](hpx::future<void> fut) -> int {
@@ -804,10 +822,10 @@ void test_read(
     double IOPs_s    = IOPS/readTime;
     if(rank == 0) {
         std::cout << "Total time         : " << readTime << "\n";
-        std::cout << "Memory Transferred : " << readMB << "MB \n";
+        std::cout << "Memory Transferred : " << readMB << " MB \n";
         std::cout << "Number of IOPs     : " << IOPS      << "\n";
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
-        std::cout << "Aggregate BW Read  : " << readBW << "MB/s" << std::endl;
+        std::cout << "Aggregate BW Read  : " << readBW << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
         char const* msg = "CSVData, read, network, %1%, ranks, \
           %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, \
@@ -883,7 +901,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
-//    test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
+    test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     //
     delete_local_storage();
 
