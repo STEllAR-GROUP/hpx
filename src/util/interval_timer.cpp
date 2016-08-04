@@ -172,7 +172,7 @@ namespace hpx { namespace util { namespace detail
         microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
     }
 
-    threads::thread_state_enum interval_timer::evaluate(
+    threads::thread_result_type interval_timer::evaluate(
         threads::thread_state_ex_enum statex)
     {
         try {
@@ -181,11 +181,15 @@ namespace hpx { namespace util { namespace detail
             if (is_stopped_ || is_terminated_ ||
                 statex == threads::wait_abort || 0 == microsecs_)
             {
-                return threads::terminated;        // object has been finalized, exit
+                // object has been finalized, exit
+                return threads::thread_result_type(threads::terminated, nullptr);
             }
 
             if (id_ != nullptr && id_ != threads::get_self_id())
-                return threads::terminated;        // obsolete timer thread
+            {
+                // obsolete timer thread
+                return threads::thread_result_type(threads::terminated, nullptr);
+            }
 
             id_ = nullptr;
             is_started_ = false;
@@ -211,7 +215,9 @@ namespace hpx { namespace util { namespace detail
             if (e.get_error() != yield_aborted)
                 throw;
         }
-        return threads::terminated;   // do not re-schedule this thread
+
+        // do not re-schedule this thread
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     // schedule a high priority task after a given time interval

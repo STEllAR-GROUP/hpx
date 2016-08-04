@@ -507,14 +507,15 @@ namespace hpx { namespace threads
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
-        thread_state_enum operator()()
+        coroutine_type::result_type operator()()
         {
-            HPX_ASSERT(this_() == coroutine_.get_thread_id());
+            HPX_ASSERT(this == coroutine_.get_thread_id());
             return coroutine_(set_state_ex(wait_signaled));
         }
 
         thread_id_type get_thread_id() const
         {
+            HPX_ASSERT(this == coroutine_.get_thread_id());
             return thread_id_type(
                     reinterpret_cast<thread_data*>(coroutine_.get_thread_id())
                 );

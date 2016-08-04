@@ -32,16 +32,24 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace threads { namespace coroutines
+namespace hpx { namespace threads
 {
-    namespace detail
+    class HPX_EXPORT thread_data;
+
+    HPX_EXPORT void intrusive_ptr_add_ref(thread_data* p);
+    HPX_EXPORT void intrusive_ptr_release(thread_data* p);
+
+    namespace coroutines
     {
-        class coroutine_self;
+        namespace detail
+        {
+            class coroutine_self;
 
-        class coroutine_impl;
+            class coroutine_impl;
+        }
+
+        class coroutine;
     }
-
-    class coroutine;
-}}}
+}}
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_FWD_HPP*/

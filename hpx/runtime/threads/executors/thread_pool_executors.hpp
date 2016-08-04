@@ -114,7 +114,7 @@ namespace hpx { namespace threads { namespace executors
             // internal run method
             void run(std::size_t virt_core, std::size_t num_thread);
 
-            threads::thread_state_enum thread_function_nullary(
+            threads::thread_result_type thread_function_nullary(
                 closure_type func);
 
             // the scheduler used by this executor

@@ -118,14 +118,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     template <typename Scheduler>
-    threads::thread_state_enum
+    threads::thread_result_type
     thread_pool_os_executor<Scheduler>::thread_function_nullary(
         closure_type func)
     {
         // execute the actual thread function
         func();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     // Return the requested policy element

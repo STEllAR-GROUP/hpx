@@ -14,6 +14,7 @@
 #include <boost/program_options.hpp>
 
 #include <numeric>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t iterations = 10000;
@@ -47,7 +48,7 @@ double measure_one(Policy policy)
 template <typename Policy>
 double measure(Policy policy)
 {
-    std::size_t num_cores = hpx::threads::hardware_concurrency();
+    std::size_t num_cores = hpx::get_os_thread_count();
     std::vector<hpx::future<double> > cores;
     cores.reserve(num_cores);
 
@@ -65,7 +66,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     bool print_header = vm.count("no-header") == 0;
     bool do_child = vm.count("no-child") == 0;      // fork only
     bool do_parent = vm.count("no-parent") == 0;    // async only
-    std::size_t num_cores = hpx::threads::hardware_concurrency();
+    std::size_t num_cores = hpx::get_os_thread_count();
     if (vm.count("num_cores") != 0)
         num_cores = vm["num_cores"].as<std::size_t>();
 

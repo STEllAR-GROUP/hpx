@@ -134,11 +134,11 @@ void print_results(
 ///////////////////////////////////////////////////////////////////////////////
 struct kernel
 {
-    thread_state_enum operator()(thread_state_ex_enum) const
+    hpx::threads::thread_result_type operator()(thread_state_ex_enum) const
     {
         worker_timed(payload * 1000);
 
-        return pending;
+        return hpx::threads::thread_result_type(hpx::threads::pending, nullptr);
     }
 
     bool operator!() const { return true; }

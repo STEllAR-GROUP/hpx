@@ -106,7 +106,7 @@ namespace hpx
             id_ = threads::invalid_thread_id;
         }
         void start_thread(util::unique_function_nonser<void()>&& func);
-        static threads::thread_state_enum thread_function_nullary(
+        static threads::thread_result_type thread_function_nullary(
             util::unique_function_nonser<void()> const& func);
 
         mutable mutex_type mtx_;
@@ -139,7 +139,14 @@ namespace hpx
 
     public:
         id() HPX_NOEXCEPT : id_(threads::invalid_thread_id) {}
-        explicit id(threads::thread_id_type i) HPX_NOEXCEPT : id_(i) {}
+        explicit id(threads::thread_id_type const& i) HPX_NOEXCEPT
+          : id_(i)
+        {}
+        explicit id(threads::thread_id_type && i) HPX_NOEXCEPT
+          : id_(std::move(i))
+        {}
+
+        threads::thread_id_type const& native_handle() const { return id_; }
     };
 
     inline bool operator== (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
@@ -189,6 +196,7 @@ namespace hpx
         HPX_API_EXPORT thread::id get_id() HPX_NOEXCEPT;
 
         HPX_API_EXPORT void yield() HPX_NOEXCEPT;
+        HPX_API_EXPORT void yield_to(thread::id) HPX_NOEXCEPT;
 
         // extensions
         HPX_API_EXPORT threads::thread_priority get_priority();

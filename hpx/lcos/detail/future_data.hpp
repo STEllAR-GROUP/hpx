@@ -772,18 +772,19 @@ namespace detail
         }
 
         // run in a separate thread
-        virtual void apply(launch policy,
+        virtual threads::thread_id_type apply(launch policy,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
             HPX_ASSERT(false);      // shouldn't ever be called
+            return threads::invalid_thread_id;
         }
 
     protected:
-        static threads::thread_state_enum run_impl(future_base_type this_)
+        static threads::thread_result_type run_impl(future_base_type this_)
         {
             this_->do_run();
-            return threads::terminated;
+            return threads::thread_result_type(threads::terminated, nullptr);
         }
 
     public:
@@ -855,11 +856,11 @@ namespace detail
         };
 
     protected:
-        static threads::thread_state_enum run_impl(future_base_type this_)
+        static threads::thread_result_type run_impl(future_base_type this_)
         {
             reset_id r(*this_);
             this_->do_run();
-            return threads::terminated;
+            return threads::thread_result_type(threads::terminated, nullptr);
         }
 
     public:
