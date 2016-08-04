@@ -20,8 +20,14 @@
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/components/component_commandline.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/runtime/startup_function.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,7 +297,7 @@ namespace hpx { namespace performance_counters { namespace papi
         }
     }
 
-    bool check_startup(hpx::util::function_nonser<void()>& startup_func,
+    bool check_startup(hpx::startup_function_type startup_func,
         bool& pre_startup)
     {
         // PAPI initialization
