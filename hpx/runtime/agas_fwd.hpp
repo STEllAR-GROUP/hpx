@@ -19,11 +19,16 @@ namespace hpx { namespace agas
         void(std::string const&, components::component_type)
     > iterate_types_function_type;
 
+    struct HPX_EXPORT component_namespace;
+    struct HPX_EXPORT locality_namespace;
     struct HPX_EXPORT primary_namespace;
+    struct HPX_EXPORT symbol_namespace;
     namespace server
     {
         struct HPX_EXPORT component_namespace;
+        struct HPX_EXPORT locality_namespace;
         struct HPX_EXPORT primary_namespace;
+        struct HPX_EXPORT symbol_namespace;
     }
     struct HPX_API_EXPORT addressing_service;
 

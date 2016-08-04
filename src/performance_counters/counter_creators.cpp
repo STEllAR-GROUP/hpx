@@ -286,22 +286,26 @@ namespace hpx { namespace performance_counters
             switch (service_code) {
                 case agas::component_ns_statistics_counter:
                     {
-                        agas::server::component_namespace::statistics_counter_action action;
+                        agas::server::component_namespace::statistics_counter_action
+                        action;
                         return action(agas_id, name).get_gid();
                     }
                 case agas::locality_ns_statistics_counter:
                     {
-                        agas::server::locality_namespace::statistics_counter_action action;
+                        agas::server::locality_namespace::statistics_counter_action
+                        action;
                         return action(agas_id, name).get_gid();
                     }
                 case agas::symbol_ns_statistics_counter:
                     {
-                        agas::server::symbol_namespace::statistics_counter_action action;
+                        agas::server::symbol_namespace::statistics_counter_action
+                        action;
                         return action(agas_id, name).get_gid();
                     }
                 case agas::primary_ns_statistics_counter:
                     {
-                        agas::server::primary_namespace::statistics_counter_action action;
+                        agas::server::primary_namespace::statistics_counter_action
+                        action;
                         return action(agas_id, name).get_gid();
                     }
                 default:

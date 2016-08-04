@@ -11,8 +11,13 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
+#include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/jenkins_hash.hpp>
+
+#include <string>
+#include <utility>
+#include <vector>
 
 using hpx::components::component_agas_symbol_namespace;
 
@@ -82,7 +87,8 @@ namespace hpx { namespace agas {
     bool symbol_namespace::is_service_instance(naming::gid_type const& gid)
     {
         return gid.get_lsb() == HPX_AGAS_SYMBOL_NS_LSB &&
-            (gid.get_msb() & ~naming::gid_type::locality_id_mask) == HPX_AGAS_SYMBOL_NS_MSB;
+            (gid.get_msb() & ~naming::gid_type::locality_id_mask)
+            == HPX_AGAS_SYMBOL_NS_MSB;
     }
 
     naming::id_type symbol_namespace::symbol_namespace_locality(std::string const& key)
@@ -96,6 +102,17 @@ namespace hpx { namespace agas {
         }
         return naming::id_type(get_service_instance(hash_value),
             naming::id_type::unmanaged);
+    }
+
+    symbol_namespace::symbol_namespace()
+      : server_(new server::symbol_namespace())
+    {}
+    symbol_namespace::~symbol_namespace()
+    {}
+
+    naming::address::address_type symbol_namespace::ptr() const
+    {
+        return reinterpret_cast<naming::address::address_type>(server_.get());
     }
 
     naming::address symbol_namespace::addr() const
@@ -119,7 +136,7 @@ namespace hpx { namespace agas {
         naming::id_type dest = symbol_namespace_locality(key);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return hpx::make_ready_future(server_.bind(std::move(key), std::move(gid)));
+            return hpx::make_ready_future(server_->bind(std::move(key), std::move(gid)));
         }
         server::symbol_namespace::bind_action action;
         return hpx::async(action, std::move(dest), std::move(key), std::move(gid));
@@ -130,7 +147,7 @@ namespace hpx { namespace agas {
         naming::id_type dest = symbol_namespace_locality(key);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return server_.bind(std::move(key), std::move(gid));
+            return server_->bind(std::move(key), std::move(gid));
         }
         server::symbol_namespace::bind_action action;
         return action(std::move(dest), std::move(key), std::move(gid));
@@ -141,7 +158,7 @@ namespace hpx { namespace agas {
         naming::id_type dest = symbol_namespace_locality(key);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            naming::gid_type raw_gid = server_.resolve(std::move(key));
+            naming::gid_type raw_gid = server_->resolve(std::move(key));
 
             if (naming::detail::has_credits(raw_gid))
                 return hpx::make_ready_future(
@@ -164,7 +181,7 @@ namespace hpx { namespace agas {
         naming::id_type dest = symbol_namespace_locality(key);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            naming::gid_type raw_gid = server_.unbind(std::move(key));
+            naming::gid_type raw_gid = server_->unbind(std::move(key));
 
             if (naming::detail::has_credits(raw_gid))
                 return hpx::make_ready_future(
@@ -192,7 +209,7 @@ namespace hpx { namespace agas {
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
             return hpx::make_ready_future(
-                server_.on_event(name, call_for_past_events, std::move(lco)));
+                server_->on_event(name, call_for_past_events, std::move(lco)));
         }
         server::symbol_namespace::on_event_action action;
         return hpx::async(
@@ -209,11 +226,11 @@ namespace hpx { namespace agas {
     {
         std::string str("locality#" +
             std::to_string(locality_id) + "/");
-        server_.register_server_instance(str.c_str(), locality_id);
+        server_->register_server_instance(str.c_str(), locality_id);
     }
 
     void symbol_namespace::unregister_server_instance(error_code& ec)
     {
-        server_.unregister_server_instance(ec);
+        server_->unregister_server_instance(ec);
     }
 }}

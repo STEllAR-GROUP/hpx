@@ -10,11 +10,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas
@@ -42,14 +45,15 @@ struct HPX_EXPORT primary_namespace
         return is_service_instance(id.get_gid());
     }
 
-    naming::address::address_type ptr() const
-    {
-        return reinterpret_cast<naming::address::address_type>(&server_);
-    }
+    primary_namespace();
+    ~primary_namespace();
+
+    naming::address::address_type ptr() const;
     naming::address addr() const;
     naming::id_type gid() const;
 
-    future<std::pair<naming::id_type, naming::address>> begin_migration(naming::gid_type id);
+    future<std::pair<naming::id_type, naming::address>>
+    begin_migration(naming::gid_type id);
     future<bool> end_migration(naming::gid_type id);
 
     bool bind_gid(gva g, naming::gid_type id, naming::gid_type locality);
@@ -82,7 +86,7 @@ struct HPX_EXPORT primary_namespace
     void register_server_instance(boost::uint32_t locality_id);
     void unregister_server_instance(error_code& ec);
 private:
-    server::primary_namespace server_;
+    std::unique_ptr<server::primary_namespace> server_;
 };
 
 }}

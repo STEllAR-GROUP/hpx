@@ -2455,7 +2455,9 @@ void addressing_service::send_refcnt_requests_non_blocking(
         typedef
             std::map<
                 naming::id_type,
-                std::vector<hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type> >
+                std::vector<
+                    hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type>
+                >
             >
             requests_type;
         requests_type requests;
@@ -2525,7 +2527,9 @@ addressing_service::send_refcnt_requests_async(
     typedef
         std::map<
             naming::id_type,
-            std::vector<hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type> >
+            std::vector<
+                hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type>
+            >
         >
         requests_type;
     requests_type requests;

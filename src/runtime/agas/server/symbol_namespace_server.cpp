@@ -23,6 +23,7 @@
 #include <hpx/util/scoped_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <cstddef>

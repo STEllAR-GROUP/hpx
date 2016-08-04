@@ -10,6 +10,9 @@
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
+#include <string>
+#include <vector>
+
 namespace hpx { namespace agas { namespace detail
 {
     hosted_component_namespace::hosted_component_namespace(naming::address addr)

@@ -44,7 +44,8 @@ namespace hpx { namespace agas
 
         virtual std::string get_component_type_name(components::component_type type)=0;
 
-        virtual lcos::future<boost::uint32_t> get_num_localities(components::component_type type)=0;
+        virtual lcos::future<boost::uint32_t>
+        get_num_localities(components::component_type type)=0;
 
         virtual naming::gid_type statistics_counter(std::string const& name)=0;;
 

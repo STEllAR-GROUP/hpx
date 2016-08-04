@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>

@@ -10,9 +10,16 @@
 #define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/util/function.hpp>
 
+#include <boost/cstdint.hpp>
+
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace hpx { namespace agas
@@ -23,8 +30,9 @@ struct symbol_namespace
     // {{{ nested types
     typedef server::symbol_namespace server_type;
 
-    typedef server_type::iterate_names_function_type
-        iterate_names_function_type;
+    typedef hpx::util::function<
+        void(std::string const&, naming::gid_type const&)
+    > iterate_names_function_type;
     // }}}
 
     static naming::gid_type get_service_instance(boost::uint32_t service_locality_id);
@@ -46,10 +54,10 @@ struct symbol_namespace
 
     static naming::id_type symbol_namespace_locality(std::string const& key);
 
-    naming::address::address_type ptr() const
-    {
-        return reinterpret_cast<naming::address::address_type>(&server_);
-    }
+    symbol_namespace();
+    ~symbol_namespace();
+
+    naming::address::address_type ptr() const;
     naming::address addr() const;
     naming::id_type gid() const;
 
@@ -73,7 +81,7 @@ struct symbol_namespace
     void unregister_server_instance(error_code& ec);
 
 private:
-    server_type server_;
+    std::unique_ptr<server_type> server_;
 };
 
 }}

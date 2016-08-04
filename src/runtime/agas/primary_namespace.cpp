@@ -11,10 +11,15 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <boost/format.hpp>
+
+#include <string>
+#include <utility>
 
 using hpx::components::component_agas_primary_namespace;
 
@@ -109,7 +114,20 @@ namespace hpx { namespace agas {
     bool primary_namespace::is_service_instance(naming::gid_type const& gid)
     {
         return gid.get_lsb() == HPX_AGAS_PRIMARY_NS_LSB &&
-            (gid.get_msb() & ~naming::gid_type::locality_id_mask) == HPX_AGAS_PRIMARY_NS_MSB;
+            (gid.get_msb() & ~naming::gid_type::locality_id_mask)
+            == HPX_AGAS_PRIMARY_NS_MSB;
+    }
+
+    primary_namespace::primary_namespace()
+      : server_(new server::primary_namespace())
+    {}
+
+    primary_namespace::~primary_namespace()
+    {}
+
+    naming::address::address_type primary_namespace::ptr() const
+    {
+        return reinterpret_cast<naming::address::address_type>(server_.get());
     }
 
     naming::address primary_namespace::addr() const
@@ -128,13 +146,14 @@ namespace hpx { namespace agas {
             naming::id_type::unmanaged);
     }
 
-    future<std::pair<naming::id_type, naming::address>> primary_namespace::begin_migration(naming::gid_type id)
+    future<std::pair<naming::id_type, naming::address>>
+    primary_namespace::begin_migration(naming::gid_type id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return hpx::make_ready_future(server_.begin_migration(id));
+            return hpx::make_ready_future(server_->begin_migration(id));
         }
         server::primary_namespace::begin_migration_action action;
         return hpx::async(action, std::move(dest), id);
@@ -145,7 +164,7 @@ namespace hpx { namespace agas {
             naming::id_type::unmanaged);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return hpx::make_ready_future(server_.end_migration(id));
+            return hpx::make_ready_future(server_->end_migration(id));
         }
         server::primary_namespace::end_migration_action action;
         return hpx::async(action, std::move(dest), id);
@@ -154,7 +173,7 @@ namespace hpx { namespace agas {
     bool primary_namespace::bind_gid(
         gva g, naming::gid_type id, naming::gid_type locality)
     {
-        return server_.bind_gid(g, id, locality);
+        return server_->bind_gid(g, id, locality);
     }
 
     future<bool> primary_namespace::bind_gid_async(
@@ -164,7 +183,7 @@ namespace hpx { namespace agas {
             naming::id_type::unmanaged);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return hpx::make_ready_future(server_.bind_gid(g, id, locality));
+            return hpx::make_ready_future(server_->bind_gid(g, id, locality));
         }
         server::primary_namespace::bind_gid_action action;
         return hpx::async(action, std::move(dest), g, id, locality);
@@ -182,7 +201,7 @@ namespace hpx { namespace agas {
         {
             hpx::apply(
                 &server::primary_namespace::route,
-                &server_,
+                server_.get(),
                 std::move(p)
             );
             f(boost::system::error_code(), parcelset::parcel());
@@ -196,7 +215,7 @@ namespace hpx { namespace agas {
     primary_namespace::resolved_type
     primary_namespace::resolve_gid(naming::gid_type id)
     {
-        return server_.resolve_gid(id);
+        return server_->resolve_gid(id);
     }
 
     future<primary_namespace::resolved_type>
@@ -206,7 +225,7 @@ namespace hpx { namespace agas {
             naming::id_type::unmanaged);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return hpx::make_ready_future(server_.resolve_gid(id));
+            return hpx::make_ready_future(server_->resolve_gid(id));
         }
         server::primary_namespace::resolve_gid_action action;
         return hpx::async(action, std::move(dest), id);
@@ -219,7 +238,7 @@ namespace hpx { namespace agas {
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
             return hpx::make_ready_future(
-                naming::id_type(server_.colocate(id), naming::id_type::unmanaged));
+                naming::id_type(server_->colocate(id), naming::id_type::unmanaged));
         }
         server::primary_namespace::colocate_action action;
         return hpx::async(action, std::move(dest), id);
@@ -233,7 +252,7 @@ namespace hpx { namespace agas {
         naming::gid_type stripped_id = naming::detail::get_stripped_gid(id);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return hpx::make_ready_future(server_.unbind_gid(count, stripped_id));
+            return hpx::make_ready_future(server_->unbind_gid(count, stripped_id));
         }
         server::primary_namespace::unbind_gid_action action;
         return hpx::async(action, std::move(dest), count, stripped_id);
@@ -247,7 +266,7 @@ namespace hpx { namespace agas {
         naming::gid_type stripped_id = naming::detail::get_stripped_gid(id);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return server_.unbind_gid(count, stripped_id);
+            return server_->unbind_gid(count, stripped_id);
         }
         server::primary_namespace::unbind_gid_action action;
         return action(std::move(dest), count, stripped_id);
@@ -264,7 +283,7 @@ namespace hpx { namespace agas {
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
             return hpx::make_ready_future(
-                server_.increment_credit(credits, lower, upper));
+                server_->increment_credit(credits, lower, upper));
         }
         server::primary_namespace::increment_credit_action action;
         return hpx::async(action, std::move(dest), credits, lower, upper);
@@ -273,12 +292,12 @@ namespace hpx { namespace agas {
     std::pair<naming::gid_type, naming::gid_type>
     primary_namespace::allocate(boost::uint64_t count)
     {
-        return server_.allocate(count);
+        return server_->allocate(count);
     }
 
     void primary_namespace::set_local_locality(naming::gid_type const& g)
     {
-        server_.set_local_locality(g);
+        server_->set_local_locality(g);
     }
 
     void primary_namespace::register_counter_types()
@@ -291,11 +310,11 @@ namespace hpx { namespace agas {
     {
         std::string str("locality#" +
             std::to_string(locality_id) + "/");
-        server_.register_server_instance(str.c_str(), locality_id);
+        server_->register_server_instance(str.c_str(), locality_id);
     }
 
     void primary_namespace::unregister_server_instance(error_code& ec)
     {
-        server_.unregister_server_instance(ec);
+        server_->unregister_server_instance(ec);
     }
 }}

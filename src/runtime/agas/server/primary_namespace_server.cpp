@@ -29,6 +29,7 @@
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <cstddef>

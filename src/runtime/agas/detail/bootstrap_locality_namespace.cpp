@@ -16,9 +16,14 @@
 
 #include <boost/cstdint.hpp>
 
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace hpx { namespace agas { namespace detail
 {
-    bootstrap_locality_namespace::bootstrap_locality_namespace(server::primary_namespace *primary)
+    bootstrap_locality_namespace::bootstrap_locality_namespace(
+        server::primary_namespace *primary)
       : server_(primary)
     {}
 
@@ -58,7 +63,8 @@ namespace hpx { namespace agas { namespace detail
         return server_.localities();
     }
 
-    parcelset::endpoints_type bootstrap_locality_namespace::resolve_locality(naming::gid_type locality)
+    parcelset::endpoints_type
+    bootstrap_locality_namespace::resolve_locality(naming::gid_type locality)
     {
         return server_.resolve_locality(locality);
     }
@@ -106,7 +112,8 @@ namespace hpx { namespace agas { namespace detail
         server::locality_namespace::register_global_counter_types();
     }
 
-    void bootstrap_locality_namespace::register_server_instance(boost::uint32_t locality_id)
+    void bootstrap_locality_namespace::register_server_instance(
+        boost::uint32_t locality_id)
     {
         HPX_ASSERT(locality_id == 0);
         const char* servicename("locality#0/");

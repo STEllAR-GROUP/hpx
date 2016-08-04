@@ -17,6 +17,9 @@
 
 #include <boost/cstdint.hpp>
 
+#include <string>
+#include <vector>
+
 namespace hpx { namespace agas { namespace detail
 {
     hosted_locality_namespace::hosted_locality_namespace(naming::address addr)
@@ -48,7 +51,8 @@ namespace hpx { namespace agas { namespace detail
         return action(gid_);
     }
 
-    parcelset::endpoints_type hosted_locality_namespace::resolve_locality(naming::gid_type locality)
+    parcelset::endpoints_type
+    hosted_locality_namespace::resolve_locality(naming::gid_type locality)
     {
         server::locality_namespace::resolve_locality_action action;
         future<parcelset::endpoints_type> endpoints_future

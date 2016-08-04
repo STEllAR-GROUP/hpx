@@ -20,6 +20,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/scoped_timer.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <cstddef>

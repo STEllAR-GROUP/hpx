@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unique_function.hpp>
 

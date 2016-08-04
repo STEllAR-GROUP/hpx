@@ -8,6 +8,7 @@
 #include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
 
 #include <string>
+#include <vector>
 
 namespace hpx { namespace agas { namespace detail
 {
@@ -82,7 +83,8 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::register_global_counter_types();
     }
 
-    void bootstrap_component_namespace::register_server_instance(boost::uint32_t locality_id)
+    void
+    bootstrap_component_namespace::register_server_instance(boost::uint32_t locality_id)
     {
         HPX_ASSERT(locality_id == 0);
         const char* servicename("locality#0/");

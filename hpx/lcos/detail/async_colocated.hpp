@@ -13,6 +13,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>

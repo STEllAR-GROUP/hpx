@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/register_apply_colocated.hpp>
