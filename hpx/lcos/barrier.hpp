@@ -1,62 +1,102 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_BARRIER_MAR_10_2010_0307PM)
-#define HPX_LCOS_BARRIER_MAR_10_2010_0307PM
+#ifndef HPX_LCOS_BARRIER_HPP
+#define HPX_LCOS_BARRIER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/stubs/barrier.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 
-#include <boost/exception_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
-{
-    class barrier
-      : public components::client_base<barrier, lcos::stubs::barrier>
+#include <string>
+
+namespace hpx { namespace lcos { namespace detail {
+    struct HPX_EXPORT barrier_node;
+}}}
+
+namespace hpx { namespace lcos {
+    /// \cond NOINTERNAL
+    namespace detail
     {
-        typedef components::client_base<barrier, lcos::stubs::barrier> base_type;
+        struct barrier_node;
+    }
+    /// \endcond
+
+    /// The barrier is an implementation performing a barrier over a number of
+    /// participating threads. The different threads don't have to be on the
+    /// same locality. This barrier can be invoked in a distributed application.
+    ///
+    /// For a local only barrier \see hpx::lcos::local::barrier.
+    class HPX_EXPORT barrier
+    {
+        typedef detail::barrier_node wrapped_type;
+        typedef components::managed_component<wrapped_type> wrapping_type;
 
     public:
-        barrier()
-        {}
+        /// Creates a barrier, rank is locality id, size is number of localities
+        ///
+        /// \param base_name The name of the barrier
+        ///
+        /// A barrier \param base_name is created. It expects that
+        /// hpx::get_num_localities() participate and the local rank is
+        /// hpx::get_locality_id().
+        barrier(std::string base_name);
 
-        /// Create a client side representation for the existing
-        /// \a server#barrier instance with the given global id \a gid.
-        barrier(naming::id_type gid)
-          : base_type(gid)
-        {}
-        barrier(lcos::shared_future<naming::id_type> gid)
-          : base_type(gid)
-        {}
+        /// Creates a barrier with a given size, rank is locality id
+        ///
+        /// \param base_name The name of the barrier
+        /// \param num The number of participating threads
+        ///
+        /// A barrier \param base_name is created. It expects that
+        /// \param num participate and the local rank is
+        /// hpx::get_locality_id().
+        barrier(std::string base_name, std::size_t num);
 
-        ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
+        /// Creates a barrier with a given size and rank
+        ///
+        /// \param base_name The name of the barrier
+        /// \param num The number of participating threads
+        /// \param rank
+        ///
+        /// A barrier \param base_name is created. It expects that
+        /// \param num participate and the local rank is \param rank.
+        barrier(std::string base_name, std::size_t num, std::size_t rank);
 
-        lcos::future<void> wait_async()
-        {
-            return this->base_type::wait_async(get_id());
-        }
+        ~barrier();
 
-        void wait()
-        {
-            this->lcos::stubs::barrier::wait(get_id());
-        }
+        /// Wait until each participant entered the barrier. Must be called by
+        /// all participants
+        void wait();
 
-        lcos::future<void> set_exception_async(boost::exception_ptr const& e)
-        {
-            return this->base_type::set_exception_async(get_id(), e);
-        }
+        /// Wait until each participant entered the barrier. Must be called by
+        /// all participants
+        ///
+        /// \returns a future that becomes ready once all participants entered
+        /// the barrier.
+        hpx::future<void> wait_async();
 
-        void set_exception(boost::exception_ptr const& e)
-        {
-            this->base_type::set_exception(get_id(), e);
-        }
+        /// Resets this barrier instance.
+        void release();
+
+        /// Get the instance of the global barrier
+        static barrier& get_global_barrier();
+
+        /// Perform a global synchronization using the default global barrier
+        /// The barrier is created once at startup and can be reused throughout
+        /// the lifetime of an HPX application.
+        ///
+        /// \note This function currently does not support dynamic connection
+        /// and disconnection of localities.
+        static void synchronize();
+
+    private:
+        boost::intrusive_ptr<wrapping_type> node_;
     };
 }}
 
 #endif
-

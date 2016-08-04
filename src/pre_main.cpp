@@ -28,12 +28,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/tuple.hpp>
 
-#define HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION
-
-#if defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
-#  include <hpx/lcos/broadcast.hpp>
-#endif
-
 #include <boost/chrono/chrono.hpp>
 
 #include <cstddef>
@@ -41,27 +35,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-
-#if defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
-
-///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::server::runtime_support::call_startup_functions_action
-    call_startup_functions_action;
-typedef
-    hpx::lcos::detail::make_broadcast_action<call_startup_functions_action>::type
-    call_startup_functions_broadcast_action;
-
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_startup_functions_action,
-    call_startup_functions_action)
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    call_startup_functions_broadcast_action)
-
-HPX_REGISTER_BROADCAST_ACTION_ID(call_startup_functions_action,
-    call_startup_functions_action,
-    hpx::actions::broadcast_call_startup_functions_action_id)
-
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 static void garbage_collect_non_blocking()
@@ -76,51 +49,6 @@ static void garbage_collect()
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-
-///////////////////////////////////////////////////////////////////////////////
-// Create a new barrier and register its id with the given symbolic name.
-static lcos::barrier
-create_barrier(std::size_t num_localities, char const* symname)
-{
-    lcos::barrier b = lcos::barrier::create(find_here(), num_localities);
-
-    // register an unmanaged gid to avoid id-splitting during startup
-    agas::register_name(launch::sync, symname, b.get_id().get_gid());
-    return b;
-}
-
-static void delete_barrier(lcos::barrier& b, char const* symname)
-{
-    agas::unregister_name(launch::sync, symname);
-    b.free();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Find a registered barrier object from its symbolic name.
-static lcos::barrier
-find_barrier(char const* symname)
-{
-    naming::id_type barrier_id;
-    for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-    {
-        barrier_id = agas::resolve_name(launch::sync, symname);
-        if (barrier_id != naming::invalid_id)
-            break;
-
-        boost::this_thread::sleep_for(
-            boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-    }
-    if (HPX_UNLIKELY(!barrier_id))
-    {
-        HPX_THROW_EXCEPTION(network_error, "pre_main::find_barrier",
-            std::string("couldn't find boot barrier ") + symname);
-    }
-    return lcos::barrier(barrier_id);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Symbolic names of global boot barrier objects
-static const char* const startup_barrier_name = "/0/agas/startup_barrier";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install performance counter startup functions for core subsystems.
@@ -171,7 +99,6 @@ int pre_main(runtime_mode mode)
 
     naming::resolver_client& agas_client = naming::get_agas_client();
     runtime& rt = get_runtime();
-    util::runtime_configuration const& cfg = rt.get_config();
 
     int exit_code = 0;
     if (runtime_mode_connect == mode)
@@ -209,8 +136,6 @@ int pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_code ? ", application exit has been requested" : "");
 
-        lcos::barrier startup_barrier;
-
         // {{{ Second and third stage barrier creation.
         if (agas_client.is_bootstrap())
         {
@@ -222,23 +147,11 @@ int pre_main(runtime_mode mode)
                     , "no console locality registered");
             }
 
-            std::size_t const num_localities =
-                static_cast<std::size_t>(cfg.get_num_localities());
-
-            if (num_localities > 1)
-            {
-                startup_barrier =
-                    create_barrier(num_localities, startup_barrier_name);
-            }
-
             LBT_(info) << "(2nd stage) pre_main: created \
                            2nd and 3rd stage boot barriers";
         }
         else // Hosted.
         {
-            // Initialize the barrier clients (find them in AGAS)
-            startup_barrier = find_barrier(startup_barrier_name);
-
             LBT_(info)
                 << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
         }
@@ -254,52 +167,25 @@ int pre_main(runtime_mode mode)
         // Second stage bootstrap synchronizes component loading across all
         // localities, ensuring that the component namespace tables are fully
         // populated before user code is executed.
-        if (startup_barrier)
-        {
-            startup_barrier.wait();
-            LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
-        }
+        lcos::barrier::synchronize();
+        LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
-#if defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
-        if (agas_client.is_bootstrap())
-        {
-            std::vector<naming::id_type> localities = hpx::find_all_localities();
-
-            call_startup_functions_action act;
-            lcos::broadcast(act, localities, true).get();
-            LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
-
-            lcos::broadcast(act, localities, false).get();
-            LBT_(info) << "(4th stage) pre_main: ran startup functions";
-        }
-#else
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
         // Third stage separates pre-startup and startup function phase.
-        if (startup_barrier)
-        {
-            startup_barrier.wait();
-            LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
-        }
+        lcos::barrier::synchronize();
+        LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(4th stage) pre_main: ran startup functions";
-#endif
 
-        if (startup_barrier)
-        {
-            // Forth stage bootstrap synchronizes startup functions across all
-            // localities. This is done after component loading to guarantee that
-            // all user code, including startup functions, are only run after the
-            // component tables are populated.
-            startup_barrier.wait();
-            LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
-
-            // Tear down the startup barrier.
-            if (agas_client.is_bootstrap())
-                delete_barrier(startup_barrier, startup_barrier_name);
-        }
+        // Forth stage bootstrap synchronizes startup functions across all
+        // localities. This is done after component loading to guarantee that
+        // all user code, including startup functions, are only run after the
+        // component tables are populated.
+        lcos::barrier::synchronize();
+        LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
     }
 
     // Enable logging. Even if we terminate at this point we will see all
