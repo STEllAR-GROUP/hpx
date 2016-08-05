@@ -73,8 +73,17 @@ namespace boost
       const path & full_path,      // example: c:/foo/boost/filesystem/path.hpp
       const string & contents)     // contents of file to be inspected
     {
-      if (contents.find( "hpxinspect:" "nodeprecatedinclude" ) != string::npos)
-        return;
+      std::string::size_type p = contents.find( "hpxinspect:" "nodeprecatedinclude" );
+      if (p != string::npos)
+      {
+        // ignore this directive here (it is handled below) if it is followed
+        // by a ':'
+        if (p == contents.size() - 30 ||
+            (contents.size() > p + 30 && contents[p + 30] != ':'))
+        {
+          return;
+        }
+      }
 
       std::set<std::string> found_includes;
 
@@ -93,6 +102,10 @@ namespace boost
             std::string found_include(m[1].first, m[1].second);
             if (found_includes.find(found_include) == found_includes.end())
             {
+              std::string tag("hpxinspect:" "nodeprecatedinclude:" + found_include);
+              if (contents.find(tag) != string::npos)
+                continue;
+
               // name was found
               found_includes.insert(found_include);
 
