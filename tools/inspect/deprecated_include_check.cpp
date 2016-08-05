@@ -33,6 +33,7 @@ namespace boost
       { "boost/shared_ptr\\.hpp", "memory" },
       { "boost/make_shared\\.hpp", "memory" },
       { "boost/enable_shared_from_this\\.hpp", "memory" },
+      { "boost/bind\\.hpp", "hpx/util/bind.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { nullptr, nullptr }
     };
