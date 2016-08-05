@@ -27,13 +27,13 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct keep_id_alive
     {
-        explicit keep_id_alive(naming::id_type const& gid)
-            : gid_(gid)
+        explicit keep_id_alive(naming::id_type && id)
+          : id_(std::move(id))
         {}
 
         void operator()() const {}
 
-        naming::id_type gid_;
+        naming::id_type id_;
     };
 
     template <typename Result>
@@ -43,16 +43,12 @@ namespace hpx { namespace detail
 
     public:
         handle_managed_target(hpx::id_type const& id, future<Result>& f)
-          : target_is_managed_(false), f_(f)
+          : target_is_managed_(false), unmanaged_id_(id), f_(f)
         {
             if (id.get_management_type() == naming::id_type::managed)
             {
                 id_ = naming::id_type(id.get_gid(), naming::id_type::unmanaged);
                 target_is_managed_ = true;
-            }
-            else
-            {
-                id_ = id;
             }
         }
 
@@ -69,17 +65,22 @@ namespace hpx { namespace detail
                 shared_state_ptr const& state =
                     traits::detail::get_shared_state(f_);
                 if (state)
-                    state->set_on_completed(hpx::detail::keep_id_alive(id_));
+                {
+                    HPX_ASSERT(id_);
+                    state->set_on_completed(
+                        hpx::detail::keep_id_alive(std::move(id_)));
+                }
             }
         }
 
         hpx::id_type const& get_id() const
         {
-            return id_;
+            return target_is_managed_ ? id_ : unmanaged_id_;
         }
 
         bool target_is_managed_;
         naming::id_type id_;
+        naming::id_type const& unmanaged_id_;
         future<Result>& f_;
     };
 
