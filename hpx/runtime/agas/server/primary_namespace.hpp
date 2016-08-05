@@ -287,7 +287,7 @@ struct HPX_EXPORT primary_namespace
 
     resolved_type resolve_gid(naming::gid_type id);
 
-    naming::gid_type colocate(naming::gid_type id);
+    naming::id_type colocate(naming::gid_type id);
 
     naming::address unbind_gid(
         boost::uint64_t count

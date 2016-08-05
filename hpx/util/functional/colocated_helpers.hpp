@@ -16,7 +16,6 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <memory>
 #include <utility>
@@ -31,15 +30,9 @@ namespace hpx { namespace util { namespace functional
     {
         extract_locality() {}
 
-        typedef
-            hpx::util::tuple<naming::gid_type, agas::gva, naming::gid_type>
-            resolved_type;
-
-        naming::id_type operator()(resolved_type const& rep,
+        naming::id_type operator()(naming::id_type const& locality_id,
             naming::id_type const& id) const
         {
-            naming::id_type locality_id(
-                hpx::util::get<2>(rep), naming::id_type::unmanaged);
             if(locality_id == naming::invalid_id)
             {
                 HPX_THROW_EXCEPTION(hpx::no_success,

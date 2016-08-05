@@ -509,9 +509,10 @@ primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type
     return r;
 } // }}}
 
-naming::gid_type primary_namespace::colocate(naming::gid_type id)
+naming::id_type primary_namespace::colocate(naming::gid_type id)
 {
-    return hpx::util::get<2>(resolve_gid(id));
+    return naming::id_type(
+        hpx::util::get<2>(resolve_gid(id)), naming::id_type::unmanaged);
 }
 
 naming::address primary_namespace::unbind_gid(

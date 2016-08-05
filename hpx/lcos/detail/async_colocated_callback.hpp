@@ -35,7 +35,7 @@ namespace hpx { namespace detail
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
         remote_result_type;
-        typedef agas::server::primary_namespace::resolve_gid_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return detail::async_continue_r_cb<action_type, remote_result_type>(
@@ -80,7 +80,7 @@ namespace hpx { namespace detail
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
         remote_result_type;
-        typedef agas::server::primary_namespace::resolve_gid_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return detail::async_continue_r_cb<action_type, remote_result_type>(

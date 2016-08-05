@@ -237,8 +237,7 @@ namespace hpx { namespace agas {
             naming::id_type::unmanaged);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {
-            return hpx::make_ready_future(
-                naming::id_type(server_->colocate(id), naming::id_type::unmanaged));
+            return hpx::make_ready_future(server_->colocate(id));
         }
         server::primary_namespace::colocate_action action;
         return hpx::async(action, std::move(dest), id);

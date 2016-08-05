@@ -39,7 +39,7 @@ namespace hpx { namespace detail
             agas::primary_namespace::get_service_instance(gid.get_gid()),
             naming::id_type::unmanaged);
 
-        typedef agas::server::primary_namespace::resolve_gid_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return apply_continue<action_type>(
@@ -80,7 +80,7 @@ namespace hpx { namespace detail
             agas::primary_namespace::get_service_instance(gid.get_gid()),
             naming::id_type::unmanaged);
 
-        typedef agas::server::primary_namespace::resolve_gid_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return apply_continue<action_type>(

@@ -49,13 +49,8 @@ namespace hpx { namespace detail
 }}
 
 #define HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(Action, Name)                \
-/**/
-#define HPX_REGISTER_ASYNC_COLOCATED(Action, Name)                            \
-/**/
-#if 0
-#define HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(Action, Name)                \
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                            \
-        void (hpx::naming::id_type, hpx::agas::response)                      \
+        void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::async_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
                 Action                                                        \
@@ -70,7 +65,7 @@ namespace hpx { namespace detail
 
 #define HPX_REGISTER_ASYNC_COLOCATED(Action, Name)                            \
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION(                                        \
-        void (hpx::naming::id_type, hpx::agas::response)                      \
+        void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::async_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
                 Action                                                        \
@@ -82,7 +77,6 @@ namespace hpx { namespace detail
       , Name                                                                  \
     );                                                                        \
 /**/
-#endif
 
 namespace hpx { namespace detail
 {
@@ -103,7 +97,7 @@ namespace hpx { namespace detail
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
         remote_result_type;
-        typedef agas::server::primary_namespace::resolve_gid_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return detail::async_continue_r<action_type, remote_result_type>(
@@ -150,7 +144,7 @@ namespace hpx { namespace detail
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
         remote_result_type;
-        typedef agas::server::primary_namespace::resolve_gid_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return detail::async_continue_r<action_type, remote_result_type>(
