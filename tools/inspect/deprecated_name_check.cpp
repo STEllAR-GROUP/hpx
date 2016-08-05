@@ -51,6 +51,10 @@ namespace boost
       { "(\\bboost\\s*::\\s*detail\\s*::\\s*atomic_count\\b)",
         "hpx::util::atomic_count" },
       { "(\\bboost\\s*::\\s*function\\b)", "hpx::util::function_nonser" },
+      { "(\\bboost\\s*::\\s*shared_ptr\\b)", "std::shared_otr" },
+      { "(\\bboost\\s*::\\s*make_shared\\b)", "std::make_shared" },
+      { "(\\bboost\\s*::\\s*enable_shared_from_this\\b)",
+        "std::enable_shared_from_this" },
       { "(\\bNULL\\b)", "nullptr" },
       { nullptr, nullptr }
     };

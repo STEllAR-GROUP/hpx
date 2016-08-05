@@ -30,6 +30,9 @@ namespace boost
       { "boost/utility/enable_if\\.hpp", "type_traits" },
       { "boost/detail/atomic_count\\.hpp", "hpx/util/atomic_count.hpp" },
       { "boost/function\\.hpp", "hpx/util/function.hpp" },
+      { "boost/shared_ptr\\.hpp", "memory" },
+      { "boost/make_shared\\.hpp", "memory" },
+      { "boost/enable_shared_from_this\\.hpp", "memory" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { nullptr, nullptr }
     };
