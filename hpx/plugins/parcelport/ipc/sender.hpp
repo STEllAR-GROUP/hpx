@@ -16,6 +16,7 @@
 #include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
 #include <hpx/plugins/parcelport/ipc/data_window.hpp>
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/bind.hpp>
@@ -36,10 +37,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         /// Construct a sending parcelport_connection with the given io_service.
         sender(boost::asio::io_service& io_service,
             parcelset::locality const& here, parcelset::locality const& there,
-            data_buffer_cache& cache,
-            performance_counters::parcels::gatherer& parcels_sent,
+            data_buffer_cache& cache, parcelset::parcelport* pp,
             std::size_t connection_count)
-          : window_(io_service), there_(there), parcels_sent_(parcels_sent),
+          : window_(io_service), there_(there), pp_(pp),
             cache_(cache)
         {
             std::string fullname(here.get<locality>().address() + "." +
@@ -126,7 +126,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             // complete data point and push back onto gatherer
             buffer_->data_point_.time_ =
                 timer_.elapsed_nanoseconds() - buffer_->data_point_.time_;
-            parcels_sent_.add_data(buffer_->data_point_);
+            pp->add_sent_data(buffer_->data_point_);
 
             // now handle the acknowledgment byte which is sent by the receiver
             void (sender::*f)(boost::system::error_code const&,

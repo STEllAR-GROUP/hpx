@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
+#include <cstring>
 #include <string>
 #include <utility>
 
@@ -109,6 +110,11 @@ namespace hpx { namespace util
         size_type operator()(std::string const& key) const
         {
             return hash(key.c_str(), static_cast<std::size_t>(key.size()));
+        }
+
+        size_type operator()(char const* key) const
+        {
+            return hash(key, std::strlen(key));
         }
 
         /// re-seed the hash generator

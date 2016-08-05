@@ -14,6 +14,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -135,7 +136,8 @@ namespace hpx
 
         template <typename Buffer, typename NewGids>
         std::size_t
-        encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
+        encode_parcels(parcelport& pp,
+            parcel const * ps, std::size_t num_parcels, Buffer & buffer,
             int archive_flags_, boost::uint64_t max_outbound_size, NewGids new_gids)
         {
             HPX_ASSERT(buffer.data_.empty());
@@ -197,8 +199,25 @@ namespace hpx
 
                         for(std::size_t i = 0; i != parcels_sent; ++i)
                         {
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                            std::size_t archive_pos = archive.current_pos();
+                            boost::int64_t serialize_time =
+                                timer.elapsed_nanoseconds();
+#endif
+
                             LPT_(debug) << ps[i];
                             archive << ps[i];
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                            performance_counters::parcels::data_point action_data;
+                            action_data.bytes_ = archive.current_pos() - archive_pos;
+                            action_data.serialization_time_ =
+                                timer.elapsed_nanoseconds() - serialize_time;
+                            action_data.num_parcels_ = 1;
+                            pp.add_sent_data(
+                                ps[i].get_action()->get_action_name(),
+                                action_data);
+#endif
                         }
 
                         arg_size = archive.bytes_written();

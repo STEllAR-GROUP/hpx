@@ -1,13 +1,14 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
+#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstdint>
@@ -17,10 +18,10 @@
 namespace hpx { namespace performance_counters
 {
     ///////////////////////////////////////////////////////////////////////////
-    // Discoverer function for action invocation counters
-    bool action_invocation_counter_discoverer(counter_info const& info,
+    // Discoverer function for per-action parcel data counters
+    bool per_action_data_counter_discoverer(counter_info const& info,
         discover_counter_func const& f, discover_counters_mode mode,
-        hpx::actions::detail::invocation_count_registry& registry,
+        hpx::parcelset::detail::per_action_data_counter_registry& registry,
         error_code& ec)
     {
         // compose the counter name templates
@@ -38,28 +39,22 @@ namespace hpx { namespace performance_counters
         return true;
     }
 
-    bool local_action_invocation_counter_discoverer(counter_info const& info,
+    bool per_action_data_counter_discoverer(counter_info const& info,
         discover_counter_func const& f, discover_counters_mode mode,
         error_code& ec)
     {
-        using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_discoverer(info, f, mode,
-            invocation_count_registry::local_instance(), ec);
-    }
-
-    bool remote_action_invocation_counter_discoverer(counter_info const& info,
-        discover_counter_func const& f, discover_counters_mode mode,
-        error_code& ec)
-    {
-        using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_discoverer(info, f, mode,
-            invocation_count_registry::remote_instance(), ec);
+        using hpx::parcelset::detail::per_action_data_counter_registry;
+        return per_action_data_counter_discoverer(info, f, mode,
+            per_action_data_counter_registry::instance(), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Creation function for action invocation counter
-    naming::gid_type action_invocation_counter_creator(counter_info const& info,
-        hpx::actions::detail::invocation_count_registry& registry,
+    // Creation function for per-action parcel data counters
+    naming::gid_type per_action_data_counter_creator(counter_info const& info,
+        hpx::parcelset::detail::per_action_data_counter_registry& registry,
+        hpx::util::function_nonser<
+            std::int64_t(std::string const&, bool)
+        > const& counter_func,
         error_code& ec)
     {
         switch (info.type_) {
@@ -71,23 +66,25 @@ namespace hpx { namespace performance_counters
 
                 if (paths.parentinstance_is_basename_) {
                     HPX_THROWS_IF(ec, bad_parameter,
-                        "action_invocation_counter_creator",
+                        "per_action_data_counter_creator",
                         "invalid action invocation counter name (instance name "
                         "must not be a valid base counter name)");
                     return naming::invalid_gid;
                 }
 
                 if (paths.parameters_.empty()) {
-                    HPX_THROWS_IF(ec, bad_parameter,
-                        "action_invocation_counter_creator",
-                        "invalid action invocation counter parameter: must "
-                        "specify an action type");
-                    return naming::invalid_gid;
+                    // if no parameters (action name) is given assume that this
+                    // counter should report the overall value for all actions
+                    using util::placeholders::_1;
+                    auto const& f =
+                        util::bind(counter_func, paths.parameters_, _1);
+                    return performance_counters::locality_raw_counter_creator(
+                        info, f,ec);
                 }
 
                 // ask registry
                 hpx::util::function_nonser<std::int64_t(bool)> f =
-                    registry.get_invocation_counter(paths.parameters_);
+                    registry.get_counter(paths.parameters_, counter_func);
 
                 return detail::create_raw_counter(info, std::move(f), ec);
             }
@@ -95,26 +92,23 @@ namespace hpx { namespace performance_counters
 
         default:
             HPX_THROWS_IF(ec, bad_parameter,
-                "action_invocation_counter_creator",
+                "per_action_data_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
     }
 
-    naming::gid_type local_action_invocation_counter_creator(
-        counter_info const& info, error_code& ec)
+    naming::gid_type per_action_data_counter_creator(
+        counter_info const& info,
+        hpx::util::function_nonser<
+            std::int64_t(std::string const&, bool)
+        > const& f,
+        error_code& ec)
     {
-        using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_creator(info,
-            invocation_count_registry::local_instance(), ec);
-    }
-
-    naming::gid_type remote_action_invocation_counter_creator(
-        counter_info const& info, error_code& ec)
-    {
-        using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_creator(info,
-            invocation_count_registry::remote_instance(), ec);
+        using hpx::parcelset::detail::per_action_data_counter_registry;
+        return per_action_data_counter_creator(info,
+            per_action_data_counter_registry::instance(), f, ec);
     }
 }}
 
+#endif

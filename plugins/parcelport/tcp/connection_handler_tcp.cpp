@@ -144,8 +144,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
-        std::shared_ptr<sender> sender_connection(new sender(
-            io_service, l, this->parcels_sent_));
+        std::shared_ptr<sender> sender_connection(new sender(io_service, l, this));
 
         // Connect to the target locality, retry if needed
         boost::system::error_code error = boost::asio::error::try_again;

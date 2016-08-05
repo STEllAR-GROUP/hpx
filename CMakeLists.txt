@@ -486,6 +486,12 @@ hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
 hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
   "Enable the TCP based parcelport."
   ON CATEGORY "Parcelport")
+hpx_option(HPX_WITH_PARCELPORT_ACTION_COUNTERS BOOL
+  "Enable performance counters reporting parcelport statistics on a per-action basis."
+  OFF CATEGORY "Parcelport")
+if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+endif()
 
 ## ibverbs parcelport settings
 hpx_option(HPX_WITH_PARCELPORT_IBVERBS_IFNAME STRING
