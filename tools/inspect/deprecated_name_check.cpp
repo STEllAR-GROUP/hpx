@@ -56,6 +56,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*enable_shared_from_this\\b)",
         "std::enable_shared_from_this" },
       { "(\\bboost\\s*::\\s*bind\\b)", "hpx::util::bind" },
+      { "(\\bboost\\s*::\\s*unique_lock\\b)", "std::unique_lock" },
       { "(\\bNULL\\b)", "nullptr" },
       { nullptr, nullptr }
     };
