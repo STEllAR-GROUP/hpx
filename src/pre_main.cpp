@@ -6,6 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+
 #include <hpx/runtime.hpp>
 
 #include <hpx/error_code.hpp>
@@ -30,6 +33,8 @@
 #if defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
 #  include <hpx/lcos/broadcast.hpp>
 #endif
+
+#include <boost/chrono/chrono.hpp>
 
 #include <cstddef>
 #include <string>
