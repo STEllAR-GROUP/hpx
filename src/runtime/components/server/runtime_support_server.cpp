@@ -582,7 +582,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 
@@ -677,7 +677,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 

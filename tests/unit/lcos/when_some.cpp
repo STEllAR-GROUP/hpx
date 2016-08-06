@@ -10,6 +10,9 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/assign/std/vector.hpp>
+
+#include <chrono>
 #include <list>
 #include <memory>
 #include <string>
@@ -19,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 int make_int_slowly()
 {
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
     return 42;
 }
 

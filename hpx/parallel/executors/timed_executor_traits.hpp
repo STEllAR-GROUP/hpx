@@ -16,9 +16,9 @@
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <type_traits>
 #include <utility>

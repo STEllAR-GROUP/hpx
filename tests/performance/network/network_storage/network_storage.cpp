@@ -12,6 +12,7 @@
 #include <boost/random.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <iostream>
 #include <memory>
@@ -353,7 +354,7 @@ int RemoveCompletions()
                 }
             }
         }
-        hpx::this_thread::suspend(boost::chrono::microseconds(10));
+        hpx::this_thread::suspend(std::chrono::microseconds(10));
     }
     return num_removed;
 }

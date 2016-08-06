@@ -7,8 +7,8 @@
 #define HPX_UTIL_POOL_TIMER
 
 #include <hpx/config.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <memory>
 #include <string>

@@ -11,11 +11,10 @@
 
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
-#else
-#include <boost/chrono/chrono.hpp>
-#include <boost/chrono/process_cpu_clocks.hpp>
 #endif
 #include <boost/cstdint.hpp>
+
+#include <chrono>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace statistics
@@ -72,8 +71,8 @@ namespace hpx { namespace util { namespace cache { namespace statistics
 #if defined(__bgq__)
                 return GetTimeBase();
 #else
-                boost::chrono::nanoseconds ns =
-                    boost::chrono::steady_clock::now().time_since_epoch();
+                std::chrono::nanoseconds ns =
+                    std::chrono::steady_clock::now().time_since_epoch();
                 return static_cast<boost::uint64_t>(ns.count());
 #endif
             }

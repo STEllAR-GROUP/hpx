@@ -8,15 +8,15 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/range/functions.hpp>
+
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
 #include <string>
 #include <vector>
 
-#include <boost/range/functions.hpp>
-#include <boost/chrono.hpp>
-
-using namespace boost::chrono;
+using namespace std::chrono;
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test(int passed_through)

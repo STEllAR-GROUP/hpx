@@ -27,6 +27,7 @@
 #include <boost/atomic.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <utility>

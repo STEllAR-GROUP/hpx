@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -26,7 +27,7 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-using boost::chrono::microseconds;
+using std::chrono::microseconds;
 
 ///////////////////////////////////////////////////////////////////////////////
 void suspend_test(barrier& b, std::size_t iterations, std::size_t n)

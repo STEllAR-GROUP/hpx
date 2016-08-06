@@ -11,7 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/chrono.hpp>
+#include <chrono>
 
 ///////////////////////////////////////////////////////////////////////////////
 void wake_up_after_2_seconds()
@@ -21,7 +21,7 @@ void wake_up_after_2_seconds()
     hpx::util::high_resolution_timer t;
 
     // Schedule a wakeup after 2 seconds.
-    using boost::chrono::seconds;
+    using std::chrono::seconds;
     hpx::future<void> f = hpx::make_ready_future_after(seconds(2));
 
     // ... do other things while waiting for the future to get ready
@@ -40,7 +40,7 @@ int return_int_at_time()
     hpx::util::high_resolution_timer t;
 
     // Schedule a wakeup 2 seconds from now.
-    using namespace boost::chrono;
+    using namespace std::chrono;
     hpx::future<int> f = hpx::make_ready_future_at(
         steady_clock::now() + seconds(2), 42);
 

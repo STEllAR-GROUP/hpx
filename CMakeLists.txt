@@ -738,6 +738,14 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
+# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0
+hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
+    "Enable support for boost::chrono (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
@@ -914,7 +922,7 @@ hpx_check_for_cxx11_std_array(
   DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
 
 hpx_check_for_cxx11_std_chrono(
-  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
+  REQUIRED "HPX needs support for C++11 std::chrono")
 
 hpx_check_for_cxx11_std_cstdint(
   DEFINITIONS HPX_HAVE_CXX11_STD_CSTDINT)

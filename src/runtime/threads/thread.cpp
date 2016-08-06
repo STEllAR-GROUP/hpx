@@ -16,8 +16,8 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
