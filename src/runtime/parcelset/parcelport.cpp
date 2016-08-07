@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+
 // This is needed to make everything work with the Intel MPI library header
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
