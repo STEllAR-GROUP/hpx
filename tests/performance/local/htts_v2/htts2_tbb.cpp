@@ -13,7 +13,9 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-template <typename BaseClock = boost::chrono::steady_clock>
+#include <chrono>
+
+template <typename BaseClock = std::chrono::steady_clock>
 struct payload_functor : tbb::task
 {
     boost::uint64_t const payload_duration_;
@@ -29,7 +31,7 @@ struct payload_functor : tbb::task
     }
 };
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct stage_tasks_functor : public tbb::task
 {
   private:
@@ -89,7 +91,7 @@ struct stage_tasks_functor : public tbb::task
     }
 };
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct tbb_driver : htts2::driver
 {
     tbb_driver(int argc, char** argv)

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/cache/entries/entry.hpp>
 
-#include <boost/chrono/chrono.hpp>
+#include <chrono>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace entries
@@ -57,11 +57,11 @@ namespace hpx { namespace util { namespace cache { namespace entries
         ///           \a false.
         bool insert()
         {
-            insertion_time_ = boost::chrono::steady_clock::now();
+            insertion_time_ = std::chrono::steady_clock::now();
             return true;
         }
 
-        boost::chrono::steady_clock::time_point const& get_creation_time() const
+        std::chrono::steady_clock::time_point const& get_creation_time() const
         {
             return insertion_time_;
         }
@@ -74,7 +74,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
         }
 
     private:
-        boost::chrono::steady_clock::time_point insertion_time_;
+        std::chrono::steady_clock::time_point insertion_time_;
     };
 }}}}
 

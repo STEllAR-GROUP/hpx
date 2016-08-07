@@ -10,8 +10,6 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 

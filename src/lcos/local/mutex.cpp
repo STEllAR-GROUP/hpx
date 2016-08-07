@@ -12,9 +12,9 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <mutex>
 #include <utility>

@@ -12,8 +12,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/chrono.hpp>
-
+#include <chrono>
 #include <utility>
 #include <vector>
 
@@ -37,7 +36,7 @@ struct test_server
 
     void busy_work() const
     {
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     int get_data() const

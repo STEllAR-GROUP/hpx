@@ -235,8 +235,9 @@ int main(int argc, char* argv[])
         ;
 
     // explicitly disable message handlers (parcel coalescing)
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.parcel.message_handlers=0");
+    std::vector<std::string> const cfg = {
+        "hpx.parcel.message_handlers=0"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

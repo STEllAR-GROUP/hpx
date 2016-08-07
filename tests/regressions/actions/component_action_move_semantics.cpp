@@ -9,8 +9,6 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/config/compiler_specific.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -306,9 +304,9 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // we need to explicitly enable the test components used by this test
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.components.action_move_semantics.enabled! = 1";
+    std::vector<std::string> const cfg = {
+        "hpx.components.action_move_semantics.enabled! = 1"
+    };
 
     // Initialize and run HPX.
     return hpx::init(desc_commandline, argc, argv, cfg);

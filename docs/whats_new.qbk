@@ -24,6 +24,11 @@ particular order):
 
 [heading Breaking Changes]
 
+* We have removed (default) support for `boost::chrono` in interfaces, uses of
+  it have been replaced with `std::chrono`. This facility can be still enabled
+  at configure time by specifying `-DHPX_WITH_BOOST_CHRONO_COMPATIBILITY=On`
+  to __cmake__.
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.

@@ -12,7 +12,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {

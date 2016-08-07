@@ -34,7 +34,6 @@
 #endif
 
 #include <boost/version.hpp>
-#include <boost/chrono/chrono.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>

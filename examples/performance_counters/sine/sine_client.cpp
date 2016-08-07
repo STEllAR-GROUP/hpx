@@ -8,7 +8,6 @@
 
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
-#include <boost/date_time.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // This example demonstrates the creation and use of different types of
@@ -113,7 +112,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 
         // give up control to the thread manager, we will be resumed after
         // 'pause' ms
-        hpx::this_thread::suspend(boost::chrono::milliseconds(pause));
+        hpx::this_thread::suspend(std::chrono::milliseconds(pause));
     }
     return 0;
 }

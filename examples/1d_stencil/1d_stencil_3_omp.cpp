@@ -18,8 +18,8 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
-#include <boost/chrono.hpp>
 
+#include <chrono>
 #include <cstdlib>
 #include <vector>
 
@@ -31,8 +31,8 @@
 // Timer with nanosecond resolution
 inline boost::uint64_t now()
 {
-    boost::chrono::nanoseconds ns =
-        boost::chrono::steady_clock::now().time_since_epoch();
+    std::chrono::nanoseconds ns =
+        std::chrono::steady_clock::now().time_since_epoch();
     return static_cast<boost::uint64_t>(ns.count());
 }
 

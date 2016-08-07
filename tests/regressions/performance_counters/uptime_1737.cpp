@@ -10,6 +10,8 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
+
 int hpx_main(int argc, char ** argv)
 {
     using hpx::performance_counters::performance_counter;
@@ -43,7 +45,7 @@ int hpx_main(int argc, char ** argv)
 
     // make sure reported value is in seconds
     double start = uptime.get_value<double>(hpx::launch::sync);
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
     double end = uptime.get_value<double>(hpx::launch::sync);
 
     HPX_TEST(end - start >= 1.0 && end - start < 1.1);

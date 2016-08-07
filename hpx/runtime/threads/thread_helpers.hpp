@@ -14,12 +14,11 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/thread_description.hpp>
 #include <hpx/util_fwd.hpp>
+#include <hpx/util/steady_clock.hpp>
+#include <hpx/util/thread_description.hpp>
 
-#include <boost/chrono/chrono.hpp>
-
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 
@@ -539,7 +538,7 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(boost::chrono::milliseconds(ms), description, ec);
+        return suspend(std::chrono::milliseconds(ms), description, ec);
     }
 
     /// Returns a reference to the executor which was used to create the current

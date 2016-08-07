@@ -8,8 +8,6 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 #include <string>
 #include <vector>
 

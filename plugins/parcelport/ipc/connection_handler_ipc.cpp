@@ -19,7 +19,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/asio/placeholders.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <memory>
 #include <mutex>

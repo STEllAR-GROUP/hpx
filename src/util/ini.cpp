@@ -32,7 +32,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #ifdef __APPLE__
 #include <crt_externs.h>

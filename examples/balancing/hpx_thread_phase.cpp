@@ -10,9 +10,9 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/chrono/duration.hpp>
 #include <boost/lockfree/queue.hpp>
 
+#include <chrono>
 #include <iostream>
 #include <mutex>
 #include <utility>
@@ -24,7 +24,7 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::lcos::local::barrier;
 using hpx::lcos::local::mutex;

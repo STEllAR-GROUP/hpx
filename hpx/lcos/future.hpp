@@ -23,7 +23,6 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/identity.hpp>
@@ -31,6 +30,7 @@
 #include <hpx/util/lazy_conditional.hpp>
 #include <hpx/util/lazy_enable_if.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <boost/exception_ptr.hpp>

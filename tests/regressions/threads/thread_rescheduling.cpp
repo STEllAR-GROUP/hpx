@@ -15,13 +15,14 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <chrono>
 #include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 
