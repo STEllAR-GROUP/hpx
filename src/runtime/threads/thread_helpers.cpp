@@ -18,10 +18,10 @@
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
-#include <hpx/util/date_time_chrono.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #  include <hpx/util/register_locks.hpp>
 #endif
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 

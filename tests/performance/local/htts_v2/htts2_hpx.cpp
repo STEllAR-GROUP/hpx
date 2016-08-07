@@ -14,10 +14,11 @@
 
 #include "htts2.hpp"
 
+#include <chrono>
 #include <string>
 #include <vector>
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct hpx_driver : htts2::driver
 {
     hpx_driver(int argc, char** argv)

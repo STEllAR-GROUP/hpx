@@ -14,8 +14,8 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/parallel/executors/timed_executor_traits.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <type_traits>
 #include <utility>

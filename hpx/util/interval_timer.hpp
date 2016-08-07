@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <boost/cstdint.hpp>
 

@@ -19,6 +19,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/chrono/chrono.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -317,9 +318,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                         "connection_handler(ibverbs)::create_connection");
                 }
                 else {
-                    boost::this_thread::sleep(boost::get_system_time() +
-                        boost::posix_time::milliseconds(
-                            HPX_NETWORK_RETRIES_SLEEP));
+                    boost::this_thread::sleep_for(
+                        boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
             }
             catch (boost::system::system_error const& e) {

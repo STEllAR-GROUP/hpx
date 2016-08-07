@@ -17,8 +17,8 @@
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/chrono/duration.hpp>
 
+#include <chrono>
 #include <stdexcept>
 #include <vector>
 
@@ -98,7 +98,7 @@ namespace test
                 /*
                 if (hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(boost::chrono::microseconds(1));
+                    hpx::this_thread::suspend(std::chrono::microseconds(1));
                 }
                 else
                 */

@@ -11,6 +11,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <utility>
@@ -19,7 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 int p1()
 {
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return 1;
 }
 
@@ -27,7 +28,7 @@ int p2(hpx::lcos::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return 2 * i;
 }
 
@@ -36,7 +37,7 @@ void p3(hpx::lcos::future<int> f)
     HPX_TEST(f.valid());
     int i = f.get();
     (void)i;
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return;
 }
 

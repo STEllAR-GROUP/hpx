@@ -101,8 +101,8 @@ find_barrier(char const* symname)
         if (agas::resolve_name_sync(symname, barrier_id))
             break;
 
-        boost::this_thread::sleep(boost::get_system_time() +
-            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+        boost::this_thread::sleep_for(
+            boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
     }
     if (HPX_UNLIKELY(!barrier_id))
     {

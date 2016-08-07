@@ -17,13 +17,15 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/atomic.hpp>
 
+#include <chrono>
 #include <memory>
 
 namespace hpx { namespace threads { namespace detail
@@ -272,7 +274,7 @@ namespace hpx { namespace threads { namespace detail
     /// behalf of one of the threads#detail#set_thread_state functions).
     template <typename SchedulingPolicy>
     thread_result_type at_timer(SchedulingPolicy& scheduler,
-        boost::chrono::steady_clock::time_point& abs_time,
+        util::steady_clock::time_point& abs_time,
         thread_id_type const& thrd, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority)
     {
@@ -302,8 +304,8 @@ namespace hpx { namespace threads { namespace detail
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
-            boost::chrono::steady_clock
-          , util::chrono_traits<boost::chrono::steady_clock>
+            util::steady_clock
+          , util::chrono_traits<util::steady_clock>
         > deadline_timer;
 
         deadline_timer t (
