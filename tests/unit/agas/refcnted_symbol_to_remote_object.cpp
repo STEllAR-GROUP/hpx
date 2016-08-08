@@ -35,8 +35,8 @@ using hpx::components::get_component_type;
 
 using hpx::applier::get_applier;
 
-using hpx::agas::register_name_sync;
-using hpx::agas::unregister_name_sync;
+using hpx::agas::register_name;
+using hpx::agas::unregister_name;
 using hpx::agas::garbage_collect;
 
 using hpx::test::simple_refcnt_monitor;
@@ -86,7 +86,7 @@ void hpx_test_main(
         hpx::naming::gid_type gid;
 
         // Associate a symbolic name with the object.
-        HPX_TEST_EQ(true, register_name_sync(name, monitor.get_id()));
+        HPX_TEST_EQ(true, register_name(hpx::launch::sync, name, monitor.get_id()));
 
         {
             // Detach the reference.
@@ -106,7 +106,7 @@ void hpx_test_main(
 
         // Remove the symbolic name. This should return the final credits
         // to AGAS.
-        HPX_TEST_EQ(gid, unregister_name_sync(name).get_gid());
+        HPX_TEST_EQ(gid, unregister_name(hpx::launch::sync, name).get_gid());
 
         // Flush pending reference counting operations.
         garbage_collect(remote_localities[0]);

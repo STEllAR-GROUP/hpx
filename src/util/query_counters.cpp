@@ -5,6 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
@@ -111,7 +112,7 @@ namespace hpx { namespace util
         {
             // start the performance counter
             using performance_counters::stubs::performance_counter;
-            performance_counter::start(ids_[i]);
+            performance_counter::start(launch::async, ids_[i]);
         }
 
         // this will invoke the evaluate function for the first time
@@ -354,7 +355,7 @@ namespace hpx { namespace util
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            started.push_back(performance_counter::start_async(ids_[i]));
+            started.push_back(performance_counter::start(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(started);
@@ -399,7 +400,7 @@ namespace hpx { namespace util
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            stopped.push_back(performance_counter::stop_async(ids_[i]));
+            stopped.push_back(performance_counter::stop(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(stopped);
@@ -444,7 +445,7 @@ namespace hpx { namespace util
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            reset.push_back(performance_counter::reset_async(ids_[i]));
+            reset.push_back(performance_counter::reset(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(reset);
@@ -483,7 +484,8 @@ namespace hpx { namespace util
         {
             if (types_[i] != performance_counters::counter_raw)
                 continue;
-            values.push_back(performance_counter::get_value_async(ids[i], reset));
+            values.push_back(performance_counter::get_value(
+                launch::async, ids[i], reset));
             indicies.push_back(i);
         }
 
@@ -526,8 +528,8 @@ namespace hpx { namespace util
         {
             if (types_[i] != performance_counters::counter_histogram)
                 continue;
-            values.push_back(
-                performance_counter::get_values_array_async(ids[i], reset));
+            values.push_back(performance_counter::get_values_array(
+                    launch::async, ids[i], reset));
             indicies.push_back(i);
         }
 

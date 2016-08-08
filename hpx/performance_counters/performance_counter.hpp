@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -44,70 +45,153 @@ namespace hpx { namespace performance_counters
 
         ///////////////////////////////////////////////////////////////////////
         future<counter_info> get_info() const;
-        counter_info get_info_sync(error_code& ec = throws) const;
+        counter_info get_info(launch::sync_policy,
+            error_code& ec = throws) const;
 
         future<counter_value> get_counter_value(bool reset = false);
-        future<counter_value> get_counter_value() const;
+        counter_value get_counter_value(launch::sync_policy,
+            bool reset = false, error_code& ec = throws);
 
-        counter_value get_counter_value_sync(bool reset = false,
-            error_code& ec = throws);
-        counter_value get_counter_value_sync(error_code& ec = throws) const;
+        future<counter_value> get_counter_value() const;
+        counter_value get_counter_value(launch::sync_policy,
+            error_code& ec = throws) const;
 
         future<counter_values_array> get_counter_values_array(bool reset = false);
-        future<counter_values_array> get_counter_values_array() const;
+        counter_values_array get_counter_values_array(launch::sync_policy,
+            bool reset = false, error_code& ec = throws);
 
-        counter_values_array get_counter_values_array_sync(bool reset = false,
-            error_code& ec = throws);
-        counter_values_array get_counter_values_array_sync(
+        future<counter_values_array> get_counter_values_array() const;
+        counter_values_array get_counter_values_array(launch::sync_policy,
             error_code& ec = throws) const;
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        counter_info get_info_sync(error_code& ec = throws) const
+        {
+            return get_info(launch::sync, ec);
+        }
+
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        counter_value get_counter_value_sync(bool reset = false,
+            error_code& ec = throws)
+        {
+            return get_counter_value(launch::sync, reset, ec);
+        }
+
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        counter_value get_counter_value_sync(error_code& ec = throws) const
+        {
+            return get_counter_value(launch::sync, ec);
+        }
+
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        counter_values_array get_counter_values_array_sync(bool reset = false,
+            error_code& ec = throws)
+        {
+            return get_counter_values_array(launch::sync, reset, ec);
+        }
+
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        counter_values_array get_counter_values_array_sync(
+            error_code& ec = throws) const
+        {
+            return get_counter_values_array(launch::sync, ec);
+        }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         future<bool> start();
-        bool start_sync(error_code& ec = throws);
+        bool start(launch::sync_policy, error_code& ec = throws);
 
         future<bool> stop();
-        bool stop_sync(error_code& ec = throws);
+        bool stop(launch::sync_policy, error_code& ec = throws);
 
         future<void> reset();
-        void reset_sync(error_code& ec = throws);
+        void reset(launch::sync_policy, error_code& ec = throws);
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        bool start_sync(error_code& ec = throws)
+        {
+            return start(launch::sync, ec);
+        }
+
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        bool stop_sync(error_code& ec = throws)
+        {
+            return stop(launch::sync, ec);
+        }
+
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void reset_sync(error_code& ec = throws)
+        {
+            return reset(launch::sync, ec);
+        }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         future<std::string> get_name() const;
-        std::string get_name_sync() const;
+        std::string get_name(launch::sync_policy, error_code& ec = throws) const;
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        std::string get_name_sync(error_code& ec = throws) const
+        {
+            return get_name(launch::sync, ec);
+        }
+#endif
 
     private:
         template <typename T>
-        static T extract_value(future<counter_value> && value, error_code& ec)
+        static T extract_value(future<counter_value> && value)
         {
-            return value.get().get_value<T>(ec);
+            return value.get().get_value<T>();
         }
 
     public:
         template <typename T>
-        future<T> get_value(bool reset = false, error_code& ec = throws)
+        future<T> get_value(bool reset = false)
         {
             return get_counter_value(reset).then(
-                util::bind(&performance_counter::extract_value<T>,
-                    util::placeholders::_1, boost::ref(ec)));
+                util::bind(
+                    &performance_counter::extract_value<T>,
+                    util::placeholders::_1));
         }
         template <typename T>
-        T get_value_sync(bool reset = false, error_code& ec = throws)
+        T get_value(launch::sync_policy, bool reset = false,
+            error_code& ec = throws)
         {
-            return get_counter_value_sync(reset).get_value<T>(ec);
+            return get_counter_value(launch::sync, reset).get_value<T>(ec);
         }
 
         template <typename T>
-        future<T> get_value(error_code& ec = throws) const
+        future<T> get_value() const
         {
             return get_counter_value().then(
-                util::bind(&performance_counter::extract_value<T>,
-                    util::placeholders::_1, boost::ref(ec)));
+                util::bind(
+                    &performance_counter::extract_value<T>,
+                    util::placeholders::_1));
         }
         template <typename T>
+        T get_value(launch::sync_policy, error_code& ec = throws) const
+        {
+            return get_counter_value(launch::sync).get_value<T>(ec);
+        }
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        template <typename T>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        T get_value_sync(bool reset = false, error_code& ec = throws)
+        {
+            return get_value(launch::sync, reset, ec);
+        }
+        template <typename T>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         T get_value_sync(error_code& ec = throws) const
         {
-            return get_counter_value_sync().get_value<T>(ec);
+            return get_value(launch::sync, ec);
         }
+#endif
     };
 
     /// Return all counters matching the given name (with optional wildcards).

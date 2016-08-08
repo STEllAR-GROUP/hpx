@@ -120,8 +120,9 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        hpx::launch p = (parts & 0x7) ?
-                            hpx::launch::sync : hpx::launch::async;
+                        hpx::launch p = hpx::launch::async;
+                        if (parts & 0x7)
+                            p = hpx::launch::sync;
 
                         workitems.push_back(
                             dataflow(
@@ -252,8 +253,9 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        hpx::launch p = (parts & 0x7) ?
-                            hpx::launch::sync : hpx::launch::async;
+                        hpx::launch p = hpx::launch::async;
+                        if (parts & 0x7)
+                            p = hpx::launch::sync;
 
                         workitems.push_back(
                             dataflow(

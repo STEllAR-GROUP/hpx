@@ -74,7 +74,7 @@ void handle_values_tests(hpx::partitioned_vector<T>& v)
     fill_vector(values, T(48), T(3));
 
     v.set_values(0, positions, values);
-    std::vector<T> result = v.get_values_sync(0, positions);
+    std::vector<T> result = v.get_values(hpx::launch::sync, 0, positions);
 
     compare_vectors(values, result);
 }
@@ -95,8 +95,8 @@ void handle_values_tests_distributed_access(hpx::partitioned_vector<T>& v)
     fill_vector(values2, T(42), T(0));
 
     v.set_values(positions, values);
-    std::vector<T> result  = v.get_values_sync(positions );
-    std::vector<T> result2 = v.get_values_sync(positions2);
+    std::vector<T> result  = v.get_values(hpx::launch::sync, positions);
+    std::vector<T> result2 = v.get_values(hpx::launch::sync, positions2);
 
     compare_vectors(values , result);
     compare_vectors(values2, result2);
