@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
 #include <type_traits>
@@ -167,89 +168,116 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<T>
-        get(std::size_t generation = default_generation) const
+        get(launch::async_policy,
+            std::size_t generation = default_generation) const
         {
             typedef typename lcos::server::channel<T>::get_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), generation);
         }
-        T get_sync(std::size_t generation = default_generation,
+        hpx::future<T>
+        get(std::size_t generation = default_generation) const
+        {
+            return get(launch::async, generation);
+        }
+        T get(launch::sync_policy, std::size_t generation = default_generation,
             hpx::error_code& ec = hpx::throws) const
         {
             return get(generation).get(ec);
         }
-        T get_sync(hpx::error_code& ec,
+        T get(launch::sync_policy, hpx::error_code& ec,
             std::size_t generation = default_generation) const
         {
-            return get(generation).get(ec);
+            return get(launch::sync, generation, ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename U, typename U2 = T, typename Enable =
-            typename std::enable_if<!std::is_void<U2>::value>::type>
-        bool set_apply(U val, std::size_t generation = default_generation)
+        template <typename U, typename U2 = T>
+        typename std::enable_if<!std::is_void<U2>::value, bool>::type
+        set(launch::apply_policy, U val,
+            std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::apply(action_type(), this->get_id(), std::move(val),
                 generation);
         }
-        template <typename U, typename U2 = T, typename Enable =
-            typename std::enable_if<!std::is_void<U2>::value>::type>
-        hpx::future<void>
-        set_async(U val, std::size_t generation = default_generation)
+        template <typename U, typename U2 = T>
+        typename std::enable_if<!std::is_void<U2>::value, hpx::future<void> >::type
+        set(launch::async_policy, U val,
+            std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), std::move(val),
                 generation);
         }
-        template <typename U, typename U2 = T, typename Enable =
-            typename std::enable_if<!std::is_void<U2>::value>::type>
-        void set(U val, std::size_t generation = default_generation)
+        template <typename U, typename U2 = T>
+        typename std::enable_if<!std::is_void<U2>::value>::type
+        set(launch::sync_policy, U val,
+            std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
-            return action_type()(this->get_id(), std::move(val), generation);
+            action_type()(this->get_id(), std::move(val), generation);
+        }
+        template <typename U, typename U2 = T>
+        typename std::enable_if<
+            !std::is_void<U2>::value &&
+            !traits::is_launch_policy<U>::value
+        >::type
+        set(U val, std::size_t generation = default_generation)
+        {
+            set(launch::sync, std::move(val), generation);
         }
 
-        template <typename U = T, typename Enable =
-            typename std::enable_if<std::is_void<U>::value>::type>
-        bool set_apply(std::size_t generation = default_generation)
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value, bool>::type
+        set(launch::apply_policy, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             return hpx::apply(action_type(), this->get_id(), util::unused,
                 generation);
         }
-        template <typename U = T, typename Enable =
-            typename std::enable_if<std::is_void<U>::value>::type>
-        hpx::future<void>
-        set_async(std::size_t generation = default_generation)
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value, hpx::future<void> >::type
+        set(launch::async_policy, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), util::unused,
                 generation);
         }
-        template <typename U = T, typename Enable =
-            typename std::enable_if<std::is_void<U>::value>::type>
-        void set(std::size_t generation = default_generation)
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value>::type
+        set(launch::sync_policy, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             return action_type()(this->get_id(), util::unused, generation);
         }
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value>::type
+        set(std::size_t generation = default_generation)
+        {
+            set(launch::sync, generation);
+        }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<void> close_async()
+        hpx::future<void> close(launch::async_policy)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
             return hpx::async(action_type(), this->get_id());
         }
+        void close(launch::sync_policy)
+        {
+            typedef typename lcos::server::channel<T>::close_action action_type;
+            action_type()(this->get_id());
+        }
         void close()
         {
-            close_async().get();
+            close(launch::sync);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -294,21 +322,28 @@ namespace hpx { namespace lcos
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<T> get(std::size_t generation = default_generation) const
+        hpx::future<T>
+        get(launch::async_policy,
+            std::size_t generation = default_generation) const
         {
             typedef typename lcos::server::channel<T>::get_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), generation);
         }
-        T get_sync(std::size_t generation = default_generation,
+        hpx::future<T>
+        get(std::size_t generation = default_generation) const
+        {
+            return get(launch::async, generation);
+        }
+        T get(launch::sync_policy, std::size_t generation = default_generation,
             hpx::error_code& ec = hpx::throws) const
         {
             return get(generation).get(ec);
         }
-        T get_sync(hpx::error_code& ec,
+        T get(launch::sync_policy, hpx::error_code& ec,
             std::size_t generation = default_generation) const
         {
-            return get(generation).get(ec);
+            return get(launch::sync, generation, ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -353,71 +388,92 @@ namespace hpx { namespace lcos
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename U, typename U2 = T, typename Enable =
-            typename std::enable_if<!std::is_void<U2>::value>::type>
-        bool set_apply(U val, std::size_t generation = default_generation)
+        template <typename U, typename U2 = T>
+        typename std::enable_if<!std::is_void<U2>::value, bool>::type
+        set(launch::apply_policy, U val,
+            std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::apply(action_type(), this->get_id(), std::move(val),
                 generation);
         }
-        template <typename U, typename U2 = T, typename Enable =
-            typename std::enable_if<!std::is_void<U2>::value>::type>
-        hpx::future<void>
-        set_async(U val, std::size_t generation = default_generation)
+        template <typename U, typename U2 = T>
+        typename std::enable_if<!std::is_void<U2>::value, hpx::future<void> >::type
+        set(launch::async_policy, U val,
+            std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), std::move(val),
                 generation);
         }
-        template <typename U, typename U2 = T, typename Enable =
-            typename std::enable_if<!std::is_void<U2>::value>::type>
-        void set(U val, std::size_t generation = default_generation)
+        template <typename U, typename U2 = T>
+        typename std::enable_if<!std::is_void<U2>::value>::type
+        set(launch::sync_policy, U val,
+            std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
-            return action_type()(this->get_id(), std::move(val), generation);
+            action_type()(this->get_id(), std::move(val), generation);
+        }
+        template <typename U, typename U2 = T>
+        typename std::enable_if<
+            !std::is_void<U2>::value &&
+            !traits::is_launch_policy<U>::value
+        >::type
+        set(U val, std::size_t generation = default_generation)
+        {
+            set(launch::sync, std::move(val), generation);
         }
 
-        template <typename U = T, typename Enable =
-            typename std::enable_if<std::is_void<U>::value>::type>
-        bool set_apply(std::size_t generation = default_generation)
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value, bool>::type
+        set(launch::apply_policy, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             return hpx::apply(action_type(), this->get_id(), util::unused,
                 generation);
         }
-        template <typename U = T, typename Enable =
-            typename std::enable_if<std::is_void<U>::value>::type>
-        hpx::future<void>
-        set_async(std::size_t generation = default_generation)
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value, hpx::future<void> >::type
+        set(launch::async_policy, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), util::unused,
                 generation);
         }
-        template <typename U = T, typename Enable =
-            typename std::enable_if<std::is_void<U>::value>::type>
-        void set(std::size_t generation = default_generation)
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value>::type
+        set(launch::sync_policy, std::size_t generation = default_generation)
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             return action_type()(this->get_id(), util::unused, generation);
         }
+        template <typename U = T>
+        typename std::enable_if<std::is_void<U>::value>::type
+        set(std::size_t generation = default_generation)
+        {
+            set(launch::sync, generation);
+        }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<void> close_async()
+        hpx::future<void> close(launch::async_policy)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
             return hpx::async(action_type(), this->get_id());
         }
+        void close(launch::sync_policy)
+        {
+            typedef typename lcos::server::channel<T>::close_action action_type;
+            action_type()(this->get_id());
+        }
         void close()
         {
-            close_async().get();
+            close(launch::sync);
         }
     };
 }}

@@ -12,6 +12,7 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/iterator_facade.hpp>
@@ -310,7 +311,7 @@ namespace hpx { namespace lcos { namespace local
                 data_ = get_checked();
         }
 
-        typename base_type::reference dereference() const
+        base_type::reference dereference() const
         {
             HPX_ASSERT(data_);
             return util::unused;
@@ -330,15 +331,7 @@ namespace hpx { namespace lcos { namespace local
           : channel_(new detail::unlimited_channel<T>())
         {}
 
-        hpx::future<T> get(std::size_t generation = std::size_t(-1)) const
-        {
-            return channel_->get(generation);
-        }
-        T get_sync(std::size_t generation = std::size_t(-1)) const
-        {
-            return channel_->get(generation, true).get();
-        }
-
+        ///////////////////////////////////////////////////////////////////////
         std::pair<T, bool>
         get_checked(std::size_t generation = std::size_t(-1)) const
         {
@@ -348,6 +341,23 @@ namespace hpx { namespace lcos { namespace local
             return std::make_pair(f.get(), true);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        hpx::future<T> get(launch::async_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            return channel_->get(generation);
+        }
+        hpx::future<T> get(std::size_t generation = std::size_t(-1)) const
+        {
+            return get(launch::async, generation);
+        }
+        T get(launch::sync_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            return channel_->get(generation, true).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         void set(T val, std::size_t generation = std::size_t(-1))
         {
             channel_->set(generation, std::move(val));
@@ -358,6 +368,7 @@ namespace hpx { namespace lcos { namespace local
             channel_->close();
         }
 
+        ///////////////////////////////////////////////////////////////////////
         channel_iterator<T> begin() const
         {
             return channel_iterator<T>(this);
@@ -394,15 +405,7 @@ namespace hpx { namespace lcos { namespace local
           : channel_(c.channel_)
         {}
 
-        hpx::future<T> get(std::size_t generation = std::size_t(-1)) const
-        {
-            return channel_->get(generation);
-        }
-        T get_sync(std::size_t generation = std::size_t(-1)) const
-        {
-            return channel_->get(generation, true).get();
-        }
-
+        ///////////////////////////////////////////////////////////////////////
         std::pair<T, bool>
         get_checked(std::size_t generation = std::size_t(-1)) const
         {
@@ -412,6 +415,23 @@ namespace hpx { namespace lcos { namespace local
             return std::make_pair(f.get(), true);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        hpx::future<T> get(launch::async_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            return channel_->get(generation);
+        }
+        hpx::future<T> get(std::size_t generation = std::size_t(-1)) const
+        {
+            return get(launch::async, generation);
+        }
+        T get(launch::sync_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            return channel_->get(generation, true).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         channel_iterator<T> begin() const
         {
             return channel_iterator<T>(this);
@@ -485,15 +505,7 @@ namespace hpx { namespace lcos { namespace local
           : channel_(new detail::unlimited_channel<util::unused_type>())
         {}
 
-        hpx::future<void> get(std::size_t generation = std::size_t(-1)) const
-        {
-            return channel_->get(generation);
-        }
-        void get_sync(std::size_t generation = std::size_t(-1)) const
-        {
-            channel_->get(generation, true).get();
-        }
-
+        ///////////////////////////////////////////////////////////////////////
         bool get_checked(std::size_t generation = std::size_t(-1)) const
         {
             hpx::future<util::unused_type> f;
@@ -504,6 +516,23 @@ namespace hpx { namespace lcos { namespace local
             return true;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        hpx::future<void> get(launch::async_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            return channel_->get(generation);
+        }
+        hpx::future<void> get(std::size_t generation = std::size_t(-1)) const
+        {
+            return get(launch::async, generation);
+        }
+        void get(launch::sync_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            channel_->get(generation, true).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         void set(std::size_t generation = std::size_t(-1))
         {
             channel_->set(generation, hpx::util::unused_type());
@@ -550,15 +579,7 @@ namespace hpx { namespace lcos { namespace local
           : channel_(c.channel_)
         {}
 
-        hpx::future<void> get(std::size_t generation = std::size_t(-1)) const
-        {
-            return channel_->get(generation);
-        }
-        void get_sync(std::size_t generation = std::size_t(-1)) const
-        {
-            channel_->get(generation, true).get();
-        }
-
+        ///////////////////////////////////////////////////////////////////////
         bool get_checked(std::size_t generation = std::size_t(-1)) const
         {
             hpx::future<util::unused_type> f;
@@ -569,6 +590,23 @@ namespace hpx { namespace lcos { namespace local
             return true;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        hpx::future<void> get(launch::async_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            return channel_->get(generation);
+        }
+        hpx::future<void> get(std::size_t generation = std::size_t(-1)) const
+        {
+            return get(launch::async, generation);
+        }
+        void get(launch::sync_policy,
+            std::size_t generation = std::size_t(-1)) const
+        {
+            channel_->get(generation, true).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         channel_iterator<void> begin() const
         {
             return channel_iterator<void>(this);

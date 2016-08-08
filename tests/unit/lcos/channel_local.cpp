@@ -5,7 +5,6 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/apply.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -29,8 +28,8 @@ void calculate_sum()
     hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size()/2), c);
     hpx::apply(&sum, std::vector<int>(s.begin() + s.size()/2, s.end()), c);
 
-    int x = c.get_sync();    // receive from c
-    int y = c.get_sync();
+    int x = c.get(hpx::launch::sync);    // receive from c
+    int y = c.get(hpx::launch::sync);
 
     int expected = std::accumulate(s.begin(), s.end(), 0);
     HPX_TEST_EQ(expected, x + y);
@@ -48,7 +47,7 @@ void pong(
     hpx::lcos::local::receive_channel<std::string> pings,
     hpx::lcos::local::send_channel<std::string> pongs)
 {
-    std::string msg = pings.get_sync();
+    std::string msg = pings.get(hpx::launch::sync);
     pongs.set(msg);
 }
 
@@ -60,7 +59,7 @@ void pingpong()
     ping(pings, "passed message");
     pong(pings, pongs);
 
-    std::string result = pongs.get_sync();
+    std::string result = pongs.get(hpx::launch::sync);
     HPX_TEST_EQ(std::string("passed message"), result);
 }
 
@@ -75,7 +74,7 @@ void pong_void(
     hpx::lcos::local::send_channel<> pongs,
     bool& pingponged)
 {
-    pings.get_sync();
+    pings.get(hpx::launch::sync);
     pongs.set();
     pingponged = true;
 }
@@ -90,7 +89,7 @@ void pingpong_void()
     ping_void(pings);
     pong_void(pings, pongs, pingponged);
 
-    pongs.get_sync();
+    pongs.get(hpx::launch::sync);
     HPX_TEST(pingponged);
 }
 
@@ -128,7 +127,7 @@ void dispatch_work()
     }
 
     jobs.close();
-    done.get_sync();
+    done.get(hpx::launch::sync);
 
     HPX_TEST_EQ(received_jobs.load(), 3);
     HPX_TEST(was_closed.load());
@@ -177,7 +176,7 @@ void deadlock_test()
     bool caught_exception = false;
     try {
         hpx::lcos::local::channel<int> c;
-        int value = c.get_sync();
+        int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
     }
     catch(hpx::exception const&) {
@@ -193,7 +192,7 @@ void closed_channel_get()
         hpx::lcos::local::channel<int> c;
         c.close();
 
-        int value = c.get_sync();
+        int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
     }
     catch(hpx::exception const&) {
@@ -210,9 +209,9 @@ void closed_channel_get_generation()
         c.set(42, 122);         // setting value for generation 122
         c.close();
 
-        HPX_TEST_EQ(c.get_sync(122), 42);
+        HPX_TEST_EQ(c.get(hpx::launch::sync, 122), 42);
 
-        int value = c.get_sync(123); // asking for generation 123
+        int value = c.get(hpx::launch::sync, 123); // asking for generation 123
         HPX_TEST(false);
     }
     catch(hpx::exception const&) {

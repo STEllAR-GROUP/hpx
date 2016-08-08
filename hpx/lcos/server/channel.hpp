@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace server
         // Retrieve the next value from the channel
         result_type get_value(error_code& ec = throws)
         {
-            return channel_.get_sync();
+            return channel_.get(launch::sync);
         }
 
         // Additional functionality exposed by the channel component
