@@ -332,16 +332,6 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        std::pair<T, bool>
-        get_checked(std::size_t generation = std::size_t(-1)) const
-        {
-            hpx::future<T> f;
-            if (!channel_->try_get(generation, &f))
-                return std::make_pair(T(), false);
-            return std::make_pair(f.get(), true);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         hpx::future<T> get(launch::async_policy,
             std::size_t generation = std::size_t(-1)) const
         {
@@ -351,10 +341,15 @@ namespace hpx { namespace lcos { namespace local
         {
             return get(launch::async, generation);
         }
-        T get(launch::sync_policy,
+        T get(launch::sync_policy, std::size_t generation = std::size_t(-1),
+            error_code& ec = throws) const
+        {
+            return channel_->get(generation, true).get(ec);
+        }
+        T get(launch::sync_policy, error_code& ec,
             std::size_t generation = std::size_t(-1)) const
         {
-            return channel_->get(generation, true).get();
+            return channel_->get(generation, true).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -406,16 +401,6 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        std::pair<T, bool>
-        get_checked(std::size_t generation = std::size_t(-1)) const
-        {
-            hpx::future<T> f;
-            if (!channel_->try_get(generation, &f))
-                return std::make_pair(T(), false);
-            return std::make_pair(f.get(), true);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         hpx::future<T> get(launch::async_policy,
             std::size_t generation = std::size_t(-1)) const
         {
@@ -425,10 +410,15 @@ namespace hpx { namespace lcos { namespace local
         {
             return get(launch::async, generation);
         }
-        T get(launch::sync_policy,
+        T get(launch::sync_policy, std::size_t generation = std::size_t(-1),
+            error_code& ec = throws) const
+        {
+            return channel_->get(generation, true).get(ec);
+        }
+        T get(launch::sync_policy, error_code& ec,
             std::size_t generation = std::size_t(-1)) const
         {
-            return channel_->get(generation, true).get();
+            return channel_->get(generation, true).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -506,17 +496,6 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        bool get_checked(std::size_t generation = std::size_t(-1)) const
-        {
-            hpx::future<util::unused_type> f;
-            if (!channel_->try_get(generation, &f))
-                return false;
-
-            f.get();
-            return true;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         hpx::future<void> get(launch::async_policy,
             std::size_t generation = std::size_t(-1)) const
         {
@@ -526,10 +505,15 @@ namespace hpx { namespace lcos { namespace local
         {
             return get(launch::async, generation);
         }
-        void get(launch::sync_policy,
+        void get(launch::sync_policy, std::size_t generation = std::size_t(-1),
+            error_code& ec = throws) const
+        {
+            channel_->get(generation, true).get(ec);
+        }
+        void get(launch::sync_policy, error_code& ec,
             std::size_t generation = std::size_t(-1)) const
         {
-            channel_->get(generation, true).get();
+            channel_->get(generation, true).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -580,17 +564,6 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        bool get_checked(std::size_t generation = std::size_t(-1)) const
-        {
-            hpx::future<util::unused_type> f;
-            if (!channel_->try_get(generation, &f))
-                return false;
-
-            f.get();
-            return true;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         hpx::future<void> get(launch::async_policy,
             std::size_t generation = std::size_t(-1)) const
         {
@@ -601,9 +574,15 @@ namespace hpx { namespace lcos { namespace local
             return get(launch::async, generation);
         }
         void get(launch::sync_policy,
+            std::size_t generation = std::size_t(-1),
+            error_code& ec = throws) const
+        {
+            channel_->get(generation, true).get(ec);
+        }
+        void get(launch::sync_policy, error_code& ec,
             std::size_t generation = std::size_t(-1)) const
         {
-            channel_->get(generation, true).get();
+            channel_->get(generation, true).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////

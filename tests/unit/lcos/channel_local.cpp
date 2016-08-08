@@ -107,8 +107,9 @@ void dispatch_work()
         {
             while(true)
             {
-                auto next = jobs.get_checked();
-                if (next.second)
+                hpx::error_code ec(hpx::lightweight);
+                int next = jobs.get(hpx::launch::sync, ec);
+                if (!ec)
                 {
                     ++received_jobs;
                 }

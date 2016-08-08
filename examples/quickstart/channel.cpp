@@ -29,8 +29,8 @@ void calculate_sum()
     hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size()/2), c);
     hpx::apply(&sum, std::vector<int>(s.begin() + s.size()/2, s.end()), c);
 
-    int x = c.get_sync();    // receive from c
-    int y = c.get_sync();
+    int x = c.get(hpx::launch::sync);    // receive from c
+    int y = c.get(hpx::launch::sync);
 
     hpx::cout << "sum: " << x + y << std::endl;
 }
@@ -47,7 +47,7 @@ void pong(
     hpx::lcos::local::receive_channel<std::string> pings,
     hpx::lcos::local::send_channel<std::string> pongs)
 {
-    std::string msg = pings.get_sync();
+    std::string msg = pings.get(hpx::launch::sync);
     pongs.set(msg);
 }
 
@@ -59,7 +59,7 @@ void pingpong()
     ping(pings, "passed message");
     pong(pings, pongs);
 
-    hpx::cout << "ping-ponged: " << pongs.get_sync() << std::endl;
+    hpx::cout << "ping-ponged: " << pongs.get(hpx::launch::sync) << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,10 +73,11 @@ void dispatch_work()
         {
             while(true)
             {
-                auto next = jobs.get_checked();
-                if (next.second)
+                hpx::error_code ec(hpx::lightweight);
+                int value = jobs.get(hpx::launch::sync, ec);
+                if (!ec)
                 {
-                    hpx::cout << "received job: " << next.first << std::endl;
+                    hpx::cout << "received job: " << value << std::endl;
                 }
                 else
                 {
@@ -96,7 +97,7 @@ void dispatch_work()
     jobs.close();
     hpx::cout << "sent all jobs" << std::endl;
 
-    done.get_sync();
+    done.get(hpx::launch::sync);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -265,6 +265,11 @@ namespace hpx { namespace lcos
         }
 
         ///////////////////////////////////////////////////////////////////////
+        void close(launch::apply_policy)
+        {
+            typedef typename lcos::server::channel<T>::close_action action_type;
+            hpx::apply(action_type(), this->get_id());
+        }
         hpx::future<void> close(launch::async_policy)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
@@ -461,6 +466,11 @@ namespace hpx { namespace lcos
         }
 
         ///////////////////////////////////////////////////////////////////////
+        void close(launch::apply_policy)
+        {
+            typedef typename lcos::server::channel<T>::close_action action_type;
+            hpx::apply(action_type(), this->get_id());
+        }
         hpx::future<void> close(launch::async_policy)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
