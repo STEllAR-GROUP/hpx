@@ -973,7 +973,7 @@ namespace hpx { namespace parcelset {
                         if (connection_started.test_and_set(std::memory_order_acquire)) {
                             lock.unlock();
                             LOG_ERROR_MSG("A connection race has been detected, do not connect");
-                            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+                            hpx::this_thread::sleep_for(std::chrono::milliseconds(1000));
                             lock.lock();
                         }
                         else {
