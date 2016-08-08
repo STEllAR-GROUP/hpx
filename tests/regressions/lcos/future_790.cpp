@@ -10,10 +10,12 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <chrono>
+
 int main()
 {
     hpx::lcos::future<int> future = hpx::lcos::make_ready_future(0);
-    boost::chrono::nanoseconds tn(static_cast<long long>(1000000000LL));
+    std::chrono::nanoseconds tn(static_cast<long long>(1000000000LL));
     future.wait_for(tn);
 
     return 0;

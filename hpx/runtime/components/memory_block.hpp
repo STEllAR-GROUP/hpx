@@ -13,12 +13,8 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/unwrapped.hpp>
 
-#include <boost/type_traits/conditional.hpp>
-#include <boost/type_traits/is_const.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/type_traits/remove_const.hpp>
-#include <boost/utility/enable_if.hpp>
-
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,10 +166,10 @@ namespace hpx { namespace components
     class access_memory_block_proxy
     {
     private:
-        typedef typename boost::remove_const<T>::type target_type;
+        typedef typename std::remove_const<T>::type target_type;
         typedef typename
-            boost::mpl::if_<
-                boost::is_const<T>, memory_block_data const&, memory_block_data&
+            std::conditional<
+                std::is_const<T>::value, memory_block_data const&, memory_block_data&
             >::type
         wrapped_type;
 
@@ -202,7 +198,7 @@ namespace hpx { namespace components
     class access_memory_block
     {
     private:
-        typedef typename boost::remove_const<T>::type target_type;
+        typedef typename std::remove_const<T>::type target_type;
 
     public:
         access_memory_block()
@@ -337,10 +333,10 @@ namespace hpx { namespace components
     }
 
     template <typename T, typename ...Us>
-    inline typename boost::enable_if<
+    inline typename std::enable_if<
         util::detail::all_of<
-            boost::is_convertible<Us const&, naming::id_type>...>,
-        util::tuple<typename boost::conditional<
+            std::is_convertible<Us const&, naming::id_type>...>::value,
+        util::tuple<typename std::conditional<
             false, Us, access_memory_block<T> >::type...>
     >::type get_memory_block_async(Us const&... vs)
     {

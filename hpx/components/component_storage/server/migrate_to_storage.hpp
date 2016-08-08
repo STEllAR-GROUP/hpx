@@ -16,6 +16,7 @@
 #include <hpx/components/component_storage/server/component_storage.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components { namespace server

@@ -138,10 +138,10 @@ int main(int argc, char* argv[])
     std::srand((unsigned int)std::time(nullptr));
 
     // initialize program
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
-    cfg.push_back("hpx.run_hpx_main=1");
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all",
+        "hpx.run_hpx_main=1"
+    };
 
     boost::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");

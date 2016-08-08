@@ -68,7 +68,8 @@ namespace examples
             *this = simple_central_tuplespace
                 (hpx::components::new_<examples::server::simple_central_tuplespace>
                     (locality));
-            bool rc = hpx::agas::register_name(symbol_name, this->get_id()).get();
+            bool rc = hpx::agas::register_name(hpx::launch::sync, symbol_name,
+                this->get_id());
 
             if(rc)
             {
@@ -88,14 +89,12 @@ namespace examples
                 return false;
             }
 
-            *this = hpx::agas::resolve_name(symbol_name).get();
+            *this = hpx::agas::resolve_name(hpx::launch::sync,symbol_name);
 
             symbol_name_ = symbol_name;
 
             return true;
         }
-
-
 
         ///////////////////////////////////////////////////////////////////////
         /// put \p tuple into tuplespace.

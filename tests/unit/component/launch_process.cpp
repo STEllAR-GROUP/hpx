@@ -32,10 +32,8 @@ std::vector<std::string> get_environment()
 #if defined(HPX_WINDOWS)
     int len = get_arraylen(_environ);
     std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
-#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__AIX__)
-    int len = get_arraylen(environ);
-    std::copy(&environ[0], &environ[len], std::back_inserter(env));
-#elif defined(__APPLE__)
+#elif defined(linux) || defined(__linux) || defined(__linux__) || \
+      defined(__AIX__) || defined(__APPLE__)
     int len = get_arraylen(environ);
     std::copy(&environ[0], &environ[len], std::back_inserter(env));
 #else
@@ -132,7 +130,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         HPX_TEST_EQ(hpx::find_all_localities().size(), std::size_t(2));
 
         // wait for it to exit, we know it returns 42 (see --exit_code=<> above)
-        int exit_code = c.wait_for_exit_sync();
+        int exit_code = c.wait_for_exit(hpx::launch::sync);
         HPX_TEST_EQ(exit_code, 42);
 
         // make sure the launched process has set the message in the component
@@ -160,8 +158,9 @@ int main(int argc, char* argv[])
 
     // This explicitly enables the component we depend on (it is disabled by
     // default to avoid being loaded outside of this test).
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.components.launch_process_test_server.enabled!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.components.launch_process_test_server.enabled!=1"
+    };
 
     HPX_TEST_EQ_MSG(
         hpx::init(desc_commandline, argc, argv, cfg), 0,

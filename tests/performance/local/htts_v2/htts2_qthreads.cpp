@@ -13,7 +13,9 @@
 #include <qthread/qthread.h>
 #include <qthread/qloop.h>
 
-typedef boost::chrono::steady_clock BaseClock;
+#include <chrono>
+
+typedef std::chrono::steady_clock BaseClock;
 
 extern "C" void stage_tasks(
     size_t start,

@@ -12,8 +12,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/chrono.hpp>
-
+#include <chrono>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -58,7 +57,7 @@ void test_only_one_upgrade_lock_permitted()
             );
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         CHECK_LOCKED_VALUE_EQUAL(unblocked_count_mutex,
             unblocked_count, 1u);
@@ -110,7 +109,7 @@ void test_can_lock_upgrade_if_currently_locked_shared()
             );
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         pool.create_thread(
             test::locking_thread<boost::upgrade_lock<shared_mutex_type> >(
@@ -170,7 +169,7 @@ void test_if_other_thread_has_write_lock_try_lock_shared_returns_false()
     hpx::thread writer(test::simple_writing_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     CHECK_LOCKED_VALUE_EQUAL(unblocked_mutex,
         unblocked_count, 1u);
@@ -199,7 +198,7 @@ void test_if_other_thread_has_write_lock_try_lock_upgrade_returns_false()
     hpx::thread writer(test::simple_writing_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     CHECK_LOCKED_VALUE_EQUAL(unblocked_mutex,
         unblocked_count, 1u);
@@ -254,7 +253,7 @@ void test_if_other_thread_has_shared_lock_try_lock_shared_returns_true()
     hpx::thread writer(test::simple_reading_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     CHECK_LOCKED_VALUE_EQUAL(unblocked_mutex,
         unblocked_count, 1u);
@@ -283,7 +282,7 @@ void test_if_other_thread_has_shared_lock_try_lock_upgrade_returns_true()
     hpx::thread writer(test::simple_reading_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     CHECK_LOCKED_VALUE_EQUAL(unblocked_mutex,
         unblocked_count, 1u);
@@ -312,7 +311,7 @@ void test_if_other_thread_has_upgrade_lock_try_lock_upgrade_returns_false()
     hpx::thread writer(test::simple_upgrade_thread(
         rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
 
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     CHECK_LOCKED_VALUE_EQUAL(unblocked_mutex,
         unblocked_count, 1u);
@@ -348,9 +347,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

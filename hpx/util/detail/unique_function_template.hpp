@@ -132,69 +132,6 @@ namespace hpx { namespace util
     {
         return f.empty();
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
-
-    template <typename T>
-    class unique_function_nonser;
-
-    template <typename R, typename ...Ts>
-    class unique_function_nonser<R(Ts...)>
-      : public unique_function<R(Ts...), false>
-    {
-        typedef unique_function<R(Ts...), false> base_type;
-
-        HPX_MOVABLE_ONLY(unique_function_nonser);
-
-    public:
-        unique_function_nonser() HPX_NOEXCEPT
-          : base_type()
-        {}
-
-        unique_function_nonser(std::nullptr_t) HPX_NOEXCEPT
-          : base_type()
-        {}
-
-        unique_function_nonser(unique_function_nonser&& other) HPX_NOEXCEPT
-          : base_type(static_cast<base_type&&>(other))
-        {}
-
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<FD, unique_function_nonser>::value
-             && traits::is_callable<FD&(Ts...), R>::value
-            >::type>
-        unique_function_nonser(F&& f)
-          : base_type(std::forward<F>(f))
-        {}
-
-        unique_function_nonser& operator=(unique_function_nonser&& other) HPX_NOEXCEPT
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
-        }
-
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<FD, unique_function_nonser>::value
-             && traits::is_callable<FD&(Ts...), R>::value
-            >::type>
-        unique_function_nonser& operator=(F&& f)
-        {
-            base_type::operator=(std::forward<F>(f));
-            return *this;
-        }
-    };
-
-    template <typename Sig>
-    static bool is_empty_function(
-        unique_function_nonser<Sig> const& f) HPX_NOEXCEPT
-    {
-        return f.empty();
-    }
-
-#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 
@@ -210,18 +147,6 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
-
-#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
-    template <typename Sig>
-    struct get_function_address<util::unique_function_nonser<Sig> >
-    {
-        static std::size_t
-            call(util::unique_function_nonser<Sig> const& f) HPX_NOEXCEPT
-        {
-            return f.get_function_address();
-        }
-    };
-#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

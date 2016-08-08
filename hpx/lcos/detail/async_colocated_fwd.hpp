@@ -15,6 +15,8 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////

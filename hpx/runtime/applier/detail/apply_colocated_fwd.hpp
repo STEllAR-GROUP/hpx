@@ -11,6 +11,8 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_continuation.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////

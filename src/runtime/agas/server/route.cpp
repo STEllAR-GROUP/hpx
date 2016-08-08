@@ -14,6 +14,7 @@
 #include <boost/format.hpp>
 
 #include <mutex>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas { namespace server

@@ -14,6 +14,7 @@
 #include <boost/regex.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,11 +52,7 @@ namespace hpx { namespace plugins { namespace parcel
                 0, 0, 1
             };
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
             map_.emplace(name, std::move(data));
-#else
-            map_.insert(map_type::value_type(name, std::move(data)));
-#endif
         }
         else
         {
@@ -91,11 +88,7 @@ namespace hpx { namespace plugins { namespace parcel
         auto it = map_.find(name);
         if (it == map_.end())
         {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
             map_.emplace(name, counter_functions());
-#else
-            map_.insert(map_type::value_type(name, counter_functions()));
-#endif
         }
     }
 

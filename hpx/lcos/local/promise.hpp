@@ -17,6 +17,8 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
+#include <utility>
+
 namespace hpx { namespace lcos { namespace local
 {
     namespace detail
@@ -515,7 +517,7 @@ namespace hpx { namespace lcos
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](shared_future<T> result) mutable
-        lcos::detail::get_shared_state(f)->set_on_completed(rh);
+        traits::detail::get_shared_state(f)->set_on_completed(rh);
     }
 
     template <typename T>
@@ -561,15 +563,15 @@ namespace std { namespace experimental
                 return !this->base_type::requires_delete();
             }
 
-            template <typename U, typename U2 = T,
-                typename = std::enable_if<!std::is_void<U2>::value>::type>
+            template <typename U, typename U2 = T, typename V =
+                typename std::enable_if<!std::is_void<U2>::value>::type>
             void return_value(U && value)
             {
                 this->base_type::set_value(std::forward<U>(value));
             }
 
-            template <typename U = T,
-                typename = std::enable_if<std::is_void<U>::value>::type>
+            template <typename U = T, typename V =
+                typename std::enable_if<std::is_void<U>::value>::type>
             void return_value()
             {
                 this->base_type::set_value();

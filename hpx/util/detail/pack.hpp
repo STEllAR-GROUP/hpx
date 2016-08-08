@@ -8,10 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_same.hpp>
-
 #include <cstddef>
+#include <type_traits>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -66,11 +64,9 @@ namespace hpx { namespace util { namespace detail
 
     template <bool ...Vs>
     struct all_of<pack_c<bool, Vs...> >
-      : boost::mpl::bool_<
-            boost::is_same<
-                pack_c<bool, Vs...>
-              , pack_c<bool, (Vs || true)...> // true...
-            >::value
+      : std::is_same<
+            pack_c<bool, Vs...>
+          , pack_c<bool, (Vs || true)...> // true...
         >
     {};
 
@@ -81,7 +77,7 @@ namespace hpx { namespace util { namespace detail
 
     template <>
     struct all_of<> // <fake-type>
-      : boost::mpl::true_
+      : std::true_type
     {};
 
     template <typename ...Ts>
@@ -89,7 +85,7 @@ namespace hpx { namespace util { namespace detail
 
     template <bool ...Vs>
     struct any_of<pack_c<bool, Vs...> >
-      : boost::mpl::bool_<
+      : std::integral_constant<bool,
             !all_of<pack_c<bool, !Vs...> >::value
         >
     {};
@@ -101,7 +97,7 @@ namespace hpx { namespace util { namespace detail
 
     template <>
     struct any_of<> // <fake-type>
-      : boost::mpl::false_
+      : std::false_type
     {};
 
     template <typename ...Ts>
@@ -119,12 +115,12 @@ namespace hpx { namespace util { namespace detail
 
     template <>
     struct none_of<> // <fake-type>
-      : boost::mpl::true_
+      : std::true_type
     {};
 
     template <typename T, typename ...Ts>
     struct contains
-      : any_of<boost::is_same<T, Ts>...>
+      : any_of<std::is_same<T, Ts>...>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

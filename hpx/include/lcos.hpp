@@ -25,6 +25,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>
 #include <hpx/include/local_lcos.hpp>
+#include <hpx/lcos/split_future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/wait_any.hpp>
 #include <hpx/lcos/wait_each.hpp>

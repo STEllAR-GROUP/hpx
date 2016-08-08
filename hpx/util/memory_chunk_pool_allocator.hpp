@@ -10,6 +10,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <cstdlib>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util { namespace detail

@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
@@ -19,7 +22,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/assign/std/vector.hpp>
+#include <boost/chrono/chrono.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -28,6 +31,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 
 #if (defined(__linux) || defined(linux) || defined(__linux__))
 #include <ifaddrs.h>
@@ -317,9 +321,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                         "connection_handler(ibverbs)::create_connection");
                 }
                 else {
-                    boost::this_thread::sleep(boost::get_system_time() +
-                        boost::posix_time::milliseconds(
-                            HPX_NETWORK_RETRIES_SLEEP));
+                    boost::this_thread::sleep_for(
+                        boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
             }
             catch (boost::system::system_error const& e) {

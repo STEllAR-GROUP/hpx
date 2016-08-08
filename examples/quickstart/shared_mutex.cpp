@@ -12,10 +12,10 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono.hpp>
 #include <boost/random.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <chrono>
 #include <ctime>
 #include <mutex>
 #include <vector>
@@ -24,7 +24,7 @@ int const writers = 3;
 int const readers = 3;
 int const cycles = 10;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 int main()
 {

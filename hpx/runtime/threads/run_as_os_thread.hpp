@@ -15,6 +15,7 @@
 #include <hpx/util/result_of.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace threads
 {

@@ -22,7 +22,7 @@ int hpx_main()
     {
         // Create the latch on locality zero, let it synchronize as many
         // threads as we have localities.
-        l = hpx::lcos::latch(hpx::get_num_localities_sync());
+        l = hpx::lcos::latch(hpx::get_num_localities(hpx::launch::sync));
 
         // Register the new instance so that the other localities can connect
         // to it.
@@ -43,8 +43,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // make sure hpx_main will run on all localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     return hpx::init(argc, argv, cfg);
 }

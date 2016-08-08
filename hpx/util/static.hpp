@@ -8,14 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/aligned_storage.hpp>
-#include <boost/call_traits.hpp>
-
-#include <boost/utility/addressof.hpp>
-#include <boost/utility/enable_if.hpp>
-
-#include <boost/type_traits/add_pointer.hpp>
-#include <boost/type_traits/alignment_of.hpp>
+#include <type_traits>
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) && \
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) && \
@@ -50,8 +43,8 @@ namespace hpx { namespace util
     public:
         typedef T value_type;
 
-        typedef typename boost::call_traits<T>::reference reference;
-        typedef typename boost::call_traits<T>::const_reference const_reference;
+        typedef T& reference;
+        typedef T const& const_reference;
 
         static_()
         {
@@ -127,8 +120,8 @@ namespace hpx { namespace util
         };
 
     public:
-        typedef typename boost::call_traits<T>::reference reference;
-        typedef typename boost::call_traits<T>::const_reference const_reference;
+        typedef T& reference;
+        typedef T const& const_reference;
 
         static_()
         {
@@ -156,15 +149,15 @@ namespace hpx { namespace util
         }
 
     private:
-        typedef typename boost::add_pointer<value_type>::type pointer;
+        typedef typename std::add_pointer<value_type>::type pointer;
 
         static pointer get_address()
         {
-            return static_cast<pointer>(data_.address());
+            return reinterpret_cast<pointer>(data_);
         }
 
-        typedef boost::aligned_storage<sizeof(value_type),
-            boost::alignment_of<value_type>::value> storage_type;
+        typedef typename std::aligned_storage<sizeof(value_type),
+            std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_;
         static boost::once_flag constructed_;

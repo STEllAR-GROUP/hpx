@@ -18,6 +18,7 @@
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +54,7 @@
         struct needs_automatic_registration<                                  \
             BOOST_PP_CAT(BOOST_PP_CAT(util::detail::__,                       \
                 BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)>\
-          : boost::mpl::false_                                                \
+          : std::false_type                                                   \
         {};                                                                   \
     }}                                                                        \
 /**/

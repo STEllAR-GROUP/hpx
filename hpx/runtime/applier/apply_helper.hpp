@@ -18,6 +18,7 @@
 #include <hpx/util/decay.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace hpx { namespace applier { namespace detail
 {

@@ -20,6 +20,7 @@
 #include <boost/range/iterator_range_core.hpp>
 
 #include <iterator>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace compute { namespace host

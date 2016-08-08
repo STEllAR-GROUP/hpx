@@ -25,12 +25,13 @@
 #error Donot include this directly. Include hpx/util/logging/logging.hpp instead
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
+
 #include <map>
+#include <utility>
 #include <vector>
-//#include <boost/thread/detail/config.hpp>
-#include <boost/config.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 

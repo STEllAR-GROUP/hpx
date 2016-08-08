@@ -28,6 +28,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace policies { namespace ipc

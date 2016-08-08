@@ -9,12 +9,15 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::simple_component_base<test_server>
 {
+    typedef hpx::components::simple_component_base<test_server> base_type;
+
     test_server() {}
     ~test_server() {}
 
@@ -27,8 +30,13 @@ struct test_server
     // be Serializable and CopyConstructable. In the remote case
     // it can be MoveConstructable in which case the serialized data
     // is moved into the components constructor.
-    test_server(test_server const& rhs) {}
-    test_server(test_server && rhs) {}
+    test_server(test_server const& rhs)
+      : base_type(rhs)
+    {}
+
+    test_server(test_server && rhs)
+      : base_type(std::move(rhs))
+    {}
 
     test_server& operator=(test_server const &) { return *this; }
     test_server& operator=(test_server &&) { return *this; }

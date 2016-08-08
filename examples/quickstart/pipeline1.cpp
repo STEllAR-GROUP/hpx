@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <boost/algorithm/string/trim.hpp>

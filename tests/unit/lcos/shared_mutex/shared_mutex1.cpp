@@ -12,11 +12,10 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/chrono.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <chrono>
 #include <mutex>
-
 #include <string>
 #include <vector>
 
@@ -116,7 +115,7 @@ void test_only_one_writer_permitted()
             );
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::seconds(2));
+        hpx::this_thread::sleep_for(std::chrono::seconds(2));
 
         CHECK_LOCKED_VALUE_EQUAL(unblocked_count_mutex,
             unblocked_count, 1u);
@@ -183,7 +182,7 @@ void test_reader_blocks_writer()
             )
         );
 
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         CHECK_LOCKED_VALUE_EQUAL(unblocked_count_mutex,
             unblocked_count, 1u);
@@ -236,7 +235,7 @@ void test_unlocking_writer_unblocks_all_readers()
             );
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         CHECK_LOCKED_VALUE_EQUAL(unblocked_count_mutex,
             unblocked_count, 0u);
@@ -304,7 +303,7 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
             );
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         for(unsigned i = 0; i != writer_count; ++i)
         {
@@ -325,7 +324,7 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
             }
         }
 
-        hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         CHECK_LOCKED_VALUE_EQUAL(unblocked_count_mutex,
             unblocked_count, reader_count);
@@ -376,9 +375,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

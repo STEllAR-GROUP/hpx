@@ -36,6 +36,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp

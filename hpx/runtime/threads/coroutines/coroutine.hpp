@@ -40,8 +40,6 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/mpl/bool.hpp>
-
 #include <cstddef>
 #include <limits>
 #include <utility>

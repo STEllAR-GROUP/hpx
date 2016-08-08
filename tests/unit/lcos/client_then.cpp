@@ -9,6 +9,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <utility>
+
 ////////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::component_base<test_server>
 {

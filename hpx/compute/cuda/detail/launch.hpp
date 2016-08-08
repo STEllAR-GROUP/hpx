@@ -23,6 +23,7 @@
 #include <cstring>
 #endif
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail

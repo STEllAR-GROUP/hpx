@@ -13,6 +13,7 @@
 #include <hpx/components/process/child.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace components { namespace process
 {

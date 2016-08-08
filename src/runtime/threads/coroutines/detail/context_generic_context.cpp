@@ -12,6 +12,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_generic_context.hpp>
 
+#include <utility>
+
 namespace hpx { namespace threads { namespace coroutines
 {
     namespace detail { namespace generic_context

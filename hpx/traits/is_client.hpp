@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct is_client
-      : boost::mpl::false_
+      : std::false_type
     {};
 
     template <typename T, typename Enable = void>

@@ -11,6 +11,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <utility>
+
 int main()
 {
     hpx::lcos::local::promise<hpx::future<int> > promise;

@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+// make inspect happy: hpxinspect:nodeprecatedinclude hpxinspect:nodeprecatedname
+
 #include <hpx/runtime/agas/request.hpp>
 
 #include <hpx/error_code.hpp>

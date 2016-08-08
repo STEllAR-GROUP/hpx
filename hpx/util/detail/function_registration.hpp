@@ -14,9 +14,8 @@
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/detail/get_table.hpp>
 
-#include <boost/mpl/bool.hpp>
-
 #include <string>
+#include <type_traits>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -120,7 +119,7 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename VTablePair>
-    struct automatic_function_registration<VTablePair, boost::mpl::false_>
+    struct automatic_function_registration<VTablePair, std::false_type>
     {
         automatic_function_registration()
         {}

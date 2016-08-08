@@ -19,6 +19,7 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi

@@ -39,6 +39,12 @@ set(tests
     when_all_vectors_1623
    )
 
+if(NOT MSVC12)
+  set(tests ${tests}
+      split_future_2246
+     )
+endif()
+
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)

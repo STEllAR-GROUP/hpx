@@ -12,6 +12,7 @@
 #include <hpx/util/security/root_certificate_authority.hpp>
 
 #include <string>
+#include <utility>
 
 namespace hpx { namespace util { namespace security
 {

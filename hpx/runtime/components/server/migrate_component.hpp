@@ -16,6 +16,7 @@
 #include <hpx/traits/is_component.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace hpx { namespace components { namespace server
 {

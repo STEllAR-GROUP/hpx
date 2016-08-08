@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
+
 #if !defined(HPX_PLUGINS_PARCELPORT_FACTORY_HPP)
 #define HPX_PLUGINS_PARCELPORT_FACTORY_HPP
 
@@ -18,7 +20,7 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/assign.hpp>
+#include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
 
 #include <string>

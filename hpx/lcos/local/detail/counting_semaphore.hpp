@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <mutex>
+#include <utility>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)

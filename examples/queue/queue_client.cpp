@@ -20,7 +20,7 @@ void worker(queue_type queue)
 {
     try {
         // retrieve one value, will possibly throw
-        int value = queue.get_value_sync();
+        int value = queue.get_value(hpx::launch::sync);
         std::cout << value << std::endl;
     }
     catch (hpx::exception const& e) {
@@ -45,7 +45,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
     // Add some values to the queue.
     for (int i = 0; i < 5; ++i)
-        queue.set_value_sync(i);
+        queue.set_value(hpx::launch::sync, i);
 
     // Create some threads waiting to pull elements from the queue, these
     // requests will fail because of the abort_pending() invoked below.

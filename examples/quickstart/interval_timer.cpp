@@ -12,7 +12,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <boost/chrono/chrono.hpp>
+#include <chrono>
 
 ///////////////////////////////////////////////////////////////////////////////
 bool call_every_500_millisecs()
@@ -28,7 +28,7 @@ int main()
     {
         // initialize timer to invoke given function every 500 milliseconds
         hpx::util::interval_timer timer(
-            &call_every_500_millisecs, boost::chrono::milliseconds(500)
+            &call_every_500_millisecs, std::chrono::milliseconds(500)
         );
 
         timer.start();

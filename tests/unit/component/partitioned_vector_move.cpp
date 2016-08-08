@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <vector>
+#include <utility>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

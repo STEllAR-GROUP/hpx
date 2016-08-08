@@ -17,6 +17,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <sstream>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset

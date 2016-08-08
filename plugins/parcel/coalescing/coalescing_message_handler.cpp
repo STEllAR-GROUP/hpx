@@ -22,8 +22,10 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
+#include <chrono>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace traits
@@ -95,7 +97,7 @@ namespace hpx { namespace plugins { namespace parcel
             util::bind(&coalescing_message_handler::timer_flush, this_()),
             util::bind(&coalescing_message_handler::flush, this_(),
                 parcelset::policies::message_handler::flush_mode_timer, true),
-            boost::chrono::microseconds(detail::get_interval(interval)),
+            std::chrono::microseconds(detail::get_interval(interval)),
             std::string(action_name) + "_timer",
             true),
         stopped_(false),

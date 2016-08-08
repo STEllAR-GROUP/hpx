@@ -6,7 +6,7 @@
 #include <hpx/util/bind_action.hpp>
 
 #include <mutex>
-
+#include <utility>
 #include <vector>
 
 #define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                              \

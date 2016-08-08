@@ -74,12 +74,13 @@ void remote_test_multiple(boost::program_options::variables_map& vm)
     {
         // create the barrier, register it with AGAS
         barrier b = barrier::create(here, localities.size());
-        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
+        HPX_TEST(hpx::agas::register_name(hpx::launch::sync, barrier_test_name,
+            b.get_id()));
 
         for (std::size_t i = 0; i != iterations; ++i)
             b.wait();
 
-        HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name));
+        HPX_TEST(hpx::agas::unregister_name(hpx::launch::sync, barrier_test_name));
     }
     else
     {
@@ -111,8 +112,8 @@ void remote_test_single(boost::program_options::variables_map& vm)
     if (hpx::find_root_locality() == here)
     {
         outer = barrier::create(here, localities.size());
-        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name_outer,
-            outer.get_id()));
+        HPX_TEST(hpx::agas::register_name(hpx::launch::sync,
+            barrier_test_name_outer, outer.get_id()));
     }
     else
     {
@@ -128,11 +129,13 @@ void remote_test_single(boost::program_options::variables_map& vm)
         {
             // create the barrier, register it with AGAS
             barrier b = barrier::create(here, localities.size());
-            HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
+            HPX_TEST(hpx::agas::register_name(hpx::launch::sync,
+                barrier_test_name, b.get_id()));
 
             b.wait();
 
-            HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name));
+            HPX_TEST(hpx::agas::unregister_name(hpx::launch::sync,
+                barrier_test_name));
         }
         else
         {
@@ -145,7 +148,8 @@ void remote_test_single(boost::program_options::variables_map& vm)
         outer.wait();
     }
 
-    HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name_outer));
+    HPX_TEST(hpx::agas::unregister_name(hpx::launch::sync,
+        barrier_test_name_outer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -176,11 +180,10 @@ int main(int argc, char* argv[])
         ;
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
-    cfg += "hpx.run_hpx_main!=1";
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all",
+        "hpx.run_hpx_main!=1"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
