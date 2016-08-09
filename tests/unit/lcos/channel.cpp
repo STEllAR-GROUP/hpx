@@ -14,6 +14,7 @@
 
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 typedef std::string string_type;

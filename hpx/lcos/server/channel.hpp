@@ -17,6 +17,9 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <type_traits>
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
