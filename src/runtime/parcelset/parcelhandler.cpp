@@ -387,8 +387,8 @@ namespace hpx { namespace parcelset
     {
         HPX_ASSERT(resolver_);
 
-        naming::id_type const* ids = p.destinations();
-        naming::address* addrs = p.addrs();
+        naming::id_type const& id = p.destination();
+        naming::address& addr = p.addr();
 
         // During bootstrap this is handled separately (see
         // addressing_service::resolve_locality.
@@ -398,7 +398,7 @@ namespace hpx { namespace parcelset
             hpx::threads::threadmanager_is(hpx::state::state_running))
         {
 //             naming::gid_type locality =
-//                 naming::get_locality_from_gid(ids[0].get_gid());
+//                 naming::get_locality_from_gid(id.get_gid());
 //             if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
@@ -421,29 +421,10 @@ namespace hpx { namespace parcelset
 
         bool resolved_locally = true;
 
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        if (!addrs[0])
+        if (!addr)
         {
-            resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
+            resolved_locally = resolver_->resolve_local(id, addr);
         }
-#else
-        std::size_t size = p.size();
-
-        if (0 == size) {
-            HPX_THROW_EXCEPTION(network_error, "parcelhandler::put_parcel",
-                "no destination address given");
-            return;
-        }
-
-        if (1 == size) {
-            if (!addrs[0])
-                resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
-        }
-        else {
-            boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_->resolve_local(ids, addrs, size, locals);
-        }
-#endif
 
         if (!p.parcel_id())
             p.parcel_id() = parcel::generate_unique_id();
@@ -460,7 +441,7 @@ namespace hpx { namespace parcelset
             // dispatch to the message handler which is associated with the
             // encapsulated action
             typedef std::pair<std::shared_ptr<parcelport>, locality> destination_pair;
-            destination_pair dest = find_appropriate_destination(addrs[0].locality_);
+            destination_pair dest = find_appropriate_destination(addr.locality_);
 
             if (load_message_handlers_ && !hpx::is_stopped_or_shutting_down())
             {
@@ -502,7 +483,7 @@ namespace hpx { namespace parcelset
             hpx::threads::threadmanager_is(hpx::state::state_running))
         {
 //             naming::gid_type locality = naming::get_locality_from_gid(
-//                 (*parcels[0].destinations()).get_gid());
+//                 (parcels[0].destination()).get_gid());
 //             if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
@@ -560,12 +541,12 @@ namespace hpx { namespace parcelset
                 p.parcel_id() = parcel::generate_unique_id();
 
             bool resolved_locally = true;
-            naming::address* addrs = p.addrs();
+            naming::address& addr = p.addr();
 
-            if (!addrs[0])
+            if (!addr)
             {
                 resolved_locally = resolver_->resolve_local(
-                    p.destinations()[0], addrs[0]);
+                    p.destination(), addr);
             }
 
             using util::placeholders::_1;
@@ -580,7 +561,7 @@ namespace hpx { namespace parcelset
                 // dispatch to the message handler which is associated with the
                 // encapsulated action
                 destination_pair dest = find_appropriate_destination(
-                    addrs[0].locality_);
+                    addr.locality_);
 
                 if (load_message_handlers_)
                 {

@@ -416,14 +416,9 @@ namespace hpx { namespace applier
     // schedule threads based on given parcel
     void applier::schedule_action(parcelset::parcel p, std::size_t num_thread)
     {
-        // fetch the set of destinations
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        std::size_t const size = 1ul;
-#else
-        std::size_t const size = p.size();
-#endif
-        naming::id_type const* ids = p.destinations();
-        naming::address const* addrs = p.addrs();
+        // fetch the set destination
+        naming::id_type const& id = p.destination();
+        naming::address const& addr = p.addr();
 
         // decode the action-type in the parcel
         std::unique_ptr<actions::continuation> cont = p.get_continuation();
@@ -454,121 +449,108 @@ namespace hpx { namespace applier
         int comptype = act->get_component_type();
         naming::gid_type dest = p.destination_locality();
 
-        // if the parcel carries a continuation it should be directed to a
-        // single destination
-        HPX_ASSERT(!cont || size == 1);
-
         naming::resolver_client& client = hpx::naming::get_agas_client();
 
-        // schedule a thread for each of the destinations
-        for (std::size_t i = 0; i != size; ++i)
+        // schedule a thread for the destination
+
+        // make sure this parcel destination matches the proper locality
+        HPX_ASSERT(dest == addr.locality_);
+
+        // decode the local virtual address of the parcel
+        naming::address::address_type lva = addr.address_;
+
+        // by convention, a zero address references either the local
+        // runtime support component or one of the AGAS components
+        if (0 == lva)
         {
-            naming::address const& addr = addrs[i];
-
-            // make sure this parcel destination matches the proper locality
-            HPX_ASSERT(dest == addr.locality_);
-
-            // decode the local virtual address of the parcel
-            naming::address::address_type lva = addr.address_;
-
-            // by convention, a zero address references either the local
-            // runtime support component or one of the AGAS components
-            if (0 == lva)
+            switch(comptype)
             {
-                switch(comptype)
-                {
-                case components::component_runtime_support:
-                    lva = get_runtime_support_raw_gid().get_lsb();
-                    break;
-
-                case components::component_agas_primary_namespace:
-                    lva = get_agas_client().get_primary_ns_lva();
-                    break;
-
-                case components::component_agas_symbol_namespace:
-                    lva = get_agas_client().get_symbol_ns_lva();
-                    break;
-
-                case components::component_plain_function:
-                    break;
-
-                default:
-                    HPX_ASSERT(false);
-                }
-            }
-            else if (comptype == components::component_memory)
-            {
-                HPX_ASSERT(naming::refers_to_virtual_memory(ids[i].get_gid()));
-                lva = get_memory_raw_gid().get_lsb();
-            }
-
-            // make sure the target has not been migrated away
-            auto r = act->was_object_migrated(ids[i], lva);
-            if (r.first)
-            {
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-                // it's unclear at this point what could be done if there is
-                // more than one destination
-                HPX_ASSERT(size == 1);
-#endif
-                // set continuation in outgoing parcel
-                if (cont)
-                    p.set_continuation(std::move(cont));
-
-                // route parcel to new locality of target
-                client.route(
-                    std::move(p),
-                    util::bind(&detail::parcel_sent_handler,
-                        boost::ref(parcel_handler_),
-                        util::placeholders::_1, util::placeholders::_2),
-                    threads::thread_priority_normal);
+            case components::component_runtime_support:
+                lva = get_runtime_support_raw_gid().get_lsb();
                 break;
+
+            case components::component_agas_primary_namespace:
+                lva = get_agas_client().get_primary_ns_lva();
+                break;
+
+            case components::component_agas_symbol_namespace:
+                lva = get_agas_client().get_symbol_ns_lva();
+                break;
+
+            case components::component_plain_function:
+                break;
+
+            default:
+                HPX_ASSERT(false);
             }
+        }
+        else if (comptype == components::component_memory)
+        {
+            HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
+            lva = get_memory_raw_gid().get_lsb();
+        }
+
+        // make sure the target has not been migrated away
+        auto r = act->was_object_migrated(id, lva);
+        if (r.first)
+        {
+            // set continuation in outgoing parcel
+            if (cont)
+                p.set_continuation(std::move(cont));
+
+            // route parcel to new locality of target
+            client.route(
+                std::move(p),
+                util::bind(&detail::parcel_sent_handler,
+                    boost::ref(parcel_handler_),
+                    util::placeholders::_1, util::placeholders::_2),
+                threads::thread_priority_normal);
+            return;
+        }
 
 #if defined(HPX_HAVE_SECURITY)
-            if (verify_capabilities_) {
-                components::security::capability caps_action =
-                    act->get_required_capabilities(lva);
+        if (verify_capabilities_) {
+            components::security::capability caps_action =
+                act->get_required_capabilities(lva);
 
-                if (caps_action.verify(caps_sender) == false) {
-                    HPX_THROW_EXCEPTION(security_error,
-                        "applier::schedule_action",
-                        boost::str(boost::format("sender has insufficient capabilities "
-                            "to execute the action (%1%, sender: %2%, action %3%)") %
-                            act->get_action_name() % caps_sender % caps_action));
-                    return;
-                }
-            }
-#endif
-            // make sure the component_type of the action matches the
-            // component type in the destination address
-            if (HPX_UNLIKELY(!components::types_are_compatible(
-                addr.type_, comptype)))
-            {
-                std::ostringstream strm;
-                strm << " types are not compatible: destination_type("
-                      << addr.type_ << ") action_type(" << comptype
-                      << ") parcel ("  << p << ")";
-                HPX_THROW_EXCEPTION(bad_component_type,
+            if (caps_action.verify(caps_sender) == false) {
+                HPX_THROW_EXCEPTION(security_error,
                     "applier::schedule_action",
-                    strm.str());
+                    boost::str(boost::format("sender has insufficient capabilities "
+                        "to execute the action (%1%, sender: %2%, action %3%)") %
+                        act->get_action_name() % caps_sender % caps_action));
+                return;
             }
+        }
+#endif
+        // make sure the component_type of the action matches the
+        // component type in the destination address
+        if (HPX_UNLIKELY(!components::types_are_compatible(
+            addr.type_, comptype)))
+        {
+            std::ostringstream strm;
+            strm << " types are not compatible: destination_type("
+                  << addr.type_ << ") action_type(" << comptype
+                  << ") parcel ("  << p << ")";
+            HPX_THROW_EXCEPTION(bad_component_type,
+                "applier::schedule_action",
+                strm.str());
+        }
 
-            // dispatch action, register work item either with or without
-            // continuation support
-            if (!cont) {
-                // No continuation is to be executed, register the plain
-                // action and the local-virtual address.
-                act->schedule_thread(ids[i], lva, threads::pending, num_thread);
-            }
-            else {
-                // This parcel carries a continuation, register a wrapper
-                // which first executes the original thread function as
-                // required by the action and triggers the continuations
-                // afterwards.
-                act->schedule_thread(std::move(cont), ids[i], lva,
-                    threads::pending, num_thread);
-            }
+        // dispatch action, register work item either with or without
+        // continuation support
+        if (!cont) {
+            // No continuation is to be executed, register the plain
+            // action and the local-virtual address.
+            act->schedule_thread(id, lva, threads::pending, num_thread);
+        }
+        else {
+            // This parcel carries a continuation, register a wrapper
+            // which first executes the original thread function as
+            // required by the action and triggers the continuations
+            // afterwards.
+            act->schedule_thread(std::move(cont), id, lva,
+                threads::pending, num_thread);
         }
     }
 

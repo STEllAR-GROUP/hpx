@@ -44,8 +44,8 @@ namespace hpx { namespace parcelset
         {
             source_id_ = naming::invalid_id;
         }
-        ar & dests_;
-        ar & addrs_;
+        ar & dest_;
+        ar & addr_;
         ar & cont_;
         ar & action_;
     }
@@ -57,8 +57,8 @@ namespace hpx { namespace parcelset
         {
             ar & source_id_;
         }
-        ar & dests_;
-        ar & addrs_;
+        ar & dest_;
+        ar & addr_;
         ar & cont_;
         ar & action_;
     }
@@ -66,13 +66,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        os << "(";
-        if (!p.dests_.empty())
-            os << p.dests_[0] << ":" << p.addrs_[0] << ":";
-#else
-        os << "(" << p.dests_ << ":" << p.addrs_ << ":";
-#endif
+        os << "(" << p.dest_ << ":" << p.addr_ << ":";
         os << p.action_->get_action_name() << ")";
 
         return os;

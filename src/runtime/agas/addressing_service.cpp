@@ -1659,10 +1659,10 @@ void addressing_service::route(
     }
 
     // compose request
-    naming::id_type const* ids = p.destinations();
+    naming::id_type const& id = p.destination();
 
     naming::id_type const target(
-        stubs::primary_namespace::get_service_instance(ids[0])
+        stubs::primary_namespace::get_service_instance(id)
       , naming::id_type::unmanaged);
 
     typedef server::primary_namespace::route_action action_type;
@@ -1711,8 +1711,8 @@ void addressing_service::route(
     // a service instance
     if (!addr)
     {
-        if (stubs::primary_namespace::is_service_instance(ids[0]) ||
-            stubs::symbol_namespace::is_service_instance(ids[0]))
+        if (stubs::primary_namespace::is_service_instance(id) ||
+            stubs::symbol_namespace::is_service_instance(id))
         {
             // target locality will supply the lva
             addr.locality_ = naming::get_locality_from_id(target).get_gid();

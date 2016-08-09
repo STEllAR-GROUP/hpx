@@ -31,18 +31,6 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-#include <hpx/util/remove_local_destinations.hpp>
-
-#include <boost/dynamic_bitset.hpp>
-
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <map>
-#include <vector>
-#endif
-
 // FIXME: Error codes?
 
 namespace hpx
@@ -205,67 +193,6 @@ namespace hpx
             return detail::put_parcel<Action>(id, std::move(addr), priority,
                 std::forward<Ts>(vs)...);
         }
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        struct destinations
-        {
-            std::vector<naming::id_type> gids_;
-            std::vector<naming::address> addrs_;
-        };
-
-        struct send_parcel
-        {
-            send_parcel(parcelset::parcelhandler& ph, actions::action_type act)
-              : ph_(ph), act_(act)
-            {}
-
-            void operator()(
-                std::pair<parcelset::locality const, destinations>& e) const
-            {
-                // Create a new parcel to be sent to the destination with the
-                // gid, action, and arguments
-                parcelset::parcel p(e.second.gids_, e.second.addrs_, act_);
-
-                // Send the parcel through the parcel handler
-                ph_.put_parcel(std::move(p));
-            }
-
-            parcelset::parcelhandler& ph_;
-            actions::action_type act_;
-        };
-
-        template <typename Action, typename ...Ts>
-        inline bool
-        apply_r_p(std::vector<naming::address>& addrs,
-            std::vector<naming::gid_type> const& gids,
-            threads::thread_priority priority, Ts&&... vs)
-        {
-            typedef typename hpx::traits::extract_action<Action>::type action_type;
-
-            // sort destinations
-            std::map<parcelset::locality, destinations> dests;
-
-            std::size_t count = gids.size();
-            for (std::size_t i = 0; i < count; ++i) {
-                complement_addr<action_type>(addrs[i]);
-
-                destinations& dest = dests[addrs[i].locality_];
-                dest.gids_.push_back(gids[i]);
-                dest.addrs_.push_back(addrs[i]);
-            }
-
-            // send one parcel to each of the destination localities
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-            actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(priority,
-                    std::forward<Ts>(vs)...));
-
-            std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
-
-            return false;     // destinations are remote
-        }
-#endif
 
         template <typename Action, typename ...Ts>
         inline bool
@@ -451,70 +378,6 @@ namespace hpx
         return apply_p<Action>(policy, actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
     }
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-    // same for multiple destinations
-    template <typename Action, typename ...Ts>
-    inline bool
-    apply_p(std::vector<naming::id_type> const& ids,
-        threads::thread_priority priority, Ts&&... vs)
-    {
-        // Determine whether the gids are local or remote
-        std::vector<naming::gid_type> gids;
-        std::vector<naming::address> addrs;
-        boost::dynamic_bitset<> locals;
-
-        std::size_t count = ids.size();
-        gids.reserve(count);
-        if (agas::is_local_address_cached(ids, addrs, locals)) {
-            // at least one destination is local
-            for (std::size_t i = 0; i < count; ++i) {
-                if (locals.test(i)) {
-                    // apply locally, do not move arguments
-                    applier::detail::apply_l_p_val<Action>(ids[i], addrs[i],
-                        priority, vs...);
-                }
-                gids.push_back(applier::detail::convert_to_gid(ids[i]));
-            }
-
-            // remove local destinations
-            std::vector<naming::gid_type>::iterator it =
-                util::remove_local_destinations(gids, addrs, locals);
-            if (it == gids.begin())
-                return true;        // all destinations are local
-
-            gids.erase(it, gids.end());
-            addrs.resize(gids.size());
-        }
-        else {
-            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
-                applier::detail::convert_to_gid);
-        }
-
-        // apply remotely
-        return applier::detail::apply_r_p<Action>(addrs, gids, priority,
-            std::forward<Ts>(vs)...);
-    }
-
-    template <typename Action, typename ...Ts>
-    inline bool
-    apply(std::vector<naming::id_type> const& gids, Ts&&... vs)
-    {
-        return apply_p<Action>(gids, actions::action_priority<Action>(),
-            std::forward<Ts>(vs)...);
-    }
-
-    template <typename Component, typename Signature, typename Derived,
-        typename ...Ts>
-    inline bool
-    apply(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        std::vector<naming::id_type> const& gids, Ts&&... vs)
-    {
-        return apply_p<Derived>(gids, actions::action_priority<Derived>(),
-            std::forward<Ts>(vs)...);
-    }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
