@@ -54,7 +54,48 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 HPX_REGISTER_BASE_LCO_WITH_VALUE(
     hpx::serialization::serialize_buffer<char>, serialization_buffer_char);
 
+double
+message_double(double d)
+{
+    return d;
+}
+HPX_PLAIN_ACTION(message_double);
+
 ///////////////////////////////////////////////////////////////////////////////
+double receive_double(
+    hpx::naming::id_type dest,
+    std::size_t loop,
+    std::size_t window_size)
+{
+    std::size_t skip = SKIP_LARGE;
+
+
+    hpx::util::high_resolution_timer t;
+
+    message_double_action msg;
+    for (std::size_t i = 0; i != loop + skip; ++i) {
+        // do not measure warm up phase
+        if (i == skip)
+            t.restart();
+
+        using hpx::parallel::for_each;
+        using hpx::parallel::par;
+
+        std::size_t const start = 0;
+
+        auto range = boost::irange(start, window_size);
+        for_each(par, boost::begin(range), boost::end(range),
+            [&](boost::uint64_t j)
+            {
+                double d = 0.0;
+                msg(dest, d);
+            }
+        );
+    }
+
+    double elapsed = t.elapsed();
+    return (elapsed * 1e6) / (2 * loop * window_size);
+}
 double receive(
     hpx::naming::id_type dest,
     char * send_buffer,
@@ -127,6 +168,11 @@ void run_benchmark(boost::program_options::variables_map & vm)
 
     // perform actual measurements
     hpx::util::high_resolution_timer timer;
+
+    // test for single double
+    double latency = receive_double(there, loop, window_size);
+    hpx::cout << std::left << std::setw(10) << "single double "
+              << latency << hpx::endl << hpx::flush;
 
     for (std::size_t size = min_size; size <= max_size; size *= 2)
     {

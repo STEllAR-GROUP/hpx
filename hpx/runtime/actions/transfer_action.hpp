@@ -73,6 +73,10 @@ namespace hpx { namespace actions
         typedef typename Action::direct_execution direct_execution;
         typedef void serialized_with_id;
 
+        // construct an empty transfer_action to avoid serialization overhead
+        transfer_action()
+        {}
+
         // construct an action from its arguments
         template <typename ...Ts>
         explicit transfer_action(Ts&&... vs)
