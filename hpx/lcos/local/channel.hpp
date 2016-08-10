@@ -265,63 +265,6 @@ namespace hpx { namespace lcos { namespace local
         std::pair<T, bool> data_;
     };
 
-    template <>
-    class channel_iterator<void>
-      : public hpx::util::iterator_facade<
-            channel_iterator<void>, util::unused_type const,
-            std::input_iterator_tag>
-    {
-        typedef hpx::util::iterator_facade<
-                channel_iterator<void>, util::unused_type const,
-                std::input_iterator_tag
-            > base_type;
-
-    public:
-        channel_iterator()
-          : channel_(nullptr), data_(false)
-        {}
-
-        inline explicit channel_iterator(channel<void> const* c);
-        inline explicit channel_iterator(receive_channel<void> const* c);
-
-    private:
-        bool get_checked()
-        {
-            hpx::future<util::unused_type> f;
-            if (channel_->try_get(std::size_t(-1), &f))
-            {
-                f.get();
-                return true;
-            }
-            return false;
-        }
-
-        friend class hpx::util::iterator_core_access;
-
-        bool equal(channel_iterator const& rhs) const
-        {
-            return (channel_ == rhs.channel_ && data_ == rhs.data_) ||
-                (!data_ && rhs.channel_ == nullptr) ||
-                (channel_ == nullptr && !rhs.data_);
-        }
-
-        void increment()
-        {
-            if (channel_)
-                data_ = get_checked();
-        }
-
-        base_type::reference dereference() const
-        {
-            HPX_ASSERT(data_);
-            return util::unused;
-        }
-
-    private:
-        boost::intrusive_ptr<detail::channel_base<util::unused_type> > channel_;
-        bool data_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class channel
@@ -487,6 +430,69 @@ namespace hpx { namespace lcos { namespace local
     {}
 
     ///////////////////////////////////////////////////////////////////////////
+    // forward declare specializations
+    template <> class channel<void>;
+    template <> class receive_channel<void>;
+    template <> class send_channel<void>;
+
+    template <>
+    class channel_iterator<void>
+      : public hpx::util::iterator_facade<
+            channel_iterator<void>, util::unused_type const,
+            std::input_iterator_tag>
+    {
+        typedef hpx::util::iterator_facade<
+                channel_iterator<void>, util::unused_type const,
+                std::input_iterator_tag
+            > base_type;
+
+    public:
+        channel_iterator()
+          : channel_(nullptr), data_(false)
+        {}
+
+        inline explicit channel_iterator(channel<void> const* c);
+        inline explicit channel_iterator(receive_channel<void> const* c);
+
+    private:
+        bool get_checked()
+        {
+            hpx::future<util::unused_type> f;
+            if (channel_->try_get(std::size_t(-1), &f))
+            {
+                f.get();
+                return true;
+            }
+            return false;
+        }
+
+        friend class hpx::util::iterator_core_access;
+
+        bool equal(channel_iterator const& rhs) const
+        {
+            return (channel_ == rhs.channel_ && data_ == rhs.data_) ||
+                (!data_ && rhs.channel_ == nullptr) ||
+                (channel_ == nullptr && !rhs.data_);
+        }
+
+        void increment()
+        {
+            if (channel_)
+                data_ = get_checked();
+        }
+
+        base_type::reference dereference() const
+        {
+            HPX_ASSERT(data_);
+            return util::unused;
+        }
+
+    private:
+        boost::intrusive_ptr<detail::channel_base<util::unused_type> > channel_;
+        bool data_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <>
     class channel<void>
     {
@@ -637,6 +643,7 @@ namespace hpx { namespace lcos { namespace local
         boost::intrusive_ptr<detail::channel_base<util::unused_type> > channel_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     inline channel_iterator<void>::channel_iterator(channel<void> const* c)
       : channel_(c ? c->channel_ : nullptr),
         data_(c ? get_checked() : false)
