@@ -24,6 +24,7 @@
 
 #include <memory>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs

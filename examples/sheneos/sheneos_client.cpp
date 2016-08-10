@@ -5,8 +5,6 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <boost/assign/std.hpp>
-
 #include <string>
 #include <vector>
 
@@ -48,16 +46,16 @@ int hpx_main(variables_map& vm)
     {
         char const* shen_symbolic_name = "/sheneos_client/test";
 
-        using namespace boost::assign;
-        std::vector<double> expected;
-        expected += 9.809012e+34;       // pressure
-        expected += 1.602810e+20;       // energy
-        expected += 2.843643e+00;       // entropy
-        expected += 4.151515e+01;       // munu
-        expected += 3.960476e+20;       // cs2
-        expected += 2.052315e+08;       // dedt
-        expected += 2.864134e+20;       // dpdrhoe
-        expected += 3.556341e+14;       // dpderho
+        std::vector<double> const expected = {
+            9.809012e+34,       // pressure
+            1.602810e+20,       // energy
+            2.843643e+00,       // entropy
+            4.151515e+01,       // munu
+            3.960476e+20,       // cs2
+            2.052315e+08,       // dedt
+            2.864134e+20,       // dpdrhoe
+            3.556341e+14,       // dpderho
+        };
 
         // create the distributed interpolation object on num_localities
         sheneos::interpolator shen;

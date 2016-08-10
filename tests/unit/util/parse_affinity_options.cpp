@@ -9,8 +9,6 @@
 #include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -1076,9 +1074,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // We force this test to use 2 threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=2";
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=2"
+    };
 
     // Initialize and run HPX
     HPX_TEST(0 == hpx::init(argc, argv, cfg));

@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -32,6 +33,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // fill
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct fill_iteration
         {
@@ -58,7 +60,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        /// \cond NOINTERNAL
         struct fill : public detail::algorithm<fill>
         {
             fill()

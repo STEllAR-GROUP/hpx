@@ -17,6 +17,7 @@
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -79,6 +80,10 @@ namespace hpx { namespace util
         typedef typename base_type::result_type result_type;
 
         function() HPX_NOEXCEPT
+          : base_type()
+        {}
+
+        function(std::nullptr_t) HPX_NOEXCEPT
           : base_type()
         {}
 
@@ -166,73 +171,6 @@ namespace hpx { namespace util
     {
         return f.empty();
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
-
-    template <typename T>
-    class function_nonser;
-
-    template <typename R, typename ...Ts>
-    class function_nonser<R(Ts...)>
-      : public function<R(Ts...), false>
-    {
-        typedef function<R(Ts...), false> base_type;
-
-    public:
-        function_nonser() HPX_NOEXCEPT
-          : base_type()
-        {}
-
-        function_nonser(function_nonser const& other)
-          : base_type(static_cast<base_type const&>(other))
-        {}
-
-        function_nonser(function_nonser&& other) HPX_NOEXCEPT
-          : base_type(static_cast<base_type&&>(other))
-        {}
-
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<FD, function_nonser>::value
-             && traits::is_callable<FD&(Ts...), R>::value
-            >::type>
-        function_nonser(F&& f)
-          : base_type(std::forward<F>(f))
-        {}
-
-        function_nonser& operator=(function_nonser const& other)
-        {
-            base_type::operator=(static_cast<base_type const&>(other));
-            return *this;
-        }
-
-        function_nonser& operator=(function_nonser&& other) HPX_NOEXCEPT
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
-        }
-
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<FD, function_nonser>::value
-             && traits::is_callable<FD&(Ts...), R>::value
-            >::type>
-        function_nonser& operator=(F&& f)
-        {
-            base_type::operator=(std::forward<F>(f));
-            return *this;
-        }
-    };
-
-    template <typename Sig>
-    static bool is_empty_function(
-        function_nonser<Sig> const& f) HPX_NOEXCEPT
-    {
-        return f.empty();
-    }
-
-#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -247,18 +185,6 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
-
-#   ifndef HPX_HAVE_CXX11_ALIAS_TEMPLATES
-    template <typename Sig>
-    struct get_function_address<util::function_nonser<Sig> >
-    {
-        static std::size_t
-            call(util::function_nonser<Sig> const& f) HPX_NOEXCEPT
-        {
-            return f.get_function_address();
-        }
-    };
-#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

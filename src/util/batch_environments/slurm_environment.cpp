@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
+
 #include <hpx/config.hpp>
 #include <hpx/util/batch_environments/slurm_environment.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
@@ -22,6 +24,7 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util { namespace batch_environments
@@ -35,7 +38,7 @@ namespace hpx { namespace util { namespace batch_environments
       , valid_(false)
     {
         char *node_num = std::getenv("SLURM_PROCID");
-        valid_ = node_num != 0;
+        valid_ = node_num != nullptr;
         if(valid_)
         {
             // Initialize our node number

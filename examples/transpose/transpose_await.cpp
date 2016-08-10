@@ -181,7 +181,7 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
 
 ///////////////////////////////////////////////////////////////////////////////
 // The returned value type has to be the same as the return type used for
-// __await below
+// co_await below
 hpx::future<sub_block> transpose_phase(
     std::vector<block> const& A, std::vector<block>& B,
     boost::uint64_t block_order, boost::uint64_t b,
@@ -203,7 +203,7 @@ hpx::future<sub_block> transpose_phase(
         hpx::future<sub_block> to =
             B[b].get_sub_block(B_offset, block_size);
 
-        transpose(__await from, __await to, block_order, tile_size);
+        transpose(co_await from, co_await to, block_order, tile_size);
     }
 
     return sub_block();
@@ -387,8 +387,9 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }

@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters>
-        std::size_t call_processing_units_parameter_count(Parameters& params);
+        std::size_t call_processing_units_parameter_count(Parameters && params);
 
         struct processing_units_count_helper
         {

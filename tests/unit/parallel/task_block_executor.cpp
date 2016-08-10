@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_task_block.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
@@ -20,7 +21,7 @@ using hpx::parallel::parallel_execution_policy;
 using hpx::parallel::parallel_task_execution_policy;
 using hpx::parallel::parallel_execution_policy_shim;
 using hpx::parallel::parallel_task_execution_policy_shim;
-using hpx::parallel::auto_chunk_size;
+using hpx::parallel::static_chunk_size;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
@@ -35,7 +36,7 @@ void define_task_block_test1(Executor& exec)
     bool task3_flag = false;
 
     typedef task_block<
-            parallel_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type;
 
     define_task_block(par.on(exec),
@@ -90,10 +91,10 @@ void define_task_block_test2(Executor& exec)
     bool task3_flag = false;
 
     typedef task_block<
-            parallel_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type1;
     typedef task_block<
-            parallel_task_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_task_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type2;
 
     hpx::future<void> f = define_task_block(par(task).on(exec),
@@ -149,7 +150,7 @@ void define_task_block_test3(Executor& exec)
     bool task3_flag = false;
 
     typedef task_block<
-            parallel_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type;
 
     define_task_block(par.on(exec),
@@ -204,10 +205,10 @@ void define_task_block_test4(Executor& exec)
     bool task3_flag = false;
 
     typedef task_block<
-            parallel_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type1;
     typedef task_block<
-            parallel_task_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_task_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type2;
 
     hpx::future<void> f = define_task_block(par(task).on(exec),
@@ -255,7 +256,7 @@ template <typename Executor>
 void define_task_block_exceptions_test1(Executor& exec)
 {
     typedef task_block<
-            parallel_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type;
 
     try {
@@ -289,7 +290,7 @@ template <typename Executor>
 void define_task_block_exceptions_test2(Executor& exec)
 {
     typedef task_block<
-            parallel_task_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_task_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type;
 
     hpx::future<void> f = define_task_block(par(task).on(exec),
@@ -325,7 +326,7 @@ template <typename Executor>
 void define_task_block_exceptions_test3(Executor& exec)
 {
     typedef task_block<
-            parallel_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type;
 
     try {
@@ -362,7 +363,7 @@ template <typename Executor>
 void define_task_block_exceptions_test4(Executor& exec)
 {
     typedef task_block<
-            parallel_task_execution_policy_shim<Executor, auto_chunk_size>
+            parallel_task_execution_policy_shim<Executor, static_chunk_size>
         > task_block_type;
 
     hpx::future<void> f = define_task_block(par(task).on(exec),
@@ -426,9 +427,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

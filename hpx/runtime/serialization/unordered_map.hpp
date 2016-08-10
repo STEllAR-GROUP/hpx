@@ -13,10 +13,7 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 
 #include <unordered_map>
-
-#include <boost/mpl/and.hpp>
-#include <boost/type_traits/add_reference.hpp>
-#include <boost/type_traits/remove_const.hpp>
+#include <utility>
 
 namespace hpx
 {

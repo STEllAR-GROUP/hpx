@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -98,7 +99,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     // serialize data
     std::vector<hpx::serialization::serialization_chunk> out_chunks;
     std::size_t arg_size = get_archive_size(outp, out_archive_flags,
-        zero_copy ? &out_chunks : 0);
+        zero_copy ? &out_chunks : nullptr);
     std::vector<char> out_buffer;
     boost::uint32_t dest_locality_id = outp.destination_locality_id();
 
@@ -108,7 +109,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
         // create an output archive and serialize the parcel
         hpx::serialization::output_archive archive(
             out_buffer, out_archive_flags, dest_locality_id,
-            zero_copy ? &out_chunks : 0);
+            zero_copy ? &out_chunks : nullptr);
         archive << outp;
 
         arg_size = archive.bytes_written();

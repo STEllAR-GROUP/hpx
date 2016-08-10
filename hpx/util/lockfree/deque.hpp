@@ -30,6 +30,8 @@
 #include <hpx/util/lockfree/detail/tagged_ptr_pair.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
+#include <type_traits>
+
 namespace boost { namespace lockfree
 {
 
@@ -82,7 +84,7 @@ struct deque_anchor //-V690
     atomic_pair pair_;
 
   public:
-    deque_anchor(): pair_(pair(0, 0, stable, 0)) {}
+    deque_anchor(): pair_(pair(nullptr, nullptr, stable, 0)) {}
 
     deque_anchor(deque_anchor const& p): pair_(p.pair_.load()) {}
 
@@ -159,8 +161,8 @@ struct deque
 
     typedef typename Alloc::template rebind<node>::other node_allocator;
 
-    typedef typename boost::mpl::if_<
-        boost::is_same<freelist_t, caching_freelist_t>,
+    typedef typename std::conditional<
+        std::is_same<freelist_t, caching_freelist_t>::value,
         caching_freelist<node, node_allocator>,
         static_freelist<node, node_allocator>
     >::type pool;
@@ -278,7 +280,7 @@ struct deque
     // Complexity: O(Processes)
     // FIXME: Should we check both pointers here?
     bool empty() const
-    { return anchor_.lrs().get_left_ptr() == 0; }
+    { return anchor_.lrs().get_left_ptr() == nullptr; }
 
     // Thread-safe and non-blocking.
     // Complexity: O(1)
@@ -292,9 +294,9 @@ struct deque
     bool push_left(T const& data)
     {
         // Allocate the new node which we will be inserting.
-        node* n = alloc_node(0, 0, data);
+        node* n = alloc_node(nullptr, nullptr, data);
 
-        if (n == 0)
+        if (n == nullptr)
             return false;
 
         // Loop until we insert successfully.
@@ -305,7 +307,7 @@ struct deque
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
-            if (lrs.get_left_ptr() == 0)
+            if (lrs.get_left_ptr() == nullptr)
             {
                 // If the deque is empty, we simply install a new anchor which
                 // points to the new node as both its leftmost and rightmost
@@ -411,14 +413,14 @@ struct deque
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
-            if (lrs.get_left_ptr() == 0)
+            if (lrs.get_left_ptr() == nullptr)
                 return false;
 
             // Check if the deque has 1 element.
             if (lrs.get_left_ptr() == lrs.get_right_ptr())
             {
                 // Try to set both anchor pointer
-                if (anchor_.cas(lrs, anchor_pair(0, 0,
+                if (anchor_.cas(lrs, anchor_pair(nullptr, nullptr,
                         lrs.get_left_tag(), lrs.get_right_tag() + 1)))
                 {
                     // Set the result, deallocate the popped node, and return.
@@ -472,14 +474,14 @@ struct deque
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
-            if (lrs.get_right_ptr() == 0)
+            if (lrs.get_right_ptr() == nullptr)
                 return false;
 
             // Check if the deque has 1 element.
             if (lrs.get_right_ptr() == lrs.get_left_ptr())
             {
                 // Try to set both anchor pointer
-                if (anchor_.cas(lrs, anchor_pair(0, 0,
+                if (anchor_.cas(lrs, anchor_pair(nullptr, nullptr,
                         lrs.get_left_tag(), lrs.get_right_tag() + 1)))
                 {
                     // Set the result, deallocate the popped node, and return.

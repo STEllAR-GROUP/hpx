@@ -215,7 +215,7 @@ namespace hpx
         options_description desc_commandline(
             std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
 
-        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), 0 };
+        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
 
         return init(static_cast<hpx_main_type>(::hpx_main), desc_commandline,
             1, dummy_argv, cfg, startup_function_type(),
@@ -236,9 +236,9 @@ namespace hpx
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
 
-        if (argc == 0 || argv == 0)
+        if (argc == 0 || argv == nullptr)
         {
-            char *dummy_argv[2] = { const_cast<char*>(app_name.c_str()), 0 };
+            char *dummy_argv[2] = { const_cast<char*>(app_name.c_str()), nullptr };
             return init(desc_commandline, 1, dummy_argv, mode);
         }
 
@@ -282,7 +282,7 @@ namespace hpx
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
 
-        HPX_ASSERT(argc != 0 && argv != 0);
+        HPX_ASSERT(argc != 0 && argv != nullptr);
 
         return init(main_f, desc_commandline, argc, argv, cfg,
             empty, empty, mode);
@@ -311,7 +311,7 @@ namespace hpx
         util::function_nonser<int(boost::program_options::variables_map& vm)>
             main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
 
-        HPX_ASSERT(argc != 0 && argv != 0);
+        HPX_ASSERT(argc != 0 && argv != nullptr);
 
         return init(main_f, desc_commandline, argc, argv, cfg,
             startup_function_type(), shutdown_function_type(), mode);

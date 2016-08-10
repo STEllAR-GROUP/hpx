@@ -50,6 +50,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas
@@ -141,7 +142,7 @@ addressing_service::addressing_service(
   , locality_()
 { // {{{
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp ? pp.get() : 0, ph.endpoints(), ini_);
+    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
 
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
@@ -449,7 +450,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 future<parcelset::endpoints_type> endpoints_future =
                 client_->get_endpoints(req, action_priority_, ec);
 
-                if (0 == threads::get_self_ptr())
+                if (nullptr == threads::get_self_ptr())
                 {
                     // this should happen only during bootstrap
                     HPX_ASSERT(hpx::is_starting());
@@ -1638,7 +1639,7 @@ void addressing_service::route(
   , threads::thread_priority local_priority
     )
 {
-    if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+    if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
         void (addressing_service::*route_ptr)(
@@ -1745,7 +1746,7 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 { // {{{ incref implementation
     naming::gid_type raw(naming::detail::get_stripped_gid(id));
 
-    if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+    if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
         lcos::future<boost::int64_t> (
@@ -1861,7 +1862,7 @@ void addressing_service::decref(
 { // {{{ decref implementation
     naming::gid_type raw(naming::detail::get_stripped_gid(gid));
 
-    if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+    if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
         void (addressing_service::*decref_ptr)(
@@ -2186,7 +2187,7 @@ void addressing_service::update_cache_entry(
         return;
     }
 
-    if(hpx::threads::get_self_ptr() == 0)
+    if(hpx::threads::get_self_ptr() == nullptr)
     {
         // Don't update the cache while HPX is starting up ...
         if(hpx::is_starting())

@@ -93,7 +93,12 @@ static void
     HPX_TEST(global_int == 5);
 
     // clear
-    v1 = (void(*)())0;
+    void (*fpv1)() = 0; // NOLINT
+    v1 = fpv1;
+    HPX_TEST(v1.empty());
+
+    v1 = write_five;
+    v1 = nullptr;
     HPX_TEST(v1.empty());
 
     // Assignment to an empty function from a free function
@@ -487,8 +492,13 @@ static void
     HPX_TEST(global_int == 2);
 
     // Test construction from 0
-    func_void_type v9((void(*)())0);
+    void (*fpv9)() = 0; // NOLINT
+    func_void_type v9(fpv9);
     HPX_TEST(v9.empty());
+
+    // Test construction from nullptr
+    func_void_type v9np(nullptr);
+    HPX_TEST(v9np.empty());
 
     // Test return values
     typedef hpx::util::function_nonser<int ()> func_int_type;
@@ -667,7 +677,7 @@ static void test_exception()
     }
 }
 
-typedef boost::function< void * (void * reader) > reader_type;
+typedef hpx::util::function_nonser< void * (void * reader) > reader_type;
 typedef std::pair<int, reader_type> mapped_type;
 
 static void test_implicit()

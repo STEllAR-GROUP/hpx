@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace lcos { namespace local
@@ -60,7 +61,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         detail::guard_atomic task;
 
-        guard() : task((detail::guard_task*)0) {}
+        guard() : task(nullptr) {}
         ~guard() {
             detail::free(task.load());
         }

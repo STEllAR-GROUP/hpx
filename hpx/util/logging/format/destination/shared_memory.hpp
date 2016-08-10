@@ -27,6 +27,7 @@
 #include <boost/shmem/shmem_named_shared_object.hpp>
 
 #include <string>
+#include <utility>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 

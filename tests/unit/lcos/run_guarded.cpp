@@ -64,8 +64,7 @@ int hpx_main(boost::program_options::variables_map& vm) {
         run_guarded(*l2,incr2);
     }
 
-    boost::function<void()> check_func = hpx::util::bind(check);
-    run_guarded(guards,check_func);
+    run_guarded(guards, &::check);
     return hpx::finalize();
 }
 
@@ -79,10 +78,9 @@ int main(int argc, char* argv[]) {
         ;
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

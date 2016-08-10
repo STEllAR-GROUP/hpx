@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,9 +6,9 @@
 #if !defined(HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM)
 #define HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM
 
+#include <hpx/config.hpp>
 #include <hpx/util/result_of.hpp>
-
-#include <boost/iterator/iterator_adaptor.hpp>
+#include <hpx/util/iterator_adaptor.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -41,7 +41,7 @@ namespace hpx { namespace util
             typedef typename std::iterator_traits<Iterator>::iterator_category
                 iterator_category;
 
-            typedef boost::iterator_adaptor<
+            typedef hpx::util::iterator_adaptor<
                 transform_iterator<Iterator, Transformer, Reference, Value>,
                 Iterator, value_type, iterator_category, reference_type
             > type;
@@ -74,13 +74,26 @@ namespace hpx { namespace util
           : base_type(it), transformer_(f)
         {}
 
+        template <typename OtherIterator, typename OtherTransformer,
+            typename OtherReference, typename OtherValue>
+        transform_iterator(
+                transform_iterator<
+                    OtherIterator, OtherTransformer,  OtherReference, OtherValue
+                > const& t,
+                typename std::enable_if<
+                    std::is_convertible<OtherIterator, Iterator>::value &&
+                    std::is_convertible<OtherTransformer, Transformer>::value
+                >::type* = 0)
+          : base_type(t.base()), transformer_(t.transformer())
+        {}
+
         Transformer const& transformer() const
         {
             return transformer_;
         }
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         typename base_type::reference dereference() const
         {

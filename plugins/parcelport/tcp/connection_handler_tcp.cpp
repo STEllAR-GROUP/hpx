@@ -7,6 +7,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/exception_list.hpp>
@@ -18,6 +21,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/chrono/chrono.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
@@ -177,9 +181,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         "connection_handler(tcp)::create_connection");
                 }
                 else {
-                    boost::this_thread::sleep(boost::get_system_time() +
-                        boost::posix_time::milliseconds(
-                            HPX_NETWORK_RETRIES_SLEEP));
+                    boost::this_thread::sleep_for(
+                        boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
             }
             catch (boost::system::system_error const& e) {
@@ -224,7 +227,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         std::string connection_addr = s.remote_endpoint().address().to_string();
         boost::uint16_t connection_port = s.remote_endpoint().port();
-        HPX_ASSERT(l.get<locality>().address() == connection_addr);
+        HPX_ASSERT(hpx::util::cleanup_ip_address(l.get<locality>().address())
+            == hpx::util::cleanup_ip_address(connection_addr));
         HPX_ASSERT(l.get<locality>().port() == connection_port);
 #endif
 

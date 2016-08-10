@@ -53,11 +53,11 @@ int hpx_main()
             {
                 // try to interpret the entered command
                 if (cmd[0] == "reset") {
-                    accu.reset_sync();
+                    accu.reset();
                 }
                 else if (cmd[0] == "add") {
                     if (cmd.size() == 2) {
-                        accu.add_sync(boost::lexical_cast<argument_type>(cmd[1]));
+                        accu.add(boost::lexical_cast<argument_type>(cmd[1]));
                     }
                     else {
                         std::cout << "error: invalid command '"
@@ -66,7 +66,7 @@ int hpx_main()
                     }
                 }
                 else if (cmd[0] == "query") {
-                    std::cout << accu.query_sync() << std::endl;
+                    std::cout << accu.query() << std::endl;
                 }
                 else if (cmd[0] == "help") {
                     std::cout << help << std::endl;
@@ -94,8 +94,9 @@ int main(int argc, char* argv[])
 {
     // We force this example to use 2 threads by default as one of the threads
     // will be sitting most of the time in the kernel waiting for user input.
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=2");
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=2"
+    };
 
     // Initialize and run HPX.
     return hpx::init(argc, argv, cfg);

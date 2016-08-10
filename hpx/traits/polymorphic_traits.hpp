@@ -11,7 +11,7 @@
 #include <hpx/traits/has_xxx.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
@@ -27,7 +27,7 @@ namespace hpx { namespace traits
 
     template <typename T>
     struct is_nonintrusive_polymorphic
-      : boost::mpl::false_ {};
+      : std::false_type {};
 
     template <typename T>
     struct is_serialized_with_id
@@ -38,7 +38,7 @@ namespace hpx { namespace traits
     namespace hpx { namespace traits {                                      \
         template <>                                                         \
         struct is_nonintrusive_polymorphic<Class>                           \
-          : boost::mpl::true_ {};                                           \
+          : std::true_type {};                                              \
     }}                                                                      \
 /**/
 
@@ -46,7 +46,7 @@ namespace hpx { namespace traits
     namespace hpx { namespace traits {                                      \
         HPX_UTIL_STRIP(TEMPLATE)                                            \
         struct is_nonintrusive_polymorphic<HPX_UTIL_STRIP(ARG_LIST)>        \
-          : boost::mpl::true_ {};                                           \
+          : std::true_type {};                                              \
     }}                                                                      \
 /**/
 
@@ -54,7 +54,7 @@ namespace hpx { namespace traits
     namespace hpx { namespace traits {                                      \
         template <>                                                         \
         struct is_serialized_with_id<Class>                                 \
-          : boost::mpl::true_ {};                                           \
+          : std::true_type {};                                              \
     }}                                                                      \
 /**/
 
@@ -62,7 +62,7 @@ namespace hpx { namespace traits
     namespace hpx { namespace traits {                                      \
         HPX_UTIL_STRIP(TEMPLATE)                                            \
         struct is_serialized_with_id<HPX_UTIL_STRIP(ARG_LIST)>              \
-          : boost::mpl::true_ {};                                           \
+          : std::true_type {};                                              \
     }}                                                                      \
 /**/
 

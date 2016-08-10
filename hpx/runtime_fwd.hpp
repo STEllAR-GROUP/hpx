@@ -11,9 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
@@ -25,10 +22,13 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
@@ -55,9 +55,11 @@ namespace hpx
     /// associated with the runtime instance the current thread is running in.
     HPX_API_EXPORT std::size_t get_runtime_instance_number();
 
-    HPX_API_EXPORT void report_error(std::size_t num_thread
-      , boost::exception_ptr const& e);
+    /// The function report_error reports the given exception to the console
+    HPX_API_EXPORT void report_error(std::size_t num_thread,
+        boost::exception_ptr const& e);
 
+    /// The function report_error reports the given exception to the console
     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
@@ -227,6 +229,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin
     ///
+    /// \param binary_filter_type [in] The type of the binary filter to create
+    /// \param compress     [in] The created filter should support compression
+    /// \param next_filter  [in] Use this as the filter to dispatch the
+    ///                     invocation into.
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.

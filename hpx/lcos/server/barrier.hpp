@@ -19,6 +19,7 @@
 #include <boost/exception_ptr.hpp>
 
 #include <mutex>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server

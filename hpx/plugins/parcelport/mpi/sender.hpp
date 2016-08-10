@@ -17,10 +17,12 @@
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
 
+#include <algorithm>
 #include <iterator>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {

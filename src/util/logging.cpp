@@ -26,8 +26,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 #include <cstddef>
 #include <cstdlib>
 #include <string>
@@ -195,7 +193,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (0 != self) {
+            if (nullptr != self) {
                 // called from inside a HPX thread
                 threads::thread_id_type id = threads::get_self_id();
                 if (id != threads::invalid_thread_id) {
@@ -223,7 +221,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (0 != self) {
+            if (nullptr != self) {
                 // called from inside a HPX thread
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase) {
@@ -274,7 +272,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_id_repr_type parent_id = threads::get_parent_id();
-            if (0 != parent_id && threads::invalid_thread_id != parent_id) {
+            if (nullptr != parent_id && threads::invalid_thread_id != parent_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(void*)*2)
@@ -1062,8 +1060,7 @@ namespace hpx { namespace util { namespace detail
         try {
             // add default logging configuration as defaults to the ini data
             // this will be overwritten by related entries in the read hpx.ini
-            using namespace boost::assign;
-            prefill_ +=
+            prefill_ = {
                 // general logging
                 "[hpx.logging]",
                 "level = ${HPX_LOGLEVEL:0}",
@@ -1185,7 +1182,7 @@ namespace hpx { namespace util { namespace detail
                     (hpx.debuglog.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
-            ;
+            };
         }
         catch (std::exception const&) {
             // just in case something goes wrong

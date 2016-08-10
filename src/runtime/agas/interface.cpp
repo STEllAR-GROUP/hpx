@@ -28,8 +28,9 @@ bool is_console()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool register_name_sync(
-    std::string const& name
+bool register_name(
+    launch::sync_policy
+  , std::string const& name
   , naming::gid_type const& gid
   , error_code& ec
     )
@@ -38,8 +39,9 @@ bool register_name_sync(
     return agas_.register_name(name, gid);
 }
 
-bool register_name_sync(
-    std::string const& name
+bool register_name(
+    launch::sync_policy
+  , std::string const& name
   , naming::id_type const& id
   , error_code& ec
     )
@@ -57,8 +59,9 @@ lcos::future<bool> register_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool unregister_name_sync(
-    std::string const& name
+bool unregister_name(
+    launch::sync_policy
+  , std::string const& name
   , naming::id_type& gid
   , error_code& ec
     )
@@ -79,8 +82,9 @@ bool unregister_name_sync(
     return false;
 }
 
-naming::id_type unregister_name_sync(
-    std::string const& name
+naming::id_type unregister_name(
+    launch::sync_policy
+  , std::string const& name
   , error_code& ec
     )
 {
@@ -97,8 +101,9 @@ lcos::future<naming::id_type> unregister_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool resolve_name_sync(
-    std::string const& name
+bool resolve_name(
+    launch::sync_policy
+  , std::string const& name
   , naming::gid_type& gid
   , error_code& ec
     )
@@ -108,9 +113,10 @@ bool resolve_name_sync(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool resolve_name_sync(
-    std::string const& name
-  , naming::id_type& gid
+bool resolve_name(
+    launch::sync_policy
+  , std::string const& name
+  , naming::id_type& id
   , error_code& ec
     )
 {
@@ -120,7 +126,7 @@ bool resolve_name_sync(
 
     if (agas_.resolve_name(name, raw_gid, ec) && !ec)
     {
-        gid = naming::id_type(raw_gid,
+        id = naming::id_type(raw_gid,
             naming::detail::has_credits(raw_gid) ?
                 naming::id_type::managed :
                 naming::id_type::unmanaged);
@@ -138,8 +144,9 @@ lcos::future<naming::id_type> resolve_name(
     return agas_.resolve_name_async(name);
 }
 
-naming::id_type resolve_name_sync(
-    std::string const& name
+naming::id_type resolve_name(
+    launch::sync_policy
+  , std::string const& name
   , error_code& ec
     )
 {
@@ -173,8 +180,9 @@ lcos::future<boost::uint32_t> get_num_localities(
     return agas_.get_num_localities_async();
 }
 
-boost::uint32_t get_num_localities_sync(
-    components::component_type type
+boost::uint32_t get_num_localities(
+    launch::sync_policy
+  , components::component_type type
   , error_code& ec
     )
 {
@@ -188,8 +196,9 @@ lcos::future<std::vector<boost::uint32_t> > get_num_threads()
     return agas_.get_num_threads_async();
 }
 
-std::vector<boost::uint32_t> get_num_threads_sync(
-    error_code& ec
+std::vector<boost::uint32_t> get_num_threads(
+    launch::sync_policy
+  , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
@@ -202,8 +211,9 @@ lcos::future<boost::uint32_t> get_num_overall_threads()
     return agas_.get_num_overall_threads_async();
 }
 
-boost::uint32_t get_num_overall_threads_sync(
-    error_code& ec
+boost::uint32_t get_num_overall_threads(
+    launch::sync_policy
+  , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
@@ -285,8 +295,9 @@ hpx::future<naming::address> resolve(
     return agas_.resolve_async(id);
 }
 
-naming::address resolve_sync(
-    naming::id_type const& id
+naming::address resolve(
+    launch::sync_policy
+  , naming::id_type const& id
   , error_code& ec
     )
 {
@@ -304,8 +315,9 @@ hpx::future<bool> bind(
     return agas_.bind_async(gid, addr, locality_id);
 }
 
-bool bind_sync(
-    naming::gid_type const& gid
+bool bind(
+    launch::sync_policy
+  , naming::gid_type const& gid
   , naming::address const& addr
   , boost::uint32_t locality_id
   , error_code& ec
@@ -325,8 +337,9 @@ hpx::future<bool> bind(
     return agas_.bind_async(gid, addr, locality_);
 }
 
-bool bind_sync(
-    naming::gid_type const& gid
+bool bind(
+    launch::sync_policy
+  , naming::gid_type const& gid
   , naming::address const& addr
   , naming::gid_type const& locality_
   , error_code& ec
@@ -345,8 +358,9 @@ hpx::future<naming::address> unbind(
     return agas_.unbind_range_async(id);
 }
 
-naming::address unbind_sync(
-    naming::gid_type const& id
+naming::address unbind(
+    launch::sync_policy
+  , naming::gid_type const& id
   , boost::uint64_t count
   , error_code& ec
     )
@@ -418,7 +432,7 @@ naming::id_type get_console_locality(
 
 boost::uint32_t get_locality_id(error_code& ec)
 {
-    if (get_runtime_ptr() == 0)
+    if (get_runtime_ptr() == nullptr)
         return naming::invalid_locality_id;
 
     naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
@@ -431,7 +445,7 @@ naming::gid_type get_next_id(
   , error_code& ec
     )
 {
-    if (get_runtime_ptr() == 0)
+    if (get_runtime_ptr() == nullptr)
     {
         HPX_THROWS_IF(ec, invalid_status,
             "get_next_id", "the runtime system has not been started yet.");
@@ -458,7 +472,7 @@ void decref(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::int64_t> incref_async(
+hpx::future<boost::int64_t> incref(
     naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive_
@@ -476,7 +490,8 @@ hpx::future<boost::int64_t> incref_async(
 }
 
 boost::int64_t incref(
-    naming::gid_type const& gid
+    launch::sync_policy
+  , naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive_
   , error_code& ec
@@ -501,8 +516,9 @@ hpx::future<naming::id_type> get_colocation_id(
     return resolver.get_colocation_id_async(id);
 }
 
-naming::id_type get_colocation_id_sync(
-    naming::id_type const& id
+naming::id_type get_colocation_id(
+    launch::sync_policy
+  , naming::id_type const& id
   , error_code& ec)
 {
     return get_colocation_id(id).get(ec);

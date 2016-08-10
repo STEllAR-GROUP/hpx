@@ -28,6 +28,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -450,7 +451,7 @@ namespace hpx { namespace util
             return plugin_registries;
 
         // make sure each node loads libraries in a different order
-        std::srand(static_cast<unsigned>(std::time(0)));
+        std::srand(static_cast<unsigned>(std::time(nullptr)));
         std::random_shuffle(libdata.begin(), libdata.end());
 
         typedef std::pair<fs::path, std::string> libdata_type;

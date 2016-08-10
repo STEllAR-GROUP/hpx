@@ -22,9 +22,10 @@
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <hpx/util/logging/detail/manipulator.hpp>    // is_generic
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
-#include <hpx/util/logging/detail/manipulator.hpp> // is_generic
+
+#include <type_traits>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
@@ -184,7 +185,7 @@ namespace detail {
 
     template<class original_formatter>
     struct find_spacer : find_spacer_generic<original_formatter,
-        boost::is_base_of<is_generic,original_formatter>::value> {
+        std::is_base_of<is_generic,original_formatter>::value> {
     };
 }
 

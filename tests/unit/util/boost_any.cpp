@@ -103,7 +103,8 @@ namespace any_tests // test definitions
         const any value;
 
         HPX_TEST_MSG(value.empty(), "empty");
-        HPX_TEST_EQ_MSG((void*)0, any_cast<int>(&value), "any_cast<int>");
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr),
+            any_cast<int>(&value), "any_cast<int>");
         HPX_TEST_EQ_MSG(value.type(), BOOST_SP_TYPEID(hpx::util::detail::any::empty),
             "type");
     }
@@ -115,8 +116,9 @@ namespace any_tests // test definitions
 
         HPX_TEST_EQ_MSG(false, value.empty(), "empty");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
-        HPX_TEST_EQ_MSG((void*)0, any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_NEQ_MSG((void*)0, any_cast<std::string>(&value),
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr),
+            any_cast<int>(&value), "any_cast<int>");
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), any_cast<std::string>(&value),
             "any_cast<std::string>");
         HPX_TEST_EQ_MSG(
             any_cast<std::string>(value), text,
@@ -174,8 +176,9 @@ namespace any_tests // test definitions
 
         HPX_TEST_EQ_MSG(false, value.empty(), "type");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
-        HPX_TEST_EQ_MSG((void*)0, any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_NEQ_MSG((void*)0, any_cast<std::string>(&value),
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr),
+            any_cast<int>(&value), "any_cast<int>");
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), any_cast<std::string>(&value),
             "any_cast<std::string>");
         HPX_TEST_EQ_MSG(
             any_cast<std::string>(value), text,
@@ -225,7 +228,8 @@ namespace any_tests // test definitions
         HPX_TEST_EQ_MSG(
             text, any_cast<small_object>(swapped),
             "comparing swapped copy against original text");
-        HPX_TEST_NEQ_MSG((void*)0, original_ptr, "address in pre-swapped original");
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
+            original_ptr, "address in pre-swapped original");
         HPX_TEST_NEQ_MSG(
             original_ptr,
             any_cast<small_object>(&swapped),
@@ -258,7 +262,8 @@ namespace any_tests // test definitions
         HPX_TEST_EQ_MSG(
             text, any_cast<big_object>(swapped),
             "comparing swapped copy against original text");
-        HPX_TEST_NEQ_MSG((void*)0, original_ptr, "address in pre-swapped original");
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
+            original_ptr, "address in pre-swapped original");
         HPX_TEST_EQ_MSG(
             original_ptr,
             any_cast<big_object>(&swapped),

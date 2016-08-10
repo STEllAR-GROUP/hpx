@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+// hpxinspect:nodeprecatedname:boost::unique_lock
+
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
 #include <hpx/runtime.hpp>
@@ -24,7 +28,6 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
@@ -323,39 +326,6 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<util::one_size_heap_list_base>
-        runtime_support::get_promise_heap(components::component_type type)
-    {
-        // locate the factory for the requested component type
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-
-        component_map_type::iterator it = components_.find(type);
-        if (it == components_.end())
-        {
-            // we don't know anything about this promise type yet
-            std::shared_ptr<components::base_lco_factory> factory(
-                new components::base_lco_factory(type));
-
-            component_factory_type data(factory);
-            std::pair<component_map_type::iterator, bool> p =
-                components_.insert(component_map_type::value_type(type, data));
-            if (!p.second)
-            {
-                l.unlock();
-                HPX_THROW_EXCEPTION(out_of_memory,
-                    "runtime_support::get_promise_heap",
-                    "could not create base_lco_factor for type " +
-                        components::get_component_type_name(type));
-            }
-
-            it = p.first;
-        }
-
-        return std::static_pointer_cast<components::base_lco_factory>(
-            (*it).second.first)->get_heap();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a memory block
     // FIXME: error code?
     naming::gid_type runtime_support::create_memory_block(
@@ -616,7 +586,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 
@@ -645,7 +615,17 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
+
+            while (tm.get_thread_count() > 1)
+                this_thread::yield();
+
             return 0;
+        }
 
         std::size_t count = 0;      // keep track of number of trials
 
@@ -701,7 +681,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 
@@ -765,7 +745,17 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
+
+            while (tm.get_thread_count() > 1)
+                this_thread::yield();
+
             return 0;
+        }
 
         boost::uint32_t initiating_locality_id = get_locality_id();
 
@@ -815,7 +805,7 @@ namespace hpx { namespace components { namespace server
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "runtime_support::shutdown_all",
-                "shutdown_all shut be invoked on the troot locality only");
+                "shutdown_all should be invoked on the root locality only");
             return;
         }
 
@@ -1021,7 +1011,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type const& gid, parcelset::endpoints_type const& eps)
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0) return;
+        if (rt == nullptr) return;
 
         // instruct our connection cache to drop all connections it is holding
         rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
@@ -1054,7 +1044,7 @@ namespace hpx { namespace components { namespace server
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();
-        HPX_ASSERT(0 != self);    // needs to be executed by a HPX thread
+        HPX_ASSERT(nullptr != self);    // needs to be executed by a HPX thread
 
         // give the scheduler some time to work on remaining tasks
         {
@@ -1233,7 +1223,7 @@ namespace hpx { namespace components { namespace server
                 std::vector<std::string> still_unregistered_options;
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
                     std::size_t(-1), mode,
-                    get_runtime_mode_from_name(runtime_mode), 0,
+                    get_runtime_mode_from_name(runtime_mode), nullptr,
                     &still_unregistered_options);
 
                 std::string still_unknown_commandline;
@@ -1243,7 +1233,7 @@ namespace hpx { namespace components { namespace server
                 if (!still_unknown_commandline.empty())
                 {
                     util::section* s = ini.get_section("hpx");
-                    HPX_ASSERT(s != 0);
+                    HPX_ASSERT(s != nullptr);
                     s->add_entry("unknown_cmd_line_option",
                         still_unknown_commandline);
                 }
@@ -1388,7 +1378,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::remove_here_from_connection_cache()
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0)
+        if (rt == nullptr)
             return;
 
         std::vector<naming::id_type> locality_ids = find_remote_localities();
@@ -1502,7 +1492,7 @@ namespace hpx { namespace components { namespace server
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type");
             }
-            return 0;
+            return nullptr;
         }
 
         l.unlock();
@@ -1514,14 +1504,14 @@ namespace hpx { namespace components { namespace server
 
         parcelset::policies::message_handler* mh = factory->create(action,
             pp, num_messages, interval);
-        if (0 == mh) {
+        if (nullptr == mh) {
             std::ostringstream strm;
             strm << "couldn't create message handler plugin of type: "
                  << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -1550,7 +1540,7 @@ namespace hpx { namespace components { namespace server
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         l.unlock();
@@ -1561,21 +1551,21 @@ namespace hpx { namespace components { namespace server
                 (*it).second.first));
 
         serialization::binary_filter* bf = factory->create(compress, next_filter);
-        if (0 == bf) {
+        if (nullptr == bf) {
             std::ostringstream strm;
-            strm << "couldn't to create binary filter plugin of type: "
+            strm << "couldn't create binary filter plugin of type: "
                  << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
         // log result if requested
-        LRT_(info) << "successfully binary filter handler plugin of type: "
+        LRT_(info) << "successfully created binary filter handler plugin of type: "
                     << binary_filter_type;
         return bf;
     }
@@ -1602,7 +1592,7 @@ namespace hpx { namespace components { namespace server
                 component_ini = ini.get_section(component_section);
 
             error_code ec(lightweight);
-            if (0 == component_ini ||
+            if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
                 util::plugin::get_plugins_list_type f;
@@ -2084,7 +2074,7 @@ namespace hpx { namespace components { namespace server
                 component_ini = ini.get_section(component_section);
 
             error_code ec(lightweight);
-            if (0 == component_ini ||
+            if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
                 // get the factory
@@ -2305,7 +2295,7 @@ namespace hpx { namespace components { namespace server
                 plugin_ini = ini.get_section(plugin_section);
 
             error_code ec(lightweight);
-            if (0 == plugin_ini ||
+            if (nullptr == plugin_ini ||
                 "0" == plugin_ini->get_entry("no_factory", "0"))
             {
                 // get the factory

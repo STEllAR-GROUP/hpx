@@ -20,8 +20,6 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/type_traits/integral_constant.hpp>
-
 #include <type_traits>
 #include <utility>
 
@@ -268,16 +266,16 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
             bound(bound const&) = default;
             bound(bound&&) = default;
 #else
-            bound(bound const& other)
+            HPX_HOST_DEVICE bound(bound const& other)
               : _f(other._f)
               , _args(other._args)
             {}
 
-            bound(bound&& other)
+            HPX_HOST_DEVICE bound(bound&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {}
@@ -445,13 +443,13 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct is_bind_expression<util::detail::bound<T> >
-      : boost::true_type
+      : std::true_type
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t I>
     struct is_placeholder<util::detail::placeholder<I> >
-      : boost::integral_constant<int, I>
+      : std::integral_constant<int, I>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

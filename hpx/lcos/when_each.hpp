@@ -142,7 +142,6 @@ namespace hpx
 #include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
@@ -164,14 +163,14 @@ namespace hpx { namespace lcos
 
             template<typename F, typename IndexType, typename FutureType>
             inline static void call(F&& f, IndexType index, FutureType&& future,
-                boost::true_type)
+                std::true_type)
             {
                 f(index, std::move(future));
             }
 
             template<typename F, typename IndexType, typename FutureType>
             inline static void call(F&& f, IndexType index, FutureType&& future,
-                boost::false_type)
+                std::false_type)
             {
                 f(std::move(future));
             }
@@ -270,7 +269,7 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::false_, boost::mpl::true_)
+            void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
                     boost::begin(boost::unwrap_ref(util::get<I>(t_))),
@@ -280,7 +279,7 @@ namespace hpx { namespace lcos
             // Current element is a simple future
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::true_, boost::mpl::false_)
+            void await_next(std::true_type, std::false_type)
             {
                 typedef typename util::decay_unwrap<
                     typename util::tuple_element<I, Tuple>::type
@@ -288,9 +287,6 @@ namespace hpx { namespace lcos
 
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
-
-                using boost::mpl::false_;
-                using boost::mpl::true_;
 
                 future_type& fut = util::get<I>(t_);
 
@@ -310,12 +306,12 @@ namespace hpx { namespace lcos
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
-                        void (when_each_frame::*f)(true_, false_) =
+                        void (when_each_frame::*f)(std::true_type, std::false_type) =
                             &when_each_frame::await_next<I>;
 
                         boost::intrusive_ptr<when_each_frame> this_(this);
                         next_future_data->set_on_completed(util::deferred_call(
-                            f, std::move(this_), true_(), false_()));
+                            f, std::move(this_), std::true_type(), std::false_type()));
                         return;
                     }
                 }
@@ -343,8 +339,8 @@ namespace hpx { namespace lcos
                     typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
-                typedef typename traits::is_future<future_type>::type is_future;
-                typedef typename traits::is_future_range<future_type>::type is_range;
+                typedef traits::is_future<future_type> is_future;
+                typedef traits::is_future_range<future_type> is_range;
 
                 await_next<I>(is_future(), is_range());
             }

@@ -53,10 +53,10 @@ namespace hpx { namespace serialization { namespace detail
         register_class_name()
         {
             polymorphic_intrusive_factory::instance().
-              register_class(
-                T::hpx_serialization_get_name_impl(),
-                &factory_function
-              );
+                register_class(
+                    T::hpx_serialization_get_name_impl(),
+                    &factory_function
+                );
         }
 
         static void* factory_function()

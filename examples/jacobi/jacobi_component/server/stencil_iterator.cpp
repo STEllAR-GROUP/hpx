@@ -11,6 +11,7 @@
 #include "stencil_iterator.hpp"
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace jacobi

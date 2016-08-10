@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -263,6 +264,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // transform binary predicate
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename F, typename Proj1, typename Proj2>
         struct transform_binary_iteration
         {
@@ -282,7 +284,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        /// \cond NOINTERNAL
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F, typename Proj1, typename Proj2>
         HPX_HOST_DEVICE

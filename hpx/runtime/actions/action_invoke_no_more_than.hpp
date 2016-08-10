@@ -21,6 +21,8 @@
 #include <boost/exception_ptr.hpp>
 
 #include <memory>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace actions { namespace detail
 {
@@ -95,7 +97,7 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static threads::thread_function_type
-        call(naming::address::address_type lva, F && f, boost::mpl::false_)
+        call(naming::address::address_type lva, F && f, std::false_type)
         {
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function),
@@ -117,7 +119,7 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static threads::thread_function_type
-        call(naming::address::address_type lva, F && f, boost::mpl::true_)
+        call(naming::address::address_type lva, F && f, std::true_type)
         {
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function_future),
@@ -133,7 +135,7 @@ namespace hpx { namespace actions { namespace detail
         call(naming::address::address_type lva, F&& f)
         {
             typedef typename Action::result_type result_type;
-            typedef typename traits::is_future<result_type>::type is_future;
+            typedef traits::is_future<result_type> is_future;
             return call(lva, std::forward<F>(f), is_future());
         }
     };
@@ -171,7 +173,7 @@ namespace hpx { namespace actions { namespace detail
         {
             if(cont_)
             {
-                HPX_ASSERT(0 != dynamic_cast<base_type *>(cont_.get()));
+                HPX_ASSERT(nullptr != dynamic_cast<base_type *>(cont_.get()));
                 static_cast<base_type *>(cont_.get())->
                     trigger_value(std::move(result));
             }
@@ -208,7 +210,7 @@ namespace hpx { namespace actions { namespace detail
         // If the action returns something which is not a future, we do nothing
         // special.
         template <typename Continuation>
-        static bool call(Continuation& cont, boost::mpl::false_)
+        static bool call(Continuation& cont, std::false_type)
         {
             return false;
         }
@@ -217,7 +219,7 @@ namespace hpx { namespace actions { namespace detail
         // be able to signal the semaphore after the wrapped action has
         // returned.
         template <typename Continuation>
-        static bool call(Continuation& c, boost::mpl::true_)
+        static bool call(Continuation& c, std::true_type)
         {
             c = std::unique_ptr<continuation>(
                 new wrapped_continuation<Action, N>(std::move(c)));
@@ -228,7 +230,7 @@ namespace hpx { namespace actions { namespace detail
         static bool call(std::unique_ptr<continuation>& cont)
         {
             typedef typename Action::result_type result_type;
-            typedef typename traits::is_future<result_type>::type is_future;
+            typedef traits::is_future<result_type> is_future;
             return call(cont, is_future());
         }
     };

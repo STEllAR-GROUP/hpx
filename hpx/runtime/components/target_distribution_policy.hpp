@@ -9,8 +9,8 @@
 #define HPX_COMPONENTS_TARGET_DISTRIBUTION_POLICY_APR_12_2015_1245PM
 
 #include <hpx/config.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -26,6 +26,8 @@
 #include <hpx/traits/promise_local_result.hpp>
 
 #include <algorithm>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components
@@ -106,11 +108,7 @@ namespace hpx { namespace components
                     -> std::vector<bulk_locality_result>
                 {
                     std::vector<bulk_locality_result> result;
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                     result.emplace_back(id, f.get());
-#else
-                    result.push_back(std::make_pair(id, f.get()));
-#endif
                     return result;
                 });
         }

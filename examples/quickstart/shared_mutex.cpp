@@ -12,10 +12,10 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono.hpp>
 #include <boost/random.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <chrono>
 #include <ctime>
 #include <mutex>
 #include <vector>
@@ -24,7 +24,7 @@ int const writers = 3;
 int const readers = 3;
 int const cycles = 10;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 int main()
 {
@@ -38,7 +38,7 @@ int main()
             [&ready, &stm, i]
             {
                 boost::random::mt19937 urng(
-                    static_cast<boost::uint32_t>(std::time(0)));
+                    static_cast<boost::uint32_t>(std::time(nullptr)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }
@@ -65,7 +65,7 @@ int main()
             [&ready, &stm, k, i]
             {
                 boost::random::mt19937 urng(
-                    static_cast<boost::uint32_t>(std::time(0)));
+                    static_cast<boost::uint32_t>(std::time(nullptr)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }

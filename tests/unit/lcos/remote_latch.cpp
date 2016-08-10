@@ -41,7 +41,7 @@ hpx::lcos::latch create_latch(std::size_t num_threads, std::size_t generation)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    boost::uint32_t num_localities = hpx::get_num_localities_sync();
+    boost::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
 
     // count_down_and_wait
     {
@@ -80,8 +80,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // make sure hpx_main will run on all localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

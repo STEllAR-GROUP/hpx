@@ -1,6 +1,7 @@
 [/==============================================================================
     Copyright (C) 2007-2016 Hartmut Kaiser
-    Copyright (C) 2012 Bryce Adelstein-Lelbach and Adrian Serio
+    Copyright (C) 2012 Bryce Adelstein-Lelbach
+    Copyright (c) 2012-2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +11,7 @@
     [quickbook 1.7]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 0.9.12]
+    [version 1.0.0]
     [copyright 2011 2012 2013 2014 2015 2016 The STE||AR Group (http://stellar-group.org)]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -36,12 +37,13 @@
 [def __0_9_9__                  [link hpx.whats_new.hpx_previous.hpx_0_9_9  V0.9.9]]
 [def __0_9_10__                 [link hpx.whats_new.hpx_previous.hpx_0_9_10 V0.9.10]]
 [def __0_9_11__                 [link hpx.whats_new.hpx_previous.hpx_0_9_11 V0.9.11]]
-[def __0_9_12__                 [link hpx.whats_new.hpx_0_9_12 V0.9.12]]
+[def __0_9_99__                 [link hpx.whats_new.hpx_previous.hpx_0_9_99 V0.9.99]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __0_9_12__]
+[def __version__                __1_0_0__]
 
 [def __hpx__                    /HPX/]
+[def __hpx_compute__            /HPX.Compute/]
 [def __stellar__                [@http://stellar-group.org STE||AR]]
 [def __stellar_list__           [@email:hpx-users@stellar.cct.lsu.edu hpx-users@stellar.cct.lsu.edu]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenode]]
@@ -67,6 +69,7 @@
 [def __unlv__                   [@http://www.unlv.edu University of Nevada, Las Vegas]]
 [def __cscs__                   [@http://www.cscs.ch Swiss National Supercomputing Centre]]
 [def __ou__                     [@http://uoregon.edu/ University of Oregon]]
+[def __lbnl__                   [@http://www.lbl.gov/ Lawrence Berkley National Laboratory (LBNL)]]
 
 [def __gsoc__                   [@https://developers.google.com/open-source/soc/ Google Summer of Code]]
 
@@ -131,6 +134,8 @@
 [def __pocl__                   [@http://portablecl.org/ POCL]]
 [def __cuda__                   [@http://www.nvidia.com/object/cuda_home_new.html CUDA]]
 [def __nt2__                    [@http://www.numscale.com/nt2/ NT2]]
+[def __lgd__                    [@http://www.libgeodecomp.org/ LibGeoDecomp]]
+[def __conan__                  [@https://www.conan.io/ Conan]]
 
 [def __cpp11__                  [@http://www.open-std.org/jtc1/sc22/wg21 C++11 Standard]]
 [def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]

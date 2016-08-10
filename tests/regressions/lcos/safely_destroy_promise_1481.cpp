@@ -11,6 +11,8 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
+
 void test_safe_destruction()
 {
     hpx::thread t;
@@ -25,7 +27,7 @@ void test_safe_destruction()
         outer = inner.then(
             [](hpx::shared_future<void> &&)
             {
-                hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             });
 
         // create a thread which will make the inner future ready

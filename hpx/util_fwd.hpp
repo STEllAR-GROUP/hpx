@@ -21,13 +21,8 @@ namespace hpx { namespace util
     template <typename Sig, bool Serializable = true>
     class function;
 
-#ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
     template <typename Sig>
     using function_nonser = function<Sig, false>;
-#else
-    template <typename T>
-    class function_nonser;
-#endif
 
     class HPX_EXPORT io_service_pool;
 
@@ -37,13 +32,8 @@ namespace hpx { namespace util
     template <typename Sig, bool Serializable = true>
     class unique_function;
 
-#ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
     template <typename Sig>
     using unique_function_nonser = unique_function<Sig, false>;
-#else
-    template <typename T>
-    class unique_function_nonser;
-#endif
     /// \endcond
 }}
 

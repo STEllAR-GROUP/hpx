@@ -10,15 +10,17 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -38,7 +40,7 @@ namespace hpx { namespace util { namespace detail
         pool_timer();
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
+            util::steady_time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown);
 
@@ -56,14 +58,14 @@ namespace hpx { namespace util { namespace detail
 
     private:
         typedef boost::asio::basic_deadline_timer<
-            boost::chrono::steady_clock,
-            util::chrono_traits<boost::chrono::steady_clock>
+            util::steady_clock,
+            util::chrono_traits<util::steady_clock>
         > deadline_timer;
 
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_; ///< function to call
         util::function_nonser<void()> on_term_; ///< function to call on termination
-        boost::chrono::steady_clock::time_point abs_time_;    ///< time interval
+        util::steady_clock::time_point abs_time_;    ///< time interval
         std::string description_;     ///< description of this interval timer
 
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
@@ -86,11 +88,11 @@ namespace hpx { namespace util { namespace detail
 
     pool_timer::pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
+            util::steady_time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(on_term),
-        abs_time_(abs_time), description_(description),
+        abs_time_(abs_time.value()), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false), is_stopped_(false),
         timer_(new deadline_timer(
@@ -135,7 +137,7 @@ namespace hpx { namespace util { namespace detail
             is_stopped_ = false;
             is_started_ = true;
 
-            HPX_ASSERT(timer_ != 0);
+            HPX_ASSERT(timer_ != nullptr);
             timer_->expires_at(abs_time_);
             timer_->async_wait(util::bind(&pool_timer::timer_handler,
                 this->shared_from_this()));
@@ -157,7 +159,7 @@ namespace hpx { namespace util { namespace detail
             is_started_ = false;
             is_stopped_ = true;
 
-            HPX_ASSERT(timer_ != 0);
+            HPX_ASSERT(timer_ != nullptr);
             timer_->cancel();
             return true;
         }
@@ -177,7 +179,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
         delete timer_;
-        timer_ = 0;
+        timer_ = nullptr;
     }
 
     pool_timer::~pool_timer()

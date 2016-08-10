@@ -12,13 +12,13 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono/chrono.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 
@@ -48,7 +48,7 @@ namespace hpx { namespace threads { namespace executors
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
             void add_at(
-                boost::chrono::steady_clock::time_point const& abs_time,
+                util::steady_clock::time_point const& abs_time,
                 closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
@@ -56,7 +56,7 @@ namespace hpx { namespace threads { namespace executors
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
             void add_after(
-                boost::chrono::steady_clock::duration const& rel_time,
+                util::steady_clock::duration const& rel_time,
                 closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
@@ -127,7 +127,7 @@ namespace hpx { namespace threads { namespace executors
             HPX_THROW_EXCEPTION(bad_parameter,
                 "hpx::threads::detail::get_service_executor",
                 "unknown pool executor type");
-            return 0;
+            return nullptr;
         }
         /// \endcond
     }

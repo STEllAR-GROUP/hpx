@@ -26,13 +26,13 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono/chrono.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -177,7 +177,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add_at(
-        boost::chrono::steady_clock::time_point const& abs_time,
+        util::steady_clock::time_point const& abs_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -212,11 +212,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add_after(
-        boost::chrono::steady_clock::duration const& rel_time,
+        util::steady_clock::duration const& rel_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
-        return add_at(boost::chrono::steady_clock::now() + rel_time,
+        return add_at(util::steady_clock::now() + rel_time,
             std::move(f), desc, stacksize, ec);
     }
 
@@ -247,7 +247,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
         ~on_self_reset()
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
         }
     };
 
@@ -286,7 +286,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             shutdown_sem_(shutdown_sem),
             self_(self)
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
             ++current_concurrency_;
         }
 

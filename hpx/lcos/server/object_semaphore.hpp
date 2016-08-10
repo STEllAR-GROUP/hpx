@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace server
 {

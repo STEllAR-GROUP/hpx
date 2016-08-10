@@ -19,6 +19,7 @@
 #include <hpx/components/component_storage/server/component_storage.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components { namespace server
@@ -97,7 +98,7 @@ namespace hpx { namespace components { namespace server
 
             {
                 std::vector<char> data = f.get();
-                serialization::input_archive archive(data, data.size(), 0);
+                serialization::input_archive archive(data, data.size(), nullptr);
                 archive >> ptr;
             }
 

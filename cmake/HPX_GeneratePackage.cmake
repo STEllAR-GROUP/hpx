@@ -50,6 +50,11 @@ foreach(lib ${HPX_LIBRARIES})
   endif()
 endforeach()
 
+set(HPX_PKG_LIBRARY_DIR "")
+foreach(dir ${HPX_LIBRARY_DIR})
+  set(HPX_PKG_LIBRARY_DIR "${HPX_PKG_LIBRARY_DIR} -L${dir}")
+endforeach()
+
 if(HPX_WITH_STATIC_LINKING)
   set(HPX_CONF_LIBRARIES "hpx;${HPX_LIBRARIES}")
   set(HPX_PKG_LIBRARIES "\${libdir}/libhpx.a ${HPX_PKG_LIBRARIES}")

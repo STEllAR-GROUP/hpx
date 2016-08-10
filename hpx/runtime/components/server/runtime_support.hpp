@@ -37,7 +37,6 @@
 #include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
@@ -48,6 +47,7 @@
 #include <mutex>
 #include <set>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -345,10 +345,6 @@ namespace hpx { namespace components { namespace server
         components::security::capability get_factory_capabilities(
             components::component_type type);
 #endif
-
-        ///////////////////////////////////////////////////////////////////////
-        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
-            components::component_type type);
 
     protected:
         // Load all components from the ini files found in the configuration
@@ -1016,7 +1012,7 @@ namespace hpx { namespace traits
     // runtime_support is a (hand-rolled) component
     template <>
     struct is_component<components::server::runtime_support>
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

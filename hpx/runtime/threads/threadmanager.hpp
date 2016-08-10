@@ -16,7 +16,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <boost/cstdint.hpp>

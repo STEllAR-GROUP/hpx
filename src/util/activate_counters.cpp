@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/activate_counters.hpp>
@@ -23,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util
@@ -105,7 +107,7 @@ namespace hpx { namespace util
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            started.push_back(performance_counter::start_async(ids_[i]));
+            started.push_back(performance_counter::start(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(started);
@@ -144,7 +146,7 @@ namespace hpx { namespace util
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            stopped.push_back(performance_counter::stop_async(ids_[i]));
+            stopped.push_back(performance_counter::stop(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(stopped);
@@ -184,7 +186,7 @@ namespace hpx { namespace util
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            reset.push_back(performance_counter::reset_async(ids_[i]));
+            reset.push_back(performance_counter::reset(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(reset);
@@ -207,37 +209,38 @@ namespace hpx { namespace util
     }
 
     std::vector<future<performance_counters::counter_value> >
-    activate_counters::evaluate_counters_async(bool reset, error_code& ec)
+    activate_counters::evaluate_counters(launch::async_policy, bool reset,
+        error_code& ec)
     {
+        std::vector<future<performance_counters::counter_value> > values;
+
         if (ids_.empty())
         {
             // start has not been called yet
             HPX_THROWS_IF(ec, invalid_status,
                 "activate_counters::evaluate_counters_async",
                 "The counters to be evaluated have not been initialized yet");
-            std::vector<future<performance_counters::counter_value> > tmp;
-            return tmp;
+            return values;
         }
-
-        std::vector<future<performance_counters::counter_value> > values;
 
         values.reserve(ids_.size());
         using hpx::performance_counters::stubs::performance_counter;
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            values.push_back(performance_counter::get_value_async(ids_[i], reset));
-
+        {
+            values.push_back(performance_counter::get_value(
+                launch::async, ids_[i], reset));
+        }
         return values;
     }
 
     std::vector<performance_counters::counter_value>
-    activate_counters::evaluate_counters_sync(bool reset, error_code& ec)
+    activate_counters::evaluate_counters(launch::sync_policy, bool reset,
+        error_code& ec)
     {
         std::vector<future<performance_counters::counter_value> >
-            futures = evaluate_counters_async(reset, ec);
+            futures = evaluate_counters(launch::async, reset, ec);
 
         return util::unwrapped(futures);
-
     }
-
 }}
 

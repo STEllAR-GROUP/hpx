@@ -13,8 +13,8 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -175,7 +175,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         std::unique_lock<mutex_type>&& lock,
         char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
@@ -200,7 +200,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread

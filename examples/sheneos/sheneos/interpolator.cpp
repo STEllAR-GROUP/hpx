@@ -18,6 +18,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "read_values.hpp"
@@ -81,13 +82,13 @@ namespace sheneos
         if (was_created_) {
             // Unregister the config data.
             config_data data = cfg_.get();
-            hpx::agas::unregister_name(data.symbolic_name_);
+            hpx::agas::unregister_name(hpx::launch::sync, data.symbolic_name_);
 
             // Unregister all symbolic names.
             for (std::size_t i = 0; i < partitions_.size(); ++i)
             {
-                hpx::agas::unregister_name(data.symbolic_name_ +
-                    std::to_string(i++));
+                hpx::agas::unregister_name(hpx::launch::sync,
+                    data.symbolic_name_ + std::to_string(i++));
             }
         }
     }
@@ -96,7 +97,7 @@ namespace sheneos
     void interpolator::create(std::string const& datafilename,
         std::string const& symbolic_name_base, std::size_t num_instances)
     {
-        // Get the component type of the partition backend.
+        // Get the component type of the partition back-end.
         hpx::components::component_type type =
             hpx::components::get_component_type<server::partition3d>();
 
@@ -123,7 +124,8 @@ namespace sheneos
     void interpolator::connect(std::string symbolic_name_base)
     {
         // Connect to the config object.
-        hpx::naming::id_type cfg_gid = hpx::agas::resolve_name(symbolic_name_base).get();
+        hpx::naming::id_type cfg_gid = hpx::agas::resolve_name(
+            hpx::launch::sync, symbolic_name_base);
         cfg_ = configuration(cfg_gid);
         config_data data = cfg_.get();
 
@@ -136,7 +138,7 @@ namespace sheneos
         {
             partitions_.push_back(hpx::naming::id_type());
             hpx::naming::id_type id = hpx::agas::resolve_name(
-                    data.symbolic_name_ + std::to_string(i)).get();
+                hpx::launch::sync, data.symbolic_name_ + std::to_string(i));
         }
 
         // Read required data from given file.
@@ -246,7 +248,8 @@ namespace sheneos
             hpx::find_locality(configuration::get_component_type());
         cfg_ = configuration(config_id, datafilename, symbolic_name_base,
             num_localities);
-        hpx::agas::register_name(symbolic_name_base, cfg_.get_id());
+        hpx::agas::register_name(hpx::launch::sync, symbolic_name_base,
+            cfg_.get_id());
 
         if (symbolic_name_base[symbolic_name_base.size() - 1] != '/')
             symbolic_name_base += "/";
@@ -257,6 +260,7 @@ namespace sheneos
         for (hpx::naming::id_type const& id : partitions_)
         {
             hpx::agas::register_name(
+                hpx::launch::sync,
                 symbolic_name_base + std::to_string(i++),
                 id);
         }

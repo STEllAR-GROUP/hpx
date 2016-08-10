@@ -22,14 +22,13 @@
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
-#include <hpx/util/logging/format/formatter/convert_format.hpp> // do_convert_format
-#include <hpx/util/logging/format/array.hpp> // array
+#include <hpx/util/logging/format/array.hpp>                       // array
+#include <hpx/util/logging/format/formatter/convert_format.hpp>    // do_convert_format
 
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
@@ -75,7 +74,7 @@ namespace detail {
         template<class formatter> void add(const string_type & name, formatter fmt) {
             // care about if generic or not
             typedef hpx::util::logging::manipulator::is_generic is_generic;
-            add_impl<formatter>( name, fmt, boost::is_base_of<is_generic,formatter>() );
+            add_impl<formatter>( name, fmt, std::is_base_of<is_generic,formatter>() );
             compute_write_steps();
         }
 
@@ -105,7 +104,7 @@ namespace detail {
 
         template<class msg_type> void write(msg_type & msg) const {
             // see type of convert
-            write_with_convert( msg, 0 );
+            write_with_convert( msg, nullptr );
         }
 
     private:
@@ -187,7 +186,8 @@ namespace detail {
                 }
                 else {
                     // last part
-                    info->write_steps.push_back( write_step( unescape(remaining), 0) );
+                    info->write_steps.push_back(
+                        write_step( unescape(remaining), nullptr) );
                     remaining.clear();
                 }
             }
@@ -196,25 +196,25 @@ namespace detail {
     private:
         // non-generic
         template<class formatter> void add_impl(const string_type & name,
-            formatter fmt, const boost::false_type& ) {
+            formatter fmt, const std::false_type& ) {
             typename data::write info(m_data);
             format_base_type * p = info->formatters.append(fmt);
             info->name_to_formatter[name] = p;
         }
         // generic manipulator
         template<class formatter> void add_impl(const string_type & name,
-            formatter fmt, const boost::true_type& ) {
+            formatter fmt, const std::true_type& ) {
             typedef hpx::util::logging::manipulator::detail::generic_holder<formatter,
                 format_base_type> holder;
 
             typedef typename formatter::convert_type formatter_convert_type;
             // they must share the same type of conversion
             // - otherwise when trying to prepend we could end up appending or vice versa
-            static_assert( (boost::is_same<formatter_convert_type,
+            static_assert( (std::is_same<formatter_convert_type,
                 convert_type>::value),
-                "boost::is_same<formatter_convert_type, convert_type>::value");
+                "std::is_same<formatter_convert_type, convert_type>::value");
 
-            add_impl( name, holder(fmt), boost::false_type() );
+            add_impl( name, holder(fmt), std::false_type() );
         }
 
 

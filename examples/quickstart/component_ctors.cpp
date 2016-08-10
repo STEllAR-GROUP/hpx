@@ -11,6 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <string>
+#include <utility>
 
 using hpx::components::stub_base;
 using hpx::components::client_base;

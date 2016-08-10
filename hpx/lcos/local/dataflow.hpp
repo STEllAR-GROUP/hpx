@@ -31,20 +31,23 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_launch_policy_dispatch<Action,
         typename std::enable_if<!traits::is_action<Action>::value>::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Policy, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename dataflow_frame<
-            launch
+            Policy
           , typename std::decay<F>::type
           , util::tuple<
                 typename traits::acquire_future<Ts>::type...
             >
         >::type
-        call(launch policy, F && f, Ts &&... ts)
+        call(Policy policy, F && f, Ts &&... ts)
         {
+            static_assert(traits::is_launch_policy<Policy>::value,
+                "Policy must be a valid launch policy");
+
             typedef
                 dataflow_frame<
-                    launch
+                    Policy
                   , typename std::decay<F>::type
                   , util::tuple<
                         typename traits::acquire_future<Ts>::type...
@@ -76,7 +79,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(launch const& policy, F && f, Ts &&... ts)
+        call(Policy policy, F && f, Ts &&... ts)
         ->  decltype(dataflow_launch_policy_dispatch<
                     typename std::decay<F>::type
                 >::call(policy, std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -102,8 +105,8 @@ namespace hpx { namespace lcos { namespace detail
         >::type
         call(F && f, Ts &&... ts)
         {
-            return dataflow_dispatch<launch>::call(
-                launch::all, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return dataflow_dispatch<hpx::detail::async_policy>::call(
+                launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
 
@@ -154,7 +157,7 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch<Executor,
         typename std::enable_if<traits::is_executor<Executor>::value>::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename detail::dataflow_frame<
             Executor
@@ -163,7 +166,7 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::acquire_future<Ts>::type...
             >
         >::type
-        call(Executor& exec, F && f, Ts &&... ts)
+        call(Executor_ && exec, F && f, Ts &&... ts)
         {
             typedef
                 detail::dataflow_frame<
@@ -176,7 +179,7 @@ namespace hpx { namespace lcos { namespace detail
                 frame_type;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
-                    exec
+                    std::forward<Executor_>(exec)
                   , std::forward<F>(f)
                   , util::forward_as_tuple(
                         traits::acquire_future_disp()(std::forward<Ts>(ts))...

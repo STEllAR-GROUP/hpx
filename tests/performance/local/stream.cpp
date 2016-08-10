@@ -27,6 +27,7 @@
 #include <boost/range/functions.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifndef STREAM_TYPE
@@ -623,16 +624,13 @@ int main(int argc, char* argv[])
         get_num_numa_pus(topo, numa_nodes, vm);
     std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
 
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.numa_sensitive=2");  // no-cross NUMA stealing
 
-    // block all cores of requested number of NUMA-domains
-    cfg.push_back(boost::str(
-        boost::format("hpx.cores=%d") % (numa_nodes * num_cores)
-    ));
-    cfg.push_back(boost::str(
-        boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second)
-    ));
+    std::vector<std::string> cfg = {
+        "hpx.numa_sensitive=2",  // no-cross NUMA stealing
+        // block all cores of requested number of NUMA-domains
+        boost::str(boost::format("hpx.cores=%d") % (numa_nodes * num_cores)),
+        boost::str(boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second)),
+    };
 
     std::string node_name("numanode");
     if (topo.get_number_of_numa_nodes() == 0)

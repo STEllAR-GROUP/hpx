@@ -439,8 +439,6 @@
 #  else
 #    if defined(HPX_INTEL_VERSION)
 #      define HPX_THREADS_STACK_OVERHEAD 0x2800
-#    elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
-#      define HPX_THREADS_STACK_OVERHEAD 0x2800
 #    else
 #      define HPX_THREADS_STACK_OVERHEAD 0x800
 #    endif
@@ -462,7 +460,11 @@
 #    if defined(HPX_DEBUG)
 #      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #    else
-#      define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte
+#      if defined(__powerpc__)
+#         define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
+#      else
+#         define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte
+#      endif
 #    endif
 #  endif
 #endif

@@ -12,7 +12,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <mutex>
-
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace threads
@@ -37,7 +37,7 @@ namespace hpx { namespace threads
     std::size_t resource_manager::initial_allocation(
         detail::manage_executor* proxy, error_code& ec)
     {
-        if (0 == proxy) {
+        if (nullptr == proxy) {
             HPX_THROWS_IF(ec, bad_parameter,
                 "resource_manager::init_allocation",
                 "manage_executor pointer is a nullptr");

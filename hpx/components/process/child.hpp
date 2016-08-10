@@ -10,10 +10,13 @@
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 
 #include <hpx/components/process/server/child.hpp>
 
 #include <boost/cstdint.hpp>
+
+#include <utility>
 
 namespace hpx { namespace components { namespace process
 {
@@ -34,10 +37,17 @@ namespace hpx { namespace components { namespace process
             return hpx::async(terminate_action(), this->get_id());
         }
 
-        void terminate_sync()
+        void terminate(launch::sync_policy)
         {
             return terminate().get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void terminate_sync()
+        {
+            return terminate(launch::sync);
+        }
+#endif
 
         hpx::future<int> wait_for_exit()
         {
@@ -45,10 +55,17 @@ namespace hpx { namespace components { namespace process
             return hpx::async(wait_for_exit_action(), this->get_id());
         }
 
-        int wait_for_exit_sync()
+        int wait_for_exit(launch::sync_policy)
         {
             return wait_for_exit().get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        int wait_for_exit_sync()
+        {
+            return wait_for_exit(launch::sync);
+        }
+#endif
     };
 }}}
 

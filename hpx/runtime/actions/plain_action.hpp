@@ -28,6 +28,7 @@
 #if defined(__NVCC__)
 #include <type_traits>
 #endif
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -83,6 +84,7 @@ namespace hpx { namespace actions
 
 namespace hpx { namespace traits
 {
+    /// \cond NOINTERNAL
     template <> HPX_ALWAYS_EXPORT
     inline components::component_type
     component_type_database<hpx::actions::detail::plain_function>::get()
@@ -90,7 +92,6 @@ namespace hpx { namespace traits
         return hpx::components::component_plain_function;
     }
 
-    /// \cond NOINTERNAL
     template <> HPX_ALWAYS_EXPORT
     inline void
     component_type_database<hpx::actions::detail::plain_function>::set(
@@ -187,29 +188,8 @@ namespace hpx { namespace traits
 /// \brief Declares a plain action type
 ///
 #define HPX_DECLARE_PLAIN_ACTION(...)                                         \
-    HPX_DECLARE_PLAIN_ACTION_(__VA_ARGS__)                                    \
+    HPX_DECLARE_ACTION(__VA_ARGS__)                                           \
     /**/
-
-/// \cond NOINTERNAL
-
-#define HPX_DECLARE_PLAIN_DIRECT_ACTION(...)                                  \
-    HPX_DECLARE_PLAIN_ACTION(__VA_ARGS__)                                     \
-    /**/
-
-#define HPX_DECLARE_PLAIN_ACTION_(...)                                        \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DECLARE_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)              \
-    )(__VA_ARGS__))                                                           \
-    /**/
-
-#define HPX_DECLARE_PLAIN_ACTION_1(func)                                      \
-    HPX_DECLARE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))             \
-    /**/
-
-#define HPX_DECLARE_PLAIN_ACTION_2(func, name) struct name;                   \
-    /**/
-
-/// \endcond
 
 /// \def HPX_PLAIN_ACTION(func, name)
 ///

@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
+
 #include <hpx/config.hpp>
 
 // System Header Files
@@ -30,7 +32,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -687,12 +688,12 @@ void section::expand_brace(std::string& value, std::string::size_type begin) con
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
             char* env = getenv(to_expand.c_str());
-            value.replace(begin, end-begin+1, 0 != env ? env : "");
+            value.replace(begin, end-begin+1, nullptr != env ? env : "");
         }
         else {
             char* env = getenv(to_expand.substr(0, colon).c_str());
             value.replace(begin, end-begin+1,
-                0 != env ? std::string(env) : to_expand.substr(colon+1));
+                nullptr != env ? std::string(env) : to_expand.substr(colon+1));
         }
     }
 }
@@ -757,12 +758,12 @@ void section::expand_brace_only(std::string& value,
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
             char* env = getenv(to_expand.c_str());
-            value.replace(begin, end-begin+1, 0 != env ? env : "");
+            value.replace(begin, end-begin+1, nullptr != env ? env : "");
         }
         else {
             char* env = getenv(to_expand.substr(0, colon).c_str());
             value.replace(begin, end-begin+1,
-                0 != env ? std::string(env) : to_expand.substr(colon+1));
+                nullptr != env ? std::string(env) : to_expand.substr(colon+1));
         }
     }
 }

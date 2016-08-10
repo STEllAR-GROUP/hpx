@@ -18,10 +18,10 @@
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
-#include <hpx/util/date_time_chrono.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #  include <hpx/util/register_locks.hpp>
 #endif
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
@@ -203,7 +203,7 @@ namespace hpx { namespace threads
         if (self_ptr)
             return self_ptr->get_continuation_recursion_count();
 
-        if (0 == continuation_recursion_count.get())
+        if (nullptr == continuation_recursion_count.get())
             continuation_recursion_count.reset(new std::size_t(0));
 
         return *continuation_recursion_count.get();
@@ -338,7 +338,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return id ? id->get_backtrace() : 0;
+        return id ? id->get_backtrace() : nullptr;
     }
 
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
@@ -359,7 +359,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return id ? id->set_backtrace(bt) : 0;
+        return id ? id->set_backtrace(bt) : nullptr;
     }
 
     threads::executors::current_executor
@@ -369,7 +369,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_executor",
                 "null thread id encountered");
-            return executors::current_executor(0);
+            return executors::current_executor(nullptr);
         }
 
         if (&ec != &throws)
@@ -573,7 +573,7 @@ namespace hpx { namespace this_thread
 
     bool has_sufficient_stack_space(std::size_t space_needed)
     {
-        if (0 == hpx::threads::get_self_ptr())
+        if (nullptr == hpx::threads::get_self_ptr())
             return false;
 
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)

@@ -21,6 +21,7 @@
 
 #include <map>
 #include <sstream>
+#include <utility>
 
 namespace hpx { namespace components { namespace security
 {

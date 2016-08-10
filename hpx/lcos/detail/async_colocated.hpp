@@ -23,6 +23,9 @@
 #include <hpx/util/functional/colocated_helpers.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <type_traits>
+#include <utility>
+
 namespace hpx { namespace detail
 {
     template <typename Tuple>

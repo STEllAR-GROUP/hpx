@@ -26,6 +26,7 @@
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -36,6 +37,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace server
@@ -514,10 +516,17 @@ namespace hpx
         /// \return Returns the value of the element at position represented
         ///         by \a pos
         ///
-        T get_value_sync(Key const& pos, bool erase) const
+        T get_value(launch::sync_policy, Key const& pos, bool erase) const
         {
             return get_value(pos, erase).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        T get_value_sync(Key const& pos, bool erase) const
+        {
+            return get_value(launch::sync, pos, erase);
+        }
+#endif
 
         /// Return the element at the position \a pos in the
         /// partition_unordered_map container.
@@ -541,10 +550,18 @@ namespace hpx
         /// \return Returns the value of the element at position represented
         ///         by \a pos
         ///
-        std::vector<T> get_values_sync(std::vector<Key> const& keys) const
+        std::vector<T> get_values(launch::sync_policy,
+            std::vector<Key> const& keys) const
         {
             return get_values(keys).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        std::vector<T> get_values_sync(std::vector<Key> const& keys) const
+        {
+            return get_values(launch::sync, keys);
+        }
+#endif
 
         /// Return the element at the position \a pos in the
         /// partition_unordered_map container.
@@ -567,10 +584,18 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value_sync(Key const& pos, T_ && val)
+        void set_value(launch::sync_policy, Key const& pos, T_ && val)
         {
             set_value(pos, std::forward<T_>(val)).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        template <typename T_>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void set_value_sync(Key const& pos, T_ && val)
+        {
+            set_value(launch::sync, pos, std::forward<T_>(val));
+        }
+#endif
 
         /// Copy the value of \a val in the element at position
         /// \a pos in the partition_unordered_map component.
@@ -594,11 +619,19 @@ namespace hpx
         /// \param pos   Position of the element in the partition_unordered_map
         /// \param val   The value to be copied
         ///
-        void set_values_sync(std::vector<Key> const& keys,
+        void set_values(launch::sync_policy, std::vector<Key> const& keys,
             std::vector<T> const& vals)
         {
             set_values(keys, vals).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void set_values_sync(std::vector<Key> const& keys,
+            std::vector<T> const& vals)
+        {
+            set_values(launch::sync, keys, vals);
+        }
+#endif
 
         /// Copy the value of \a val in the element at position
         /// \a pos in the partition_unordered_map component.
@@ -623,10 +656,17 @@ namespace hpx
         ///
         /// \return Returns the number of elements erased
         ///
-        std::size_t erase_sync(Key const& key)
+        std::size_t erase(launch::sync_policy, Key const& key)
         {
             return erase(key).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        std::size_t erase_sync(Key const& key)
+        {
+            return erase(launch::sync, key);
+        }
+#endif
 
         /// Erase all values with the given key from the partition_unordered_map
         /// container.

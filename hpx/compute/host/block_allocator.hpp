@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -116,7 +117,8 @@ namespace hpx { namespace compute { namespace host
         // topo.allocate(). The pointer hint may be used to provide locality of
         // reference: the allocator, if supported by the implementation, will
         // attempt to allocate the new memory block as close as possible to hint.
-        pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
+        pointer allocate(size_type n,
+            std::allocator<void>::const_pointer hint = nullptr)
         {
             return reinterpret_cast<pointer>(
                 hpx::threads::get_topology().allocate(n * sizeof(T)));
@@ -149,7 +151,7 @@ namespace hpx { namespace compute { namespace host
         {
             auto irange = boost::irange(std::size_t(0), count);
             auto policy =
-                hpx::parallel::par
+                hpx::parallel::parallel_execution_policy()
                     .on(executor_)
                     .with(hpx::parallel::static_chunk_size());
 
@@ -170,7 +172,7 @@ namespace hpx { namespace compute { namespace host
             cancellation_token tok;
             partitioner::call(std::move(policy),
                 boost::begin(irange), count,
-                [&arguments, p, tok](iterator_type it, std::size_t part_size)
+                [&arguments, p, &tok](iterator_type it, std::size_t part_size)
                     mutable -> partition_result_type
                 {
                     iterator_type last =

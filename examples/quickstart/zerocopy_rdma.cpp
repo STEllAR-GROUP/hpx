@@ -8,6 +8,7 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,7 +32,7 @@ public:
     typedef std::ptrdiff_t difference_type;
 
     pointer_allocator() HPX_NOEXCEPT
-      : pointer_(0), size_(0)
+      : pointer_(nullptr), size_(0)
     {
     }
 

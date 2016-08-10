@@ -12,6 +12,8 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <utility>
+
 namespace hpx { namespace applier
 {
 

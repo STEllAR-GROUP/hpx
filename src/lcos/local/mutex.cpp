@@ -12,11 +12,12 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -35,7 +36,7 @@ namespace hpx { namespace lcos { namespace local
 
     void mutex::lock(char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         HPX_ITT_SYNC_PREPARE(this);
         std::unique_lock<mutex_type> l(mtx_);
@@ -63,7 +64,7 @@ namespace hpx { namespace lcos { namespace local
 
     bool mutex::try_lock(char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         HPX_ITT_SYNC_PREPARE(this);
         std::unique_lock<mutex_type> l(mtx_);
@@ -83,7 +84,7 @@ namespace hpx { namespace lcos { namespace local
 
     void mutex::unlock(error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         HPX_ITT_SYNC_RELEASING(this);
         std::unique_lock<mutex_type> l(mtx_);
@@ -116,7 +117,7 @@ namespace hpx { namespace lcos { namespace local
     bool timed_mutex::try_lock_until(util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         HPX_ITT_SYNC_PREPARE(this);
         std::unique_lock<mutex_type> l(mtx_);

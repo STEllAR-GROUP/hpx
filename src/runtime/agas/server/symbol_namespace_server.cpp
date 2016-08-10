@@ -23,6 +23,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas
@@ -262,14 +263,15 @@ void symbol_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
+    agas::register_name(launch::sync, instance_name_,
+        get_unmanaged_id().get_gid(), ec);
 }
 
 void symbol_namespace::unregister_server_instance(
     error_code& ec
     )
 {
-    agas::unregister_name_sync(instance_name_, ec);
+    agas::unregister_name(launch::sync, instance_name_, ec);
     this->base_type::finalize();
 }
 
@@ -278,7 +280,7 @@ void symbol_namespace::finalize()
     if (!instance_name_.empty())
     {
         error_code ec(lightweight);
-        agas::unregister_name_sync(instance_name_, ec);
+        agas::unregister_name(launch::sync, instance_name_, ec);
     }
 }
 

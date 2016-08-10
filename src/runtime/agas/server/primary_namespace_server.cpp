@@ -24,15 +24,12 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
-#  include <memory>
-#endif
-
 #include <cstdint>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas
@@ -300,14 +297,15 @@ void primary_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
+    agas::register_name(launch::sync, instance_name_,
+        get_unmanaged_id().get_gid(), ec);
 }
 
 void primary_namespace::unregister_server_instance(
     error_code& ec
     )
 {
-    agas::unregister_name_sync(instance_name_, ec);
+    agas::unregister_name(launch::sync, instance_name_, ec);
     this->base_type::finalize();
 }
 
@@ -316,7 +314,7 @@ void primary_namespace::finalize()
     if (!instance_name_.empty())
     {
         error_code ec(lightweight);
-        agas::unregister_name_sync(instance_name_, ec);
+        agas::unregister_name(launch::sync, instance_name_, ec);
     }
 }
 
@@ -398,18 +396,8 @@ response primary_namespace::begin_migration(
     if (it == migrating_objects_.end())
     {
         std::pair<migration_table_type::iterator, bool> p =
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
             migrating_objects_.emplace(std::piecewise_construct,
                 std::forward_as_tuple(id), std::forward_as_tuple());
-#else
-            migrating_objects_.insert(migration_table_type::value_type(
-                id,
-                hpx::util::make_tuple(
-                    false, 0,
-                    std::make_shared<lcos::local::condition_variable_any>()
-                )
-            ));
-#endif
         HPX_ASSERT(p.second);
         it = p.first;
     }
@@ -435,11 +423,7 @@ response primary_namespace::end_migration(
     if (it == migrating_objects_.end() || !get<0>(it->second))
         return response(primary_ns_end_migration, no_success);
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     get<2>(it->second).notify_all(ec);
-#else
-    get<2>(it->second)->notify_all(ec);
-#endif
 
     // flag this id as not being migrated anymore
     get<0>(it->second) = false;
@@ -462,11 +446,7 @@ void primary_namespace::wait_for_migration_locked(
     {
         ++get<1>(it->second);
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
         get<2>(it->second).wait(l, ec);
-#else
-        get<2>(it->second)->wait(l, ec);
-#endif
 
         if (--get<1>(it->second) == 0 && !get<0>(it->second))
             migrating_objects_.erase(it);

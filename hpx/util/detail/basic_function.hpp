@@ -18,8 +18,7 @@
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
-#include <boost/mpl/bool.hpp>
-
+#include <cstddef>
 #include <cstring>
 #include <string>
 #include <type_traits>
@@ -38,7 +37,7 @@ namespace hpx { namespace util { namespace detail
     template <typename F>
     static bool is_empty_function(F const& f, std::true_type) HPX_NOEXCEPT
     {
-        return f == 0;
+        return f == nullptr;
     }
 
     template <typename F>
@@ -163,6 +162,11 @@ namespace hpx { namespace util { namespace detail
             return *this;
         }
 
+        void assign(std::nullptr_t) HPX_NOEXCEPT
+        {
+            reset();
+        }
+
         template <typename F>
         void assign(F&& f)
         {
@@ -229,7 +233,7 @@ namespace hpx { namespace util { namespace detail
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())
-                return 0;
+                return nullptr;
 
             return &vtable::get<target_type>(object);
         }
@@ -245,7 +249,7 @@ namespace hpx { namespace util { namespace detail
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())
-                return 0;
+                return nullptr;
 
             return &vtable::get<target_type>(object);
         }
@@ -411,7 +415,7 @@ namespace hpx { namespace traits
             VTablePtr
           , hpx::util::detail::empty_function<Sig>
         >
-    > : boost::mpl::false_
+    > : std::false_type
     {};
 }}
 

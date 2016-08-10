@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -39,58 +39,92 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     future<counter_info> performance_counter::get_info() const
     {
-        return stubs::performance_counter::get_info_async(get_id());
+        return stubs::performance_counter::get_info(launch::async, get_id());
     }
-    counter_info performance_counter::get_info_sync(error_code& ec) const
+    counter_info performance_counter::get_info(launch::sync_policy,
+        error_code& ec) const
     {
-        return stubs::performance_counter::get_info(get_id(), ec);
+        return stubs::performance_counter::get_info(launch::sync, get_id(), ec);
     }
 
     future<counter_value> performance_counter::get_counter_value(bool reset)
     {
-        return stubs::performance_counter::get_value_async(get_id(), reset);
+        return stubs::performance_counter::get_value(launch::async,
+            get_id(), reset);
     }
-    counter_value performance_counter::get_counter_value_sync(bool reset,
-        error_code& ec)
+    counter_value performance_counter::get_counter_value(launch::sync_policy,
+        bool reset, error_code& ec)
     {
-        return stubs::performance_counter::get_value(get_id(), reset, ec);
+        return stubs::performance_counter::get_value(launch::sync,
+            get_id(), reset, ec);
     }
 
     future<counter_value> performance_counter::get_counter_value() const
     {
-        return stubs::performance_counter::get_value_async(get_id(), false);
+        return stubs::performance_counter::get_value(launch::async,
+            get_id(), false);
     }
-    counter_value performance_counter::get_counter_value_sync(error_code& ec) const
+    counter_value performance_counter::get_counter_value(launch::sync_policy,
+        error_code& ec) const
     {
-        return stubs::performance_counter::get_value(get_id(), false, ec);
+        return stubs::performance_counter::get_value(launch::sync,
+            get_id(), false, ec);
+    }
+
+    future<counter_values_array>
+    performance_counter::get_counter_values_array(bool reset)
+    {
+        return stubs::performance_counter::get_values_array(launch::async,
+            get_id(), reset);
+    }
+    counter_values_array
+    performance_counter::get_counter_values_array(launch::sync_policy,
+        bool reset, error_code& ec)
+    {
+        return stubs::performance_counter::get_values_array(launch::sync,
+            get_id(), reset, ec);
+    }
+
+    future<counter_values_array>
+    performance_counter::get_counter_values_array() const
+    {
+        return stubs::performance_counter::get_values_array(launch::async,
+            get_id(), false);
+    }
+    counter_values_array
+    performance_counter::get_counter_values_array(launch::sync_policy,
+        error_code& ec) const
+    {
+        return stubs::performance_counter::get_values_array(launch::sync,
+            get_id(), false, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     future<bool> performance_counter::start()
     {
-        return stubs::performance_counter::start_async(get_id());
+        return stubs::performance_counter::start(launch::async, get_id());
     }
-    bool performance_counter::start_sync(error_code& ec)
+    bool performance_counter::start(launch::sync_policy, error_code& ec)
     {
-        return stubs::performance_counter::start(get_id(), ec);
+        return stubs::performance_counter::start(launch::sync, get_id(), ec);
     }
 
     future<bool> performance_counter::stop()
     {
-        return stubs::performance_counter::stop_async(get_id());
+        return stubs::performance_counter::stop(launch::async, get_id());
     }
-    bool performance_counter::stop_sync(error_code& ec)
+    bool performance_counter::stop(launch::sync_policy, error_code& ec)
     {
-        return stubs::performance_counter::stop(get_id(), ec);
+        return stubs::performance_counter::stop(launch::sync, get_id(), ec);
     }
 
     future<void> performance_counter::reset()
     {
-        return stubs::performance_counter::reset_async(get_id());
+        return stubs::performance_counter::reset(launch::async, get_id());
     }
-    void performance_counter::reset_sync(error_code& ec)
+    void performance_counter::reset(launch::sync_policy, error_code& ec)
     {
-        stubs::performance_counter::reset(get_id(), ec);
+        stubs::performance_counter::reset(launch::sync, get_id(), ec);
     }
 
     ///
@@ -104,13 +138,14 @@ namespace hpx { namespace performance_counters
             });
     }
 
-    std::string performance_counter::get_name_sync() const
+    std::string performance_counter::get_name(launch::sync_policy,
+        error_code& ec) const
     {
-        return get_name().get();
+        return get_name().get(ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Return all counters matching the given name (with optional wildcards).
+    /// Return all counters matching the given name (with optional wild-cards).
     std::vector<performance_counter>
     discover_counters(std::string const& name, error_code& ec)
     {

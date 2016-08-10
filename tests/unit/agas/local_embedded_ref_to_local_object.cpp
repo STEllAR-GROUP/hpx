@@ -7,9 +7,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-#include <boost/chrono.hpp>
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -24,7 +23,7 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
@@ -130,10 +129,10 @@ int main(
         ;
 
     // We need to explicitly enable the test components used by this test.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.components.simple_refcnt_checker.enabled! = 1";
-    cfg += "hpx.components.managed_refcnt_checker.enabled! = 1";
+    std::vector<std::string> const cfg = {
+        "hpx.components.simple_refcnt_checker.enabled! = 1",
+        "hpx.components.managed_refcnt_checker.enabled! = 1"
+    };
 
     // Initialize and run HPX.
     return init(cmdline, argc, argv, cfg);

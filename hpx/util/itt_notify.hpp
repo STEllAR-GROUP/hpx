@@ -348,7 +348,7 @@ inline void itt_sync_releasing(void*) {}
 inline void itt_sync_released(void*) {}
 inline void itt_sync_destroy(void*) {}
 
-inline ___itt_caller* itt_stack_create() { return 0; }
+inline ___itt_caller* itt_stack_create() { return nullptr; }
 inline void itt_stack_enter(___itt_caller*) {}
 inline void itt_stack_leave(___itt_caller*) {}
 inline void itt_stack_destroy(___itt_caller*) {}
@@ -366,15 +366,15 @@ inline void itt_thread_ignore() {}
 inline void itt_task_begin(___itt_domain const*, ___itt_string_handle*) {}
 inline void itt_task_end(___itt_domain const*) {}
 
-inline ___itt_domain* itt_domain_create(char const*) { return 0; }
-inline ___itt_string_handle* itt_task_handle_create(char const*) { return 0; }
+inline ___itt_domain* itt_domain_create(char const*) { return nullptr; }
+inline ___itt_string_handle* itt_task_handle_create(char const*) { return nullptr; }
 
-inline ___itt_id* itt_make_id(void*, unsigned long) { return 0; }
+inline ___itt_id* itt_make_id(void*, unsigned long) { return nullptr; }
 inline void itt_id_create(___itt_domain const*, ___itt_id*) {}
 inline void itt_id_destroy(___itt_id*) {}
 
 inline __itt_heap_function itt_heap_function_create(const char*,
-            const char*) { return 0; }
+            const char*) { return nullptr; }
 inline void itt_heap_allocate_begin(__itt_heap_function, std::size_t, int) {}
 inline void itt_heap_allocate_end(__itt_heap_function, void**, std::size_t, int) {}
 inline void itt_heap_free_begin(__itt_heap_function, void*) {}

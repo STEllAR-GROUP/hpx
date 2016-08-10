@@ -29,10 +29,13 @@
 #include <boost/detail/endian.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <chrono>
 #include <limits>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -324,7 +327,7 @@ namespace hpx { namespace parcelset
         {
             if (0 == std::strcmp(name, io_service_pool_.get_name()))
                 return &io_service_pool_;
-            return 0;
+            return nullptr;
         }
 
         bool do_background_work(std::size_t num_thread)
@@ -381,7 +384,7 @@ namespace hpx { namespace parcelset
             if (ec) return;
 
             threads::set_thread_state(id,
-                boost::chrono::milliseconds(100), threads::pending,
+                std::chrono::milliseconds(100), threads::pending,
                 threads::wait_signaled, threads::thread_priority_boost, ec);
         }
 
@@ -454,10 +457,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::enable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            connection_handler_traits<
                 ConnectionHandler_
-            >::send_early_parcel
+            >::send_early_parcel::value
         >::type
         send_early_parcel_impl(locality const & dest, parcel p)
         {
@@ -474,10 +477,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::disable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            !connection_handler_traits<
                 ConnectionHandler_
-            >::send_early_parcel
+            >::send_early_parcel::value
         >::type
         send_early_parcel_impl(locality const & dest, parcel p)
         {
@@ -486,10 +489,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::enable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            connection_handler_traits<
                 ConnectionHandler_
-            >::do_background_work,
+            >::do_background_work::value,
             bool
         >::type
         do_background_work_impl(std::size_t num_thread)
@@ -498,10 +501,10 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename boost::disable_if<
-            typename connection_handler_traits<
+        typename std::enable_if<
+            !connection_handler_traits<
                 ConnectionHandler_
-            >::do_background_work,
+            >::do_background_work::value,
             bool
         >::type
         do_background_work_impl(std::size_t)
@@ -605,35 +608,15 @@ namespace hpx { namespace parcelset
             {
                 util::get<0>(e) = std::make_shared<std::vector<parcel> >();
                 HPX_ASSERT(util::get<1>(e).empty());
-#if HPX_GCC_VERSION < 40700
-                // GCC4.6 gets incredibly confused
-                std::swap(
-                    *util::get<0>(e),
-                    static_cast<std::vector<parcel>&>(parcels));
-                std::swap(
-                    util::get<1>(e),
-                    static_cast<std::vector<write_handler_type>&>(handlers));
-#else
                 std::swap(*util::get<0>(e), parcels);
                 std::swap(util::get<1>(e), handlers);
-#endif
             }
 #else
             if (util::get<0>(e).empty())
             {
                 HPX_ASSERT(util::get<1>(e).empty());
-#if HPX_GCC_VERSION < 40700
-                // GCC4.6 gets incredibly confused
-                std::swap(
-                    util::get<0>(e),
-                    static_cast<std::vector<parcel>&>(parcels));
-                std::swap(
-                    util::get<1>(e),
-                    static_cast<std::vector<write_handler_type>&>(handlers));
-#else
                 std::swap(util::get<0>(e), parcels);
                 std::swap(util::get<1>(e), handlers);
-#endif
             }
 #endif
             else

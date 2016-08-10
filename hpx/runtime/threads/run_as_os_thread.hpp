@@ -15,6 +15,7 @@
 #include <hpx/util/result_of.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace threads
 {
@@ -23,7 +24,7 @@ namespace hpx { namespace threads
     hpx::future<typename util::result_of<F&&(Ts &&...)>::type>
     run_as_os_thread(F && f, Ts &&... vs)
     {
-        HPX_ASSERT(get_self_ptr() != 0);
+        HPX_ASSERT(get_self_ptr() != nullptr);
 
         typedef executors::io_pool_executor executor_type;
         typedef parallel::executor_traits<executor_type> traits;

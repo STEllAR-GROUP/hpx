@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace lcos
 {
@@ -22,17 +22,17 @@ namespace hpx { namespace traits
     {
         template <typename Future, typename Enable = void>
         struct is_unique_future
-          : boost::mpl::false_
+          : std::false_type
         {};
 
         template <typename R>
         struct is_unique_future<lcos::future<R> >
-          : boost::mpl::true_
+          : std::true_type
         {};
 
         template <typename Future, typename Enable = void>
         struct is_future_customization_point
-          : boost::mpl::false_
+          : std::false_type
         {};
     }
 
@@ -43,12 +43,12 @@ namespace hpx { namespace traits
 
     template <typename R>
     struct is_future<lcos::future<R> >
-      : boost::mpl::true_
+      : std::true_type
     {};
 
     template <typename R>
     struct is_future<lcos::shared_future<R> >
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

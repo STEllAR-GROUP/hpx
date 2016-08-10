@@ -111,7 +111,7 @@ namespace hpx { namespace util
         bool valid() const HPX_NOEXCEPT
         {
             if (type_ == data_type_description)
-                return 0 != data_.desc_;
+                return nullptr != data_.desc_;
 
             HPX_ASSERT(type_ == data_type_address);
             return 0 != data_.addr_;

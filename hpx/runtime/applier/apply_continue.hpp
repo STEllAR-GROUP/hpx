@@ -12,6 +12,8 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/traits/extract_action.hpp>
 
+#include <utility>
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////

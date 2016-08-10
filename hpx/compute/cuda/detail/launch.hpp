@@ -23,6 +23,8 @@
 #include <cstring>
 #endif
 #include <string>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail
 {
@@ -42,6 +44,24 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 
         fun_type f_;
         args_type args_;
+
+        HPX_HOST_DEVICE closure(fun_type && f, args_type && args)
+          : f_(std::move(f))
+          , args_(std::move(args))
+        {}
+
+        HPX_HOST_DEVICE closure(closure const& rhs)
+          : f_(rhs.f_)
+          , args_(rhs.args_)
+        {}
+
+        HPX_HOST_DEVICE closure(closure && rhs)
+          : f_(std::move(rhs.f_))
+          , args_(std::move(rhs.args_))
+        {}
+
+        HPX_DELETE_COPY_ASSIGN(closure);
+        HPX_DELETE_MOVE_ASSIGN(closure);
 
         HPX_HOST_DEVICE void operator()()
         {
@@ -99,7 +119,6 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 #endif
         }
     };
-
 
     // Launch any given function F with the given parameters. This function
     // does not involve any device synchronization.

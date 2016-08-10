@@ -62,7 +62,7 @@ namespace hpx { namespace util
 
         T& operator*() const
         {
-            HPX_ASSERT(0 != ptr_);
+            HPX_ASSERT(nullptr != ptr_);
             return *ptr_;
         }
 
@@ -136,7 +136,7 @@ namespace hpx { namespace util
 
             ptr = reinterpret_cast<T *>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
-            HPX_ASSERT(0 != ptr);
+            HPX_ASSERT(nullptr != ptr);
             return *ptr;
         }
 
@@ -148,7 +148,7 @@ namespace hpx { namespace util
 
             ptr = reinterpret_cast<T *>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
-            if (0 != ptr)
+            if (nullptr != ptr)
                 delete ptr;
 
             ptr = new_value;

@@ -13,17 +13,16 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <boost/assign.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 int p1()
 {
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return 1;
 }
 
@@ -31,7 +30,7 @@ int p2(hpx::lcos::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return 2 * i;
 }
 
@@ -40,7 +39,7 @@ void p3(hpx::lcos::future<int> f)
     HPX_TEST(f.valid());
     int i = f.get();
     (void)i;
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return;
 }
 
@@ -189,10 +188,9 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

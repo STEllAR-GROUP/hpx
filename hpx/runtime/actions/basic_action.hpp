@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
@@ -40,7 +41,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
@@ -54,10 +54,6 @@
 
 namespace hpx { namespace actions
 {
-    // transfer_action forward declaration
-    template <typename Action>
-    struct transfer_action;
-
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -285,23 +281,24 @@ namespace hpx { namespace actions
             return invoker()(lva, std::forward<Ts>(vs)...);
         }
 
+    private:
         ///////////////////////////////////////////////////////////////////////
-        typedef typename traits::is_future<result_type>::type is_future_pred;
+        typedef traits::is_future<result_type> is_future_pred;
 
         struct sync_invoke
         {
-            template <typename IdOrPolicy, typename ...Ts>
+            template <typename IdOrPolicy, typename Policy, typename ...Ts>
             HPX_FORCEINLINE static result_type call(
-                boost::mpl::false_, launch policy,
+                std::false_type, Policy policy,
                 IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...).get(ec);
             }
 
-            template <typename IdOrPolicy, typename ...Ts>
+            template <typename IdOrPolicy, typename Policy, typename ...Ts>
             HPX_FORCEINLINE static result_type call(
-                boost::mpl::true_, launch policy,
+                std::true_type, Policy policy,
                 IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
@@ -309,6 +306,7 @@ namespace hpx { namespace actions
             }
         };
 
+    public:
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
@@ -324,7 +322,9 @@ namespace hpx { namespace actions
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
-            return (*this)(launch::all, id, ec, std::forward<Ts>(vs)...);
+            return util::void_guard<result_type>(),
+                sync_invoke::call(is_future_pred(), launch::sync, id, ec,
+                    std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
@@ -332,14 +332,18 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
-            return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
+            return util::void_guard<result_type>(),
+                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
+                    std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
-            return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
+            return util::void_guard<result_type>(),
+                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
+                    std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -368,7 +372,7 @@ namespace hpx { namespace actions
         operator()(DistPolicy const& dist_policy, error_code& ec,
             Ts&&... vs) const
         {
-            return (*this)(launch::all, dist_policy, ec,
+            return (*this)(launch::sync, dist_policy, ec,
                 std::forward<Ts>(vs)...);
         }
 
@@ -381,7 +385,7 @@ namespace hpx { namespace actions
         operator()(launch policy,
             DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return (*this)(launch::all, dist_policy, throws,
+            return (*this)(launch::sync, dist_policy, throws,
                 std::forward<Ts>(vs)...);
         }
 
@@ -393,7 +397,7 @@ namespace hpx { namespace actions
         >::type
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return (*this)(launch::all, dist_policy, throws,
+            return (*this)(launch::sync, dist_policy, throws,
                 std::forward<Ts>(vs)...);
         }
 
@@ -592,6 +596,7 @@ namespace hpx { namespace actions
         output_stream_write_sync_action_id,
         performance_counter_get_counter_info_action_id,
         performance_counter_get_counter_value_action_id,
+        performance_counter_get_counter_values_array_action_id,
         performance_counter_set_counter_value_action_id,
         performance_counter_reset_counter_value_action_id,
         performance_counter_start_action_id,
@@ -692,6 +697,33 @@ namespace hpx { namespace serialization
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \def HPX_DECLARE_ACTION(func, name)
+/// \brief Declares an action type
+///
+#define HPX_DECLARE_ACTION(...)                                               \
+    HPX_DECLARE_ACTION_(__VA_ARGS__)                                          \
+    /**/
+
+/// \cond NOINTERNAL
+
+#define HPX_DECLARE_DIRECT_ACTION(...)                                        \
+    HPX_DECLARE_ACTION(__VA_ARGS__)                                           \
+    /**/
+
+#define HPX_DECLARE_ACTION_(...)                                              \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DECLARE_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                    \
+    )(__VA_ARGS__))                                                           \
+    /**/
+
+#define HPX_DECLARE_ACTION_1(func)                                            \
+    HPX_DECLARE_ACTION_2(func, BOOST_PP_CAT(func, _action))                   \
+    /**/
+
+#define HPX_DECLARE_ACTION_2(func, name) struct name;                         \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
@@ -718,6 +750,9 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    namespace hpx { namespace actions {                                       \
+        template struct transfer_action<action>;                              \
+    }}                                                                        \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -730,11 +765,11 @@ namespace hpx { namespace serialization
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
         struct is_action<action>                                              \
-          : boost::mpl::true_                                                 \
+          : std::true_type                                                    \
         {};                                                                   \
         template <>                                                           \
         struct needs_automatic_registration<action>                           \
-          : boost::mpl::false_                                                \
+          : std::false_type                                                   \
         {};                                                                   \
     }}                                                                        \
 /**/

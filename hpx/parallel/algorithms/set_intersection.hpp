@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 #include <boost/shared_array.hpp>
 

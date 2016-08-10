@@ -35,27 +35,27 @@ namespace hpx { namespace compute { namespace cuda
         {}
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void apply_execute(F && f, Ts &&... ts) const
         {
             detail::launch(target_, 1, 1,
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename ... Ts>
-        hpx::future<void> async_execute(F && f, Ts &&... ts)
+        hpx::future<void> async_execute(F && f, Ts &&... ts) const
         {
             apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
             return target_.get_future();
         }
 
         template <typename F, typename ... Ts>
-        void execute(F && f, Ts &&... ts)
+        void execute(F && f, Ts &&... ts) const
         {
             apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
             target_.synchronize();
         }
 
-        std::size_t processing_units_count()
+        std::size_t processing_units_count() const
         {
             cudaDeviceProp props;
             cudaError_t error = cudaGetDeviceProperties(&props,
@@ -86,7 +86,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename Shape, typename ... Ts>
-        void bulk_launch(F && f, Shape const& shape, Ts &&... ts)
+        void bulk_launch(F && f, Shape const& shape, Ts &&... ts) const
         {
             std::size_t count = boost::size(shape);
 
@@ -105,11 +105,9 @@ namespace hpx { namespace compute { namespace cuda
             shape_container_type shape_container(
                 boost::begin(shape), boost::end(shape), alloc_type(target_));
 
-            value_type const* p = &(*boost::begin(shape));
             detail::launch(
                 target_, num_blocks, threads_per_block,
-                [] HPX_DEVICE (F f, value_type * p,
-                    std::size_t count, Ts&... ts)
+                [] HPX_DEVICE (F f, value_type* p, std::size_t count, Ts const&... ts)
                 {
                     int idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
@@ -123,7 +121,7 @@ namespace hpx { namespace compute { namespace cuda
 
         template <typename F, typename Shape, typename ... Ts>
         std::vector<hpx::future<void> >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
 
@@ -133,7 +131,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename Shape, typename ... Ts>
-        void bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        void bulk_execute(F && f, Shape const& shape, Ts &&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
             target_.synchronize();

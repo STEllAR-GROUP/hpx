@@ -102,7 +102,7 @@ namespace hpx { namespace components
 
     void pending_logs::add(message_type const& msg)
     {
-        if (0 == hpx::get_runtime_ptr()) {
+        if (nullptr == hpx::get_runtime_ptr()) {
             // This branch will be taken if it's too early or too late in the
             // game. We do local logging only. Any queued messages which may be
             // still left in the queue are logged locally as well.

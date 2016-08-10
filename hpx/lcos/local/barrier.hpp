@@ -10,6 +10,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <mutex>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local

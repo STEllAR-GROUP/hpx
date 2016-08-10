@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -35,28 +36,51 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // for_each_n
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename F, typename Proj>
         struct for_each_iteration
         {
-            typename hpx::util::decay<F>::type f_;
-            typename hpx::util::decay<Proj>::type proj_;
+            typedef typename hpx::util::decay<F>::type fun_type;
+            typedef typename hpx::util::decay<Proj>::type proj_type;
+
+            fun_type f_;
+            proj_type proj_;
+
+            template <typename F_, typename Proj_>
+            HPX_HOST_DEVICE for_each_iteration(F_ && f, Proj_ && proj)
+              : f_(std::forward<F_>(f))
+              , proj_(std::forward<Proj_>(proj))
+            {}
+
+            HPX_HOST_DEVICE for_each_iteration(for_each_iteration const& rhs)
+              : f_(rhs.f_)
+              , proj_(rhs.proj_)
+            {}
+
+            HPX_HOST_DEVICE for_each_iteration(for_each_iteration && rhs)
+              : f_(std::move(rhs.f_))
+              , proj_(std::move(rhs.proj_))
+            {}
+
+            HPX_DELETE_COPY_ASSIGN(for_each_iteration);
+            HPX_DELETE_MOVE_ASSIGN(for_each_iteration);
 
             template <typename Iter>
             HPX_HOST_DEVICE
             void operator()(std::size_t /*part_index*/,
                 Iter part_begin, std::size_t part_size)
             {
+                typedef typename util::detail::loop_n<Iter>::type it_type;
+
                 util::loop_n(
                     part_begin, part_size,
-                    [this](Iter curr) mutable
+                    [this](it_type curr) mutable
                     {
-                        hpx::util::invoke(
-                            f_, hpx::util::invoke(proj_, *curr));
+                        hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr));
                     });
             }
         };
 
-        /// \cond NOINTERNAL
         template <typename Iter>
         struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {
@@ -71,8 +95,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy, InIter first, std::size_t count, F && f,
                 Proj && proj/* = Proj()*/)
             {
+                typedef typename util::detail::loop_n<InIter>::type it_type;
+
                 return util::loop_n(first, count,
-                    [&f, &proj](InIter curr)
+                    [&f, &proj](it_type curr)
                     {
                         hpx::util::invoke(f, hpx::util::invoke(proj, *curr));
                     });
@@ -80,7 +106,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            static typename util::detail::algorithm_result<ExPolicy,
+                InIter>::type
             parallel(ExPolicy && policy, InIter first, std::size_t count,
                 F && f, Proj && proj/* = Proj()*/)
             {
@@ -88,9 +115,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     return util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy), first, count,
-                        for_each_iteration<F, Proj>{
+                        for_each_iteration<F, Proj>(
                             std::forward<F>(f), std::forward<Proj>(proj)
-                        },
+                        ),
                         [](InIter && last) -> InIter
                         {
                             return std::move(last);
@@ -245,29 +272,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static Iter
+            static InIter
             sequential(ExPolicy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
+                typedef typename util::detail::loop<InIter>::type it_type;
+
                 return util::loop(first, last,
-                    [&f, &proj](Iter curr)
+                    [&f, &proj](it_type curr)
                     {
                         f(hpx::util::invoke(proj, *curr));
                     });
             }
 
-            template <typename ExPolicy, typename InIter, typename F>
-            static InIter
-            sequential(ExPolicy, InIter first, InIter last, F && f,
-                util::projection_identity)
-            {
-                std::for_each(first, last, std::forward<F>(f));
-                return last;
-            }
-
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+            static typename util::detail::algorithm_result<ExPolicy,
+                InIter>::type
             parallel(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
@@ -280,7 +301,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         ///////////////////////////////////////////////////////////////////////
         // non-segmented implementation
-        template <typename ExPolicy, typename InIter, typename F, typename Proj>
+        template <typename ExPolicy, typename InIter, typename F,
+            typename Proj>
         inline typename util::detail::algorithm_result<ExPolicy, InIter>::type
         for_each_(ExPolicy && policy, InIter first, InIter last, F && f,
             Proj && proj, std::false_type)
@@ -302,7 +324,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename SegIter, typename F, typename Proj>
+        template <typename ExPolicy, typename SegIter, typename F,
+            typename Proj>
         inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type);

@@ -20,8 +20,8 @@ int hpx_main(int argc, char ** argv)
     performance_counter cycles(
         "/papi{locality#0/worker-thread#0}/PAPI_TOT_CYC");
 
-    boost::int64_t val1 = total_cycles.get_value_sync<boost::int64_t>();
-    boost::int64_t val2 = cycles.get_value_sync<boost::int64_t>();
+    boost::int64_t val1 = total_cycles.get_value<boost::int64_t>(hpx::launch::sync);
+    boost::int64_t val2 = cycles.get_value<boost::int64_t>(hpx::launch::sync);
 
     HPX_TEST(val1 != 0);
     HPX_TEST(val2 != 0);

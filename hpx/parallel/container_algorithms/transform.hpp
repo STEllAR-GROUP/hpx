@@ -24,6 +24,7 @@
 #include <boost/range/functions.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -335,14 +336,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam InIter1     The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators for the second
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam Rng1        The type of the first source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Rng2        The type of the second source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -360,14 +359,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first1       Refers to the beginning of the first sequence of
-    ///                     elements the algorithm will be applied to.
-    /// \param last1        Refers to the end of the first sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the second sequence of
-    ///                     elements the algorithm will be applied to.
-    /// \param last2        Refers to the end of the second sequence of elements
-    ///                     the algorithm will be applied to.
+    /// \param rng1         Refers to the first sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param rng2         Refers to the second sequence of elements the
+    ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     /// \param f            Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the

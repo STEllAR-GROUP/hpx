@@ -12,12 +12,14 @@
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/jenkins_hash.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
 
 #include <boost/cstdint.hpp>
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel
@@ -30,7 +32,14 @@ namespace hpx { namespace plugins { namespace parcel
     public:
         coalescing_counter_registry() {}
 
-        typedef util::function_nonser<boost::int64_t(bool)> get_counter_type;
+        typedef util::function_nonser<boost::int64_t(bool)>
+            get_counter_type;
+        typedef util::function_nonser<std::vector<boost::int64_t>(bool)>
+            get_counter_values_type;
+        typedef util::function_nonser<
+                void(boost::int64_t, boost::int64_t, boost::int64_t,
+                    get_counter_values_type&)
+            > get_counter_values_creator_type;
 
         struct counter_functions
         {
@@ -38,6 +47,8 @@ namespace hpx { namespace plugins { namespace parcel
             get_counter_type num_messages;
             get_counter_type num_parcels_per_message;
             get_counter_type average_time_between_parcels;
+            get_counter_values_creator_type time_between_parcels_histogram_creator;
+            boost::int64_t min_boundary, max_boundary, num_buckets;
         };
 
         typedef std::unordered_map<
@@ -51,19 +62,30 @@ namespace hpx { namespace plugins { namespace parcel
         void register_action(std::string const& name,
             get_counter_type num_parcels, get_counter_type num_messages,
             get_counter_type time_between_parcels,
-            get_counter_type average_time_between_parcels);
+            get_counter_type average_time_between_parcels,
+            get_counter_values_creator_type time_between_parcels_histogram_creator);
 
         get_counter_type get_parcels_counter(std::string const& name) const;
         get_counter_type get_messages_counter(std::string const& name) const;
-        get_counter_type get_parcels_per_message_counter(std::string const& name) const;
+        get_counter_type get_parcels_per_message_counter(
+            std::string const& name) const;
         get_counter_type get_average_time_between_parcels_counter(
             std::string const& name) const;
+        get_counter_values_type get_time_between_parcels_histogram_counter(
+            std::string const& name, boost::int64_t min_boundary,
+            boost::int64_t max_boundary, boost::int64_t num_buckets);
 
         bool counter_discoverer(
             performance_counters::counter_info const& info,
             performance_counters::counter_path_elements& p,
             performance_counters::discover_counter_func const& f,
             performance_counters::discover_counters_mode mode, error_code& ec);
+
+        static std::vector<boost::int64_t> empty_histogram(bool)
+        {
+            std::vector<boost::int64_t> result = { 0, 0, 1, 0 };
+            return result;
+        }
 
     private:
         struct tag {};

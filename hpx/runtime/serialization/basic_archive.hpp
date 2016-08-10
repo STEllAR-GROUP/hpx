@@ -10,11 +10,11 @@
 #include <hpx/config.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/type_traits/is_pointer.hpp>
 
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <type_traits>
 
 namespace hpx { namespace serialization
 {
@@ -58,7 +58,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void invoke(T & t)
         {
-            static_assert(!boost::is_pointer<T>::value,
+            static_assert(!std::is_pointer<T>::value,
                 "HPX does not support serialization of raw pointers. "
                 "Please use smart pointers.");
 

@@ -139,7 +139,7 @@ int qthreads_main(
         ///////////////////////////////////////////////////////////////////////
         // Initialize the PRNG seed.
         if (!seed)
-            seed = boost::uint64_t(std::time(0));
+            seed = boost::uint64_t(std::time(nullptr));
 
         ///////////////////////////////////////////////////////////////////////
         // Validate command-line arguments.
@@ -217,10 +217,8 @@ int qthreads_main(
 
         // Randomly shuffle the entire sequence to deal with drift.
         using hpx::util::placeholders::_1;
-        boost::function<boost::uint64_t(boost::uint64_t)> shuffler_f =
-            hpx::util::bind(&shuffler, boost::ref(prng), _1);
-        std::random_shuffle(payloads.begin(), payloads.end()
-                          , shuffler_f);
+        std::random_shuffle(payloads.begin(), payloads.end(),
+            hpx::util::bind(&shuffler, boost::ref(prng), _1));
 
         ///////////////////////////////////////////////////////////////////////
         // Validate the payloads.

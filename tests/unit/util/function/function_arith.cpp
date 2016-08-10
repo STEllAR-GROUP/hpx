@@ -29,7 +29,7 @@ int main()
     HPX_TEST(f);
     HPX_TEST_EQ(f(5, 3), 5.f/3);
 
-    f = (float(*)(int, int))0;
+    f = nullptr;
     HPX_TEST(!f);
 
     f = &mul_ints;

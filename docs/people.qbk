@@ -1,5 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2015 Hartmut Kaiser
+    Copyright (C) 2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,29 +10,31 @@
 
 The __stellar__ Group (pronounced as stellar) stands for "[*S]ystems [*T]echnology,
 [*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch". We are an
-international group of faculty, researchers, and students working at different
-organizations. The goal of the __stellar__ Group is to promote the development of
+international group of faculty, researchers, and students working at various
+institutions around the world.
+The goal of the __stellar__ Group is to promote the development of
 scalable parallel applications by providing a community for ideas, a framework
 for collaboration, and a platform for communicating these concepts to the
 broader community.
 
-All of our work is centered around building technologies for
+Our work is focused on building technologies for
 scalable parallel applications. __hpx__, our general purpose C++ runtime system
-for parallel and distributed applications, is no exeption. We use __hpx__ for
+for parallel and distributed applications, is no exception. We use __hpx__ for
 a broad range of scientific applications, helping scientists and developers
 to write code which scales better and shows better performance compared
 to more conventional programming models such as MPI.
 
 __hpx__ is based on /ParalleX/ which is a new
 (and still experimental) parallel execution model aiming to
-overcome the limitations imposed by the current hardware and the way we write
+overcome the limitations imposed by the current hardware and the techniques
+we use to write
 applications today. Our group focuses on two types of applications - those
 requiring excellent strong scaling, allowing for a dramatic reduction of
 execution time for fixed workloads and those needing highest level of sustained
 performance through massive parallelism. These applications are
 presently unable (through conventional practices) to effectively exploit a
-relatively small number of cores in a multi-core system. By extention,
-these application will not be able to exploit high-end
+relatively small number of cores in a multi-core system. By extension,
+these application will not be able to exploit high-end exascale
 computing systems which are likely to employ hundreds of millions of such cores by the
 end of this decade.
 
@@ -64,10 +67,10 @@ our tables below.
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
   [[Agustin Berge]           [__cct__, __lsu__]   [[$./images/emails/aberge.png]]]
+  [[John Biddiscombe]        [__cscs__]           [[$./images/emails/biddisco.png]]]
   [[Anton Bikineev]          [__cct__, __lsu__]   [[$./images/emails/antbikineev.png]]]
   [[Martin Stumpf]           [__inf3__, __fau__]  [[$./images/emails/martinhstumpf.png]]]
-  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
-  [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
+  [[Bryce Adelstein-Lelbach] [__lbnl__]           [[$./images/emails/balelbach.png]]]
   [[Shuangyang Yang]         [__cct__, __lsu__]   [[$./images/emails/syang16.png]]]
   [[Jeroen Habraken]         [__tue__]            [[$./images/emails/vexocide.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
@@ -75,7 +78,6 @@ our tables below.
   [[Adrian Serio]            [__cct__, __lsu__]   [[$./images/emails/aserio.png]]]
   [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
   [[Matthew Anderson]        [__crest__, __iu__]  [[$./images/emails/manderson.png]]]
-  [[Alex Nagelberg]          [__cct__, __lsu__]   [[$./images/emails/anagelberg.png]]]
   [[Dylan Stark]             [__sandia__]         [[$./images/emails/dstark.png]]]
 ]
 
@@ -97,6 +99,31 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Khalid Hasanov, who contributed changes which allowed to run HPX on 64Bit
+  power-pc architectures.
+* Zahra Khatami, who contributed the prefetching iterators and the persistent
+  auto chunking executor parameters implementation.
+* Marcin Copik, who worked on implementing GPU support for C++AMP and HCC.
+  He also worked on implementing a HCC backend for __hpx_compute__.
+* Minh-Khanh Do, who contributed the implementation of several segmented
+  algorithms.
+* Bibek Wagle, who worked on fixing and analyzing the performance of the parcel
+  coalescing plugin in __hpx__.
+* Lukas Troska, who reported several problems and contributed various test cases
+  allowing to reproduce the corresponding issues.
+* Andreas Schaefer, who worked on integrating his library (__lgd__) with __hpx__.
+  He reported various problems and submitted several patches to fix issues
+  allowing for a better integration with __lgd__.
+* Satyaki Upadhyay, who contributed several examples to __hpx__.
+* Brandon Cordes, who contributed several improvements to the inspect tool.
+* Harris Brakmic, who contributed an extensive build system description for
+  building __hpx__ with Visual Studio.
+* Parsa Amini, who refactored and simplified the implementation of AGAS in
+  __hpx__.
+* Luis Martinez de Bartolome who implemented a build system extension for
+  __hpx__ integrating it with the __conan__ C/C++ package manager.
+* Vinay C Amatya, who contributed to the documentation and provided some
+  of the __hpx__ examples.
 * Kevin Huck and Nick Chaimov (__ou__), who contributed the integration of APEX
   (Autonomic Performance Environment for eXascale) with __hpx__.
 * Francisco Jose Tapia, who helped with implementing the parallel sort
@@ -128,7 +155,8 @@ the project through discussions, pull requests, documentation patches, etc.
   buildsystem more portable.
 * Andreas Buhr, who helped with improving our documentation.
 * Antoine Tran Tan (Laboratoire de Recherche en Informatique, Paris), who
-  worked on integrating __hpx__ as a backend for __nt2__.
+  worked on integrating __hpx__ as a backend for __nt2__. He also contributed
+  an implementation of an API similar to Fortran co-arrays on top of __hpx__.
 * John Biddiscombe (__cscs__), who helped with the BlueGene/Q port of
   __hpx__, implemented the parallel sort algorithm, and made several other
   contributions.
@@ -137,7 +165,8 @@ the project through discussions, pull requests, documentation patches, etc.
   reports, feature requests, and made several direct contributions.
 * Mathias Gaunard (Metascale), who contributed several patches to reduce
   compile time warnings generated while compiling __hpx__.
-* Andreas Buhr, who helped fixing some documentation inconsistencies.
+* Andreas Buhr, who helped with improving our documentation, especially by
+  suggesting some fixes for inconsistencies.
 * Patricia Grubel (__nmsu__), who contributed the description
   of the different __hpx__ thread scheduler policies and is working on the
   performance analysis of our thread scheduling subsystem.
@@ -185,10 +214,11 @@ __hpx__ is currently funded by the following grants:
   United States Government or any agency thereof.
 * The Bavarian Research Foundation (Bayerische Forschungsstfitung)
   through the grant AZ-987-11.
-
+* The European Commission's Horizon 2020 programme through the grant
+  H2020-EU.1.2.2. 671603 (AllScale). 
 
 [endsect] [/ People]
 
 [/Proofread by:]
-[/Adrian Serio 3-13-12]
+[/Adrian Serio 6-28-16]
 [/Phillip LeBlanc 3-13-12]

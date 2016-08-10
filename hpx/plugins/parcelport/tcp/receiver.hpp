@@ -36,6 +36,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
@@ -166,7 +167,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         static_cast<boost::uint32_t>(buffer_.num_chunks_.second));
 
                 void (receiver::*f)(boost::system::error_code const&,
-                        Handler) = 0;
+                        Handler) = nullptr;
 
                 if (num_zero_copy_chunks != 0) {
                     typedef parcel_buffer_type::transmission_chunk_type

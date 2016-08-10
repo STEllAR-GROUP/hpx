@@ -13,8 +13,6 @@
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 
-#include <boost/mpl/list.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
 {

@@ -26,6 +26,11 @@ namespace hpx
         /// The function \a get_applier returns a reference to the (thread
         /// specific) applier instance.
         HPX_API_EXPORT applier& get_applier();
+
+        /// The function \a get_applier returns a pointer to the (thread
+        /// specific) applier instance. The returned pointer is NULL if the
+        /// current thread is not known to HPX or if the runtime system is not
+        /// active.
         HPX_API_EXPORT applier* get_applier_ptr();
     }
 }

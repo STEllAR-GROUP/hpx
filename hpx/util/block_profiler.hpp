@@ -23,6 +23,7 @@
 #endif
 
 #include <string>
+#include <utility>
 
 #define HPX_DONT_USE_BLOCK_PROFILER
 

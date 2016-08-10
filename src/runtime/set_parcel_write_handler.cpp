@@ -15,7 +15,7 @@ namespace hpx
         parcel_write_handler_type const& f)
     {
         runtime* rt = get_runtime_ptr();
-        if (0 != rt)
+        if (nullptr != rt)
             return rt->get_parcel_handler().set_write_handler(f);
 
         HPX_THROW_EXCEPTION(invalid_status,

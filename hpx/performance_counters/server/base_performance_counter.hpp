@@ -38,6 +38,19 @@ namespace hpx { namespace performance_counters { namespace server
                 "set_counter_value is not implemented for this counter");
         }
 
+        virtual counter_value get_counter_value(bool reset)
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "get_counter_value",
+                "get_counter_value is not implemented for this counter");
+            return counter_value();
+        }
+
+        virtual counter_values_array get_counter_values_array(bool reset)
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
+                "get_counter_values_array is not implemented for this counter");
+        }
+
         virtual bool start()
         {
             return false;    // nothing to do
@@ -89,6 +102,11 @@ namespace hpx { namespace performance_counters { namespace server
             return this->get_counter_value(reset);
         }
 
+        counter_values_array get_counter_values_array_nonvirt(bool reset)
+        {
+            return this->get_counter_values_array(reset);
+        }
+
         void set_counter_value_nonvirt(counter_value const& info)
         {
             this->set_counter_value(info);
@@ -122,6 +140,11 @@ namespace hpx { namespace performance_counters { namespace server
         /// counter.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
             get_counter_value_nonvirt, get_counter_value_action);
+
+        /// The \a get_counter_value_action queries the value of a performance
+        /// counter.
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
+            get_counter_values_array_nonvirt, get_counter_values_array_action);
 
         /// The \a set_counter_value_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
@@ -160,6 +183,14 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter
     ::get_counter_value_action,
     performance_counter_get_counter_value_action)
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::performance_counters::server::base_performance_counter
+    ::get_counter_values_array_action);
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::performance_counters::server::base_performance_counter
+    ::get_counter_values_array_action,
+    performance_counter_get_counter_values_array_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
     hpx::performance_counters::server::base_performance_counter

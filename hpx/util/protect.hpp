@@ -32,15 +32,15 @@ namespace hpx { namespace util
               : F(std::move(f))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
             protected_bind(protected_bind const&) = default;
             protected_bind(protected_bind&&) = default;
 #else
-            protected_bind(protected_bind const& other)
+            HPX_HOST_DEVICE protected_bind(protected_bind const& other)
               : F(other)
             {}
 
-            protected_bind(protected_bind&& other)
+            HPX_HOST_DEVICE protected_bind(protected_bind&& other)
               : F(std::move(other))
             {}
 #endif
@@ -52,10 +52,12 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
+    HPX_HOST_DEVICE
     typename std::enable_if<
         traits::is_bind_expression<typename std::decay<T>::type>::value
       , detail::protected_bind<typename std::decay<T>::type>
-    >::type protect(T&& f)
+    >::type
+    protect(T&& f)
     {
         return detail::protected_bind<
             typename std::decay<T>::type
@@ -64,10 +66,12 @@ namespace hpx { namespace util
 
     // leave everything that is not a bind expression as is
     template <typename T>
+    HPX_HOST_DEVICE
     typename std::enable_if<
         !traits::is_bind_expression<typename std::decay<T>::type>::value
       , T
-    >::type protect(T&& v) //-V659
+    >::type
+    protect(T&& v) //-V659
     {
         return std::forward<T>(v);
     }

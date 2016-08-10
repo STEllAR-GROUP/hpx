@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace plugins { namespace parcel { namespace detail
@@ -61,7 +62,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         {
             if (!messages_.empty())
             {
-                if (0 == threads::get_self_ptr())
+                if (nullptr == threads::get_self_ptr())
                 {
                     // reschedule this call on a new HPX thread
                     using parcelset::parcelport;

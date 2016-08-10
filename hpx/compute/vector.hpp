@@ -18,6 +18,7 @@
 
 #include <initializer_list>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace compute
@@ -62,7 +63,7 @@ namespace hpx { namespace compute
           , alloc_(alloc)
           , data_(alloc_traits::allocate(alloc_, count))
         {
-            alloc_traits::bulk_construct(alloc_, static_cast<T*>(data_), size_, value);
+            alloc_traits::bulk_construct(alloc_, data_, size_, value);
         }
 
         // Constructs the container with count default-inserted instances of T.
@@ -73,7 +74,7 @@ namespace hpx { namespace compute
           , alloc_(alloc)
           , data_(alloc_traits::allocate(alloc_, count))
         {
-            alloc_traits::bulk_construct(alloc_, static_cast<T*>(data_), size_);
+            alloc_traits::bulk_construct(alloc_, data_, size_);
         }
 
         template <typename InIter,
@@ -137,9 +138,9 @@ namespace hpx { namespace compute
 
         ~vector()
         {
-            if(static_cast<T*>(data_) != nullptr)
+            if(data_ != nullptr)
             {
-                alloc_traits::bulk_destroy(alloc_, static_cast<T*>(data_), size_);
+                alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
             }
         }
@@ -153,9 +154,9 @@ namespace hpx { namespace compute
             hpx::parallel::util::copy_helper(other.begin(), other.end(),
                 iterator(data, 0, alloc_traits::target(other.alloc_)));
 
-            if(static_cast<T*>(data_) != nullptr)
+            if(data_ != nullptr)
             {
-                alloc_traits::bulk_destroy(alloc_, static_cast<T*>(data_), size_);
+                alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
             }
 
@@ -332,7 +333,7 @@ namespace hpx { namespace compute
         ///
         void clear() HPX_NOEXCEPT
         {
-            alloc_traits::bulk_destroy(alloc_, static_cast<T*>(data_), size_);
+            alloc_traits::bulk_destroy(alloc_, data_, size_);
             size_ = 0;
         }
 

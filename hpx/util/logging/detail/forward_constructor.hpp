@@ -21,15 +21,12 @@
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <boost/config.hpp>
+
+#include <type_traits>
 
 //#if BOOST_WORKAROUND(HPX_MSVC, BOOST_TESTED_AT(1400))
-
-#ifdef HPX_MSVC
-// because of copy-constructor bug
-#include <boost/type_traits/is_base_of.hpp>
-#endif
 
 namespace hpx { namespace util { namespace logging {
 
@@ -67,15 +64,15 @@ namespace hpx { namespace util { namespace logging {
 #define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW(class_name,forward_to,type) \
         class_name() : forward_to(new type) {} \
         template<class p1> class_name(const p1 & a1 ) { \
-            see_if_copy_constructor\
-( a1, forward_to, boost::is_base_of<class_name,p1>() ); \
+            see_if_copy_constructor( a1, forward_to, \
+                std::is_base_of<class_name,p1>() ); \
         } \
         template<class p1, class forward_type>\
- void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::true_type& )\
+ void see_if_copy_constructor(const p1 & a1, forward_type&, const std::true_type& )\
  { forward_to = a1.forward_to; \
         } \
         template<class p1, class forward_type> void see_if_copy_constructor\
-(const p1 & a1, forward_type&, const boost::false_type& ) { \
+(const p1 & a1, forward_type&, const std::false_type& ) { \
             forward_to = forward_type(new type(a1)); \
         } \
         template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2)\
@@ -95,15 +92,15 @@ namespace hpx { namespace util { namespace logging {
         class_name() : forward_to(new type) { init (); } \
         template<class p1> class_name(const p1 & a1 ) { \
             see_if_copy_constructor\
-( a1, forward_to, boost::is_base_of<class_name,p1>() ); \
+( a1, forward_to, std::is_base_of<class_name,p1>() ); \
         } \
         template<class p1, class forward_type>\
- void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::true_type& )\
+ void see_if_copy_constructor(const p1 & a1, forward_type&, const std::true_type& )\
  { forward_to = a1.forward_to; \
             init (); \
         } \
         template<class p1, class forward_type>\
- void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::false_type& )\
+ void see_if_copy_constructor(const p1 & a1, forward_type&, const std::false_type& )\
  { forward_to = forward_type(new type(a1)); \
             init (); \
         } \

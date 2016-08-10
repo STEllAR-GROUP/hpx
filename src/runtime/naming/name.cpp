@@ -219,7 +219,7 @@ namespace hpx { namespace naming
                 HPX_ASSERT(false);          // invalid management type
                 return &detail::gid_unmanaged_deleter;
             }
-            return 0;
+            return nullptr;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -350,7 +350,7 @@ namespace hpx { namespace naming
 
                     naming::gid_type new_gid = gid;     // strips lock-bit
                     HPX_ASSERT(new_gid != invalid_gid);
-                    return agas::incref_async(new_gid, new_credit)
+                    return agas::incref(new_gid, new_credit)
                         .then(
                             hpx::util::bind(postprocess_incref, boost::ref(gid))
                         );
@@ -443,7 +443,7 @@ namespace hpx { namespace naming
             {
                 hpx::util::scoped_unlock<std::unique_lock<gid_type::mutex_type> >
                     ul(l);
-                 result = agas::incref(unlocked_gid, added_credit);
+                 result = agas::incref(launch::sync, unlocked_gid, added_credit);
             }
 
             return result;
@@ -719,9 +719,10 @@ namespace hpx { namespace naming
 
 namespace hpx
 {
-    naming::id_type get_colocation_id_sync(naming::id_type const& id, error_code& ec)
+    naming::id_type get_colocation_id(launch::sync_policy,
+        naming::id_type const& id, error_code& ec)
     {
-        return agas::get_colocation_id_sync(id, ec);
+        return agas::get_colocation_id(launch::sync, id, ec);
     }
 
     lcos::future<naming::id_type> get_colocation_id(naming::id_type const& id)

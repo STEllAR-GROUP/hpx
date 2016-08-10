@@ -40,11 +40,11 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class base_lco_with_value : public base_lco
     {
+    protected:
         typedef typename std::conditional<
             std::is_void<Result>::value, util::unused_type, Result
         >::type result_type;
 
-    protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco_with_value() {}
