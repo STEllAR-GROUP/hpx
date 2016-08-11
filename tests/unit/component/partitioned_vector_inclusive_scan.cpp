@@ -13,6 +13,8 @@
 
 #include <boost/range/functions.hpp>
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
@@ -126,7 +128,7 @@ void inclusive_scan_tests()
 int main()
 {
     inclusive_scan_tests<int>();
-//    inclusive_scan_tests<double>();
+    inclusive_scan_tests<double>();
 
     return 0;
 }

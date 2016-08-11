@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Minh-Khanh Do
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/segmented_scan_partitioner.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -25,6 +26,7 @@
 #include <iterator>
 #include <numeric>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -33,74 +35,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // inclusive_scan
     namespace detail
     {
-        template <typename ExPolicy, typename Result, typename Algo, typename Tag>
-        struct segmented_scan_partitioner1;
-
-        template <typename ExPolicy, typename Result, typename Algo>
-        struct segmented_scan_partitioner1<ExPolicy, Result, Algo,
-            parallel::traits::static_partitioner_tag>
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        OutIter merge_inclusive_scan(InIter first, InIter last,
+            OutIter dest, T init, Op && op)
         {
-            template <typename ExPolicy_, typename InIter, typename Op>
-            static Result call(ExPolicy_ && policy,
-                InIter first, InIter last, Op && op)
+            // add init to each element
+            for (/* */; first != last; (void) ++first, ++dest)
             {
-                typedef typename std::iterator_traits<InIter>::value_type value_type;
-
-                Result result(std::distance(first, last));
-
-                if (result.size() != 0) {
-                    result[0] = *first;
-
-                    Algo::parallel(policy, first+1, last, result.begin()+1,
-                        std::forward<value_type>(*first), op);
-                }
-
-                return result;
+                *dest = op(init, *first);
             }
-        };
-
-        template <typename Result, typename Algo>
-        struct segmented_scan_partitioner1<parallel_task_execution_policy, Result, Algo,
-            parallel::traits::static_partitioner_tag>
-        {
-            template <typename ExPolicy, typename InIter, typename Op>
-            static hpx::future<Result> call(ExPolicy && policy,
-                InIter first, InIter last, Op && op)
-            {
-                typedef typename std::iterator_traits<InIter>::value_type value_type;
-
-                Result result(std::distance(first, last));
-                if (result.size() != 0) {
-                    result[0] = *first;
-                }
-
-                return dataflow(
-                    [=]() mutable
-                    {
-                        Algo::parallel(policy,
-                            first+1, last, result.begin()+1,
-                            std::forward<value_type>(*first), std::forward<Op>(op)).wait();
-
-                        return result;
-                    });
-            }
-        };
-
-        template <typename ExPolicy, typename Result, typename Algo>
-        struct segmented_scan_partitioner1<ExPolicy, Result, Algo,
-                parallel::traits::default_partitioner_tag>
-            : segmented_scan_partitioner1<ExPolicy, Result, Algo,
-                parallel::traits::static_partitioner_tag>
-        {};
-
-        template <typename ExPolicy, typename Result, typename Algo,
-            typename PartTag = typename parallel::traits::extract_partitioner<
-                typename hpx::util::decay<ExPolicy>::type
-            >::type>
-        struct segmented_scan_partitioner
-            : segmented_scan_partitioner1<
-                typename hpx::util::decay<ExPolicy>::type, Result, Algo, PartTag>
-        {};
+            return dest;
+        }
 
         template <typename Value>
         struct inclusive_scan_segmented
@@ -138,7 +83,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type value_type;
 
-                return segmented_scan_partitioner<ExPolicy, vector_type,
+                return util::segmented_scan_partitioner<ExPolicy, vector_type,
                     inclusive_scan<typename vector_type::iterator>>
                         ::call(
                     policy,
@@ -146,20 +91,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <typename InIter, typename OutIter, typename T, typename Op>
-        OutIter merge_inclusive_scan(InIter first, InIter last,
-            OutIter dest, T init, Op && op)
-        {
-            for (/* */; first != last; (void) ++first, ++dest)
-            {
-                *dest = op(init, *first);
-            }
-            return dest;
-        }
-
         // sequential remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter, typename T,
-            typename Op>
+        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
+            typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan(Algo && algo, ExPolicy const& policy, SegIter first,
             SegIter last, OutIter dest, T init, Op && op, std::true_type)
@@ -241,8 +175,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         // parallel remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter, typename T,
-            typename Op>
+        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
+            typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan(Algo && algo, ExPolicy const& policy, SegIter first,
             SegIter last, OutIter dest, T init, Op && op, std::false_type)
@@ -266,7 +200,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             segment_iterator send = traits::segment(last);
 
             difference_type count = std::distance(sit, send);
-
 
             typedef typename std::vector<T> vector_type;
             std::vector<shared_future<vector_type>> results;
@@ -345,8 +278,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             workitems.push_back(make_ready_future(std::forward<T>(init)));
 
             std::size_t segment_index = 0;
-            std::size_t final_index = 0;
-            std::size_t work_index = 0;
 
             for (auto const& res : results) {
 
