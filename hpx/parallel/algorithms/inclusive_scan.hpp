@@ -269,17 +269,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_output_iterator<OutIter>::value ||
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
-/*
-            typedef std::integral_constant<bool,
-                    is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value ||
-                   !hpx::traits::is_forward_iterator<OutIter>::value
-                > is_seq;
 
-            return detail::inclusive_scan<OutIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest, std::move(init), std::forward<Op>(op));
-            */
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::inclusive_scan_(
@@ -369,9 +359,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 
-        return detail::inclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, std::move(init), std::plus<T>());
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+
+        return detail::inclusive_scan_(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            std::move(init), std::plus<T>(),
+            is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -453,9 +446,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
-        return detail::inclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, value_type(), std::plus<value_type>());
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+
+        return detail::inclusive_scan_(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            value_type(), std::plus<value_type>(),
+            is_segmented());
     }
 }}}
 
