@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace executors
             }
 
         protected:
-            static threads::thread_state_enum thread_function_nullary(
+            static threads::thread_result_type thread_function_nullary(
                 closure_type func);
 
             // Return the requested policy element

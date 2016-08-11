@@ -126,11 +126,11 @@ namespace hpx { namespace detail
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
             if (hpx::detail::has_async_policy(launch_policy))
             {
-                p.apply(launch_policy);
+                threads::thread_id_type tid = p.apply(launch_policy);
                 if (launch_policy == launch::fork)
                 {
                     // make sure this thread is executed last
-                    hpx::this_thread::yield();
+                    hpx::this_thread::yield_to(thread::id(std::move(tid)));
                 }
             }
             return p.get_future();

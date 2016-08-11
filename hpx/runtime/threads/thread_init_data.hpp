@@ -67,7 +67,7 @@ namespace hpx { namespace threads
         {}
 
         template <typename F>
-        thread_init_data(F&& f, util::thread_description const& desc,
+        thread_init_data(F && f, util::thread_description const& desc,
                 naming::address::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1),

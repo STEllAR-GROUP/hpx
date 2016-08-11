@@ -99,7 +99,9 @@ struct managed_refcnt_monitor
         threads::set_thread_state(threads::get_self_id(), d, threads::pending);
 
         // Suspend this pxthread.
-        threads::get_self().yield(threads::suspended);
+        threads::get_self().yield(
+            threads::thread_result_type(threads::suspended, nullptr)
+        );
 
         return flag_.is_ready();
     }
