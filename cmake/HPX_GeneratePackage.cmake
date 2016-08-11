@@ -18,7 +18,9 @@ export(TARGETS ${HPX_EXPORT_TARGETS}
 #  NAMESPACE hpx::
 )
 
-export(PACKAGE ${HPX_PACKAGE_NAME})
+if(HPX_WITH_EXPORT_PACKAGE)
+  export(PACKAGE ${HPX_PACKAGE_NAME})
+endif()
 
 # Generate library list for pkg config ...
 set(_is_debug FALSE)
