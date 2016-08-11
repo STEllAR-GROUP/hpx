@@ -15,52 +15,19 @@
 #include <iomanip>
 #include <iostream>
 
-namespace hpx { namespace naming { namespace detail
-{
-    struct name_serialization_data
-    {
-        gid_type locality_;
-        address::component_type type_;
-        address::address_type address_;
-        address::address_type offset_;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned)
-        {
-            ar & locality_ & type_ & address_ & offset_;
-        }
-    };
-}}}
-
-HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::name_serialization_data)
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
     template <typename Archive>
     void address::save(Archive& ar, const unsigned int version) const
     {
-        detail::name_serialization_data data{
-            locality_, type_, address_, offset_};
-        ar << data;
+        ar & locality_ & type_ & address_;
     }
 
     template <typename Archive>
     void address::load(Archive& ar, const unsigned int version)
     {
-        if (version > HPX_ADDRESS_VERSION)
-        {
-            HPX_THROW_EXCEPTION(version_too_new,
-                "address::load",
-                "trying to load address with unknown version");
-        }
-
-        detail::name_serialization_data data;
-        ar >> data;
-        locality_ = data.locality_;
-        type_ = data.type_;
-        address_ = data.address_;
-        offset_ = data.offset_;
+        ar & locality_ & type_ & address_;
     }
 
     template HPX_EXPORT
