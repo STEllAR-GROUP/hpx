@@ -27,12 +27,11 @@ generate_parcel(hpx::id_type const& dest, hpx::id_type const& cont, T && data)
     hpx::naming::address addr;
     hpx::parcelset::parcel p(hpx::parcelset::detail::create_parcel::call(
         std::true_type(), std::true_type(),
-        dest, addr,
+        dest, std::move(addr),
         hpx::actions::typed_continuation<hpx::id_type>(cont),
         Action(), hpx::threads::thread_priority_normal,
         std::forward<T>(data)));
 
-    p.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
     p.set_source_id(hpx::find_here());
 
     return p;

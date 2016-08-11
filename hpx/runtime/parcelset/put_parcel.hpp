@@ -30,14 +30,14 @@ namespace hpx { namespace parcelset {
                 std::true_type /* Continuation */,
                 std::true_type /* Action */,
                 naming::id_type const& dest,
-                naming::address const& addr,
+                naming::address&& addr,
                 Continuation&& cont,
                 Action,
                 Args&&... args)
             {
                 return parcel(
                     dest,
-                    addr,
+                    std::move(addr),
                     std::unique_ptr<actions::continuation>(
                         new typename util::decay<Continuation>::type(
                             std::forward<Continuation>(cont)
@@ -55,7 +55,7 @@ namespace hpx { namespace parcelset {
                 std::false_type /* Continuation */,
                 std::true_type /* Action */,
                 naming::id_type const& dest,
-                naming::address const& addr,
+                naming::address&& addr,
                 std::unique_ptr<actions::continuation> cont,
                 Action,
                 Args&&... args)
@@ -64,7 +64,7 @@ namespace hpx { namespace parcelset {
                     "We need an action to construct a parcel");
                 return parcel(
                     dest,
-                    addr,
+                    std::move(addr),
                     std::move(cont),
                     std::unique_ptr<actions::base_action>(
                         new actions::transfer_action<Action>(
@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset {
                 std::false_type /* Continuation */,
                 std::false_type /* Action */,
                 naming::id_type const& dest,
-                naming::address addr,
+                naming::address&& addr,
                 Action,
                 Args&&... args)
             {
@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset {
                     "We need an action to construct a parcel");
                 return parcel(
                     dest,
-                    addr,
+                    std::move(addr),
                     std::unique_ptr<actions::continuation>(),
                     std::unique_ptr<actions::base_action>(
                         new actions::transfer_action<Action>(
@@ -101,7 +101,7 @@ namespace hpx { namespace parcelset {
 
     template <typename... Args>
     void put_parcel(
-        naming::id_type const& dest, naming::address addr, Args&&... args)
+        naming::id_type const& dest, naming::address&& addr, Args&&... args)
     {
         typedef
             typename util::detail::at_index<0, Args...>::type
@@ -134,7 +134,7 @@ namespace hpx { namespace parcelset {
 
     template <typename Callback, typename... Args>
     void put_parcel_cb(Callback&& cb,
-        naming::id_type const& dest, naming::address addr, Args&&... args)
+        naming::id_type const& dest, naming::address&& addr, Args&&... args)
     {
         typedef
             typename util::detail::at_index<0, Args...>::type

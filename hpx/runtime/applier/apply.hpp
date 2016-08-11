@@ -40,14 +40,14 @@ namespace hpx
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Action>
-        inline naming::address& complement_addr(naming::address& addr)
+        inline naming::address&& complement_addr(naming::address& addr)
         {
             if (components::component_invalid == addr.type_)
             {
                 addr.type_ = components::get_component_type<
                     typename Action::component_type>();
             }
-            return addr;
+            return std::move(addr);
         }
 
         template <typename Action, typename ...Ts>
@@ -60,7 +60,7 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel(id, complement_addr<action_type>(addr),
+            parcelset::put_parcel(id, std::move(complement_addr<action_type>(addr)),
                 act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
@@ -77,7 +77,7 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel(id, complement_addr<action_type>(addr),
+            parcelset::put_parcel(id, std::move(complement_addr<action_type>(addr)),
                 std::forward<Continuation>(cont),
                 act, priority, std::forward<Ts>(vs)...);
 
@@ -95,7 +95,8 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel_cb(cb, id, complement_addr<action_type>(addr),
+            parcelset::put_parcel_cb(cb, id,
+                std::move(complement_addr<action_type>(addr)),
                 act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
@@ -112,7 +113,8 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel_cb(std::move(cb), id, complement_addr<action_type>(addr),
+            parcelset::put_parcel_cb(std::move(cb), id,
+                std::move(complement_addr<action_type>(addr)),
                 act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
@@ -130,7 +132,8 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel_cb(cb, id, complement_addr<action_type>(addr),
+            parcelset::put_parcel_cb(cb, id,
+                std::move(complement_addr<action_type>(addr)),
                 std::forward<Continuation>(cont),
                 act, priority, std::forward<Ts>(vs)...);
 
@@ -149,7 +152,8 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel_cb(std::move(cb), id, complement_addr<action_type>(addr),
+            parcelset::put_parcel_cb(std::move(cb), id,
+                std::move(complement_addr<action_type>(addr)),
                 std::forward<Continuation>(cont),
                 act, priority, std::forward<Ts>(vs)...);
 
@@ -394,7 +398,7 @@ namespace hpx
                 .sync_put_parcel(
                     parcelset::detail::create_parcel::call(
                         std::false_type(), std::false_type(),
-                        id, complement_addr<action_type_>(addr),
+                        id, std::move(complement_addr<action_type_>(addr)),
                         action_type_(), priority
                     )
                 );

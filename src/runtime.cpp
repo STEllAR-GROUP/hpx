@@ -10,7 +10,6 @@
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>

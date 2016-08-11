@@ -16,36 +16,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // generate unique parcel id
-    naming::gid_type parcel::generate_unique_id(
-        boost::uint32_t locality_id_default)
-    {
-        static boost::atomic<boost::uint64_t> id(0);
-
-        error_code ec(lightweight);        // ignore all errors
-        boost::uint32_t locality_id = hpx::get_locality_id(ec);
-        if (locality_id == naming::invalid_locality_id)
-            locality_id = locality_id_default;
-
-        naming::gid_type result = naming::get_gid_from_locality_id(locality_id);
-        result.set_lsb(++id);
-        return result;
-    }
-
     void parcel::serialize(serialization::input_archive & ar, unsigned)
     {
         ar & data_;
-        if(data_.has_source_id_)
-        {
-            ar & source_id_;
-        }
-        else
-        {
-            source_id_ = naming::invalid_id;
-        }
         ar & dest_;
-        ar & addr_;
         ar & cont_;
         ar & action_;
     }
@@ -53,12 +27,7 @@ namespace hpx { namespace parcelset
     void parcel::serialize(serialization::output_archive & ar, unsigned)
     {
         ar & data_;
-        if(data_.has_source_id_)
-        {
-            ar & source_id_;
-        }
         ar & dest_;
-        ar & addr_;
         ar & cont_;
         ar & action_;
     }
@@ -66,7 +35,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
-        os << "(" << p.dest_ << ":" << p.addr_ << ":";
+        os << "(" << p.destination() << ":" << p.addr() << ":";
         os << p.action_->get_action_name() << ")";
 
         return os;
