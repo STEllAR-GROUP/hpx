@@ -671,6 +671,10 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::actions::base_lco_with_value_hpx_agas_response_vector_get,
     hpx::actions::base_lco_with_value_hpx_agas_response_vector_set)
 
+HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(
+    typed_continuation_hpx_agas_response_type,
+    hpx::actions::typed_continuation_hpx_agas_response)
+
 typedef base_lco_with_value<bool, response> base_lco_bool_response_type;
 HPX_REGISTER_ACTION_ID(
     base_lco_bool_response_type::set_value_action,

@@ -665,6 +665,9 @@ namespace hpx { namespace actions
         base_lco_with_value_std_bool_ptrdiff_get,
         base_lco_with_value_std_bool_ptrdiff_set,
 
+        // typed continuations...
+        typed_continuation_hpx_agas_response,
+
         last_action_id
     };
 
