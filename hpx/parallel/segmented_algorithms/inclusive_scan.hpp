@@ -77,9 +77,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return dataflow(
                     [=]() mutable
                     {
+                        std::cout << "result before" << std::endl;
                         Algo::parallel(policy,
                             first+1, last, result.begin()+1,
                             std::forward<value_type>(*first), std::forward<Op>(op)).wait();
+                        std::cout << "result after" << std::endl;
 
                         return result;
                     });
@@ -345,6 +347,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             workitems.push_back(make_ready_future(std::forward<T>(init)));
 
             std::size_t segment_index = 0;
+            std::size_t final_index = 0;
+            std::size_t work_index = 0;
 
             for (auto const& res : results) {
 
@@ -355,6 +359,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::util::unwrapped(
                             [&, dest](T last_value, vector_type r)
                             {
+                                std::cout << "finalitems: " << final_index++ << std::endl;
                                 merge_inclusive_scan(r.begin(),
                                     r.end(), dest, last_value, op);
                             }
@@ -376,6 +381,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             hpx::util::unwrapped(
                                 [&](vector_type r)
                                 {
+                                    std::cout << "workitems: " << work_index++ << std::endl;
                                     return *(r.end()-1);
                                 }
                             ), res
