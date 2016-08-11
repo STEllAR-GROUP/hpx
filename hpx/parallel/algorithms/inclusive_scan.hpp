@@ -118,7 +118,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         T part_init = get<0>(*part_begin);
                         get<1>(*part_begin++) = part_init;
-
                         return sequential_inclusive_scan_n(
                             get<0>(part_begin.get_iterator_tuple()),
                             part_size-1,
@@ -354,12 +353,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::inclusive_scan_(
@@ -438,12 +431,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_output_iterator<OutIter>::value ||
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
 
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
