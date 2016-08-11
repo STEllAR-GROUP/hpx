@@ -58,13 +58,13 @@ void run_template_accumulator(char const* type)
         {
             // try to interpret the entered command
             if (cmd[0] == "reset") {
-                accu.reset_sync();
+                accu.reset();
             }
             else if (cmd[0] == "add") {
                 if (cmd.size() == 2) {
                     try {
                         double val = boost::lexical_cast<double>(cmd[1]);
-                        accu.add_sync(argument_type(val));
+                        accu.add(argument_type(val));
                     }
                     catch (boost::bad_lexical_cast const&) {
                         std::cout << "error: invalid argument for add: '"
@@ -78,7 +78,7 @@ void run_template_accumulator(char const* type)
                 }
             }
             else if (cmd[0] == "query") {
-                std::cout << accu.query_sync() << std::endl;
+                std::cout << accu.query() << std::endl;
             }
             else if (cmd[0] == "help") {
                 std::cout << help << std::endl;

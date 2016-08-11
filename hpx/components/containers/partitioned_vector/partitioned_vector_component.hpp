@@ -22,6 +22,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/get_ptr.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
@@ -618,10 +619,17 @@ namespace hpx
         /// \return Returns the value of the element at position represented
         ///         by \a pos
         ///
-        T get_value_sync(std::size_t pos) const
+        T get_value(launch::sync_policy, std::size_t pos) const
         {
             return get_value(pos).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        T get_value_sync(std::size_t pos) const
+        {
+            return get_value(launch::sync, pos);
+        }
+#endif
 
         /// Return the element at the position \a pos in the
         /// partitioned_vector_partition container.
@@ -645,10 +653,18 @@ namespace hpx
         /// \return Returns the value of the element at position represented
         ///         by \a pos
         ///
-        std::vector<T> get_values_sync(std::vector<std::size_t> const& pos) const
+        std::vector<T> get_values(launch::sync_policy,
+            std::vector<std::size_t> const& pos) const
         {
             return get_values(pos).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        std::vector<T> get_values_sync(std::vector<std::size_t> const& pos) const
+        {
+            return get_values(launch::sync, pos);
+        }
+#endif
 
         /// Return the element at the position \a pos in the
         /// partitioned_vector_partition container.
@@ -714,10 +730,18 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value_sync(std::size_t pos, T_ && val)
+        void set_value(launch::sync_policy, std::size_t pos, T_ && val)
         {
             set_value(pos, std::forward<T_>(val)).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        template <typename T_>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void set_value_sync(std::size_t pos, T_ && val)
+        {
+            set_value(launch::sync, pos, std::forward<T_>(val));
+        }
+#endif
 
         /// Copy the value of \a val in the element at position
         /// \a pos in the partitioned_vector_partition component.
@@ -741,11 +765,19 @@ namespace hpx
         /// \param pos   Position of the element in the partitioned_vector_partition
         /// \param val   The value to be copied
         ///
-        void set_values_sync(std::vector<std::size_t> const& pos,
-            std::vector<T> const& val)
+        void set_values(launch::sync_policy,
+            std::vector<std::size_t> const& pos, std::vector<T> const& val)
         {
             set_values(pos, val).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void set_values_sync(std::vector<std::size_t> const& pos,
+            std::vector<T> const& val)
+        {
+            set_values(launch::sync, pos, val);
+        }
+#endif
 
         /// Copy the value of \a val in the element at position
         /// \a pos in the partitioned_vector_partition component.
@@ -774,10 +806,17 @@ namespace hpx
         ///
         /// \return This returns the data of the partitioned_vector_partition
         ///
-        typename server_type::data_type get_copied_data_sync() const
+        typename server_type::data_type get_copied_data(launch::sync_policy) const
         {
             return get_copied_data().get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        typename server_type::data_type get_copied_data_sync() const
+        {
+            return get_copied_data(launch::sync);
+        }
+#endif
 
         /// Returns a copy of the data owned by the partitioned_vector_partition
         /// component.
@@ -796,10 +835,18 @@ namespace hpx
         ///
         /// \return This returns the data of the partition_vector
         ///
-        void set_data_sync(typename server_type::data_type && other) const
+        void set_data(launch::sync_policy,
+            typename server_type::data_type && other) const
         {
             set_data(std::move(other)).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void set_data_sync(typename server_type::data_type && other) const
+        {
+            set_data(launch::sync, std::move(other));
+        }
+#endif
 
         /// Updates the data owned by the partition_vector
         /// component.

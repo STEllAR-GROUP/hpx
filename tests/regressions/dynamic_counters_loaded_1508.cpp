@@ -24,7 +24,7 @@ int hpx_main(int argc, char ** argv)
         using hpx::performance_counters::counter_value;
         using hpx::performance_counters::status_is_valid;
 
-        counter_value value = memory.get_counter_value_sync();
+        counter_value value = memory.get_counter_value(hpx::launch::sync);
         HPX_TEST(status_is_valid(value.status_));
 
         double val = value.get_value<double>();

@@ -79,9 +79,9 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
         using hpx::performance_counters::counter_value;
         using hpx::performance_counters::status_is_valid;
 
-        counter_value value1 = sine_explicit.get_counter_value_sync();
-        counter_value value2 = sine_implicit.get_counter_value_sync();
-        counter_value value3 = sine_average.get_counter_value_sync();
+        counter_value value1 = sine_explicit.get_counter_value(hpx::launch::sync);
+        counter_value value2 = sine_implicit.get_counter_value(hpx::launch::sync);
+        counter_value value3 = sine_average.get_counter_value(hpx::launch::sync);
 
         if (status_is_valid(value1.status_))
         {

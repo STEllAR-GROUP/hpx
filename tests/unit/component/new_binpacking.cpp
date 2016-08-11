@@ -70,7 +70,7 @@ std::vector<hpx::id_type> test_binpacking_multiple()
         hpx::performance_counters::performance_counter instances(
             counter_name, localities[i]);
 
-        count += instances.get_value_sync<boost::uint64_t>();
+        count += instances.get_value<boost::uint64_t>(hpx::launch::sync);
     }
 
     // now use bin-packing policy to fill up the number of instances
@@ -84,7 +84,8 @@ std::vector<hpx::id_type> test_binpacking_multiple()
         hpx::performance_counters::performance_counter instances(
             counter_name, localities[i]);
 
-        boost::uint64_t c = instances.get_value_sync<boost::uint64_t>();
+        boost::uint64_t c =
+            instances.get_value<boost::uint64_t>(hpx::launch::sync);
         new_count += c;
 
         HPX_TEST_EQ(c, localities.size()+1);
@@ -121,14 +122,16 @@ void test_binpacking_single()
 
     hpx::performance_counters::performance_counter instances(
         counter_name, localities[0]);
-    boost::uint64_t before = instances.get_value_sync<boost::uint64_t>();
+    boost::uint64_t before =
+        instances.get_value<boost::uint64_t>(hpx::launch::sync);
 
     // now use bin-packing policy to create one more instance
     hpx::id_type filled_target = hpx::new_<test_server>(
         hpx::binpacked(localities)).get();
 
     // now, the first locality should have one more instance
-    boost::uint64_t after = instances.get_value_sync<boost::uint64_t>();
+    boost::uint64_t after =
+        instances.get_value<boost::uint64_t>(hpx::launch::sync);
 
     HPX_TEST_EQ(before+1, after);
 }

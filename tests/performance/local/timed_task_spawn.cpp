@@ -88,7 +88,7 @@ void print_results(
     std::vector<hpx::performance_counters::counter_value> counter_values;
 
     if (ac)
-        counter_values = ac->evaluate_counters_sync();
+        counter_values = ac->evaluate_counters(hpx::launch::sync);
 
     if (csv_header)
     {

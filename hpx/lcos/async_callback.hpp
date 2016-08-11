@@ -41,7 +41,7 @@ namespace hpx { namespace detail
                     Action
                 >::remote_result_type
             >::type>
-        call(launch launch_policy,
+        call(Policy launch_policy,
             naming::id_type const& id, Callback&& cb, Ts&&... ts)
         {
             return hpx::detail::async_cb_impl<Action>(launch_policy, id,
@@ -57,7 +57,7 @@ namespace hpx { namespace detail
                     Action
                 >::remote_result_type
             >::type>
-        call(launch launch_policy,
+        call(Policy launch_policy,
             components::client_base<Client, Stub> const& c, Callback&& cb,
             Ts&&... ts)
         {
@@ -87,7 +87,7 @@ namespace hpx { namespace detail
                 >::type
             >
         >::type
-        call(launch launch_policy,
+        call(Policy launch_policy,
             DistPolicy const& policy, Callback&& cb, Ts&&... ts)
         {
             return policy.template async_cb<Action>(launch_policy,
@@ -110,8 +110,8 @@ namespace hpx { namespace detail
         call(naming::id_type const& id, Callback&& cb, Ts&&... ts)
         {
             return async_cb_action_dispatch<
-                    Action, launch
-                >::call(launch::all, id, std::forward<Callback>(cb),
+                    Action, hpx::detail::async_policy
+                >::call(launch::async, id, std::forward<Callback>(cb),
                     std::forward<Ts>(ts)...);
         }
     };
@@ -144,8 +144,8 @@ namespace hpx { namespace detail
                 "The action to invoke is not supported by the target");
 
             return async_cb_action_dispatch<
-                    Action, launch
-                >::call(launch::all, c.get_id(), std::forward<Callback>(cb),
+                    Action, hpx::detail::async_policy
+                >::call(launch::async, c.get_id(), std::forward<Callback>(cb),
                     std::forward<Ts>(ts)...);
         }
     };
@@ -168,8 +168,8 @@ namespace hpx { namespace detail
         call(DistPolicy const& policy, Callback&& cb, Ts&&... ts)
         {
             return async_cb_action_dispatch<
-                    Action, launch
-                >::call(launch::all, policy, std::forward<Callback>(cb),
+                    Action, hpx::detail::async_policy
+                >::call(launch::async, policy, std::forward<Callback>(cb),
                     std::forward<Ts>(ts)...);
         }
     };
@@ -273,7 +273,7 @@ namespace hpx { namespace detail
                     Derived
                 >::remote_result_type
             >::type>
-        call(launch launch_policy,
+        call(Policy launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&,
             naming::id_type const& id, Callback&& cb, Ts&&... ts)
         {
@@ -281,7 +281,8 @@ namespace hpx { namespace detail
                 std::forward<Callback>(cb), std::forward<Ts>(ts)...);
         }
 
-        template <typename Component, typename Signature, typename Derived,
+        template <
+            typename Component, typename Signature, typename Derived,
             typename Client, typename Stub, typename Callback, typename ...Ts>
         HPX_FORCEINLINE static
         lcos::future<
@@ -290,7 +291,7 @@ namespace hpx { namespace detail
                     Derived
                 >::remote_result_type
             >::type>
-        call(launch launch_policy,
+        call(Policy launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&,
             components::client_base<Client, Stub> const& c, Callback&& cb,
             Ts&&... ts)
@@ -307,7 +308,8 @@ namespace hpx { namespace detail
                 std::forward<Callback>(cb), std::forward<Ts>(ts)...);
         }
 
-        template <typename Component, typename Signature, typename Derived,
+        template <
+            typename Component, typename Signature, typename Derived,
             typename DistPolicy, typename Callback, typename ...Ts>
         HPX_FORCEINLINE static
         lcos::future<
@@ -316,7 +318,7 @@ namespace hpx { namespace detail
                     Derived
                 >::remote_result_type
             >::type>
-        call(launch launch_policy,
+        call(Policy launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&,
             DistPolicy const& policy, Callback&& cb, Ts&&... ts)
         {

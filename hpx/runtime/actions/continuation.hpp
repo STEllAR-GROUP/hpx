@@ -359,6 +359,7 @@ namespace hpx { namespace actions
         {
             try {
                 HPX_ASSERT(result.is_ready());
+                result.get();                   // rethrow exceptions
                 cont->trigger();
             }
             catch (...) {
