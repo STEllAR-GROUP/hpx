@@ -6,11 +6,13 @@
 #ifndef HPX_RUNTIME_ACTIONS_FWD_HPP
 #define HPX_RUNTIME_ACTIONS_FWD_HPP
 
+#include <hpx/config.hpp>
+
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
-    struct HPX_API_EXPORT base_action;
+    struct HPX_EXPORT base_action;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>

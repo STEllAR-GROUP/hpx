@@ -394,14 +394,17 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             // Send the parcel through the parcel handler
-            hpx::get_runtime().get_parcel_handler()
-                .sync_put_parcel(
-                    parcelset::detail::create_parcel::call(
-                        std::false_type(), std::false_type(),
-                        id, std::move(complement_addr<action_type_>(addr)),
-                        action_type_(), priority
-                    )
+            HPX_ASSERT(id.get_management_type() == naming::id_type::unmanaged);
+            naming::gid_type gid = id.get_gid();
+            parcelset::parcel p =
+                parcelset::detail::create_parcel::call(
+                    std::false_type(), std::false_type(),
+                    std::move(gid), std::move(complement_addr<action_type_>(addr)),
+                    action_type_(), priority
                 );
+            p.size() = 4096;
+            hpx::get_runtime().get_parcel_handler()
+                .sync_put_parcel(std::move(p));
             return false;     // destination is remote
         }
 

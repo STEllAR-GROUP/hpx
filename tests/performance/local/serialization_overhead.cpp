@@ -9,6 +9,8 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <hpx/runtime/serialization/detail/preprocess.hpp>
+
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -16,6 +18,8 @@
 #include <fstream>
 #include <iterator>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 // This function will never be called
@@ -30,7 +34,7 @@ std::size_t get_archive_size(hpx::parcelset::parcel const& p,
     std::vector<hpx::serialization::serialization_chunk>* chunks)
 {
     // gather the required size for the archive
-    hpx::serialization::detail::size_gatherer_container gather_size;
+    hpx::serialization::detail::preprocess gather_size;
     hpx::serialization::output_archive archive(
         gather_size, flags, 0, chunks);
     archive << p;
@@ -91,10 +95,11 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp;
+    hpx::naming::gid_type dest = here.get_gid();
     if (continuation) {
         outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
             std::true_type(), std::true_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action(), hpx::threads::thread_priority_normal, buffer
             ));
@@ -102,7 +107,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     else {
         outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
             std::false_type(), std::false_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             test_action(), hpx::threads::thread_priority_normal, buffer));
     }
 

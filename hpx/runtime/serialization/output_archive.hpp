@@ -21,6 +21,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <unordered_map>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -32,20 +33,17 @@ namespace hpx { namespace serialization
     {
         typedef basic_archive<output_archive> base_type;
 
-        typedef std::list<naming::gid_type> new_gids_type;
-        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+        typedef std::unordered_map<naming::gid_type, naming::gid_type> splitted_gids_type;
 
         template <typename Container>
         output_archive(Container & buffer,
             boost::uint32_t flags = 0U,
             boost::uint32_t dest_locality_id = ~0U,
             std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr,
-            new_gids_map* new_gids = nullptr)
+            binary_filter* filter = nullptr)
             : base_type(flags)
             , buffer_(new output_container<Container>(buffer, chunks, filter))
             , dest_locality_id_(dest_locality_id)
-            , new_gids_(new_gids)
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
@@ -68,14 +66,14 @@ namespace hpx { namespace serialization
             }
         }
 
-        bool is_saving() const
+        void set_splitted_gids(splitted_gids_type& splitted_gids)
         {
-            return buffer_->is_saving();
+            splitted_gids_ = &splitted_gids;
         }
 
-        bool is_future_awaiting() const
+        bool is_preprocessing() const
         {
-            return buffer_->is_future_awaiting();
+            return buffer_->is_preprocessing();
         }
 
         template <typename Future>
@@ -97,6 +95,8 @@ namespace hpx { namespace serialization
 
         void add_gid(naming::gid_type const & gid,
             naming::gid_type const & splitted_gid);
+
+        bool has_gid(naming::gid_type const & gid);
 
         naming::gid_type get_new_gid(naming::gid_type const & gid);
 
@@ -293,7 +293,7 @@ namespace hpx { namespace serialization
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
         boost::uint32_t dest_locality_id_;
-        new_gids_map * new_gids_;
+        splitted_gids_type * splitted_gids_;
     };
 }}
 

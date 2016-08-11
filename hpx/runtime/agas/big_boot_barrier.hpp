@@ -26,6 +26,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -104,8 +105,9 @@ struct HPX_EXPORT big_boot_barrier
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
         parcelset::parcel p(
             parcelset::detail::create_parcel::call(std::false_type(), std::false_type(),
-                naming::get_id_from_locality_id(target_locality_id),
+                naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
+        p.size() = 4096;
         pp->send_early_parcel(dest, std::move(p));
     } // }}}
 
@@ -120,8 +122,9 @@ struct HPX_EXPORT big_boot_barrier
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
         parcelset::parcel p(
             parcelset::detail::create_parcel::call(std::false_type(), std::false_type(),
-                naming::get_id_from_locality_id(target_locality_id),
+                naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
+        p.size() = 4096;
         get_runtime().get_parcel_handler().put_parcel(std::move(p));
     } // }}}
 

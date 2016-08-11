@@ -118,25 +118,12 @@ namespace hpx
                     }
                 }
             }
-
-            inline std::size_t
-            get_archive_size(parcel const& p, boost::uint32_t flags,
-                boost::uint32_t dest_locality_id,
-                std::vector<serialization::serialization_chunk>* chunks)
-            {
-                // gather the required size for the archive
-                hpx::serialization::detail::size_gatherer_container gather_size;
-                hpx::serialization::output_archive archive(
-                    gather_size, flags, dest_locality_id, chunks);
-                archive << p;
-                return gather_size.size();
-            }
         }
 
-        template <typename Buffer, typename NewGids>
+        template <typename Buffer>
         std::size_t
         encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
-            int archive_flags_, boost::uint64_t max_outbound_size, NewGids new_gids)
+            int archive_flags_, boost::uint64_t max_outbound_size)
         {
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
@@ -147,8 +134,12 @@ namespace hpx
             std::size_t parcels_sent = 0;
 
             std::size_t parcels_size = 1;
+
             if(num_parcels != std::size_t(-1))
+            {
+                arg_size = sizeof(boost::int64_t);
                 parcels_size = num_parcels;
+            }
 
             // guard against serialization errors
             try {
@@ -170,8 +161,7 @@ namespace hpx
                     {
                         if (arg_size >= max_outbound_size)
                             break;
-                        arg_size += detail::get_archive_size(ps[parcels_sent],
-                            archive_flags, dest_locality_id, &buffer.chunks_);
+                        arg_size += ps[parcels_sent].size();
                     }
 
                     buffer.data_.reserve((std::max)(chunk_default, arg_size));
@@ -189,8 +179,7 @@ namespace hpx
                           , archive_flags
                           , dest_locality_id
                           , &buffer.chunks_
-                          , filter.get()
-                          , new_gids);
+                          , filter.get());
 
                         if(num_parcels != std::size_t(-1))
                             archive << parcels_sent; //-V128
@@ -198,9 +187,11 @@ namespace hpx
                         for(std::size_t i = 0; i != parcels_sent; ++i)
                         {
                             LPT_(debug) << ps[i];
+                            archive.set_splitted_gids(ps[i].splitted_gids());
                             archive << ps[i];
                         }
 
+                        HPX_ASSERT(arg_size >= archive.bytes_written());
                         arg_size = archive.bytes_written();
                     }
 

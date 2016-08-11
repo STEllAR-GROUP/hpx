@@ -417,7 +417,7 @@ namespace hpx { namespace applier
     void applier::schedule_action(parcelset::parcel p, std::size_t num_thread)
     {
         // fetch the set destination
-        naming::id_type const& id = p.destination();
+        naming::gid_type const& gid = p.destination();
         naming::address const& addr = p.addr();
 
         // decode the action-type in the parcel
@@ -486,12 +486,12 @@ namespace hpx { namespace applier
         }
         else if (comptype == components::component_memory)
         {
-            HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
+            HPX_ASSERT(naming::refers_to_virtual_memory(gid));
             lva = get_memory_raw_gid().get_lsb();
         }
 
         // make sure the target has not been migrated away
-        auto r = act->was_object_migrated(id, lva);
+        auto r = act->was_object_migrated(gid, lva);
         if (r.first)
         {
             // set continuation in outgoing parcel
@@ -542,14 +542,14 @@ namespace hpx { namespace applier
         if (!cont) {
             // No continuation is to be executed, register the plain
             // action and the local-virtual address.
-            act->schedule_thread(id, lva, threads::pending, num_thread);
+            act->schedule_thread(gid, lva, threads::pending, num_thread);
         }
         else {
             // This parcel carries a continuation, register a wrapper
             // which first executes the original thread function as
             // required by the action and triggers the continuations
             // afterwards.
-            act->schedule_thread(std::move(cont), id, lva,
+            act->schedule_thread(std::move(cont), gid, lva,
                 threads::pending, num_thread);
         }
     }

@@ -27,8 +27,7 @@ namespace hpx { namespace serialization
         template <typename Container>
         struct access_data
         {
-            static bool is_saving() { return true; }
-            static bool is_future_awaiting() { return false; }
+            static bool is_preprocessing() { return false; }
 
             static void await_future(
                 Container& cont
@@ -39,6 +38,11 @@ namespace hpx { namespace serialization
                     naming::gid_type const & gid,
                     naming::gid_type const & splitted_gid)
             {}
+
+            static bool has_gid(Container& cont, naming::gid_type const& gid)
+            {
+                return false;
+            }
 
             static void write(Container& cont, std::size_t count,
                 std::size_t current, void const* address)
@@ -145,14 +149,9 @@ namespace hpx { namespace serialization
             }
         }
 
-        bool is_saving() const
+        bool is_preprocessing() const
         {
-            return detail::access_data<Container>::is_saving();
-        }
-
-        bool is_future_awaiting() const
-        {
-            return detail::access_data<Container>::is_future_awaiting();
+            return detail::access_data<Container>::is_preprocessing();
         }
 
         void await_future(
@@ -166,6 +165,11 @@ namespace hpx { namespace serialization
             naming::gid_type const & splitted_gid)
         {
             detail::access_data<Container>::add_gid(cont_, gid, splitted_gid);
+        }
+
+        bool has_gid(naming::gid_type const & gid)
+        {
+            return detail::access_data<Container>::has_gid(cont_, gid);
         }
 
         void set_filter(binary_filter* filter) // override

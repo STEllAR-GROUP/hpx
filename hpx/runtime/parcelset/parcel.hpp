@@ -31,7 +31,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <vector>
+#include <unordered_map>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -52,6 +52,11 @@ namespace hpx { namespace parcelset
         HPX_MOVABLE_ONLY(parcel);
 
     private:
+
+        typedef
+            std::unordered_map<naming::gid_type, naming::gid_type>
+            splitted_gids_type;
+
 #if defined(HPX_DEBUG)
         bool is_valid() const
         {
@@ -60,7 +65,7 @@ namespace hpx { namespace parcelset
                 return true;
 
             // verify target destination
-            if (dest_ && data_.addr_.locality_)
+            if (data_.dest_ && data_.addr_.locality_)
             {
                 // if we have a destination we need an action as well
                 if (!action_)
@@ -97,13 +102,15 @@ namespace hpx { namespace parcelset
             data()
               : start_time_(0),
                 creation_time_(util::high_resolution_timer::now()),
-                source_id_(naming::invalid_gid)
+                source_id_(naming::invalid_gid),
+                dest_(naming::invalid_gid)
             {}
 
-            explicit data(naming::address&& addr)
+            data(naming::gid_type&& dest, naming::address&& addr)
               : start_time_(0),
                 creation_time_(util::high_resolution_timer::now()),
                 source_id_(naming::invalid_gid),
+                dest_(std::move(dest)),
                 addr_(std::move(addr))
             {}
 
@@ -111,11 +118,14 @@ namespace hpx { namespace parcelset
               : start_time_(rhs.start_time_),
                 creation_time_(rhs.creation_time_),
                 source_id_(std::move(rhs.source_id_)),
+                dest_(std::move(rhs.dest_)),
                 addr_(std::move(rhs.addr_))
             {
                 rhs.start_time_ = 0;
                 rhs.creation_time_ = 0;
+                rhs.creation_time_ = 0;
                 rhs.source_id_ = naming::invalid_gid;
+                rhs.dest_ = naming::invalid_gid;
                 rhs.addr_ = naming::address();
             }
 
@@ -124,11 +134,13 @@ namespace hpx { namespace parcelset
                 start_time_ = rhs.start_time_;
                 creation_time_ = rhs.creation_time_;
                 source_id_ = std::move(rhs.source_id_);
+                dest_ = std::move(rhs.dest_);
                 addr_ = std::move(rhs.addr_);
 
                 rhs.start_time_ = 0;
                 rhs.creation_time_ = 0;
                 rhs.source_id_ = naming::invalid_gid;
+                rhs.dest_ = naming::invalid_gid;
                 rhs.addr_ = naming::address();
                 return *this;
             }
@@ -139,12 +151,15 @@ namespace hpx { namespace parcelset
                 ar & start_time_;
                 ar & creation_time_;
                 ar & source_id_;
+                ar & dest_;
+                ar & addr_;
             }
 
             double start_time_;
             double creation_time_;
 
             naming::gid_type source_id_;
+            naming::gid_type dest_;
             naming::address addr_;
         };
 
@@ -152,26 +167,27 @@ namespace hpx { namespace parcelset
 
     private:
         parcel(
-            naming::id_type const& dest,
+            naming::gid_type&& dest,
             naming::address&& addr,
             std::unique_ptr<actions::continuation> cont,
             std::unique_ptr<actions::base_action> act
         )
-          : data_(std::move(addr)),
-            dest_(dest),
+          : data_(std::move(dest), std::move(addr)),
             cont_(std::move(cont)),
-            action_(std::move(act))
+            action_(std::move(act)),
+            size_(0)
         {
-            HPX_ASSERT(is_valid());
+//             HPX_ASSERT(is_valid());
         }
         friend struct detail::create_parcel;
     public:
 
         parcel(parcel && other)
           : data_(std::move(other.data_)),
-            dest_(std::move(other.dest_)),
             cont_(std::move(other.cont_)),
-            action_(std::move(other.action_))
+            action_(std::move(other.action_)),
+            splitted_gids_(std::move(other.splitted_gids_)),
+            size_(other.size_)
         {
             HPX_ASSERT(is_valid());
         }
@@ -179,9 +195,10 @@ namespace hpx { namespace parcelset
         parcel &operator=(parcel && other)
         {
             data_ = std::move(other.data_);
-            dest_ = std::move(other.dest_);
             cont_ = std::move(other.cont_);
             action_ = std::move(other.action_);
+            splitted_gids_ = std::move(other.splitted_gids_);
+            size_ = other.size_;
 
             other.reset();
 
@@ -192,7 +209,6 @@ namespace hpx { namespace parcelset
         void reset()
         {
             data_ = data();
-            dest_ = hpx::naming::invalid_id;
             cont_.reset();
             action_.reset();
         }
@@ -225,10 +241,16 @@ namespace hpx { namespace parcelset
             }
         }
 
-        naming::id_type const& destination() const
+        void set_destination_id(naming::gid_type&& dest)
         {
+            data_.dest_ = dest;
+            HPX_ASSERT(is_valid());
+        }
 
-            return dest_;
+        naming::gid_type const& destination() const
+        {
+            HPX_ASSERT(is_valid());
+            return data_.dest_;
         }
 
         naming::address const& addr() const
@@ -287,6 +309,26 @@ namespace hpx { namespace parcelset
             return action_ ? action_->does_termination_detection() : false;
         }
 
+        splitted_gids_type& splitted_gids() const
+        {
+            return const_cast<splitted_gids_type&>(splitted_gids_);
+        }
+
+        void set_splitted_gids(splitted_gids_type&& splitted_gids)
+        {
+            splitted_gids_ = std::move(splitted_gids);
+        }
+
+        std::size_t const& size() const
+        {
+            return size_;
+        }
+
+        std::size_t & size()
+        {
+            return size_;
+        }
+
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);
 
@@ -297,10 +339,11 @@ namespace hpx { namespace parcelset
         void serialize(serialization::output_archive & ar, unsigned);
 
         data data_;
-
-        naming::id_type dest_;
         std::unique_ptr<actions::continuation> cont_;
         std::unique_ptr<actions::base_action> action_;
+
+        splitted_gids_type splitted_gids_;
+        std::size_t size_;
     };
 
     HPX_EXPORT std::string dump_parcel(parcel const& p);

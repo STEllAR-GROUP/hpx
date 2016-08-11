@@ -226,17 +226,17 @@ namespace hpx { namespace actions
         virtual bool does_termination_detection() const = 0;
 
         /// Perform thread initialization
-        virtual void schedule_thread(naming::id_type const& target,
+        virtual void schedule_thread(naming::gid_type const& target,
             naming::address::address_type lva,
             threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
 
         virtual void schedule_thread(std::unique_ptr<continuation> cont,
-            naming::id_type const& target, naming::address::address_type lva,
+            naming::gid_type const& target, naming::address::address_type lva,
             threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
 
         /// Return whether the given object was migrated
         virtual std::pair<bool, components::pinned_ptr>
-            was_object_migrated(hpx::id_type const&,
+            was_object_migrated(hpx::naming::gid_type const&,
                 naming::address::address_type) = 0;
 
         /// Return a pointer to the filter to be used while serializing an

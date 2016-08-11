@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/detail/preprocess.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -18,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,7 +88,7 @@ std::size_t get_archive_size(hpx::parcelset::parcel const& p,
     std::vector<hpx::serialization::serialization_chunk>* chunks)
 {
     // gather the required size for the archive
-    hpx::serialization::detail::size_gatherer_container gather_size;
+    hpx::serialization::detail::preprocess gather_size;
     hpx::serialization::output_archive archive(gather_size, flags, 0, chunks);
     archive << p;
     return gather_size.size();
@@ -177,9 +179,10 @@ void test_normal_serialization(T& arg)
 #endif
 
     // create a parcel with/without continuation
+    hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
         hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             Action(), hpx::threads::thread_priority_normal, arg
         )
@@ -207,9 +210,10 @@ void test_normal_serialization(T1& arg1, T2& arg2)
 #endif
 
     // create a parcel with/without continuation
+    hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
         hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
         )
@@ -238,9 +242,10 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
 #endif
 
     // create a parcel with/without continuation
+    hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
         hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action3(),
             hpx::threads::thread_priority_normal, d, arg1, s, i, arg2
@@ -270,9 +275,10 @@ void test_zero_copy_serialization(T& arg)
 #endif
 
     // create a parcel with/without continuation
+    hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
         hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             Action(), hpx::threads::thread_priority_normal, arg
         )
@@ -300,9 +306,10 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 #endif
 
     // create a parcel with/without continuation
+    hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
         hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
         )
@@ -331,9 +338,10 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
 #endif
 
     // create a parcel with/without continuation
+    hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
         hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
-            here, std::move(addr),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action3(), hpx::threads::thread_priority_normal, d, arg1, s, i, arg2
         )

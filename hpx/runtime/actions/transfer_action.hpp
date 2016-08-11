@@ -270,7 +270,7 @@ namespace hpx { namespace actions
 
         /// Return all data needed for thread initialization
         threads::thread_init_data&
-        get_thread_init_data(naming::id_type const& target,
+        get_thread_init_data(naming::id_type&& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = get_thread_function(lva);
@@ -288,13 +288,13 @@ namespace hpx { namespace actions
             data.priority = priority_;
             data.stacksize = threads::get_stack_size(stacksize_);
 
-            data.target = target;
+            data.target = std::move(target);
             return data;
         }
 
         threads::thread_init_data&
         get_thread_init_data(std::unique_ptr<continuation> cont,
-            naming::id_type const& target,
+            naming::id_type&& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = get_thread_function(std::move(cont), lva);
@@ -312,12 +312,12 @@ namespace hpx { namespace actions
             data.priority = priority_;
             data.stacksize = threads::get_stack_size(stacksize_);
 
-            data.target = target;
+            data.target = std::move(target);
             return data;
         }
 
         // schedule a new thread
-        void schedule_thread(naming::id_type const& target,
+        void schedule_thread(naming::gid_type const& target_gid,
             naming::address::address_type lva,
             threads::thread_state_enum initial_state,
             std::size_t num_thread)
@@ -326,17 +326,27 @@ namespace hpx { namespace actions
             threads::thread_init_data data;
             data.num_os_thread = num_thread;
 
+            naming::id_type target;
+            if (naming::detail::has_credits(target_gid))
+            {
+                target = naming::id_type(target_gid, naming::id_type::managed);
+            }
+            else
+            {
+                target = naming::id_type(target_gid, naming::id_type::unmanaged);
+            }
+
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
-                    get_thread_init_data(std::move(cont), target, lva, data),
+                    get_thread_init_data(std::move(cont), std::move(target), lva, data),
                     initial_state);
 
             }
             else
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
-                    get_thread_init_data(target, lva, data), initial_state);
+                    get_thread_init_data(std::move(target), lva, data), initial_state);
             }
 
             // keep track of number of invocations
@@ -344,7 +354,7 @@ namespace hpx { namespace actions
         }
 
         void schedule_thread(std::unique_ptr<continuation> cont,
-            naming::id_type const& target, naming::address::address_type lva,
+            naming::gid_type const& target_gid, naming::address::address_type lva,
             threads::thread_state_enum initial_state,
             std::size_t num_thread)
         {
@@ -355,8 +365,18 @@ namespace hpx { namespace actions
             threads::thread_init_data data;
             data.num_os_thread = num_thread;
 
+            naming::id_type target;
+            if (naming::detail::has_credits(target_gid))
+            {
+                target = naming::id_type(target_gid, naming::id_type::managed);
+            }
+            else
+            {
+                target = naming::id_type(target_gid, naming::id_type::unmanaged);
+            }
+
             traits::action_schedule_thread<derived_type>::call(lva,
-                get_thread_init_data(std::move(cont), target, lva, data),
+                get_thread_init_data(std::move(cont), std::move(target), lva, data),
                 initial_state);
 
 
@@ -366,7 +386,7 @@ namespace hpx { namespace actions
 
         /// Return whether the given object was migrated
         std::pair<bool, components::pinned_ptr>
-            was_object_migrated(hpx::id_type const& id,
+            was_object_migrated(hpx::naming::gid_type const& id,
                 naming::address::address_type lva)
         {
             return traits::action_was_object_migrated<derived_type>::call(id, lva);

@@ -1,52 +1,47 @@
-//  Copyright (c) 2015 Thomas Heller
+//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SERIALIZATION_FUTURE_AWAIT_CONTAINER_HPP)
-#define HPX_SERIALIZATION_FUTURE_AWAIT_CONTAINER_HPP
+#if !defined(HPX_SERIALIZATION_DETAIL_PREPROCESS_HPP)
+#define HPX_SERIALIZATION_DETAIL_PREPROCESS_HPP
 
-// This 'container' is used to gather futures that need to become
-// ready before the actual serialization process can be started
-
-#include <hpx/config.hpp>
-#include <hpx/dataflow.hpp>
+// This 'container' is used to gather the required archive size for a given
+// type before it is serialized. In addition, it allows to register futures
+// to ensure each future is ready before serializing it.
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
-#include <list>
-#include <map>
-#include <memory>
+#include <cstddef>
 #include <mutex>
+#include <unordered_map>
 #include <utility>
-#include <vector>
-
-namespace hpx
-{
-    bool is_starting();
-}
 
 namespace hpx { namespace serialization { namespace detail
 {
     template <typename Container>
     struct access_data;
 
-    class future_await_container
-        : public std::enable_shared_from_this<future_await_container>
+    class preprocess
     {
         typedef hpx::lcos::local::spinlock mutex_type;
-        typedef std::list<naming::gid_type> new_gids_type;
-        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+        typedef std::unordered_map<naming::gid_type, naming::gid_type> splitted_gids_map;
     public:
-        future_await_container()
-          : done_(false)
+        preprocess()
+          : size_(0)
+          , done_(false)
           , num_futures_(0)
           , triggered_futures_(0)
         {}
 
-        std::size_t size() const { return 0; }
-        void resize(std::size_t size) { }
+        std::size_t size() const { return size_; }
+        void resize(std::size_t size) { size_ = size; }
 
         void trigger()
         {
@@ -71,11 +66,10 @@ namespace hpx { namespace serialization { namespace detail
                 std::lock_guard<mutex_type> l(mtx_);
                 ++num_futures_;
             }
-            std::shared_ptr<future_await_container> this_(this->shared_from_this());
             future_data.set_on_completed(
-                [this_]()
+                [this]()
                 {
-                    this_->trigger();
+                    this->trigger();
                 }
             );
         }
@@ -85,7 +79,14 @@ namespace hpx { namespace serialization { namespace detail
             naming::gid_type const & splitted_gid)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            new_gids_[gid].push_back(splitted_gid);
+            HPX_ASSERT(splitted_gids_[gid] == naming::invalid_gid);
+            splitted_gids_[gid] = splitted_gid;
+        }
+
+        bool has_gid(naming::gid_type const & gid)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return splitted_gids_.find(gid) != splitted_gids_.end();
         }
 
         void reset()
@@ -117,14 +118,16 @@ namespace hpx { namespace serialization { namespace detail
                 }
             }
 
-            hpx::dataflow(//hpx::launch::sync,
-                util::unwrapped(std::move(f))
-              , promise_.get_future());
+            hpx::future<void> fut = promise_.get_future();
+            auto shared_state_ = hpx::traits::future_access<hpx::future<void> >::
+                get_shared_state(fut);
+            shared_state_->set_on_completed(std::move(f));
         }
 
-        new_gids_map new_gids_;
+        splitted_gids_map splitted_gids_;
 
     private:
+        std::size_t size_;
         mutex_type mtx_;
         bool done_;
         std::size_t num_futures_;
@@ -134,33 +137,37 @@ namespace hpx { namespace serialization { namespace detail
     };
 
     template <>
-    struct access_data<future_await_container>
+    struct access_data<preprocess>
     {
-        static bool is_saving() { return false; }
-        static bool is_future_awaiting() { return true; }
+        static bool is_preprocessing() { return true; }
 
         static void await_future(
-            future_await_container& cont
+            preprocess& cont
           , hpx::lcos::detail::future_data_refcnt_base & future_data)
         {
             cont.await_future(future_data);
         }
 
-        static void add_gid(future_await_container& cont,
+        static void add_gid(preprocess& cont,
                 naming::gid_type const & gid,
                 naming::gid_type const & splitted_gid)
         {
             cont.add_gid(gid, splitted_gid);
         }
 
+        static bool has_gid(preprocess& cont, naming::gid_type const& gid)
+        {
+            return cont.has_gid(gid);
+        }
+
         static void
-        write(future_await_container& cont, std::size_t count,
+        write(preprocess& cont, std::size_t count,
             std::size_t current, void const* address)
         {
         }
 
         static bool
-        flush(binary_filter* filter, future_await_container& cont,
+        flush(binary_filter* filter, preprocess& cont,
             std::size_t current, std::size_t size, std::size_t written)
         {
             return true;

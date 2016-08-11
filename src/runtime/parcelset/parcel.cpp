@@ -19,7 +19,6 @@ namespace hpx { namespace parcelset
     void parcel::serialize(serialization::input_archive & ar, unsigned)
     {
         ar & data_;
-        ar & dest_;
         ar & cont_;
         ar & action_;
     }
@@ -27,7 +26,6 @@ namespace hpx { namespace parcelset
     void parcel::serialize(serialization::output_archive & ar, unsigned)
     {
         ar & data_;
-        ar & dest_;
         ar & cont_;
         ar & action_;
     }
@@ -35,7 +33,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
-        os << "(" << p.destination() << ":" << p.addr() << ":";
+        os << "(" << p.data_.dest_ << ":" << p.data_.addr_ << ":";
         os << p.action_->get_action_name() << ")";
 
         return os;

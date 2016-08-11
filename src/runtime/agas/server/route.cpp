@@ -28,7 +28,7 @@ namespace hpx { namespace agas { namespace server
 
         error_code ec = throws;
 
-        naming::id_type const& id = p.destination();
+        naming::gid_type const& gid = p.destination();
         naming::address& addr = p.addr();
         resolved_type cache_address;
 
@@ -39,8 +39,6 @@ namespace hpx { namespace agas { namespace server
         {
             std::unique_lock<mutex_type> l(mutex_);
 
-            naming::gid_type gid(id.get_gid());
-
             // wait for any migration to be completed
             wait_for_migration_locked(l, gid, ec);
 
@@ -48,14 +46,13 @@ namespace hpx { namespace agas { namespace server
 
             if (ec || hpx::util::get<0>(cache_address) == naming::invalid_gid)
             {
-                id_type const cid = id;
                 l.unlock();
 
                 HPX_THROWS_IF(ec, no_success,
                     "primary_namespace::route",
                     boost::str(boost::format(
                             "can't route parcel to unknown gid: %s"
-                        ) % cid));
+                        ) % gid));
 
                 return response(primary_ns_route, no_success);
             }
@@ -68,7 +65,7 @@ namespace hpx { namespace agas { namespace server
             }
 
             gva const g = hpx::util::get<1>(cache_address).resolve(
-                id.get_gid(), hpx::util::get<0>(cache_address));
+                gid, hpx::util::get<0>(cache_address));
 
             addr.locality_ = g.prefix;
             addr.type_ = g.type;

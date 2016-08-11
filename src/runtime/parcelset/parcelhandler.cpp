@@ -387,7 +387,7 @@ namespace hpx { namespace parcelset
     {
         HPX_ASSERT(resolver_);
 
-        naming::id_type const& id = p.destination();
+        naming::gid_type const& gid = p.destination();
         naming::address& addr = p.addr();
 
         // During bootstrap this is handled separately (see
@@ -423,7 +423,7 @@ namespace hpx { namespace parcelset
 
         if (!addr)
         {
-            resolved_locally = resolver_->resolve_local(id, addr);
+            resolved_locally = resolver_->resolve_local(gid, addr);
         }
 
         using util::placeholders::_1;
@@ -480,7 +480,7 @@ namespace hpx { namespace parcelset
             hpx::threads::threadmanager_is(hpx::state::state_running))
         {
 //             naming::gid_type locality = naming::get_locality_from_gid(
-//                 (parcels[0].destination()).get_gid());
+//                 parcels[0].destination());
 //             if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
