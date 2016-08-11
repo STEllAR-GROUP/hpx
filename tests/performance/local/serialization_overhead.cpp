@@ -92,14 +92,18 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp;
     if (continuation) {
-        outp = hpx::parcelset::parcel(here, addr,
+        outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
+            std::true_type(), std::true_type(),
+            here, addr,
             hpx::actions::typed_continuation<int>(here),
             test_action(), hpx::threads::thread_priority_normal, buffer
-            );
+            ));
     }
     else {
-        outp = hpx::parcelset::parcel(here, addr,
-            test_action(), hpx::threads::thread_priority_normal, buffer);
+        outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
+            std::false_type(), std::false_type(),
+            here, addr,
+            test_action(), hpx::threads::thread_priority_normal, buffer));
     }
 
     outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();

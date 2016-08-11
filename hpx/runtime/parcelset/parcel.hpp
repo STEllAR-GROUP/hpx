@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
-//  Copyright (c) 2015 Thomas Heller
+//  Copyright (c) 2015-2016 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
@@ -17,11 +17,10 @@
 #endif
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -148,79 +147,22 @@ namespace hpx { namespace parcelset
 
         parcel() {}
 
-        template <
-            typename Action
-          , typename...Args
-          , typename Enable =
-                typename std::enable_if<traits::is_action<Action>::value>::type
-          >
-        parcel(
-            naming::id_type const& dest,
-            naming::address const& addr,
-            Action,
-            Args &&... args
-        )
-          : dest_(dest),
-            addr_(addr),
-            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
-        {
-            HPX_ASSERT(is_valid());
-        }
-
-        template <
-            typename Continuation
-          , typename Action
-          , typename...Args
-          , typename Enable
-                = typename std::enable_if<
-                    traits::is_action<Action>::value
-                 && traits::is_continuation<Continuation>::value
-                 && !std::is_same<
-                        Continuation
-                      , std::unique_ptr<actions::continuation>
-                    >::value
-                >::type
-          >
-        parcel(
-            naming::id_type const& dest,
-            naming::address const& addr,
-            Continuation && cont,
-            Action,
-            Args &&... args
-        )
-          : dest_(dest),
-            addr_(addr),
-            cont_(
-                new typename util::decay<Continuation>
-                    ::type(std::forward<Continuation>(cont))
-            ),
-            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
-        {
-            HPX_ASSERT(is_valid());
-        }
-
-        template <
-            typename Action
-          , typename...Args
-          , typename Enable
-                = typename std::enable_if<
-                    traits::is_action<Action>::value
-                >::type
-          >
+    private:
         parcel(
             naming::id_type const& dest,
             naming::address const& addr,
             std::unique_ptr<actions::continuation> cont,
-            Action,
-            Args &&... args
+            std::unique_ptr<actions::base_action> act
         )
           : dest_(dest),
             addr_(addr),
             cont_(std::move(cont)),
-            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
+            action_(std::move(act))
         {
             HPX_ASSERT(is_valid());
         }
+        friend struct detail::create_parcel;
+    public:
 
         parcel(parcel && other)
           : data_(std::move(other.data_)),

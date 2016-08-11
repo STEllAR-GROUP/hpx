@@ -8,19 +8,18 @@
 #define HPX_APPLIER_APPLY_NOV_27_2008_0957AM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_action.hpp>
@@ -61,13 +60,8 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
+            parcelset::put_parcel(id, complement_addr<action_type>(addr),
                 act, priority, std::forward<Ts>(vs)...);
-
-            ph.put_parcel(std::move(p));
 
             return false;     // destinations are remote
         }
@@ -81,15 +75,11 @@ namespace hpx
             typedef
                 typename hpx::traits::extract_action<Action>::type
                 action_type;
+            action_type act;
 
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
+            parcelset::put_parcel(id, complement_addr<action_type>(addr),
                 std::forward<Continuation>(cont),
-                action_type(), priority, std::forward<Ts>(vs)...);
-
-            ph.put_parcel(std::move(p));
+                act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
         }
@@ -103,14 +93,10 @@ namespace hpx
             typedef
                 typename hpx::traits::extract_action<Action>::type
                 action_type;
+            action_type act;
 
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
-                action_type(), priority, std::forward<Ts>(vs)...);
-
-            ph.put_parcel(std::move(p), cb);
+            parcelset::put_parcel_cb(cb, id, complement_addr<action_type>(addr),
+                act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
         }
@@ -124,14 +110,10 @@ namespace hpx
             typedef
                 typename hpx::traits::extract_action<Action>::type
                 action_type;
+            action_type act;
 
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
-                action_type(), priority, std::forward<Ts>(vs)...);
-
-            ph.put_parcel(std::move(p), std::move(cb));
+            parcelset::put_parcel_cb(std::move(cb), id, complement_addr<action_type>(addr),
+                act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
         }
@@ -146,15 +128,11 @@ namespace hpx
             typedef
                 typename hpx::traits::extract_action<Action>::type
                 action_type;
+            action_type act;
 
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
+            parcelset::put_parcel_cb(cb, id, complement_addr<action_type>(addr),
                 std::forward<Continuation>(cont),
-                action_type(), priority, std::forward<Ts>(vs)...);
-
-            ph.put_parcel(std::move(p), cb);
+                act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
         }
@@ -169,15 +147,11 @@ namespace hpx
             typedef
                 typename hpx::traits::extract_action<Action>::type
                 action_type;
+            action_type act;
 
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
+            parcelset::put_parcel_cb(std::move(cb), id, complement_addr<action_type>(addr),
                 std::forward<Continuation>(cont),
-                action_type(), priority, std::forward<Ts>(vs)...);
-
-            ph.put_parcel(std::move(p), std::move(cb));
+                act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
         }
@@ -415,12 +389,15 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type_>(addr),
-                action_type_(), priority);
-
             // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler()
-                .sync_put_parcel(std::move(p));
+            hpx::get_runtime().get_parcel_handler()
+                .sync_put_parcel(
+                    parcelset::detail::create_parcel::call(
+                        std::false_type(), std::false_type(),
+                        id, complement_addr<action_type_>(addr),
+                        action_type_(), priority
+                    )
+                );
             return false;     // destination is remote
         }
 

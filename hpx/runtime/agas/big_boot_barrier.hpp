@@ -15,6 +15,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
@@ -101,8 +102,10 @@ struct HPX_EXPORT big_boot_barrier
     ) { // {{{
         HPX_ASSERT(pp);
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
-        parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id),
-                addr, act, std::forward<Args>(args)...);
+        parcelset::parcel p(
+            parcelset::detail::create_parcel::call(std::false_type(), std::false_type(),
+                naming::get_id_from_locality_id(target_locality_id),
+                addr, act, std::forward<Args>(args)...));
         if (!p.parcel_id())
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         pp->send_early_parcel(dest, std::move(p));
@@ -117,8 +120,10 @@ struct HPX_EXPORT big_boot_barrier
       , Args &&... args
     ) { // {{{
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
-        parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id),
-                addr, act, std::forward<Args>(args)...);
+        parcelset::parcel p(
+            parcelset::detail::create_parcel::call(std::false_type(), std::false_type(),
+                naming::get_id_from_locality_id(target_locality_id),
+                addr, act, std::forward<Args>(args)...));
         if (!p.parcel_id())
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         get_runtime().get_parcel_handler().put_parcel(std::move(p));

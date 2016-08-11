@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -120,8 +121,6 @@ namespace hpx { namespace traits
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
-
-    struct HPX_API_EXPORT base_action;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

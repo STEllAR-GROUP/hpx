@@ -29,6 +29,11 @@ namespace hpx {
             struct message_handler;
         }
 
+        namespace detail
+        {
+            struct create_parcel;
+        }
+
         HPX_API_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type,
             std::size_t num, std::size_t interval, locality const& l,
