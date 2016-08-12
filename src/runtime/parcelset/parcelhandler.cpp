@@ -1069,12 +1069,12 @@ namespace hpx { namespace parcelset
                 pp_type, _1, _2
             ));
 #else
-        util::function_nonser<std::int64_t(std::string const&, bool)>
+        util::function_nonser<std::int64_t(bool)>
             num_parcel_sends(util::bind(
                 &parcelhandler::get_parcel_send_count, this,
                 pp_type, _1
             ));
-        util::function_nonser<std::int64_t(std::string const&, bool)>
+        util::function_nonser<std::int64_t(bool)>
             num_parcel_receives(util::bind(
                 &parcelhandler::get_parcel_receive_count, this,
                 pp_type, _1
