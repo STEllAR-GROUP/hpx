@@ -8,7 +8,6 @@
 
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
-#include <boost/date_time.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // This example demonstrates the creation and use of different types of
@@ -80,9 +79,9 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
         using hpx::performance_counters::counter_value;
         using hpx::performance_counters::status_is_valid;
 
-        counter_value value1 = sine_explicit.get_counter_value_sync();
-        counter_value value2 = sine_implicit.get_counter_value_sync();
-        counter_value value3 = sine_average.get_counter_value_sync();
+        counter_value value1 = sine_explicit.get_counter_value(hpx::launch::sync);
+        counter_value value2 = sine_implicit.get_counter_value(hpx::launch::sync);
+        counter_value value3 = sine_average.get_counter_value(hpx::launch::sync);
 
         if (status_is_valid(value1.status_))
         {
@@ -113,7 +112,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 
         // give up control to the thread manager, we will be resumed after
         // 'pause' ms
-        hpx::this_thread::suspend(boost::chrono::milliseconds(pause));
+        hpx::this_thread::suspend(std::chrono::milliseconds(pause));
     }
     return 0;
 }

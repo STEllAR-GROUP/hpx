@@ -729,6 +729,14 @@ if(HPX_WITH_GENERIC_EXECUTION_POLICY)
   hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
 endif()
 
+# HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY BOOL
+    "Enable old style ..._sync/..._async functions in API (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+endif()
+
 # BADBAD: This enables an overload of swap is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -742,6 +750,14 @@ hpx_option(HPX_WITH_TUPLE_RVALUE_SWAP BOOL
   ON CATEGORY "Utility" ADVANCED)
 if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
+endif()
+
+# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0
+hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
+    "Enable support for boost::chrono (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -920,7 +936,7 @@ hpx_check_for_cxx11_std_array(
   DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
 
 hpx_check_for_cxx11_std_chrono(
-  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
+  REQUIRED "HPX needs support for C++11 std::chrono")
 
 hpx_check_for_cxx11_std_cstdint(
   DEFINITIONS HPX_HAVE_CXX11_STD_CSTDINT)

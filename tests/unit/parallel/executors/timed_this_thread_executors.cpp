@@ -9,13 +9,12 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
 #include <string>
 #include <vector>
 
-#include <boost/chrono.hpp>
-
-using namespace boost::chrono;
+using namespace std::chrono;
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test(int passed_through)

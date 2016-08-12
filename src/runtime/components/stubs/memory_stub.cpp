@@ -16,14 +16,14 @@ namespace hpx { namespace components { namespace stubs
     {
         return hpx::async<components::server::allocate_action>(id, size);
     }
-    naming::id_type memory::allocate_sync(hpx::id_type const& id,
-        std::size_t size, error_code& ec)
+    naming::id_type memory::allocate(launch::sync_policy,
+        hpx::id_type const& id, std::size_t size, error_code& ec)
     {
         return allocate(id, size).get(ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void memory::store8_async(hpx::id_type const& id,
+    void memory::store8(launch::apply_policy, hpx::id_type const& id,
         boost::uint8_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -37,13 +37,13 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::store8_action>(
             id, id.get_lsb(), value);
     }
-    void memory::store8_sync(hpx::id_type const& id, boost::uint8_t value,
-        error_code& ec)
+    void memory::store8(launch::sync_policy, hpx::id_type const& id,
+        boost::uint8_t value, error_code& ec)
     {
         store8(id, value).get(ec);
     }
 
-    void memory::store16_async(hpx::id_type const& id,
+    void memory::store16(launch::apply_policy, hpx::id_type const& id,
         boost::uint16_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -57,13 +57,13 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::store16_action>(
             id, id.get_lsb(), value);
     }
-    void memory::store16_sync(hpx::id_type const& id, boost::uint16_t value,
-        error_code& ec)
+    void memory::store16(launch::sync_policy, hpx::id_type const& id,
+        boost::uint16_t value, error_code& ec)
     {
         store16(id, value).get(ec);
     }
 
-    void memory::store32_async(hpx::id_type const& id,
+    void memory::store32(launch::apply_policy, hpx::id_type const& id,
         boost::uint32_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -77,13 +77,13 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::store32_action>(
             id, id.get_lsb(), value);
     }
-    void memory::store32_sync(hpx::id_type const& id, boost::uint32_t value,
-        error_code& ec)
+    void memory::store32(launch::sync_policy, hpx::id_type const& id,
+        boost::uint32_t value, error_code& ec)
     {
         store32(id, value).get(ec);
     }
 
-    void memory::store64_async(hpx::id_type const& id,
+    void memory::store64(launch::apply_policy, hpx::id_type const& id,
         boost::uint64_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -97,13 +97,13 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::store64_action>(
             id, id.get_lsb(), value);
     }
-    void memory::store64_sync(hpx::id_type const& id, boost::uint64_t value,
-        error_code& ec)
+    void memory::store64(launch::sync_policy, hpx::id_type const& id,
+        boost::uint64_t value, error_code& ec)
     {
         store64(id, value).get(ec);
     }
 
-    void memory::store128_async(hpx::id_type const& id,
+    void memory::store128(launch::apply_policy, hpx::id_type const& id,
         components::server::memory::uint128_t const& value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -117,7 +117,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::store128_action>(
             id, id.get_lsb(), value);
     }
-    void memory::store128_sync(hpx::id_type const& id,
+    void memory::store128(launch::sync_policy, hpx::id_type const& id,
         components::server::memory::uint128_t const& value, error_code& ec)
     {
         store128(id, value).get(ec);
@@ -130,7 +130,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::load8_action>(
             id, id.get_lsb());
     }
-    boost::uint8_t memory::load8_sync(hpx::id_type const& id, error_code& ec)
+    boost::uint8_t memory::load8(launch::sync_policy,
+        hpx::id_type const& id, error_code& ec)
     {
         return load8(id).get(ec);
     }
@@ -141,7 +142,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::load16_action>(
             id, id.get_lsb());
     }
-    boost::uint16_t memory::load16_sync(hpx::id_type const& id, error_code& ec)
+    boost::uint16_t memory::load16(launch::sync_policy,
+        hpx::id_type const& id, error_code& ec)
     {
         return load16(id).get(ec);
     }
@@ -152,7 +154,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::load32_action>(
             id, id.get_lsb());
     }
-    boost::uint32_t memory::load32_sync(hpx::id_type const& id, error_code& ec)
+    boost::uint32_t memory::load32(launch::sync_policy,
+        hpx::id_type const& id, error_code& ec)
     {
         return load32(id).get(ec);
     }
@@ -163,7 +166,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::load64_action>(
             id, id.get_lsb());
     }
-    boost::uint64_t memory::load64_sync(hpx::id_type const& id, error_code& ec)
+    boost::uint64_t memory::load64(launch::sync_policy,
+        hpx::id_type const& id, error_code& ec)
     {
         return load64(id).get(ec);
     }
@@ -175,8 +179,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<components::server::memory::load128_action>(
             id, id.get_lsb());
     }
-    components::server::memory::uint128_t memory::load128_sync(hpx::id_type const& id,
-        error_code& ec)
+    components::server::memory::uint128_t memory::load128(launch::sync_policy,
+        hpx::id_type const& id, error_code& ec)
     {
         return load128(id).get(ec);
     }

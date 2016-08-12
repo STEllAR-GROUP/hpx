@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+// hpxinspect:nodeprecatedname:boost::unique_lock
+
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
 #include <hpx/runtime.hpp>
@@ -582,7 +586,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 
@@ -677,7 +681,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 
@@ -1045,7 +1049,7 @@ namespace hpx { namespace components { namespace server
         // give the scheduler some time to work on remaining tasks
         {
             util::unlock_guard<Lock> ul(l);
-            self->yield(threads::pending);
+            self->yield(threads::thread_result_type(threads::pending, nullptr));
         }
 
         // get rid of all terminated threads

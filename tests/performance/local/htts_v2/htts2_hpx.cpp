@@ -14,10 +14,11 @@
 
 #include "htts2.hpp"
 
+#include <chrono>
 #include <string>
 #include <vector>
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct hpx_driver : htts2::driver
 {
     hpx_driver(int argc, char** argv)
@@ -54,13 +55,13 @@ struct hpx_driver : htts2::driver
         return hpx::finalize();
     }
 
-    hpx::threads::thread_state_enum payload_thread_function(
+    hpx::threads::thread_result_type payload_thread_function(
         hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
         )
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
         //++count_;
-        return hpx::threads::terminated;
+        return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
     }
 
     void stage_tasks(boost::uint64_t target_osthread)

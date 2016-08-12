@@ -10,6 +10,8 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
+
 int hpx_main(int argc, char ** argv)
 {
     using hpx::performance_counters::performance_counter;
@@ -20,7 +22,7 @@ int hpx_main(int argc, char ** argv)
     {
         bool exception_thrown = false;
         try {
-            uptime.reset_sync();
+            uptime.reset(hpx::launch::sync);
             HPX_TEST(false);
         }
         catch (hpx::exception const&) {
@@ -32,7 +34,7 @@ int hpx_main(int argc, char ** argv)
     {
         bool exception_thrown = false;
         try {
-            uptime.get_value_sync<double>(true);
+            uptime.get_value<double>(hpx::launch::sync, true);
             HPX_TEST(false);
         }
         catch (hpx::exception const&) {
@@ -42,15 +44,15 @@ int hpx_main(int argc, char ** argv)
     }
 
     // make sure reported value is in seconds
-    double start = uptime.get_value_sync<double>();
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
-    double end = uptime.get_value_sync<double>();
+    double start = uptime.get_value<double>(hpx::launch::sync);
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
+    double end = uptime.get_value<double>(hpx::launch::sync);
 
     HPX_TEST(end - start >= 1.0 && end - start < 1.1);
 
     // make sure start/stop return false
-    HPX_TEST(!uptime.start_sync());
-    HPX_TEST(!uptime.stop_sync());
+    HPX_TEST(!uptime.start(hpx::launch::sync));
+    HPX_TEST(!uptime.stop(hpx::launch::sync));
 
     return hpx::finalize();
 }

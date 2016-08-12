@@ -49,12 +49,6 @@ namespace hpx
         template <typename ValueType>
         struct object_semaphore;
 
-        namespace stubs
-        {
-            template <typename ValueType>
-            struct object_semaphore;
-        }
-
         namespace server
         {
             template <typename ValueType>

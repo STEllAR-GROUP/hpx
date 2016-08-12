@@ -12,6 +12,7 @@
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/ini.hpp>
@@ -154,8 +155,8 @@ namespace hpx { namespace components { namespace stubs
         }
 
         // apply remotely (only if runtime is not stopping)
-        naming::id_type id = get_colocation_id_sync(
-            naming::id_type(gid, naming::id_type::unmanaged));
+        naming::id_type id = get_colocation_id(
+            launch::sync, naming::id_type(gid, naming::id_type::unmanaged));
 
         lcos::packaged_action<action_type, void> p;
         lcos::future<void> f = p.get_future();

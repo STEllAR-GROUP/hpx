@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2016 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 set(example_programs
     allow_unknown_options
+    channel
     component_ctors
     component_in_executable
     component_inheritance
@@ -47,6 +48,7 @@ set(example_programs
    )
 
 set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(channel_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)

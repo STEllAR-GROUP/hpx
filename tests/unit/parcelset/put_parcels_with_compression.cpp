@@ -240,14 +240,16 @@ void verify_counters()
         performance_counter const& serialize_counter = serialize_counters[i];
         performance_counter const& data_counter = data_counters[i];
 
-        counter_value serialize_value = serialize_counter.get_counter_value_sync();
-        counter_value data_value = data_counter.get_counter_value_sync();
+        counter_value serialize_value =
+            serialize_counter.get_counter_value(hpx::launch::sync);
+        counter_value data_value =
+            data_counter.get_counter_value(hpx::launch::sync);
 
         double serialize_val = serialize_value.get_value<double>();
         double data_val = data_value.get_value<double>();
 
-        std::string serialize_name = serialize_counter.get_name_sync();
-        std::string data_name = data_counter.get_name_sync();
+        std::string serialize_name = serialize_counter.get_name(hpx::launch::sync);
+        std::string data_name = data_counter.get_name(hpx::launch::sync);
 
         if (data_val != 0 && serialize_val != 0)
         {

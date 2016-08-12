@@ -27,6 +27,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.Tools Tools Options]
 
 [#build_system.cmake_variables.Generic][h3 Generic Options]
+* [link build_system.cmake_variables.HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY]
 * [link build_system.cmake_variables.HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION]
 * [link build_system.cmake_variables.HPX_WITH_BENCHMARK_SCRIPTS_PATH HPX_WITH_BENCHMARK_SCRIPTS_PATH]
 * [link build_system.cmake_variables.HPX_WITH_BOOST_ALL_DYNAMIC_LINK HPX_WITH_BOOST_ALL_DYNAMIC_LINK]
@@ -50,7 +51,6 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_LOGGING HPX_WITH_LOGGING]
 * [link build_system.cmake_variables.HPX_WITH_MALLOC HPX_WITH_MALLOC]
 * [link build_system.cmake_variables.HPX_WITH_NATIVE_TLS HPX_WITH_NATIVE_TLS]
-* [link build_system.cmake_variables.HPX_WITH_NETWORKING HPX_WITH_NETWORKING]
 * [link build_system.cmake_variables.HPX_WITH_PARCEL_COALESCING HPX_WITH_PARCEL_COALESCING]
 * [link build_system.cmake_variables.HPX_WITH_RUN_MAIN_EVERYWHERE HPX_WITH_RUN_MAIN_EVERYWHERE]
 * [link build_system.cmake_variables.HPX_WITH_SECURITY HPX_WITH_SECURITY]
@@ -58,6 +58,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_SYCL HPX_WITH_SYCL]
 
 [variablelist
+        [[[#build_system.cmake_variables.HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY] `HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY:BOOL`][Enable old style ..._sync/..._async functions in API (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION] `HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION:BOOL`][Use automatic serialization registration for actions and functions. This affects compatibility between HPX applications compiled with different compilers (default ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_BENCHMARK_SCRIPTS_PATH] `HPX_WITH_BENCHMARK_SCRIPTS_PATH:PATH`][Directory to place batch scripts in]]
         [[[#build_system.cmake_variables.HPX_WITH_BOOST_ALL_DYNAMIC_LINK] `HPX_WITH_BOOST_ALL_DYNAMIC_LINK:BOOL`][Add BOOST_ALL_DYN_LINK to compile flags]]
@@ -81,7 +82,6 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_LOGGING] `HPX_WITH_LOGGING:BOOL`][Build HPX with logging enabled (default: ON).]]
         [[[#build_system.cmake_variables.HPX_WITH_MALLOC] `HPX_WITH_MALLOC:STRING`][Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)]]
         [[[#build_system.cmake_variables.HPX_WITH_NATIVE_TLS] `HPX_WITH_NATIVE_TLS:BOOL`][Use native TLS support if available (default: ON)]]
-        [[[#build_system.cmake_variables.HPX_WITH_NETWORKING] `HPX_WITH_NETWORKING:BOOL`][Enable networking. If this is disabled then HPX will not be usable in distributed use cases]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCEL_COALESCING] `HPX_WITH_PARCEL_COALESCING:BOOL`][Enable the parcel coalescing plugin (default: ON).]]
         [[[#build_system.cmake_variables.HPX_WITH_RUN_MAIN_EVERYWHERE] `HPX_WITH_RUN_MAIN_EVERYWHERE:BOOL`][Run hpx_main by default on all localities (default: OFF).]]
         [[[#build_system.cmake_variables.HPX_WITH_SECURITY] `HPX_WITH_SECURITY:BOOL`][Enable security support via libsodium.]]
@@ -175,6 +175,7 @@ The options are split into these categories:
 ] [/ AGAS Options]
 
 [#build_system.cmake_variables.Parcelport][h3 Parcelport Options]
+* [link build_system.cmake_variables.HPX_WITH_PARCELPORT_ACTION_COUNTERS HPX_WITH_PARCELPORT_ACTION_COUNTERS]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_IBVERBS HPX_WITH_PARCELPORT_IBVERBS]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_IBVERBS_IFNAME HPX_WITH_PARCELPORT_IBVERBS_IFNAME]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS HPX_WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS]
@@ -187,6 +188,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_TCP HPX_WITH_PARCELPORT_TCP]
 
 [variablelist
+        [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_ACTION_COUNTERS] `HPX_WITH_PARCELPORT_ACTION_COUNTERS:BOOL`][Enable performance counters reporting parcelport statistics on a per-action basis.]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_IBVERBS] `HPX_WITH_PARCELPORT_IBVERBS:BOOL`][Enable the ibverbs based parcelport. This is currently an experimental feature]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_IBVERBS_IFNAME] `HPX_WITH_PARCELPORT_IBVERBS_IFNAME:STRING`][The interface name of the ibverbs capable network adapter (default: ib0)]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS] `HPX_WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS:STRING`][Maximum number of chunks that can be allocated (default: 100)]]

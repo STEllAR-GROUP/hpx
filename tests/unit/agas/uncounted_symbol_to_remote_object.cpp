@@ -9,8 +9,8 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
-#include <boost/chrono.hpp>
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -25,7 +25,7 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::gid_type;
@@ -37,8 +37,8 @@ using hpx::components::get_component_type;
 
 using hpx::applier::get_applier;
 
-using hpx::agas::register_name_sync;
-using hpx::agas::unregister_name_sync;
+using hpx::agas::register_name;
+using hpx::agas::unregister_name;
 using hpx::agas::garbage_collect;
 
 using hpx::test::simple_refcnt_monitor;
@@ -89,7 +89,7 @@ void hpx_test_main(
         // should not reference-count the name, as the GID we're passing has
         // no credits.
         gid_type raw_gid = get_stripped_gid(monitor.get_raw_gid());
-        HPX_TEST_EQ(true, register_name_sync(name, raw_gid));
+        HPX_TEST_EQ(true, register_name(hpx::launch::sync, name, raw_gid));
 
         {
             // Detach the reference.
@@ -112,7 +112,7 @@ void hpx_test_main(
         HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
 
         // Remove the symbolic name.
-        HPX_TEST_EQ(raw_gid, unregister_name_sync(name).get_gid());
+        HPX_TEST_EQ(raw_gid, unregister_name(hpx::launch::sync, name).get_gid());
 
         // Flush pending reference counting operations.
         garbage_collect();

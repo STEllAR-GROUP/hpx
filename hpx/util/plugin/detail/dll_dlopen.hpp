@@ -4,6 +4,9 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::shared_ptr
+
 #ifndef HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 

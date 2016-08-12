@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <boost/cstdint.hpp>
 
@@ -70,7 +70,7 @@ namespace hpx { namespace util { namespace detail
         // schedule a high priority task after a given time interval
         void schedule_thread(std::unique_lock<mutex_type> & l);
 
-        threads::thread_state_enum
+        threads::thread_result_type
             evaluate(threads::thread_state_ex_enum statex);
 
         void terminate();             // handle system shutdown

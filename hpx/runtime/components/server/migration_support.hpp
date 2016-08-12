@@ -180,7 +180,7 @@ namespace hpx { namespace components
     protected:
         // Execute the wrapped action. This function is bound in decorate_action
         // above. The bound object performs the pinning/unpinning.
-        threads::thread_state_enum thread_function(
+        threads::thread_result_type thread_function(
             threads::thread_state_ex_enum state,
             threads::thread_function_type && f,
             components::pinned_ptr)

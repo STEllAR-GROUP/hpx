@@ -8,8 +8,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
-#include <boost/chrono.hpp>
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -24,13 +24,13 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 
-using hpx::agas::register_name_sync;
-using hpx::agas::unregister_name_sync;
+using hpx::agas::register_name;
+using hpx::agas::unregister_name;
 using hpx::agas::garbage_collect;
 
 using hpx::test::simple_refcnt_monitor;
@@ -70,7 +70,7 @@ void hpx_test_main(
              << flush;
 
         // Associate a symbolic name with the object.
-        HPX_TEST_EQ(true, register_name_sync(name, monitor.get_id()));
+        HPX_TEST_EQ(true, register_name(hpx::launch::sync, name, monitor.get_id()));
 
         hpx::naming::gid_type gid;
 
@@ -92,7 +92,7 @@ void hpx_test_main(
 
         // Remove the symbolic name. This should return the final credits
         // to AGAS.
-        HPX_TEST_EQ(gid, unregister_name_sync(name).get_gid());
+        HPX_TEST_EQ(gid, unregister_name(hpx::launch::sync, name).get_gid());
 
         // Flush pending reference counting operations.
         garbage_collect();

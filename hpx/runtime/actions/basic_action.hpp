@@ -79,7 +79,7 @@ namespace hpx { namespace actions
               , f_(std::move(other.f_))
             {}
 
-            HPX_FORCEINLINE threads::thread_state_enum
+            HPX_FORCEINLINE threads::thread_result_type
             operator()(threads::thread_state_ex_enum)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
@@ -88,7 +88,7 @@ namespace hpx { namespace actions
                 typedef typename Action::local_result_type local_result_type;
 
                 actions::trigger<local_result_type>(std::move(cont_), f_);
-                return threads::terminated;
+                return threads::thread_result_type(threads::terminated, nullptr);
             }
 
         private:
@@ -198,7 +198,7 @@ namespace hpx { namespace actions
         struct thread_function
         {
             template <typename ...Ts>
-            HPX_FORCEINLINE threads::thread_state_enum
+            HPX_FORCEINLINE threads::thread_result_type
             operator()(naming::address::address_type lva, Ts&&... vs) const
             {
                 try {
@@ -232,7 +232,7 @@ namespace hpx { namespace actions
                 // OS-thread. This will throw if there are still any locks
                 // held.
                 util::force_error_on_lock();
-                return threads::terminated;
+                return threads::thread_result_type(threads::terminated, nullptr);
             }
         };
 
@@ -282,23 +282,24 @@ namespace hpx { namespace actions
             return invoker()(lva, std::forward<Ts>(vs)...);
         }
 
+    private:
         ///////////////////////////////////////////////////////////////////////
         typedef traits::is_future<result_type> is_future_pred;
 
         struct sync_invoke
         {
-            template <typename IdOrPolicy, typename ...Ts>
+            template <typename IdOrPolicy, typename Policy, typename ...Ts>
             HPX_FORCEINLINE static result_type call(
-                std::false_type, launch policy,
+                std::false_type, Policy policy,
                 IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...).get(ec);
             }
 
-            template <typename IdOrPolicy, typename ...Ts>
+            template <typename IdOrPolicy, typename Policy, typename ...Ts>
             HPX_FORCEINLINE static result_type call(
-                std::true_type, launch policy,
+                std::true_type, Policy policy,
                 IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
@@ -306,6 +307,7 @@ namespace hpx { namespace actions
             }
         };
 
+    public:
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
@@ -321,7 +323,9 @@ namespace hpx { namespace actions
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
-            return (*this)(launch::all, id, ec, std::forward<Ts>(vs)...);
+            return util::void_guard<result_type>(),
+                sync_invoke::call(is_future_pred(), launch::sync, id, ec,
+                    std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
@@ -329,14 +333,18 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
-            return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
+            return util::void_guard<result_type>(),
+                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
+                    std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
-            return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
+            return util::void_guard<result_type>(),
+                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
+                    std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -365,7 +373,7 @@ namespace hpx { namespace actions
         operator()(DistPolicy const& dist_policy, error_code& ec,
             Ts&&... vs) const
         {
-            return (*this)(launch::all, dist_policy, ec,
+            return (*this)(launch::sync, dist_policy, ec,
                 std::forward<Ts>(vs)...);
         }
 
@@ -378,7 +386,7 @@ namespace hpx { namespace actions
         operator()(launch policy,
             DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return (*this)(launch::all, dist_policy, throws,
+            return (*this)(launch::sync, dist_policy, throws,
                 std::forward<Ts>(vs)...);
         }
 
@@ -390,7 +398,7 @@ namespace hpx { namespace actions
         >::type
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return (*this)(launch::all, dist_policy, throws,
+            return (*this)(launch::sync, dist_policy, throws,
                 std::forward<Ts>(vs)...);
         }
 

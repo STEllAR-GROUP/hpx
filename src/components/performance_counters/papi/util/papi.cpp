@@ -5,13 +5,16 @@
 
 #include <hpx/config.hpp>
 
+
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
+
 
 #include <boost/format.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -31,12 +34,12 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     // PAPI domain description strings
     std::map<std::string, int> const papi_domain_map = {
-        {"user",   PAPI_DOM_USER}
-        {"kernel", PAPI_DOM_KERNEL}
-        {"other",  PAPI_DOM_OTHER}
-        {"super",  PAPI_DOM_SUPERVISOR}
-        {"all",    PAPI_DOM_ALL}
-        {"min",    PAPI_DOM_MIN}
+        {"user",   PAPI_DOM_USER},
+        {"kernel", PAPI_DOM_KERNEL},
+        {"other",  PAPI_DOM_OTHER},
+        {"super",  PAPI_DOM_SUPERVISOR},
+        {"all",    PAPI_DOM_ALL},
+        {"min",    PAPI_DOM_MIN},
         {"max",    PAPI_DOM_MAX}
     };
 

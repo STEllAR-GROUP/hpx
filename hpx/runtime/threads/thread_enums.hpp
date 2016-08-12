@@ -36,10 +36,13 @@ namespace hpx { namespace threads
                                  thread-manager) */
         terminated = 5,     /*!< thread has been stopped an may be
                                  garbage collected */
-        staged = 6          /*!< this is not a real thread state, but
+        staged = 6,         /*!< this is not a real thread state, but
                                  allows to reference staged task descriptions,
                                  which eventually will be converted into
                                  thread objects */
+        pending_do_not_schedule = 7 /*! this is not a real thread state,
+                                 but allows to create a thread in pending state
+                                 without scheduling it */
     };
 
     /// Get the readable string representing the name of the given

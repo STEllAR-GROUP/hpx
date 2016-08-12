@@ -12,8 +12,8 @@
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
 #endif
-#include <boost/chrono/chrono.hpp>
-#include <boost/chrono/process_cpu_clocks.hpp>
+
+#include <chrono>
 
 namespace hpx { namespace util
 {
@@ -26,8 +26,8 @@ namespace hpx { namespace util
 #if defined(__bgq__)
             return GetTimeBase();
 #else
-            boost::chrono::nanoseconds ns =
-                boost::chrono::steady_clock::now().time_since_epoch();
+            std::chrono::nanoseconds ns =
+                std::chrono::steady_clock::now().time_since_epoch();
             return static_cast<boost::uint64_t>(ns.count());
 #endif
         }
@@ -36,7 +36,7 @@ namespace hpx { namespace util
         // returned by this clock.
         static boost::uint64_t (min)()
         {
-            typedef boost::chrono::duration_values<boost::chrono::nanoseconds>
+            typedef std::chrono::duration_values<std::chrono::nanoseconds>
                 duration_values;
             return (duration_values::min)().count();
         }
@@ -45,7 +45,7 @@ namespace hpx { namespace util
         // returned by this clock.
         static boost::uint64_t (max)()
         {
-            typedef boost::chrono::duration_values<boost::chrono::nanoseconds>
+            typedef std::chrono::duration_values<std::chrono::nanoseconds>
                 duration_values;
             return (duration_values::max)().count();
         }

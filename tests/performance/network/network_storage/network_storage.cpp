@@ -12,6 +12,7 @@
 #include <boost/random.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <iostream>
 #include <memory>
@@ -353,7 +354,7 @@ int RemoveCompletions()
                 }
             }
         }
-        hpx::this_thread::suspend(boost::chrono::microseconds(10));
+        hpx::this_thread::suspend(std::chrono::microseconds(10));
     }
     return num_removed;
 }
@@ -381,7 +382,7 @@ hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symnam
     );
 
     hpx::lcos::barrier b = hpx::lcos::barrier::create(hpx::find_here(), num_localities);
-    hpx::agas::register_name_sync(symname, b.get_id());
+    hpx::agas::register_name(hpx::launch::sync, symname, b.get_id());
     return b;
 }
 
@@ -741,7 +742,8 @@ void find_barrier_startup()
     uint64_t rank = hpx::naming::get_locality_id_from_id(here);
 
     if (rank != 0) {
-        hpx::id_type id = hpx::agas::resolve_name_sync("/0/DSM_barrier");
+        hpx::id_type id =
+            hpx::agas::resolve_name(hpx::launch::sync, "/0/DSM_barrier");
         unique_barrier = hpx::lcos::barrier(id);
     }
 }
@@ -818,7 +820,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::cout << "Unregistering Barrier " << rank << std::endl;
     );
     if (0 == rank)
-        hpx::agas::unregister_name_sync("/0/DSM_barrier");
+        hpx::agas::unregister_name(hpx::launch::sync, "/0/DSM_barrier");
 
     DEBUG_OUTPUT(2,
         std::cout << "Calling finalize" << rank << std::endl;

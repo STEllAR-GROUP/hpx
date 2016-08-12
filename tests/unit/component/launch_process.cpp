@@ -130,7 +130,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         HPX_TEST_EQ(hpx::find_all_localities().size(), std::size_t(2));
 
         // wait for it to exit, we know it returns 42 (see --exit_code=<> above)
-        int exit_code = c.wait_for_exit_sync();
+        int exit_code = c.wait_for_exit(hpx::launch::sync);
         HPX_TEST_EQ(exit_code, 42);
 
         // make sure the launched process has set the message in the component

@@ -24,7 +24,7 @@ namespace hpx { namespace traits
     {
         template <typename Policy>
         struct is_launch_policy
-          : std::is_same<launch, Policy>
+          : std::is_base_of<hpx::detail::policy_holder, Policy>
         {};
 
         template <typename Policy>

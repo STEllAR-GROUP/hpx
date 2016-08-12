@@ -11,6 +11,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -499,19 +500,19 @@ void test_wait_callback_with_timed_wait()
     hpx::lcos::shared_future<void> fv =
         fi.then(hpx::util::bind(&do_nothing_callback, boost::ref(pi)));
 
-    int state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    int state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
     HPX_TEST_EQ(callback_called, 0U);
 
-    state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
-    state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
     HPX_TEST_EQ(callback_called, 0U);
 
     pi.set_value(42);
 
-    state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::ready));
 
     HPX_TEST_EQ(callback_called, 1U);
@@ -594,7 +595,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
 ///////////////////////////////////////////////////////////////////////////////
 int make_int_slowly()
 {
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
     return 42;
 }
 
