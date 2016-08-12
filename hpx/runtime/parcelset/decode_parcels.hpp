@@ -167,7 +167,7 @@ namespace hpx { namespace parcelset
                 data.serialization_time_ = timer.elapsed_nanoseconds() -
                     overall_add_parcel_time;
 
-                pp.add_received_data("", data);
+                pp.add_received_data(data);
             }
             catch (hpx::exception const& e) {
                 LPT_(error)
