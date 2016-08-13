@@ -12,6 +12,7 @@
 #include <hpx/util/function.hpp>
 
 #include <cstdint>
+#include <string>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
