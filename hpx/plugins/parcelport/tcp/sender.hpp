@@ -18,6 +18,7 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/plugins/parcelport/tcp/locality.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
