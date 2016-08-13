@@ -20,27 +20,28 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <cstdint>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::int64_t skynet(boost::int64_t num, boost::int64_t size, boost::int64_t div)
+std::int64_t skynet(std::int64_t num, std::int64_t size, std::int64_t div)
 {
     if (size != 1)
     {
         size /= div;
 
-        std::vector<hpx::future<boost::int64_t> > results;
+        std::vector<hpx::future<std::int64_t> > results;
         results.reserve(div);
 
-        for (boost::int64_t i = 0; i != div; ++i)
+        for (std::int64_t i = 0; i != div; ++i)
         {
-            boost::int64_t sub_num = num + i * size;
+            std::int64_t sub_num = num + i * size;
             results.push_back(hpx::async(skynet, sub_num, size, div));
         }
 
         hpx::wait_all(results);
 
-        boost::int64_t sum = 0;
+        std::int64_t sum = 0;
         for (auto & f : results)
             sum += f.get();
         return sum;
@@ -49,26 +50,26 @@ boost::int64_t skynet(boost::int64_t num, boost::int64_t size, boost::int64_t di
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::int64_t>
-skynet_f(boost::int64_t num, boost::int64_t size, boost::int64_t div)
+hpx::future<std::int64_t>
+skynet_f(std::int64_t num, std::int64_t size, std::int64_t div)
 {
     if (size != 1)
     {
         size /= div;
 
-        std::vector<hpx::future<boost::int64_t> > results;
+        std::vector<hpx::future<std::int64_t> > results;
         results.reserve(div);
 
-        for (boost::int64_t i = 0; i != div; ++i)
+        for (std::int64_t i = 0; i != div; ++i)
         {
-            boost::int64_t sub_num = num + i * size;
+            std::int64_t sub_num = num + i * size;
             results.push_back(hpx::async(skynet_f, sub_num, size, div));
         }
 
         return hpx::dataflow(
-            [](std::vector<hpx::future<boost::int64_t> > && sums)
+            [](std::vector<hpx::future<std::int64_t> > && sums)
             {
-                boost::int64_t sum = 0;
+                std::int64_t sum = 0;
                 for (auto & f : sums)
                     sum += f.get();
                 return sum;
@@ -82,9 +83,9 @@ skynet_f(boost::int64_t num, boost::int64_t size, boost::int64_t div)
 int main()
 {
     {
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::util::high_resolution_clock::now();
 
-        hpx::future<boost::int64_t> result = hpx::async(skynet, 0, 1000000, 10);
+        hpx::future<std::int64_t> result = hpx::async(skynet, 0, 1000000, 10);
         result.wait();
 
         t = hpx::util::high_resolution_clock::now() - t;
@@ -95,9 +96,9 @@ int main()
     }
 
     {
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::util::high_resolution_clock::now();
 
-        hpx::future<boost::int64_t> result = hpx::async(skynet_f, 0, 1000000, 10);
+        hpx::future<std::int64_t> result = hpx::async(skynet_f, 0, 1000000, 10);
         result.wait();
 
         t = hpx::util::high_resolution_clock::now() - t;

@@ -19,8 +19,7 @@
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -54,16 +53,16 @@ namespace hpx { namespace plugins { namespace parcel
             bool stop_buffering = false);
 
         // access performance counter data
-        boost::int64_t get_parcels_count(bool reset);
-        boost::int64_t get_messages_count(bool reset);
-        boost::int64_t get_parcels_per_message_count(bool reset);
-        boost::int64_t get_average_time_between_parcels(bool reset);
-        std::vector<boost::int64_t>
+        std::int64_t get_parcels_count(bool reset);
+        std::int64_t get_messages_count(bool reset);
+        std::int64_t get_parcels_per_message_count(bool reset);
+        std::int64_t get_average_time_between_parcels(bool reset);
+        std::vector<std::int64_t>
             get_time_between_parcels_histogram(bool reset);
         void get_time_between_parcels_histogram_creator(
-            boost::int64_t min_boundary, boost::int64_t max_boundary,
-            boost::int64_t num_buckets,
-            util::function_nonser<std::vector<boost::int64_t>(bool)>& result);
+            std::int64_t min_boundary, std::int64_t max_boundary,
+            std::int64_t num_buckets,
+            util::function_nonser<std::vector<std::int64_t>(bool)>& result);
 
         // register the given action
         static void register_action(char const* action, error_code& ec);
@@ -84,15 +83,15 @@ namespace hpx { namespace plugins { namespace parcel
         std::string action_name_;
 
         // performance counter data
-        boost::int64_t num_parcels_;
-        boost::int64_t reset_num_parcels_;
-        boost::int64_t reset_num_parcels_per_message_parcels_;
-        boost::int64_t num_messages_;
-        boost::int64_t reset_num_messages_;
-        boost::int64_t reset_num_parcels_per_message_messages_;
-        boost::int64_t started_at_;
-        boost::int64_t reset_time_num_parcels_;
-        boost::int64_t last_parcel_time_;
+        std::int64_t num_parcels_;
+        std::int64_t reset_num_parcels_;
+        std::int64_t reset_num_parcels_per_message_parcels_;
+        std::int64_t num_messages_;
+        std::int64_t reset_num_messages_;
+        std::int64_t reset_num_parcels_per_message_messages_;
+        std::int64_t started_at_;
+        std::int64_t reset_time_num_parcels_;
+        std::int64_t last_parcel_time_;
 
         typedef boost::accumulators::accumulator_set<
                 double,     // collects percentiles
@@ -100,9 +99,9 @@ namespace hpx { namespace plugins { namespace parcel
             > histogram_collector_type;
 
         std::unique_ptr<histogram_collector_type> time_between_parcels_;
-        boost::int64_t histogram_min_boundary_;
-        boost::int64_t histogram_max_boundary_;
-        boost::int64_t histogram_num_buckets_;
+        std::int64_t histogram_min_boundary_;
+        std::int64_t histogram_max_boundary_;
+        std::int64_t histogram_num_buckets_;
     };
 }}}
 

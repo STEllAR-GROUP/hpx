@@ -13,6 +13,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -26,7 +27,7 @@ int test_function(hpx::serialization::serialize_buffer<double> const& b)
 HPX_PLAIN_ACTION(test_function, test_action)
 
 std::size_t get_archive_size(hpx::parcelset::parcel const& p,
-    boost::uint32_t flags,
+    std::uint32_t flags,
     std::vector<hpx::serialization::serialization_chunk>* chunks)
 {
     // gather the required size for the archive
@@ -44,7 +45,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function));
+        reinterpret_cast<std::uint64_t>(&test_function));
 
     // compose archive flags
 #ifdef BOOST_BIG_ENDIAN
@@ -109,7 +110,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     if (zerocopy)
         chunks = new std::vector<hpx::serialization::serialization_chunk>();
 
-    boost::uint32_t dest_locality_id = outp.destination_locality_id();
+    std::uint32_t dest_locality_id = outp.destination_locality_id();
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)

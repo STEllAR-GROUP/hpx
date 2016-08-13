@@ -11,7 +11,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/protect.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 #include <iostream>

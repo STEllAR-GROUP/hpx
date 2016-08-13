@@ -9,14 +9,14 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/thread_executors.hpp>
 
-#include "worker_timed.hpp"
+#include <boost/format.hpp>
 
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include <boost/format.hpp>
-#include <boost/cstdint.hpp>
+#include "worker_timed.hpp"
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -38,13 +38,13 @@ using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
-boost::uint64_t tasks = 500000;
-boost::uint64_t delay = 0;
+std::uint64_t tasks = 500000;
+std::uint64_t delay = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    boost::uint64_t cores
+    std::uint64_t cores
   , double walltime
     )
 {
@@ -112,7 +112,7 @@ int hpx_main(
         t.restart();
 
         // schedule normal threads
-        for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (std::uint64_t i = 0; i < tasks; ++i)
             executors[i % num_executors].add(
                 hpx::util::bind(&worker_timed, delay * 1000));
     // destructors of executors will wait for all tasks to finish executing
@@ -134,11 +134,11 @@ int main(
 
     cmdline.add_options()
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , value<std::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(0)
+        , value<std::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
 
         ( "executors,e"

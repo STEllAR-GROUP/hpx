@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/cstdint.hpp
+
 #ifndef HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
@@ -16,6 +18,9 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
+#include <boost/cstdint.hpp>
+
+#include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
@@ -37,8 +42,8 @@ namespace hpx { namespace serialization
 
         template <typename Container>
         output_archive(Container & buffer,
-            boost::uint32_t flags = 0U,
-            boost::uint32_t dest_locality_id = ~0U,
+            std::uint32_t flags = 0U,
+            std::uint32_t dest_locality_id = ~0U,
             std::vector<serialization_chunk>* chunks = nullptr,
             binary_filter* filter = nullptr,
             new_gids_map* new_gids = nullptr)
@@ -51,7 +56,7 @@ namespace hpx { namespace serialization
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
-            boost::uint64_t endianess = this->base_type::endian_big() ? ~0ul : 0ul;
+            std::uint64_t endianess = this->base_type::endian_big() ? ~0ul : 0ul;
             save(endianess);
 
             // send flags sent by the other end to make sure both ends have
@@ -85,7 +90,7 @@ namespace hpx { namespace serialization
                 *hpx::traits::future_access<Future>::get_shared_state(f));
         }
 
-        boost::uint32_t get_dest_locality_id() const
+        std::uint32_t get_dest_locality_id() const
         {
             return dest_locality_id_;
         }
@@ -197,13 +202,13 @@ namespace hpx { namespace serialization
         template <typename T>
         void save_integral(T val, std::false_type)
         {
-            save_integral_impl(static_cast<boost::int64_t>(val));
+            save_integral_impl(static_cast<std::int64_t>(val));
         }
 
         template <typename T>
         void save_integral(T val, std::true_type)
         {
-            save_integral_impl(static_cast<boost::uint64_t>(val));
+            save_integral_impl(static_cast<std::uint64_t>(val));
         }
 
 #if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
@@ -274,12 +279,12 @@ namespace hpx { namespace serialization
               buffer_->save_binary_chunk(address, count);
         }
 
-        typedef std::map<const void *, boost::uint64_t> pointer_tracker;
+        typedef std::map<const void *, std::uint64_t> pointer_tracker;
 
         // FIXME: make this function capable for ADL lookup and hence if used
         // as a dependent name it doesn't require output_archive to be complete
         // type or itself to be forwarded
-        friend boost::uint64_t track_pointer(output_archive& ar, const void* pos)
+        friend std::uint64_t track_pointer(output_archive& ar, const void* pos)
         {
             pointer_tracker::iterator it = ar.pointer_tracker_.find(pos);
             if(it == ar.pointer_tracker_.end())
@@ -292,7 +297,7 @@ namespace hpx { namespace serialization
 
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
-        boost::uint32_t dest_locality_id_;
+        std::uint32_t dest_locality_id_;
         new_gids_map * new_gids_;
     };
 }}

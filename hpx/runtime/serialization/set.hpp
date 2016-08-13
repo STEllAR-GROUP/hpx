@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <cstdint>
 #include <set>
 #include <utility>
 
@@ -18,7 +19,7 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, std::set<T, Compare, Allocator> & set, unsigned)
     {
         set.clear();
-        boost::uint64_t size;
+        std::uint64_t size;
         ar >> size;
 
         set.clear();
@@ -33,7 +34,7 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar,const std::set<T, Compare, Allocator> & set,
         unsigned)
     {
-        boost::uint64_t size = set.size();
+        std::uint64_t size = set.size();
         ar << size;
         if(set.empty()) return;
         for (T const& i: set) {

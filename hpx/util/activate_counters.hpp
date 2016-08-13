@@ -13,8 +13,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/cstdint.hpp>
-
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util

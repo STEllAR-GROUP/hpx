@@ -18,6 +18,7 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -203,13 +204,13 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
-        boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
+        std::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
         {
             HPX_ASSERT(tree.size());
             // Return queue length of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                boost::uint64_t queue_length = 0;
+                std::uint64_t queue_length = 0;
                 for (size_type i = 0; i != tree.size(); ++i)
                 {
                     level_type const& t = tree[i];
@@ -222,7 +223,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // Cumulative queue lengths of all queues.
-            boost::int64_t result = 0;
+            std::int64_t result = 0;
             for(size_type i = 0; i < tree.size(); ++i)
             {
                 for(size_type j = 0; j < tree.at(i).size(); ++j)
@@ -235,7 +236,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current thread count of the queues.
-        boost::int64_t get_thread_count(thread_state_enum state = unknown,
+        std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1), bool reset = false) const
         {
@@ -243,7 +244,7 @@ namespace hpx { namespace threads { namespace policies
             // Return thread count of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                boost::uint64_t thread_count = 0;
+                std::uint64_t thread_count = 0;
                 for (size_type i = 0; i != tree.size(); ++i)
                 {
                     level_type const& t = tree[i];
@@ -256,7 +257,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // Return the cumulative count for all queues.
-            boost::int64_t result = 0;
+            std::int64_t result = 0;
             for(size_type i = 0; i < tree.size(); ++i)
             {
                 for(size_type j = 0; j < tree[i].size(); ++j)
@@ -269,7 +270,7 @@ namespace hpx { namespace threads { namespace policies
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         ///////////////////////////////////////////////////////////////////////
-        boost::int64_t get_average_thread_wait_time(
+        std::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
             HPX_ASSERT(tree.size());
@@ -277,7 +278,7 @@ namespace hpx { namespace threads { namespace policies
             // Return average thread wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                boost::uint64_t wait_time = 0;
+                std::uint64_t wait_time = 0;
                 for (size_type i = 0; i != tree.size(); ++i)
                 {
                     level_type const& t = tree[i];
@@ -291,8 +292,8 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // Return the cumulative average thread wait time for all queues.
-            boost::int64_t result = 0;
-            boost::int64_t count = 0;
+            std::int64_t result = 0;
+            std::int64_t count = 0;
             for(size_type i = 0; i < tree.size(); ++i)
             {
                 for(size_type j = 0; j < tree[i].size(); ++j)
@@ -305,7 +306,7 @@ namespace hpx { namespace threads { namespace policies
             return count ? (result / count) : 0; //-V609
         }
 
-        boost::int64_t get_average_task_wait_time(
+        std::int64_t get_average_task_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
             HPX_ASSERT(tree.size());
@@ -313,7 +314,7 @@ namespace hpx { namespace threads { namespace policies
             // Return average task wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                boost::uint64_t wait_time = 0;
+                std::uint64_t wait_time = 0;
                 for (size_type i = 0; i != tree.size(); ++i)
                 {
                     level_type const& t = tree[i];
@@ -327,8 +328,8 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // Return the cumulative average task wait time for all queues.
-            boost::int64_t result = 0;
-            boost::int64_t count = 0;
+            std::int64_t result = 0;
+            std::int64_t count = 0;
             for(size_type i = 0; i < tree.size(); ++i)
             {
                 for(size_type j = 0; j < tree[i].size(); ++j)
@@ -343,9 +344,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        boost::uint64_t get_creation_time(bool reset)
+        std::uint64_t get_creation_time(bool reset)
         {
-            boost::uint64_t time = 0;
+            std::uint64_t time = 0;
 
             for (size_type i = 0; i != tree.size(); ++i)
             {
@@ -356,9 +357,9 @@ namespace hpx { namespace threads { namespace policies
             return time;
         }
 
-        boost::uint64_t get_cleanup_time(bool reset)
+        std::uint64_t get_cleanup_time(bool reset)
         {
-            boost::uint64_t time = 0;
+            std::uint64_t time = 0;
 
             for (size_type i = 0; i != tree.size(); ++i)
             {
@@ -371,9 +372,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        boost::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_pending_misses = 0;
+            std::int64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -398,9 +399,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        boost::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_pending_accesses = 0;
+            std::int64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -425,9 +426,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        boost::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -452,9 +453,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -479,9 +480,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -506,9 +507,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -594,7 +595,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(parent < tree.at(level-1).size());
 
             thread_queue_type * tq = tree[level][idx];
-            boost::int64_t num = tq->get_pending_queue_length();
+            std::int64_t num = tq->get_pending_queue_length();
             thread_queue_type * dest = tree[level-1][parent];
             if(num == 0)
             {
@@ -618,7 +619,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            boost::int64_t count = tq->get_pending_queue_length()/d + 1;
+            std::int64_t count = tq->get_pending_queue_length()/d + 1;
             dest->move_work_items_from(tq, count);
 
             tq->increment_num_stolen_from_pending(std::size_t(count));
@@ -628,7 +629,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree[0].size());
@@ -670,7 +671,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
         {
             for(size_type i = 0; i < tree.size(); ++i)
             {
@@ -700,7 +701,7 @@ namespace hpx { namespace threads { namespace policies
 
             thread_queue_type * tq = tree[level][idx];
 
-            boost::int64_t num = tq->get_staged_queue_length();
+            std::int64_t num = tq->get_staged_queue_length();
             if(num == 0)
             {
                 if(task_flag_tree[level][idx] == false)
@@ -735,7 +736,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count)
+            std::int64_t& idle_loop_count)
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree.at(0).size());

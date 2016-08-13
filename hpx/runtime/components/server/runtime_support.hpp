@@ -41,6 +41,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
@@ -185,7 +186,7 @@ namespace hpx { namespace components { namespace server
         /// \param count [in] This GID is a count of the number of components
         ///                   to destroy. It does not represent a global address.
         void free_component(agas::gva const&, naming::gid_type const& gid,
-            boost::uint64_t count);
+            std::uint64_t count);
 
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout, naming::id_type const& respond_to);
@@ -210,7 +211,7 @@ namespace hpx { namespace components { namespace server
         /// \brief Update the given name mapping into the AGAS cache of this
         ///        locality.
         void update_agas_cache_entry(naming::gid_type const&,
-            naming::address const&, boost::uint64_t, boost::uint64_t);
+            naming::address const&, std::uint64_t, std::uint64_t);
 
         /// \brief Load all components on this locality.
         int load_components();
@@ -227,7 +228,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Return the current instance count for the given component
         ///        type
-        boost::int32_t get_instance_count(components::component_type);
+        std::int32_t get_instance_count(components::component_type);
 
         /// \brief Remove the given locality from our connection cache
         void remove_from_connection_cache(naming::gid_type const& gid,
@@ -237,8 +238,8 @@ namespace hpx { namespace components { namespace server
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
         bool dijkstra_termination();
 #else
-        void dijkstra_termination(boost::uint32_t initiating_locality_id,
-            boost::uint32_t num_localities, bool dijkstra_token);
+        void dijkstra_termination(std::uint32_t initiating_locality_id,
+            std::uint32_t num_localities, bool dijkstra_token);
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -416,9 +417,9 @@ namespace hpx { namespace components { namespace server
 
 #if !defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
         void send_dijkstra_termination_token(
-            boost::uint32_t target_locality_id,
-            boost::uint32_t initiating_locality_id,
-            boost::uint32_t num_localities, bool dijkstra_token);
+            std::uint32_t target_locality_id,
+            std::uint32_t initiating_locality_id,
+            std::uint32_t num_localities, bool dijkstra_token);
 #endif
 
     private:

@@ -8,14 +8,14 @@
 #if !defined(HPX_E0A61B00_A571_48EF_8516_ECB48CDDBC00)
 #define HPX_E0A61B00_A571_48EF_8516_ECB48CDDBC00
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util { namespace hardware
 {
 
-inline boost::uint64_t timestamp()
+inline std::uint64_t timestamp()
 {
-    boost::uint32_t lo = 0, hi = 0;
+    std::uint32_t lo = 0, hi = 0;
     #if defined(HPX_HAVE_RDTSCP)
         __asm__ __volatile__ (
             "rdtscp ;\n"
@@ -30,7 +30,7 @@ inline boost::uint64_t timestamp()
             :
             : "rbx", "rcx");
     #endif
-    return ((static_cast<boost::uint64_t>(hi)) << 32) | lo;
+    return ((static_cast<std::uint64_t>(hi)) << 32) | lo;
 }
 
 }}}

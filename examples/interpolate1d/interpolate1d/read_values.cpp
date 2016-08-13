@@ -7,6 +7,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstdint>
 #include <string>
 
 #include "read_values.hpp"
@@ -41,7 +42,7 @@ namespace interpolate1d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::uint64_t extract_data_range (std::string const& datafilename,
+    std::uint64_t extract_data_range (std::string const& datafilename,
         double& minval, double& maxval, double& delta,
         std::size_t start, std::size_t end)
     {

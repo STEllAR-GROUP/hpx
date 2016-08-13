@@ -12,9 +12,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/steady_clock.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -44,11 +43,11 @@ namespace hpx { namespace util { namespace detail
     public:
         interval_timer();
         interval_timer(util::function_nonser<bool()> const& f,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown);
         interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown);
 
         ~interval_timer();
@@ -61,10 +60,10 @@ namespace hpx { namespace util { namespace detail
         bool is_started() const { return is_started_; }
         bool is_terminated() const { return is_terminated_; }
 
-        boost::int64_t get_interval() const;
+        std::int64_t get_interval() const;
 
-        void slow_down(boost::int64_t max_interval);
-        void speed_up(boost::int64_t min_interval);
+        void slow_down(std::int64_t max_interval);
+        void speed_up(std::int64_t min_interval);
 
     protected:
         // schedule a high priority task after a given time interval
@@ -80,7 +79,7 @@ namespace hpx { namespace util { namespace detail
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_; ///< function to call
         util::function_nonser<void()> on_term_; ///< function to call on termination
-        boost::int64_t microsecs_;    ///< time interval
+        std::int64_t microsecs_;    ///< time interval
         threads::thread_id_type id_;  ///< id of currently scheduled thread
         std::string description_;     ///< description of this interval timer
 
@@ -102,11 +101,11 @@ namespace hpx { namespace util
     public:
         interval_timer();
         interval_timer(util::function_nonser<bool()> const& f,
-            boost::int64_t microsecs, std::string const& description = "",
+            std::int64_t microsecs, std::string const& description = "",
             bool pre_shutdown = false);
         interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::int64_t microsecs, std::string const& description = "",
+            std::int64_t microsecs, std::string const& description = "",
             bool pre_shutdown = false);
 
         interval_timer(util::function_nonser<bool()> const& f,
@@ -142,10 +141,10 @@ namespace hpx { namespace util
             return timer_->is_terminated();
         }
 
-        boost::int64_t get_interval() const;
+        std::int64_t get_interval() const;
 
-        void slow_down(boost::int64_t max_interval);
-        void speed_up(boost::int64_t min_interval);
+        void slow_down(std::int64_t max_interval);
+        void speed_up(std::int64_t min_interval);
 
         void slow_down(util::steady_duration const& max_interval);
         void speed_up(util::steady_duration const& min_interval);

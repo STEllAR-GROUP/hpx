@@ -15,6 +15,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -55,14 +56,14 @@ vector<double> L;
 vector<double> U;
 int size = 200;
 
-boost::uint64_t get_tick_count()
+std::uint64_t get_tick_count()
 {
     return hpx::util::high_resolution_clock::now() / 1000;
 }
 
 int hpx_main (int argc, char *argv[])
 {
-    boost::uint64_t t1, t2;
+    std::uint64_t t1, t2;
     vector<double> originalA;
     int numBlocks = 20;
 

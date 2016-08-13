@@ -13,6 +13,7 @@
 #include <boost/atomic.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -154,7 +155,7 @@ int hpx_main(variables_map& vm)
 
     {
         // create a (remote) memory block
-        memory_block mb = memory_block::create<int, uint8_t>(prefix, elements);
+        memory_block mb = memory_block::create<int, std::uint8_t>(prefix, elements);
         access_memory_block<int> data(mb.get_data());
 
         // randomly fill the vector

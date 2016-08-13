@@ -10,6 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -58,7 +59,7 @@ namespace interpolate1d
 
     private:
         std::vector<hpx::naming::id_type> partitions_;
-        boost::uint64_t num_elements_;
+        std::uint64_t num_elements_;
         double minval_, delta_;
     };
 }

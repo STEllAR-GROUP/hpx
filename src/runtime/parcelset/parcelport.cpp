@@ -21,6 +21,7 @@
 
 #include <boost/chrono/chrono.hpp>
 
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -115,7 +116,7 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::uint64_t HPX_EXPORT get_max_inbound_size(parcelport& pp)
+    std::uint64_t HPX_EXPORT get_max_inbound_size(parcelport& pp)
     {
         return pp.get_max_inbound_message_size();
     }

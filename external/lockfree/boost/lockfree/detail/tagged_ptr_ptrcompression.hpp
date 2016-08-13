@@ -10,9 +10,8 @@
 #define BOOST_LOCKFREE_TAGGED_PTR_PTRCOMPRESSION_HPP_INCLUDED
 
 #include <cstddef>              /* for std::size_t */
+#include <cstdint>
 #include <limits>
-
-#include <boost/cstdint.hpp>
 
 #include <boost/lockfree/detail/branch_hints.hpp>
 
@@ -25,10 +24,10 @@ namespace detail {
 template <class T>
 class tagged_ptr
 {
-    typedef boost::uint64_t compressed_ptr_t;
+    typedef std::uint64_t compressed_ptr_t;
 
 public:
-    typedef boost::uint16_t tag_t;
+    typedef std::uint16_t tag_t;
 
 private:
     union cast_unit

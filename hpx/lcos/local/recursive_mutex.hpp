@@ -15,6 +15,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
@@ -63,7 +65,7 @@ namespace hpx { namespace lcos { namespace local
             typedef typename thread_id_from_mutex<Mutex>::thread_id_type
                 thread_id_type;
 
-            boost::atomic<boost::uint64_t> recursion_count;
+            boost::atomic<std::uint64_t> recursion_count;
             boost::atomic<thread_id_type> locking_thread_id;
             Mutex mtx;
 

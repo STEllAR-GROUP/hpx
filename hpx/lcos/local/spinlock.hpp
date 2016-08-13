@@ -35,6 +35,7 @@
 #endif
 
 #include <cstddef>
+#include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -54,7 +55,7 @@ namespace hpx { namespace lcos { namespace local
 #if defined(__ANDROID__) && defined(ANDROID)
         int v_;
 #else
-        boost::uint64_t v_;
+        std::uint64_t v_;
 #endif
 
     public:
@@ -181,10 +182,10 @@ namespace hpx { namespace lcos { namespace local
         bool acquire_lock()
         {
 #if !defined( BOOST_SP_HAS_SYNC )
-            boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
+            std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
-            boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
+            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
             return r == 0;
         }
@@ -193,7 +194,7 @@ namespace hpx { namespace lcos { namespace local
         {
 #if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
-            *const_cast<boost::uint64_t volatile*>(&v_) = 0;
+            *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);
 #endif

@@ -10,6 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -143,8 +144,8 @@ namespace hpx { namespace components
         }
 
         void update_agas_cache_entry(naming::gid_type const& gid,
-            naming::address const& g, boost::uint64_t count,
-            boost::uint64_t offset)
+            naming::address const& g, std::uint64_t count,
+            std::uint64_t offset)
         {
             this->base_type::update_agas_cache_entry(gid_, gid, g, count, offset);
         }
@@ -155,7 +156,7 @@ namespace hpx { namespace components
             this->base_type::get_config(gid_, ini);
         }
 
-        boost::int32_t  get_instance_count(components::component_type type)
+        std::int32_t  get_instance_count(components::component_type type)
         {
             return this->base_type::get_instance_count(gid_, type);
         }

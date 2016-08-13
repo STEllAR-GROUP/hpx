@@ -22,7 +22,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/integer/cover_operators.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/detail/endian.hpp>
 
 #include <climits>

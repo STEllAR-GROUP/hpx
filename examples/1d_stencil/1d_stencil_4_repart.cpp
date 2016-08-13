@@ -22,13 +22,13 @@
 #include <hpx/include/performance_counters.hpp>
 
 #include <boost/range/irange.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#include <limits>
 #include <algorithm>
-#include <string>
+#include <cstdint>
+#include <limits>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -58,7 +58,7 @@ void setup_counters() {
         performance_counter::start(id);
         std::cout << "Counter " << counter_name << " initialized " << id << std::endl;
         counter_value value = performance_counter::get_value(id);
-        std::cout << "Counter value " << value.get_value<boost::int64_t>() << std::endl;
+        std::cout << "Counter value " << value.get_value<std::int64_t>() << std::endl;
         counter_id = id;
         end_iteration_event = apex::register_custom_event("Repartition");
         counters_initialized = true;
@@ -79,7 +79,7 @@ double get_counter_value() {
     }
     try {
         counter_value value1 = performance_counter::get_value(counter_id, true);
-        boost::int64_t counter_value = value1.get_value<boost::int64_t>();
+        std::int64_t counter_value = value1.get_value<std::int64_t>();
         std::cerr << "counter_value " << counter_value << std::endl;
         return (double)(counter_value);
     }
@@ -279,15 +279,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     /* Number of partitions dynamically determined
     // Number of partitions.
-    // boost::uint64_t np = vm["np"].as<boost::uint64_t>();
+    // std::uint64_t np = vm["np"].as<std::uint64_t>();
     */
 
     // Number of grid points.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();
+    std::uint64_t nx = vm["nx"].as<std::uint64_t>();
     // Number of steps.
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();
     // Number of runs (repartition between runs).
-    boost::uint64_t nr = vm["nr"].as<boost::uint64_t>();
+    std::uint64_t nr = vm["nr"].as<std::uint64_t>();
 
     //std::cerr << "nx = " << nx << std::endl;
     //std::cerr << "nt = " << nt << std::endl;
@@ -296,13 +296,13 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (vm.count("no-header"))
         header = false;
 
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
     // Find divisors of nx
-    std::vector<boost::uint64_t> divisors;
+    std::vector<std::uint64_t> divisors;
     // Start with os_thread_count so we have at least as many
     // partitions as we have HPX threads.
-    for(boost::uint64_t i = os_thread_count; i < std::sqrt(nx); ++i) {
+    for(std::uint64_t i = os_thread_count; i < std::sqrt(nx); ++i) {
         if(nx % i == 0) {
             divisors.push_back(i);
             divisors.push_back(nx/i);
@@ -310,7 +310,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     // This is not necessarily correct (sqrt(x) does not always evenly divide x)
     // and leads to partition size = 1 which we want to avoid
-    //divisors.push_back(static_cast<boost::uint64_t>(std::sqrt(nx)));
+    //divisors.push_back(static_cast<std::uint64_t>(std::sqrt(nx)));
     std::sort(divisors.begin(), divisors.end());
 
     if(divisors.size() == 0) {
@@ -322,7 +322,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     //std::cerr << "Divisors: ";
-    //for(boost::uint64_t d : divisors) {
+    //for(std::uint64_t d : divisors) {
     //    std::cerr << d << " ";
     //}
     //std::cerr << std::endl;
@@ -343,17 +343,17 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     boost::shared_array<double> data;
-    for(boost::uint64_t i = 0; i < nr; ++i)
+    for(std::uint64_t i = 0; i < nr; ++i)
     {
-        boost::uint64_t parts = divisors[np_index];
-        boost::uint64_t size_per_part = nx / parts;
-        boost::uint64_t total_size = parts * size_per_part;
+        std::uint64_t parts = divisors[np_index];
+        std::uint64_t size_per_part = nx / parts;
+        std::uint64_t total_size = parts * size_per_part;
 
         //std::cerr << "parts: " << parts << " Per part: " << size_per_part;
         //std::cerr << " Overall: " << total_size << std::endl;
 
         // Measure execution time.
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::util::high_resolution_clock::now();
 
         // Execute nt time steps on nx grid points and print the final solution.
         hpx::future<stepper::space> result =
@@ -362,7 +362,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         stepper::space solution = result.get();
         hpx::wait_all(solution);
 
-        boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+        std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
         // Get new partition size
         apex::custom_event(end_iteration_event, 0);
@@ -371,7 +371,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         if (!data)
             data.reset(new double[total_size]);
 
-        for(boost::uint64_t partition = 0; partition != parts; ++partition)
+        for(std::uint64_t partition = 0; partition != parts; ++partition)
         {
             solution[partition].get()
                 .copy_into_array(data.get() + (partition*size_per_part));
@@ -380,7 +380,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Print the final solution
         if (vm.count("results"))
         {
-            for (boost::uint64_t i = 0; i != parts; ++i)
+            for (std::uint64_t i = 0; i != parts; ++i)
                 std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
         }
 
@@ -400,11 +400,11 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", value<boost::uint64_t>()->default_value(10),
+        ("nx", value<std::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(45),
+        ("nt", value<std::uint64_t>()->default_value(45),
          "Number of time steps")
-        ("nr", value<boost::uint64_t>()->default_value(10),
+        ("nr", value<std::uint64_t>()->default_value(10),
          "Number of runs")
         ("k", value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")

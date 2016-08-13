@@ -8,6 +8,7 @@
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 #include <hpx/runtime/agas/detail/hosted_service_client.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -49,7 +50,7 @@ namespace hpx { namespace agas { namespace detail
     }
 
     void hosted_service_client::register_server_instance(
-            boost::uint32_t locality_id)
+            std::uint32_t locality_id)
     {
         std::string str("locality#" +
             std::to_string(locality_id) + "/");

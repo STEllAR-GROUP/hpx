@@ -11,23 +11,24 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::int32_t increment(boost::int32_t i)
+std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
 HPX_PLAIN_ACTION(increment);  // defines increment_action
 
-boost::int32_t increment_with_future(hpx::shared_future<boost::int32_t> fi)
+std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
 HPX_PLAIN_ACTION(increment_with_future);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::int32_t mult2(boost::int32_t i)
+std::int32_t mult2(std::int32_t i)
 {
     return i * 2;
 }
@@ -59,8 +60,8 @@ int hpx_main()
         HPX_TEST_EQ(f1.get(), 43);
         HPX_TEST_EQ(callback_called.load(), 1);
 
-        hpx::promise<boost::int32_t> p;
-        hpx::shared_future<boost::int32_t> f = p.get_future();
+        hpx::promise<std::int32_t> p;
+        hpx::shared_future<std::int32_t> f = p.get_future();
 
         callback_called.store(0);
         hpx::future<int> f2 = hpx::async_continue_cb(
@@ -81,8 +82,8 @@ int hpx_main()
         HPX_TEST_EQ(f1.get(), 43);
         HPX_TEST_EQ(callback_called.load(), 1);
 
-        hpx::promise<boost::int32_t> p;
-        hpx::shared_future<boost::int32_t> f = p.get_future();
+        hpx::promise<std::int32_t> p;
+        hpx::shared_future<std::int32_t> f = p.get_future();
 
         callback_called.store(0);
         hpx::future<int> f2 = hpx::async_continue_cb(

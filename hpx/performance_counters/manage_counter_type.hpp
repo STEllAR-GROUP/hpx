@@ -16,6 +16,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstdint>
 #include <string>
 
 namespace hpx { namespace performance_counters
@@ -116,7 +117,7 @@ namespace hpx { namespace performance_counters
     ///       have to register each counter type on every locality where a
     ///       corresponding performance counter will be created.
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
-        hpx::util::function_nonser<boost::int64_t(bool)> const& counter_value,
+        hpx::util::function_nonser<std::int64_t(bool)> const& counter_value,
         std::string const& helptext = "", std::string const& uom = "",
         error_code& ec = throws);
 
@@ -185,7 +186,7 @@ namespace hpx { namespace performance_counters
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
         counter_type type, std::string const& helptext,
         std::string const& uom = "",
-        boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
+        std::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
         error_code& ec = throws);
 
     /// \brief Install a new generic performance counter type in a way, which
@@ -228,7 +229,7 @@ namespace hpx { namespace performance_counters
         counter_type type, std::string const& helptext,
         create_counter_func const& create_counter,
         discover_counters_func const& discover_counters,
-        boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
+        std::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
         std::string const& uom = "", error_code& ec = throws);
 
     /// \cond NOINTERNAL
@@ -241,7 +242,7 @@ namespace hpx { namespace performance_counters
                                     ///< counter type
         std::string helptext_;      ///< Longer descriptive text explaining the
                                     ///< counter type
-        boost::uint32_t version_;   ///< Version of this counter type definition
+        std::uint32_t version_;   ///< Version of this counter type definition
                                     ///< (default: HPX_PERFORMANCE_COUNTER_V1)
         create_counter_func create_counter_;
             ///< Function used to create a counter instance of this type.

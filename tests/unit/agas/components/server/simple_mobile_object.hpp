@@ -11,6 +11,8 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace test { namespace server
 {
 
@@ -20,9 +22,9 @@ struct HPX_COMPONENT_EXPORT simple_mobile_object
   public:
     simple_mobile_object() {}
 
-    boost::uint64_t get_lva()
+    std::uint64_t get_lva()
     {
-        return reinterpret_cast<boost::uint64_t>(this);
+        return reinterpret_cast<std::uint64_t>(this);
     }
 
     HPX_DEFINE_COMPONENT_ACTION(simple_mobile_object

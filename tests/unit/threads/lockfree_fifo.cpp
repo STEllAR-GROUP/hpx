@@ -16,22 +16,23 @@
 
 #include <boost/lockfree/queue.hpp>
 
+#include <cstdint>
 #include <vector>
 
-std::vector<boost::lockfree::queue<boost::uint64_t>*> queues;
-std::vector<boost::uint64_t> stolen;
+std::vector<boost::lockfree::queue<std::uint64_t>*> queues;
+std::vector<std::uint64_t> stolen;
 
-boost::uint64_t threads = 2;
-boost::uint64_t items = 500000;
+std::uint64_t threads = 2;
+std::uint64_t items = 500000;
 
-bool get_next_thread(boost::uint64_t num_thread)
+bool get_next_thread(std::uint64_t num_thread)
 {
-    boost::uint64_t r = 0;
+    std::uint64_t r = 0;
 
     if ((*queues[num_thread]).pop(r))
         return true;
 
-    for (boost::uint64_t i = 0; i < threads; ++i)
+    for (std::uint64_t i = 0; i < threads; ++i)
     {
         if (i == num_thread) continue;
 
@@ -45,11 +46,11 @@ bool get_next_thread(boost::uint64_t num_thread)
     return false;
 }
 
-void worker_thread(boost::uint64_t num_thread)
+void worker_thread(std::uint64_t num_thread)
 {
 //    while (get_next_thread(num_thread))
 //        {}
-    for (boost::uint64_t i = 0; i < items; ++i)
+    for (std::uint64_t i = 0; i < items; ++i)
     {
         bool result = get_next_thread(num_thread);
         BOOST_TEST(result);
@@ -72,9 +73,9 @@ int main(int argc, char** argv)
 
     desc_cmdline.add_options()
         ("help,h", "print out program usage (this message)")
-        ("threads,t", value<boost::uint64_t>(&threads)->default_value(2),
+        ("threads,t", value<std::uint64_t>(&threads)->default_value(2),
          "the number of worker threads inserting objects into the fifo")
-        ("items,i", value<boost::uint64_t>(&items)->default_value(500000),
+        ("items,i", value<std::uint64_t>(&items)->default_value(500000),
          "the number of items to create per queue")
     ;
 
@@ -92,15 +93,15 @@ int main(int argc, char** argv)
     }
 
     if (vm.count("threads"))
-        threads = vm["threads"].as<boost::uint64_t>();
+        threads = vm["threads"].as<std::uint64_t>();
 
     stolen.resize(threads);
 
-    for (boost::uint64_t i = 0; i < threads; ++i)
+    for (std::uint64_t i = 0; i < threads; ++i)
     {
-        queues.push_back(new boost::lockfree::queue<boost::uint64_t>(items));
+        queues.push_back(new boost::lockfree::queue<std::uint64_t>(items));
 
-        for (boost::uint64_t j = 0; j < items; ++j)
+        for (std::uint64_t j = 0; j < items; ++j)
             (*queues[i]).push(j);
 
         BOOST_TEST(!(*queues[i]).empty());
@@ -109,16 +110,16 @@ int main(int argc, char** argv)
     {
         boost::thread_group tg;
 
-        for (boost::uint64_t i = 0; i != threads; ++i)
+        for (std::uint64_t i = 0; i != threads; ++i)
             tg.create_thread(hpx::util::bind(&worker_thread, i));
 
         tg.join_all();
     }
 
-    for (boost::uint64_t i = 0; i < threads; ++i)
+    for (std::uint64_t i = 0; i < threads; ++i)
         BOOST_TEST(stolen[i] == 0);
 
-    for (boost::uint64_t i = 0; i < threads; ++i)
+    for (std::uint64_t i = 0; i < threads; ++i)
         delete queues[i];
 
     return boost::report_errors();

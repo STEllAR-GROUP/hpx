@@ -15,9 +15,8 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <cstddef> // for std::size_t
+#include <cstdint>
 
 namespace boost { namespace lockfree
 {
@@ -27,8 +26,8 @@ template <class Left, class Right>
 struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 {
     typedef __uint128_t compressed_ptr_pair_t;
-    typedef boost::uint64_t compressed_ptr_t;
-    typedef boost::uint16_t tag_t;
+    typedef std::uint64_t compressed_ptr_t;
+    typedef std::uint16_t tag_t;
 
     union BOOST_LOCKFREE_DCAS_ALIGNMENT cast_unit
     {
@@ -202,8 +201,8 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 #else
 struct BOOST_LOCKFREE_DCAS_ALIGNMENT uint128_type
 {
-    boost::uint64_t left;
-    boost::uint64_t right;
+    std::uint64_t left;
+    std::uint64_t right;
 
     bool operator==(volatile uint128_type const& rhs) const
     { return (left == rhs.left) && (right == rhs.right); }
@@ -216,8 +215,8 @@ template <class Left, class Right>
 struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 {
     typedef uint128_type compressed_ptr_pair_t;
-    typedef boost::uint64_t compressed_ptr_t;
-    typedef boost::uint16_t tag_t;
+    typedef std::uint64_t compressed_ptr_t;
+    typedef std::uint16_t tag_t;
 
     union BOOST_LOCKFREE_DCAS_ALIGNMENT cast_unit
     {

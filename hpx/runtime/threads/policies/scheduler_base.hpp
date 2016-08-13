@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -48,7 +49,7 @@ namespace hpx { namespace threads { namespace policies
     {
         struct reset_on_exit
         {
-            reset_on_exit(boost::atomic<boost::int32_t>& counter)
+            reset_on_exit(boost::atomic<std::int32_t>& counter)
               : counter_(counter)
             {
                 ++counter_;
@@ -59,7 +60,7 @@ namespace hpx { namespace threads { namespace policies
                 HPX_ASSERT(counter_ > 0);
                 --counter_;
             }
-            boost::atomic<boost::int32_t>& counter_;
+            boost::atomic<std::int32_t>& counter_;
         };
     }
 #endif
@@ -227,30 +228,30 @@ namespace hpx { namespace threads { namespace policies
         virtual bool numa_sensitive() const { return false; }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        virtual boost::uint64_t get_creation_time(bool reset) = 0;
-        virtual boost::uint64_t get_cleanup_time(bool reset) = 0;
+        virtual std::uint64_t get_creation_time(bool reset) = 0;
+        virtual std::uint64_t get_cleanup_time(bool reset) = 0;
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        virtual boost::int64_t get_num_pending_misses(std::size_t num_thread,
+        virtual std::int64_t get_num_pending_misses(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::int64_t get_num_pending_accesses(std::size_t num_thread,
+        virtual std::int64_t get_num_pending_accesses(std::size_t num_thread,
             bool reset) = 0;
 
-        virtual boost::int64_t get_num_stolen_from_pending(std::size_t num_thread,
+        virtual std::int64_t get_num_stolen_from_pending(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::int64_t get_num_stolen_to_pending(std::size_t num_thread,
+        virtual std::int64_t get_num_stolen_to_pending(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::int64_t get_num_stolen_from_staged(std::size_t num_thread,
+        virtual std::int64_t get_num_stolen_from_staged(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::int64_t get_num_stolen_to_staged(std::size_t num_thread,
+        virtual std::int64_t get_num_stolen_to_staged(std::size_t num_thread,
             bool reset) = 0;
 #endif
 
-        virtual boost::int64_t get_queue_length(
+        virtual std::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const = 0;
 
-        virtual boost::int64_t get_thread_count(
+        virtual std::int64_t get_thread_count(
             thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
@@ -265,7 +266,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread) = 0;
 
         virtual bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd) = 0;
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd) = 0;
 
         virtual void schedule_thread(threads::thread_data* thrd,
             std::size_t num_thread,
@@ -275,10 +276,10 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_normal) = 0;
 
         virtual bool destroy_thread(threads::thread_data* thrd,
-            boost::int64_t& busy_count) = 0;
+            std::int64_t& busy_count) = 0;
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count) = 0;
+            std::int64_t& idle_loop_count) = 0;
 
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
@@ -286,9 +287,9 @@ namespace hpx { namespace threads { namespace policies
             boost::exception_ptr const& e) = 0;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        virtual boost::int64_t get_average_thread_wait_time(
+        virtual std::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const = 0;
-        virtual boost::int64_t get_average_task_wait_time(
+        virtual std::int64_t get_average_task_wait_time(
             std::size_t num_thread = std::size_t(-1)) const = 0;
 #endif
 
@@ -307,7 +308,7 @@ namespace hpx { namespace threads { namespace policies
         // support for suspension on idle queues
         boost::mutex mtx_;
         boost::condition_variable cond_;
-        boost::atomic<boost::uint32_t> wait_count_;
+        boost::atomic<std::uint32_t> wait_count_;
 #endif
 
         std::vector<boost::atomic<hpx::state> > states_;

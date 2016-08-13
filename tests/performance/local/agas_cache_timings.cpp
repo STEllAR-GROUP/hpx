@@ -16,12 +16,12 @@
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
 #include <hpx/util/histogram.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
 #include <boost/icl/closed_interval.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <map>
 #include <string>
@@ -45,7 +45,7 @@ public:
       : key_()
     {}
 
-    explicit gva_cache_key(hpx::naming::gid_type const& id, boost::uint64_t count)
+    explicit gva_cache_key(hpx::naming::gid_type const& id, std::uint64_t count)
       : key_(hpx::naming::detail::get_stripped_gid(id),
              hpx::naming::detail::get_stripped_gid(id) + (count - 1))
     {
@@ -57,7 +57,7 @@ public:
         return boost::icl::lower(key_);
     }
 
-    boost::uint64_t get_count() const
+    std::uint64_t get_count() const
     {
         hpx::naming::gid_type const size = boost::icl::length(key_);
         HPX_ASSERT(size.get_msb() == 0);
@@ -86,7 +86,7 @@ public:
 
 struct gva_erase_policy
 {
-    gva_erase_policy(hpx::naming::gid_type const& id, boost::uint64_t count)
+    gva_erase_policy(hpx::naming::gid_type const& id, std::uint64_t count)
       : entry(id, count)
     {}
 
@@ -109,12 +109,12 @@ typedef hpx::util::cache::local_cache<
 
 ///////////////////////////////////////////////////////////////////////////////
 void calculate_histogram(std::string const& prefix,
-    std::vector<boost::uint64_t> const& timings)
+    std::vector<std::uint64_t> const& timings)
 {
     auto minmax = std::minmax_element(timings.begin(), timings.end());
 
     typedef boost::accumulators::accumulator_set<
-            boost::uint64_t,
+            std::uint64_t,
             boost::accumulators::features<hpx::util::tag::histogram>
         > histogram_collector_type;
 
@@ -123,7 +123,7 @@ void calculate_histogram(std::string const& prefix,
         hpx::util::tag::histogram::min_range = *minmax.first,
         hpx::util::tag::histogram::max_range = *minmax.second);
 
-    for (boost::int64_t t : timings)
+    for (std::int64_t t : timings)
     {
         hist(t);
     }
@@ -149,17 +149,17 @@ void calculate_histogram(std::string const& prefix,
 void test_insert(gva_cache_type& cache, std::size_t num_entries)
 {
     hpx::naming::gid_type locality = hpx::get_locality();
-    boost::uint32_t ct = hpx::components::component_invalid;
+    std::uint32_t ct = hpx::components::component_invalid;
 
-    std::vector<boost::uint64_t> timings;
+    std::vector<std::uint64_t> timings;
     timings.reserve(num_entries);
 
     for (std::size_t i = 0; i != num_entries; ++i)
     {
         gva_cache_key key(hpx::detail::get_next_id(), 1);
-        hpx::agas::gva value(locality, ct, 1, boost::uint64_t(0), 0);
+        hpx::agas::gva value(locality, ct, 1, std::uint64_t(0), 0);
 
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::util::high_resolution_clock::now();
 
         cache.insert(key, value);
 
@@ -171,7 +171,7 @@ void test_insert(gva_cache_type& cache, std::size_t num_entries)
 
 void test_get(gva_cache_type& cache, hpx::naming::gid_type first_key)
 {
-    std::vector<boost::uint64_t> timings;
+    std::vector<std::uint64_t> timings;
     timings.reserve(cache.size());
 
     for (std::size_t i = 0; i != cache.size(); ++i)
@@ -180,7 +180,7 @@ void test_get(gva_cache_type& cache, hpx::naming::gid_type first_key)
         gva_cache_key idbase;
         gva_cache_type::entry_type e;
 
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::util::high_resolution_clock::now();
 
         cache.get_entry(key, idbase, e);
 
@@ -193,17 +193,17 @@ void test_get(gva_cache_type& cache, hpx::naming::gid_type first_key)
 void test_update(gva_cache_type& cache, hpx::naming::gid_type first_key)
 {
     hpx::naming::gid_type locality = hpx::get_locality();
-    boost::uint32_t ct = hpx::components::component_invalid;
+    std::uint32_t ct = hpx::components::component_invalid;
 
-    std::vector<boost::uint64_t> timings;
+    std::vector<std::uint64_t> timings;
     timings.reserve(cache.size());
 
     for (std::size_t i = 0; i != cache.size(); ++i)
     {
         gva_cache_key key(++first_key, 1);
-        hpx::agas::gva value(locality, ct, 1, boost::uint64_t(1), 1);
+        hpx::agas::gva value(locality, ct, 1, std::uint64_t(1), 1);
 
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::util::high_resolution_clock::now();
 
         cache.update(key, value);
 

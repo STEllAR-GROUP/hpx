@@ -16,10 +16,10 @@
 
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
 
-#include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
 
 #include <chrono>
+#include <cstdint>
 #include <cstdlib>
 #include <vector>
 
@@ -29,11 +29,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timer with nanosecond resolution
-inline boost::uint64_t now()
+inline std::uint64_t now()
 {
     std::chrono::nanoseconds ns =
         std::chrono::steady_clock::now().time_since_epoch();
-    return static_cast<boost::uint64_t>(ns.count());
+    return static_cast<std::uint64_t>(ns.count());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ double dx = 1.;     // grid spacing
 
 inline std::size_t idx(std::size_t i, std::size_t size)
 {
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
+    return (std::int64_t(i) < 0) ? (i + size) % size : i % size;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ struct stepper
         {
         // Visual Studio requires OMP loop variables to be signed :/
         # pragma omp for schedule(static)
-        for (boost::int64_t i = 0; i < (boost::int64_t)np; ++i)
+        for (std::int64_t i = 0; i < (std::int64_t)np; ++i)
             U[0][i] = partition_data(nx, double(i));
 
         // Actual time step loop
@@ -141,7 +141,7 @@ struct stepper
 
             // Visual Studio requires OMP loop variables to be signed :/
             # pragma omp for schedule(static)
-            for (boost::int64_t i = 0; i < (boost::int64_t)np; ++i)
+            for (std::int64_t i = 0; i < (std::int64_t)np; ++i)
                 next[i] =
                 heat_part(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
         }
@@ -154,9 +154,9 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
+    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
@@ -166,12 +166,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    boost::uint64_t t = now();
+    std::uint64_t t = now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     stepper::space solution = step.do_work(np, nx, nt);
 
-    boost::uint64_t elapsed = now() - t;
+    std::uint64_t elapsed = now() - t;
 
     // Print the final solution
     if (vm.count("results"))
@@ -179,7 +179,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 0; i != np; ++i)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
-//  boost::uint64_t const os_thread_count = omp_get_num_threads();
+//  std::uint64_t const os_thread_count = omp_get_num_threads();
     # pragma omp parallel
     # pragma omp master
     print_time_results(omp_get_num_threads(), elapsed, nx, np, nt, header);
@@ -195,11 +195,11 @@ int main(int argc, char* argv[])
     po::options_description desc_commandline;
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", po::value<boost::uint64_t>()->default_value(10),
+        ("nx", po::value<std::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
-        ("nt", po::value<boost::uint64_t>()->default_value(45),
+        ("nt", po::value<std::uint64_t>()->default_value(45),
          "Number of time steps")
-        ("np", po::value<boost::uint64_t>()->default_value(10),
+        ("np", po::value<std::uint64_t>()->default_value(10),
          "Number of partitions")
         ("k", po::value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")

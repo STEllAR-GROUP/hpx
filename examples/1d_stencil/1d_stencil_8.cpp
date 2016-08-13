@@ -14,10 +14,10 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/shared_array.hpp>
-#include <boost/cstdint.hpp>
 
 #include "print_time_results.hpp"
 
+#include <cstdint>
 #include <iostream>
 #include <mutex>
 #include <stack>
@@ -595,7 +595,7 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
 HPX_REGISTER_GATHER(stepper_server::space, stepper_server_space_gatherer);
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
+void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np)
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::size_t nl = localities.size();                    // Number of localities
@@ -611,7 +611,7 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
     stepper step(nl);
 
     // Measure execution time.
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Perform all work and wait for it to finish
     hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt);
@@ -619,7 +619,7 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
     // Gather results from all localities
     if (0 == hpx::get_locality_id())
     {
-        boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+        std::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
 
         hpx::future<std::vector<stepper_server::space> > overall_result =
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
@@ -634,7 +634,7 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
             }
         }
 
-        boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+        std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
         // Print the solution at time-step 'nt'.
         if (print_results)
@@ -651,7 +651,7 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
             }
         }
 
-        print_time_results(boost::uint32_t(nl), num_worker_threads, elapsed,
+        print_time_results(std::uint32_t(nl), num_worker_threads, elapsed,
             nx, np, nt, header);
     }
     else
@@ -663,9 +663,9 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
+    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
 
     if (vm.count("no-header"))
         header = false;
@@ -684,11 +684,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline;
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", value<boost::uint64_t>()->default_value(10),
+        ("nx", value<std::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(45),
+        ("nt", value<std::uint64_t>()->default_value(45),
          "Number of time steps")
-        ("np", value<boost::uint64_t>()->default_value(10),
+        ("np", value<std::uint64_t>()->default_value(10),
          "Number of partitions")
         ("k", value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")

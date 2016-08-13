@@ -8,9 +8,10 @@
 #include <hpx/lcos/broadcast.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <vector>
 
-boost::uint32_t f1()
+std::uint32_t f1()
 {
     return hpx::get_locality_id();
 }
@@ -27,7 +28,7 @@ HPX_PLAIN_ACTION(f2);
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f2_action)
 HPX_REGISTER_BROADCAST_ACTION(f2_action)
 
-boost::uint32_t f3(boost::uint32_t i)
+std::uint32_t f3(std::uint32_t i)
 {
     return hpx::get_locality_id() + i;
 }
@@ -36,7 +37,7 @@ HPX_PLAIN_ACTION(f3);
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f3_action)
 HPX_REGISTER_BROADCAST_ACTION(f3_action)
 
-void f4(boost::uint32_t i)
+void f4(std::uint32_t i)
 {
 }
 HPX_PLAIN_ACTION(f4);
@@ -45,7 +46,7 @@ HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f4_action)
 HPX_REGISTER_BROADCAST_ACTION(f4_action)
 
 
-boost::uint32_t f1_idx(std::size_t)
+std::uint32_t f1_idx(std::size_t)
 {
     return hpx::get_locality_id();
 }
@@ -62,7 +63,7 @@ HPX_PLAIN_ACTION(f2_idx);
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f2_idx_action)
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f2_idx_action)
 
-boost::uint32_t f3_idx(boost::uint32_t i, std::size_t)
+std::uint32_t f3_idx(std::uint32_t i, std::size_t)
 {
     return hpx::get_locality_id() + i;
 }
@@ -71,7 +72,7 @@ HPX_PLAIN_ACTION(f3_idx);
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f3_idx_action)
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f3_idx_action)
 
-void f4_idx(boost::uint32_t i, std::size_t)
+void f4_idx(std::uint32_t i, std::size_t)
 {
 }
 HPX_PLAIN_ACTION(f4_idx);
@@ -86,7 +87,7 @@ int hpx_main()
     hpx::id_type there = here;
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     {
-        std::vector<boost::uint32_t> f1_res;
+        std::vector<std::uint32_t> f1_res;
         f1_res = hpx::lcos::broadcast<f1_action>(localities).get();
 
         HPX_TEST_EQ(f1_res.size(), localities.size());
@@ -97,7 +98,7 @@ int hpx_main()
 
         hpx::lcos::broadcast<f2_action>(localities).get();
 
-        std::vector<boost::uint32_t> f3_res;
+        std::vector<std::uint32_t> f3_res;
         f3_res = hpx::lcos::broadcast<f3_action>(localities, 1).get();
 
         HPX_TEST_EQ(f3_res.size(), localities.size());
@@ -110,7 +111,7 @@ int hpx_main()
         hpx::lcos::broadcast<f4_action>(localities, 0).get();
     }
     {
-        std::vector<boost::uint32_t> f1_res;
+        std::vector<std::uint32_t> f1_res;
         f1_res = hpx::lcos::broadcast_with_index<f1_idx_action>(localities).get();
 
         HPX_TEST_EQ(f1_res.size(), localities.size());
@@ -121,7 +122,7 @@ int hpx_main()
 
         hpx::lcos::broadcast_with_index<f2_idx_action>(localities).get();
 
-        std::vector<boost::uint32_t> f3_res;
+        std::vector<std::uint32_t> f3_res;
         f3_res = hpx::lcos::broadcast_with_index<f3_idx_action>(localities, 1).get();
 
         HPX_TEST_EQ(f3_res.size(), localities.size());

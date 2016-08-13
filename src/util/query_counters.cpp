@@ -21,6 +21,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <mutex>
@@ -32,7 +33,7 @@
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
-            boost::int64_t interval, std::string const& dest, std::string const& form,
+            std::int64_t interval, std::string const& dest, std::string const& form,
             std::vector<std::string> const& shortnames, bool csv_header)
       : names_(names), destination_(dest), format_(form),
             counter_shortnames_(shortnames), csv_header_(csv_header),
@@ -175,7 +176,7 @@ namespace hpx { namespace util
         out << boost::str(boost::format("%.6f") % elapsed) << ",[s],";
 
         bool first = true;
-        for (boost::int64_t val : value.values_)
+        for (std::int64_t val : value.values_)
         {
             if (!first)
                 out << ':';
@@ -207,7 +208,7 @@ namespace hpx { namespace util
         performance_counters::counter_values_array const& value)
     {
         bool first = true;
-        for (boost::int64_t val : value.values_)
+        for (std::int64_t val : value.values_)
         {
             if (!first)
                 out << ':';

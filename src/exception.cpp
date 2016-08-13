@@ -34,6 +34,7 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #if defined(_POSIX_VERSION)
 #include <iostream>
 #endif
@@ -224,7 +225,7 @@ namespace hpx { namespace detail
     HPX_EXPORT boost::exception_ptr construct_exception(
         Exception const& e, std::string const& func,
         std::string const& file, long line, std::string const& back_trace,
-        boost::uint32_t node, std::string const& hostname, boost::int64_t pid,
+        std::uint32_t node, std::string const& hostname, std::int64_t pid,
         std::size_t shepherd, std::size_t thread_id,
         std::string const& thread_name, std::string const& env,
         std::string const& config, std::string const& state_name,
@@ -322,7 +323,7 @@ namespace hpx { namespace detail
         if (is_of_lightweight_hpx_category(e))
             return construct_lightweight_exception(e, func, file, line);
 
-        boost::int64_t pid = ::getpid();
+        std::int64_t pid = ::getpid();
         std::string back_trace(backtrace());
 
         std::string state_name("not running");
@@ -345,7 +346,7 @@ namespace hpx { namespace detail
         // if this is not a HPX thread we do not need to query neither for
         // the shepherd thread nor for the thread id
         error_code ec(lightweight);
-        boost::uint32_t node = get_locality_id(ec);
+        std::uint32_t node = get_locality_id(ec);
 
         std::size_t shepherd = std::size_t(-1);
         threads::thread_id_type thread_id;
@@ -558,7 +559,7 @@ namespace hpx
         if (env && !env->empty())
             strm << "{env}: " << *env;
 
-        boost::uint32_t const* locality =
+        std::uint32_t const* locality =
             boost::get_error_info<hpx::detail::throw_locality>(e);
         if (locality)
             strm << "{locality-id}: " << *locality << "\n";
@@ -568,7 +569,7 @@ namespace hpx
         if (hostname_ && !hostname_->empty())
             strm << "{hostname}: " << *hostname_ << "\n";
 
-        boost::int64_t const* pid_ =
+        std::int64_t const* pid_ =
             boost::get_error_info<hpx::detail::throw_pid>(e);
         if (pid_ && -1 != *pid_)
             strm << "{process-id}: " << *pid_ << "\n";
@@ -717,16 +718,16 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return the locality where the exception was thrown.
-    boost::uint32_t get_error_locality_id(boost::exception const& e)
+    std::uint32_t get_error_locality_id(boost::exception const& e)
     {
-        boost::uint32_t const* locality =
+        std::uint32_t const* locality =
             boost::get_error_info<hpx::detail::throw_locality>(e);
         if (locality)
             return *locality;
         return naming::invalid_locality_id;
     }
 
-    boost::uint32_t get_error_locality_id(boost::exception_ptr const& e)
+    std::uint32_t get_error_locality_id(boost::exception_ptr const& e)
     {
         if (!e)
             return naming::invalid_locality_id;
@@ -742,12 +743,12 @@ namespace hpx
         }
     }
 
-    boost::uint32_t get_error_locality_id(hpx::exception const& e)
+    std::uint32_t get_error_locality_id(hpx::exception const& e)
     {
         return get_error_locality_id(dynamic_cast<boost::exception const&>(e));
     }
 
-    boost::uint32_t get_error_locality_id(hpx::error_code const& e)
+    std::uint32_t get_error_locality_id(hpx::error_code const& e)
     {
         return get_error_locality_id(detail::access_exception(e));
     }
@@ -823,16 +824,16 @@ namespace hpx
 
     /// Return the (operating system) process id of the locality where the
     /// exception was thrown.
-    boost::int64_t get_error_process_id(boost::exception const& e)
+    std::int64_t get_error_process_id(boost::exception const& e)
     {
-        boost::int64_t const* pid_ =
+        std::int64_t const* pid_ =
             boost::get_error_info<hpx::detail::throw_pid>(e);
         if (pid_)
             return *pid_;
         return -1;
     }
 
-    boost::int64_t get_error_process_id(boost::exception_ptr const& e)
+    std::int64_t get_error_process_id(boost::exception_ptr const& e)
     {
         if (!e) return -1;
 
@@ -847,12 +848,12 @@ namespace hpx
         }
     }
 
-    boost::int64_t get_error_process_id(hpx::exception const& e)
+    std::int64_t get_error_process_id(hpx::exception const& e)
     {
         return get_error_process_id(dynamic_cast<boost::exception const&>(e));
     }
 
-    boost::int64_t get_error_process_id(hpx::error_code const& e)
+    std::int64_t get_error_process_id(hpx::error_code const& e)
     {
         return get_error_process_id(detail::access_exception(e));
     }

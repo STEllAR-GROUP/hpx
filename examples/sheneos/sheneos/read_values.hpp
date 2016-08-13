@@ -13,8 +13,7 @@
     #error sheneos requires threadsafe HDF5 libraries
 #endif
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <string>
 
 #include "dimension.hpp"
@@ -25,7 +24,7 @@ namespace sheneos
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Extract the lower and upper bounds of a data range from \a datafilename.
-    boost::uint64_t extract_data_range(std::string const& datafilename,
+    std::uint64_t extract_data_range(std::string const& datafilename,
         char const* name, double& minval, double& maxval, double& delta,
         std::size_t start = 0, std::size_t end = std::size_t(-1));
 

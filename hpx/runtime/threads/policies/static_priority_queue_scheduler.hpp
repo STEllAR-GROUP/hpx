@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
+#include <cstdint>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -59,7 +60,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = this->queues_.size();
 
@@ -101,7 +102,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count)
+            std::int64_t& idle_loop_count)
         {
             HPX_ASSERT(num_thread < this->queues_.size());
 

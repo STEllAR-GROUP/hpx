@@ -20,7 +20,6 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
@@ -262,8 +261,8 @@ namespace hpx { namespace threads { namespace detail
 //         util::itt::id threadid(domain, this);
         util::itt::frame_context fctx(domain);
 
-        boost::int64_t idle_loop_count = 0;
-        boost::int64_t busy_loop_count = 0;
+        std::int64_t idle_loop_count = 0;
+        std::int64_t busy_loop_count = 0;
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);

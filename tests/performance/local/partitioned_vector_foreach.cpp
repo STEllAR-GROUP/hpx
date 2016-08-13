@@ -11,16 +11,16 @@
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
-#include "worker_timed.hpp"
-
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "worker_timed.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
@@ -46,11 +46,11 @@ struct wait_op
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Policy, typename Vector>
-boost::uint64_t foreach_vector(Policy && policy, Vector const& v)
+std::uint64_t foreach_vector(Policy && policy, Vector const& v)
 {
     typedef typename Vector::value_type value_type;
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
@@ -85,8 +85,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // retrieve reference time
         std::vector<int> ref(vector_size);
-        boost::uint64_t seq_ref = foreach_vector(hpx::parallel::seq, ref);
-        boost::uint64_t par_ref = foreach_vector(
+        std::uint64_t seq_ref = foreach_vector(hpx::parallel::seq, ref);
+        std::uint64_t par_ref = foreach_vector(
             hpx::parallel::par.with(cs), ref); //-V106
 
         // sequential hpx::partitioned_vector iteration

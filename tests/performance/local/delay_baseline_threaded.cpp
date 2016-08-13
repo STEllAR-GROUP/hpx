@@ -9,6 +9,7 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <stdexcept>
@@ -17,7 +18,6 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/program_options.hpp>
@@ -36,9 +36,9 @@ using hpx::util::high_resolution_timer;
 using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t threads = 1;
-boost::uint64_t tasks = 500000;
-boost::uint64_t delay = 5;
+std::uint64_t threads = 1;
+std::uint64_t tasks = 500000;
+std::uint64_t delay = 5;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,16 +87,16 @@ void print_results(
 ///////////////////////////////////////////////////////////////////////////////
 void invoke_n_workers_nowait(
     double& elapsed
-  , boost::uint64_t workers
+  , std::uint64_t workers
     )
 {
     // Warmup.
-    for (boost::uint64_t i = 0; i < tasks; ++i)
+    for (std::uint64_t i = 0; i < tasks; ++i)
     {
         worker_timed(delay * 1000);
     }
 
-    for (boost::uint64_t i = 0; i < tasks; ++i)
+    for (std::uint64_t i = 0; i < tasks; ++i)
     {
         worker_timed(delay * 1000);
     }
@@ -104,7 +104,7 @@ void invoke_n_workers_nowait(
     // Start the clock.
     high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i < tasks; ++i)
+    for (std::uint64_t i = 0; i < tasks; ++i)
     {
         worker_timed(delay * 1000);
     }
@@ -115,7 +115,7 @@ void invoke_n_workers_nowait(
 void invoke_n_workers(
     boost::barrier& b
   , double& elapsed
-  , boost::uint64_t workers
+  , std::uint64_t workers
     )
 {
     b.wait();
@@ -135,7 +135,7 @@ int app_main(
     boost::thread_group workers;
     boost::barrier b(threads - 1);
 
-    for (boost::uint32_t i = 0; i != threads - 1; ++i)
+    for (std::uint32_t i = 0; i != threads - 1; ++i)
     {
         workers.add_thread(new boost::thread(invoke_n_workers,
             std::ref(b), std::ref(elapsed[i]), tasks));
@@ -147,7 +147,7 @@ int app_main(
 
     workers.join_all();
 
-    for (boost::uint64_t i = 0; i < elapsed.size(); ++i)
+    for (std::uint64_t i = 0; i < elapsed.size(); ++i)
     {
         //cout << i << " " << elapsed[i] << "\n";
         total_elapsed += elapsed[i];
@@ -177,15 +177,15 @@ int main(
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint64_t>(&threads)->default_value(1)
+        , value<std::uint64_t>(&threads)->default_value(1)
         , "number of threads to use")
 
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , value<std::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(5)
+        , value<std::uint64_t>(&delay)->default_value(5)
         , "duration of delay in microseconds")
 
         ( "no-header"

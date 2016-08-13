@@ -7,22 +7,23 @@
 #define HPX_UTIL_GET_AND_RESET_VALUE_FEB_27_2012_0248PM
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
+
+#include <cstdint>
 
 namespace hpx { namespace util
 {
     // helper function for counter evaluation
-    inline boost::uint64_t get_and_reset_value(boost::uint64_t& value, bool reset)
+    inline std::uint64_t get_and_reset_value(std::uint64_t& value, bool reset)
     {
-        boost::uint64_t result = value;
+        std::uint64_t result = value;
         if (reset)
             value = 0;
         return result;
     }
 
-    inline boost::int64_t get_and_reset_value(boost::int64_t& value, bool reset)
+    inline std::int64_t get_and_reset_value(std::int64_t& value, bool reset)
     {
-        boost::int64_t result = value;
+        std::int64_t result = value;
         if (reset)
             value = 0;
         return result;

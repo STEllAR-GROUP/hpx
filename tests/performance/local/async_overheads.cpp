@@ -9,13 +9,14 @@
 #include "worker_timed.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t num_level_tasks = 16;
 std::size_t spread = 2;
-boost::uint64_t delay_ns = 0;
+std::uint64_t delay_ns = 0;
 
 void test_func()
 {
@@ -65,14 +66,14 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::vector<hpx::future<void> > tasks;
         tasks.reserve(num_tasks);
 
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != num_tasks; ++i)
             tasks.push_back(hpx::async(&test_func));
 
         hpx::wait_all(tasks);
 
-        boost::uint64_t end = hpx::util::high_resolution_clock::now();
+        std::uint64_t end = hpx::util::high_resolution_clock::now();
 
         std::cout << "Elapsed sequential time: "
                   << (end - start) / 1e9 << " [s]"
@@ -80,12 +81,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     {
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         hpx::future<void> f = hpx::async(&spawn_level, num_tasks);
         hpx::wait_all(f);
 
-        boost::uint64_t end = hpx::util::high_resolution_clock::now();
+        std::uint64_t end = hpx::util::high_resolution_clock::now();
 
         std::cout << "Elapsed hierarchical time: "
                   << (end - start) / 1e9 << " [s]"
@@ -108,7 +109,7 @@ int main(int argc, char* argv[])
          "number of tasks spawned per sub-spawn (default: 16)")
         ("spread,p", value<std::size_t>(&spread)->default_value(2),
          "number of sub-spawns per level (default: 2)")
-        ("delay,d", value<boost::uint64_t>(&delay_ns)->default_value(0),
+        ("delay,d", value<std::uint64_t>(&delay_ns)->default_value(0),
          "time spent in the delay loop [ns]")
         ;
 

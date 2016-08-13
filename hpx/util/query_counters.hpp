@@ -12,8 +12,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/interval_timer.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -29,7 +28,7 @@ namespace hpx { namespace util
 
     public:
         query_counters(std::vector<std::string> const& names,
-            boost::int64_t interval, std::string const& dest,
+            std::int64_t interval, std::string const& dest,
             std::string const& form, std::vector<std::string> const& shortnames,
             bool csv_header);
 

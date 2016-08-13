@@ -7,6 +7,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -41,7 +42,7 @@ hpx::lcos::latch create_latch(std::size_t num_threads, std::size_t generation)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    boost::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
 
     // count_down_and_wait
     {

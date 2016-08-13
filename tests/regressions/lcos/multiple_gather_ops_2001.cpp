@@ -9,8 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -18,22 +17,22 @@
 
 char const* gather_basename = "/test/gather/";
 
-HPX_REGISTER_GATHER(boost::uint32_t, test_gather);
+HPX_REGISTER_GATHER(std::uint32_t, test_gather);
 
 int hpx_main(int argc, char* argv[])
 {
     for (int i = 0; i < 10; ++i)
     {
-        hpx::future<boost::uint32_t> value =
+        hpx::future<std::uint32_t> value =
             hpx::make_ready_future(hpx::get_locality_id());
 
         if (hpx::get_locality_id() == 0)
         {
-            hpx::future<std::vector<boost::uint32_t> > overall_result =
+            hpx::future<std::vector<std::uint32_t> > overall_result =
                 hpx::lcos::gather_here(gather_basename, std::move(value),
                     hpx::get_num_localities(hpx::launch::sync), i);
 
-            std::vector<boost::uint32_t> sol = overall_result.get();
+            std::vector<std::uint32_t> sol = overall_result.get();
 
             for (std::size_t j = 0; j < sol.size(); ++j)
             {

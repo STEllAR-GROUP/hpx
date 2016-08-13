@@ -14,6 +14,7 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/integer/uint128.hpp>
 
+#include <cstdint>
 #include <utility>
 #include <type_traits>
 
@@ -48,61 +49,61 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// \brief Action to store an 8 bit value to a memory location
-        void store8(boost::uint64_t addr, boost::uint8_t value)
+        void store8(std::uint64_t addr, std::uint8_t value)
         {
-            *reinterpret_cast<boost::uint8_t*>(addr) = value;
+            *reinterpret_cast<std::uint8_t*>(addr) = value;
         }
 
         /// \brief Action to store an 16 bit value to a memory location
-        void store16(boost::uint64_t addr, boost::uint16_t value)
+        void store16(std::uint64_t addr, std::uint16_t value)
         {
-            *reinterpret_cast<boost::uint16_t*>(addr) = value;
+            *reinterpret_cast<std::uint16_t*>(addr) = value;
         }
 
         /// \brief Action to store an 32 bit value to a memory location
-        void store32(boost::uint64_t addr, boost::uint32_t value)
+        void store32(std::uint64_t addr, std::uint32_t value)
         {
-            *reinterpret_cast<boost::uint32_t*>(addr) = value;
+            *reinterpret_cast<std::uint32_t*>(addr) = value;
         }
 
         /// \brief Action to store an 64 bit value to a memory location
-        void store64(boost::uint64_t addr, boost::uint64_t value)
+        void store64(std::uint64_t addr, std::uint64_t value)
         {
-            *reinterpret_cast<boost::uint64_t*>(addr) = value;
+            *reinterpret_cast<std::uint64_t*>(addr) = value;
         }
 
         /// \brief Action to store an 64 bit value to a memory location
-        void store128(boost::uint64_t addr, uint128_t const& value)
+        void store128(std::uint64_t addr, uint128_t const& value)
         {
             *reinterpret_cast<uint128_t*>(addr) = value;
         }
 
         /// \brief Action to load an 8 bit value to a memory location
-        boost::uint8_t load8(boost::uint64_t addr) const
+        std::uint8_t load8(std::uint64_t addr) const
         {
-            return *reinterpret_cast<boost::uint8_t*>(addr);
+            return *reinterpret_cast<std::uint8_t*>(addr);
         }
 
         /// \brief Action to load an 16 bit value to a memory location
-        boost::uint16_t load16(boost::uint64_t addr) const
+        std::uint16_t load16(std::uint64_t addr) const
         {
-            return *reinterpret_cast<boost::uint16_t*>(addr);
+            return *reinterpret_cast<std::uint16_t*>(addr);
         }
 
         /// \brief Action to load an 32 bit value to a memory location
-        boost::uint32_t load32(boost::uint64_t addr) const
+        std::uint32_t load32(std::uint64_t addr) const
         {
-            return *reinterpret_cast<boost::uint32_t*>(addr);
+            return *reinterpret_cast<std::uint32_t*>(addr);
         }
 
         /// \brief Action to load an 64 bit value to a memory location
-        boost::uint64_t load64(boost::uint64_t addr) const
+        std::uint64_t load64(std::uint64_t addr) const
         {
-            return *reinterpret_cast<boost::uint64_t*>(addr);
+            return *reinterpret_cast<std::uint64_t*>(addr);
         }
 
         /// \brief Action to load an 128 bit value to a memory location
-        uint128_t load128(boost::uint64_t addr) const
+        uint128_t load128(std::uint64_t addr) const
         {
             return *reinterpret_cast<uint128_t*>(addr);
         }

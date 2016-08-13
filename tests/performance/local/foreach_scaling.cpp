@@ -11,10 +11,10 @@
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <numeric>
 #include <stdexcept>
@@ -88,9 +88,9 @@ hpx::future<void> measure_task_foreach(std::size_t size)
         );
 }
 
-boost::uint64_t average_out_parallel(std::size_t vector_size)
+std::uint64_t average_out_parallel(std::size_t vector_size)
 {
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for(auto i = 0; i < test_count; i++)
@@ -99,11 +99,11 @@ boost::uint64_t average_out_parallel(std::size_t vector_size)
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
-boost::uint64_t average_out_task(std::size_t vector_size)
+std::uint64_t average_out_task(std::size_t vector_size)
 {
     if (num_overlapping_loops <= 0)
     {
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for(auto i = 0; i < test_count; i++)
             measure_task_foreach(vector_size).wait();
@@ -114,7 +114,7 @@ boost::uint64_t average_out_task(std::size_t vector_size)
     std::vector<hpx::shared_future<void> > tests;
     tests.resize(num_overlapping_loops);
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     for(auto i = 0; i < test_count; i++)
     {
@@ -128,9 +128,9 @@ boost::uint64_t average_out_task(std::size_t vector_size)
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
-boost::uint64_t average_out_sequential(std::size_t vector_size)
+std::uint64_t average_out_sequential(std::size_t vector_size)
 {
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for(auto i = 0; i < test_count; i++)
@@ -158,9 +158,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     } else {
 
         //results
-        boost::uint64_t par_time = average_out_parallel(vector_size);
-        boost::uint64_t task_time = average_out_task(vector_size);
-        boost::uint64_t seq_time = average_out_sequential(vector_size);
+        std::uint64_t par_time = average_out_parallel(vector_size);
+        std::uint64_t task_time = average_out_task(vector_size);
+        std::uint64_t seq_time = average_out_sequential(vector_size);
 
         if(csvoutput) {
             hpx::cout << "," << seq_time/1e9

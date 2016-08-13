@@ -20,10 +20,10 @@
 #include <hpx/util_fwd.hpp>
 #include <boost/lockfree/queue.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -93,8 +93,8 @@ struct HPX_EXPORT big_boot_barrier
 
     template <typename Action, typename... Args>
     void apply(
-        boost::uint32_t source_locality_id
-      , boost::uint32_t target_locality_id
+        std::uint32_t source_locality_id
+      , std::uint32_t target_locality_id
       , parcelset::locality const & dest
       , Action act
       , Args &&... args
@@ -110,8 +110,8 @@ struct HPX_EXPORT big_boot_barrier
 
     template <typename Action, typename... Args>
     void apply_late(
-        boost::uint32_t source_locality_id
-      , boost::uint32_t target_locality_id
+        std::uint32_t source_locality_id
+      , std::uint32_t target_locality_id
       , parcelset::locality const & dest
       , Action act
       , Args &&... args

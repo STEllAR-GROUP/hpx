@@ -12,8 +12,9 @@
 
 #include <hpx/runtime/naming/name.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/io/ios_state.hpp>
+
+#include <cstdint>
 
 #include "hash.hpp"
 
@@ -30,13 +31,13 @@ namespace hpx { namespace components { namespace security
         {
         }
 
-        parcel_suffix(boost::uint32_t locality_id,
+        parcel_suffix(std::uint32_t locality_id,
                 naming::gid_type const& parcel_id, hash const& hash)
           : locality_id_(locality_id), parcel_id_(parcel_id), hash_(hash)
         {
         }
 
-        boost::uint32_t get_locality_id() const
+        std::uint32_t get_locality_id() const
         {
             return locality_id_;
         }
@@ -79,7 +80,7 @@ namespace hpx { namespace components { namespace security
         }
 
     private:
-        boost::uint32_t locality_id_;
+        std::uint32_t locality_id_;
         naming::gid_type parcel_id_;
         hash hash_;
     };

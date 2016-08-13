@@ -6,13 +6,13 @@
 #if !defined(JENKINS_HASH_HPP_SEP_08_2007_0102PM)
 #define JENKINS_HASH_HPP_SEP_08_2007_0102PM
 
-#include <boost/cstdint.hpp>
 #include <cstdlib>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
 #include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -86,7 +86,7 @@ namespace hpx { namespace util
     {
     public:
         /// this is the type representing the result of this hash
-        typedef boost::uint32_t size_type;
+        typedef std::uint32_t size_type;
 
         /// The seedenum is used as a dummy parameter to distinguish the different
         /// constructors

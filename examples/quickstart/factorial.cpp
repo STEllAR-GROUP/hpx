@@ -14,23 +14,23 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
 
+#include <cstdint>
 #include <iostream>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t factorial(boost::uint64_t m);
+std::uint64_t factorial(std::uint64_t m);
 
 HPX_PLAIN_ACTION(factorial, factorial_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t factorial(boost::uint64_t n)
+std::uint64_t factorial(std::uint64_t n)
 {
     if (0 >= n)
         return 1;
 
-    hpx::lcos::future<boost::uint64_t> n1 =
+    hpx::lcos::future<std::uint64_t> n1 =
         hpx::async<factorial_action>(hpx::find_here(), n - 1);
     return n * n1.get();
 }
@@ -38,12 +38,12 @@ boost::uint64_t factorial(boost::uint64_t n)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    std::uint64_t n = vm["n-value"].as<std::uint64_t>();
 
     {
         hpx::util::high_resolution_timer t;
 
-        boost::uint64_t r =
+        std::uint64_t r =
             hpx::async<factorial_action>(hpx::find_here(), n).get();
 
         double elapsed = t.elapsed();
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "n-value"
-        , value<boost::uint64_t>()->default_value(10)
+        , value<std::uint64_t>()->default_value(10)
         , "n value for the factorial function")
         ;
 

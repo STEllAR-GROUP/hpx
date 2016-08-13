@@ -24,6 +24,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <cstdint>
 #include <map>
 #include <set>
 #include <string>
@@ -58,7 +59,7 @@ struct HPX_EXPORT component_namespace
 
     typedef components::component_type component_id_type;
 
-    typedef std::set<boost::uint32_t> prefixes_type;
+    typedef std::set<std::uint32_t> prefixes_type;
 
     typedef boost::bimap<std::string, component_id_type> component_id_table_type;
 
@@ -92,8 +93,8 @@ struct HPX_EXPORT component_namespace
                 , time_(0)
             {}
 
-            boost::atomic<boost::int64_t> count_;
-            boost::atomic<boost::int64_t> time_;
+            boost::atomic<std::int64_t> count_;
+            boost::atomic<std::int64_t> time_;
         };
 
         counter_data()
@@ -101,23 +102,23 @@ struct HPX_EXPORT component_namespace
 
     public:
         // access current counter values
-        boost::int64_t get_bind_prefix_count(bool);
-        boost::int64_t get_bind_name_count(bool);
-        boost::int64_t get_resolve_id_count(bool);
-        boost::int64_t get_unbind_name_count(bool);
-        boost::int64_t get_iterate_types_count(bool);
-        boost::int64_t get_component_type_name_count(bool);
-        boost::int64_t get_num_localities_count(bool);
-        boost::int64_t get_overall_count(bool);
+        std::int64_t get_bind_prefix_count(bool);
+        std::int64_t get_bind_name_count(bool);
+        std::int64_t get_resolve_id_count(bool);
+        std::int64_t get_unbind_name_count(bool);
+        std::int64_t get_iterate_types_count(bool);
+        std::int64_t get_component_type_name_count(bool);
+        std::int64_t get_num_localities_count(bool);
+        std::int64_t get_overall_count(bool);
 
-        boost::int64_t get_bind_prefix_time(bool);
-        boost::int64_t get_bind_name_time(bool);
-        boost::int64_t get_resolve_id_time(bool);
-        boost::int64_t get_unbind_name_time(bool);
-        boost::int64_t get_iterate_types_time(bool);
-        boost::int64_t get_component_type_name_time(bool);
-        boost::int64_t get_num_localities_time(bool);
-        boost::int64_t get_overall_time(bool);
+        std::int64_t get_bind_prefix_time(bool);
+        std::int64_t get_bind_name_time(bool);
+        std::int64_t get_resolve_id_time(bool);
+        std::int64_t get_unbind_name_time(bool);
+        std::int64_t get_iterate_types_time(bool);
+        std::int64_t get_component_type_name_time(bool);
+        std::int64_t get_num_localities_time(bool);
+        std::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_bind_prefix_count();
@@ -145,7 +146,7 @@ struct HPX_EXPORT component_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
+        update_time_on_exit(boost::atomic<std::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
           , t_(t)
         {}
@@ -155,8 +156,8 @@ struct HPX_EXPORT component_namespace
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
+        std::uint64_t started_at_;
+        boost::atomic<std::int64_t>& t_;
     };
 
   public:

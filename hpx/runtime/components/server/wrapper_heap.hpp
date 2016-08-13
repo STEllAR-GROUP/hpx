@@ -21,6 +21,7 @@
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <new>
@@ -290,7 +291,7 @@ namespace hpx { namespace components { namespace detail
                 }
             }
 
-            return base_gid_ + static_cast<boost::uint64_t>(
+            return base_gid_ + static_cast<std::uint64_t>(
                 static_cast<value_type*>(p) - addr);
         }
 

@@ -11,6 +11,8 @@
 
 #include <boost/format.hpp>
 
+#include <cstdint>
+
 #include "server/sine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,14 +30,14 @@ namespace performance_counters { namespace sine
 {
     ///////////////////////////////////////////////////////////////////////////
     // This function will be invoked whenever the implicit counter is queried.
-    boost::int64_t immediate_sine(bool reset)
+    std::int64_t immediate_sine(bool reset)
     {
-        static boost::uint64_t started_at =
+        static std::uint64_t started_at =
             hpx::util::high_resolution_clock::now();
 
-        boost::uint64_t up_time =
+        std::uint64_t up_time =
             hpx::util::high_resolution_clock::now() - started_at;
-        return boost::int64_t(std::sin(up_time / 1e10) * 100000.);
+        return std::int64_t(std::sin(up_time / 1e10) * 100000.);
     }
 
     ///////////////////////////////////////////////////////////////////////////

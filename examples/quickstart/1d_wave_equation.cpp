@@ -30,8 +30,8 @@
 #include <boost/format.hpp>
 #include <boost/math/constants/constants.hpp>
 
+#include <cstdint>
 #include <mutex>
-
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -68,8 +68,8 @@ double dt = 0.;
 double dx = 0.;
 
 // Command line argument.
-boost::uint64_t nt = 0;
-boost::uint64_t nx = 0;
+std::uint64_t nt = 0;
+std::uint64_t nx = 0;
 
 struct data{
   // Default constructor: data d1;
@@ -108,7 +108,7 @@ std::vector<std::vector<data> > u;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Forward declaration of the wave function.
-double wave(boost::uint64_t t, boost::uint64_t x);
+double wave(std::uint64_t t, std::uint64_t x);
 
 // Any global function needs to be wrapped into a plain_action if it should be
 // invoked as a HPX-thread.
@@ -131,7 +131,7 @@ double calculate_u_tplus_x_1st(double u_t_xplus, double u_t_x,
   return u_tplus_x;
 }
 
-double wave(boost::uint64_t t, boost::uint64_t x)
+double wave(std::uint64_t t, std::uint64_t x)
 {
   std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
   //  cout << (boost::format("calling wave... t=%1% x=%2%\n") % t % x) << flush;
@@ -195,8 +195,8 @@ int hpx_main(variables_map& vm)
   //    dt = vm["dt-value"].as<double>();
   //    dx = vm["dx-value"].as<double>();
   //    c = vm["c-value"].as<double>();
-  nx = vm["nx-value"].as<boost::uint64_t>();
-  nt = vm["nt-value"].as<boost::uint64_t>();
+  nx = vm["nx-value"].as<std::uint64_t>();
+  nt = vm["nt-value"].as<std::uint64_t>();
 
   c = 1.0;
 
@@ -222,7 +222,7 @@ int hpx_main(variables_map& vm)
     high_resolution_timer t;
 
     std::vector<future<double> > futures;
-    for (boost::uint64_t i=0;i<nx;i++)
+    for (std::uint64_t i=0;i<nx;i++)
       futures.push_back(async<wave_action>(here,nt-1,i));
 
     // open file for output
@@ -265,11 +265,11 @@ int main(int argc, char* argv[])
       , "c parameter of the wave equation")
 
     ( "nx-value"
-      , value<boost::uint64_t>()->default_value(100)
+      , value<std::uint64_t>()->default_value(100)
       , "nx parameter of the wave equation")
 
     ( "nt-value"
-      , value<boost::uint64_t>()->default_value(400)
+      , value<std::uint64_t>()->default_value(400)
       , "nt parameter of the wave equation")
     ;
 

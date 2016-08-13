@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -52,7 +53,7 @@ namespace test
     {
         std::string option_;
         data_good_thread t[2];
-        boost::uint64_t masks[2];
+        std::uint64_t masks[2];
     };
 
 //  Test cases implemented below:

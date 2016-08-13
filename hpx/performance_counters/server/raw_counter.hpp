@@ -11,6 +11,8 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
@@ -29,7 +31,7 @@ namespace hpx { namespace performance_counters { namespace server
         {}
 
         raw_counter(counter_info const& info,
-            hpx::util::function_nonser<boost::int64_t(bool)> f);
+            hpx::util::function_nonser<std::int64_t(bool)> f);
 
         hpx::performance_counters::counter_value
             get_counter_value(bool reset = false);
@@ -53,7 +55,7 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     private:
-        hpx::util::function_nonser<boost::int64_t(bool)> f_;
+        hpx::util::function_nonser<std::int64_t(bool)> f_;
         bool reset_;
     };
 }}}

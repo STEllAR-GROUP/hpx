@@ -9,17 +9,17 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t threshold = 2;
-boost::uint64_t distribute_at = 2;
+std::uint64_t threshold = 2;
+std::uint64_t distribute_at = 2;
 int num_repeats = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,10 +39,10 @@ hpx::id_type here;
 struct when_all_wrapper
 {
     typedef hpx::util::tuple<
-            hpx::lcos::future<boost::uint64_t>
-          , hpx::lcos::future<boost::uint64_t> > data_type;
+            hpx::lcos::future<std::uint64_t>
+          , hpx::lcos::future<std::uint64_t> > data_type;
 
-    boost::uint64_t operator()(
+    std::uint64_t operator()(
         hpx::lcos::future<data_type> data
     ) const
     {
@@ -52,30 +52,30 @@ struct when_all_wrapper
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_NOINLINE boost::uint64_t fibonacci_serial_sub(boost::uint64_t n)
+HPX_NOINLINE std::uint64_t fibonacci_serial_sub(std::uint64_t n)
 {
     if (n < 2)
         return n;
     return fibonacci_serial_sub(n-1) + fibonacci_serial_sub(n-2);
 }
 
-boost::uint64_t fibonacci_serial(boost::uint64_t n)
+std::uint64_t fibonacci_serial(std::uint64_t n)
 {
     ++serial_execution_count;
     return fibonacci_serial_sub(n);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::id_type const& get_next_locality(boost::uint64_t next)
+hpx::id_type const& get_next_locality(std::uint64_t next)
 {
     return localities[next % localities.size()];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n);
+hpx::future<std::uint64_t> fibonacci_future(std::uint64_t n);
 HPX_PLAIN_ACTION(fibonacci_future);
 
-hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
+hpx::future<std::uint64_t> fibonacci_future(std::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -91,13 +91,13 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
         loc2 = get_next_locality(++next_locality);
     }
     else if (n-1 == distribute_at) {
-        boost::uint64_t next = next_locality += 2;
+        std::uint64_t next = next_locality += 2;
         loc1 = get_next_locality(next-1);
         loc2 = get_next_locality(next);
     }
 
-    hpx::future<boost::uint64_t> f = hpx::async(fib, loc1, n-1);
-    hpx::future<boost::uint64_t> r = fib(loc2, n-2);
+    hpx::future<std::uint64_t> f = hpx::async(fib, loc1, n-1);
+    hpx::future<std::uint64_t> r = fib(loc2, n-2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());
 }
@@ -106,9 +106,9 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 int hpx_main(boost::program_options::variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
-    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    std::uint64_t n = vm["n-value"].as<std::uint64_t>();
     std::string test = vm["test"].as<std::string>();
-    boost::uint64_t max_runs = vm["n-runs"].as<boost::uint64_t>();
+    std::uint64_t max_runs = vm["n-runs"].as<std::uint64_t>();
 
     if (max_runs == 0) {
         std::cerr << "fibonacci_futures_distributed: wrong command "
@@ -118,18 +118,18 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     bool executed_one = false;
-    boost::uint64_t r = 0;
+    std::uint64_t r = 0;
 
     if (test == "all" || test == "0")
     {
         // Keep track of the time required to execute.
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         // Synchronous execution, use as reference only.
         r = fibonacci_serial(n);
 
 //        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
-        boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % d);
@@ -140,7 +140,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (test == "all" || test == "1")
     {
         // Keep track of the time required to execute.
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -150,7 +150,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
 //        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
-        boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_future(%1%) == %2%,elapsed time:,%3%,[s],%4%\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs)
             % next_locality.load());
@@ -185,9 +185,9 @@ boost::program_options::options_description get_commandline_options()
 
     using boost::program_options::value;
     desc_commandline.add_options()
-        ( "n-value", value<boost::uint64_t>()->default_value(10),
+        ( "n-value", value<std::uint64_t>()->default_value(10),
           "n value for the Fibonacci function")
-        ( "n-runs", value<boost::uint64_t>()->default_value(1),
+        ( "n-runs", value<std::uint64_t>()->default_value(1),
           "number of runs to perform")
         ( "threshold", value<unsigned int>()->default_value(2),
           "threshold for switching to serial code")
@@ -214,7 +214,7 @@ void init_globals()
         return;
     }
 
-    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    std::uint64_t n = vm["n-value"].as<std::uint64_t>();
 
     threshold = vm["threshold"].as<unsigned int>();
     if (threshold < 2 || threshold > n) {

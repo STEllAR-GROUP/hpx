@@ -3,19 +3,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-
 #include <hpx/config.hpp>
 
+#include <hpx/util/high_resolution_timer.hpp>
+
 #include <boost/config.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/program_options.hpp>
 
-#include <hpx/util/high_resolution_timer.hpp>
+#include <cstdint>
+#include <iostream>
 
 #include <functional>
 
@@ -35,7 +35,7 @@ static boost::thread_specific_ptr<double> global_scratch;
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
     boost::barrier& b
-  , boost::uint64_t updates
+  , std::uint64_t updates
     )
 {
     b.wait();
@@ -63,7 +63,7 @@ int main(
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     unsigned threads;
-    boost::uint64_t updates;
+    std::uint64_t updates;
 
     cmdline.add_options()
         ( "help,h"
@@ -74,7 +74,7 @@ int main(
          "number of OS-threads")
 
         ( "updates,u"
-        , value<boost::uint64_t>(&updates)->default_value(1 << 22)
+        , value<std::uint64_t>(&updates)->default_value(1 << 22)
         , "updates made to the TLS variable per OS-thread")
 
         ( "csv"

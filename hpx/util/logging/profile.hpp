@@ -34,6 +34,7 @@
 #include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -122,7 +123,7 @@ struct compute {
         return c;
     }
 
-    void add_period(const ::boost::int64_t & mcs, type t) {
+    void add_period(const ::std::int64_t & mcs, type t) {
         // note : this will work even after this object has been destroyed
         // (since it's a global)
         m_cpu_times[t] += mcs;
@@ -166,7 +167,7 @@ private:
     // note: we don't use std::vector;
     // we want this to be available even after destruction
     // (if logs are used after they've been destroyed
-    boost::int64_t m_cpu_times[ last_ + 1];
+    std::int64_t m_cpu_times[ last_ + 1];
 
     // where should we dump the results?
     log_function m_log;

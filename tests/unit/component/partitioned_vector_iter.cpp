@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -137,7 +138,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         iterator end = v.end(locality_id);
         for (iterator it = v.begin(locality_id); it != end; ++it, ++count)
         {
@@ -156,7 +157,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_iterator end = v.cend(locality_id);
         for (const_iterator it = v.cbegin(locality_id); it != end; ++it, ++count)
         {
@@ -178,7 +179,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     seg_count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         local_segment_iterator seg_end = v.segment_end(locality_id);
         for (local_segment_iterator seg_it = v.segment_begin(locality_id);
              seg_it != seg_end; ++seg_it, ++seg_count)
@@ -197,7 +198,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     seg_count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_local_segment_iterator seg_cend = v.segment_cend(locality_id);
         for (const_local_segment_iterator seg_cit = v.segment_cbegin(locality_id);
              seg_cit != seg_cend; ++seg_cit, ++seg_count)

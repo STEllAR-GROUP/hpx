@@ -18,6 +18,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -36,23 +37,23 @@ namespace hpx { namespace serialization {
         public:
             typedef void* (*ctor_t) ();
             typedef std::map<std::string, ctor_t> typename_to_ctor_t;
-            typedef std::map<std::string, boost::uint32_t> typename_to_id_t;
+            typedef std::map<std::string, std::uint32_t> typename_to_id_t;
             typedef std::vector<ctor_t> cache_t;
 
-            HPX_STATIC_CONSTEXPR boost::uint32_t invalid_id = ~0u;
+            HPX_STATIC_CONSTEXPR std::uint32_t invalid_id = ~0u;
 
             HPX_EXPORT void register_factory_function(
                 const std::string& type_name, ctor_t ctor);
 
             HPX_EXPORT void register_typename(
-                const std::string& type_name, boost::uint32_t id);
+                const std::string& type_name, std::uint32_t id);
 
             HPX_EXPORT void fill_missing_typenames();
 
-            HPX_EXPORT boost::uint32_t try_get_id(
+            HPX_EXPORT std::uint32_t try_get_id(
                 const std::string& type_name) const;
 
-            boost::uint32_t get_max_registered_id() const
+            std::uint32_t get_max_registered_id() const
             {
                 return max_id;
             }
@@ -67,9 +68,9 @@ namespace hpx { namespace serialization {
             friend struct ::hpx::util::static_<id_registry>;
             friend class polymorphic_id_factory;
 
-            HPX_EXPORT void cache_id(boost::uint32_t id, ctor_t ctor);
+            HPX_EXPORT void cache_id(std::uint32_t id, ctor_t ctor);
 
-            boost::uint32_t max_id;
+            std::uint32_t max_id;
             typename_to_ctor_t typename_to_ctor;
             typename_to_id_t typename_to_id;
             cache_t cache;
@@ -86,7 +87,7 @@ namespace hpx { namespace serialization {
 
         public:
             template <class T>
-            static T* create(boost::uint32_t id, std::string const* name = nullptr)
+            static T* create(std::uint32_t id, std::string const* name = nullptr)
             {
                 const cache_t& vec = id_registry::instance().cache;
 
@@ -110,7 +111,7 @@ namespace hpx { namespace serialization {
                 return static_cast<T*>(ctor());
             }
 
-            HPX_EXPORT static boost::uint32_t get_id(
+            HPX_EXPORT static std::uint32_t get_id(
                 const std::string& type_name);
 
         private:
@@ -152,10 +153,10 @@ namespace hpx { namespace serialization {
                 register_class_name<T, typename std::enable_if<
                     traits::is_serialized_with_id<T>::value>::type>::instance;
 
-        template <boost::uint32_t desc>
+        template <std::uint32_t desc>
         std::string get_constant_entry_name();
 
-        template <boost::uint32_t Id>
+        template <std::uint32_t Id>
         struct add_constant_entry
         {
             add_constant_entry()
@@ -167,7 +168,7 @@ namespace hpx { namespace serialization {
             static add_constant_entry instance;
         };
 
-        template <boost::uint32_t Id>
+        template <std::uint32_t Id>
         add_constant_entry<Id> add_constant_entry<Id>::instance;
 
     } // detail

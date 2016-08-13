@@ -15,6 +15,7 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -36,7 +37,7 @@ namespace hpx { namespace agas { namespace detail
         }
 
         void register_server_instance(char const* servicename
-          , boost::uint32_t locality_id)
+          , std::uint32_t locality_id)
         {
             primary_ns_server_.register_server_instance(servicename, locality_id);
             symbol_ns_server_.register_server_instance(servicename, locality_id);
@@ -95,7 +96,7 @@ namespace hpx { namespace agas { namespace detail
         void register_counter_types();
 
         void register_server_instance(
-            boost::uint32_t locality_id);
+            std::uint32_t locality_id);
 
         bool unregister_server(
             request const& req

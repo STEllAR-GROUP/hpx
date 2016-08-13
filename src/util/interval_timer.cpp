@@ -13,6 +13,7 @@
 #include <hpx/util/bind.hpp>
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -25,7 +26,7 @@ namespace hpx { namespace util { namespace detail
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(),
         microsecs_(microsecs), id_(nullptr), description_(description),
@@ -35,7 +36,7 @@ namespace hpx { namespace util { namespace detail
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(on_term),
         microsecs_(microsecs), id_(nullptr), description_(description),
@@ -156,18 +157,18 @@ namespace hpx { namespace util { namespace detail
         }
     }
 
-    boost::int64_t interval_timer::get_interval() const
+    std::int64_t interval_timer::get_interval() const
     {
         std::lock_guard<mutex_type> l(mtx_);
         return microsecs_;
     }
 
-    void interval_timer::slow_down(boost::int64_t max_interval)
+    void interval_timer::slow_down(std::int64_t max_interval)
     {
         std::lock_guard<mutex_type> l(mtx_);
         microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
     }
-    void interval_timer::speed_up(boost::int64_t min_interval)
+    void interval_timer::speed_up(std::int64_t min_interval)
     {
         std::lock_guard<mutex_type> l(mtx_);
         microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
@@ -279,7 +280,7 @@ namespace hpx { namespace util
     interval_timer::interval_timer() {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
             f, microsecs, description, pre_shutdown))
@@ -287,7 +288,7 @@ namespace hpx { namespace util
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
             f, on_term, microsecs, description, pre_shutdown))
@@ -314,17 +315,17 @@ namespace hpx { namespace util
         timer_->terminate();
     }
 
-    boost::int64_t interval_timer::get_interval() const
+    std::int64_t interval_timer::get_interval() const
     {
         return timer_->get_interval();
     }
 
-    void interval_timer::slow_down(boost::int64_t max_interval)
+    void interval_timer::slow_down(std::int64_t max_interval)
     {
         return timer_->slow_down(max_interval);
     }
 
-    void interval_timer::speed_up(boost::int64_t min_interval)
+    void interval_timer::speed_up(std::int64_t min_interval)
     {
         return timer_->speed_up(min_interval);
     }
