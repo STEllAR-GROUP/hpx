@@ -10,8 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
 
 namespace hpx
 {
@@ -54,20 +52,8 @@ namespace hpx
         private:
             friend class serialization::access;
 
-            template <typename Archive>
-            void load(Archive& ar, unsigned version)
-            {
-                int value = 0;
-                ar & value;
-                policy_ = static_cast<launch_policy>(value);
-            }
-
-            template <typename Archive>
-            void save(Archive& ar, unsigned version) const
-            {
-                int value = static_cast<int>(policy_);
-                ar & value;
-            }
+            void load(serialization::input_archive& ar, unsigned version);
+            void save(serialization::output_archive& ar, unsigned version) const;
 
             HPX_SERIALIZATION_SPLIT_MEMBER()
         };
