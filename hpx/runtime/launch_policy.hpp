@@ -52,8 +52,8 @@ namespace hpx
         private:
             friend class serialization::access;
 
-            void load(serialization::input_archive& ar, unsigned version);
-            void save(serialization::output_archive& ar, unsigned version) const;
+            HPX_EXPORT void load(serialization::input_archive& ar, unsigned);
+            HPX_EXPORT void save(serialization::output_archive& ar, unsigned) const;
 
             HPX_SERIALIZATION_SPLIT_MEMBER()
         };
