@@ -8,6 +8,7 @@
 
 #include <H5Cpp.h>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 

@@ -15,6 +15,7 @@
 #include <boost/array.hpp>
 
 #include <climits>
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 

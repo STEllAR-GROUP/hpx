@@ -20,6 +20,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <list>

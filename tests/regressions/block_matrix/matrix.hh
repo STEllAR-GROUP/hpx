@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 #include <initializer_list>
 #include <iostream>

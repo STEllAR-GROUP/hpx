@@ -6,6 +6,7 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

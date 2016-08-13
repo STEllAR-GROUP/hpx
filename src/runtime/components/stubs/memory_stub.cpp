@@ -8,6 +8,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/runtime/components/stubs/memory.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 namespace hpx { namespace components { namespace stubs

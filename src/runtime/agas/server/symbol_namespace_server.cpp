@@ -20,6 +20,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>

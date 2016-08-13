@@ -21,6 +21,7 @@
 #include <boost/lockfree/detail/branch_hints.hpp>
 #include <boost/lockfree/detail/prefix.hpp>
 
+#include <cstddef>
 #include <algorithm>
 
 namespace boost

@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////

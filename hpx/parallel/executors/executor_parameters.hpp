@@ -23,6 +23,7 @@
 #include <boost/ref.hpp>
 
 #include <cstdarg>
+#include <cstddef>
 #include <functional>
 #include <type_traits>
 #include <utility>

@@ -20,6 +20,7 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

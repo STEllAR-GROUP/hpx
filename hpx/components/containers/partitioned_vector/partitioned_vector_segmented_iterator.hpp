@@ -26,6 +26,7 @@
 
 #include <boost/integer.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <limits>

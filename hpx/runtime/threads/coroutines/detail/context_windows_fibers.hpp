@@ -44,6 +44,7 @@
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 #if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)

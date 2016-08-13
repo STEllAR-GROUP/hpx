@@ -10,6 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
+#include <cstddef>
 #include <string>
 
 #include "../server/partition.hpp"

@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>

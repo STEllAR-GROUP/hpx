@@ -14,6 +14,7 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <functional>

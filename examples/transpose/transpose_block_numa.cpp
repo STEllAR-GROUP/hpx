@@ -16,6 +16,7 @@
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <numeric>

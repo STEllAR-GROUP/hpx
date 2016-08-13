@@ -9,6 +9,7 @@
 #include "worker_timed.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <vector>

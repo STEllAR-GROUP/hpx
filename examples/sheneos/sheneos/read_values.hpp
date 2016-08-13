@@ -13,6 +13,7 @@
     #error sheneos requires threadsafe HDF5 libraries
 #endif
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 

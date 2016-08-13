@@ -10,6 +10,7 @@
 #include <hpx/util/bind.hpp>
 #include <boost/lockfree/queue.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <map>

@@ -24,6 +24,7 @@
 
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <boost/version.hpp>
+
 #include <cstddef>
 
 namespace hpx { namespace util

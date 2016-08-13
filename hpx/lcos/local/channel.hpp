@@ -22,6 +22,7 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <iterator>
 #include <mutex>

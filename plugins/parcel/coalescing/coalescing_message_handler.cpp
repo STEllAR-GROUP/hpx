@@ -23,6 +23,7 @@
 #include <boost/accumulators/accumulators.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>

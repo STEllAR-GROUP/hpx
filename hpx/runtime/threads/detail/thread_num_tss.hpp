@@ -10,6 +10,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstdarg>
+#include <cstddef>
 
 namespace hpx { namespace threads { namespace detail
 {

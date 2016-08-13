@@ -22,6 +22,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>

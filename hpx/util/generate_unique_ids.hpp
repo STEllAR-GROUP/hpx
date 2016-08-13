@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/spinlock.hpp>
 
+#include <cstddef>
 #include <mutex>
 
 #if defined(HPX_MSVC)

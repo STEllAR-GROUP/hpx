@@ -12,6 +12,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/interval_timer.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>

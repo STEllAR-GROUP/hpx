@@ -20,6 +20,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <type_traits>

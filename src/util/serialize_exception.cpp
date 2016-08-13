@@ -10,6 +10,7 @@
 #include <boost/version.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <string>

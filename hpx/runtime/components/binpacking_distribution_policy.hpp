@@ -23,6 +23,7 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <string>

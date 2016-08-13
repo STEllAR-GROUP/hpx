@@ -20,6 +20,7 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <sstream>
 #include <type_traits>

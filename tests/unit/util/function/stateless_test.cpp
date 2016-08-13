@@ -14,6 +14,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <stdexcept>
 
 struct stateless_integer_add

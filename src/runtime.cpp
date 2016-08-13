@@ -43,6 +43,7 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <memory>

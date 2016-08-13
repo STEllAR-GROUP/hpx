@@ -26,6 +26,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

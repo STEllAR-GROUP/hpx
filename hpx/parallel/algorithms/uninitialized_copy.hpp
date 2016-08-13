@@ -21,6 +21,7 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>

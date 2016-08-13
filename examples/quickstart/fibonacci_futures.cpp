@@ -11,6 +11,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <utility>

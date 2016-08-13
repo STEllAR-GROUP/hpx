@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

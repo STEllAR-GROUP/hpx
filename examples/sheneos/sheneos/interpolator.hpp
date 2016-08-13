@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>

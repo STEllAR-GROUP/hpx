@@ -11,6 +11,7 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>

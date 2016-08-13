@@ -21,6 +21,7 @@
 #include <hpx/include/parallel_algorithm.hpp>
 #include <boost/range/irange.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <utility>

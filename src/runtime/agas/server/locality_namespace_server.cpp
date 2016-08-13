@@ -19,6 +19,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <map>

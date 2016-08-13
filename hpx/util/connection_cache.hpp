@@ -23,6 +23,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <map>

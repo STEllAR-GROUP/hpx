@@ -15,6 +15,8 @@
 
 #include <hpx/config.hpp>
 
+#include <boost/lockfree/detail/prefix.hpp>
+
 #include <cstddef> // for std::size_t
 #include <cstdint>
 

@@ -34,6 +34,7 @@
 #include <boost/spirit/include/qi_directive.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>

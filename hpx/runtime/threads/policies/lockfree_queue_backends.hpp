@@ -14,6 +14,7 @@
 #include <boost/lockfree/queue.hpp>
 #include <boost/lockfree/stack.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 namespace hpx { namespace threads { namespace policies

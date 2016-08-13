@@ -21,6 +21,7 @@
 #include <boost/accumulators/accumulators.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <map>

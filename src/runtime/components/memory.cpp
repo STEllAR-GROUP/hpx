@@ -10,6 +10,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////

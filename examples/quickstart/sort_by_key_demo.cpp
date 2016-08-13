@@ -11,6 +11,7 @@
 #include <hpx/include/parallel_sort.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <cstddef>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

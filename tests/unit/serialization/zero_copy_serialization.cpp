@@ -15,6 +15,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

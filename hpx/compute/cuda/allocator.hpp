@@ -21,6 +21,7 @@
 #include <cuda_runtime.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <limits>
 #include <memory>

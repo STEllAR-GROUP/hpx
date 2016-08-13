@@ -14,6 +14,7 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/integer/uint128.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <type_traits>

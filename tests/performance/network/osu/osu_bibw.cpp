@@ -13,6 +13,7 @@
 
 #include <boost/range/irange.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

@@ -22,6 +22,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <sstream>
 #include <type_traits>

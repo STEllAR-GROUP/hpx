@@ -13,6 +13,7 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <cstddef>
 #include <list>
 #include <string>
 #include <vector>

@@ -27,6 +27,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

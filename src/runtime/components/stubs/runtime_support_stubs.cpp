@@ -20,6 +20,7 @@
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <vector>

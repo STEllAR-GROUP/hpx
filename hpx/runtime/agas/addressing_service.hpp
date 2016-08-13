@@ -27,6 +27,7 @@
 #include <boost/atomic.hpp>
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>

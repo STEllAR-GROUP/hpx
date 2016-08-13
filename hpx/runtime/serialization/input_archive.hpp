@@ -18,6 +18,7 @@
 
 #include <boost/cstdint.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>

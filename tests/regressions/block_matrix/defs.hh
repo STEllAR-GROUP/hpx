@@ -6,6 +6,7 @@
 #ifndef DEFS_HH
 #define DEFS_HH
 
+#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>

@@ -11,6 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>

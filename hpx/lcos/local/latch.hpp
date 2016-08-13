@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <utility>
 

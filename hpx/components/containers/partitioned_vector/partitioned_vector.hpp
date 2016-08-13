@@ -29,6 +29,7 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iterator>

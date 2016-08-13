@@ -19,6 +19,7 @@
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>

@@ -30,6 +30,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 

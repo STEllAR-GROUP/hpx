@@ -14,6 +14,7 @@
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <numeric>

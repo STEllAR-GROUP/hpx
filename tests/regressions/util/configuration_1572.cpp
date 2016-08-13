@@ -9,6 +9,7 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 

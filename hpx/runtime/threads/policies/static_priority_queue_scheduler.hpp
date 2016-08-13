@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 

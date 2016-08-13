@@ -18,6 +18,7 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

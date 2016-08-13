@@ -17,6 +17,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <stdexcept>

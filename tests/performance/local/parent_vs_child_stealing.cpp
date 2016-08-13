@@ -11,6 +11,7 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <numeric>
 #include <vector>

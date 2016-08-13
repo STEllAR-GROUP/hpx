@@ -14,6 +14,7 @@
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iostream>

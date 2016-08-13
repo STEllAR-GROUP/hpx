@@ -16,6 +16,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <list>
 #include <mutex>
 #include <set>

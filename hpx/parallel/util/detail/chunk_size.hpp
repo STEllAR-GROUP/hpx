@@ -17,6 +17,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

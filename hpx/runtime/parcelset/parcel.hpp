@@ -28,6 +28,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

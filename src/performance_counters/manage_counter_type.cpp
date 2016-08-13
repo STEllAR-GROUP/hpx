@@ -15,6 +15,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

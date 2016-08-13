@@ -9,6 +9,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>

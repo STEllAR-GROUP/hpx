@@ -35,6 +35,7 @@
 #include <boost/archive/basic_archive.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <type_traits>

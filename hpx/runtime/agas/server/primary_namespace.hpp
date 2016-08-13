@@ -28,6 +28,7 @@
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <map>

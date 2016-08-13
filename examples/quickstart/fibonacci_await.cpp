@@ -15,6 +15,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <memory>

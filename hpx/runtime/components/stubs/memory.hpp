@@ -13,6 +13,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 namespace hpx { namespace components { namespace stubs

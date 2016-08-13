@@ -11,6 +11,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <string>

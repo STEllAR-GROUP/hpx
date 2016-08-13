@@ -14,6 +14,7 @@
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 

@@ -13,6 +13,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <fstream>
 #include <iterator>

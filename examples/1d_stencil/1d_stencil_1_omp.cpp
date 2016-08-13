@@ -17,6 +17,7 @@
 #include <boost/program_options.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <vector>

@@ -13,6 +13,7 @@
 #include <hpx/util/bind.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>

@@ -17,6 +17,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <mutex>
 #include <string>

@@ -27,6 +27,7 @@
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 #include <hpx/components/containers/unordered/unordered_map_segmented_iterator.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>

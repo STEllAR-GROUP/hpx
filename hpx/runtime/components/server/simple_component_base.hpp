@@ -21,6 +21,7 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <sstream>

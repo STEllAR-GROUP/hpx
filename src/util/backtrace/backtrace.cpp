@@ -47,9 +47,10 @@
 #ifdef BOOST_HAVE_UNWIND
 #include <unwind.h>
 #endif
-#include <cstring>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <ostream>
 #include <sstream>

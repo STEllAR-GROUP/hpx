@@ -48,6 +48,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <functional>

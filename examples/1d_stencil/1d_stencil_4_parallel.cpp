@@ -19,6 +19,7 @@
 
 #include <boost/iterator/counting_iterator.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

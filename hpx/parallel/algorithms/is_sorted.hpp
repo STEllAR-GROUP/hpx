@@ -22,6 +22,7 @@
 #include <boost/range/functions.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <type_traits>

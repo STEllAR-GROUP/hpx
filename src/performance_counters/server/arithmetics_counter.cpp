@@ -18,6 +18,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>

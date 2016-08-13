@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>

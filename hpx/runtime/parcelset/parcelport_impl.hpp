@@ -30,6 +30,7 @@
 #include <boost/exception_ptr.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <memory>

@@ -25,6 +25,7 @@
 #include <hpx/util/apex.hpp>
 #endif
 
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <utility>

@@ -12,6 +12,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>

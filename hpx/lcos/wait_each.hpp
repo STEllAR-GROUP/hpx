@@ -121,6 +121,7 @@ namespace hpx
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/detail/pack.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

@@ -21,6 +21,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/ini.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <utility>

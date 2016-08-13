@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <map>

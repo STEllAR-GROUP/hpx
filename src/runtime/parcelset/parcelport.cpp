@@ -21,6 +21,7 @@
 
 #include <boost/chrono/chrono.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>

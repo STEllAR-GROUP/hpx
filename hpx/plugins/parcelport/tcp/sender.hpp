@@ -32,6 +32,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>

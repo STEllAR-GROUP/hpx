@@ -9,6 +9,7 @@
 #include <hpx/lcos/reduce.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

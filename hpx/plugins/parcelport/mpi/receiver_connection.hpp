@@ -14,6 +14,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <utility>

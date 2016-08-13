@@ -9,6 +9,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <string>

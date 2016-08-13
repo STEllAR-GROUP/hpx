@@ -18,6 +18,7 @@
 #include <boost/format.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>

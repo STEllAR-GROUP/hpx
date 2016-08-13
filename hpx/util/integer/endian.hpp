@@ -25,6 +25,7 @@
 #include <boost/detail/endian.hpp>
 
 #include <climits>
+#include <cstddef>
 #include <iosfwd>
 #include <type_traits>
 

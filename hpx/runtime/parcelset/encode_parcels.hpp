@@ -21,6 +21,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

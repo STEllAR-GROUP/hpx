@@ -24,6 +24,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <memory>

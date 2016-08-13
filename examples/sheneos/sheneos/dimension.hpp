@@ -10,6 +10,8 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace sheneos
 {

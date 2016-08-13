@@ -12,6 +12,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>

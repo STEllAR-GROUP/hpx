@@ -25,6 +25,7 @@
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>

@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_TEST_IS_SORTED_MAY28_15_1320
 
 //
+#include <cstddef>
 #include <cstdint>
 #include <iomanip>
 #include <limits>

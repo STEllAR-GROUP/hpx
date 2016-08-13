@@ -14,6 +14,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <vector>

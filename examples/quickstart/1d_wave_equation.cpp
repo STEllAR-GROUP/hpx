@@ -30,6 +30,7 @@
 #include <boost/format.hpp>
 #include <boost/math/constants/constants.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <vector>

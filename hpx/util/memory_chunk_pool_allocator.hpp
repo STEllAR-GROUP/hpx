@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <utility>
 #include <vector>

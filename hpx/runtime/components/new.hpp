@@ -20,6 +20,7 @@
 #include <hpx/util/lazy_enable_if.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

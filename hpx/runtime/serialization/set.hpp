@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <set>
 #include <utility>

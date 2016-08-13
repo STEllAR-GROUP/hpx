@@ -12,6 +12,8 @@
 
 #include <functional>
 
+#include <cstddef>
+
 struct data
 {
     ///< For synchronizing two-phase initialization.

@@ -10,6 +10,7 @@
 
 #include <hpx/runtime/naming/name.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 namespace hpx { namespace performance_counters { namespace parcels

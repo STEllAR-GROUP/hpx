@@ -15,6 +15,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>

@@ -13,6 +13,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <utility>

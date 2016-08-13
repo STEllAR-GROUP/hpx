@@ -23,6 +23,7 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

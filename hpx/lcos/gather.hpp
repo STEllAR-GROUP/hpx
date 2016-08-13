@@ -147,6 +147,7 @@ namespace hpx { namespace lcos
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <string>
 #include <type_traits>

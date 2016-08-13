@@ -14,6 +14,7 @@
 
 #include <boost/io/ios_state.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 #include "hash.hpp"

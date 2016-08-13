@@ -8,6 +8,7 @@
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <cstddef>
 #include <vector>
 
 #include "grid.hpp"

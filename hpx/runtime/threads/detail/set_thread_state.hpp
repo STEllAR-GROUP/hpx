@@ -26,6 +26,7 @@
 #include <boost/atomic.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <memory>
 

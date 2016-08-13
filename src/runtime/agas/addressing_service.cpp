@@ -45,6 +45,7 @@
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <map>

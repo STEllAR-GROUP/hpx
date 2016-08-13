@@ -18,6 +18,7 @@
 
 #include <boost/thread/shared_mutex.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>

@@ -21,6 +21,7 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -34,6 +34,7 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #if defined(_POSIX_VERSION)
 #include <iostream>

@@ -33,6 +33,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
