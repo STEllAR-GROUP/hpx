@@ -195,7 +195,7 @@ namespace hpx { namespace parcelset
     )
     {
         std::vector<serialization::serialization_chunk>
-            chunks(std::move(decode_chunks(buffer)));
+            chunks(decode_chunks(buffer));
         decode_message_with_chunks(pp, std::move(buffer),
             parcel_count, chunks, num_thread);
     }

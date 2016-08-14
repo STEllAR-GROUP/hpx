@@ -746,6 +746,10 @@ namespace hpx { namespace parcelset
             HPX_ASSERT(locality_id == sender_connection->destination());
             sender_connection->verify(locality_id);
 #endif
+
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+            sender_connection->set_state(parcelport_connection::state_send_pending);
+#endif
             // encode the parcels
             std::size_t num_parcels = encode_parcels(&p, 1,
                     sender_connection->buffer_,
@@ -763,13 +767,10 @@ namespace hpx { namespace parcelset
 
                 // send the parcel
                 sender_connection->async_write(
-                    [p{std::move(p)},handler{std::move(handler)}]
-                     (boost::system::error_code const& e)
-                {
-                    handler(e, p);
-                },
-                util::bind(&parcelport_impl::immediate_send_done,
-                    this, _1, _2, _3));
+                    util::bind(util::one_shot(handler),
+                        _1,  std::move(p)),
+                    util::bind(&parcelport_impl::immediate_send_done,
+                        this, _1, _2, _3));
             }
         }
 
@@ -855,7 +856,7 @@ namespace hpx { namespace parcelset
             --operations_in_flight_;
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            client_connection->set_state(parcelport_connection::state_scheduled_thread);
+            sender_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif
         }
 
@@ -869,7 +870,7 @@ namespace hpx { namespace parcelset
             --operations_in_flight_;
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            client_connection->set_state(parcelport_connection::state_scheduled_thread);
+            sender_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif
             if (!ec)
             {
