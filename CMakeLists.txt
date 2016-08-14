@@ -152,10 +152,6 @@ hpx_option(HPX_WITH_COMPILER_WARNINGS BOOL
   "Enable compiler warnings (default: ON)"
   ON ADVANCED)
 
-hpx_option(HPX_WITH_EXPORT_PACKAGE BOOL
-  "Export the package via CMake."
-  ON ADVANCED)
-
 hpx_option(HPX_WITH_DOCUMENTATION BOOL
   "Build the HPX documentation (default OFF)."
   OFF CATEGORY "Build Targets")
