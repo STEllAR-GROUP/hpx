@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
+#include <functional>
 #include <mutex>
 
 using boost::program_options::variables_map;
@@ -232,7 +233,7 @@ void do_test_creation_through_reference_wrapper()
 {
     non_copyable_functor f;
 
-    hpx::thread thrd(boost::ref(f));
+    hpx::thread thrd(std::ref(f));
     thrd.join();
     HPX_TEST_EQ(f.value, 999u);
 }
@@ -267,7 +268,7 @@ void test_creation_through_reference_wrapper()
 // void do_test_timed_join()
 // {
 //     long_running_thread f;
-//     hpx::thread thrd(boost::ref(f));
+//     hpx::thread thrd(std::ref(f));
 //     HPX_TEST(thrd.joinable());
 //     std::chrono::system_clock::time_point xt =
 //         std::chrono::system_clock::now()
@@ -310,8 +311,8 @@ void test_swap()
 
     hpx::lcos::local::barrier b1(3);
     hpx::lcos::local::barrier b2(3);
-    hpx::thread t1(&simple_sync_thread, boost::ref(b1), boost::ref(b2));
-    hpx::thread t2(&simple_sync_thread, boost::ref(b1), boost::ref(b2));
+    hpx::thread t1(&simple_sync_thread, std::ref(b1), std::ref(b2));
+    hpx::thread t2(&simple_sync_thread, std::ref(b1), std::ref(b2));
 
     b1.wait();   // wait for both threads to be started
 

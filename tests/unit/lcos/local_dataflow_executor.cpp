@@ -14,6 +14,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -242,7 +243,7 @@ void future_function_pointers(Executor& exec)
     {
         vf.push_back(dataflow(exec, &future_int_f1, make_ready_future()));
     }
-    future<int> f5 = dataflow(exec, &future_int_f_vector, boost::ref(vf));
+    future<int> f5 = dataflow(exec, &future_int_f_vector, std::ref(vf));
 
     HPX_TEST_EQ(f5.get(), 10);
 }

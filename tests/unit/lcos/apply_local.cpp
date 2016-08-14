@@ -12,6 +12,7 @@
 #include <boost/atomic.hpp>
 
 #include <chrono>
+#include <functional>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -121,12 +122,12 @@ int hpx_main()
     std::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
 #   if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
     result_cv.wait_for(l, std::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 18));
+        hpx::util::bind(std::equal_to<boost::int32_t>(), std::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
 #   else
     result_cv.wait_for(l, std::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 15));
+        hpx::util::bind(std::equal_to<boost::int32_t>(), std::ref(accumulator), 15));
 
     HPX_TEST_EQ(accumulator.load(), 15);
 #   endif

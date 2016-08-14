@@ -46,6 +46,7 @@
 #include <boost/icl/closed_interval.hpp>
 
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -1872,7 +1873,7 @@ void addressing_service::decref(
         ) = &addressing_service::decref;
 
         threads::register_thread_nullary(
-            util::deferred_call(decref_ptr, this, raw, credit, boost::ref(throws)),
+            util::deferred_call(decref_ptr, this, raw, credit, std::ref(throws)),
             "addressing_service::decref", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default, ec);
@@ -2200,7 +2201,7 @@ void addressing_service::update_cache_entry(
           , error_code&
         ) = &addressing_service::update_cache_entry;
         threads::register_thread_nullary(
-            util::deferred_call(update_cache_entry_ptr, this, id, g, boost::ref(throws)),
+            util::deferred_call(update_cache_entry_ptr, this, id, g, std::ref(throws)),
             "addressing_service::update_cache_entry", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default, ec);

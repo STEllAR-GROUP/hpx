@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <functional>
 #include <numeric>
 #include <string>
 #include <type_traits>
@@ -47,7 +48,7 @@ void test_apply(Executor& exec)
     hpx::thread::id id;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    traits::apply_execute(exec, &apply_test, boost::ref(l), boost::ref(id), 42);
+    traits::apply_execute(exec, &apply_test, std::ref(l), std::ref(id), 42);
     l.count_down_and_wait();
 
     HPX_TEST(id != hpx::this_thread::get_id());

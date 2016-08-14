@@ -22,6 +22,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -179,7 +180,7 @@ void wait_for_tasks(
         if (all_count != suspended_tasks + 1)
         {
             register_work(hpx::util::bind(&wait_for_tasks
-                                    , boost::ref(finished)
+                                    , std::ref(finished)
                                     , suspended_tasks)
                 , "wait_for_tasks", hpx::threads::pending
                 , hpx::threads::thread_priority_low);
@@ -468,7 +469,7 @@ int hpx_main(
         hpx::lcos::local::barrier finished(2);
 
         register_work(hpx::util::bind(&wait_for_tasks
-                                , boost::ref(finished)
+                                , std::ref(finished)
                                 , total_suspended_tasks
                                  )
             , "wait_for_tasks", hpx::threads::pending

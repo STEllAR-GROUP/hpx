@@ -21,6 +21,7 @@
 #include <boost/regex.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>
 
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -216,7 +217,7 @@ namespace hpx { namespace performance_counters
             {
                 using hpx::util::placeholders::_1;
                 discover_counter = hpx::util::bind(&expand_counter_info, _1,
-                    discover_counter, boost::ref(ec));
+                    discover_counter, std::ref(ec));
             }
 
             counter_info info = (*it).second.info_;
@@ -237,7 +238,7 @@ namespace hpx { namespace performance_counters
             {
                 using hpx::util::placeholders::_1;
                 discover_counter = hpx::util::bind(&expand_counter_info, _1,
-                    discover_counter, boost::ref(ec));
+                    discover_counter, std::ref(ec));
             }
 
             // split name
@@ -305,7 +306,7 @@ namespace hpx { namespace performance_counters
         {
             using hpx::util::placeholders::_1;
             discover_counter_ = hpx::util::bind(&expand_counter_info, _1,
-                std::move(discover_counter), boost::ref(ec));
+                std::move(discover_counter), std::ref(ec));
         }
         else
         {

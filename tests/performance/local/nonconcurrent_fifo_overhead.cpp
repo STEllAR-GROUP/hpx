@@ -11,6 +11,7 @@
 
 #include "worker_timed.hpp"
 
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -221,9 +222,9 @@ int app_main(
     for (boost::uint32_t i = 0; i != threads; ++i)
         workers.add_thread(new boost::thread(
             perform_iterations,
-            boost::ref(b),
-            boost::ref(elapsed_control[i]),
-            boost::ref(elapsed_lockfree[i])
+            std::ref(b),
+            std::ref(elapsed_control[i]),
+            std::ref(elapsed_lockfree[i])
             ));
 
     workers.join_all();

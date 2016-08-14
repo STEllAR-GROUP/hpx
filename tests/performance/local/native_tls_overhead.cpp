@@ -17,6 +17,8 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <functional>
+
 #if defined(__has_feature)
 #  if __has_feature(cxx_thread_local)
 #    define HPX_NATIVE_TLS thread_local
@@ -118,7 +120,7 @@ int main(
     high_resolution_timer t;
 
     for (boost::uint32_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, boost::ref(b), updates));
+        workers.add_thread(new boost::thread(worker, std::ref(b), updates));
 
     workers.join_all();
 

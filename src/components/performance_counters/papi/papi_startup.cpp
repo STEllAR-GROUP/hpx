@@ -8,14 +8,6 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <cctype>
-#include <set>
-#include <string>
-#include <utility>
-
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
-
 #include <hpx/util/bind.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
@@ -29,6 +21,15 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/exception.hpp>
+
+#include <boost/format.hpp>
+#include <boost/program_options.hpp>
+
+#include <cctype>
+#include <functional>
+#include <set>
+#include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -145,7 +146,7 @@ namespace hpx { namespace performance_counters { namespace papi
                 std::string evstr((*gi)->long_descr);
                 info.helptext_ = "returns the count of occurrences of \""+
                     evstr+"\" in "+(*it)+" instance";
-                if (!f(info, boost::ref(ec)) || ec) return false;
+                if (!f(info, std::ref(ec)) || ec) return false;
             }
         }
         return true;

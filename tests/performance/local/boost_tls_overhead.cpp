@@ -17,6 +17,8 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <functional>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -101,7 +103,7 @@ int main(
     high_resolution_timer t;
 
     for (unsigned i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, boost::ref(b), updates));
+        workers.add_thread(new boost::thread(worker, std::ref(b), updates));
 
     workers.join_all();
 
