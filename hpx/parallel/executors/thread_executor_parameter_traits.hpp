@@ -15,7 +15,6 @@
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/util/always_void.hpp>
 
-#include <cstdarg>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
