@@ -18,8 +18,6 @@
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
-#include <boost/mpl/bool.hpp>
-
 #include <cstddef>
 #include <cstring>
 #include <string>
@@ -417,7 +415,7 @@ namespace hpx { namespace traits
             VTablePtr
           , hpx::util::detail::empty_function<Sig>
         >
-    > : boost::mpl::false_
+    > : std::false_type
     {};
 }}
 

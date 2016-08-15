@@ -13,6 +13,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas { namespace stubs

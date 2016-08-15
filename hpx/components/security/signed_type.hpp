@@ -15,7 +15,7 @@
 
 #include <hpx/components/security/signature.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace components { namespace security
 {
@@ -105,7 +105,7 @@ namespace hpx { namespace traits
     template <typename T>
     struct is_bitwise_serializable<
             hpx::components::security::signed_type<T> >
-       : boost::mpl::true_
+       : std::true_type
     {};
 }}
 

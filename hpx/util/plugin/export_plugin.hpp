@@ -21,6 +21,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_NAME_2(name1, name2)                                       \

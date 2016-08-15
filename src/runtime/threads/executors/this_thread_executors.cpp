@@ -23,13 +23,13 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono/chrono.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -97,7 +97,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     template <typename Scheduler>
-    threads::thread_state_enum
+    threads::thread_result_type
     this_thread_executor<Scheduler>::thread_function_nullary(
         closure_type func)
     {
@@ -112,7 +112,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // held.
         util::force_error_on_lock();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     // Schedule the specified function for execution in this executor.
@@ -159,7 +159,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_at(
-        boost::chrono::steady_clock::time_point const& abs_time,
+        util::steady_clock::time_point const& abs_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -203,11 +203,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_after(
-        boost::chrono::steady_clock::duration const& rel_time,
+        util::steady_clock::duration const& rel_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
-        return add_at(boost::chrono::steady_clock::now() + rel_time,
+        return add_at(util::steady_clock::now() + rel_time,
             std::move(f), desc, stacksize, ec);
     }
 

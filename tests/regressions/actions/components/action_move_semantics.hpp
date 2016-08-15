@@ -10,6 +10,8 @@
 
 #include <tests/regressions/actions/components/stubs/action_move_semantics.hpp>
 
+#include <utility>
+
 namespace hpx { namespace test
 {
     struct action_move_semantics

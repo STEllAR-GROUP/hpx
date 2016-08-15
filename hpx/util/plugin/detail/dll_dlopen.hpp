@@ -4,6 +4,9 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::shared_ptr
+
 #ifndef HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
@@ -19,13 +22,12 @@
 #include <boost/thread/once.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
 
 #include <iostream>
 #include <mutex>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
@@ -213,8 +215,8 @@ namespace hpx { namespace util { namespace plugin {
             std::unique_lock<boost::recursive_mutex> lock(mutex_instance());
 
             static_assert(
-                boost::is_pointer<SymbolType>::value,
-                "boost::is_pointer<SymbolType>::value");
+                std::is_pointer<SymbolType>::value,
+                "std::is_pointer<SymbolType>::value");
 
             SymbolType address = very_detail::nasty_cast<SymbolType>(
                 MyGetProcAddress(dll_handle, symbol_name.c_str()));

@@ -45,9 +45,9 @@ endif()
 ################################################################################
 project(HPX CXX C)
 
-set(HPX_MAJOR_VERSION 0)
-set(HPX_MINOR_VERSION 9)
-set(HPX_PATCH_LEVEL   99)
+set(HPX_MAJOR_VERSION 1)
+set(HPX_MINOR_VERSION 0)
+set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
@@ -262,10 +262,6 @@ endif()
 ################################################################################
 set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6.99
-      AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-    set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
-  endif()
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
     set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
   endif()
@@ -433,38 +429,38 @@ string(TOUPPER ${HPX_WITH_THREAD_SCHEDULERS} HPX_WITH_THREAD_SCHEDULERS_UC)
 foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "ALL")
     set(_all On)
-    set(HPX_HAVE_ALL_SCHEDULERS ON CACHE INTERNAL "")
+    set(HPX_WITH_ALL_SCHEDULERS ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "ABP-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_ABP_SCHEDULER)
-    set(HPX_HAVE_ABP_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_WITH_ABP_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "LOCAL" OR _all)
     hpx_add_config_define(HPX_HAVE_LOCAL_SCHEDULER)
-    set(HPX_HAVE_LOCAL_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_WITH_LOCAL_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "STATIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    set(HPX_HAVE_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_WITH_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "STATIC" OR _all)
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
-    set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
   # The throttle scheduler is not supported neither on Windows nor on Mac
   if(HPX_WITH_APEX AND NOT WIN32 AND NOT APPLE)
     if(_scheduler STREQUAL "THROTTLE" OR _all)
       hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
-      set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
+      set(HPX_WITH_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
     endif()
   endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
-    set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-    set(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   unset(_all)
 endforeach()
@@ -727,6 +723,14 @@ if(HPX_WITH_GENERIC_EXECUTION_POLICY)
   hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
 endif()
 
+# HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY BOOL
+    "Enable old style ..._sync/..._async functions in API (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+endif()
+
 # BADBAD: This enables an overload of swap is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -742,6 +746,14 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
+# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0
+hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
+    "Enable support for boost::chrono (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
@@ -754,8 +766,8 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Check if the selected compiler versions are supposed to work with our codebase
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.4.4)
-    hpx_error("GCC 4.4.5 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
+    hpx_error("GCC 4.8 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -847,7 +859,7 @@ endif()
 
 # Check the availability of certain C++11 language features
 hpx_check_for_cxx11_alias_templates(
-  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+  REQUIRED "HPX needs support for C++11 alias templates")
 
 hpx_check_for_cxx11_auto(
   REQUIRED "HPX needs support for C++11 auto")
@@ -882,9 +894,6 @@ hpx_check_for_cxx11_extended_friend_declarations(
 
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")
-
-hpx_check_for_cxx11_initializer_list(
-  DEFINITIONS HPX_HAVE_CXX11_INITIALIZER_LIST)
 
 hpx_check_for_cxx11_inline_namespaces(
   DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
@@ -921,13 +930,13 @@ hpx_check_for_cxx11_std_array(
   DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
 
 hpx_check_for_cxx11_std_chrono(
-  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
+  REQUIRED "HPX needs support for C++11 std::chrono")
 
 hpx_check_for_cxx11_std_cstdint(
   DEFINITIONS HPX_HAVE_CXX11_STD_CSTDINT)
 
 hpx_check_for_cxx11_std_initializer_list(
-  DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
+  REQUIRED "HPX needs support for C++11 std::initializer_list")
 
 hpx_check_for_cxx11_std_is_bind_expression(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
@@ -942,7 +951,7 @@ hpx_check_for_cxx11_std_lock_guard(
   REQUIRED "HPX needs support for C++11 std::lock_guard")
 
 hpx_check_for_cxx11_std_reference_wrapper(
-  DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
+  REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
 
 hpx_check_for_cxx11_std_shared_ptr(
   REQUIRED "HPX needs support for C++11 std::shared_ptr")
@@ -1210,13 +1219,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Werror=reorder)
     hpx_add_compile_flag_if_available(-Werror=return-type)
     hpx_add_compile_flag_if_available(-Werror=sequence-point)
-
-    if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
-      # Uninitialized variables are bad, earlier compilers issue spurious
-      # warnings
-      hpx_add_compile_flag_if_available(-Werror=uninitialized)
-    endif()
-
+    hpx_add_compile_flag_if_available(-Werror=uninitialized)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
@@ -1237,9 +1240,8 @@ else()
   # in GCC.
   hpx_add_compile_flag_if_available(-Werror=return-type LANGUAGES CXX C)
 
-  # We get false positives all over the place with this. Also, detection for
-  # this flag fails with GCC 4.4 and 4.5.
-  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.5)
+  # We get false positives all over the place with this.
+  if(CMAKE_COMPILER_IS_GNUCXX)
     hpx_add_compile_flag_if_available(-Wno-unused-but-set-parameter LANGUAGES CXX C)
     hpx_add_compile_flag_if_available(-Wno-unused-but-set-variable LANGUAGES CXX C)
     # Uninitialized variables are bad, earlier compilers issue spurious warnings
@@ -1251,9 +1253,8 @@ else()
   hpx_add_compile_flag_if_available(-Wno-sync-nand LANGUAGES CXX C)
 
   # Silence warnings about deleting polymorphic objects with non-virtual dtors.
-  # These come from within Boost. Detection for this flag fails with GCC 4.4,
-  # 4.5 and 4.6.
-  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6)
+  # These come from within Boost.
+  if(CMAKE_COMPILER_IS_GNUCXX)
     hpx_add_compile_flag_if_available(-Wno-delete-non-virtual-dtor LANGUAGES CXX)
   endif()
 

@@ -17,6 +17,7 @@
 
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace tests
 {
@@ -463,6 +464,7 @@ namespace tests
             >());
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <class T>
     class static_object
     {
@@ -474,7 +476,6 @@ namespace tests
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class input_output_iterator_archetype
     {

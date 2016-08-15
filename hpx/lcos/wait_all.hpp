@@ -98,7 +98,6 @@ namespace hpx
 #include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
@@ -123,13 +122,13 @@ namespace hpx { namespace lcos
         template <typename R>
         struct is_future_or_shared_state<
                 boost::intrusive_ptr<future_data<R> > >
-          : boost::mpl::true_
+          : std::true_type
         {};
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Range, typename Enable = void>
         struct is_future_or_shared_state_range
-            : boost::mpl::false_
+            : std::false_type
         {};
 
         template <typename T>
@@ -232,7 +231,7 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::false_, boost::mpl::true_)
+            void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
                     boost::begin(boost::unwrap_ref(util::get<I>(t_))),
@@ -242,7 +241,7 @@ namespace hpx { namespace lcos
             // Current element is a simple future
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::true_, boost::mpl::false_)
+            void await_next(std::true_type, std::false_type)
             {
                 typedef typename util::decay_unwrap<
                     typename util::tuple_element<I, Tuple>::type
@@ -251,9 +250,6 @@ namespace hpx { namespace lcos
                 typedef typename detail::future_or_shared_state_result<
                         future_type
                     >::type future_result_type;
-
-                using boost::mpl::false_;
-                using boost::mpl::true_;
 
                 boost::intrusive_ptr<
                     lcos::detail::future_data<future_result_type>
@@ -270,12 +266,12 @@ namespace hpx { namespace lcos
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
-                        void (wait_all_frame::*f)(true_, false_) =
+                        void (wait_all_frame::*f)(std::true_type, std::false_type) =
                             &wait_all_frame::await_next<I>;
 
                         boost::intrusive_ptr<wait_all_frame> this_(this);
                         next_future_data->set_on_completed(util::deferred_call(
-                            f, std::move(this_), true_(), false_()));
+                            f, std::move(this_), std::true_type(), std::false_type()));
                         return;
                     }
                 }

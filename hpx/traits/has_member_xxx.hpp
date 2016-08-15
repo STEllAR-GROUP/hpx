@@ -7,7 +7,6 @@
 #ifndef HPX_TRAITS_HAS_MEMBER_XXX_HPP
 #define HPX_TRAITS_HAS_MEMBER_XXX_HPP
 
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
 
 #include <type_traits>
@@ -32,16 +31,16 @@
                                                                   \
         template <typename T, typename Ambiguous =                \
             member_function_holder<&helper::MEMBER> >             \
-        struct impl : boost::mpl::true_ {};                       \
+        struct impl : std::true_type {};                          \
                                                                   \
         template <typename T>                                     \
         struct impl<T,                                            \
             member_function_holder<&helper_composed<T>::MEMBER> > \
-          : boost::mpl::false_ {};                                \
+          : std::false_type {};                                   \
     }                                                             \
                                                                   \
     template <typename T, typename Enable = void>                 \
-    struct BOOST_PP_CAT(has_, MEMBER) : boost::mpl::false_ {};    \
+    struct BOOST_PP_CAT(has_, MEMBER) : std::false_type {};       \
                                                                   \
     template <typename T>                                         \
     struct BOOST_PP_CAT(has_, MEMBER)<T,                          \

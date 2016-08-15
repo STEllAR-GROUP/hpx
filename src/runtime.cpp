@@ -5,9 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/version.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
@@ -15,21 +17,20 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp> // EXPORTS get_next_id
+#include <hpx/runtime/components/server/simple_component_base.hpp>    // EXPORTS get_next_id
 #include <hpx/runtime/get_config_entry.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/performance_counters/registry.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/state.hpp>
+#include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/version.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>
@@ -1064,7 +1065,7 @@ namespace hpx
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
-    boost::uint32_t get_num_localities_sync(error_code& ec)
+    boost::uint32_t get_num_localities(hpx::launch::sync_policy, error_code& ec)
     {
         if (nullptr == hpx::get_runtime_ptr())
             return 0;
@@ -1080,8 +1081,8 @@ namespace hpx
         return get_runtime().get_config().get_num_localities();
     }
 
-    boost::uint32_t get_num_localities_sync(components::component_type type,
-        error_code& ec)
+    boost::uint32_t get_num_localities(hpx::launch::sync_policy,
+        components::component_type type, error_code& ec)
     {
         if (nullptr == hpx::get_runtime_ptr())
             return 0;

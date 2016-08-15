@@ -26,8 +26,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 #include <cstddef>
 #include <cstdlib>
 #include <string>
@@ -1062,8 +1060,7 @@ namespace hpx { namespace util { namespace detail
         try {
             // add default logging configuration as defaults to the ini data
             // this will be overwritten by related entries in the read hpx.ini
-            using namespace boost::assign;
-            prefill_ +=
+            prefill_ = {
                 // general logging
                 "[hpx.logging]",
                 "level = ${HPX_LOGLEVEL:0}",
@@ -1185,7 +1182,7 @@ namespace hpx { namespace util { namespace detail
                     (hpx.debuglog.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
-            ;
+            };
         }
         catch (std::exception const&) {
             // just in case something goes wrong

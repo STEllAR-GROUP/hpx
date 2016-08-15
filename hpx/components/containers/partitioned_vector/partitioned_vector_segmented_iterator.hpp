@@ -15,6 +15,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/iterator_adaptor.hpp>
@@ -30,6 +31,7 @@
 #include <limits>
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx
@@ -139,7 +141,7 @@ namespace hpx
             {
                 if (!it_.get_data())
                 {
-                    return it_.get_partition().get_value_sync(
+                    return it_.get_partition().get_value(launch::sync,
                         it_.get_local_index());
                 }
                 return *(it_.get_data()->begin() + it_.get_local_index());
@@ -150,7 +152,7 @@ namespace hpx
             {
                 if (!it_.get_data())
                 {
-                    it_.get_partition().set_value_sync(
+                    it_.get_partition().set_value(launch::sync,
                         it_.get_local_index(), std::forward<T_>(value));
                 }
                 else
@@ -176,7 +178,7 @@ namespace hpx
             {
                 if (!it_.get_data())
                 {
-                    return it_.get_partition().get_value_sync(
+                    return it_.get_partition().get_value(launch::sync,
                         it_.get_local_index());
                 }
                 return *it_.local();
@@ -196,13 +198,13 @@ namespace hpx
 
             operator T() const
             {
-                return v_.get_value_sync(index_);
+                return v_.get_value(launch::sync, index_);
             }
 
             template <typename T_>
             vector_value_proxy& operator=(T_ && value)
             {
-                v_.set_value_sync(index_, std::forward<T_>(value));
+                v_.set_value(launch::sync, index_, std::forward<T_>(value));
                 return *this;
             }
 
@@ -788,7 +790,7 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(data_);
-            return data_->get_value_sync(global_index_);
+            return data_->get_value(launch::sync, global_index_);
         }
 
         void increment()

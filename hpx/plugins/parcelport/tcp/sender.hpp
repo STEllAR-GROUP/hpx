@@ -34,6 +34,7 @@
 #include <boost/cstdint.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp

@@ -14,12 +14,11 @@
 
 #include "htts2.hpp"
 
-#include <boost/assign/std/vector.hpp>
-
+#include <chrono>
 #include <string>
 #include <vector>
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct hpx_driver : htts2::driver
 {
     hpx_driver(int argc, char** argv)
@@ -29,11 +28,11 @@ struct hpx_driver : htts2::driver
 
     void run()
     {
-        using namespace boost::assign;
-        std::vector<std::string> cfg;
-        cfg += "hpx.os_threads=" + std::to_string(osthreads_);
-        cfg += "hpx.run_hpx_main!=0";
-        cfg += "hpx.commandline.allow_unknown!=1";
+        std::vector<std::string> const cfg = {
+            "hpx.os_threads=" + std::to_string(osthreads_),
+            "hpx.run_hpx_main!=0",
+            "hpx.commandline.allow_unknown!=1"
+        };
 
         hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
         boost::program_options::options_description desc;
@@ -56,13 +55,13 @@ struct hpx_driver : htts2::driver
         return hpx::finalize();
     }
 
-    hpx::threads::thread_state_enum payload_thread_function(
+    hpx::threads::thread_result_type payload_thread_function(
         hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
         )
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
         //++count_;
-        return hpx::threads::terminated;
+        return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
     }
 
     void stage_tasks(boost::uint64_t target_osthread)

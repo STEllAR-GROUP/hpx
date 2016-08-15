@@ -11,7 +11,7 @@
 The __stellar__ Group (pronounced as stellar) stands for "[*S]ystems [*T]echnology,
 [*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch". We are an
 international group of faculty, researchers, and students working at various
-institutions around the world. 
+institutions around the world.
 The goal of the __stellar__ Group is to promote the development of
 scalable parallel applications by providing a community for ideas, a framework
 for collaboration, and a platform for communicating these concepts to the
@@ -26,7 +26,7 @@ to more conventional programming models such as MPI.
 
 __hpx__ is based on /ParalleX/ which is a new
 (and still experimental) parallel execution model aiming to
-overcome the limitations imposed by the current hardware and the techniques 
+overcome the limitations imposed by the current hardware and the techniques
 we use to write
 applications today. Our group focuses on two types of applications - those
 requiring excellent strong scaling, allowing for a dramatic reduction of
@@ -99,6 +99,8 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Khalid Hasanov, who contributed changes which allowed to run HPX on 64Bit
+  power-pc architectures.
 * Zahra Khatami, who contributed the prefetching iterators and the persistent
   auto chunking executor parameters implementation.
 * Marcin Copik, who worked on implementing GPU support for C++AMP and HCC.
@@ -212,7 +214,8 @@ __hpx__ is currently funded by the following grants:
   United States Government or any agency thereof.
 * The Bavarian Research Foundation (Bayerische Forschungsstfitung)
   through the grant AZ-987-11.
-
+* The European Commission's Horizon 2020 programme through the grant
+  H2020-EU.1.2.2. 671603 (AllScale). 
 
 [endsect] [/ People]
 

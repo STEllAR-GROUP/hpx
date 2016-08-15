@@ -19,6 +19,7 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <sstream>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

@@ -20,6 +20,7 @@
 
 #include <mutex>
 #include <stdexcept>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

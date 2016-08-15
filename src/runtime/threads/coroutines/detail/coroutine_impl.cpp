@@ -41,6 +41,7 @@
 #include <boost/lockfree/stack.hpp>
 
 #include <cstddef>
+#include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
@@ -97,13 +98,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
                     // if this thread returned 'terminated' we need to reset
                     // the functor and the bound arguments
-                    if (this->m_result_last == terminated)
+                    if (this->m_result_last.first == terminated)
                         this->reset();
                 }
 
                 // return value to other side of the fence
                 this->bind_result(&this->m_result_last);
-            } catch (exit_exception const&) {
+            }
+            catch (exit_exception const&) {
                 status = super_type::ctx_exited_exit;
                 tinfo = boost::current_exception();
                 this->reset();            // reset functor
@@ -121,7 +123,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 this->reset();
             }
 
-            this->do_return(status, tinfo);
+            this->do_return(status, std::move(tinfo));
+
         } while (this->m_state == super_type::ctx_running);
 
         // should not get here, never

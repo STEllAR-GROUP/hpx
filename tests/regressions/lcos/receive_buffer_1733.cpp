@@ -8,6 +8,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #define MAX_ITERATIONS static_cast<std::size_t>(100)
@@ -19,7 +20,7 @@ inline std::size_t idx(std::size_t i, int dir)
 {
     HPX_ASSERT(dir == 1 || dir == -1);
 
-    std::size_t size = hpx::get_num_localities_sync();
+    std::size_t size = hpx::get_num_localities(hpx::launch::sync);
 
     if (i == 0 && dir == -1)
         return size - 1;
@@ -147,8 +148,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // This test requires to run hpx_main on all localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

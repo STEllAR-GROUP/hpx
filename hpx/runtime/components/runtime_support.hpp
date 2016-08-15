@@ -10,6 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components
@@ -105,16 +106,6 @@ namespace hpx { namespace components
         void call_startup_functions(bool pre_startup)
         {
             this->base_type::call_startup_functions(gid_, pre_startup);
-        }
-
-        lcos::future<void> call_shutdown_functions_async(bool pre_shutdown)
-        {
-            return this->base_type::call_shutdown_functions_async(gid_, pre_shutdown);
-        }
-
-        void call_shutdown_functions(bool pre_shutdown)
-        {
-            this->base_type::call_shutdown_functions(gid_, pre_shutdown);
         }
 
         /// \brief Shutdown the given runtime system

@@ -13,6 +13,8 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -54,15 +56,15 @@ namespace hpx
 
             detail::apply_impl<set_action>(
                 actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont), target, std::move(addr),
-                actions::action_priority<set_action>());
+                    local_result_type, remote_result_type>(cont),
+                target, std::move(addr), actions::action_priority<set_action>());
         }
         else
         {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont), id, std::move(addr),
-                actions::action_priority<set_action>());
+                    local_result_type, remote_result_type>(cont),
+                id, std::move(addr), actions::action_priority<set_action>());
         }
     }
 
@@ -109,7 +111,8 @@ namespace hpx
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr,
-        boost::exception_ptr const& e, naming::id_type const& cont, bool move_credits)
+        boost::exception_ptr const& e, naming::id_type const& cont,
+        bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
         typedef
@@ -126,15 +129,15 @@ namespace hpx
 
             detail::apply_impl<set_action>(
                 actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont), target, std::move(addr),
-                actions::action_priority<set_action>(), e);
+                    local_result_type, remote_result_type>(cont),
+                target, std::move(addr), actions::action_priority<set_action>(), e);
         }
         else
         {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont), id, std::move(addr),
-                actions::action_priority<set_action>(), e);
+                    local_result_type, remote_result_type>(cont),
+                id, std::move(addr), actions::action_priority<set_action>(), e);
         }
     }
 
@@ -157,14 +160,16 @@ namespace hpx
 
             detail::apply_impl<set_action>(
                 actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont), target, std::move(addr),
+                    local_result_type, remote_result_type>(cont),
+                target, std::move(addr),
                 actions::action_priority<set_action>(), std::move(e));
         }
         else
         {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont), id, std::move(addr),
+                    local_result_type, remote_result_type>(cont),
+                id, std::move(addr),
                 actions::action_priority<set_action>(), std::move(e));
         }
     }

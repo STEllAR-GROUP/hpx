@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace compute { namespace host

@@ -146,7 +146,8 @@ int hpx_main(
 
         bool verbose = vm.count("verbose") != 0;
 
-        boost::uint32_t num_localities = hpx::get_num_localities_sync();
+        boost::uint32_t num_localities =
+            hpx::get_num_localities(hpx::launch::sync);
 
         hpx::id_type const here = hpx::find_here();
 

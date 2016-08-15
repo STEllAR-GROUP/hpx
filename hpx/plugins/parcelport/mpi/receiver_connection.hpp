@@ -15,6 +15,7 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
 #include <cstring>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi

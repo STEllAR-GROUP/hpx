@@ -145,6 +145,13 @@ the sequence number of the counter invocation, the time stamp at which this
 information has been sampled, the unit of measure for the time stamp,
 the actual counter value, and an optional unit of measure for the counter value.
 
+The actual counter value can be represented by a single number (for counters
+returning singular values) or a list of numbers separated by `':'` (for
+counters returning an array of values, like for instance a histogram).
+
+[note The name of the performance counter will be enclosed in double quotes
+      (`'"'`) if it contains one or more commas (`','`).]
+
 Requesting to query the counter data once after a constant time interval with
 this command line
 
@@ -162,12 +169,12 @@ example for brevity):
 
 [teletype]
 ```
-    threads{locality#0/total}/count/cumulative,1,0.002409[s],22
-    agas{locality#0/total}/count/bind,1,0.002542[s],9
-    threads{locality#0/total}/count/cumulative,2,0.023002[s],41
-    agas{locality#0/total}/count/bind,2,0.023557[s],10
-    threads{locality#0/total}/count/cumulative,3,0.037514[s],46
-    agas{locality#0/total}/count/bind,3,0.038679[s],10
+    threads{locality#0/total}/count/cumulative,1,0.002409,[s],22
+    agas{locality#0/total}/count/bind,1,0.002542,[s],9
+    threads{locality#0/total}/count/cumulative,2,0.023002,[s],41
+    agas{locality#0/total}/count/bind,2,0.023557,[s],10
+    threads{locality#0/total}/count/cumulative,3,0.037514,[s],46
+    agas{locality#0/total}/count/bind,3,0.038679,[s],10
 ```
 
 [c++]
@@ -201,10 +208,10 @@ threads:
     hello world from OS-thread 0 on locality 0
     hello world from OS-thread 3 on locality 0
     hello world from OS-thread 2 on locality 0
-    /threads{locality#0/worker-thread#0}/count/cumulative,1,0.0025214[s],27
-    /threads{locality#0/worker-thread#1}/count/cumulative,1,0.0025453[s],33
-    /threads{locality#0/worker-thread#2}/count/cumulative,1,0.0025683[s],29
-    /threads{locality#0/worker-thread#3}/count/cumulative,1,0.0025904[s],33
+    /threads{locality#0/worker-thread#0}/count/cumulative,1,0.0025214,[s],27
+    /threads{locality#0/worker-thread#1}/count/cumulative,1,0.0025453,[s],33
+    /threads{locality#0/worker-thread#2}/count/cumulative,1,0.0025683,[s],29
+    /threads{locality#0/worker-thread#3}/count/cumulative,1,0.0025904,[s],33
 ```
 [c++]
 

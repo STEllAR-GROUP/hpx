@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:boost::unique_lock
+
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
@@ -233,7 +235,7 @@ namespace hpx {
     int pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy>
-    threads::thread_state_enum
+    threads::thread_result_type
     runtime_impl<SchedulingPolicy>::run_helper(
         util::function_nonser<runtime::hpx_main_function_type> func, int& result)
     {
@@ -247,7 +249,7 @@ namespace hpx {
         if (result) {
             LBT_(info) << "runtime_impl::run_helper: bootstrap "
                           "aborted, bailing out";
-            return threads::terminated;
+            return threads::thread_result_type(threads::terminated, nullptr);
         }
 
         LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
@@ -285,7 +287,7 @@ namespace hpx {
             // Call hpx_main
             result = func();
         }
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     template <typename SchedulingPolicy>

@@ -20,10 +20,11 @@
 #include <hpx/util/thread_description.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 
+#include <functional>
 #include <mutex>
 #include <utility>
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -32,7 +33,7 @@ namespace hpx { namespace lcos { namespace detail
     struct transfer_result
     {
         template <typename Source, typename Destination>
-        void apply(Source&& src, Destination& dest, boost::mpl::false_) const
+        void apply(Source&& src, Destination& dest, std::false_type) const
         {
             try {
                 dest.set_value(src.get());
@@ -43,7 +44,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Source, typename Destination>
-        void apply(Source&& src, Destination& dest, boost::mpl::true_) const
+        void apply(Source&& src, Destination& dest, std::true_type) const
         {
             try {
                 src.get();
@@ -57,9 +58,9 @@ namespace hpx { namespace lcos { namespace detail
         template <typename SourceState, typename DestinationState>
         void operator()(SourceState& src, DestinationState const& dest) const
         {
-            typedef typename boost::is_void<
+            typedef std::is_void<
                 typename traits::future_traits<Future>::type
-            >::type is_void;
+            > is_void;
 
             apply(traits::future_access<Future>::create(src), *dest, is_void());
         }
@@ -67,7 +68,7 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Func, typename Future, typename Continuation>
     void invoke_continuation(Func& func, Future& future, Continuation& cont,
-        boost::mpl::false_)
+        std::false_type)
     {
         try {
             cont.set_value(func(std::move(future)));
@@ -79,7 +80,7 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Func, typename Future, typename Continuation>
     void invoke_continuation(Func& func, Future& future, Continuation& cont,
-        boost::mpl::true_)
+        std::true_type)
     {
         try {
             func(std::move(future));
@@ -91,24 +92,24 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Func, typename Future, typename Continuation>
-    typename boost::disable_if<
-        traits::detail::is_unique_future<
+    typename std::enable_if<
+        !traits::detail::is_unique_future<
             typename util::result_of<Func(Future)>::type
-        >
+        >::value
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
-        typedef typename boost::is_void<
+        typedef std::is_void<
             typename util::result_of<Func(Future)>::type
-        >::type is_void;
+        > is_void;
 
         invoke_continuation(func, future, cont, is_void());
     }
 
     template <typename Func, typename Future, typename Continuation>
-    typename boost::enable_if<
+    typename std::enable_if<
         traits::detail::is_unique_future<
             typename util::result_of<Func(Future)>::type
-        >
+        >::value
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         try {
@@ -239,7 +240,7 @@ namespace hpx { namespace lcos { namespace detail
             run(f, throws);
         }
 
-        threads::thread_state_enum
+        threads::thread_result_type
         async_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -249,7 +250,7 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(f);
             invoke_continuation(f_, future, *this);
-            return threads::terminated;
+            return threads::thread_result_type(threads::terminated, nullptr);
         }
 
         void async(
@@ -270,7 +271,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             boost::intrusive_ptr<continuation> this_(this);
-            threads::thread_state_enum (continuation::*async_impl_ptr)(
+            threads::thread_result_type (continuation::*async_impl_ptr)(
                 typename traits::detail::shared_state_ptr_for<Future>::type const&
             ) = &continuation::async_impl;
 
@@ -300,7 +301,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             boost::intrusive_ptr<continuation> this_(this);
-            threads::thread_state_enum (continuation::*async_impl_ptr)(
+            threads::thread_result_type (continuation::*async_impl_ptr)(
                 typename traits::detail::shared_state_ptr_for<Future>::type const&
             ) = &continuation::async_impl;
 
@@ -330,7 +331,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             boost::intrusive_ptr<continuation> this_(this);
-            threads::thread_state_enum (continuation::*async_impl_ptr)(
+            threads::thread_result_type (continuation::*async_impl_ptr)(
                 typename traits::detail::shared_state_ptr_for<Future>::type const&
             ) = &continuation::async_impl;
 

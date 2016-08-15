@@ -16,6 +16,9 @@
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/detail/iterator.hpp>
 
+#include <type_traits>
+#include <utility>
+
 namespace hpx { namespace traits
 {
     struct cuda_pointer_tag : general_pointer_tag {};

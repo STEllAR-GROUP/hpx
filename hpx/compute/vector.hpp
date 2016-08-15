@@ -19,6 +19,7 @@
 
 #include <initializer_list>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace compute

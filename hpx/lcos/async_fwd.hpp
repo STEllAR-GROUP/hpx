@@ -11,6 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {

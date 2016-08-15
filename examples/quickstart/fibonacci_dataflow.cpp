@@ -17,6 +17,7 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <iostream>
+#include <utility>
 #include <string>
 
 #include <boost/cstdint.hpp>

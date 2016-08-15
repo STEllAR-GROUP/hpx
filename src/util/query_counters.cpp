@@ -5,6 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
@@ -25,6 +26,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util
@@ -60,12 +62,9 @@ namespace hpx { namespace util
 
         names_.push_back(info.fullname_);
         ids_.push_back(id);
-
-//         using performance_counters::stubs::performance_counter;
-//         performance_counters::counter_info info =
-//             performance_counter::get_info(id);
-
         uoms_.push_back(info.unit_of_measure_);
+        types_.push_back(info.type_);
+
         return true;
     }
 
@@ -113,7 +112,7 @@ namespace hpx { namespace util
         {
             // start the performance counter
             using performance_counters::stubs::performance_counter;
-            performance_counter::start(ids_[i]);
+            performance_counter::start(launch::async, ids_[i]);
         }
 
         // this will invoke the evaluate function for the first time
@@ -123,6 +122,17 @@ namespace hpx { namespace util
     void query_counters::stop_evaluating_counters()
     {
         timer_.stop();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Stream>
+    void query_counters::print_name_csv(Stream& out, std::string const& name)
+    {
+        std::string s = performance_counters::remove_counter_prefix(name);
+        if (s.find_first_of(",") != std::string::npos)
+            out << "\"" << s << "\"";
+        else
+            out << s;
     }
 
     template <typename Stream>
@@ -136,8 +146,8 @@ namespace hpx { namespace util
         apex::sample_value(name.c_str(), val);
 #endif
 
-        out << performance_counters::remove_counter_prefix(name) << ",";
-        out << value.count_ << ",";
+        print_name_csv(out, name);
+        out  << "," << value.count_ << ",";
         if (!ec) {
             double elapsed = static_cast<double>(value.time_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)
@@ -152,9 +162,30 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
-    void query_counters::print_name_csv(Stream& out, std::string const& name)
+    void query_counters::print_value(Stream& out, std::string const& name,
+        performance_counters::counter_values_array const& value,
+        std::string const& uom)
     {
-        out << performance_counters::remove_counter_prefix(name);
+        error_code ec(lightweight);        // do not throw
+
+        print_name_csv(out, name);
+        out << "," << value.count_ << ",";
+
+        double elapsed = static_cast<double>(value.time_) * 1e-9;
+        out << boost::str(boost::format("%.6f") % elapsed) << ",[s],";
+
+        bool first = true;
+        for (boost::int64_t val : value.values_)
+        {
+            if (!first)
+                out << ':';
+            first = false;
+            out << val;
+        }
+
+        if (!uom.empty())
+            out << ",[" << uom << "]";
+        out << "\n";
     }
 
     template <typename Stream>
@@ -172,11 +203,115 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
+    void query_counters::print_value_csv(Stream& out,
+        performance_counters::counter_values_array const& value)
+    {
+        bool first = true;
+        for (boost::int64_t val : value.values_)
+        {
+            if (!first)
+                out << ':';
+            first = false;
+            out << val;
+        }
+    }
+
+    template <typename Stream>
     void query_counters::print_name_csv_short(Stream& out, std::string const& name)
     {
         out << name;
     }
 
+    template <typename Stream>
+    void query_counters::print_headers(Stream& output)
+    {
+        if (csv_header_) {
+            if (format_ == "csv")
+            {
+                // first print raw value counters
+                bool first = true;
+                for (std::size_t i = 0; i != names_.size(); ++i)
+                {
+                    if (types_[i] != performance_counters::counter_raw)
+                        continue;
+                    if (!first)
+                        output << ",";
+                    first = false;
+                    print_name_csv(output, names_[i]);
+                }
+
+                // now print array value counters
+                for (std::size_t i = 0; i != names_.size(); ++i)
+                {
+                    if (types_[i] != performance_counters::counter_histogram)
+                        continue;
+                    if (!first)
+                        output << ",";
+                    first = false;
+                    print_name_csv(output, names_[i]);
+                }
+
+                output << "\n";
+            }
+            else if (format_ == "csv-short")
+            {
+                // first print raw value counters
+                bool first = true;
+                for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
+                {
+                    if (types_[i] != performance_counters::counter_raw)
+                        continue;
+                    if (!first)
+                        output << ",";
+                    first = false;
+                    print_name_csv_short(output, counter_shortnames_[i]);
+                }
+
+                // now print array value counters
+                for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
+                {
+                    if (types_[i] != performance_counters::counter_histogram)
+                        continue;
+                    if (!first)
+                        output << ",";
+                    first = false;
+                    print_name_csv_short(output, counter_shortnames_[i]);
+                }
+
+                output << "\n";
+            }
+            csv_header_ = false;
+        }
+    }
+
+    template <typename Stream, typename Future>
+    void query_counters::print_values(Stream& output,
+        std::vector<Future> && values, std::vector<std::size_t> && indicies)
+    {
+        if (format_ == "csv" || format_ == "csv-short")
+        {
+            bool first = true;
+            for (std::size_t i = 0; i != values.size(); ++i)
+            {
+                if (!first)
+                    output << ",";
+                first = false;
+                print_value_csv(output, values[i].get());
+            }
+            output << "\n";
+        }
+        else
+        {
+            std::size_t idx = 0;
+            for (std::size_t i : indicies)
+            {
+                print_value(output, names_[i], values[idx].get(), uoms_[i]);
+                ++idx;
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     bool query_counters::evaluate()
     {
         bool reset = false;
@@ -220,7 +355,7 @@ namespace hpx { namespace util
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            started.push_back(performance_counter::start_async(ids_[i]));
+            started.push_back(performance_counter::start(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(started);
@@ -265,7 +400,7 @@ namespace hpx { namespace util
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            stopped.push_back(performance_counter::stop_async(ids_[i]));
+            stopped.push_back(performance_counter::stop(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(stopped);
@@ -310,7 +445,7 @@ namespace hpx { namespace util
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            reset.push_back(performance_counter::reset_async(ids_[i]));
+            reset.push_back(performance_counter::reset(launch::async, ids_[i]));
 
         // wait for all counters to be started
         wait_all(reset);
@@ -330,6 +465,94 @@ namespace hpx { namespace util
                 return;
             }
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool query_counters::print_raw_counters(bool destination_is_cout,
+        bool reset, char const* description, std::vector<id_type> const& ids,
+        error_code& ec)
+    {
+        // Query the performance counters.
+        using performance_counters::stubs::performance_counter;
+        std::vector<future<performance_counters::counter_value> > values;
+        std::vector<std::size_t> indicies;
+
+        values.reserve(ids.size());
+        indicies.reserve(ids.size());
+
+        for (std::size_t i = 0; i != ids.size(); ++i)
+        {
+            if (types_[i] != performance_counters::counter_raw)
+                continue;
+            values.push_back(performance_counter::get_value(
+                launch::async, ids[i], reset));
+            indicies.push_back(i);
+        }
+
+        if (values.empty())
+            return false;
+
+        std::ostringstream output;
+        if (description)
+            output << description << std::endl;
+
+        // Output the performance counter value.
+        print_headers(output);
+        print_values(output, std::move(values), std::move(indicies));
+
+        if (destination_is_cout) {
+            std::cout << output.str() << std::flush;
+        }
+        else {
+            std::ofstream out(destination_.c_str(), std::ofstream::app);
+            out << output.str();
+        }
+
+        return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool query_counters::print_array_counters(bool destination_is_cout,
+        bool reset, char const* description, std::vector<id_type> const& ids,
+        error_code& ec)
+    {
+        // Query the performance counters.
+        using performance_counters::stubs::performance_counter;
+        std::vector<future<performance_counters::counter_values_array> > values;
+        std::vector<std::size_t> indicies;
+
+        values.reserve(ids.size());
+        indicies.reserve(ids.size());
+
+        for (std::size_t i = 0; i != ids.size(); ++i)
+        {
+            if (types_[i] != performance_counters::counter_histogram)
+                continue;
+            values.push_back(performance_counter::get_values_array(
+                    launch::async, ids[i], reset));
+            indicies.push_back(i);
+        }
+
+        if (values.empty())
+            return false;
+
+        std::ostringstream output;
+        if (description)
+            output << description << std::endl;
+
+        // Output the performance counter value.
+        print_headers(output);
+        print_values(output, std::move(values), std::move(indicies));
+
+        if (destination_is_cout) {
+            std::cout << output.str() << std::flush;
+        }
+        else {
+            std::ofstream out(destination_.c_str(), std::ofstream::app);
+            out << output.str();
+        }
+
+        return true;
     }
 
     bool query_counters::evaluate_counters(bool reset,
@@ -365,72 +588,23 @@ namespace hpx { namespace util
             ids = ids_;
         }
 
-        if (ids.empty())
-            return false;
+        bool result = false;
 
-        // Query the performance counters.
-        using performance_counters::stubs::performance_counter;
-        std::vector<future<performance_counters::counter_value> > values;
+        if (!ids.empty())
+        {
+            result = print_raw_counters(destination_is_cout, reset,
+                description, ids, ec);
+            if (ec) return false;
 
-        values.reserve(ids.size());
-        for (std::size_t i = 0; i != ids.size(); ++i)
-            values.push_back(performance_counter::get_value_async(ids[i], reset));
-
-        std::ostringstream output;
-        if (description)
-            output << description << std::endl;
-
-//         // wait for all values to be returned
-//         wait_all(values);
-
-        // Output the performance counter value.
-        if (csv_header_ == true) {
-            if(format_ == "csv") {
-                for (std::size_t i = 0; i < names_.size(); ++i)
-                {
-                    print_name_csv(output, names_[i]);
-                    if (i != names_.size()-1)
-                        output << ",";
-                }
-                output << "\n";
-            }
-
-            if(format_ == "csv-short") {
-                for (std::size_t i = 0; i < counter_shortnames_.size(); ++i)
-                {
-                    print_name_csv_short(output, counter_shortnames_[i]);
-                    if (i != counter_shortnames_.size()-1)
-                        output << ",";
-                }
-                output << "\n";
-            }
-            csv_header_ = false;
+            result = print_array_counters(destination_is_cout, reset,
+                description, ids, ec) || result;
+            if (ec) return false;
         }
 
-        if (format_ == "csv" || format_ == "csv-short") {
-            for (std::size_t i = 0; i < values.size(); ++i)
-            {
-                print_value_csv(output, values[i].get());
-                if (i != values.size()-1)
-                    output << ",";
-            }
-            output << "\n";
-        }
-        else {
-            for (std::size_t i = 0; i < values.size(); ++i)
-                print_value(output, names_[i], values[i].get(), uoms_[i]);
-        }
+        if (&ec != &throws)
+            ec = make_success_code();
 
-        if (destination_is_cout) {
-            std::cout << output.str() << std::flush;
-        }
-        else {
-            std::ofstream out(destination_.c_str(), std::ofstream::app);
-            out << output.str();
-        }
-
-        return true;
+        return result;
     }
-}
-}
+}}
 

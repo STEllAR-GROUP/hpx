@@ -83,10 +83,12 @@ namespace hpx { namespace compute { namespace cuda
                 int num_blocks = static_cast<int>(
                     (chunk_size + threads_per_block - 1) / threads_per_block);
 
-                detail::launch(
-                    target_, num_blocks, threads_per_block,
-                    [begin, chunk_size]
-                    HPX_DEVICE (F f, Ts&... ts)
+            detail::launch(
+                target_, num_blocks, threads_per_block,
+                [] HPX_DEVICE (F f, value_type* p, std::size_t count, Ts const&... ts)
+                {
+                    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                    if (idx < count)
                     {
                         int idx = blockIdx.x * blockDim.x + threadIdx.x;
                         if(idx < chunk_size)

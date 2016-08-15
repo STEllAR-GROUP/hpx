@@ -126,9 +126,20 @@ namespace hpx { namespace iostreams
         template <typename Tag>
         hpx::future<naming::id_type> create_ostream(Tag tag)
         {
-            return create_ostream(get_outstream_name(tag), detail::get_outstream(tag));
+            return create_ostream(get_outstream_name(tag),
+                detail::get_outstream(tag));
         }
 
+//         ///////////////////////////////////////////////////////////////////////
+//         void release_ostream(char const* name, naming::id_type const& id);
+//
+//         template <typename Tag>
+//         void release_ostream(Tag tag, naming::id_type const& id)
+//         {
+//             release_ostream(get_outstream_name(tag), id);
+//         }
+
+        ///////////////////////////////////////////////////////////////////////
         void register_ostreams();
         void unregister_ostreams();
     }
@@ -254,13 +265,17 @@ namespace hpx { namespace iostreams
         }
 
         // reset this object during runtime system shutdown
-        void uninitialize()
+        template <typename Tag>
+        void uninitialize(Tag tag)
         {
             std::unique_lock<mutex_type> l(mtx_, std::try_to_lock);
             if (l)
             {
-                streaming_operator_sync(hpx::async_flush, l);   // unlocks l
+                streaming_operator_sync(hpx::async_flush, l);   // unlocks
             }
+
+            // FIXME: find a later spot to invoke this
+//             detail::release_ostream(tag, this->get_id());
             this->base_type::free();
         }
 

@@ -18,6 +18,8 @@
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/util/tuple.hpp>
 //
+#include <type_traits>
+#include <utility>
 #include <vector>
 //
 /// \cond NOINTERNAL
@@ -349,7 +351,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }
                             // normal add of previous + this
                         else {
-                            debug_reduce_by_key(" = " << func(a_val, b_val) << std::endl);
+                            debug_reduce_by_key(
+                                " = " << func(a_val, b_val) << std::endl);
                             value_type temp = func(a_val, b_val);
                             return make_tuple(
                                 temp,
@@ -537,12 +540,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     >
 
     /// \cond NOINTERNAL
-    typename util::detail::algorithm_result<ExPolicy, std::pair<OutIter, OutIter2>>::type
-        reduce_by_key(ExPolicy &&policy, RanIter key_first, RanIter key_last,
-            RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
-            Compare &&comp = Compare(),
-            Func &&func = Func()
-            )
+    typename util::detail::algorithm_result<
+        ExPolicy, std::pair<OutIter, OutIter2>
+    >::type
+    reduce_by_key(ExPolicy &&policy, RanIter key_first, RanIter key_last,
+        RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
+        Compare &&comp = Compare(),
+        Func &&func = Func()
+        )
     {
         typedef util::detail::algorithm_result<
             ExPolicy, std::pair<OutIter, OutIter2>> result;

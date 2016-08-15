@@ -174,7 +174,8 @@ namespace hpx { namespace compute { namespace cuda
                     auto end = m.end();
                     for (auto it = m.begin(); it != end; ++it)
                     {
-                        result.push_back(std::move(*it));
+                        hpx::id_type locality = t.native_handle().get_locality();
+                        result.emplace_back(std::move(locality), v[i].get());
                     }
 
                     return result;

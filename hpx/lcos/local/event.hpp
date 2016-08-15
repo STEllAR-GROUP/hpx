@@ -15,6 +15,7 @@
 #include <boost/atomic.hpp>
 
 #include <mutex>
+#include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local

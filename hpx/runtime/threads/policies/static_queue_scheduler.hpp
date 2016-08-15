@@ -18,7 +18,6 @@
 #include <hpx/util/logging.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/mpl/bool.hpp>
 
 #include <memory>
 #include <string>

@@ -23,12 +23,12 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include <memory>
 #include <mutex>
 #include <numeric>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -240,16 +240,16 @@ namespace hpx { namespace threads
     protected:
         ///
         template <typename C>
-        void start_periodic_maintenance(boost::mpl::true_);
+        void start_periodic_maintenance(std::true_type);
 
         template <typename C>
-        void start_periodic_maintenance(boost::mpl::false_) {}
+        void start_periodic_maintenance(std::false_type) {}
 
         template <typename C>
-        void periodic_maintenance_handler(boost::mpl::true_);
+        void periodic_maintenance_handler(std::true_type);
 
         template <typename C>
-        void periodic_maintenance_handler(boost::mpl::false_) {}
+        void periodic_maintenance_handler(std::false_type) {}
 
     public:
         /// The function register_counter_types() is called during startup to

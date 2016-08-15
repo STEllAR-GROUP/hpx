@@ -13,6 +13,8 @@
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/traits/extract_action.hpp>
 
+#include <utility>
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////

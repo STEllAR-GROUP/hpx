@@ -8,6 +8,7 @@
 
 #if defined(HPX_HAVE_PAPI)
 
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

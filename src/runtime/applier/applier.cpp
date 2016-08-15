@@ -38,7 +38,7 @@ namespace hpx { namespace detail
 namespace hpx { namespace applier
 {
     ///////////////////////////////////////////////////////////////////////////
-    static inline threads::thread_state_enum thread_function(
+    static inline threads::thread_result_type thread_function(
         util::unique_function_nonser<void(threads::thread_state_ex_enum)> func)
     {
         // execute the actual thread function
@@ -49,10 +49,10 @@ namespace hpx { namespace applier
         // held.
         util::force_error_on_lock();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
-    static inline threads::thread_state_enum thread_function_nullary(
+    static inline threads::thread_result_type thread_function_nullary(
         util::unique_function_nonser<void()> func)
     {
         // execute the actual thread function
@@ -63,7 +63,7 @@ namespace hpx { namespace applier
         // held.
         util::force_error_on_lock();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     ///////////////////////////////////////////////////////////////////////////

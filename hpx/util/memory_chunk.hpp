@@ -22,6 +22,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace util
 {

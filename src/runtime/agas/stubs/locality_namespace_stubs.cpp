@@ -15,6 +15,7 @@
 #include <hpx/lcos/packaged_action.hpp>
 
 #include <map>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas { namespace stubs

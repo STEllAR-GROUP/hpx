@@ -25,23 +25,10 @@ namespace hpx { namespace util
     // Default template argument handling for iterator_adaptor
     namespace detail
     {
-        template <typename T>
-        struct add_reference
-        {
-            typedef T& type;
-        };
-
-        template <>
-        struct add_reference<void>
-        {
-            typedef void type;
-        };
-
         // A meta-function which computes an iterator_adaptor's base class,
         // a specialization of iterator_facade.
         template <typename Derived, typename Base, typename Value,
-            typename Category, typename Reference, typename Difference,
-            typename Pointer>
+            typename Category, typename Reference, typename Difference>
         struct iterator_adaptor_base
         {
             typedef typename std::conditional<
@@ -59,7 +46,7 @@ namespace hpx { namespace util
                     typename std::conditional<
                         std::is_void<Value>::value,
                         typename std::iterator_traits<Base>::reference,
-                        typename add_reference<Value>::type
+                        typename std::add_lvalue_reference<Value>::type
                     >::type,
                     Reference
                 >::type reference_type;
@@ -78,7 +65,7 @@ namespace hpx { namespace util
 
             typedef iterator_facade<
                     Derived, value_type, iterator_category, reference_type,
-                    distance_type, Pointer
+                    distance_type
                 > type;
         };
     }
@@ -109,15 +96,15 @@ namespace hpx { namespace util
     template <
         typename Derived, typename Base, typename Value = void,
         typename Category = void, typename Reference = void,
-        typename Difference = void, typename Pointer = void>
+        typename Difference = void>
     class iterator_adaptor
       : public hpx::util::detail::iterator_adaptor_base<
-                Derived, Base, Value, Category, Reference, Difference, Pointer
+                Derived, Base, Value, Category, Reference, Difference
             >::type
     {
     protected:
         typedef typename hpx::util::detail::iterator_adaptor_base<
-                Derived, Base, Value, Category, Reference, Difference, Pointer
+                Derived, Base, Value, Category, Reference, Difference
             >::type base_adaptor_type;
 
         friend class hpx::util::iterator_core_access;
@@ -143,7 +130,7 @@ namespace hpx { namespace util
     protected:
         // for convenience in derived classes
         typedef iterator_adaptor<
-                Derived, Base, Value, Category, Reference, Difference, Pointer
+                Derived, Base, Value, Category, Reference, Difference
             > iterator_adaptor_;
 
         // lvalue access to the Base object for Derived
@@ -171,11 +158,11 @@ namespace hpx { namespace util
         }
 
         template <typename OtherDerived, typename OtherIterator, typename V,
-            typename C, typename R, typename D, typename P>
+            typename C, typename R, typename D>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        bool equal(iterator_adaptor<
-                OtherDerived, OtherIterator, V, C, R, D, P
-            > const& x) const
+        bool equal(
+            iterator_adaptor<OtherDerived, OtherIterator, V, C, R, D> const& x)
+            const
         {
             // Maybe re-add with same_distance
             //  static_assert(
@@ -203,12 +190,12 @@ namespace hpx { namespace util
         }
 
         template <typename OtherDerived, typename OtherIterator, typename V,
-            typename C, typename R, typename D, typename P>
+            typename C, typename R, typename D>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename base_adaptor_type::difference_type
         distance_to(
             iterator_adaptor<
-                OtherDerived, OtherIterator, V, C, R, D, P
+                OtherDerived, OtherIterator, V, C, R, D
             > const& y) const
         {
             // Maybe re-add with same_distance

@@ -80,8 +80,9 @@ struct manage_global_runtime
 #endif
 
         // make sure hpx_main is always executed
-        std::vector<std::string> cfg;
-        cfg.push_back("hpx.run_hpx_main!=1");
+        std::vector<std::string> const cfg = {
+            "hpx.run_hpx_main!=1"
+        };
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;

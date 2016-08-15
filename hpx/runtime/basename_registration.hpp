@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx

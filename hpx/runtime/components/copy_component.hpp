@@ -16,7 +16,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_component.hpp>
 
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -42,8 +42,8 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<naming::id_type>
 #else
-    inline typename boost::enable_if<
-        traits::is_component<Component>, future<naming::id_type>
+    inline typename std::enable_if<
+        traits::is_component<Component>::value, future<naming::id_type>
     >::type
 #endif
     copy(naming::id_type const& to_copy)
@@ -73,8 +73,8 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<naming::id_type>
 #else
-    inline typename boost::enable_if<
-        traits::is_component<Component>, future<naming::id_type>
+    inline typename std::enable_if<
+        traits::is_component<Component>::value, future<naming::id_type>
     >::type
 #endif
     copy(naming::id_type const& to_copy, naming::id_type const& target_locality)

@@ -24,7 +24,6 @@
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 
 #include <string>
 #include <type_traits>
@@ -45,7 +44,7 @@ namespace hpx { namespace traits
     template <typename Derived>
     struct is_client<Derived,
             typename util::always_void<typename Derived::is_client_tag>::type>
-      : boost::mpl::true_
+      : std::true_type
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -55,7 +54,7 @@ namespace hpx { namespace traits
         template <typename Derived>
         struct is_future_customization_point<Derived,
                 typename std::enable_if<is_client<Derived>::value>::type>
-          : boost::mpl::true_
+          : std::true_type
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -200,7 +199,7 @@ namespace hpx { namespace components
             if (!registered_name_.empty())
             {
                 std::string name = std::move(registered_name_);
-                agas::unregister_name_sync(name, ec);
+                agas::unregister_name(launch::sync, name, ec);
             }
         }
 
@@ -520,7 +519,7 @@ namespace hpx { namespace components
         static void register_as_helper(Derived && f,
             std::string const& symbolic_name)
         {
-            hpx::agas::register_name(symbolic_name, f.get());
+            hpx::agas::register_name(launch::sync, symbolic_name, f.get());
         }
 
     public:

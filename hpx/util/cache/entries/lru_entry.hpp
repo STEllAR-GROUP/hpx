@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/cache/entries/entry.hpp>
 
-#include <boost/chrono/chrono.hpp>
+#include <chrono>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace entries
@@ -39,14 +39,14 @@ namespace hpx { namespace util { namespace cache { namespace entries
     public:
         /// \brief Any cache entry has to be default constructible
         lru_entry()
-          : access_time_(boost::chrono::steady_clock::now())
+          : access_time_(std::chrono::steady_clock::now())
         {}
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
         explicit lru_entry(Value const& val)
           : base_type(val),
-            access_time_(boost::chrono::steady_clock::now())
+            access_time_(std::chrono::steady_clock::now())
         {}
 
         /// \brief    The function \a touch is called by a cache holding this
@@ -62,12 +62,12 @@ namespace hpx { namespace util { namespace cache { namespace entries
         ///           the sort order as mandated by the cache's UpdatePolicy
         bool touch()
         {
-            access_time_ = boost::chrono::steady_clock::now();
+            access_time_ = std::chrono::steady_clock::now();
             return true;
         }
 
         /// \brief Returns the last access time of the entry.
-        boost::chrono::steady_clock::time_point const& get_access_time() const
+        std::chrono::steady_clock::time_point const& get_access_time() const
         {
             return access_time_;
         }
@@ -80,7 +80,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
         }
 
     private:
-        boost::chrono::steady_clock::time_point access_time_;
+        std::chrono::steady_clock::time_point access_time_;
     };
 }}}}
 

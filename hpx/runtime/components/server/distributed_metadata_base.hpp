@@ -14,9 +14,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
-#include <boost/cstdint.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <type_traits>
 
 namespace hpx { namespace components { namespace server
 {
@@ -29,8 +27,8 @@ namespace hpx { namespace components { namespace server
     template <typename ConfigData, typename Derived = detail::this_type>
     class distributed_metadata_base
       : public hpx::components::simple_component_base<
-            typename boost::mpl::if_<
-                boost::is_same<Derived, detail::this_type>,
+            typename std::conditional<
+                std::is_same<Derived, detail::this_type>::value,
                 distributed_metadata_base<ConfigData, Derived>,
                 Derived
             >::type>
