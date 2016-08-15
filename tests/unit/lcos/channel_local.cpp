@@ -115,8 +115,8 @@ void dispatch_work()
                 }
                 else
                 {
-                    done.set();
                     was_closed = true;
+                    done.set();
                     break;
                 }
             }
