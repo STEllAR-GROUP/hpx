@@ -19,6 +19,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
+#include <hpx/traits/action_put_parcel.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_action.hpp>
@@ -54,15 +55,9 @@ namespace hpx
         put_parcel(naming::id_type const& id, naming::address&& addr,
             threads::thread_priority priority, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::type
-                action_type;
-            action_type act;
-
-            parcelset::put_parcel(id, complement_addr<action_type>(addr),
-                act, priority, std::forward<Ts>(vs)...);
-
-            return false;     // destinations are remote
+            return hpx::traits::action_put_parcel<Action>::call(
+                id, std::forward<naming::address>(addr),
+                priority, std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename Continuation, typename ...Ts>
@@ -71,16 +66,9 @@ namespace hpx
             threads::thread_priority priority,
             Continuation && cont, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::type
-                action_type;
-            action_type act;
-
-            parcelset::put_parcel(id, complement_addr<action_type>(addr),
-                std::forward<Continuation>(cont),
-                act, priority, std::forward<Ts>(vs)...);
-
-            return false;     // destinations are remote
+            return hpx::traits::action_put_parcel<Action>::call_cont(
+                id, std::forward<naming::address>(addr),
+                priority, std::forward<Continuation>(cont), std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename ...Ts>
@@ -89,17 +77,10 @@ namespace hpx
             threads::thread_priority priority,
             parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::type
-                action_type;
-            action_type act;
-
-            parcelset::put_parcel_cb(cb, id,
-                complement_addr<action_type>(addr),
-                act, priority, std::forward<Ts>(vs)...);
-
-            return false;     // destinations are remote
-        }
+            return hpx::traits::action_put_parcel<Action>::call_cb(
+                id, std::forward<naming::address>(addr),
+                priority, cb, std::forward<Ts>(vs)...);
+         }
 
         template <typename Action, typename ...Ts>
         inline bool
@@ -107,16 +88,10 @@ namespace hpx
             threads::thread_priority priority,
             parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::type
-                action_type;
-            action_type act;
-
-            parcelset::put_parcel_cb(std::move(cb), id,
-                complement_addr<action_type>(addr),
-                act, priority, std::forward<Ts>(vs)...);
-
-            return false;     // destinations are remote
+            return hpx::traits::action_put_parcel<Action>::call_cb(
+                id, std::forward<naming::address>(addr),
+                priority, std::forward<parcelset::parcelhandler::write_handler_type>(cb),
+                std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename Continuation, typename ...Ts>
@@ -126,18 +101,11 @@ namespace hpx
             Continuation && cont,
             parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::type
-                action_type;
-            action_type act;
-
-            parcelset::put_parcel_cb(cb, id,
-                complement_addr<action_type>(addr),
-                std::forward<Continuation>(cont),
-                act, priority, std::forward<Ts>(vs)...);
-
-            return false;     // destinations are remote
-        }
+            return hpx::traits::action_put_parcel<Action>::call_cont_cb(
+                id, std::forward<naming::address>(addr),
+                priority, std::forward<Continuation>(cont), cb,
+                std::forward<Ts>(vs)...);
+         }
 
         template <typename Action, typename Continuation, typename ...Ts>
         inline bool
@@ -146,18 +114,12 @@ namespace hpx
             Continuation && cont,
             parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::type
-                action_type;
-            action_type act;
-
-            parcelset::put_parcel_cb(std::move(cb), id,
-                complement_addr<action_type>(addr),
-                std::forward<Continuation>(cont),
-                act, priority, std::forward<Ts>(vs)...);
-
-            return false;     // destinations are remote
-        }
+            return hpx::traits::action_put_parcel<Action>::call_cont_cb(
+                id, std::forward<naming::address>(addr),
+                priority, std::forward<Continuation>(cont),
+                std::forward<parcelset::parcelhandler::write_handler_type>(cb),
+                std::forward<Ts>(vs)...);
+         }
 
         // We know it is remote.
         template <typename Action, typename ...Ts>
