@@ -7,6 +7,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 namespace hpx
 {
