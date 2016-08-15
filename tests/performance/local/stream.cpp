@@ -267,10 +267,7 @@ run_benchmark(
     Executor exec(target, targets...);
 
     // Creating the policy used in the parallel algorithms
-    typedef
-        typename hpx::parallel::v3::detail::extract_executor_parameters<Executor>::type
-        chunker_type;
-    auto policy = hpx::parallel::par.on(exec).with(chunker_type());
+    auto policy = hpx::parallel::par.on(exec);
 
     // Initialize arrays
     hpx::parallel::fill(policy, a.begin(), a.end(), 1.0);

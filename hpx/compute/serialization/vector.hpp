@@ -12,6 +12,9 @@
 #if !defined(__CUDA_ARCH__)
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
+#else
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#endif
 
 #include <hpx/compute/vector.hpp>
 
@@ -19,9 +22,10 @@
 
 namespace hpx { namespace serialization
 {
+#if !defined(__CUDA_ARCH__)
+    // load compute::vector<T>
     namespace detail
     {
-        // load compute::vector<T>
         template <typename T, typename Allocator>
         void load_impl(input_archive & ar, compute::vector<T, Allocator> & vs,
             std::false_type)
@@ -127,7 +131,17 @@ namespace hpx { namespace serialization
 
         detail::save_impl(ar, v, use_optimized());
     }
+#else
+    template <typename T, typename Allocator>
+    void serialize(input_archive & ar, compute::vector<T, Allocator> & v,
+        unsigned)
+    {}
+
+    template <typename T, typename Allocator>
+    void serialize(output_archive & ar, compute::vector<T, Allocator> const& v,
+        unsigned)
+    {}
+#endif
 }}
 
-#endif
 #endif

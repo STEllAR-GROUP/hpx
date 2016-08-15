@@ -93,7 +93,11 @@ namespace hpx { namespace parallel { namespace util
     {
         typedef
             typename hpx::traits::pointer_category<
-                typename hpx::util::decay<InIter>::type,
+                typename hpx::util::decay<
+                    typename hpx::traits::remove_const_iterator_value_type<
+                        InIter
+                    >::type
+                >::type,
                 typename hpx::util::decay<OutIter>::type
             >::type
             category;

@@ -33,7 +33,6 @@ namespace hpx { namespace traits
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     namespace detail
     {
-
         template <typename Source, typename Dest>
         struct pointer_category
         {
@@ -65,7 +64,7 @@ namespace hpx { namespace traits
 
         // pointers are layout compatible
         template <typename T>
-        struct pointer_category<T*, T const*>
+        struct pointer_category<T const*, T*>
         {
             typedef trivially_copyable_pointer_tag type;
         };
@@ -87,6 +86,14 @@ namespace hpx { namespace traits
             type;
     };
 #endif
+
+    // Allow for matching of iterator<T const> to iterator<T> while calculating
+    // pointer category.
+    template <typename Iterator, typename Enable = void>
+    struct remove_const_iterator_value_type
+    {
+        typedef Iterator type;
+    };
 }}
 
 #endif

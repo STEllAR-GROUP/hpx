@@ -21,6 +21,17 @@
 
 namespace hpx { namespace traits
 {
+    // Allow for matching of iterator<T const> to iterator<T> while calculating
+    // pointer category.
+    template <typename T>
+    struct remove_const_iterator_value_type<
+        compute::detail::iterator<T const, compute::cuda::allocator<T> >
+    >
+    {
+        typedef compute::detail::iterator<T, compute::cuda::allocator<T> > type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     struct cuda_pointer_tag : general_pointer_tag {};
 
     struct cuda_copyable_pointer_tag : cuda_pointer_tag {};
@@ -31,14 +42,13 @@ namespace hpx { namespace traits
     template <typename T>
     struct pointer_category<
         compute::detail::iterator<T, compute::cuda::allocator<T> >,
-        compute::detail::iterator<T, compute::cuda::allocator<T> >,
+        compute::detail::iterator<T, compute::cuda::allocator<T> >
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-        typename std::enable_if<
-           !std::is_trivially_copyable<T>::value
-
+      , typename std::enable_if<
+           !std::is_trivially_copyable<
+                typename hpx::util::decay<T>::type
+            >::value
         >::type
-#else
-        void
 #endif
     >
     {
@@ -51,7 +61,9 @@ namespace hpx { namespace traits
         compute::detail::iterator<T, compute::cuda::allocator<T> >,
         typename std::enable_if<
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-           !std::is_trivially_copyable<T>::value &&
+           !std::is_trivially_copyable<
+                typename hpx::util::decay<T>::type
+            >::value &&
 #endif
            !std::is_same<
                 Source,
@@ -110,7 +122,9 @@ namespace hpx { namespace traits
         compute::detail::iterator<T, compute::cuda::allocator<T> >,
         compute::detail::iterator<T, compute::cuda::allocator<T> >,
         typename std::enable_if<
-           std::is_trivially_copyable<T>::value
+            std::is_trivially_copyable<
+                typename hpx::util::decay<T>::type
+            >::value
         >::type
     >
     {
@@ -122,7 +136,9 @@ namespace hpx { namespace traits
         Source,
         compute::detail::iterator<T, compute::cuda::allocator<T> >,
         typename std::enable_if<
-           std::is_trivially_copyable<T>::value &&
+            std::is_trivially_copyable<
+                typename hpx::util::decay<T>::type
+            >::value &&
            !std::is_same<
                 Source,
                 compute::detail::iterator<T, compute::cuda::allocator<T> >
