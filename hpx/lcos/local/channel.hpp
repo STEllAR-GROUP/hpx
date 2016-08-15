@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             unlimited_channel()
-              : closed_(false)
+              : get_generation_(0), set_generation_(0), closed_(false)
             {}
 
         protected:
