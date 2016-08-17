@@ -91,12 +91,259 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
+        template <typename T, typename InIter, typename Op>
+        T sequential_inclusive_scan_segmented_ret(InIter first, InIter last,
+            Op && op)
+        {
+            T ret = *first;
+
+            if(first != last) {
+                for(++first; first != last; (void) ++first) {
+                    ret = op(ret, *first);
+                }
+            }
+
+            return ret;
+        }
+
+        template <typename Value>
+        struct inclusive_scan_segmented_ret
+            : public detail::algorithm<inclusive_scan_segmented_ret<Value>, Value>
+        {
+            typedef Value T;
+
+            inclusive_scan_segmented_ret()
+                : inclusive_scan_segmented_ret::algorithm("inclusive_scan_segmented_ret")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename Op>
+            static T
+            sequential(ExPolicy && policy, InIter first, InIter last, Op && op)
+            {
+                return sequential_inclusive_scan_segmented_ret<T>(
+                    first, last, std::forward<Op>(op));
+            }
+
+            template <typename ExPolicy, typename FwdIter, typename Op>
+            static typename util::detail::algorithm_result<
+                ExPolicy, T
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last, Op && op)
+            {
+                typedef typename std::iterator_traits<FwdIter>::value_type value_type;
+
+                return util::partitioner<ExPolicy, T>::call(
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    [&op](FwdIter part_begin, std::size_t part_size) -> T
+                    {
+                        T ret = *part_begin;
+                        if(part_size > 1)
+                        {
+                            util::loop_n(part_begin+1, part_size-1,
+                                [&](FwdIter const& curr)
+                                {
+                                    ret = op(ret, *curr);
+                                });
+                        }
+                        return ret;
+                    },
+                    hpx::util::unwrapped(
+                        [&op](std::vector<T>&& results)
+                        {
+                            T ret = *results.begin();
+
+                            if(results.size() > 1) {
+                                util::loop_n(results.begin()+1, results.size()-1,
+                                    [&](typename std::vector<T>::iterator const& curr)
+                                    {
+                                        ret = op(ret, *curr);
+                                    });
+                            }
+                            return ret;
+                        }
+                    ));
+            }
+        };
+
+        struct inclusive_scan_segmented_void :
+            public detail::algorithm<inclusive_scan_segmented_void>
+        {
+            inclusive_scan_segmented_void()
+                : inclusive_scan_segmented_void::algorithm("inclusive_scan_segmented_void")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+                typename Op>
+            static hpx::util::unused_type
+            sequential(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+                T && init, Op && op)
+            {
+                inclusive_scan<OutIter>().sequential(
+                    std::forward<ExPolicy>(policy), first, last, dest,
+                    std::forward<T>(init), std::forward<Op>(op));
+                return hpx::util::unused;
+            }
+
+            template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+                typename Op>
+            static typename util::detail::algorithm_result<ExPolicy>::type
+            parallel(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+                T && init, Op && op)
+            {
+                typedef typename util::detail::algorithm_result<ExPolicy>::type
+                    result_type;
+
+                if(first == last)
+                    return util::detail::algorithm_result<ExPolicy>::get();
+
+
+                return hpx::util::void_guard<result_type>(),
+                    inclusive_scan<OutIter>().parallel(
+                        std::forward<ExPolicy>(policy), first, last, dest,
+                        std::forward<T>(init), std::forward<Op>(op));
+            }
+        };
+
+
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        segmented_inclusive_scan(Algo && algo, ExPolicy const& policy, SegIter first,
+        segmented_inclusive_scan(Algo && algo, ExPolicy && policy, SegIter first,
             SegIter last, OutIter dest, T init, Op && op, std::true_type)
+        {
+            typedef typename hpx::traits::segmented_iterator_traits<OutIter>
+                ::is_segmented_iterator is_out_seg;
+
+
+            return segmented_inclusive_scan_seq(
+                std::forward<Algo>(algo),
+                std::forward<ExPolicy>(policy),
+                first, last, dest, std::move(init), std::forward<Op>(op),
+                is_out_seg());
+
+        }
+
+        // sequential segmented OutIter implementation
+        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
+            typename T, typename Op>
+        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        segmented_inclusive_scan_seq(Algo && algo, ExPolicy const& policy, SegIter first,
+            SegIter last, OutIter dest, T init, Op && op, std::true_type)
+        {
+            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+
+            if (first == last)
+                return result::get(std::move(dest));
+
+            typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
+            typedef typename traits_in::segment_iterator segment_iterator_in;
+            typedef typename traits_in::local_iterator local_iterator_type_in;
+
+            typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
+            typedef typename traits_out::segment_iterator segment_iterator_out;
+            typedef typename traits_out::local_iterator local_iterator_type_out;
+
+            typedef typename hpx::util::tuple<
+                    local_iterator_type_in, local_iterator_type_in
+                > local_iterator_in_tuple;
+
+            segment_iterator_in sit_in = traits_in::segment(first);
+            segment_iterator_in send_in = traits_in::segment(last);
+
+            segment_iterator_out sit_out = traits_out::segment(dest);
+
+            std::vector<T> results;
+            std::vector<local_iterator_in_tuple> in_iters;
+            std::vector<segment_iterator_out> out_iters;
+
+            OutIter temp_dest = dest;
+            if (sit_in == send_in)
+            {
+                // all elements on the same partition
+                local_iterator_type_in beg = traits_in::local(first);
+                local_iterator_type_in end = traits_in::end(sit_in);
+                if (beg != end)
+                {
+                    results.push_back(dispatch(traits_in::get_id(sit_in),
+                        inclusive_scan_segmented_ret<T>(), policy,
+                        std::true_type(), beg, end, op));
+                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    out_iters.push_back(sit_out);
+                }
+            }
+            else
+            {
+                // handle the remaining part of the first partition
+                local_iterator_type_in beg = traits_in::local(first);
+                local_iterator_type_in end = traits_in::end(sit_in);
+
+                if (beg != end)
+                {
+                    results.push_back(dispatch(traits_in::get_id(sit_in),
+                        inclusive_scan_segmented_ret<T>(), policy,
+                        std::true_type(), beg, end, op));
+                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    out_iters.push_back(sit_out);
+                }
+
+                // handle all partitions
+                for(++sit_in, ++sit_out; sit_in != send_in; ++sit_in, ++sit_out) {
+                    beg = traits_in::begin(sit_in);
+                    end = traits_in::end(sit_in);
+                    if (beg != end)
+                    {
+                        results.push_back(dispatch(traits_in::get_id(sit_in),
+                            inclusive_scan_segmented_ret<T>(), policy,
+                            std::true_type(), beg, end, op));
+                        in_iters.push_back(hpx::util::make_tuple(beg, end));
+                        out_iters.push_back(sit_out);
+                    }
+                }
+
+                // handle the beginning of the last partition
+                beg = traits_in::begin(sit_in);
+                end = traits_in::local(last);
+                if (beg != end)
+                {
+                    results.push_back(dispatch(traits_in::get_id(sit_in),
+                        inclusive_scan_segmented_ret<T>(), policy,
+                        std::true_type(), beg, end, op));
+                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    out_iters.push_back(sit_out);
+                }
+            }
+
+            // merge results
+
+            T last_value = init;
+            for (std::size_t i = 0; i < results.size(); ++i) {
+                using hpx::util::get;
+                local_iterator_type_out out = traits_out::begin(out_iters[i]);
+
+                dispatch(traits_out::get_id(out_iters[i]),
+                    inclusive_scan_segmented_void(),
+                    policy, std::true_type(),
+                    get<0>(in_iters[i]), get<1>(in_iters[i]),
+                    out, last_value, op);
+                last_value += results[i];
+            }
+
+            OutIter final_dest = dest;
+            std::advance(final_dest, std::distance(first,last));
+
+            return result::get(std::move(final_dest));
+
+        }
+
+
+        // sequential non segmented OutIter implementation
+        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
+            typename T, typename Op>
+        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        segmented_inclusive_scan_seq(Algo && algo, ExPolicy const& policy, SegIter first,
+            SegIter last, OutIter dest, T init, Op && op, std::false_type)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -178,7 +425,195 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        segmented_inclusive_scan(Algo && algo, ExPolicy const& policy, SegIter first,
+        segmented_inclusive_scan(Algo && algo, ExPolicy&& policy, SegIter first,
+            SegIter last, OutIter dest, T init, Op && op, std::false_type)
+        {
+            typedef typename hpx::traits::segmented_iterator_traits<OutIter>
+                ::is_segmented_iterator is_out_seg;
+
+
+            return segmented_inclusive_scan_par(
+                std::forward<Algo>(algo),
+                std::forward<ExPolicy>(policy),
+                first, last, dest, std::move(init), std::forward<Op>(op),
+                is_out_seg());
+        }
+
+        // parallel segmented OutIter implementation
+        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
+            typename T, typename Op>
+        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        segmented_inclusive_scan_par(Algo && algo, ExPolicy const& policy, SegIter first,
+            SegIter last, OutIter dest, T init, Op && op, std::true_type)
+        {
+            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+
+            if (first == last)
+                return result::get(std::move(dest));
+
+            typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
+            typedef typename traits_in::segment_iterator segment_iterator_in;
+            typedef typename traits_in::local_iterator local_iterator_type_in;
+
+            typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
+            typedef typename traits_out::segment_iterator segment_iterator_out;
+            typedef typename traits_out::local_iterator local_iterator_type_out;
+
+            typedef typename std::iterator_traits<segment_iterator_in>::difference_type
+                difference_type;
+
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
+
+            typedef typename hpx::util::tuple<
+                    local_iterator_type_in, local_iterator_type_in
+                > local_iterator_in_tuple;
+
+            segment_iterator_in sit_in = traits_in::segment(first);
+            segment_iterator_in send_in = traits_in::segment(last);
+
+            segment_iterator_out sit_out = traits_out::segment(dest);
+
+            difference_type count = std::distance(sit_in, send_in);
+
+            std::vector<shared_future<T>> results;
+            std::vector<local_iterator_in_tuple> in_iters;
+            std::vector<segment_iterator_out> out_iters;
+
+            results.reserve(count);
+            in_iters.reserve(count);
+            out_iters.reserve(count);
+
+            OutIter temp_dest = dest;
+            if (sit_in == send_in)
+            {
+                // all elements on the same partition
+                local_iterator_type_in beg = traits_in::local(first);
+                local_iterator_type_in end = traits_in::end(sit_in);
+                if (beg != end)
+                {
+                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    out_iters.push_back(sit_out);
+                    results.push_back(dispatch_async(traits_in::get_id(sit_in),
+                        inclusive_scan_segmented_ret<T>(), policy,
+                        forced_seq(), beg, end, op));
+                }
+            }
+            else
+            {
+                // handle the remaining part of the first partition
+                local_iterator_type_in beg = traits_in::local(first);
+                local_iterator_type_in end = traits_in::end(sit_in);
+
+                if (beg != end)
+                {
+                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    out_iters.push_back(sit_out);
+                    results.push_back(dispatch_async(traits_in::get_id(sit_in),
+                        inclusive_scan_segmented_ret<T>(), policy,
+                        forced_seq(), beg, end, op));
+                }
+
+                // handle all partitions
+                for(++sit_in, ++sit_out; sit_in != send_in; ++sit_in, ++sit_out) {
+                    beg = traits_in::begin(sit_in);
+                    end = traits_in::end(sit_in);
+                    if (beg != end)
+                    {
+                        in_iters.push_back(hpx::util::make_tuple(beg, end));
+                        out_iters.push_back(sit_out);
+                        results.push_back(dispatch_async(traits_in::get_id(sit_in),
+                            inclusive_scan_segmented_ret<T>(), policy,
+                            forced_seq(), beg, end, op));
+                    }
+                }
+
+                // handle the beginning of the last partition
+                beg = traits_in::begin(sit_in);
+                end = traits_in::local(last);
+                if (beg != end)
+                {
+                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    out_iters.push_back(sit_out);
+                    results.push_back(dispatch_async(traits_in::get_id(sit_in),
+                        inclusive_scan_segmented_ret<T>(), policy,
+                        forced_seq(), beg, end, op));
+                }
+            }
+
+            std::vector<shared_future<T>> workitems;
+            workitems.reserve(results.size()+1);
+
+            std::vector<hpx::future<void>> finalitems;
+            finalitems.reserve(results.size());
+
+            // first init value is the given init value
+            workitems.push_back(make_ready_future(std::forward<T>(init)));
+
+            std::size_t i = 0;
+
+            for (auto const& res : results) {
+                using hpx::util::get;
+                segment_iterator_out out_it = out_iters[i];
+                local_iterator_type_out out = traits_out::begin(out_it);
+                local_iterator_in_tuple in_tuple = in_iters[i];
+
+                // dispatch scan on each partition
+                // performed as soon as the init values are ready
+                finalitems.push_back(
+                    dataflow(
+                        policy.executor(),
+                        hpx::util::unwrapped(
+                            [=, &op](T last_value)
+                            {
+                                dispatch(traits_out::get_id(out_it),
+                                    inclusive_scan_segmented_void(),
+                                    hpx::parallel::seq, std::true_type(),
+                                    get<0>(in_tuple), get<1>(in_tuple),
+                                    out, last_value, op);
+                            }
+                        ), workitems.back()
+                    )
+                );
+
+                // push init values of the scans
+                // performed as soon as the needed resultst are ready
+                workitems.push_back(
+                    dataflow(
+                        policy.executor(),
+                        hpx::util::unwrapped(op),
+                        workitems.back(),
+                        res
+                    )
+                );
+                ++i;
+            }
+
+
+            OutIter final_dest = dest;
+            std::advance(final_dest, std::distance(first,last));
+
+            // wait for all tasks to finish
+            return result::get(
+                dataflow(
+                    [final_dest](
+                        std::vector<shared_future<T>> &&r,
+                        std::vector<shared_future<T>> &&wi,
+                        std::vector<hpx::future<void>> &&fi
+                    ) mutable -> OutIter
+                    {
+                        return final_dest;
+                    },
+                    std::move(results), std::move(workitems), std::move(finalitems)));
+        }
+
+
+        // parallel non-segmented OutIter implementation
+        template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
+            typename T, typename Op>
+        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        segmented_inclusive_scan_par(Algo && algo, ExPolicy const& policy, SegIter first,
             SegIter last, OutIter dest, T init, Op && op, std::false_type)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
@@ -332,6 +767,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         }
 
+
+
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename OutIter, typename T,
@@ -341,6 +778,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             T init, Op && op, std::true_type)
         {
             typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+
 
             if (first == last)
                 return util::detail::algorithm_result<
