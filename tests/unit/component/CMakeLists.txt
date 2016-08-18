@@ -108,6 +108,11 @@ set(partitioned_vector_iter_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_move_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
 
+set(partitioned_vector_inclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_inclusive_scan_PARAMETERS
+    LOCALITIES 3
+    THREADS_PER_LOCALITY 3)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

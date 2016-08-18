@@ -205,7 +205,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
             typename T, typename Op>
@@ -215,7 +214,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
-
 
             return segmented_inclusive_scan_seq(
                 std::forward<Algo>(algo),
@@ -258,6 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::vector<local_iterator_in_tuple> in_iters;
             std::vector<segment_iterator_out> out_iters;
 
+            // 1. Step: scan on each partition, get last T of the scan
             OutIter temp_dest = dest;
             if (sit_in == send_in)
             {
@@ -315,18 +314,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
             }
 
-            // merge results
-
+            // first init value is the given init value
             T last_value = init;
             for (std::size_t i = 0; i < results.size(); ++i) {
                 using hpx::util::get;
                 local_iterator_type_out out = traits_out::begin(out_iters[i]);
 
+                // 2. Step: use the init values to dispatch final scan for each segment
                 dispatch(traits_out::get_id(out_iters[i]),
                     inclusive_scan_segmented_void(),
                     policy, std::true_type(),
                     get<0>(in_iters[i]), get<1>(in_iters[i]),
                     out, last_value, op);
+
+                // 3. Step: compute new init values for the next segment
                 last_value += results[i];
             }
 
@@ -485,7 +486,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             in_iters.reserve(count);
             out_iters.reserve(count);
 
-            OutIter temp_dest = dest;
+            // 1. Step: scan on each partition, get last T of the scan
             if (sit_in == send_in)
             {
                 // all elements on the same partition
@@ -559,13 +560,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type_out out = traits_out::begin(out_it);
                 local_iterator_in_tuple in_tuple = in_iters[i];
 
-                // dispatch scan on each partition
+                // 2. Step: use the init values to dispatch final scan for each segment
                 // performed as soon as the init values are ready
+                // wait for 1. step of current partition to prevent race condition
+                // when used in place
                 finalitems.push_back(
                     dataflow(
                         policy.executor(),
                         hpx::util::unwrapped(
-                            [=, &op](T last_value)
+                            [=, &op](T last_value, T)
                             {
                                 dispatch(traits_out::get_id(out_it),
                                     inclusive_scan_segmented_void(),
@@ -573,12 +576,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     get<0>(in_tuple), get<1>(in_tuple),
                                     out, last_value, op);
                             }
-                        ), workitems.back()
+                        ), workitems.back(), res
                     )
                 );
 
-                // push init values of the scans
-                // performed as soon as the needed resultst are ready
+                // 3. Step: compute new init value for the next segment
+                // performed as soon as the needed results are ready
                 workitems.push_back(
                     dataflow(
                         policy.executor(),
