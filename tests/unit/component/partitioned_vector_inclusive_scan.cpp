@@ -7,6 +7,7 @@
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_scan.hpp>
+#include <hpx/include/parallel_copy.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -21,12 +22,119 @@ HPX_REGISTER_PARTITIONED_VECTOR(double);
 HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
+
+struct iota :
+    public hpx::parallel::v1::detail::algorithm<iota>
+{
+    iota()
+        : iota::algorithm("iota")
+    {}
+
+    template <typename ExPolicy, typename InIter, typename T>
+    static hpx::util::unused_type
+    sequential(ExPolicy && policy, InIter first, InIter last, T && init)
+    {
+        std::iota(first, last, init);
+        return hpx::util::unused;
+    }
+
+    template <typename ExPolicy, typename InIter, typename T>
+    static hpx::util::unused_type
+    parallel(ExPolicy && policy, InIter first, InIter last, T && init)
+    {
+        return hpx::util::void_guard<result_type>(),
+            sequential(policy, first, last, init);
+    }
+};
+
 template <typename T>
 void iota_vector(hpx::partitioned_vector<T>& v, T val)
 {
-    typename hpx::partitioned_vector<T>::iterator it = v.begin(), end = v.end();
-    for(/**/; it != end; ++it)
-        *it = val++;
+    auto first = v.begin();
+    auto last = v.end();
+
+    typedef hpx::traits::segmented_iterator_traits<decltype(first)> traits;
+    typedef typename traits::segment_iterator segment_iterator;
+    typedef typename traits::local_iterator local_iterator_type;
+
+    segment_iterator sit = traits::segment(first);
+    segment_iterator send = traits::segment(last);
+
+    T temp_val = val;
+
+    for (; sit != send; ++sit)
+    {
+        local_iterator_type beg = traits::begin(sit);
+        local_iterator_type end = traits::end(sit);
+
+        hpx::parallel::v1::detail::dispatch(traits::get_id(sit),
+                iota(), hpx::parallel::seq, std::true_type(), beg, end, temp_val
+        );
+
+        temp_val += std::distance(beg, end);
+    }
+}
+
+template <typename Value>
+struct verify :
+    public hpx::parallel::v1::detail::algorithm<verify<Value>, Value>
+{
+    verify()
+        : verify::algorithm("verify")
+    {}
+
+    template <typename ExPolicy, typename SegIter, typename InIter>
+    static Value
+    sequential(ExPolicy && policy, SegIter first, SegIter last, InIter in)
+    {
+        return std::equal(first, last, in.begin());
+    }
+
+    template <typename ExPolicy, typename SegIter, typename InIter>
+    static Value
+    parallel(ExPolicy && policy, InIter first, InIter last, InIter in)
+    {
+        return sequential(policy, first, last, in);
+    }
+};
+
+
+template<typename T>
+void verify_values(hpx::partitioned_vector<T> v1, std::vector<T> v2)
+{
+    auto first = v1.begin();
+    auto last = v1.end();
+
+    typedef hpx::traits::segmented_iterator_traits<decltype(first)> traits;
+    typedef typename traits::segment_iterator segment_iterator;
+    typedef typename traits::local_iterator local_iterator_type;
+
+    segment_iterator sit = traits::segment(first);
+    segment_iterator send = traits::segment(last);
+
+    auto beg2 = v2.begin();
+
+    std::vector<bool> results;
+
+    for (; sit != send; ++sit)
+    {
+        local_iterator_type beg = traits::begin(sit);
+        local_iterator_type end = traits::end(sit);
+
+        std::vector<T> test(std::distance(beg, end));
+        std::copy_n(beg2, test.size(), test.begin());
+
+        results.push_back(
+            hpx::parallel::v1::detail::dispatch(traits::get_id(sit),
+                verify<bool>(), hpx::parallel::seq, std::true_type(), beg, end, test
+        ));
+
+        beg2 += std::distance(beg, end);
+    }
+    bool final_result = std::all_of(results.begin(), results.end(),
+        [](bool v) { return v; });
+
+    HPX_TEST(final_result);
 }
 
 template<typename T>
@@ -38,212 +146,181 @@ struct opt
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_with_policy(std::size_t size,
-    DistPolicy const& dist_policy, ExPolicy const& policy)
+template <typename T, typename ExPolicy>
+void inclusive_scan_algo_tests_with_policy(
+    hpx::partitioned_vector<T>& in,
+    std::vector<T> ver, ExPolicy const& policy)
 {
-    hpx::partitioned_vector<T> c(size, dist_policy);
-    iota_vector(c, T(1));
-
-    std::vector<T> d(c.size());
+    std::vector<T> out(in.size());
     T val(0);
 
     hpx::parallel::inclusive_scan(policy,
-        c.begin(), c.end(), d.begin(), val, opt<T>());
+        in.begin(), in.end(), out.begin(), val, opt<T>());
 
-    // verify values
-    std::vector<T> e(c.size());
-    std::iota(e.begin(), e.end(), T(1));
-    std::vector<T> f(c.size());
-
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
-        e.begin(), e.end(), f.begin(), val, opt<T>());
-
-    HPX_TEST(std::equal(d.begin(), d.end(), f.begin()));
+    HPX_TEST(std::equal(out.begin(), out.end(), ver.begin()));
 }
 
-template <typename T, typename DistPolicy, typename ExPolicy>
+template <typename T, typename ExPolicy>
 void inclusive_scan_algo_tests_segmented_out_with_policy(
-    std::size_t size, DistPolicy const& in_dist_policy,
-    DistPolicy const& out_dist_policy, ExPolicy const& policy)
+    hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
+    std::vector<T> ver, ExPolicy const& policy)
 {
-    hpx::partitioned_vector<T> c(size, in_dist_policy);
-    iota_vector(c, T(1));
-
-    hpx::partitioned_vector<T> d(c.size(), out_dist_policy);
     T val(0);
-
     hpx::parallel::inclusive_scan(policy,
-        c.begin(), c.end(), d.begin(), val, opt<T>());
+        in.begin(), in.end(), out.begin(), val, opt<T>());
 
-    // verify values
-    std::vector<T> e(c.size());
-    std::iota(e.begin(), e.end(), T(1));
-    std::vector<T> f(c.size());
-
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
-        e.begin(), e.end(), f.begin(), val, opt<T>());
-
-    HPX_TEST(std::equal(d.begin(), d.end(), f.begin()));
+    verify_values(out, ver);
 }
 
 template <typename T, typename DistPolicy, typename ExPolicy>
 void inclusive_scan_algo_tests_inplace_with_policy(
-    std::size_t size, DistPolicy const& dist_policy, ExPolicy const& policy)
+    std::size_t size, DistPolicy const& dist_policy,
+    std::vector<T> ver, ExPolicy const& policy)
 {
-    hpx::partitioned_vector<T> c(size, dist_policy);
-    iota_vector(c, T(1));
+    hpx::partitioned_vector<T> in(size, dist_policy);
+    iota_vector(in, T(1));
 
     T val(0);
-
     hpx::parallel::inclusive_scan(policy,
-        c.begin(), c.end(), c.begin(), val, opt<T>());
+        in.begin(), in.end(), in.begin(), val, opt<T>());
 
-    // verify values
-    std::vector<T> e(c.size());
-    std::iota(e.begin(), e.end(), T(1));
-    std::vector<T> f(c.size());
-
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
-        e.begin(), e.end(), f.begin(), val, opt<T>());
-
-    HPX_TEST(std::equal(c.begin(), c.end(), f.begin()));
+    verify_values(in, ver);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_with_policy_async(std::size_t size,
-    DistPolicy const& dist_policy, ExPolicy const& policy)
+template <typename T, typename ExPolicy>
+void inclusive_scan_algo_tests_with_policy_async(
+    hpx::partitioned_vector<T>& in,
+    std::vector<T> ver, ExPolicy const& policy)
 {
-    hpx::partitioned_vector<T> c(size, dist_policy);
-    iota_vector(c, T(1));
-
-    std::vector<T> d(c.size());
+    std::vector<T> out(in.size());
     T val(0);
 
     auto res =
         hpx::parallel::inclusive_scan(policy,
-        c.begin(), c.end(), d.begin(), val, opt<T>());
+        in.begin(), in.end(), out.begin(), val, opt<T>());
     res.get();
 
-    // verify values
-    std::vector<T> e(c.size());
-    std::iota(e.begin(), e.end(), T(1));
-    std::vector<T> f(c.size());
-
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
-        e.begin(), e.end(), f.begin(), val, opt<T>());
-
-    HPX_TEST(std::equal(d.begin(), d.end(), f.begin()));
+    HPX_TEST(std::equal(out.begin(), out.end(), ver.begin()));
 }
 
-template <typename T, typename DistPolicy, typename ExPolicy>
+template <typename T, typename ExPolicy>
 void inclusive_scan_algo_tests_segmented_out_with_policy_async(
-    std::size_t size, DistPolicy const& in_dist_policy, DistPolicy
-    const& out_dist_policy, ExPolicy const& policy)
+    hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
+    std::vector<T> ver, ExPolicy const& policy)
 {
-    hpx::partitioned_vector<T> c(size, in_dist_policy);
-    iota_vector(c, T(1));
-
-    hpx::partitioned_vector<T> d(c.size(), out_dist_policy);
     T val(0);
-
     auto res =
         hpx::parallel::inclusive_scan(policy,
-        c.begin(), c.end(), d.begin(), val, opt<T>());
+        in.begin(), in.end(), out.begin(), val, opt<T>());
     res.get();
 
-    // verify values
-    std::vector<T> e(c.size());
-    std::iota(e.begin(), e.end(), T(1));
-    std::vector<T> f(c.size());
-
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
-        e.begin(), e.end(), f.begin(), val, opt<T>());
-
-    HPX_TEST(std::equal(d.begin(), d.end(), f.begin()));
+    verify_values(out, ver);
 }
 
 template <typename T, typename DistPolicy, typename ExPolicy>
 void inclusive_scan_algo_tests_inplace_with_policy_async(
-    std::size_t size, DistPolicy const& dist_policy, ExPolicy const& policy)
+    std::size_t size, DistPolicy const& dist_policy,
+    std::vector<T> ver, ExPolicy const& policy)
 {
-    hpx::partitioned_vector<T> c(size, dist_policy);
-    iota_vector(c, T(1));
+    hpx::partitioned_vector<T> in(size, dist_policy);
+    iota_vector(in, T(1));
 
     T val(0);
-
     auto res =
         hpx::parallel::inclusive_scan(policy,
-        c.begin(), c.end(), c.begin(), val, opt<T>());
-    auto r = res.get();
+        in.begin(), in.end(), in.begin(), val, opt<T>());
+    res.get();
 
-    // verify values
-    std::vector<T> e(c.size());
-    std::iota(e.begin(), e.end(), T(1));
-    std::vector<T> f(c.size());
-
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
-        e.begin(), e.end(), f.begin(), val, opt<T>());
-
-    HPX_TEST(std::equal(c.begin(), c.end(), f.begin()));
+    verify_values(in, ver);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename DistPolicy>
-void inclusive_scan_tests_with_policy(std::size_t size, std::size_t localities,
+void inclusive_scan_tests_with_policy(std::size_t size,
     DistPolicy const& policy)
 {
     using namespace hpx::parallel;
     using hpx::parallel::task;
 
-    inclusive_scan_algo_tests_with_policy<T>(size, policy, seq);
-    inclusive_scan_algo_tests_with_policy<T>(size, policy, par);
+    // setup partitioned vector to test
+    hpx::partitioned_vector<T> in(size, policy);
+    iota_vector(in, T(1));
+
+    std::vector<T> ver(in.size());
+    std::iota(ver.begin(), ver.end(), T(1));
+    T val(0);
+
+    hpx::parallel::v1::detail::sequential_inclusive_scan(
+        ver.begin(), ver.end(), ver.begin(), val, opt<T>());
+
+    //sync
+    inclusive_scan_algo_tests_with_policy<T>(in, ver, seq);
+    inclusive_scan_algo_tests_with_policy<T>(in, ver, par);
 
     //async
-    inclusive_scan_algo_tests_with_policy_async<T>(size, policy, seq(task));
-    inclusive_scan_algo_tests_with_policy_async<T>(size, policy, par(task));
+    inclusive_scan_algo_tests_with_policy_async<T>(in, ver, seq(task));
+    inclusive_scan_algo_tests_with_policy_async<T>(in, ver, par(task));
 }
 
 template <typename T, typename DistPolicy>
 void inclusive_scan_tests_segmented_out_with_policy(std::size_t size,
-    std::size_t localities, DistPolicy const& in_policy, DistPolicy const& out_policy)
+    DistPolicy const& in_policy, DistPolicy const& out_policy)
 {
     using namespace hpx::parallel;
     using hpx::parallel::task;
 
-    inclusive_scan_algo_tests_segmented_out_with_policy<T>(size,
-        in_policy, out_policy, seq);
-    inclusive_scan_algo_tests_segmented_out_with_policy<T>(size,
-        out_policy, out_policy, par);
+    // setup partitioned vector to test
+    hpx::partitioned_vector<T> in(size, in_policy);
+    iota_vector(in, T(1));
+
+    hpx::partitioned_vector<T> out(size, out_policy);
+
+    std::vector<T> ver(in.size());
+    std::iota(ver.begin(), ver.end(), T(1));
+    T val(0);
+
+    hpx::parallel::v1::detail::sequential_inclusive_scan(
+        ver.begin(), ver.end(), ver.begin(), val, opt<T>());
+
+    //sync
+    inclusive_scan_algo_tests_segmented_out_with_policy<T>(in, out, ver, seq);
+    inclusive_scan_algo_tests_segmented_out_with_policy<T>(in, out, ver, par);
 
     //async
-    inclusive_scan_algo_tests_segmented_out_with_policy_async<T>(size,
-        in_policy, out_policy, seq(task));
-    inclusive_scan_algo_tests_segmented_out_with_policy_async<T>(size,
-        in_policy, out_policy, par(task));
+    inclusive_scan_algo_tests_segmented_out_with_policy_async<T>(
+        in, out, ver, seq(task));
+    inclusive_scan_algo_tests_segmented_out_with_policy_async<T>(
+        in, out, ver, par(task));
 }
 
 template <typename T, typename DistPolicy>
 void inclusive_scan_tests_inplace_with_policy(std::size_t size,
-    std::size_t localities, DistPolicy const& policy)
+    DistPolicy const& policy)
 {
     using namespace hpx::parallel;
     using hpx::parallel::task;
 
-    inclusive_scan_algo_tests_inplace_with_policy<T>(size,
-        policy, seq);
-    inclusive_scan_algo_tests_inplace_with_policy<T>(size,
-        policy, par);
+    // setup verification vector
+    std::vector<T> ver(size);
+    std::iota(ver.begin(), ver.end(), T(1));
+    T val(0);
+
+    hpx::parallel::v1::detail::sequential_inclusive_scan(
+        ver.begin(), ver.end(), ver.begin(), val, opt<T>());
+
+    //sync
+    inclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, seq);
+    inclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, par);
 
     //async
-    inclusive_scan_algo_tests_inplace_with_policy_async<T>(size,
-        policy, seq(task));
-    inclusive_scan_algo_tests_inplace_with_policy_async<T>(size,
-        policy, par(task));
+    inclusive_scan_algo_tests_inplace_with_policy_async<T>(
+        size, policy, ver, seq(task));
+    inclusive_scan_algo_tests_inplace_with_policy_async<T>(
+        size, policy, ver, par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -251,20 +328,19 @@ void inclusive_scan_tests_inplace_with_policy(std::size_t size,
 template <typename T>
 void inclusive_scan_tests()
 {
-    std::size_t const length = 100;
+    std::size_t const length = 100000;
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    inclusive_scan_tests_with_policy<T>(length, 1, hpx::container_layout);
-    inclusive_scan_tests_with_policy<T>(length, 3, hpx::container_layout(3));
-    inclusive_scan_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
-    inclusive_scan_tests_with_policy<T>(length, localities.size(),
-        hpx::container_layout(localities));
+    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout);
+    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3));
+    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3, localities));
+    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(localities));
 
-    inclusive_scan_tests_segmented_out_with_policy<T>(length, localities.size(),
+    inclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(localities));
 
-    inclusive_scan_tests_inplace_with_policy<T>(length, localities.size(),
+    inclusive_scan_tests_inplace_with_policy<T>(length,
         hpx::container_layout(localities));
 }
 
