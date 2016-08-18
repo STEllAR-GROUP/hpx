@@ -146,7 +146,7 @@ namespace hpx { namespace compute { namespace detail
         target_distribution_policy(std::vector<target_type> && targets,
                 std::size_t num_partitions)
           : targets_(std::move(targets)),
-            num_partitions_(num_partitions_),
+            num_partitions_(num_partitions),
             next_target_(0)
         {}
 
