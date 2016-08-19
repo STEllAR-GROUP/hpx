@@ -9,12 +9,13 @@
 #define HPX_UTIL_DETAIL_BASIC_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
-#include <hpx/util/detail/get_table.hpp>
+#include <hpx/util/detail/vtable/serializable_function_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
@@ -51,81 +52,19 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Function>
-    struct init_registration;
-
-    template <typename VTablePtr, typename T>
-    struct serializable_function_registration;
-
-    template <typename VTablePtr>
-    struct serializable_function_vtable_ptr
-      : VTablePtr
-    {
-        char const* name;
-        typename serializable_vtable::save_object_t save_object;
-        typename serializable_vtable::load_object_t load_object;
-
-        template <typename T>
-        serializable_function_vtable_ptr(construct_vtable<T>) HPX_NOEXCEPT
-          : VTablePtr(construct_vtable<T>())
-          , name("empty")
-          , save_object(&serializable_vtable::save_object<T>)
-          , load_object(&serializable_vtable::load_object<T>)
-        {
-            if (!this->empty)
-            {
-                name = get_function_name<
-                    serializable_function_registration<VTablePtr, T>
-                >();
-            }
-            init_registration<
-                serializable_function_registration<VTablePtr, T>
-            >::g.register_function();
-        }
-    };
-
-    template <typename VTablePtr, typename T>
-    struct serializable_function_registration
-    {
-        typedef serializable_function_vtable_ptr<VTablePtr> first_type;
-        typedef T second_type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // registration code for serialization
-    template <typename VTablePtr, typename T>
-    struct init_registration<
-        serializable_function_registration<VTablePtr, T>
-    >
-    {
-        static automatic_function_registration<
-            serializable_function_registration<VTablePtr, T>
-        > g;
-    };
-
-    template <typename VTablePtr, typename T>
-    automatic_function_registration<
-        serializable_function_registration<VTablePtr, T>
-    > init_registration<
-        serializable_function_registration<VTablePtr, T>
-    >::g =  automatic_function_registration<
-                serializable_function_registration<VTablePtr, T>
-            >();
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename VTablePtr, typename Sig>
+    template <typename VTable, typename Sig>
     class function_base;
 
-    template <typename VTablePtr, typename R, typename ...Ts>
-    class function_base<VTablePtr, R(Ts...)>
+    template <typename VTable, typename R, typename ...Ts>
+    class function_base<VTable, R(Ts...)>
     {
         HPX_MOVABLE_ONLY(function_base);
 
         // make sure the empty table instance is initialized in time, even
         // during early startup
-        static VTablePtr const* get_empty_table()
+        static VTable const* get_empty_table()
         {
-            static VTablePtr const empty_table =
+            static VTable const empty_table =
                 detail::construct_vtable<detail::empty_function<R(Ts...)> >();
             return &empty_table;
         }
@@ -174,13 +113,13 @@ namespace hpx { namespace util { namespace detail
             {
                 typedef typename std::decay<F>::type target_type;
 
-                VTablePtr const* f_vptr = get_table_ptr<target_type>();
+                VTable const* f_vptr = get_vtable<target_type>();
                 if (vptr == f_vptr)
                 {
                     vtable::reconstruct<target_type>(object, std::forward<F>(f));
                 } else {
                     reset();
-                    vtable::delete_<empty_function<R(Ts...)> >(object);
+                    vtable::_delete<empty_function<R(Ts...)> >(object);
 
                     vptr = f_vptr;
                     vtable::construct<target_type>(object, std::forward<F>(f));
@@ -231,7 +170,7 @@ namespace hpx { namespace util { namespace detail
                 traits::is_callable<target_type&(Ts...), R>::value
               , "T shall be Callable with the function signature");
 
-            VTablePtr const* f_vptr = get_table_ptr<target_type>();
+            VTable const* f_vptr = get_vtable<target_type>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
@@ -247,7 +186,7 @@ namespace hpx { namespace util { namespace detail
                 traits::is_callable<target_type&(Ts...), R>::value
               , "T shall be Callable with the function signature");
 
-            VTablePtr const* f_vptr = get_table_ptr<target_type>();
+            VTable const* f_vptr = get_vtable<target_type>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
@@ -266,37 +205,37 @@ namespace hpx { namespace util { namespace detail
 
     private:
         template <typename T>
-        static VTablePtr const* get_table_ptr() HPX_NOEXCEPT
+        static VTable const* get_vtable() HPX_NOEXCEPT
         {
-            return detail::get_table<VTablePtr, T>();
+            return detail::get_vtable<VTable, T>();
         }
 
     protected:
-        VTablePtr const *vptr;
+        VTable const *vptr;
         mutable void* object[(vtable::function_storage_size / sizeof(void*))];
     };
 
-    template <typename Sig, typename VTablePtr>
-    static bool is_empty_function(function_base<VTablePtr, Sig> const& f) HPX_NOEXCEPT
+    template <typename Sig, typename VTable>
+    static bool is_empty_function(function_base<VTable, Sig> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename VTablePtr, typename Sig, bool Serializable>
+    template <typename VTable, typename Sig, bool Serializable>
     class basic_function;
 
-    template <typename VTablePtr, typename R, typename ...Ts>
-    class basic_function<VTablePtr, R(Ts...), true>
+    template <typename VTable, typename R, typename ...Ts>
+    class basic_function<VTable, R(Ts...), true>
       : public function_base<
-            serializable_function_vtable_ptr<VTablePtr>
+            serializable_function_vtable<VTable>
           , R(Ts...)
         >
     {
         HPX_MOVABLE_ONLY(basic_function);
 
-        typedef serializable_function_vtable_ptr<VTablePtr> vtable_ptr;
-        typedef function_base<vtable_ptr, R(Ts...)> base_type;
+        typedef serializable_function_vtable<VTable> vtable;
+        typedef function_base<vtable, R(Ts...)> base_type;
 
     public:
         typedef R result_type;
@@ -329,7 +268,7 @@ namespace hpx { namespace util { namespace detail
                 std::string name;
                 ar >> name;
 
-                this->vptr = detail::get_table_ptr<vtable_ptr>(name);
+                this->vptr = detail::get_vtable<vtable>(name);
                 this->vptr->load_object(this->object, ar, version);
             }
         }
@@ -350,13 +289,13 @@ namespace hpx { namespace util { namespace detail
         HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 
-    template <typename VTablePtr, typename R, typename ...Ts>
-    class basic_function<VTablePtr, R(Ts...), false>
-      : public function_base<VTablePtr, R(Ts...)>
+    template <typename VTable, typename R, typename ...Ts>
+    class basic_function<VTable, R(Ts...), false>
+      : public function_base<VTable, R(Ts...)>
     {
         HPX_MOVABLE_ONLY(basic_function);
 
-        typedef function_base<VTablePtr, R(Ts...)> base_type;
+        typedef function_base<VTable, R(Ts...)> base_type;
 
     public:
         typedef R result_type;
@@ -376,47 +315,12 @@ namespace hpx { namespace util { namespace detail
         }
     };
 
-    template <typename Sig, typename VTablePtr, bool Serializable>
+    template <typename Sig, typename VTable, bool Serializable>
     static bool is_empty_function(
-        basic_function<VTablePtr, Sig, Serializable> const& f) HPX_NOEXCEPT
+        basic_function<VTable, Sig, Serializable> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }
 }}}
-
-// Pseudo registration for empty functions.
-// We don't want to serialize empty functions.
-namespace hpx { namespace util { namespace detail
-{
-    template <typename VTablePtr, typename Sig>
-    struct get_function_name_impl<
-        hpx::util::detail::serializable_function_registration<
-            VTablePtr
-          , hpx::util::detail::empty_function<Sig>
-        >
-    >
-    {
-        static char const * call()
-        {
-            hpx::throw_exception(bad_function_call,
-                "empty function object should not be used",
-                "get_function_name<empty_function>");
-            return "";
-        }
-    };
-}}}
-
-namespace hpx { namespace traits
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename VTablePtr, typename Sig>
-    struct needs_automatic_registration<
-        hpx::util::detail::serializable_function_registration<
-            VTablePtr
-          , hpx::util::detail::empty_function<Sig>
-        >
-    > : std::false_type
-    {};
-}}
 
 #endif

@@ -34,7 +34,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
       : scheduler_base_(scheduler)
     {}
 
-    threads::thread_state_enum
+    threads::thread_result_type
     current_executor::thread_function_nullary(closure_type func)
     {
         // execute the actual thread function
@@ -45,7 +45,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // held.
         util::force_error_on_lock();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     // Schedule the specified function for execution in this executor.
