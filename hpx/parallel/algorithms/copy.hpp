@@ -413,7 +413,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
-                    [pred, proj](zip_iterator part_begin, std::size_t part_size)
+                    [pred, proj, flags]
+                        (zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
                     {
                         std::size_t curr = 0;
