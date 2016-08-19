@@ -170,7 +170,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             public detail::algorithm<inclusive_scan_segmented_void>
         {
             inclusive_scan_segmented_void()
-                : inclusive_scan_segmented_void::algorithm("inclusive_scan_segmented_void")
+                : inclusive_scan_segmented_void
+                    ::algorithm("inclusive_scan_segmented_void")
             {}
 
             template <typename ExPolicy, typename InIter, typename OutIter, typename T,
