@@ -3,6 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+// hpxinspect:nodeprecatedname:boost::unique_lock
+
 #if !defined(HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM)
 #define HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM
 
@@ -19,6 +23,7 @@
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #endif
 
+#include <boost/chrono/chrono.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/locks.hpp>
@@ -27,6 +32,7 @@
 #include <boost/atomic.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <utility>

@@ -14,6 +14,7 @@
 
 #define HPX_BACKTRACE_SOURCE
 #include <hpx/async.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 
 #include <boost/config.hpp>
 
@@ -47,13 +48,14 @@
 #include <unwind.h>
 #include <boost/cstdint.hpp>
 #endif
+#include <cstring>
+#include <cstdlib>
 #include <iomanip>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
-#include <string.h>
-#include <stdlib.h>
 
 #if defined(HPX_MSVC)
 #include <windows.h>
@@ -410,9 +412,13 @@ namespace hpx { namespace util {
             util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size()));
 
         error_code ec(lightweight);
-        p.apply(launch::fork, threads::thread_priority_default,
+        threads::thread_id_type tid = p.apply(
+            launch::fork, threads::thread_priority_default,
             threads::thread_stacksize_medium, ec);
         if (ec) return "<couldn't retrieve stack backtrace>";
+
+        // make sure this thread is executed last
+        hpx::this_thread::yield_to(thread::id(std::move(tid)));
 
         return p.get_future().get(ec);
     }

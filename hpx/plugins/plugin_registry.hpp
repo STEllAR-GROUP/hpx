@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
+
 #if !defined(HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM)
 #define HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 

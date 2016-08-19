@@ -25,11 +25,11 @@
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
 
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -73,14 +73,10 @@ namespace hpx { namespace actions { namespace detail
     };
 }}}
 
+HPX_IS_BITWISE_SERIALIZABLE(hpx::actions::detail::action_serialization_data)
+
 namespace hpx { namespace traits
 {
-    template <>
-    struct is_bitwise_serializable<
-            hpx::actions::detail::action_serialization_data>
-       : boost::mpl::true_
-    {};
-
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////

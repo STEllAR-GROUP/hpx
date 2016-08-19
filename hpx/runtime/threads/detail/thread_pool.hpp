@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>

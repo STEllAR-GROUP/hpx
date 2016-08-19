@@ -12,13 +12,8 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/type_traits/is_empty.hpp>
-
 #include <string>
+#include <type_traits>
 
 namespace hpx { namespace serialization
 {
@@ -96,18 +91,18 @@ namespace hpx { namespace serialization
             };
 
         public:
-            typedef typename boost::mpl::eval_if<
-                hpx::traits::is_intrusive_polymorphic<T>,
-                    boost::mpl::identity<intrusive_polymorphic>,
-                        boost::mpl::eval_if<
-                            detail::has_serialize<T>,
-                                boost::mpl::identity<intrusive_usual>,
-                                boost::mpl::eval_if<
-                                    boost::is_empty<T>,
-                                        boost::mpl::identity<empty>,
-                                        boost::mpl::identity<non_intrusive>
-                                >
-                        >
+            typedef typename std::conditional<
+                hpx::traits::is_intrusive_polymorphic<T>::value,
+                intrusive_polymorphic,
+                typename std::conditional<
+                    detail::has_serialize<T>::value,
+                    intrusive_usual,
+                    typename std::conditional<
+                        std::is_empty<T>::value,
+                        empty,
+                        non_intrusive
+                    >::type
+                >::type
             >::type type;
         };
 

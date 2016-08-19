@@ -11,6 +11,8 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <utility>
+
 using hpx::components::stub_base;
 using hpx::components::client_base;
 using hpx::components::managed_component;

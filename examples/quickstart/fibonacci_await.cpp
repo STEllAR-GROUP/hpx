@@ -19,6 +19,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t threshold = 2;

@@ -40,7 +40,6 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
-using hpx::applier::register_thread_nullary;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -89,7 +88,7 @@ void print_results(
     std::vector<hpx::performance_counters::counter_value> counter_values;
 
     if (ac)
-        counter_values = ac->evaluate_counters_sync();
+        counter_values = ac->evaluate_counters(hpx::launch::sync);
 
     if (csv_header)
     {
@@ -192,15 +191,15 @@ void wait_for_tasks(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::threads::thread_state_enum invoke_worker_timed_no_suspension(
+hpx::threads::thread_result_type invoke_worker_timed_no_suspension(
     hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
     )
 {
     worker_timed(delay * 1000);
-    return hpx::threads::terminated;
+    return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
 }
 
-hpx::threads::thread_state_enum invoke_worker_timed_suspension(
+hpx::threads::thread_result_type invoke_worker_timed_suspension(
     hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
     )
 {
@@ -209,7 +208,7 @@ hpx::threads::thread_state_enum invoke_worker_timed_suspension(
     hpx::error_code ec(hpx::lightweight);
     hpx::this_thread::suspend(hpx::threads::suspended, "suspend", ec);
 
-    return hpx::threads::terminated;
+    return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

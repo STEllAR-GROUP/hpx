@@ -9,11 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40703
-// this needs to go first to workaround a weird GCC4.6 ICE
-#include <hpx/util/reinitializable_static.hpp>
-#endif
-
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
@@ -25,13 +20,10 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <boost/cstdint.hpp>
 
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -181,8 +173,8 @@ namespace hpx { namespace components
         }
 
     public:
-        typedef typename boost::mpl::if_<
-            boost::is_same<Component, detail::this_type>,
+        typedef typename std::conditional<
+            std::is_same<Component, detail::this_type>::value,
             managed_component_base, Component
         >::type this_component_type;
 
@@ -195,11 +187,11 @@ namespace hpx { namespace components
         // make sure that we have a back_ptr whenever we need to control the
         // lifetime of the managed_component
         static_assert((
-            boost::is_same<ctor_policy, traits::construct_without_back_ptr>::value ||
-            boost::is_same<dtor_policy,
+            std::is_same<ctor_policy, traits::construct_without_back_ptr>::value ||
+            std::is_same<dtor_policy,
             traits::managed_object_controls_lifetime>::value),
-            "boost::is_same<ctor_policy, traits::construct_without_back_ptr>::value || "
-            "boost::is_same<dtor_policy, "
+            "std::is_same<ctor_policy, traits::construct_without_back_ptr>::value || "
+            "std::is_same<dtor_policy, "
             "traits::managed_object_controls_lifetime>::value");
 
         managed_component_base()
@@ -361,8 +353,8 @@ namespace hpx { namespace components
         HPX_NON_COPYABLE(managed_component);
 
     public:
-        typedef typename boost::mpl::if_<
-                boost::is_same<Derived, detail::this_type>,
+        typedef typename std::conditional<
+                std::is_same<Derived, detail::this_type>::value,
                 managed_component, Derived
             >::type derived_type;
 

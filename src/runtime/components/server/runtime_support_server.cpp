@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+// hpxinspect:nodeprecatedname:boost::unique_lock
+
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
 #include <hpx/runtime.hpp>
@@ -582,7 +586,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 
@@ -611,7 +615,17 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
+
+            while (tm.get_thread_count() > 1)
+                this_thread::yield();
+
             return 0;
+        }
 
         std::size_t count = 0;      // keep track of number of trials
 
@@ -667,7 +681,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
+            //this_thread::sleep_for(boost::chrono::millisec(100));
             this_thread::yield();
         }
 
@@ -731,7 +745,17 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
+
+            while (tm.get_thread_count() > 1)
+                this_thread::yield();
+
             return 0;
+        }
 
         boost::uint32_t initiating_locality_id = get_locality_id();
 
@@ -781,7 +805,7 @@ namespace hpx { namespace components { namespace server
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "runtime_support::shutdown_all",
-                "shutdown_all shut be invoked on the troot locality only");
+                "shutdown_all should be invoked on the root locality only");
             return;
         }
 
@@ -1025,7 +1049,7 @@ namespace hpx { namespace components { namespace server
         // give the scheduler some time to work on remaining tasks
         {
             util::unlock_guard<Lock> ul(l);
-            self->yield(threads::pending);
+            self->yield(threads::thread_result_type(threads::pending, nullptr));
         }
 
         // get rid of all terminated threads
@@ -1529,7 +1553,7 @@ namespace hpx { namespace components { namespace server
         serialization::binary_filter* bf = factory->create(compress, next_filter);
         if (nullptr == bf) {
             std::ostringstream strm;
-            strm << "couldn't to create binary filter plugin of type: "
+            strm << "couldn't create binary filter plugin of type: "
                  << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
@@ -1541,7 +1565,7 @@ namespace hpx { namespace components { namespace server
             ec = make_success_code();
 
         // log result if requested
-        LRT_(info) << "successfully binary filter handler plugin of type: "
+        LRT_(info) << "successfully created binary filter handler plugin of type: "
                     << binary_filter_type;
         return bf;
     }

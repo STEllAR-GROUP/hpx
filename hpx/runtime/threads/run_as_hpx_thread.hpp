@@ -19,6 +19,7 @@
 #include <mutex>
 #include <thread>
 #include <type_traits>
+#include <utility>
 
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
 #include <experimental/optional>

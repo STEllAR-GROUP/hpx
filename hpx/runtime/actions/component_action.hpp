@@ -23,6 +23,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 

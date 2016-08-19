@@ -7,7 +7,6 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 
 #include <boost/format.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <string>
 #include <vector>
@@ -80,9 +79,9 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this application to use at least 2 threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=2";
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=2"
+    };
 
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv, cfg);

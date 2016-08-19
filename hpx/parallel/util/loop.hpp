@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { namespace util

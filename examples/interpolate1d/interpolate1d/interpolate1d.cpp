@@ -9,6 +9,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <string>
+#include <utility>
 
 #include "read_values.hpp"
 #include "partition.hpp"

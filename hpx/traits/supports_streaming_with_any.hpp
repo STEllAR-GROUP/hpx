@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
@@ -16,7 +16,7 @@ namespace hpx { namespace traits
     // Customization point for streaming with util::any
     template <typename T, typename Enable = void>
     struct supports_streaming_with_any
-      : boost::mpl::true_       // the default is to support streaming
+      : std::true_type       // the default is to support streaming
     {};
 }}
 

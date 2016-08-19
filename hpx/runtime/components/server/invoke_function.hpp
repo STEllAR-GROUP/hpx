@@ -12,6 +12,8 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 
+#include <utility>
+
 namespace hpx { namespace components { namespace server
 {
     namespace detail

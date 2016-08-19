@@ -18,7 +18,6 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/assign/std/vector.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
@@ -114,9 +113,7 @@ namespace hpx { namespace util
         if (!need_to_call_pre_initialize)
             return;
 
-        using namespace boost::assign;
-        std::vector<std::string> lines; //-V808
-        lines +=
+        std::vector<std::string> lines = {
             // create an empty application section
             "[application]",
 
@@ -292,7 +289,7 @@ namespace hpx { namespace util
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"
-        ;
+        };
 
         std::vector<std::string> lines_pp =
             hpx::parcelset::parcelhandler::load_runtime_configuration();

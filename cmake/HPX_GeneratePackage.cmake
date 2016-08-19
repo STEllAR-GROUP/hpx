@@ -18,8 +18,6 @@ export(TARGETS ${HPX_EXPORT_TARGETS}
 #  NAMESPACE hpx::
 )
 
-export(PACKAGE ${HPX_PACKAGE_NAME})
-
 # Generate library list for pkg config ...
 set(_is_debug FALSE)
 set(_is_release FALSE)
@@ -48,6 +46,11 @@ foreach(lib ${HPX_LIBRARIES})
     set(_is_debug FALSE)
     set(_is_release FALSE)
   endif()
+endforeach()
+
+set(HPX_PKG_LIBRARY_DIR "")
+foreach(dir ${HPX_LIBRARY_DIR})
+  set(HPX_PKG_LIBRARY_DIR "${HPX_PKG_LIBRARY_DIR} -L${dir}")
 endforeach()
 
 if(HPX_WITH_STATIC_LINKING)

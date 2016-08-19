@@ -6,8 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/process.hpp>
-
 #include <hpx/util/lightweight_test.hpp>
+
+#include <tests/unit/component/components/launch_process_test_server.hpp>
 
 #include <boost/filesystem.hpp>
 
@@ -31,10 +32,8 @@ std::vector<std::string> get_environment()
 #if defined(HPX_WINDOWS)
     int len = get_arraylen(_environ);
     std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
-#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__AIX__)
-    int len = get_arraylen(environ);
-    std::copy(&environ[0], &environ[len], std::back_inserter(env));
-#elif defined(__APPLE__)
+#elif defined(linux) || defined(__linux) || defined(__linux__) || \
+      defined(__AIX__) || defined(__APPLE__)
     int len = get_arraylen(environ);
     std::copy(&environ[0], &environ[len], std::back_inserter(env));
 #else
@@ -55,20 +54,24 @@ int hpx_main(boost::program_options::variables_map &vm)
 
     fs::path exe = base_dir / "launched_process_test" HPX_EXECUTABLE_EXTENSION;
 
-    std::string launch_target = "";
-    if (vm.count("launch")) {
-        launch_target = vm["launch"].as < std::string > ();
-      std::cout << "using launch: " << launch_target << std::endl;
-      exe = launch_target;
+    std::string launch_target;
+    if (vm.count("launch"))
+    {
+        launch_target = vm["launch"].as<std::string>();
+        std::cout << "using launch: " << launch_target << std::endl;
+        exe = launch_target;
     }
-    else {
-      std::cout << "using launch (def) : " << exe << std::endl;
+    else
+    {
+        std::cout << "using launch (default): " << exe << std::endl;
     }
 
     // set up command line for launched executable
     std::vector<std::string> args;
     args.push_back(exe.string());
     args.push_back("--exit_code=42");
+    args.push_back("--component=test_server");
+    args.push_back("--set_message=accessed");
     args.push_back("--hpx:ignore-batch-env");
 
     // set up environment for launched executable
@@ -107,25 +110,38 @@ int hpx_main(boost::program_options::variables_map &vm)
             process::wait_on_latch("launch_process")   // same as above!
         );
 
-    // wait for the HPX locality to be up and running
-    c.wait();
-    HPX_TEST(c);
-
-    // now the launched executable should have connected back as a new locality
     {
-        std::vector<hpx::id_type> localities = hpx::find_all_localities();
-        HPX_TEST_EQ(localities.size(), std::size_t(2));
-    }
+        // now create an instance of the test_server component
+        hpx::components::client<launch_process::test_server> t =
+            hpx::new_<launch_process::test_server>(hpx::find_here());
 
-    // wait for it to exit, we know it returns 42
-    int exit_code = c.wait_for_exit_sync();
-    HPX_TEST_EQ(exit_code, 42);
+        hpx::future<std::string> f =
+            hpx::async(launch_process_get_message_action(), t);
+        HPX_TEST_EQ(f.get(), std::string("initialized"));
+
+        // register the component instance with AGAS
+        t.register_as("test_server");       // same as --component=<> above
+
+        // wait for the HPX locality to be up and running
+        c.wait();
+        HPX_TEST(c);
+
+        // the launched executable should have connected back as a new locality
+        HPX_TEST_EQ(hpx::find_all_localities().size(), std::size_t(2));
+
+        // wait for it to exit, we know it returns 42 (see --exit_code=<> above)
+        int exit_code = c.wait_for_exit(hpx::launch::sync);
+        HPX_TEST_EQ(exit_code, 42);
+
+        // make sure the launched process has set the message in the component
+        // this should be the same as --set_message=<> above
+        f = hpx::async(launch_process_get_message_action(), t);
+        HPX_TEST_EQ(f.get(), std::string("accessed"));
+
+    }   // release the component
 
     // the new locality should have disconnected now
-    {
-        std::vector<hpx::id_type> localities = hpx::find_all_localities();
-        HPX_TEST_EQ(localities.size(), std::size_t(1));
-    }
+    HPX_TEST_EQ(hpx::find_all_localities().size(), std::size_t(1));
 
     return hpx::finalize();
 }
@@ -138,9 +154,14 @@ int main(int argc, char* argv[])
     options_description desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()("launch,l", value<std::string>(),
-        "the process that will be launched and connect back");
+        "the process that will be launched and which connects back");
 
-    std::vector<std::string> cfg;
+    // This explicitly enables the component we depend on (it is disabled by
+    // default to avoid being loaded outside of this test).
+    std::vector<std::string> const cfg = {
+        "hpx.components.launch_process_test_server.enabled!=1"
+    };
+
     HPX_TEST_EQ_MSG(
         hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status"

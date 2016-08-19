@@ -18,10 +18,10 @@
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
-#include <hpx/util/date_time_chrono.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #  include <hpx/util/register_locks.hpp>
 #endif
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
@@ -29,6 +29,7 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -442,7 +443,9 @@ namespace hpx { namespace this_thread
     ///
     /// If the suspension was aborted, this function will throw a
     /// \a yield_aborted exception.
-    threads::thread_state_ex_enum suspend(threads::thread_state_enum state,
+    threads::thread_state_ex_enum suspend(
+        threads::thread_state_enum state,
+        threads::thread_id_type const& nextid,
         util::thread_description const& description, error_code& ec)
     {
         // let the thread manager do other things while waiting
@@ -468,7 +471,7 @@ namespace hpx { namespace this_thread
 #endif
 
             // suspend the HPX-thread
-            statex = self.yield(state);
+            statex = self.yield(threads::thread_result_type(state, nextid));
         }
 
         // handle interruption, if needed
@@ -476,7 +479,8 @@ namespace hpx { namespace this_thread
         if (ec) return threads::wait_unknown;
 
         // handle interrupt and abort
-        if (statex == threads::wait_abort) {
+        if (statex == threads::wait_abort)
+        {
             std::ostringstream strm;
             strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
@@ -493,6 +497,7 @@ namespace hpx { namespace this_thread
 
     threads::thread_state_ex_enum suspend(
         util::steady_time_point const& abs_time,
+        threads::thread_id_type const& nextid,
         util::thread_description const& description, error_code& ec)
     {
         // schedule a thread waking us up at_time
@@ -523,7 +528,8 @@ namespace hpx { namespace this_thread
             if (ec) return threads::wait_unknown;
 
             // suspend the HPX-thread
-            statex = self.yield(threads::suspended);
+            statex = self.yield(
+                threads::thread_result_type(threads::suspended, nextid));
 
             if (statex != threads::wait_timeout)
             {

@@ -14,6 +14,8 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
+#include <utility>
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////

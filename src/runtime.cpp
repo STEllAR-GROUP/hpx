@@ -5,9 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/version.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
@@ -15,21 +17,20 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp> // EXPORTS get_next_id
+#include <hpx/runtime/components/server/simple_component_base.hpp>    // EXPORTS get_next_id
 #include <hpx/runtime/get_config_entry.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/performance_counters/registry.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/state.hpp>
+#include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/version.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>
@@ -1064,7 +1065,7 @@ namespace hpx
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
-    boost::uint32_t get_num_localities_sync(error_code& ec)
+    boost::uint32_t get_num_localities(hpx::launch::sync_policy, error_code& ec)
     {
         if (nullptr == hpx::get_runtime_ptr())
             return 0;
@@ -1080,8 +1081,8 @@ namespace hpx
         return get_runtime().get_config().get_num_localities();
     }
 
-    boost::uint32_t get_num_localities_sync(components::component_type type,
-        error_code& ec)
+    boost::uint32_t get_num_localities(hpx::launch::sync_policy,
+        components::component_type type, error_code& ec)
     {
         if (nullptr == hpx::get_runtime_ptr())
             return 0;
@@ -1129,7 +1130,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_os_thread_count()",
+                "the runtime system has not been initialized yet");
             return std::size_t(0);
+        }
         return rt->get_config().get_os_thread_count();
     }
 
@@ -1137,7 +1144,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_os_thread_count(exec)",
+                "the runtime system has not been initialized yet");
             return std::size_t(0);
+        }
 
         if (!exec)
             return rt->get_config().get_os_thread_count();
@@ -1151,7 +1164,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_worker_thread_num",
+                "the runtime system has not been initialized yet");
             return std::size_t(-1);
+        }
         return rt->get_thread_manager().get_worker_thread_num();
     }
 
@@ -1159,7 +1178,14 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_num_worker_threads",
+                "the runtime system has not been initialized yet");
             return std::size_t(0);
+        }
+
         error_code ec(lightweight);
         return static_cast<std::size_t>(
             rt->get_agas_client().get_num_overall_threads(ec));
@@ -1169,7 +1195,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::is_scheduler_numa_sensitive",
+                "the runtime system has not been initialized yet");
             return false;
+        }
 
         bool numa_sensitive = false;
         if (std::size_t(-1) !=
@@ -1184,6 +1216,11 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
             return rt->keep_factory_alive(type);
+
+        HPX_THROW_EXCEPTION(
+            invalid_status,
+            "hpx::keep_factory_alive",
+            "the runtime system has not been initialized yet");
         return false;
     }
 

@@ -31,6 +31,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -7,12 +7,13 @@
 #define HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM
 
 #include <hpx/include/parallel_execution_policy.hpp>
+#include <hpx/include/util.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
 
 #include <numeric>
 #include <random>
+#include <utility>
 #include <vector>
 
 namespace test
@@ -20,14 +21,14 @@ namespace test
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
-      : boost::iterator_adaptor<
+      : hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
         base_type;
 
     public:
@@ -84,14 +85,14 @@ namespace test
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct decorated_iterator
-      : boost::iterator_adaptor<
+      : hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
         base_type;
 
     public:
@@ -107,7 +108,7 @@ namespace test
         {}
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         typename base_type::reference dereference() const
         {

@@ -40,8 +40,6 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/mpl/bool.hpp>
-
 #include <cstddef>
 #include <limits>
 #include <utility>
@@ -57,31 +55,25 @@ namespace hpx { namespace threads { namespace coroutines
     public:
         friend struct detail::coroutine_accessor;
 
-        typedef thread_state_enum result_type;
-        typedef thread_state_ex_enum arg_type;
-
         typedef detail::coroutine_impl impl_type;
         typedef impl_type::pointer impl_ptr;
         typedef impl_type::thread_id_repr_type thread_id_repr_type;
 
-        typedef util::unique_function_nonser<
-            thread_state_enum(thread_state_ex_enum)
-        > functor_type;
+        typedef impl_type::result_type result_type;
+        typedef impl_type::arg_type arg_type;
+
+        typedef util::unique_function_nonser<result_type(arg_type)> functor_type;
 
         coroutine() : m_pimpl(nullptr) {}
 
         coroutine(functor_type&& f, naming::id_type&& target,
-            thread_id_repr_type id = nullptr, std::ptrdiff_t stack_size =
-            detail::default_stack_size)
+                thread_id_repr_type id = nullptr,
+                std::ptrdiff_t stack_size = detail::default_stack_size)
           : m_pimpl(impl_type::create(
                 std::move(f), std::move(target), id, stack_size))
         {
             HPX_ASSERT(m_pimpl->is_ready());
         }
-
-        //coroutine (impl_ptr p)
-        //  : m_pimpl(p)
-        //{}
 
         coroutine(coroutine && src)
           : m_pimpl(src.m_pimpl)
@@ -149,13 +141,12 @@ namespace hpx { namespace threads { namespace coroutines
 
             m_pimpl->invoke();
 
-            return *m_pimpl->result();
+            return std::move(*m_pimpl->result());
         }
 
-        typedef void(coroutine::*bool_type)();
-        operator bool_type() const
+        explicit operator bool() const
         {
-            return good() ? &coroutine::bool_type_f : nullptr;
+            return good();
         }
 
         bool operator==(const coroutine& rhs) const
@@ -208,8 +199,6 @@ namespace hpx { namespace threads { namespace coroutines
         }
 
     protected:
-        void bool_type_f() {}
-
         bool good() const
         {
             return !empty() && !exited() && !waiting();

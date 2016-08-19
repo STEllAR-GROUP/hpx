@@ -37,6 +37,7 @@
 
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -56,8 +57,9 @@ namespace hpx { namespace parcelset
     struct connection_handler_traits<policies::mpi::parcelport>
     {
         typedef policies::mpi::sender_connection connection_type;
-        typedef boost::mpl::true_  send_early_parcel;
-        typedef boost::mpl::true_ do_background_work;
+        typedef std::true_type  send_early_parcel;
+        typedef std::true_type  do_background_work;
+        typedef std::true_type  use_connection_cache;
 
         static const char * type()
         {

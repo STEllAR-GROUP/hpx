@@ -14,6 +14,7 @@
 #include <hpx/lcos/packaged_action.hpp>
 
 #include <cstdint>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace agas { namespace stubs

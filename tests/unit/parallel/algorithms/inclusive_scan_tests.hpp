@@ -14,6 +14,7 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/functions.hpp>
 
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"

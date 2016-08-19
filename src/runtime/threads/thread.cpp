@@ -16,8 +16,8 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -108,7 +108,7 @@ namespace hpx
         threads::run_thread_exit_callbacks(id);
     }
 
-    threads::thread_state_enum thread::thread_function_nullary(
+    threads::thread_result_type thread::thread_function_nullary(
         util::unique_function_nonser<void()> const& func)
     {
         try {
@@ -137,7 +137,8 @@ namespace hpx
 
         // run all callbacks attached to the exit event for this thread
         run_thread_exit_callbacks();
-        return threads::terminated;
+
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     thread::id thread::get_id() const HPX_NOEXCEPT
@@ -319,6 +320,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread
     {
+        void yield_to(thread::id id) HPX_NOEXCEPT
+        {
+            this_thread::suspend(threads::pending, id.native_handle(),
+                "this_thread::yield_to");
+        }
+
         void yield() HPX_NOEXCEPT
         {
             this_thread::suspend(threads::pending, "this_thread::yield");

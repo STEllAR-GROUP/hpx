@@ -20,19 +20,19 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/math/common_factor_ct.hpp>
-#include <boost/mpl/max.hpp>
-#include <boost/mpl/sizeof.hpp>
-#include <boost/type_traits/aligned_storage.hpp>
-#include <boost/type_traits/alignment_of.hpp>
 
+#include <chrono>
+#include <functional>
 #include <memory>
 #include <mutex>
+#include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -153,23 +153,17 @@ namespace detail
 
         // determine the required alignment, define aligned storage of proper
         // size
-        typedef
-            typename boost::math::static_lcm<
-                boost::alignment_of<value_type>::value
-              , boost::alignment_of<error_type>::value
-            >::type
-            max_alignment;
+        HPX_STATIC_CONSTEXPR std::size_t max_alignment =
+            (std::alignment_of<value_type>::value >
+             std::alignment_of<error_type>::value) ?
+            std::alignment_of<value_type>::value
+          : std::alignment_of<error_type>::value;
 
-        typedef
-            typename boost::mpl::max<
-                boost::mpl::sizeof_<value_type>
-              , boost::mpl::sizeof_<error_type>
-            >::type
-            max_size;
+        HPX_STATIC_CONSTEXPR std::size_t max_size =
+                (sizeof(value_type) > sizeof(error_type)) ?
+                    sizeof(value_type) : sizeof(error_type);
 
-        typedef boost::aligned_storage<
-            max_size::value, max_alignment::value
-        > type;
+        typedef typename std::aligned_storage<max_size, max_alignment>::type type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -322,7 +316,7 @@ namespace detail
             if (state_ == exception)
             {
                 boost::exception_ptr* exception_ptr =
-                    static_cast<boost::exception_ptr*>(storage_.address());
+                    reinterpret_cast<boost::exception_ptr*>(&storage_);
                 // an error has been reported in the meantime, throw or set
                 // the error code
                 if (&ec == &throws) {
@@ -334,7 +328,7 @@ namespace detail
                 }
                 return nullptr;
             }
-            return static_cast<result_type*>(storage_.address());
+            return reinterpret_cast<result_type*>(&storage_);
         }
 
         // deferred execution of a given continuation
@@ -389,7 +383,7 @@ namespace detail
                 if (!run_on_completed_on_new_thread(
                         util::deferred_call(&future_data::run_on_completed,
                             std::move(this_), std::move(on_completed),
-                            boost::ref(ptr)),
+                            std::ref(ptr)),
                         ec))
                 {
                     // thread creation went wrong
@@ -426,7 +420,7 @@ namespace detail
 
             // set the data
             result_type* value_ptr =
-                static_cast<result_type*>(storage_.address());
+                reinterpret_cast<result_type*>(&storage_);
             ::new ((void*)value_ptr) result_type(
                 future_data_result<Result>::set(std::forward<Target>(data)));
             state_ = value;
@@ -462,7 +456,7 @@ namespace detail
 
             // set the data
             boost::exception_ptr* exception_ptr =
-                static_cast<boost::exception_ptr*>(storage_.address());
+                reinterpret_cast<boost::exception_ptr*>(&storage_);
             ::new ((void*)exception_ptr) boost::exception_ptr(
                 std::forward<Target>(data));
             state_ = exception;
@@ -525,14 +519,14 @@ namespace detail
             case value:
             {
                 result_type* value_ptr =
-                    static_cast<result_type*>(storage_.address());
+                    reinterpret_cast<result_type*>(&storage_);
                 value_ptr->~result_type();
                 break;
             }
             case exception:
             {
                 boost::exception_ptr* exception_ptr =
-                    static_cast<boost::exception_ptr*>(storage_.address());
+                    reinterpret_cast<boost::exception_ptr*>(&storage_);
                 exception_ptr->~exception_ptr();
                 break;
             }
@@ -585,7 +579,7 @@ namespace detail
         }
 
         virtual future_status
-        wait_until(boost::chrono::steady_clock::time_point const& abs_time,
+        wait_until(util::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(mtx_);
@@ -658,7 +652,7 @@ namespace detail
 
         template <typename Result_>
         timed_future_data(
-            boost::chrono::steady_clock::time_point const& abs_time,
+            util::steady_clock::time_point const& abs_time,
             Result_&& init)
         {
             boost::intrusive_ptr<timed_future_data> this_(this);
@@ -733,7 +727,7 @@ namespace detail
         }
 
         virtual future_status
-        wait_until(boost::chrono::steady_clock::time_point const& abs_time,
+        wait_until(util::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
             if (!started_test())
@@ -780,18 +774,19 @@ namespace detail
         }
 
         // run in a separate thread
-        virtual void apply(launch policy,
+        virtual threads::thread_id_type apply(launch policy,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
             HPX_ASSERT(false);      // shouldn't ever be called
+            return threads::invalid_thread_id;
         }
 
     protected:
-        static threads::thread_state_enum run_impl(future_base_type this_)
+        static threads::thread_result_type run_impl(future_base_type this_)
         {
             this_->do_run();
-            return threads::terminated;
+            return threads::thread_result_type(threads::terminated, nullptr);
         }
 
     public:
@@ -863,11 +858,11 @@ namespace detail
         };
 
     protected:
-        static threads::thread_state_enum run_impl(future_base_type this_)
+        static threads::thread_result_type run_impl(future_base_type this_)
         {
             reset_id r(*this_);
             this_->do_run();
-            return threads::terminated;
+            return threads::thread_result_type(threads::terminated, nullptr);
         }
 
     public:

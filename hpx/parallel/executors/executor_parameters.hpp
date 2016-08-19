@@ -16,9 +16,7 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <cstdarg>
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 #include <functional>
-#endif
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -61,171 +59,269 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             unwrapper(U && u) : T(std::forward<U>(u)) {}
         };
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct variable_chunk_size_call_helper
+        {
+            variable_chunk_size_call_helper(Wrapper&) {}
+        };
+
+        template <typename T, typename Wrapper>
+        struct variable_chunk_size_call_helper<T, Wrapper,
+            typename std::enable_if<has_variable_chunk_size<T>::value>::type>
+        {
+            variable_chunk_size_call_helper(Wrapper& wrap)
+              : wrap_(wrap)
+            {}
+
+            template <typename Executor>
+            HPX_FORCEINLINE bool variable_chunk_size(Executor && exec)
+            {
+                return wrap_.get().variable_chunk_size(
+                    std::forward<Executor>(exec));
+            }
+
+        private:
+            Wrapper& wrap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct maximal_number_of_chunks_call_helper
+        {
+            maximal_number_of_chunks_call_helper(Wrapper&) {}
+        };
+
+        template <typename T, typename Wrapper>
+        struct maximal_number_of_chunks_call_helper<T, Wrapper,
+            typename std::enable_if<
+                has_maximal_number_of_chunks<T>::value
+            >::type>
+        {
+            maximal_number_of_chunks_call_helper(Wrapper& wrap)
+              : wrap_(wrap)
+            {}
+
+            template <typename Executor>
+            HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
+                Executor && exec, std::size_t cores)
+            {
+                return wrap_.get().maximal_number_of_chunks(
+                    std::forward<Executor>(exec), cores);
+            }
+
+        private:
+            Wrapper& wrap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct get_chunk_size_call_helper
+        {
+            get_chunk_size_call_helper(Wrapper&) {}
+        };
+
+        template <typename T, typename Wrapper>
+        struct get_chunk_size_call_helper<T, Wrapper,
+            typename std::enable_if<has_get_chunk_size<T>::value>::type>
+        {
+            get_chunk_size_call_helper(Wrapper& wrap)
+              : wrap_(wrap)
+            {}
+
+            template <typename Executor, typename F>
+            HPX_FORCEINLINE std::size_t get_chunk_size(Executor && exec, F && f,
+                std::size_t num_tasks)
+            {
+                return wrap_.get().get_chunk_size(std::forward<Executor>(exec),
+                    std::forward<F>(f), num_tasks);
+            }
+
+        private:
+            Wrapper& wrap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct mark_begin_execution_call_helper
+        {
+            mark_begin_execution_call_helper(Wrapper&) {}
+        };
+
+        template <typename T, typename Wrapper>
+        struct mark_begin_execution_call_helper<T, Wrapper,
+            typename std::enable_if<has_mark_begin_execution<T>::value>::type>
+        {
+            mark_begin_execution_call_helper(Wrapper& wrap)
+              : wrap_(wrap)
+            {}
+
+            HPX_FORCEINLINE void mark_begin_execution()
+            {
+                wrap_.get().mark_begin_execution();
+            }
+
+        private:
+            Wrapper& wrap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct mark_end_execution_call_helper
+        {
+            mark_end_execution_call_helper(Wrapper&) {}
+        };
+
+        template <typename T, typename Wrapper>
+        struct mark_end_execution_call_helper<T, Wrapper,
+            typename std::enable_if<has_mark_begin_execution<T>::value>::type>
+        {
+            mark_end_execution_call_helper(Wrapper& wrap)
+              : wrap_(wrap)
+            {}
+
+            HPX_FORCEINLINE void mark_end_execution()
+            {
+                wrap_.get().mark_end_execution();
+            }
+
+        private:
+            Wrapper& wrap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct processing_units_count_call_helper
+        {
+            processing_units_count_call_helper(Wrapper&) {}
+        };
+
+        template <typename T, typename Wrapper>
+        struct processing_units_count_call_helper<T, Wrapper,
+            typename std::enable_if<
+                has_processing_units_count<T>::value
+            >::type>
+        {
+            processing_units_count_call_helper(Wrapper& wrap)
+              : wrap_(wrap)
+            {}
+
+            HPX_FORCEINLINE std::size_t processing_units_count()
+            {
+                return wrap_.get().processing_units_count();
+            }
+
+        private:
+            Wrapper& wrap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct reset_thread_distribution_call_helper
+        {
+            reset_thread_distribution_call_helper(Wrapper&) {}
+        };
+
+        template <typename T, typename Wrapper>
+        struct reset_thread_distribution_call_helper<T, Wrapper,
+            typename std::enable_if<
+                has_reset_thread_distribution<T>::value
+            >::type>
+        {
+            reset_thread_distribution_call_helper(Wrapper& wrap)
+              : wrap_(wrap)
+            {}
+
+            template <typename Executor>
+            HPX_FORCEINLINE void reset_thread_distribution(Executor && exec)
+            {
+                wrap_.get().reset_thread_distribution(
+                    std::forward<Executor>(exec));
+            }
+
+        private:
+            Wrapper& wrap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct base_member_helper
+        {
+            base_member_helper(T && t)
+              : member_(std::move(t))
+            {}
+
+            T member_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct unwrapper< ::boost::reference_wrapper<T> >
+          : base_member_helper<boost::reference_wrapper<T> >
+          , variable_chunk_size_call_helper<T, boost::reference_wrapper<T> >
+          , maximal_number_of_chunks_call_helper<T, boost::reference_wrapper<T> >
+          , get_chunk_size_call_helper<T, boost::reference_wrapper<T> >
+          , mark_begin_execution_call_helper<T, boost::reference_wrapper<T> >
+          , mark_end_execution_call_helper<T, boost::reference_wrapper<T> >
+          , processing_units_count_call_helper<T, boost::reference_wrapper<T> >
+          , reset_thread_distribution_call_helper<T, boost::reference_wrapper<T> >
         {
-            template <typename WrapperType>
-            unwrapper(WrapperType && wrapped_param)
-              : wrap(std::forward<WrapperType>(wrapped_param))
+            typedef boost::reference_wrapper<T> wrapper_type;
+
+            unwrapper(wrapper_type wrapped_param)
+              : base_member_helper<wrapper_type>(std::move(wrapped_param))
+              , variable_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , maximal_number_of_chunks_call_helper<T, wrapper_type>(this->member_)
+              , get_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , mark_begin_execution_call_helper<T, wrapper_type>(this->member_)
+              , mark_end_execution_call_helper<T, wrapper_type>(this->member_)
+              , processing_units_count_call_helper<T, wrapper_type>(this->member_)
+              , reset_thread_distribution_call_helper<T, wrapper_type>(this->member_)
             {}
-
-            template <
-                typename Executor, typename U = T,
-                typename std::enable_if<
-                    has_variable_chunk_size<U>::value
-                >::type* = nullptr>
-            auto variable_chunk_size(Executor & exec)
-            ->  decltype(std::declval<U>().variable_chunk_size(exec))
-            {
-                return wrap.get().variable_chunk_size(exec);
-            }
-
-            template <typename Executor, typename F, typename U = T,
-                typename std::enable_if<
-                    has_get_chunk_size<U>::value
-                >::type* = nullptr>
-            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks)
-            ->  decltype(
-                    std::declval<U>().get_chunk_size(
-                        exec, std::forward<F>(f), num_tasks)
-                )
-            {
-                return wrap.get().get_chunk_size(exec, std::forward<F>(f),
-                    num_tasks);
-            }
-
-            template <typename U = T,
-                typename std::enable_if<
-                    has_mark_begin_execution<U>::value
-                >::type* = nullptr>
-            auto mark_begin_execution()
-            ->  decltype(std::declval<U>().mark_begin_execution())
-            {
-                return wrap.get().mark_begin_execution();
-            }
-
-            template <typename U = T,
-                typename std::enable_if<
-                    has_mark_end_execution<U>::value
-                >::type* = nullptr>
-            auto mark_end_execution()
-            ->  decltype(std::declval<U>().mark_end_execution())
-            {
-                return wrap.get().mark_end_execution();
-            }
-
-            template <typename U = T,
-                typename std::enable_if<
-                    has_processing_units_count<U>::value
-                >::type* = nullptr>
-            auto processing_units_count()
-            ->  decltype(std::declval<U>().processing_units_count())
-            {
-                return wrap.get().processing_units_count();
-            }
-
-            template<typename Executor, typename U = T,
-                typename std::enable_if<
-                    has_reset_thread_distribution<U>::value
-                >::type* = nullptr>
-            auto reset_thread_distribution(Executor & exec)
-            ->  decltype(std::declval<U>().reset_thread_distribution(exec))
-            {
-                return wrap.get().reset_thread_distribution(exec);
-            }
-
-        private:
-            boost::reference_wrapper<T> wrap;
         };
 
-#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
         template <typename T>
         struct unwrapper< ::std::reference_wrapper<T> >
+          : base_member_helper<std::reference_wrapper<T> >
+          , variable_chunk_size_call_helper<T, std::reference_wrapper<T> >
+          , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T> >
+          , get_chunk_size_call_helper<T, std::reference_wrapper<T> >
+          , mark_begin_execution_call_helper<T, std::reference_wrapper<T> >
+          , mark_end_execution_call_helper<T, std::reference_wrapper<T> >
+          , processing_units_count_call_helper<T, std::reference_wrapper<T> >
+          , reset_thread_distribution_call_helper<T, std::reference_wrapper<T> >
         {
-            template <typename WrapperType>
-            unwrapper(WrapperType && wrapped_param)
-              : wrap(std::forward<WrapperType>(wrapped_param))
+            typedef std::reference_wrapper<T> wrapper_type;
+
+            unwrapper(wrapper_type wrapped_param)
+              : base_member_helper<wrapper_type>(std::move(wrapped_param))
+              , variable_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , maximal_number_of_chunks_call_helper<T, wrapper_type>(this->member_)
+              , get_chunk_size_call_helper<T, wrapper_type>(this->member_)
+              , mark_begin_execution_call_helper<T, wrapper_type>(this->member_)
+              , mark_end_execution_call_helper<T, wrapper_type>(this->member_)
+              , processing_units_count_call_helper<T, wrapper_type>(this->member_)
+              , reset_thread_distribution_call_helper<T, wrapper_type>(this->member_)
             {}
-
-            template <typename Executor, typename U = T,
-                typename std::enable_if<
-                    has_variable_chunk_size<U>::value
-                >::type* = nullptr>
-            auto variable_chunk_size(Executor & exec)
-            ->  decltype(std::declval<U>().variable_chunk_size(exec))
-            {
-                return wrap.get().variable_chunk_size(exec);
-            }
-
-            template <typename Executor, typename F, typename U = T,
-                typename std::enable_if<
-                    has_get_chunk_size<U>::value
-                >::type* = nullptr>
-            auto get_chunk_size(Executor & exec, F && f, std::size_t num_tasks)
-            ->  decltype(
-                    std::declval<U>().get_chunk_size(
-                        exec, std::forward<F>(f), num_tasks)
-                )
-            {
-                return wrap.get().get_chunk_size(exec, std::forward<F>(f),
-                    num_tasks);
-            }
-
-            template <typename U = T,
-                typename std::enable_if<
-                    has_mark_begin_execution<U>::value
-                >::type* = nullptr>
-            auto mark_begin_execution()
-            ->  decltype(std::declval<U>().mark_begin_execution())
-            {
-                return wrap.get().mark_begin_execution();
-            }
-
-            template <typename U = T,
-                typename std::enable_if<
-                    has_mark_end_execution<U>::value
-                >::type* = nullptr>
-            auto mark_end_execution()
-            ->  decltype(std::declval<U>().mark_end_execution())
-            {
-                return wrap.get().mark_end_execution();
-            }
-
-            template <typename U = T,
-                typename std::enable_if<
-                    has_processing_units_count<U>::value
-                >::type* = nullptr>
-            auto processing_units_count()
-            ->  decltype(std::declval<U>().processing_units_count())
-            {
-                return wrap.get().processing_units_count();
-            }
-
-            template <typename Executor, typename U = T,
-                typename std::enable_if<
-                    has_reset_thread_distribution<U>::value
-                >::type* = nullptr>
-            auto reset_thread_distribution(Executor & exec)
-            ->  decltype(std::declval<U>().reset_thread_distribution(exec))
-            {
-                return wrap.get().reset_thread_distribution(exec);
-            }
-
-        private:
-            std::reference_wrapper<T> wrap;
         };
-#endif
 
         ///////////////////////////////////////////////////////////////////////
 
 #define HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(func)                       \
-    static_assert(parameters_type_counter<                                    \
+    static_assert(                                                            \
+        parameters_type_counter<                                              \
             BOOST_PP_CAT(hpx::parallel::v3::detail::has_, func)<              \
                 typename hpx::util::decay_unwrap<Params>::type>::value...     \
         >::value <= 1,                                                        \
         "Passing more than one executor parameters type exposing "            \
             BOOST_PP_STRINGIZE(func) " is not possible")                      \
     /**/
+
+#if defined(HPX_MSVC) && HPX_MSVC < 1900
+// for MSVC 12 disable: warning C4520: '...' : multiple default constructors specified
+#pragma warning(push)
+#pragma warning(disable: 4520)
+#endif
 
         template <typename ... Params>
         struct executor_parameters : public unwrapper<Params>...
@@ -234,22 +330,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 hpx::util::detail::all_of<
                     hpx::traits::is_executor_parameters<Params>...
                 >::value,
-                "All passed parameters must be a proper executor parameters "
+                "All passed parameters must be proper executor parameters "
                 "objects"
             );
+            static_assert(sizeof...(Params) >= 2,
+                "This type is meant to be used with at least 2 parameters "
+                "objects");
 
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(variable_chunk_size);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(get_chunk_size);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_begin_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(processing_units_count);
+            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(maximal_number_of_chunks);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(reset_thread_distribution);
 
             executor_parameters()
               : unwrapper<Params>()...
             {}
 
-            template <typename ... Params_>
+            template <typename ... Params_, typename T =
+                typename std::enable_if<
+                    hpx::util::detail::pack<Params...>::size ==
+                        hpx::util::detail::pack<Params_...>::size
+                >::type>
             executor_parameters(Params_ &&... params)
               : unwrapper<Params>(std::forward<Params_>(params))...
             {}
@@ -271,6 +375,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         /// \endcond
     }
+
+#if defined(HPX_MSVC) && HPX_MSVC < 1900
+#pragma warning(pop)
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ... Params>

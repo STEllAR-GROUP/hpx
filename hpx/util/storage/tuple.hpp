@@ -11,6 +11,7 @@
 #include <hpx/util/any.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,10 +77,10 @@ namespace hpx { namespace util { namespace storage
 
             template <typename T>
             tuple& push_back(const T& field,
-                    typename boost::disable_if<boost::is_same<
+                    typename std::enable_if<!std::is_same<
                         elem_type,
                         typename util::decay<T>::type
-                    > >::type* = nullptr)
+                    >::value>::type* = nullptr)
             {
                 tuple_.push_back(elem_type(field)); // insert an any object
                 return *this;

@@ -21,11 +21,9 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
-
 #include <mutex>
 #include <sstream>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace detail
@@ -43,9 +41,9 @@ namespace hpx { namespace components
     class simple_component_base : public traits::detail::simple_component_tag
     {
     protected:
-        typedef typename boost::mpl::if_<
-                boost::is_same<Component, detail::this_type>,
-                simple_component_base, Component
+        typedef typename std::conditional<
+            std::is_same<Component, detail::this_type>::value,
+            simple_component_base, Component
             >::type this_component_type;
 
         Component& derived()
@@ -72,7 +70,7 @@ namespace hpx { namespace components
             if (gid_)
             {
                 error_code ec;
-                agas::unbind_sync(gid_, 1, ec);
+                agas::unbind(launch::sync, gid_, 1, ec);
             }
         }
 
@@ -163,7 +161,8 @@ namespace hpx { namespace components
                     gid_ = assign_gid;
                     naming::detail::strip_credits_from_gid(gid_);
 
-                    if (!agas::bind_sync(gid_, addr, appl.get_locality_id()))
+                    if (!agas::bind(launch::sync, gid_, addr,
+                            appl.get_locality_id()))
                     {
                         std::ostringstream strm;
                         strm << "failed to rebind id " << gid_

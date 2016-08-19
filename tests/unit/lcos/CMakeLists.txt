@@ -22,6 +22,8 @@ set(tests
     async_remote_client
     broadcast
     broadcast_apply
+    channel
+    channel_local
     client_then
     condition_variable
     counting_semaphore
@@ -51,6 +53,13 @@ set(tests
     when_any
     when_some
    )
+
+if(NOT MSVC12)
+  # MSVC12 can't cope with split_future
+  set(tests ${tests}
+      split_future
+      split_shared_future)
+endif()
 
 if(HPX_WITH_AWAIT)
   set(tests ${tests} await)

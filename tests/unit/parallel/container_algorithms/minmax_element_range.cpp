@@ -13,6 +13,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -468,8 +469,9 @@ int main(int argc, char* argv[])
         ;
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=all");
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

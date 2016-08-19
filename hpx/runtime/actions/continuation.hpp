@@ -359,6 +359,7 @@ namespace hpx { namespace actions
         {
             try {
                 HPX_ASSERT(result.is_ready());
+                result.get();                   // rethrow exceptions
                 cont->trigger();
             }
             catch (...) {
@@ -368,7 +369,7 @@ namespace hpx { namespace actions
         }
 
         template <typename Result, typename Future, typename F, typename ...Ts>
-        void trigger_impl_future(boost::mpl::true_,
+        void trigger_impl_future(std::true_type,
             std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             typedef typename traits::future_traits<Future>::type type;
@@ -401,7 +402,7 @@ namespace hpx { namespace actions
         }
 
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl_future(boost::mpl::false_,
+        void trigger_impl_future(std::false_type,
             std::unique_ptr<continuation> cont, F&& f, Ts&&... vs)
         {
             try {
@@ -425,9 +426,7 @@ namespace hpx { namespace actions
         void trigger_impl(std::false_type, std::unique_ptr<continuation> cont,
             F&& f, Ts&&... vs)
         {
-            typedef
-                typename traits::is_future<RemoteResult>::type
-                is_future;
+            typedef traits::is_future<RemoteResult> is_future;
 
             trigger_impl_future<Result, RemoteResult>(is_future(),
                 std::move(cont), std::forward<F>(f), std::forward<Ts>(vs)...);

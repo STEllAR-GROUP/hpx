@@ -12,6 +12,7 @@
 #include <hpx/include/serialization.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

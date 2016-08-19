@@ -26,8 +26,9 @@
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+
 #include <memory>
+#include <type_traits>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -186,14 +187,14 @@ private:
 
     // non-generic
     template<class formatter> void add_formatter_impl(formatter fmt,
-        const boost::false_type& ) {
+        const std::false_type& ) {
         formatter_ptr p = m_formatters.append(fmt);
         m_router.append_formatter(p);
     }
 
     // non-generic
     template<class formatter> void del_formatter_impl(formatter fmt,
-        const boost::false_type& ) {
+        const std::false_type& ) {
         formatter_ptr p = m_formatters.get_ptr(fmt);
         m_router.del_formatter(p);
         m_formatters.del(fmt);
@@ -201,14 +202,14 @@ private:
 
     // non-generic
     template<class destination> void add_destination_impl(destination dest,
-        const boost::false_type& ) {
+        const std::false_type& ) {
         destination_ptr p = m_destinations.append(dest);
         m_router.append_destination(p);
     }
 
     // non-generic
     template<class destination> void del_destination_impl(destination dest,
-        const boost::false_type& ) {
+        const std::false_type& ) {
         destination_ptr p = m_destinations.get_ptr(dest);
         m_router.del_destination(p);
         m_destinations.del(dest);
@@ -216,34 +217,34 @@ private:
 
     // generic manipulator
     template<class formatter> void add_formatter_impl(formatter fmt,
-        const boost::true_type& ) {
+        const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
             ::generic_holder<formatter,formatter_base> holder;
-        add_formatter_impl( holder(fmt), boost::false_type() );
+        add_formatter_impl( holder(fmt), std::false_type() );
     }
 
     // generic manipulator
     template<class formatter> void del_formatter_impl(formatter fmt,
-        const boost::true_type& ) {
+        const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
             ::generic_holder<formatter,formatter_base> holder;
-        del_formatter_impl( holder(fmt), boost::false_type() );
+        del_formatter_impl( holder(fmt), std::false_type() );
     }
 
     // generic manipulator
     template<class destination> void add_destination_impl(destination dest,
-        const boost::true_type& ) {
+        const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
             ::generic_holder<destination,destination_base> holder;
-        add_destination_impl( holder(dest), boost::false_type() );
+        add_destination_impl( holder(dest), std::false_type() );
     }
 
     // generic manipulator
     template<class destination> void del_destination_impl(destination dest,
-        const boost::true_type& ) {
+        const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
             ::generic_holder<destination,destination_base> holder;
-        del_destination_impl( holder(dest), boost::false_type() );
+        del_destination_impl( holder(dest), std::false_type() );
     }
 
 public:
@@ -254,7 +255,8 @@ public:
     */
     template<class formatter> void add_formatter(formatter fmt) {
         typedef hpx::util::logging::manipulator::is_generic is_generic;
-        add_formatter_impl<formatter>( fmt, boost::is_base_of<is_generic,formatter>() );
+        add_formatter_impl<formatter>(
+            fmt, std::is_base_of<is_generic,formatter>() );
     }
 
     /**
@@ -277,7 +279,8 @@ public:
     */
     template<class formatter> void del_formatter(formatter fmt) {
         typedef hpx::util::logging::manipulator::is_generic is_generic;
-        del_formatter_impl<formatter>( fmt, boost::is_base_of<is_generic,formatter>() );
+        del_formatter_impl<formatter>(
+            fmt, std::is_base_of<is_generic,formatter>() );
     }
 
     /**
@@ -286,7 +289,7 @@ public:
     template<class destination> void add_destination(destination dest) {
         typedef hpx::util::logging::manipulator::is_generic is_generic;
         add_destination_impl<destination>( dest,
-            boost::is_base_of<is_generic,destination>() );
+            std::is_base_of<is_generic,destination>() );
     }
 
     /**
@@ -295,7 +298,7 @@ public:
     template<class destination> void del_destination(destination dest) {
         typedef hpx::util::logging::manipulator::is_generic is_generic;
         del_destination_impl<destination>( dest,
-            boost::is_base_of<is_generic,destination>() );
+            std::is_base_of<is_generic,destination>() );
     }
 
     /**

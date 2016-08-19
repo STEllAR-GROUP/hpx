@@ -11,7 +11,7 @@
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/version.hpp>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::component<

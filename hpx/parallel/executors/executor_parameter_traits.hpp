@@ -205,11 +205,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             static auto call(int, Parameters && params, Executor && exec,
                     std::size_t cores)
             ->  decltype(
-                    params.get_maximal_number_of_chunks(
+                    params.maximal_number_of_chunks(
                         std::forward<Executor>(exec), cores)
                 )
             {
-                return params.get_maximal_number_of_chunks(
+                return params.maximal_number_of_chunks(
                     std::forward<Executor>(exec), cores);
             }
 
@@ -238,6 +238,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 >::call(std::forward<Parameters>(params),
                     std::forward<Executor>(exec), cores);
         }
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>

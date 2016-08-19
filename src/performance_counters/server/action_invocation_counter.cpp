@@ -11,6 +11,7 @@
 #include <hpx/util/function.hpp>
 
 #include <cstdint>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters

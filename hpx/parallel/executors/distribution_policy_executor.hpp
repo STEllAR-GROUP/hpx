@@ -23,6 +23,7 @@
 #include <hpx/util/result_of.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -86,7 +87,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
         template <typename Action, typename ... Ts>
         typename std::enable_if<
             hpx::traits::is_action<Action>::value
@@ -96,7 +96,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             policy_.template apply<Action>(threads::thread_priority_default,
                 std::forward<Ts>(ts)...);
         }
-#endif
 
         // async_execute implementations
         template <typename F, typename ... Ts>
@@ -113,7 +112,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
         template <typename Action, typename ... Ts>
         typename std::enable_if<
             hpx::traits::is_action<Action>::value,
@@ -124,7 +122,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             return policy_.template async<Action>(launch::async,
                 std::forward<Ts>(ts)...);
         }
-#endif
         /// \endcond
 
     public:

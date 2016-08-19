@@ -12,14 +12,22 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/is_component.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/type_traits/add_const.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    namespace detail
+    {
+        template <typename Component>
+        struct is_simple_or_fixed_component
+          : std::integral_constant<bool,
+                std::is_base_of<traits::detail::simple_component_tag, Component>::value
+             || std::is_base_of<traits::detail::fixed_component_tag, Component>::value
+            >
+        {};
+    }
+
     /// The \a get_lva template is a helper structure allowing to convert a
     /// local virtual address as stored in a local address (returned from
     /// the function \a resolver_client#resolve) to the address of the
@@ -38,20 +46,9 @@ namespace hpx
     template <typename Component>
     struct get_lva
     {
-        struct is_simple_or_fixed_component
-          : boost::mpl::or_<
-                boost::is_base_and_derived<
-                    traits::detail::simple_component_tag, Component
-                >,
-                boost::is_base_and_derived<
-                    traits::detail::fixed_component_tag, Component
-                >
-            >
-        {};
-
         template <typename Address>
         static Component*
-        call(Address lva, boost::mpl::false_)
+        call(Address lva, std::false_type)
         {
             typedef typename Component::wrapping_type wrapping_type;
             return reinterpret_cast<wrapping_type*>(lva)->get_checked();
@@ -59,7 +56,7 @@ namespace hpx
 
         template <typename Address>
         static Component*
-        call(Address lva, boost::mpl::true_)
+        call(Address lva, std::true_type)
         {
             return reinterpret_cast<Component*>(lva);
         }
@@ -67,29 +64,18 @@ namespace hpx
         static Component*
         call(naming::address::address_type lva)
         {
-            return call(lva, is_simple_or_fixed_component());
+            return call(lva, detail::is_simple_or_fixed_component<Component>());
         }
     };
 
     template <typename Component>
     struct get_lva<Component const>
     {
-        struct is_simple_or_fixed_component
-          : boost::mpl::or_<
-                boost::is_base_and_derived<
-                    traits::detail::simple_component_tag, Component
-                >,
-                boost::is_base_and_derived<
-                    traits::detail::fixed_component_tag, Component
-                >
-            >
-        {};
-
         template <typename Address>
         static Component const*
-        call(Address lva, boost::mpl::false_)
+        call(Address lva, std::false_type)
         {
-            typedef typename boost::add_const<
+            typedef typename std::add_const<
                 typename Component::wrapping_type
             >::type wrapping_type;
             return reinterpret_cast<wrapping_type*>(lva)->get_checked();
@@ -97,7 +83,7 @@ namespace hpx
 
         template <typename Address>
         static Component const*
-        call(Address lva, boost::mpl::true_)
+        call(Address lva, std::true_type)
         {
             return reinterpret_cast<Component const*>(lva);
         }
@@ -105,7 +91,7 @@ namespace hpx
         static Component const*
         call(naming::address::address_type lva)
         {
-            return call(lva, is_simple_or_fixed_component());
+            return call(lva, detail::is_simple_or_fixed_component<Component>());
         }
     };
 

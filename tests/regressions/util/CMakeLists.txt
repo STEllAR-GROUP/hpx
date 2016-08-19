@@ -14,6 +14,7 @@ set(tests
     serialize_buffer_1069
     tuple_serialization_803
     unwrapped_1528
+    use_all_cores_2262
     zero_copy_parcels_1001
    )
 

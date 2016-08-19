@@ -15,6 +15,7 @@
 #include <hpx/util/integer/uint128.hpp>
 
 #include <utility>
+#include <type_traits>
 
 namespace hpx { namespace components { namespace server
 {
@@ -134,7 +135,7 @@ namespace hpx { namespace traits
     // memory is a (hand-rolled) component
     template <>
     struct is_component<components::server::memory>
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

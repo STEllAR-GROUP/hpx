@@ -35,6 +35,7 @@
 #include <memory>
 #include <mutex>
 #include <unordered_set>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std
@@ -205,7 +206,8 @@ namespace hpx { namespace threads { namespace policies
                 // Take ownership of the thread object and rebind it.
                 thrd = heap->front();
                 heap->pop_front();
-                thrd->rebind(data, state);
+                thrd->rebind(data,
+                    state == pending_do_not_schedule ? pending : state);
             }
 
             else
@@ -214,7 +216,8 @@ namespace hpx { namespace threads { namespace policies
 
                 // Allocate a new thread object.
                 thrd = threads::thread_data::create(
-                    data, memory_pool_, state);
+                    data, memory_pool_,
+                    state == pending_do_not_schedule ? pending : state);
             }
         }
 
@@ -712,9 +715,6 @@ namespace hpx { namespace threads { namespace policies
                     }
                     ++thread_map_count_;
 
-                    // return the thread_id of the newly created thread
-                    if (id) *id = thrd;
-
                     // this thread has to be in the map now
                     HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
                     HPX_ASSERT(thrd->get_pool() == &memory_pool_);
@@ -722,6 +722,9 @@ namespace hpx { namespace threads { namespace policies
                     // push the new thread in the pending queue thread
                     if (initial_state == pending)
                         schedule_thread(thrd.get());
+
+                    // return the thread_id of the newly created thread
+                    if (id) *id = std::move(thrd);
 
                     if (&ec != &throws)
                         ec = make_success_code();

@@ -14,6 +14,7 @@
 #include <boost/cstdint.hpp>
 
 #include <mutex>
+#include <utility>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)

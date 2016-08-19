@@ -12,6 +12,7 @@
 #include <hpx/include/lcos.hpp>
 
 #include <iostream>
+#include <utility>
 #include <string>
 
 #include <boost/cstdint.hpp>

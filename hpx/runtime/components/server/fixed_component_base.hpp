@@ -20,10 +20,10 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/cstdint.hpp>
 
 #include <sstream>
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -36,8 +36,8 @@ template <typename Component>
 class fixed_component_base : public traits::detail::fixed_component_tag
 {
 private:
-    typedef typename boost::mpl::if_<
-            boost::is_same<Component, detail::this_type>,
+    typedef typename std::conditional<
+            std::is_same<Component, detail::this_type>::value,
             fixed_component_base, Component
         >::type this_component_type;
 

@@ -11,15 +11,16 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/atomic.hpp>
-#include <boost/chrono/system_clocks.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/ref.hpp>
+
+#include <chrono>
+#include <type_traits>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -32,13 +33,13 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::mpl::false_)
+        boost::atomic<hpx::state>& global_state, std::false_type)
     {
     }
 
     template <typename SchedulingPolicy>
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::mpl::true_)
+        boost::atomic<hpx::state>& global_state, std::true_type)
     {
         bool running = is_running_state(global_state.load());
         scheduler.periodic_maintenance(running);
@@ -47,51 +48,51 @@ namespace hpx { namespace threads { namespace detail
         {
             // create timer firing in correspondence with given time
             typedef boost::asio::basic_deadline_timer<
-                boost::chrono::steady_clock
-              , util::chrono_traits<boost::chrono::steady_clock>
+                util::steady_clock
+              , util::chrono_traits<util::steady_clock>
             > deadline_timer;
 
             deadline_timer t(
                 get_thread_pool("timer-thread")->get_io_service(),
-                boost::chrono::milliseconds(1000));
+                std::chrono::milliseconds(1000));
 
             void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
-                boost::mpl::true_) =
+                std::true_type) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
             t.async_wait(util::bind(handler, boost::ref(scheduler),
-                boost::ref(global_state), boost::mpl::true_()));
+                boost::ref(global_state), std::true_type()));
         }
     }
 
     template <typename SchedulingPolicy>
     inline void start_periodic_maintenance(SchedulingPolicy&,
-        boost::atomic<hpx::state>& global_state, boost::mpl::false_)
+        boost::atomic<hpx::state>& global_state, std::false_type)
     {
     }
 
     template <typename SchedulingPolicy>
     inline void start_periodic_maintenance(SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::mpl::true_)
+        boost::atomic<hpx::state>& global_state, std::true_type)
     {
         scheduler.periodic_maintenance(is_running_state(global_state.load()));
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
-            boost::chrono::steady_clock
-          , util::chrono_traits<boost::chrono::steady_clock>
+            util::steady_clock
+          , util::chrono_traits<util::steady_clock>
         > deadline_timer;
 
         deadline_timer t (
             get_thread_pool("io-thread")->get_io_service(),
-            boost::chrono::milliseconds(1000));
+            std::chrono::milliseconds(1000));
 
         void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
-            boost::mpl::true_) =
+            std::true_type) =
             &periodic_maintenance_handler<SchedulingPolicy>;
 
         t.async_wait(util::bind(handler, boost::ref(scheduler),
-            boost::ref(global_state), boost::mpl::true_()));
+            boost::ref(global_state), std::true_type()));
     }
 }}}
 

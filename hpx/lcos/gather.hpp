@@ -137,6 +137,7 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/local/and_gate.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
@@ -148,6 +149,8 @@ namespace hpx { namespace lcos
 
 #include <mutex>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace lcos
@@ -241,7 +244,14 @@ namespace hpx { namespace lcos
             hpx::future<T> result)
         {
             typedef typename gather_server<T>::get_result_action action_type;
-            return async(action_type(), f.get(), site, result.get());
+
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            return async(action_type(), id, site, result.get()).then(
+                [id](hpx::future<std::vector<T> > && f)
+                {
+                    return f.get();
+                });
         }
 
         template <typename T>
@@ -263,7 +273,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities_sync();
+            num_sites = hpx::get_num_localities(hpx::launch::sync);
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
@@ -310,7 +320,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities_sync();
+            num_sites = hpx::get_num_localities(hpx::launch::sync);
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
@@ -347,7 +357,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities_sync();
+            num_sites = hpx::get_num_localities(hpx::launch::sync);
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 

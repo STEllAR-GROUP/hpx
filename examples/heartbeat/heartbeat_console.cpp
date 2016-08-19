@@ -46,8 +46,9 @@ int main(int argc, char* argv[])
         ;
 
     // we expect other localities to connect
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.expect_connecting_localities=1");
+    std::vector<std::string> const cfg = {
+        "hpx.expect_connecting_localities=1"
+    };
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
