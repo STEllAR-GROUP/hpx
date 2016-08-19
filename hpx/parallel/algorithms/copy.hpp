@@ -430,6 +430,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 if ((get<1>(*it) = f))
                                     ++curr;
                             });
+
                         return curr;
                     },
                     // step 2 propagates the partition results from left

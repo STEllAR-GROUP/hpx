@@ -98,15 +98,15 @@ namespace hpx { namespace parallel { namespace util
                     {
                         HPX_ASSERT(count_ > count);
 
-                        hpx::shared_future<Result1> f = workitems[1];
+                        hpx::shared_future<Result1> curr = workitems[1];
                         workitems[1] = dataflow(hpx::launch::sync,
-                            f2, workitems[0], std::move(f)
+                            f2, workitems[0], curr
                         );
 
                         finalitems.push_back(dataflow(
                             policy.executor(),
                             hpx::util::bind(f3, first_, count_ - count, _1),
-                            workitems[0], workitems[1])
+                            workitems[0], curr)
                         );
                     }
 
@@ -121,24 +121,20 @@ namespace hpx { namespace parallel { namespace util
                         if (parts & 0x7)
                             p = hpx::launch::sync;
 
-                        FwdIter b = hpx::util::get<0>(elem);
-                        std::size_t s = hpx::util::get<1>(elem);
+                        FwdIter it = hpx::util::get<0>(elem);
+                        std::size_t size = hpx::util::get<1>(elem);
 
-                        hpx::shared_future<Result1> f = workitems.back();
-                        workitems.push_back(
-                            dataflow(
-                                p, f2, std::move(f),
-                                executor_traits::async_execute(
-                                    policy.executor(), f1, b, s
-                                )
-                            )
-                        );
+                        hpx::shared_future<Result1> prev = workitems.back();
+                        auto curr = executor_traits::async_execute(
+                            policy.executor(), f1, it, size).share();
+
+                        workitems.push_back(dataflow(p, f2, prev, curr));
 
                         finalitems.push_back(
                             dataflow(
                                 policy.executor(),
-                                hpx::util::bind(f3, b, s, _1),
-                                workitems[parts - 1], workitems[parts]
+                                hpx::util::bind(f3, it, size, _1),
+                                prev, curr
                             )
                         );
 
@@ -230,15 +226,15 @@ namespace hpx { namespace parallel { namespace util
                     {
                         HPX_ASSERT(count_ > count);
 
-                        hpx::shared_future<Result1> f = workitems[1];
+                        hpx::shared_future<Result1> curr = workitems[1];
                         workitems[1] = dataflow(hpx::launch::sync,
-                            f2, workitems[0], std::move(f)
+                            f2, workitems[0], curr
                         );
 
                         finalitems.push_back(dataflow(
                             policy.executor(),
                             hpx::util::bind(f3, first_, count_ - count, _1),
-                            workitems[0], workitems[1])
+                            workitems[0], curr)
                         );
                     }
 
@@ -253,24 +249,20 @@ namespace hpx { namespace parallel { namespace util
                         if (parts & 0x7)
                             p = hpx::launch::sync;
 
-                        FwdIter b = hpx::util::get<0>(elem);
-                        std::size_t s = hpx::util::get<1>(elem);
+                        FwdIter it = hpx::util::get<0>(elem);
+                        std::size_t size = hpx::util::get<1>(elem);
 
-                        hpx::shared_future<Result1> f = workitems.back();
-                        workitems.push_back(
-                            dataflow(
-                                p, f2, std::move(f),
-                                executor_traits::async_execute(
-                                    policy.executor(), f1, b, s
-                                )
-                            )
-                        );
+                        hpx::shared_future<Result1> prev = workitems.back();
+                        auto curr = executor_traits::async_execute(
+                            policy.executor(), f1, it, size).share();
+
+                        workitems.push_back(dataflow(p, f2, prev, curr));
 
                         finalitems.push_back(
                             dataflow(
                                 policy.executor(),
-                                hpx::util::bind(f3, b, s, _1),
-                                workitems[parts - 1], workitems[parts]
+                                hpx::util::bind(f3, it, size, _1),
+                                prev, curr
                             )
                         );
 
