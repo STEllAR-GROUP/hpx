@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {

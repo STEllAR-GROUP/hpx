@@ -18,6 +18,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace compute { namespace cuda
