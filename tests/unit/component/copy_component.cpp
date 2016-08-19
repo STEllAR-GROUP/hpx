@@ -4,28 +4,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/include/iostreams.hpp>
-#include <hpx/include/partitioned_vector.hpp>
-#include <hpx/include/parallel_scan.hpp>
-
-#include <boost/format.hpp>
-#include <boost/ref.hpp>
-
-#include <list>
-#include <mutex>
-#include <set>
 
 #include <utility>
 #include <vector>
-#include <chrono>
-#include <thread>
 
-HPX_REGISTER_PARTITIONED_VECTOR(int);
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::simple_component_base<test_server>
@@ -155,15 +141,6 @@ bool test_copy_component_there(hpx::id_type id)
     return false;
 }
 
-struct opt
-{
-    int operator()(int v1, int v2) const
-    {
-        return v1 + v2;
-    }
-};
-
-
 int main()
 {
     HPX_TEST(test_copy_component(hpx::find_here()));
@@ -177,57 +154,6 @@ int main()
         HPX_TEST(test_copy_component_here(id));
         HPX_TEST(test_copy_component_there(id));
     }
-
-/* REMOVE LATER */
-    auto policy = hpx::parallel::par(hpx::parallel::task);
-    auto op =
-        [](double v1, double v2) {
-            return v1 + v2;
-        };
-    int init = 0;
-
-    hpx::partitioned_vector<int> v1(100, hpx::container_layout(hpx::find_all_localities()));
-    std::iota(v1.begin(), v1.end(), 1);
-
-    hpx::partitioned_vector<int> v2(100, hpx::container_layout(hpx::find_all_localities()));
-
-    auto first = v1.begin();
-    auto last = v1.end();
-    auto dest = v2.begin();
-
-    auto res = hpx::parallel::inclusive_scan(policy, first, last, dest, init);
-
-    auto res1 = res.get();
-
-    std::vector<int> e(v1.size());
-    std::iota(e.begin(), e.end(), 1);
-    std::vector<int> f(e.size());
-
-    auto res2 = hpx::parallel::v1::detail::sequential_inclusive_scan(
-        e.begin(), e.end(), f.begin(), 0, opt());
-
-    for (auto i : v2) {
-        std::cout << i << "\t";
-    }
-
-    std::cout << std::endl;
-
-    for (auto i : f) {
-        std::cout << i << "\t";
-    }
-
-    std::cout << std::endl;
-
-    std::string test = "true";
-    for (std::size_t i = 0; i < v1.size(); ++i) {
-        if (v2[i] != f[i]) {
-            test = "false";
-        }
-    }
-
-    std::cout << "result: " << test << std::endl;
-    std::cout << "end: " << *(res1-1) << " " << *(res2-1) << std::endl;
-/* REMOVE LATER END */
 
     return hpx::util::report_errors();
 }
