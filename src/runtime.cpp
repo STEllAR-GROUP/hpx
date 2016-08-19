@@ -1130,7 +1130,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_os_thread_count()",
+                "the runtime system has not been initialized yet");
             return std::size_t(0);
+        }
         return rt->get_config().get_os_thread_count();
     }
 
@@ -1138,7 +1144,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_os_thread_count(exec)",
+                "the runtime system has not been initialized yet");
             return std::size_t(0);
+        }
 
         if (!exec)
             return rt->get_config().get_os_thread_count();
@@ -1152,7 +1164,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_worker_thread_num",
+                "the runtime system has not been initialized yet");
             return std::size_t(-1);
+        }
         return rt->get_thread_manager().get_worker_thread_num();
     }
 
@@ -1160,7 +1178,14 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::get_num_worker_threads",
+                "the runtime system has not been initialized yet");
             return std::size_t(0);
+        }
+
         error_code ec(lightweight);
         return static_cast<std::size_t>(
             rt->get_agas_client().get_num_overall_threads(ec));
@@ -1170,7 +1195,13 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
+        {
+            HPX_THROW_EXCEPTION(
+                invalid_status,
+                "hpx::is_scheduler_numa_sensitive",
+                "the runtime system has not been initialized yet");
             return false;
+        }
 
         bool numa_sensitive = false;
         if (std::size_t(-1) !=
@@ -1185,6 +1216,11 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
             return rt->keep_factory_alive(type);
+
+        HPX_THROW_EXCEPTION(
+            invalid_status,
+            "hpx::keep_factory_alive",
+            "the runtime system has not been initialized yet");
         return false;
     }
 
