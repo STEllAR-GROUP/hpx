@@ -205,6 +205,119 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
+        template <typename SegIter, typename OutIter>
+        static bool is_segmented_the_same(SegIter first, SegIter last, OutIter dest,
+            std::false_type)
+        {
+            return false;
+        }
+
+        template <typename SegIter, typename OutIter>
+        static bool is_segmented_the_same(SegIter first, SegIter last, OutIter dest,
+            std::true_type)
+        {
+            typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
+            typedef typename traits_in::segment_iterator segment_iterator_in;
+            typedef typename traits_in::local_iterator local_iterator_type_in;
+
+            typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
+            typedef typename traits_out::segment_iterator segment_iterator_out;
+            typedef typename traits_out::local_iterator local_iterator_type_out;
+
+            segment_iterator_in sit_in = traits_in::segment(first);
+            segment_iterator_in send_in = traits_in::segment(last);
+
+            segment_iterator_out sit_out = traits_out::segment(dest);
+
+            if (sit_in == send_in)
+            {
+                // all elements on the same partition
+                local_iterator_type_in beg_in = traits_in::local(first);
+                local_iterator_type_in end_in = traits_in::end(sit_in);
+
+                local_iterator_type_out beg_out = traits_out::local(dest);
+                local_iterator_type_out end_out = traits_out::end(sit_out);
+
+                if(beg_in != end_in) {
+                    std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
+                    std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+
+                    std::size_t in_dist = std::distance(beg_in, end_in);
+                    std::size_t out_dist = std::distance(beg_out, end_out);
+
+                    if (in_id != out_id || in_dist != out_dist) {
+                        return false;
+                    }
+                }
+
+            }
+            else
+            {
+                // handle the remaining part of the first partition
+                local_iterator_type_in beg_in = traits_in::local(first);
+                local_iterator_type_in end_in = traits_in::end(sit_in);
+
+                local_iterator_type_out beg_out = traits_out::local(dest);
+                local_iterator_type_out end_out = traits_out::end(sit_out);
+
+                if(beg_in != end_in) {
+                    std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
+                    std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+
+                    std::size_t in_dist = std::distance(beg_in, end_in);
+                    std::size_t out_dist = std::distance(beg_out, end_out);
+
+                    if (in_id != out_id || in_dist != out_dist) {
+                        return false;
+                    }
+                }
+
+                // handle all partitions
+                for(++sit_in, ++sit_out; sit_in != send_in; ++sit_in, ++sit_out) {
+                    beg_in = traits_in::begin(sit_in);
+                    end_in = traits_in::end(sit_in);
+
+                    beg_out = traits_out::begin(sit_out);
+                    end_out = traits_out::end(sit_out);
+
+                    if(beg_in != end_in) {
+                        std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
+                        std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+
+                        std::size_t in_dist = std::distance(beg_in, end_in);
+                        std::size_t out_dist = std::distance(beg_out, end_out);
+
+                        if (in_id != out_id || in_dist != out_dist) {
+                            return false;
+                        }
+                    }
+                }
+
+                // handle the last partition
+                beg_in = traits_in::begin(sit_in);
+                end_in = traits_in::end(sit_in);
+
+                beg_out = traits_out::begin(sit_out);
+                end_out = traits_out::end(sit_out);
+
+                if (beg_in != end_in) {
+                    std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
+                    std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+
+                    std::size_t in_dist = std::distance(beg_in, end_in);
+                    std::size_t out_dist = std::distance(beg_out, end_out);
+
+                    if (in_id != out_id || in_dist != out_dist) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+
+        }
+
+
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter, typename OutIter,
             typename T, typename Op>
@@ -215,12 +328,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
 
-            return segmented_inclusive_scan_seq(
-                std::forward<Algo>(algo),
-                std::forward<ExPolicy>(policy),
-                first, last, dest, std::move(init), std::forward<Op>(op),
-                is_out_seg());
-
+            if (is_segmented_the_same(first, last, dest, is_out_seg()))
+            {
+                return segmented_inclusive_scan_seq(
+                    std::forward<Algo>(algo),
+                    std::forward<ExPolicy>(policy),
+                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    is_out_seg());
+            }
+            else
+            {
+                return segmented_inclusive_scan_seq(
+                    std::forward<Algo>(algo),
+                    std::forward<ExPolicy>(policy),
+                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    std::false_type());
+            }
         }
 
         // sequential segmented OutIter implementation
@@ -432,12 +555,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
 
-
-            return segmented_inclusive_scan_par(
-                std::forward<Algo>(algo),
-                std::forward<ExPolicy>(policy),
-                first, last, dest, std::move(init), std::forward<Op>(op),
-                is_out_seg());
+            if (is_segmented_the_same(first, last, dest, is_out_seg()))
+            {
+                return segmented_inclusive_scan_par(
+                    std::forward<Algo>(algo),
+                    std::forward<ExPolicy>(policy),
+                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    is_out_seg());
+            }
+            else
+            {
+                return segmented_inclusive_scan_par(
+                    std::forward<Algo>(algo),
+                    std::forward<ExPolicy>(policy),
+                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    std::false_type());
+            }
         }
 
         // parallel segmented OutIter implementation

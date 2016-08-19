@@ -454,6 +454,9 @@ void inclusive_scan_tests()
     inclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(localities));
 
+    inclusive_scan_tests_segmented_out_with_policy<T>(length,
+        hpx::container_layout(localities), hpx::container_layout(10));
+
     inclusive_scan_tests_inplace_with_policy<T>(length,
         hpx::container_layout(localities));
 }
