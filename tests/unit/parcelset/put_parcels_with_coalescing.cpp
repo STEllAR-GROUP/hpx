@@ -220,11 +220,11 @@ void print_counters(char const* name)
 
     for (performance_counter const& c : counters)
     {
-        counter_value value = c.get_counter_value_sync();
+        counter_value value = c.get_counter_value(hpx::launch::sync);
         HPX_TEST_NEQ(value.get_value<double>(), 0.0);
 
         hpx::cout
-            << "counter: " << c.get_name_sync()
+            << "counter: " << c.get_name(hpx::launch::sync)
             << ", value: " << value.get_value<double>()
             << std::endl;
     }

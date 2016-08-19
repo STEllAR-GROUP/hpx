@@ -37,6 +37,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_base.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -61,20 +62,20 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
     public:
         typedef context_base super_type;
-        typedef thread_state_enum result_type;
-        typedef thread_state_ex_enum arg_type;
         typedef context_base::thread_id_repr_type thread_id_repr_type;
+        typedef boost::intrusive_ptr<threads::thread_data> thread_id_type;
 
-        typedef util::unique_function_nonser<
-            thread_state_enum(thread_state_ex_enum)
-        > functor_type;
+        typedef std::pair<thread_state_enum, thread_id_type> result_type;
+        typedef thread_state_ex_enum arg_type;
+
+        typedef util::unique_function_nonser<result_type(arg_type)> functor_type;
 
         typedef boost::intrusive_ptr<coroutine_impl> pointer;
 
         coroutine_impl(functor_type&& f, naming::id_type&& target,
-            thread_id_repr_type id, std::ptrdiff_t stack_size)
+                thread_id_repr_type id, std::ptrdiff_t stack_size)
           : context_base(*this, stack_size, id)
-          , m_result_last(thread_state_enum::unknown)
+          , m_result_last(std::make_pair(thread_state_enum::unknown, nullptr))
           , m_arg(nullptr)
           , m_result(nullptr)
           , m_fun(std::move(f))

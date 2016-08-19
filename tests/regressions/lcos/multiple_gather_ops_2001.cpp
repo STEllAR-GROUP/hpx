@@ -31,7 +31,7 @@ int hpx_main(int argc, char* argv[])
         {
             hpx::future<std::vector<boost::uint32_t> > overall_result =
                 hpx::lcos::gather_here(gather_basename, std::move(value),
-                    hpx::get_num_localities_sync(), i);
+                    hpx::get_num_localities(hpx::launch::sync), i);
 
             std::vector<boost::uint32_t> sol = overall_result.get();
 

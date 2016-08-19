@@ -182,13 +182,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
 #if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
-        void count_down() throw()
+        void count_down() HPX_NOEXCEPT
         {
             HPX_ASSERT(m_operation_counter);
             --m_operation_counter;
         }
 
-        void count_up() throw()
+        void count_up() HPX_NOEXCEPT
         {
             ++m_operation_counter;
         }
@@ -221,7 +221,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
          * returns 'is_ready()'.
          * Nothrow.
          */
-        bool signal() throw()
+        bool signal() HPX_NOEXCEPT
         {
             HPX_ASSERT(!running() && !exited());
             HPX_ASSERT(m_wait_counter);
@@ -412,7 +412,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // Cannot be called if there are pending operations.
         // It follows that cannot be called from 'this'.
         // Nothrow.
-        void exit() throw()
+        void exit() HPX_NOEXCEPT
         {
             HPX_ASSERT(!pending());
             HPX_ASSERT(is_ready());
@@ -433,7 +433,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
         // Nothrow.
-        ~context_base() throw()
+        ~context_base() HPX_NOEXCEPT
         {
             HPX_ASSERT(!running());
             try {
@@ -559,11 +559,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
         // Nothrow.
-        void do_return(context_exit_status status, boost::exception_ptr& info) throw()
+        void do_return(context_exit_status status, boost::exception_ptr && info)
+            HPX_NOEXCEPT
         {
             HPX_ASSERT(status != ctx_not_exited);
             HPX_ASSERT(m_state == ctx_running);
-            m_type_info = info;
+            m_type_info = std::move(info);
             m_state = ctx_exited;
             m_exit_status = status;
             do_yield();
@@ -572,7 +573,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     protected:
 
         // Nothrow.
-        void do_yield() throw()
+        void do_yield() HPX_NOEXCEPT
         {
             swap_context(*this, m_caller, detail::yield_hint());
         }

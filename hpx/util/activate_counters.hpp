@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -44,11 +44,27 @@ namespace hpx { namespace util
         typedef std::vector<performance_counters::counter_value>
             sync_counter_values_type;
 
-        async_counter_values_type
-        evaluate_counters_async(bool reset = false, error_code& ec = throws);
+        async_counter_values_type evaluate_counters(launch::async_policy,
+            bool reset = false, error_code& ec = throws);
 
-        sync_counter_values_type
-        evaluate_counters_sync(bool reset = false, error_code& ec = throws);
+        sync_counter_values_type evaluate_counters(launch::sync_policy,
+            bool reset = false, error_code& ec = throws);
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        async_counter_values_type evaluate_counters_async(bool reset = false,
+            error_code& ec = throws)
+        {
+            return evaluate_counters(launch::async, reset, ec);
+        }
+
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        sync_counter_values_type evaluate_counters_sync(bool reset = false,
+            error_code& ec = throws)
+        {
+            return evaluate_counters(launch::sync, reset, ec);
+        }
+#endif
 
         std::string name(std::size_t i) const
         {

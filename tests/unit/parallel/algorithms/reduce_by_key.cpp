@@ -22,7 +22,7 @@
 //
 #include "sort_tests.hpp"
 //
-//#define EXTRA_DEBUG
+#define EXTRA_DEBUG
 //
 namespace debug {
     template<typename T>
@@ -140,7 +140,7 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
         debug::output("key range", keys.begin(), result.first);
         debug::output("val range", values.begin(), result.second);
         debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         throw std::string("Problem");
     }
     HPX_TEST(is_equal);
 }
@@ -229,7 +229,7 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
         debug::output("key range", keys.begin(), result.first);
         debug::output("val range", values.begin(), result.second);
         debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         throw std::string("Problem");
     }
     HPX_TEST(is_equal);
 }
@@ -314,7 +314,7 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
         debug::output("key range", keys.begin(), result.first);
         debug::output("val range", values.begin(), result.second);
         debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         throw std::string("Problem");
     }
     HPX_TEST(is_equal);
 }

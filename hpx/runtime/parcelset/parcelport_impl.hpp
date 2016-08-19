@@ -199,10 +199,18 @@ namespace hpx { namespace parcelset
         {
             HPX_ASSERT(dest.type() == type());
 
-            // enqueue the outgoing parcel ...
-            enqueue_parcel(dest, std::move(p), std::move(f));
+            if (!connection_handler_traits<ConnectionHandler>::
+                use_connection_cache::value)
+            {
+                send_parcel_immediate(dest, std::move(p), std::move(f));
+            }
+            else
+            {
+                // enqueue the outgoing parcel ...
+                enqueue_parcel(dest, std::move(p), std::move(f));
 
-            get_connection_and_send_parcels(dest);
+                get_connection_and_send_parcels(dest);
+            }
         }
 
         void put_parcels(locality const& dest, std::vector<parcel> parcels,
@@ -224,11 +232,22 @@ namespace hpx { namespace parcelset
                     parcels[i].destination_locality());
             }
 #endif
+            if (!connection_handler_traits<ConnectionHandler>::
+                use_connection_cache::value)
+            {
+                for (std::size_t i = 0; i != parcels.size(); ++i)
+                {
+                    send_parcel_immediate(dest, std::move(parcels[i]),
+                        std::move(handlers[i]));
+                }
+            }
+            else
+            {
+                // enqueue the outgoing parcels ...
+                enqueue_parcels(dest, std::move(parcels), std::move(handlers));
 
-            // enqueue the outgoing parcels ...
-            enqueue_parcels(dest, std::move(parcels), std::move(handlers));
-
-            get_connection_and_send_parcels(dest);
+                get_connection_and_send_parcels(dest);
+            }
         }
 
         void send_early_parcel(locality const & dest, parcel p)
@@ -612,6 +631,49 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
+        void send_parcel_immediate(locality const& locality_id, parcel p,
+            write_handler_type handler)
+        {
+            // If we are stopped already, discard pending parcels
+            if (hpx::is_stopped()) return;
+
+            error_code ec;
+            std::shared_ptr<connection> sender_connection =
+                connection_handler().create_connection(locality_id, ec);
+
+#if defined(HPX_DEBUG)
+            // verify the connection points to the right destination
+            HPX_ASSERT(locality_id == sender_connection->destination());
+            sender_connection->verify(locality_id);
+#endif
+
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+            sender_connection->set_state(parcelport_connection::state_send_pending);
+#endif
+            // encode the parcels
+            std::size_t num_parcels = encode_parcels(&p, 1,
+                    sender_connection->buffer_,
+                    archive_flags_,
+                    this->get_max_outbound_message_size());
+
+            using hpx::parcelset::detail::call_for_each;
+            using hpx::util::placeholders::_1;
+            using hpx::util::placeholders::_2;
+            using hpx::util::placeholders::_3;
+            HPX_ASSERT(num_parcels == 1);
+            {
+                ++operations_in_flight_;
+
+                // send the parcel
+                sender_connection->async_write(
+                    util::bind(util::one_shot(handler),
+                        _1,  std::move(p)),
+                    util::bind(&parcelport_impl::immediate_send_done,
+                        this, _1, _2, _3));
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         void get_connection_and_send_parcels(
             locality const& locality_id, bool background = false)
         {
@@ -682,6 +744,20 @@ namespace hpx { namespace parcelset
             }
         }
 
+        void immediate_send_done(
+            boost::system::error_code const& ec,
+            locality const& locality_id,
+            std::shared_ptr<connection> sender_connection)
+        {
+            HPX_ASSERT(operations_in_flight_ != 0);
+            --operations_in_flight_;
+
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+            sender_connection->set_state(parcelport_connection::state_scheduled_thread);
+#endif
+        }
+
+
         void send_pending_parcels_trampoline(
             boost::system::error_code const& ec,
             locality const& locality_id,
@@ -691,7 +767,7 @@ namespace hpx { namespace parcelset
             --operations_in_flight_;
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            client_connection->set_state(parcelport_connection::state_scheduled_thread);
+            sender_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif
             if (!ec)
             {

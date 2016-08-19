@@ -199,7 +199,7 @@ namespace hpx { namespace components
             if (!registered_name_.empty())
             {
                 std::string name = std::move(registered_name_);
-                agas::unregister_name_sync(name, ec);
+                agas::unregister_name(launch::sync, name, ec);
             }
         }
 
@@ -519,7 +519,7 @@ namespace hpx { namespace components
         static void register_as_helper(Derived && f,
             std::string const& symbolic_name)
         {
-            hpx::agas::register_name(symbolic_name, f.get());
+            hpx::agas::register_name(launch::sync, symbolic_name, f.get());
         }
 
     public:

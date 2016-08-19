@@ -151,10 +151,6 @@ namespace hpx
                     if (filter.get() != nullptr)
                         archive_flags |= serialization::enable_compression;
 
-                    // Get the chunk size from the allocator if it supports it
-                    size_t chunk_default = hpx::traits::default_chunk_size<
-                            typename Buffer::allocator_type
-                        >::call(buffer.data_.get_allocator());
 
                     // preallocate data
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
@@ -164,7 +160,7 @@ namespace hpx
                         arg_size += ps[parcels_sent].size();
                     }
 
-                    buffer.data_.reserve((std::max)(chunk_default, arg_size));
+                    buffer.data_.reserve(arg_size);
 
                     // mark start of serialization
                     util::high_resolution_timer timer;

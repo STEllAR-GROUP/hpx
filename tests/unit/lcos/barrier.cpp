@@ -74,12 +74,13 @@ void remote_test_multiple(boost::program_options::variables_map& vm)
     {
         // create the barrier, register it with AGAS
         barrier b = barrier::create(here, localities.size());
-        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
+        HPX_TEST(hpx::agas::register_name(hpx::launch::sync, barrier_test_name,
+            b.get_id()));
 
         for (std::size_t i = 0; i != iterations; ++i)
             b.wait();
 
-        HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name));
+        HPX_TEST(hpx::agas::unregister_name(hpx::launch::sync, barrier_test_name));
     }
     else
     {
@@ -111,8 +112,8 @@ void remote_test_single(boost::program_options::variables_map& vm)
     if (hpx::find_root_locality() == here)
     {
         outer = barrier::create(here, localities.size());
-        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name_outer,
-            outer.get_id()));
+        HPX_TEST(hpx::agas::register_name(hpx::launch::sync,
+            barrier_test_name_outer, outer.get_id()));
     }
     else
     {
@@ -128,11 +129,13 @@ void remote_test_single(boost::program_options::variables_map& vm)
         {
             // create the barrier, register it with AGAS
             barrier b = barrier::create(here, localities.size());
-            HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
+            HPX_TEST(hpx::agas::register_name(hpx::launch::sync,
+                barrier_test_name, b.get_id()));
 
             b.wait();
 
-            HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name));
+            HPX_TEST(hpx::agas::unregister_name(hpx::launch::sync,
+                barrier_test_name));
         }
         else
         {
@@ -145,7 +148,8 @@ void remote_test_single(boost::program_options::variables_map& vm)
         outer.wait();
     }
 
-    HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name_outer));
+    HPX_TEST(hpx::agas::unregister_name(hpx::launch::sync,
+        barrier_test_name_outer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

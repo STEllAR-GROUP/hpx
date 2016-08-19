@@ -70,7 +70,7 @@ namespace hpx { namespace components
             if (gid_)
             {
                 error_code ec;
-                agas::unbind_sync(gid_, 1, ec);
+                agas::unbind(launch::sync, gid_, 1, ec);
             }
         }
 
@@ -161,7 +161,8 @@ namespace hpx { namespace components
                     gid_ = assign_gid;
                     naming::detail::strip_credits_from_gid(gid_);
 
-                    if (!agas::bind_sync(gid_, addr, appl.get_locality_id()))
+                    if (!agas::bind(launch::sync, gid_, addr,
+                            appl.get_locality_id()))
                     {
                         std::ostringstream strm;
                         strm << "failed to rebind id " << gid_

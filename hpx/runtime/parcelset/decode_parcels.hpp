@@ -86,15 +86,14 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Parcelport, typename Buffer>
-    void decode_message(
+    void decode_message_with_chunks(
         Parcelport & pp
       , Buffer buffer
       , std::size_t parcel_count
+      , std::vector<serialization::serialization_chunk> &chunks
       , std::size_t num_thread = -1
     )
     {
-        std::vector<serialization::serialization_chunk> chunks(
-            decode_chunks(buffer));
         boost::uint64_t inbound_data_size = buffer.data_size_;
 
         // protect from un-handled exceptions bubbling up
@@ -184,6 +183,21 @@ namespace hpx { namespace parcelset
                 << "decode_message: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Parcelport, typename Buffer>
+    void decode_message(
+        Parcelport & pp
+      , Buffer buffer
+      , std::size_t parcel_count
+      , std::size_t num_thread = -1
+    )
+    {
+        std::vector<serialization::serialization_chunk>
+            chunks(decode_chunks(buffer));
+        decode_message_with_chunks(pp, std::move(buffer),
+            parcel_count, chunks, num_thread);
     }
 
     template <typename Parcelport, typename Buffer>

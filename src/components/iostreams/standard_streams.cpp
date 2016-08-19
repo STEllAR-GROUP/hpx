@@ -67,7 +67,7 @@ namespace hpx { namespace iostreams { namespace detail
 //         if (agas::is_console())
 //         {
 //             // now unregister the object from AGAS
-//             agas::unregister_name_sync(name);
+//             agas::unregister_name(launch::sync, name);
 //         }
 //     }
 }}}

@@ -413,7 +413,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
-                    [pred, proj](zip_iterator part_begin, std::size_t part_size)
+                    [pred, proj, flags]
+                        (zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
                     {
                         std::size_t curr = 0;
@@ -538,7 +539,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter, typename F,
-        typename Proj,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
@@ -551,7 +552,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
     copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f,
-        Proj && proj)
+        Proj && proj = Proj())
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter>::value),
@@ -573,25 +574,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 first, last, dest, std::forward<F>(f),
                 std::forward<Proj>(proj)));
     }
-
-    /// \cond NOINTERNAL
-    template <typename ExPolicy, typename InIter, typename OutIter, typename F,
-    HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_indirect_callable<
-            F, traits::projected<util::projection_identity, InIter>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
-    >::type
-    copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f)
-    {
-        return copy_if(std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<F>(f), util::projection_identity());
-    }
-    /// \endcond
 }}}
 
 #endif

@@ -17,19 +17,15 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstdint>
+#include <utility>
 
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
     struct HPX_EXPORT threadmanager_base;
-    class HPX_EXPORT thread_data;
 
     template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl;
-
-    typedef thread_state_enum thread_function_sig(thread_state_ex_enum);
-    typedef util::unique_function_nonser<thread_function_sig>
-        thread_function_type;
 
     class HPX_EXPORT executor;
 
@@ -39,8 +35,13 @@ namespace hpx { namespace threads
     typedef coroutines::detail::coroutine_impl thread_self_impl_type;
 
     typedef void * thread_id_repr_type;
-
     typedef boost::intrusive_ptr<thread_data> thread_id_type;
+
+    typedef std::pair<thread_state_enum, thread_id_type> thread_result_type;
+    typedef thread_state_ex_enum thread_arg_type;
+
+    typedef thread_result_type thread_function_sig(thread_arg_type);
+    typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
 
     HPX_API_EXPORT void intrusive_ptr_add_ref(thread_data* p);
     HPX_API_EXPORT void intrusive_ptr_release(thread_data* p);

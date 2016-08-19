@@ -912,7 +912,7 @@ namespace hpx { namespace performance_counters
         // register the canonical name with AGAS
         std::string name(complemented_info.fullname_);
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
-        agas::register_name_sync(name, id, ec);
+        agas::register_name(launch::sync, name, id, ec);
         if (ec) return status_invalid_data;
 
         if (&ec != &throws)
@@ -937,7 +937,7 @@ namespace hpx { namespace performance_counters
 
         // unregister this counter from AGAS
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
-        agas::unregister_name_sync(name, ec);
+        agas::unregister_name(launch::sync, name, ec);
         if (ec) {
             LPCS_(warning) << ( boost::format("failed to remove counter %s")
                 % complemented_info.fullname_);

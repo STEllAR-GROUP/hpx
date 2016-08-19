@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/throw_exception.hpp>
@@ -179,12 +180,53 @@ namespace hpx
     ///
     template <typename Component>
     std::shared_ptr<Component>
-    get_ptr_sync(naming::id_type const& id, error_code& ec = throws)
+    get_ptr(launch::sync_policy, naming::id_type const& id,
+        error_code& ec = throws)
     {
         hpx::future<std::shared_ptr<Component> > ptr =
             get_ptr<Component>(id);
         return ptr.get(ec);
     }
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+    /// \brief Returns the pointer to the underlying memory of a component
+    ///
+    /// The function hpx::get_ptr_sync can be used to extract the pointer to
+    /// the underlying memory of a given component.
+    ///
+    /// \param id  [in] The global id of the component for which the pointer
+    ///            to the underlying memory should be retrieved.
+    /// \param ec  [in,out] this represents the error status on exit, if this
+    ///            is pre-initialized to \a hpx#throws the function will throw
+    ///            on error instead.
+    ///
+    /// \tparam    The only template parameter has to be the type of the
+    ///            server side component.
+    ///
+    /// \returns   This function returns the pointer to the underlying memory
+    ///            for the component instance with the given \a id.
+    ///
+    /// \note      This function will successfully return the requested result
+    ///            only if the given component is currently located on the the
+    ///            requesting locality. Otherwise the function will raise and
+    ///            error.
+    ///
+    /// \note      As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///            function doesn't throw but returns the result code using the
+    ///            parameter \a ec. Otherwise it throws an instance of
+    ///            hpx::exception.
+    ///
+    /// \note     This functions is deprecated, it will be removed in a future
+    ///           version of HPX.
+    ///
+    template <typename Component>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+    std::shared_ptr<Component>
+    get_ptr_sync(naming::id_type const& id, error_code& ec = throws)
+    {
+        return get_ptr(launch::sync, id, ec);
+    }
+#endif
 }
 
 #endif
