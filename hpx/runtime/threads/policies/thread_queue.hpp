@@ -15,6 +15,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -36,6 +37,7 @@
 #include <mutex>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std
@@ -906,6 +908,62 @@ namespace hpx { namespace threads { namespace policies
                     schedule_thread((*it).get());
                 }
             }
+        }
+
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const
+        {
+            std::uint64_t count = thread_map_count_;
+            if (state == terminated)
+            {
+                count = terminated_items_count_;
+            }
+            else if (state == unknown)
+            {
+                count = thread_map_count_ + terminated_items_count_;
+            }
+            else if (state == staged)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_queue::iterate_threads",
+                    "can't iterate over thread ids of staged threads");
+                return false;
+            }
+
+            std::vector<thread_id_type> ids;
+            ids.reserve(count);
+
+            if (state == unknown)
+            {
+                std::lock_guard<mutex_type> lk(mtx_);
+                thread_map_type::const_iterator end =  thread_map_.end();
+                for (thread_map_type::const_iterator it = thread_map_.begin();
+                     it != end; ++it)
+                {
+                    ids.push_back(*it);
+                }
+            }
+            else
+            {
+                std::lock_guard<mutex_type> lk(mtx_);
+                thread_map_type::const_iterator end =  thread_map_.end();
+                for (thread_map_type::const_iterator it = thread_map_.begin();
+                     it != end; ++it)
+                {
+                    if ((*it)->get_state().state() == state)
+                        ids.push_back(*it);
+                }
+            }
+
+            // now invoke callback function for all matching threads
+            for (thread_id_type const& id : ids)
+            {
+                if (!f(id))
+                    return false;       // stop iteration
+            }
+
+            return true;
         }
 
         /// This is a function which gets called periodically by the thread

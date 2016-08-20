@@ -255,6 +255,14 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
+    bool thread_pool<Scheduler>::enumerate_threads(
+        util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state) const
+    {
+        return sched_.Scheduler::enumerate_threads(f, state);
+    }
+
+    template <typename Scheduler>
     void thread_pool<Scheduler>::reset_thread_distribution()
     {
         return sched_.Scheduler::reset_thread_distribution();

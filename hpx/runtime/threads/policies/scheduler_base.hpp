@@ -19,6 +19,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #endif
@@ -255,6 +256,11 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
+
+        // Enumerate all matching threads
+        virtual bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const = 0;
 
         virtual void abort_all_suspended_threads() = 0;
 

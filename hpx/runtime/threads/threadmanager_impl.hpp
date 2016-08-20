@@ -154,6 +154,11 @@ namespace hpx { namespace threads
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1), bool reset = false) const;
 
+        // Enumerate all matching threads
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const;
+
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
         //        supplying the wait_abort extended state flag
