@@ -20,9 +20,6 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    template <typename Function>
-    struct init_registration;
-
     template <typename VTable, typename T>
     struct serializable_function_registration;
 
@@ -34,16 +31,15 @@ namespace hpx { namespace util { namespace detail
         char const* name;
 
         template <typename T>
-        HPX_CONSTEXPR serializable_function_vtable(construct_vtable<T>) HPX_NOEXCEPT
+        serializable_function_vtable(construct_vtable<T>) HPX_NOEXCEPT
           : VTable(construct_vtable<T>())
           , serializable_vtable(construct_vtable<T>())
-          , name((init_registration<
-                    serializable_function_registration<VTable, T>
-                >::g.register_function(), this->empty
-                  ? "empty" : get_function_name<
-                        serializable_function_registration<VTable, T>
-                    >()))
-        {}
+          , name(this->empty
+              ? "empty"
+              : get_function_name<serializable_function_registration<VTable, T>>())
+        {
+            function_registration<VTable, T> auto_register;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -53,27 +49,6 @@ namespace hpx { namespace util { namespace detail
         typedef serializable_function_vtable<VTable> first_type;
         typedef T second_type;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // registration code for serialization
-    template <typename VTable, typename T>
-    struct init_registration<
-        serializable_function_registration<VTable, T>
-    >
-    {
-        static automatic_function_registration<
-            serializable_function_registration<VTable, T>
-        > g;
-    };
-
-    template <typename VTable, typename T>
-    automatic_function_registration<
-        serializable_function_registration<VTable, T>
-    > init_registration<
-        serializable_function_registration<VTable, T>
-    >::g =  automatic_function_registration<
-                serializable_function_registration<VTable, T>
-            >();
 }}}
 
 // Pseudo registration for empty functions.
@@ -97,18 +72,5 @@ namespace hpx { namespace util { namespace detail
         }
     };
 }}}
-
-namespace hpx { namespace traits
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename VTable, typename Sig>
-    struct needs_automatic_registration<
-        hpx::util::detail::serializable_function_registration<
-            VTable
-          , hpx::util::detail::empty_function<Sig>
-        >
-    > : std::false_type
-    {};
-}}
 
 #endif

@@ -48,41 +48,20 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT function_registration_info_base
-    {
-        virtual void const* get_vtable() const = 0;
-
-        virtual ~function_registration_info_base() {}
-    };
-
     template <typename VTable, typename T>
-    struct function_registration_info : function_registration_info_base
-    {
-        virtual void const* get_vtable() const
-        {
-            return detail::get_vtable<VTable, T>();
-        }
-    };
-
-    template <typename VTablePair>
     struct function_registration
     {
-        typedef function_registration_info_base base_type;
-
         static void * create()
         {
-            static function_registration_info<
-                typename VTablePair::first_type,
-                typename VTablePair::second_type
-            > ri;
-            return &ri;
+            return const_cast<VTable*>(detail::get_vtable<VTable, T>());
         }
 
         function_registration()
         {
+            typedef serializable_function_registration<VTable, T> vtable_pair;
             hpx::serialization::detail::polymorphic_intrusive_factory::instance().
                 register_class(
-                    detail::get_function_name<VTablePair>()
+                    detail::get_function_name<vtable_pair>()
                   , &function_registration::create
                 );
         }
@@ -91,44 +70,10 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable>
     VTable const* get_vtable(std::string const& name)
     {
-        detail::function_registration_info_base *
-            p(
-                hpx::serialization::detail::polymorphic_intrusive_factory::instance().
-                    create<function_registration_info_base>(name)
-            );
-
-        return static_cast<VTable const*>(p->get_vtable());
+        return
+            hpx::serialization::detail::polymorphic_intrusive_factory::instance().
+                create<VTable const>(name);
     }
-
-    template <
-        typename VTablePair
-      , typename Enable =
-            typename traits::needs_automatic_registration<VTablePair>::type
-    >
-    struct automatic_function_registration
-    {
-        automatic_function_registration()
-        {
-            function_registration<VTablePair> auto_register;
-        }
-
-        automatic_function_registration& register_function()
-        {
-            return *this;
-        }
-    };
-
-    template <typename VTablePair>
-    struct automatic_function_registration<VTablePair, std::false_type>
-    {
-        automatic_function_registration()
-        {}
-
-        automatic_function_registration& register_function()
-        {
-            return *this;
-        }
-    };
 }}}
 
 #endif

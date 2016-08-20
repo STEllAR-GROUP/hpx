@@ -117,12 +117,6 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_CONTINUATION_REGISTER_UNIQUE_FUNCTION_FACTORY(VTable, Name)       \
-    static ::hpx::util::detail::function_registration<VTable> const           \
-        BOOST_PP_CAT(Name, _unique_function_factory_registration) =           \
-            ::hpx::util::detail::function_registration<VTable>();             \
-/**/
-
 #define HPX_DECLARE_GET_UNIQUE_FUNCTION_NAME(VTable, Name)                    \
     namespace hpx { namespace util { namespace detail {                       \
         template<> HPX_ALWAYS_EXPORT                                          \
@@ -165,10 +159,6 @@ namespace hpx { namespace traits
 /**/
 
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION(Sig, Functor, Name)                 \
-    HPX_CONTINUATION_REGISTER_UNIQUE_FUNCTION_FACTORY(                        \
-        BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
-            BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
-      , Name)                                                                 \
     HPX_DEFINE_GET_UNIQUE_FUNCTION_NAME(                                      \
         BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
             BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
