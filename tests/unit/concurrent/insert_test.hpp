@@ -13,6 +13,8 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <deque>
+#include <memory>
+#include <utility>
 
 #include "check_equal_containers.hpp"
 
@@ -63,4 +65,5 @@ bool test_range_insertion()
 
 }    //namespace test {
 
-#endif    //#ifndef BOOST_CONTAINER_TEST_INSERT_TEST_HPP
+#endif
+

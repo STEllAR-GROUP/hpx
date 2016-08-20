@@ -127,7 +127,8 @@ namespace hpx { namespace compute
             other.capacity_ = 0;
         }
 
-        vector(std::initializer_list<T> init, Allocator const& alloc)
+        vector(std::initializer_list<T> init,
+                Allocator const& alloc = Allocator())
           : size_(init.size())
           , capacity_(init.size())
           , alloc_(alloc)

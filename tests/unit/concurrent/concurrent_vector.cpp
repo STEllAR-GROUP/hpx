@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <memory>
+#include <utility>
 
 //Explicit instantiation to detect compilation errors
 template class hpx::concurrent::vector<test::movable_and_copyable_int,
@@ -81,43 +82,44 @@ void recursive_vector_test()    //Test for recursive types
 //     five,
 //     six
 // };
-//
-// template <class VoidAllocator>
-// struct GetAllocatorCont
-// {
-//     template <class ValueType>
-//     struct apply
-//     {
-//         typedef hpx::concurrent::vector<ValueType,
-//             typename allocator_traits<VoidAllocator>::
-//                 template portable_rebind_alloc<ValueType>::type
-//             > type;
-//     };
-// };
-//
-// template <class VoidAllocator>
-// int test_cont_variants()
-// {
-//     typedef typename GetAllocatorCont<VoidAllocator>::template apply<int>::type
-//         MyCont;
-//     typedef typename GetAllocatorCont<VoidAllocator>::template apply<
-//         test::movable_int>::type MyMoveCont;
-//     typedef typename GetAllocatorCont<VoidAllocator>::template apply<
-//         test::movable_and_copyable_int>::type MyCopyMoveCont;
-//     typedef typename GetAllocatorCont<VoidAllocator>::template apply<
-//         test::copyable_int>::type MyCopyCont;
-//
-//     if (test::vector_test<MyCont>())
-//         return 1;
-//     if (test::vector_test<MyMoveCont>())
-//         return 1;
-//     if (test::vector_test<MyCopyMoveCont>())
-//         return 1;
-//     if (test::vector_test<MyCopyCont>())
-//         return 1;
-//
-//     return 0;
-// }
+
+template <class VoidAllocator>
+struct GetAllocatorCont
+{
+    template <class ValueType>
+    struct apply
+    {
+        typedef hpx::concurrent::vector<
+                ValueType,
+                typename std::allocator_traits<VoidAllocator>::
+                    template rebind_alloc<ValueType>
+            > type;
+    };
+};
+
+template <class VoidAllocator>
+int test_cont_variants()
+{
+    typedef typename GetAllocatorCont<VoidAllocator>::
+        template apply<int>::type MyCont;
+    typedef typename GetAllocatorCont<VoidAllocator>::
+        template apply<test::movable_int>::type MyMoveCont;
+    typedef typename GetAllocatorCont<VoidAllocator>::
+        template apply<test::movable_and_copyable_int>::type MyCopyMoveCont;
+    typedef typename GetAllocatorCont<VoidAllocator>::
+        template apply<test::copyable_int>::type MyCopyCont;
+
+    if (test::vector_test<MyCont>())
+        return 1;
+    if (test::vector_test<MyMoveCont>())
+        return 1;
+    if (test::vector_test<MyCopyMoveCont>())
+        return 1;
+    if (test::vector_test<MyCopyCont>())
+        return 1;
+
+    return 0;
+}
 
 int hpx_main()
 {
@@ -143,26 +145,25 @@ int hpx_main()
             HPX_TEST_EQ(vector_int2[i], (int)i);
         }
     }
-//     recursive_vector_test();
-//     {
-//         //Now test move semantics
-//         hpx::concurrent::vector<recursive_vector> original;
-//         hpx::concurrent::vector<recursive_vector> move_ctor(boost::move(original));
-//         hpx::concurrent::vector<recursive_vector> move_assign;
-//         move_assign = boost::move(move_ctor);
-//         move_assign.swap(original);
-//     }
-//
-//     ////////////////////////////////////
-//     //    Testing allocator implementations
-//     ////////////////////////////////////
-//     //       std:allocator
-//     if (test_cont_variants<std::allocator<void>>())
-//     {
-//         std::cerr << "test_cont_variants< std::allocator<void> > failed"
-//                   << std::endl;
-//         return 1;
-//     }
+
+    recursive_vector_test();
+
+    {
+        // Now test move semantics
+        hpx::concurrent::vector<recursive_vector> original;
+        hpx::concurrent::vector<recursive_vector> move_ctor(std::move(original));
+        hpx::concurrent::vector<recursive_vector> move_assign;
+        move_assign = std::move(move_ctor);
+        move_assign.swap(original);
+    }
+
+    ////////////////////////////////////
+    // Testing allocator implementations
+    ////////////////////////////////////
+
+    //       std:allocator
+    HPX_TEST(!test_cont_variants<std::allocator<void>>());
+
 //     //       hpx::concurrent::allocator
 //     if (test_cont_variants<allocator<void>>())
 //     {

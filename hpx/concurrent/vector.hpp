@@ -70,11 +70,14 @@ namespace hpx { namespace concurrent
 
         typedef typename std::allocator_traits<Allocator>::
                 template rebind_alloc<std::pair<TType, bool> >
-            allocator_type;
+            base_allocator_type;
 
     public:
+        using value_type = TType;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
+        using allocator_type = Allocator;
+
         using iterator = vector_forward_iterator<TType, Allocator>;
         using const_iterator = vector_const_forward_iterator<TType, Allocator>;
         using reverse_iterator = vector_reverse_iterator<TType, Allocator>;
@@ -88,7 +91,9 @@ namespace hpx { namespace concurrent
         //--------------------------------------------------------------------
         vector();
 
-        vector(size_type count, TType const& value = TType(),
+        vector(size_type count, Allocator const& alloc = Allocator());
+
+        vector(size_type count, TType const& value,
             Allocator const& alloc = Allocator());
 
         //--------------------------------------------------------------------
@@ -98,7 +103,8 @@ namespace hpx { namespace concurrent
         ///
         /// @param Initialiser list
         //--------------------------------------------------------------------
-        vector(std::initializer_list<TType>&& in_initialObjects);
+        vector(std::initializer_list<TType>&& in_initialObjects,
+            Allocator const& alloc = Allocator());
         //--------------------------------------------------------------------
         /// Copy constructor that creates this as a copy of the given vector
         ///
@@ -107,6 +113,9 @@ namespace hpx { namespace concurrent
         /// @param Vector to copy
         //--------------------------------------------------------------------
         vector(const vector& rhs);
+
+        vector(const vector& rhs, Allocator const& alloc);
+
         //--------------------------------------------------------------------
         /// Copy assignment that creates this as a copy of the given vector
         ///
@@ -125,6 +134,9 @@ namespace hpx { namespace concurrent
         /// @param Vector to move
         //--------------------------------------------------------------------
         vector(vector&& rhs);
+
+        vector(vector&& rhs, Allocator const& alloc);
+
         //--------------------------------------------------------------------
         /// Move assignment that transfers ownership from the given vector
         ///
@@ -153,6 +165,11 @@ namespace hpx { namespace concurrent
         /// @param Object to add
         //--------------------------------------------------------------------
         void push_back(const TType& in_object);
+
+        void pop_back();
+
+        void shrink_to_fit() { /* do nothing */ }
+
         //--------------------------------------------------------------------
         /// @author S Downie
         ///
@@ -348,6 +365,13 @@ namespace hpx { namespace concurrent
         //--------------------------------------------------------------------
         void clear();
 
+        void swap(vector& other)
+        {
+            vector tmp = std::move(other);
+            other = std::move(*this);
+            *this = std::move(tmp);
+        }
+
     private:
         //--------------------------------------------------------------------
         /// Cleanup any elements that are marked for removal
@@ -357,7 +381,7 @@ namespace hpx { namespace concurrent
         void garbage_collect();
 
     private:
-        std::vector<std::pair<TType, bool>, allocator_type> container_;
+        std::vector<std::pair<TType, bool>, base_allocator_type> container_;
 
         std::atomic<size_type> size_;
         bool is_locked_ = false;
@@ -379,9 +403,17 @@ namespace hpx { namespace concurrent
     //--------------------------------------------------------------------
 
     template <typename TType, typename Allocator>
+    vector<TType, Allocator>::vector(size_type count, Allocator const& alloc)
+      : container_(count, std::make_pair(TType(), false), base_allocator_type(alloc))
+      , size_(count)
+      , lock_(mutex_, std::defer_lock)
+    {
+    }
+
+    template <typename TType, typename Allocator>
     vector<TType, Allocator>::vector(size_type count, TType const& value,
             Allocator const& alloc)
-      : container_(count, std::make_pair(value, false), allocator_type(alloc))
+      : container_(count, std::make_pair(value, false), base_allocator_type(alloc))
       , size_(count)
       , lock_(mutex_, std::defer_lock)
     {
@@ -390,8 +422,10 @@ namespace hpx { namespace concurrent
     //--------------------------------------------------------------------
     template <typename TType, typename Allocator>
     vector<TType, Allocator>::vector(
-        std::initializer_list<TType>&& in_initial_objects)
-      : size_(0)
+            std::initializer_list<TType>&& in_initial_objects,
+            Allocator const& alloc)
+      : container_(base_allocator_type(alloc))
+      , size_(0)
       , lock_(mutex_, std::defer_lock)
     {
         size_ = in_initial_objects.size();
@@ -407,6 +441,14 @@ namespace hpx { namespace concurrent
     template <typename TType, typename Allocator>
     vector<TType, Allocator>::vector(const vector& rhs)
       : container_(rhs.container_)
+      , size_(rhs.size_.load())
+      , lock_(mutex_, std::defer_lock)
+    {
+    }
+
+    template <typename TType, typename Allocator>
+    vector<TType, Allocator>::vector(const vector& rhs, Allocator const& alloc)
+      : container_(rhs.container_, alloc)
       , size_(rhs.size_.load())
       , lock_(mutex_, std::defer_lock)
     {
@@ -431,6 +473,15 @@ namespace hpx { namespace concurrent
     {
         rhs.size_ = 0;
     }
+
+    template <typename TType, typename Allocator>
+    vector<TType, Allocator>::vector(vector&& rhs, Allocator const& alloc)
+      : container_(std::move(rhs.container_), alloc)
+      , size_(rhs.size_.load())
+      , lock_(mutex_, std::defer_lock)
+    {
+        rhs.size_ = 0;
+    }
     //--------------------------------------------------------------------
     //--------------------------------------------------------------------
     template <typename TType, typename Allocator>
@@ -449,7 +500,7 @@ namespace hpx { namespace concurrent
     {
         std::unique_lock<recursive_mutex> l(mutex_);
         container_.push_back(
-            std::make_pair(std::forward<TType>(in_object), false));
+            std::make_pair(std::move(in_object), false));
         ++size_;
     }
     //--------------------------------------------------------------------
@@ -460,6 +511,23 @@ namespace hpx { namespace concurrent
         std::unique_lock<recursive_mutex> l(mutex_);
         container_.push_back(std::make_pair(in_object, false));
         ++size_;
+    }
+
+    template <typename TType, typename Allocator>
+    void vector<TType, Allocator>::pop_back()
+    {
+        std::unique_lock<recursive_mutex> l(mutex_);
+        if (!is_locked_)
+        {
+            container_.erase(container_.begin() + container_.size() - 1);
+        }
+        else
+        {
+            container_[container_.size() - 1].second = true;
+            requires_gc_ = true;
+        }
+
+        --size_;
     }
     //--------------------------------------------------------------------
     //--------------------------------------------------------------------
@@ -536,7 +604,7 @@ namespace hpx { namespace concurrent
             size_type index = 0;
             for (size_type i = 0; i < size; ++i)
             {
-                if (container_[i].second == false)
+                if (!container_[i].second)
                 {
                     if (++count == in_index)
                     {
@@ -720,7 +788,7 @@ namespace hpx { namespace concurrent
         const vector_forward_iterator<TType, Allocator>& in_it_erase)
     {
         std::unique_lock<recursive_mutex> l(mutex_);
-        if (is_locked_ == false)
+        if (!is_locked_)
         {
             container_.erase(container_.begin() + in_it_erase.get_index());
         }
@@ -730,7 +798,7 @@ namespace hpx { namespace concurrent
             requires_gc_ = true;
         }
 
-        size_--;
+        --size_;
 
         auto it_copy = in_it_erase;
         ++it_copy;
@@ -744,7 +812,7 @@ namespace hpx { namespace concurrent
         const vector_reverse_iterator<TType, Allocator>& in_it_erase)
     {
         std::unique_lock<recursive_mutex> l(mutex_);
-        if (is_locked_ == false)
+        if (!is_locked_)
         {
             container_.erase(container_.begin() + in_it_erase.get_index());
         }
@@ -754,7 +822,7 @@ namespace hpx { namespace concurrent
             requires_gc_ = true;
         }
 
-        size_--;
+        --size_;
 
         auto itCopy = in_it_erase;
         ++itCopy;
@@ -766,7 +834,7 @@ namespace hpx { namespace concurrent
     void vector<TType, Allocator>::clear()
     {
         std::unique_lock<recursive_mutex> l(mutex_);
-        if (is_locked_ == false)
+        if (!is_locked_)
         {
             container_.clear();
         }

@@ -9,11 +9,7 @@
 #ifndef HPX_CONTAINER_TEST_CHECK_EQUAL_CONTAINER_HPP
 #define HPX_CONTAINER_TEST_CHECK_EQUAL_CONTAINER_HPP
 
-// #include <boost/container/detail/config_begin.hpp>
-// #include <boost/container/detail/pair.hpp>
-// #include <boost/container/detail/mpl.hpp>
-// #include <boost/move/unique_ptr.hpp>
-
+#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -68,7 +64,7 @@ bool CheckEqual(const Pair1 &pair1, const Pair2 &pair2,
         CheckEqual(pair1.second, pair2.second);
 }
 
-//Function to check if both containers are equal
+// Function to check if both containers are equal
 template <class ContA, class ContB>
 bool CheckEqualContainers(const ContA &cont_a, const ContB &cont_b)
 {
@@ -127,6 +123,4 @@ bool CheckEqualPairContainers(
 
 }    //namespace test{
 
-// #include <boost/container/detail/config_end.hpp>
-
-#endif    //#ifndef BOOST_CONTAINER_TEST_CHECK_EQUAL_CONTAINER_HPP
+#endif
