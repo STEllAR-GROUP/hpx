@@ -147,8 +147,9 @@ namespace hpx { namespace parcelset {
             void operator()()
             {
                 preprocess_.reset();
-                hpx::serialization::output_archive archive(preprocess_);
-                archive << p_;
+                typedef hpx::serialization::output_archive archive_type;
+                std::shared_ptr<archive_type> archive(new archive_type(preprocess_));
+                (*archive) << p_;
 
                 // We are doing a fixed point iteration until we are sure that the
                 // serialization process requires nothing more to wait on ...
@@ -160,10 +161,10 @@ namespace hpx { namespace parcelset {
                 if(preprocess_.has_futures())
                 {
                     auto this_ = this->shared_from_this();
-                    preprocess_([this_](){ (*this_)(); });
+                    preprocess_([this_, archive](){ (*this_)(); });
                     return;
                 }
-                HPX_ASSERT(preprocess_.size() == archive.bytes_written());
+                HPX_ASSERT(preprocess_.size() == archive->bytes_written());
                 p_.size() = preprocess_.size();
                 p_.set_splitted_gids(std::move(preprocess_.splitted_gids_));
                 put_parcel_(std::move(p_));
