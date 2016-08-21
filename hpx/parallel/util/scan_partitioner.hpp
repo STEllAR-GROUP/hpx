@@ -68,8 +68,6 @@ namespace hpx { namespace parallel { namespace util
                 scoped_executor_parameters<parameters_type> scoped_param(
                     policy.parameters());
 
-                using hpx::util::placeholders::_1;
-
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
                 std::list<boost::exception_ptr> errors;
@@ -100,14 +98,10 @@ namespace hpx { namespace parallel { namespace util
 
                         hpx::shared_future<Result1> curr = workitems[1];
                         workitems[1] = dataflow(hpx::launch::sync,
-                            f2, workitems[0], curr
-                        );
+                            f2, workitems[0], curr);
 
-                        finalitems.push_back(dataflow(
-                            policy.executor(),
-                            hpx::util::bind(f3, first_, count_ - count, _1),
-                            workitems[0], curr)
-                        );
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, first_, count_ - count, workitems[0], curr));
                     }
 
                     std::size_t parts = workitems.size();
@@ -130,13 +124,8 @@ namespace hpx { namespace parallel { namespace util
 
                         workitems.push_back(dataflow(p, f2, prev, curr));
 
-                        finalitems.push_back(
-                            dataflow(
-                                policy.executor(),
-                                hpx::util::bind(f3, it, size, _1),
-                                prev, curr
-                            )
-                        );
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, it, size, prev, curr));
 
                         ++parts;
                     }
@@ -196,8 +185,6 @@ namespace hpx { namespace parallel { namespace util
                             scoped_executor_parameters
                         >(policy.parameters()));
 
-                using hpx::util::placeholders::_1;
-
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
                 std::list<boost::exception_ptr> errors;
@@ -228,14 +215,10 @@ namespace hpx { namespace parallel { namespace util
 
                         hpx::shared_future<Result1> curr = workitems[1];
                         workitems[1] = dataflow(hpx::launch::sync,
-                            f2, workitems[0], curr
-                        );
+                            f2, workitems[0], curr);
 
-                        finalitems.push_back(dataflow(
-                            policy.executor(),
-                            hpx::util::bind(f3, first_, count_ - count, _1),
-                            workitems[0], curr)
-                        );
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, first_, count_ - count, workitems[0], curr));
                     }
 
                     std::size_t parts = workitems.size();
@@ -258,13 +241,8 @@ namespace hpx { namespace parallel { namespace util
 
                         workitems.push_back(dataflow(p, f2, prev, curr));
 
-                        finalitems.push_back(
-                            dataflow(
-                                policy.executor(),
-                                hpx::util::bind(f3, it, size, _1),
-                                prev, curr
-                            )
-                        );
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, it, size, prev, curr));
 
                         ++parts;
                     }
