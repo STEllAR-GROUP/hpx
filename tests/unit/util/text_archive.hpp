@@ -5,6 +5,8 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 // text_archive
+#include <fstream>
+
 #include <boost/archive/text_oarchive.hpp>
 typedef boost::archive::text_oarchive test_oarchive;
 typedef std::ofstream test_ostream;
