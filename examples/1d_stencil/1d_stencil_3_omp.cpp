@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <iostream>
 #include <vector>
 
 #include <omp.h>

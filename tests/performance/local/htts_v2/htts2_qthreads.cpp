@@ -15,6 +15,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <iostream>
 
 typedef std::chrono::steady_clock BaseClock;
 

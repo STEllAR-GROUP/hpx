@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 #include "print_time_results.hpp"

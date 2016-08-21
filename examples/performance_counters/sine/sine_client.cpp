@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 
 #include <cstdint>
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 // This example demonstrates the creation and use of different types of

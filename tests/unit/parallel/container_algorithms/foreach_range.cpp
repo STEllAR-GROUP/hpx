@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 

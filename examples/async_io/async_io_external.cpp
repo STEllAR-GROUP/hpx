@@ -11,6 +11,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <iostream>
 #include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////

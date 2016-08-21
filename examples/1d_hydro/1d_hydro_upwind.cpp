@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <fstream>
+#include <iostream>
 #include <mutex>
 #include <vector>
 

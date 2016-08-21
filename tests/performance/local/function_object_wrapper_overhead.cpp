@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <iostream>
 
 #include "worker_timed.hpp"
 

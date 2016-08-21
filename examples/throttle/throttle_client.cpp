@@ -14,6 +14,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/format.hpp>
 
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>

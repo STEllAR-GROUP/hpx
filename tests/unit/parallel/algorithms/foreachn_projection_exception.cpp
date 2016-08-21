@@ -12,6 +12,7 @@
 #include <boost/atomic.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
