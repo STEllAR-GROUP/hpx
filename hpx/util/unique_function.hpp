@@ -12,14 +12,11 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/util/detail/basic_function.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/unique_function_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -117,52 +114,12 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DECLARE_GET_UNIQUE_FUNCTION_NAME(VTable, Name)                    \
-    namespace hpx { namespace util { namespace detail {                       \
-        template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_function_name<VTable>();                              \
-    }}}                                                                       \
-/**/
-
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(Sig, Functor, Name)     \
-    namespace hpx { namespace util { namespace detail {                       \
-        typedef                                                               \
-            serializable_function_registration<                               \
-                unique_function_vtable<Sig>                                   \
-              , std::decay<HPX_UTIL_STRIP(Functor)>::type                     \
-            >                                                                 \
-            BOOST_PP_CAT(BOOST_PP_CAT(__,                                     \
-                BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type);\
-    }}}                                                                       \
-    HPX_DECLARE_GET_UNIQUE_FUNCTION_NAME(                                     \
-        BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
-            BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
-        , Name)                                                               \
-    namespace hpx { namespace traits {                                        \
-        template <>                                                           \
-        struct needs_automatic_registration<                                  \
-            BOOST_PP_CAT(BOOST_PP_CAT(util::detail::__,                       \
-                BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)>\
-          : std::false_type                                                   \
-        {};                                                                   \
-    }}                                                                        \
-/**/
-
-#define HPX_DEFINE_GET_UNIQUE_FUNCTION_NAME(VTable, Name)                     \
-    namespace hpx { namespace util { namespace detail {                       \
-        template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_function_name<VTable>()                               \
-        {                                                                     \
-            return BOOST_PP_STRINGIZE(Name);                                  \
-        }                                                                     \
-    }}}                                                                       \
+    HPX_DECLARE_GET_FUNCTION_NAME(unique_function_vtable<Sig>, Functor, Name) \
 /**/
 
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION(Sig, Functor, Name)                 \
-    HPX_DEFINE_GET_UNIQUE_FUNCTION_NAME(                                      \
-        BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
-            BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
-      , Name)                                                                 \
+    HPX_DEFINE_GET_FUNCTION_NAME(unique_function_vtable<Sig>, Functor, Name)  \
 /**/
 
 #endif

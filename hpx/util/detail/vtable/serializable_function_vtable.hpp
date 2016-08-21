@@ -9,20 +9,16 @@
 #define HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_FUNCTION_VTABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/access.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/detail/empty_function.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
+#include <string>
 #include <type_traits>
 
 namespace hpx { namespace util { namespace detail
 {
-    template <typename VTable, typename T>
-    struct serializable_function_registration;
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable>
     struct serializable_function_vtable
@@ -34,43 +30,26 @@ namespace hpx { namespace util { namespace detail
         serializable_function_vtable(construct_vtable<T>) HPX_NOEXCEPT
           : VTable(construct_vtable<T>())
           , serializable_vtable(construct_vtable<T>())
-          , name(this->empty
-              ? "empty"
-              : get_function_name<serializable_function_registration<VTable, T>>())
+          , name(this->empty ? "empty" : get_function_name<VTable, T>())
         {
-            function_registration<VTable, T> auto_register;
+            hpx::serialization::detail::polymorphic_intrusive_factory::instance().
+                register_class(name, &serializable_function_vtable::get_vtable<T>);
+        }
+
+        template <typename T>
+        static void* get_vtable()
+        {
+            return const_cast<VTable*>(detail::get_vtable<VTable, T>());
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename VTable, typename T>
-    struct serializable_function_registration
+    template <typename VTable>
+    VTable const* get_vtable(std::string const& name)
     {
-        typedef serializable_function_vtable<VTable> first_type;
-        typedef T second_type;
-    };
-}}}
-
-// Pseudo registration for empty functions.
-// We don't want to serialize empty functions.
-namespace hpx { namespace util { namespace detail
-{
-    template <typename VTable, typename Sig>
-    struct get_function_name_impl<
-        hpx::util::detail::serializable_function_registration<
-            VTable
-          , hpx::util::detail::empty_function<Sig>
-        >
-    >
-    {
-        static char const * call()
-        {
-            hpx::throw_exception(bad_function_call,
-                "empty function object should not be used",
-                "get_function_name<empty_function>");
-            return "";
-        }
-    };
+        return
+            hpx::serialization::detail::polymorphic_intrusive_factory::instance().
+                create<VTable const>(name);
+    }
 }}}
 
 #endif
