@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <mutex>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>

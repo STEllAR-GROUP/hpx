@@ -24,6 +24,7 @@
 #include <iostream>
 #include <iterator>
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>

@@ -29,6 +29,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <sstream>
 #include <string>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp

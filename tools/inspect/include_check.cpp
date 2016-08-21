@@ -39,6 +39,7 @@ namespace boost
       { "(\\bstd\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper", "functional" },
       { "(\\bstd\\s*::\\s*(c?ref)\\b)", "std::\\2", "functional" },
       { "(\\bstd\\s*::\\s*(u?int[0-9]+_t)\\b)", "std::\\2", "cstdint" },
+      { "(\\bstd\\s*::\\s*((i|o)?stringstream)\\b)", "std::\\2", "sstream" },
       // cstddef
       { "(\\bstd\\s*::\\s*size_t\\b)", "std::size_t", "cstddef" },
       { "(\\bstd\\s*::\\s*ptrdiff_t\\b)", "std::ptrdiff_t", "cstddef" },

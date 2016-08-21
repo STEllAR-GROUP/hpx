@@ -11,6 +11,8 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <sstream>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
 HPX_REGISTER_ACTION_ID(

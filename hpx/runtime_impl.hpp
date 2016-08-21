@@ -32,6 +32,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <sstream>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
