@@ -47,10 +47,10 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/ref.hpp>
 
 #include <cstdint>
 #include <cstdlib>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -595,7 +595,7 @@ void register_worker(registration_header const& header)
             = new util::unique_function_nonser<void()>(
             util::bind(
                 util::one_shot(f)
-              , boost::ref(get_big_boot_barrier())
+              , std::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(prefix)
               , dest
@@ -779,7 +779,7 @@ void register_worker_security(registration_header_security const& header)
                 new util::unique_function_nonser<void()>(
             util::bind(
                 util::one_shot(&big_boot_barrier::apply)
-              , boost::ref(get_big_boot_barrier())
+              , std::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(header.prefix)
               , notify_worker_security_action()

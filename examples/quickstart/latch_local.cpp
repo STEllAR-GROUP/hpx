@@ -9,6 +9,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <functional>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

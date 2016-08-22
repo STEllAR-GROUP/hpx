@@ -12,6 +12,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -472,7 +473,7 @@ void test_wait_callback()
     hpx::lcos::shared_future<int> fi = pi.get_future();
 
     fi.then(&wait_callback);
-    hpx::thread t(&promise_set_value, boost::ref(pi));
+    hpx::thread t(&promise_set_value, std::ref(pi));
 
     fi.wait();
 
@@ -498,7 +499,7 @@ void test_wait_callback_with_timed_wait()
     hpx::lcos::shared_future<int> fi = pi.get_future();
 
     hpx::lcos::shared_future<void> fv =
-        fi.then(hpx::util::bind(&do_nothing_callback, boost::ref(pi)));
+        fi.then(hpx::util::bind(&do_nothing_callback, std::ref(pi)));
 
     int state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));

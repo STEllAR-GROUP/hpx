@@ -13,6 +13,7 @@
 #include <boost/atomic.hpp>
 
 #include <chrono>
+#include <functional>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -121,7 +122,7 @@ void test_apply_with_executor(Executor& exec)
     std::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
     result_cv.wait_for(l, std::chrono::seconds(1),
         hpx::util::bind(std::equal_to<boost::int32_t>(),
-            boost::ref(accumulator), 18));
+            std::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
 }

@@ -13,8 +13,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/ref.hpp>
-
+#include <functional>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -259,11 +258,11 @@ void make_tuple_test()
 
     A a = A(); B b;
     const A ca = a;
-    hpx::util::make_tuple(boost::cref(a), b);
-    hpx::util::make_tuple(boost::ref(a), b);
-    hpx::util::make_tuple(boost::ref(a), boost::cref(b));
+    hpx::util::make_tuple(std::cref(a), b);
+    hpx::util::make_tuple(std::ref(a), b);
+    hpx::util::make_tuple(std::ref(a), std::cref(b));
 
-    hpx::util::make_tuple(boost::ref(ca));
+    hpx::util::make_tuple(std::ref(ca));
 
     // the result of make_tuple is assignable:
     HPX_TEST(hpx::util::make_tuple(2, 4, 6) ==

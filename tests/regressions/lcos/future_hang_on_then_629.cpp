@@ -14,6 +14,7 @@
 #include <boost/random.hpp>
 #include <boost/format.hpp>
 
+#include <functional>
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -134,7 +135,7 @@ double null_tree(
                                         );
 
         futures.push_back(f.then
-            (hpx::util::bind(&null_callback, boost::ref(dd), j,
+            (hpx::util::bind(&null_callback, std::ref(dd), j,
                 hpx::util::placeholders::_1)));
     }
 

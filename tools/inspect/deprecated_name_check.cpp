@@ -57,7 +57,9 @@ namespace boost
         "std::enable_shared_from_this" },
       { "(\\bboost\\s*::\\s*bind\\b)", "hpx::util::bind" },
       { "(\\bboost\\s*::\\s*unique_lock\\b)", "std::unique_lock" },
-      { "(\\bboost\\s*::\\s*chrono)", "std::chrono" },
+      { "(\\bboost\\s*::\\s*chrono\\b)", "std::chrono" },
+      { "(\\bboost\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper" },
+      { "(\\bboost\\s*::\\s*(c?ref)\\b)", "std::\\2" },
       { "(\\bNULL\\b)", "nullptr" },
       { nullptr, nullptr }
     };
