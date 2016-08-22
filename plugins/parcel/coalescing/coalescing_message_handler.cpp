@@ -64,20 +64,15 @@ namespace hpx { namespace plugins { namespace parcel
     {
         std::size_t get_num_messages(std::size_t num_messages)
         {
-            if (std::size_t(-1) != num_messages)
-                return num_messages;
-
             return boost::lexical_cast<std::size_t>(hpx::get_config_entry(
-                "hpx.plugins.coalescing_message_handler.num_messages", 50));
+                "hpx.plugins.coalescing_message_handler.num_messages",
+                num_messages));
         }
 
         std::size_t get_interval(std::size_t interval)
         {
-            if (std::size_t(-1) != interval)
-                return interval;
-
             return boost::lexical_cast<std::size_t>(hpx::get_config_entry(
-                "hpx.plugins.coalescing_message_handler.interval", 100));
+                "hpx.plugins.coalescing_message_handler.interval", interval));
         }
 
         bool get_background_flush()
@@ -92,13 +87,14 @@ namespace hpx { namespace plugins { namespace parcel
     coalescing_message_handler::coalescing_message_handler(
             char const* action_name, parcelset::parcelport* pp, std::size_t num,
             std::size_t interval)
-      : pp_(pp), buffer_(detail::get_num_messages(num)),
+      : pp_(pp),
+        num_coalesced_parcels_(detail::get_num_messages(num)),
+        interval_(detail::get_interval(interval)),
+        buffer_(num_coalesced_parcels_),
         timer_(
             util::bind(&coalescing_message_handler::timer_flush, this_()),
             util::bind(&coalescing_message_handler::flush_terminate, this_()),
-            std::chrono::microseconds(detail::get_interval(interval)),
-            std::string(action_name) + "_timer",
-            true),
+            std::string(action_name) + "_timer"),
         stopped_(false),
         allow_background_flush_(detail::get_background_flush()),
         action_name_(action_name),
@@ -136,20 +132,29 @@ namespace hpx { namespace plugins { namespace parcel
         std::unique_lock<mutex_type> l(mtx_);
         ++num_parcels_;
 
+        // get time since last parcel
+        boost::int64_t parcel_time = util::high_resolution_clock::now();
+        boost::int64_t time_since_last_parcel = parcel_time - last_parcel_time_;
+        last_parcel_time_ = parcel_time;
+
         // collect data for time between parcels histogram
         if (time_between_parcels_)
-        {
-            boost::int64_t parcel_time = util::high_resolution_clock::now();
-            (*time_between_parcels_)(parcel_time - last_parcel_time_);
-            last_parcel_time_ = parcel_time;
-        }
+            (*time_between_parcels_)(time_since_last_parcel);
 
-        if (stopped_) {
+        std::chrono::microseconds interval(detail::get_interval(interval_));
+
+        // just send parcel if the coalescing was stopped or the buffer is
+        // empty and time since last parcel is larger than coalescing interval.
+        if (stopped_ ||
+            (buffer_.empty() &&
+                std::chrono::microseconds(time_since_last_parcel) > interval
+           ))
+        {
             ++num_messages_;
             l.unlock();
 
             // this instance should not buffer parcels anymore
-            pp_->put_parcel(dest, std::move(p), f);
+            pp_->put_parcel(dest, std::move(p), std::move(f));
             return;
         }
 
@@ -158,16 +163,16 @@ namespace hpx { namespace plugins { namespace parcel
 
         switch(s) {
         case detail::message_buffer::first_message:
-            timer_.start(false);        // start deadline timer to flush buffer
-            l.unlock();
+            // start deadline timer to flush buffer
+            timer_.start(interval);
             break;
 
         case detail::message_buffer::normal:
             if (timer_.is_started())
                 break;
 
-            timer_.start(false);        // start deadline timer to flush buffer
-            l.unlock();
+            // start deadline timer to flush buffer
+            timer_.start(interval);
             break;
 
         case detail::message_buffer::buffer_now_full:
@@ -211,7 +216,8 @@ namespace hpx { namespace plugins { namespace parcel
     void coalescing_message_handler::flush_terminate()
     {
         std::unique_lock<mutex_type> l(mtx_);
-        flush_locked(l, parcelset::policies::message_handler::flush_mode_timer, true, true);
+        flush_locked(l, parcelset::policies::message_handler::flush_mode_timer,
+            true, true);
     }
 
     bool coalescing_message_handler::flush_locked(
@@ -228,22 +234,21 @@ namespace hpx { namespace plugins { namespace parcel
             return false;
         }
 
-        if (!stopped_ && stop_buffering) {
+        if (!stopped_ && stop_buffering)
+        {
             stopped_ = true;
-
-            //util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             timer_.stop();              // interrupt timer
         }
-
-        if (cancel_timer)
+        else if (cancel_timer)
         {
-            timer_.stop();
+            timer_.stop();              // interrupt timer
         }
 
         if (buffer_.empty())
             return false;
 
-        detail::message_buffer buff (buffer_.capacity());
+        detail::message_buffer buff (
+            detail::get_num_messages(num_coalesced_parcels_));
         std::swap(buff, buffer_);
 
         ++num_messages_;

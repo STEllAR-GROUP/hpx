@@ -29,27 +29,15 @@ namespace hpx { namespace util
     public:
         pool_timer();
 
-        //pool_timer(util::function_nonser<bool()> const& f,
-        //    util::function_nonser<void()> const& on_term,
-        //    hpx::util::steady_time_point const& abs_time,
-        //    std::string const& description = "",
-        //    bool pre_shutdown = false);
-
-        //pool_timer(util::function_nonser<bool()> const& f,
-        //    util::function_nonser<void()> const& on_term,
-        //    hpx::util::steady_duration const& rel_time,
-        //    std::string const& description = "",
-        //    bool pre_shutdown = false);
-
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::microseconds const& time_duration,
             std::string const& description = "",
-            bool pre_shutdown = false);
+            bool pre_shutdown = true);
 
         ~pool_timer();
 
-        bool start(bool evaluate = true);
+        bool start(util::steady_duration const& time_duration,
+            bool evaluate = false);
         bool stop();
 
         bool is_started() const;

@@ -79,6 +79,8 @@ namespace hpx { namespace plugins { namespace parcel
     private:
         mutable mutex_type mtx_;
         parcelset::parcelport* pp_;
+        std::size_t num_coalesced_parcels_;
+        std::size_t interval_;
         detail::message_buffer buffer_;
         util::pool_timer timer_;
         bool stopped_;
