@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Minh-Khanh Do
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -153,6 +154,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+            typename Op>
+        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+            T init, Op && op, std::false_type) {
+
+            typedef std::integral_constant<bool,
+                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                   !hpx::traits::is_forward_iterator<OutIter>::value
+                > is_seq;
+
+            return exclusive_scan<OutIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest, std::move(init), std::forward<Op>(op));
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+            typename Op>
+        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+            T init, Op && op, std::true_type);
         /// \endcond
     }
 
@@ -252,15 +277,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::exclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, std::move(init), std::forward<Op>(op));
+        return detail::exclusive_scan_(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            std::move(init), std::forward<Op>(op),
+            is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////

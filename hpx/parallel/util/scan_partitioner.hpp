@@ -265,7 +265,6 @@ namespace hpx { namespace parallel { namespace util
                                 )
                             )
                         );
-
                         finalitems.push_back(
                             dataflow(
                                 policy.executor(),
@@ -273,7 +272,6 @@ namespace hpx { namespace parallel { namespace util
                                 workitems[parts - 1], workitems[parts]
                             )
                         );
-
                         ++parts;
                     }
                 }
@@ -284,6 +282,7 @@ namespace hpx { namespace parallel { namespace util
                 catch (...) {
                     errors.push_back(boost::current_exception());
                 }
+                
 
                 // wait for all tasks to finish
                 return dataflow(
