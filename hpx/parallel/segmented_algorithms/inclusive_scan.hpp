@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
-        
+ 
         struct merge_inclusive_scan
         {
             template <typename InIter, typename OutIter, typename T, typename Op>
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy && policy, FwdIter first, FwdIter last, Op && op)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type value_type;
-                
+ 
                 typedef util::detail::algorithm_result<ExPolicy, vector_type> result;
 
                 vector_type res(std::distance(first, last));
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (res.size() != 0) {
                     res[0] = *first;
                 }
-                
+ 
                 return result::get(
                     dataflow([=, &op](vector_type r) {
                         Algo().parallel(
@@ -139,7 +139,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 >(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, std::move(init), std::forward<Op>(op),
-                    merge_inclusive_scan(), 
+                    merge_inclusive_scan(),
                     [op] (vector_type v, T val) {
                         return op(v.back(), val);
                     }

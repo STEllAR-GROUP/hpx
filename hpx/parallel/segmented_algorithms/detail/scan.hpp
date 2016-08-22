@@ -352,7 +352,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     out_iters.push_back(sit_out);
                 }
             }
-    
+ 
             // first init value is the given init value
             T last_value = init;
             for (std::size_t i = 0; i < results.size(); ++i) {
