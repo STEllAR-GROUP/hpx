@@ -919,10 +919,6 @@ namespace hpx { namespace threads { namespace policies
             {
                 count = terminated_items_count_;
             }
-            else if (state == unknown)
-            {
-                count = thread_map_count_ + terminated_items_count_;
-            }
             else if (state == staged)
             {
                 HPX_THROW_EXCEPTION(bad_parameter,

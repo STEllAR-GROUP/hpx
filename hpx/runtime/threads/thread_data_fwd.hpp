@@ -106,9 +106,11 @@ namespace hpx { namespace threads
     ///       being defined.
     HPX_API_EXPORT std::uint64_t get_self_component_id();
 
-    /// The function \a get_thread_manager returns a reference to the
-    /// current thread manager.
+    /// \cond NOINTERNAL
+    // The function get_thread_manager returns a reference to the
+    // current thread manager.
     HPX_API_EXPORT threadmanager_base& get_thread_manager();
+    /// \endcond
 
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
