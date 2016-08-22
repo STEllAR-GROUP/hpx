@@ -32,6 +32,7 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
+#include <cstring>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -409,6 +410,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef util::scan_partitioner<
                         ExPolicy, std::pair<FwdIter, OutIter>, std::size_t
                     > scan_partitioner_type;
+
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, flags.get()), count, init,
@@ -430,6 +432,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 if ((get<1>(*it) = f))
                                     ++curr;
                             });
+
                         return curr;
                     },
                     // step 2 propagates the partition results from left
@@ -438,9 +441,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     // step 3 runs final accumulation on each partition
                     [dest, flags](
                         zip_iterator part_begin, std::size_t part_size,
-                        hpx::shared_future<std::size_t> f_accu) mutable
+                        hpx::shared_future<std::size_t> curr,
+                        hpx::shared_future<std::size_t> next) mutable
                     {
-                        std::advance(dest, f_accu.get());
+                        next.get();     // rethrow exceptions
+
+                        std::advance(dest, curr.get());
                         util::loop_n(part_begin, part_size,
                             [&dest](zip_iterator it) mutable
                             {
