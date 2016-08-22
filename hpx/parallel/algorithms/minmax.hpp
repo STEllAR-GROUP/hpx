@@ -228,10 +228,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename FwdIter,
         typename Proj = util::projection_identity,
-        typename F = std::less<
-            typename std::remove_reference<
-                typename traits::projected_result_of<Proj, FwdIter>::type
-            >::type>,
+        typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&
@@ -451,10 +448,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename FwdIter,
         typename Proj = util::projection_identity,
-        typename F = std::less<
-            typename std::remove_reference<
-                typename traits::projected_result_of<Proj, FwdIter>::type
-            >::type>,
+        typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&
@@ -713,10 +707,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 #endif
     template <typename ExPolicy, typename FwdIter,
         typename Proj = util::projection_identity,
-        typename F = std::less<
-            typename std::remove_reference<
-                typename traits::projected_result_of<Proj, FwdIter>::type
-            >::type>,
+        typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&

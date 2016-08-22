@@ -8,6 +8,7 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 
 #include <utility>
 
@@ -19,9 +20,13 @@ namespace hpx { namespace lcos { namespace detail
         lcos::local::futures_factory<bool()> p(std::move(f));
 
         // launch a new thread executing the given function
-        p.apply(launch::fork, threads::thread_priority_boost,
+        threads::thread_id_type tid = p.apply(
+            launch::fork, threads::thread_priority_boost,
             threads::thread_stacksize_default, ec);
         if (ec) return false;
+
+        // make sure this thread is executed last
+        hpx::this_thread::yield_to(thread::id(std::move(tid)));
 
         // wait for the task to run
         return p.get_future().get(ec);

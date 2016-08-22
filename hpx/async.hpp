@@ -115,22 +115,102 @@ namespace hpx { namespace detail
                     F(Ts&&...)
                 >::type result_type;
 
-            if (launch_policy == launch::sync) {
+            if (launch_policy == launch::sync)
+            {
                 return detail::call_sync(
                     util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
                     typename std::is_void<result_type>::type());
             }
+
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
             if (hpx::detail::has_async_policy(launch_policy))
             {
-                p.apply(launch_policy);
+                threads::thread_id_type tid = p.apply(launch_policy);
                 if (launch_policy == launch::fork)
                 {
                     // make sure this thread is executed last
-                    hpx::this_thread::yield();
+                    hpx::this_thread::yield_to(thread::id(std::move(tid)));
                 }
             }
+            return p.get_future();
+        }
+
+        template <typename F, typename ...Ts>
+        HPX_FORCEINLINE static
+        typename std::enable_if<
+            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            hpx::future<
+                typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
+            >
+        >::type
+        call(hpx::detail::sync_policy, F && f, Ts&&... ts)
+        {
+            typedef typename util::detail::deferred_result_of<F(Ts&&...)>::type
+                result_type;
+
+            return detail::call_sync(
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
+                typename std::is_void<result_type>::type());
+        }
+
+        template <typename F, typename ...Ts>
+        HPX_FORCEINLINE static
+        typename std::enable_if<
+            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            hpx::future<
+                typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
+            >
+        >::type
+        call(hpx::detail::async_policy, F && f, Ts&&... ts)
+        {
+            typedef typename util::detail::deferred_result_of<F(Ts&&...)>::type
+                result_type;
+
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+
+            p.apply(launch::async);
+            return p.get_future();
+        }
+
+        template <typename F, typename ...Ts>
+        HPX_FORCEINLINE static
+        typename std::enable_if<
+            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            hpx::future<
+                typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
+            >
+        >::type
+        call(hpx::detail::fork_policy, F && f, Ts&&... ts)
+        {
+            typedef typename util::detail::deferred_result_of<F(Ts&&...)>::type
+                result_type;
+
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+
+            p.apply(launch::fork);
+            hpx::this_thread::yield();  // make sure this thread is executed last
+            return p.get_future();
+        }
+
+        template <typename F, typename ...Ts>
+        HPX_FORCEINLINE static
+        typename std::enable_if<
+            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            hpx::future<
+                typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
+            >
+        >::type
+        call(hpx::detail::deferred_policy, F && f, Ts&&... ts)
+        {
+            typedef typename util::detail::deferred_result_of<F(Ts&&...)>::type
+                result_type;
+
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+
             return p.get_future();
         }
     };
@@ -150,8 +230,8 @@ namespace hpx { namespace detail
         >::type
         call(F&& f, Ts&&... ts)
         {
-            return async_dispatch<launch>::call(
-                launch::all, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return async_dispatch<hpx::detail::async_policy>::call(
+                launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
 

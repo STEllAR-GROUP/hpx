@@ -22,6 +22,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
+#include <chrono>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -95,7 +96,7 @@ namespace hpx { namespace plugins { namespace parcel
         timer_(
             util::bind(&coalescing_message_handler::timer_flush, this_()),
             util::bind(&coalescing_message_handler::flush_terminate, this_()),
-            boost::chrono::microseconds(detail::get_interval(interval)),
+            std::chrono::microseconds(detail::get_interval(interval)),
             std::string(action_name) + "_timer",
             true),
         stopped_(false),

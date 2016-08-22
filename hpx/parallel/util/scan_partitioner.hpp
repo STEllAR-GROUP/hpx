@@ -14,7 +14,6 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
@@ -69,10 +68,6 @@ namespace hpx { namespace parallel { namespace util
                 scoped_executor_parameters<parameters_type> scoped_param(
                     policy.parameters());
 
-                using hpx::util::get;
-                using hpx::util::placeholders::_1;
-                using hpx::util::deferred_call;
-
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
                 std::list<boost::exception_ptr> errors;
@@ -83,7 +78,7 @@ namespace hpx { namespace parallel { namespace util
 
                     HPX_ASSERT(count > 0);
                     FwdIter first_ = first;
-                    std::size_t test_chunk_size = count / 100;
+                    std::size_t count_ = count;
 
                     // estimate a chunk size based on number of cores used
                     std::vector<tuple_type> shape =
@@ -99,18 +94,14 @@ namespace hpx { namespace parallel { namespace util
                     // start f3.
                     if (workitems.size() == 2)
                     {
-                        HPX_ASSERT(workitems.size() < 3);
+                        HPX_ASSERT(count_ > count);
 
+                        hpx::shared_future<Result1> curr = workitems[1];
                         workitems[1] = dataflow(hpx::launch::sync,
-                            f2, workitems[0], workitems[1]
-                        );
+                            f2, workitems[0], curr);
 
-                        finalitems.push_back(dataflow(
-                            policy.executor(),
-                            hpx::util::bind(
-                                f3, first_, test_chunk_size, _1),
-                            workitems[0], workitems[1])
-                        );
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, first_, count_ - count, workitems[0], curr));
                     }
 
                     std::size_t parts = workitems.size();
@@ -120,28 +111,21 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        hpx::launch p = (parts & 0x7) ?
-                            hpx::launch::sync : hpx::launch::async;
+                        hpx::launch p = hpx::launch::async;
+                        if (parts & 0x7)
+                            p = hpx::launch::sync;
 
-                        workitems.push_back(
-                            dataflow(
-                                p, f2, workitems.back(),
-                                executor_traits::async_execute(
-                                    policy.executor(),
-                                    f1, get<0>(elem), get<1>(elem)
-                                )
-                            )
-                        );
+                        FwdIter it = hpx::util::get<0>(elem);
+                        std::size_t size = hpx::util::get<1>(elem);
 
-                        finalitems.push_back(
-                            dataflow(
-                                policy.executor(),
-                                hpx::util::bind(
-                                    f3, get<0>(elem), get<1>(elem), _1
-                                ),
-                                workitems[parts - 1], workitems[parts]
-                            )
-                        );
+                        hpx::shared_future<Result1> prev = workitems.back();
+                        auto curr = executor_traits::async_execute(
+                            policy.executor(), f1, it, size).share();
+
+                        workitems.push_back(dataflow(p, f2, prev, curr));
+
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, it, size, prev, curr));
 
                         ++parts;
                     }
@@ -201,10 +185,6 @@ namespace hpx { namespace parallel { namespace util
                             scoped_executor_parameters
                         >(policy.parameters()));
 
-                using hpx::util::get;
-                using hpx::util::placeholders::_1;
-                using hpx::util::deferred_call;
-
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
                 std::list<boost::exception_ptr> errors;
@@ -215,7 +195,7 @@ namespace hpx { namespace parallel { namespace util
 
                     HPX_ASSERT(count > 0);
                     FwdIter first_ = first;
-                    std::size_t test_chunk_size = count / 100;
+                    std::size_t count_ = count;
 
                     // estimate a chunk size based on number of cores used
                     std::vector<tuple_type> shape =
@@ -231,18 +211,14 @@ namespace hpx { namespace parallel { namespace util
                     // start f3.
                     if (workitems.size() == 2)
                     {
-                        HPX_ASSERT(workitems.size() < 3);
+                        HPX_ASSERT(count_ > count);
 
+                        hpx::shared_future<Result1> curr = workitems[1];
                         workitems[1] = dataflow(hpx::launch::sync,
-                            f2, workitems[0], workitems[1]
-                        );
+                            f2, workitems[0], curr);
 
-                        finalitems.push_back(dataflow(
-                            policy.executor(),
-                            hpx::util::bind(
-                                f3, first_, test_chunk_size, _1),
-                            workitems[0], workitems[1])
-                        );
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, first_, count_ - count, workitems[0], curr));
                     }
 
                     std::size_t parts = workitems.size();
@@ -252,28 +228,21 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        hpx::launch p = (parts & 0x7) ?
-                            hpx::launch::sync : hpx::launch::async;
+                        hpx::launch p = hpx::launch::async;
+                        if (parts & 0x7)
+                            p = hpx::launch::sync;
 
-                        workitems.push_back(
-                            dataflow(
-                                p, f2, workitems.back(),
-                                executor_traits::async_execute(
-                                    policy.executor(),
-                                    f1, get<0>(elem), get<1>(elem)
-                                )
-                            )
-                        );
+                        FwdIter it = hpx::util::get<0>(elem);
+                        std::size_t size = hpx::util::get<1>(elem);
 
-                        finalitems.push_back(
-                            dataflow(
-                                policy.executor(),
-                                hpx::util::bind(
-                                    f3, get<0>(elem), get<1>(elem), _1
-                                ),
-                                workitems[parts - 1], workitems[parts]
-                            )
-                        );
+                        hpx::shared_future<Result1> prev = workitems.back();
+                        auto curr = executor_traits::async_execute(
+                            policy.executor(), f1, it, size).share();
+
+                        workitems.push_back(dataflow(p, f2, prev, curr));
+
+                        finalitems.push_back(dataflow(policy.executor(),
+                            f3, it, size, prev, curr));
 
                         ++parts;
                     }

@@ -130,7 +130,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         HPX_TEST_EQ(hpx::find_all_localities().size(), std::size_t(2));
 
         // wait for it to exit, we know it returns 42 (see --exit_code=<> above)
-        int exit_code = c.wait_for_exit_sync();
+        int exit_code = c.wait_for_exit(hpx::launch::sync);
         HPX_TEST_EQ(exit_code, 42);
 
         // make sure the launched process has set the message in the component
@@ -158,8 +158,9 @@ int main(int argc, char* argv[])
 
     // This explicitly enables the component we depend on (it is disabled by
     // default to avoid being loaded outside of this test).
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.components.launch_process_test_server.enabled!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.components.launch_process_test_server.enabled!=1"
+    };
 
     HPX_TEST_EQ_MSG(
         hpx::init(desc_commandline, argc, argv, cfg), 0,

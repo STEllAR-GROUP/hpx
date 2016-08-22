@@ -7,6 +7,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+// hpxinspect:nodeprecatedname:boost::unique_lock
+
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -38,6 +42,7 @@
 #include <hpx/components/security/signed_type.hpp>
 #endif
 
+#include <boost/chrono/chrono.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
@@ -527,8 +532,8 @@ void register_worker(registration_header const& header)
             got_root_certificate = true;
             break;
         }
-        boost::this_thread::sleep(boost::get_system_time() +
-            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+        boost::this_thread::sleep_for(
+            boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
     }
 
     if (!got_root_certificate)

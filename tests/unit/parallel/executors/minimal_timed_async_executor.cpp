@@ -8,17 +8,17 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/range/functions.hpp>
+
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
 #include <string>
 #include <utility>
 #include <type_traits>
 #include <vector>
 
-#include <boost/range/functions.hpp>
-#include <boost/chrono.hpp>
-
-using namespace boost::chrono;
+using namespace std::chrono;
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id sync_test(int passed_through)
@@ -183,9 +183,9 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

@@ -13,7 +13,7 @@
         <DisplayString Condition="shared_state_.px->state_ == 3">ready(value)</DisplayString>
         <DisplayString Condition="shared_state_.px->state_ == 5">ready(exception)</DisplayString>
         <Expand>
-            <Item Name="[value]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_.data_.buf))</Item>
+            <Item Name="[value]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_._Pad))</Item>
         </Expand>
     </Type>
 
@@ -22,8 +22,8 @@
         <DisplayString Condition="shared_state_.px->state_ == 3">ready(value)</DisplayString>
         <DisplayString Condition="shared_state_.px->state_ == 5">ready(exception)</DisplayString>
         <Expand>
-            <Item Name="[value]" Condition="shared_state_.px->state_ == 3">*(($T1 *)(shared_state_.px->storage_.data_.buf))</Item>
-            <Item Name="[exception]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_.data_.buf))</Item>
+            <Item Name="[value]" Condition="shared_state_.px->state_ == 3">*(($T1 *)(shared_state_.px->storage_._Pad))</Item>
+            <Item Name="[exception]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_._Pad))</Item>
         </Expand>
     </Type>
 
@@ -32,7 +32,7 @@
         <DisplayString Condition="shared_state_.px->state_ == 3">ready(value)</DisplayString>
         <DisplayString Condition="shared_state_.px->state_ == 5">ready(exception)</DisplayString>
         <Expand>
-            <Item Name="[value]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_.data_.buf))</Item>
+            <Item Name="[value]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_._Pad))</Item>
         </Expand>
     </Type>
 
@@ -41,8 +41,8 @@
         <DisplayString Condition="shared_state_.px->state_ == 3">ready(value)</DisplayString>
         <DisplayString Condition="shared_state_.px->state_ == 5">ready(exception)</DisplayString>
         <Expand>
-            <Item Name="[value]" Condition="shared_state_.px->state_ == 3">*(($T1 *)(shared_state_.px->storage_.data_.buf))</Item>
-            <Item Name="[exception]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_.data_.buf))</Item>
+            <Item Name="[value]" Condition="shared_state_.px->state_ == 3">*(($T1 *)(shared_state_.px->storage_._Pad))</Item>
+            <Item Name="[exception]" Condition="shared_state_.px->state_ == 5">*((boost::exception_ptr*)(shared_state_.px->storage_._Pad))</Item>
         </Expand>
     </Type>
 

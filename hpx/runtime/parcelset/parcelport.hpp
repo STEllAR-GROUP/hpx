@@ -105,7 +105,7 @@ namespace hpx { namespace parcelset
         /// parcelports are enabled.
         virtual bool can_connect(locality const &, bool use_alternative_parcelport)
         {
-            return can_bootstrap() || use_alternative_parcelport;
+            return use_alternative_parcelport || can_bootstrap();
         }
 
         /// Queues a parcel for transmission to another locality

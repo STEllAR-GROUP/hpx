@@ -6,6 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+
 #include <hpx/runtime.hpp>
 
 #include <hpx/error_code.hpp>
@@ -30,6 +33,8 @@
 #if defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
 #  include <hpx/lcos/broadcast.hpp>
 #endif
+
+#include <boost/chrono/chrono.hpp>
 
 #include <cstddef>
 #include <string>
@@ -80,13 +85,13 @@ create_barrier(std::size_t num_localities, char const* symname)
     lcos::barrier b = lcos::barrier::create(find_here(), num_localities);
 
     // register an unmanaged gid to avoid id-splitting during startup
-    agas::register_name_sync(symname, b.get_id().get_gid());
+    agas::register_name(launch::sync, symname, b.get_id().get_gid());
     return b;
 }
 
 static void delete_barrier(lcos::barrier& b, char const* symname)
 {
-    agas::unregister_name_sync(symname);
+    agas::unregister_name(launch::sync, symname);
     b.free();
 }
 
@@ -98,11 +103,11 @@ find_barrier(char const* symname)
     naming::id_type barrier_id;
     for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
     {
-        if (agas::resolve_name_sync(symname, barrier_id))
+        if (agas::resolve_name(launch::sync, symname, barrier_id))
             break;
 
-        boost::this_thread::sleep(boost::get_system_time() +
-            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+        boost::this_thread::sleep_for(
+            boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
     }
     if (HPX_UNLIKELY(!barrier_id))
     {
@@ -221,7 +226,8 @@ int pre_main(runtime_mode mode)
 
             if (num_localities > 1)
             {
-                startup_barrier = create_barrier(num_localities, startup_barrier_name);
+                startup_barrier =
+                    create_barrier(num_localities, startup_barrier_name);
             }
 
             LBT_(info) << "(2nd stage) pre_main: created \
@@ -232,7 +238,8 @@ int pre_main(runtime_mode mode)
             // Initialize the barrier clients (find them in AGAS)
             startup_barrier = find_barrier(startup_barrier_name);
 
-            LBT_(info) << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
+            LBT_(info)
+                << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
         }
         // }}}
 

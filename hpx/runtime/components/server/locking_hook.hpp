@@ -54,12 +54,18 @@ namespace hpx { namespace components
 
     protected:
         typedef util::function_nonser<
-            threads::thread_state_ex_enum(threads::thread_state_enum)
+            threads::thread_arg_type(threads::thread_result_type)
         > yield_decorator_type;
 
-        struct undecorate_wrapper
+        struct decorate_wrapper
         {
-            ~undecorate_wrapper()
+            template <typename F>
+            decorate_wrapper(F && f)
+            {
+                threads::get_self().decorate_yield(std::forward<F>(f));
+            }
+
+            ~decorate_wrapper()
             {
                 threads::get_self().undecorate_yield();
             }
@@ -67,11 +73,10 @@ namespace hpx { namespace components
 
         // Execute the wrapped action. This locks the mutex ensuring a thread
         // safe action invocation.
-        threads::thread_state_enum thread_function(
-            threads::thread_state_ex_enum state,
-            threads::thread_function_type f)
+        threads::thread_result_type thread_function(
+            threads::thread_arg_type state, threads::thread_function_type f)
         {
-            threads::thread_state_enum result = threads::unknown;
+            threads::thread_result_type result(threads::unknown, nullptr);
 
             // now lock the mutex and execute the action
             std::unique_lock<mutex_type> l(mtx_);
@@ -87,26 +92,25 @@ namespace hpx { namespace components
 
             {
                 // register our yield decorator
-                using util::placeholders::_1;
-                threads::get_self().decorate_yield(
-                    util::bind(&locking_hook::yield_function, this, _1));
-
-                undecorate_wrapper yield_undecorator;
-                (void)yield_undecorator;       // silence gcc warnings
+                decorate_wrapper yield_decorator(
+                    util::bind(&locking_hook::yield_function, this,
+                        util::placeholders::_1));
 
                 result = f(state);
+
+                (void)yield_decorator;       // silence gcc warnings
             }
 
             return result;
         }
 
-        struct decorate_wrapper
+        struct undecorate_wrapper
         {
-            decorate_wrapper()
+            undecorate_wrapper()
               : yield_decorator_(threads::get_self().undecorate_yield())
             {}
 
-            ~decorate_wrapper()
+            ~undecorate_wrapper()
             {
                 threads::get_self().decorate_yield(std::move(yield_decorator_));
             }
@@ -116,13 +120,12 @@ namespace hpx { namespace components
 
         // The yield decorator unlocks the mutex and calls the system yield
         // which gives up control back to the thread manager.
-        threads::thread_state_ex_enum yield_function(
-            threads::thread_state_enum state)
+        threads::thread_arg_type yield_function(threads::thread_result_type state)
         {
             // We un-decorate the yield function as the lock handling may
             // suspend, which causes an infinite recursion otherwise.
-            decorate_wrapper yield_decorator;
-            threads::thread_state_ex_enum result = threads::wait_unknown;
+            undecorate_wrapper yield_decorator;
+            threads::thread_arg_type result = threads::wait_unknown;
 
             {
                 util::unlock_guard<mutex_type> ul(mtx_);

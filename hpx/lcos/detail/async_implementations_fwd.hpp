@@ -23,11 +23,54 @@ namespace hpx { namespace detail
     async_impl(launch policy, hpx::id_type const& id,
         Ts&&... vs);
 
+    template <typename Action, typename ...Ts>
+    hpx::future<
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
+    async_impl(hpx::detail::sync_policy, hpx::id_type const& id,
+        Ts&&... vs);
+
+    template <typename Action, typename ...Ts>
+    hpx::future<
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
+    async_impl(hpx::detail::async_policy, hpx::id_type const& id,
+        Ts&&... vs);
+
+    template <typename Action, typename ...Ts>
+    hpx::future<
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
+    async_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
+        Ts&&... vs);
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>
     hpx::future<
         typename hpx::traits::extract_action<Action>::local_result_type
     >
     async_cb_impl(launch policy, hpx::id_type const& id,
+        Callback&& cb, Ts&&... vs);
+
+    template <typename Action, typename Callback, typename ...Ts>
+    hpx::future<
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
+    async_cb_impl(hpx::detail::sync_policy, hpx::id_type const& id,
+        Callback&& cb, Ts&&... vs);
+
+    template <typename Action, typename Callback, typename ...Ts>
+    hpx::future<
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
+    async_cb_impl(hpx::detail::async_policy, hpx::id_type const& id,
+        Callback&& cb, Ts&&... vs);
+
+    template <typename Action, typename Callback, typename ...Ts>
+    hpx::future<
+        typename hpx::traits::extract_action<Action>::local_result_type
+    >
+    async_cb_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs);
 }}
 

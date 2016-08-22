@@ -9,9 +9,11 @@
 #define HPX_NO_VERSION_CHECK
 #include "htts2.hpp"
 
+#include <chrono>
+
 #include <omp.h>
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct omp_driver : htts2::driver
 {
     omp_driver(int argc, char** argv)

@@ -214,13 +214,6 @@ macro(hpx_check_for_cxx11_function_template_default_args)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_initializer_list)
-  add_hpx_config_test(HPX_WITH_CXX11_INITIALIZER_LIST
-    SOURCE cmake/tests/cxx11_initializer_list.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_inline_namespaces)
   add_hpx_config_test(HPX_WITH_CXX11_INLINE_NAMESPACES
     SOURCE cmake/tests/cxx11_inline_namespaces.cpp

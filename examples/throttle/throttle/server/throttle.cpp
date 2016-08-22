@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
+// hpxinspect:nodeprecatedname:boost::chrono
+
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
@@ -11,6 +14,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <boost/chrono/chrono.hpp>
 #include <boost/thread.hpp>
 
 #include <mutex>
@@ -93,11 +97,9 @@ namespace throttle { namespace server
 
         {
             // put this shepherd thread to sleep for 100ms
-            boost::system_time xt(boost::get_system_time() +
-                boost::posix_time::milliseconds(100));
-
             hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
-            boost::thread::sleep(xt);
+
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
         }
 
         // if this thread still needs to be suspended, re-schedule this routine

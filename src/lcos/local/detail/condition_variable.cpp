@@ -13,8 +13,8 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/exception_ptr.hpp>

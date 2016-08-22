@@ -84,7 +84,7 @@ namespace hpx { namespace lcos { namespace local
 
         protected:
             // run in a separate thread
-            void apply(launch policy,
+            threads::thread_id_type apply(launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
@@ -98,12 +98,14 @@ namespace hpx { namespace lcos { namespace local
                         util::deferred_call(&base_type::run_impl, std::move(this_)),
                         util::thread_description(f_),
                         threads::pending, false, stacksize, ec);
+                    return threads::invalid_thread_id;
                 }
                 else if (policy == launch::fork) {
-                    threads::register_thread_nullary(
+                    return threads::register_thread_nullary(
                         util::deferred_call(&base_type::run_impl, std::move(this_)),
                         util::thread_description(f_),
-                        threads::pending, false, threads::thread_priority_boost,
+                        threads::pending_do_not_schedule, true,
+                        threads::thread_priority_boost,
                         get_worker_thread_num(), stacksize, ec);
                 }
                 else {
@@ -112,6 +114,7 @@ namespace hpx { namespace lcos { namespace local
                         util::thread_description(f_),
                         threads::pending, false, priority, std::size_t(-1),
                         stacksize, ec);
+                    return threads::invalid_thread_id;
                 }
             }
         };
@@ -293,7 +296,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // asynchronous execution
-        void apply(
+        threads::thread_id_type apply(
             launch policy = launch::async,
             threads::thread_priority priority = threads::thread_priority_default,
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
@@ -303,9 +306,9 @@ namespace hpx { namespace lcos { namespace local
                 HPX_THROW_EXCEPTION(task_moved,
                     "futures_factory<Result()>::apply()",
                     "futures_factory invalid (has it been moved?)");
-                return;
+                return threads::invalid_thread_id;
             }
-            task_->apply(policy, priority, stacksize, ec);
+            return task_->apply(policy, priority, stacksize, ec);
         }
 
         // Result retrieval

@@ -151,8 +151,9 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, this example is serial and therefor only needs on thread,
     // We just use hpx::init to parse our command line arguments
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads!=1"
+    };
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }

@@ -68,6 +68,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         switch_status (thread_data* t, thread_state prev_state)
           : thread_(t), prev_state_(prev_state),
+            next_thread_id_(nullptr),
             need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
         {}
 
@@ -81,10 +82,12 @@ namespace hpx { namespace threads { namespace detail
 
         // allow to change the state the thread will be switched to after
         // execution
-        thread_state operator=(thread_state_enum new_state)
+        thread_state operator=(thread_result_type && new_state)
         {
-            return prev_state_ = thread_state(new_state,
+            prev_state_ = thread_state(new_state.first,
                 prev_state_.state_ex(), prev_state_.tag() + 1);
+            next_thread_id_ = std::move(new_state.second);
+            return prev_state_;
         }
 
         // Get the state this thread was in before execution (usually pending),
@@ -112,10 +115,17 @@ namespace hpx { namespace threads { namespace detail
         // disable default handling in destructor
         void disable_restore() { need_restore_state_ = false; }
 
+        thread_data* get_next_thread() const
+        {
+            // we know that the thread-id is just the pointer to the thread_data
+            return reinterpret_cast<thread_data*>(next_thread_id_.get());
+        }
+
     private:
         thread_data* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
+        thread_id_type next_thread_id_;
         bool need_restore_state_;
     };
 
@@ -262,13 +272,15 @@ namespace hpx { namespace threads { namespace detail
 
         // spin for some time after queues have become empty
         bool may_exit = false;
+        thread_data* thrd = nullptr;
+        thread_data* next_thrd = nullptr;
 
         while (true) {
             // Get the next HPX thread from the queue
-            thread_data* thrd = nullptr;
-
-            if (scheduler.SchedulingPolicy::get_next_thread(
-                    num_thread, idle_loop_count, thrd))
+            thrd = next_thrd;
+            if (HPX_LIKELY(thrd ||
+                    scheduler.SchedulingPolicy::get_next_thread(num_thread,
+                        idle_loop_count, thrd)))
             {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -285,7 +297,7 @@ namespace hpx { namespace threads { namespace detail
 
                 detail::write_old_state_log(num_thread, thrd, state_val);
 
-                if (pending == state_val) {
+                if (HPX_LIKELY(pending == state_val)) {
                     // switch the state of the thread to active and back to
                     // what the thread reports as its return value
 
@@ -293,7 +305,8 @@ namespace hpx { namespace threads { namespace detail
                         // tries to set state to active (only if state is still
                         // the same as 'state')
                         detail::switch_status thrd_stat (thrd, state);
-                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending)
+                        if (HPX_LIKELY(thrd_stat.is_valid() &&
+                                thrd_stat.get_previous() == pending))
                         {
                             tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -343,7 +356,7 @@ namespace hpx { namespace threads { namespace detail
                         }
 
                         // store and retrieve the new state in the thread
-                        if (!thrd_stat.store_state(state)) {
+                        if (HPX_UNLIKELY(!thrd_stat.store_state(state))) {
                             // some other worker-thread got in between and changed
                             // the state of this thread, we just continue with
                             // the next one
@@ -356,6 +369,10 @@ namespace hpx { namespace threads { namespace detail
 
                         // any exception thrown from the thread will reset its
                         // state at this point
+
+                        // handle next thread id if given (switch directly to
+                        // this thread)
+                        next_thrd = thrd_stat.get_next_thread();
                     }
 
                     //detail::write_new_state_log_debug(num_thread, thrd,
@@ -364,10 +381,13 @@ namespace hpx { namespace threads { namespace detail
                     // Re-add this work item to our list of work items if the HPX
                     // thread should be re-scheduled. If the HPX thread is suspended
                     // now we just keep it in the map of threads.
-                    if (state_val == pending) {
-                        // schedule other work
-                        scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                            is_running_state(this_state.load()), idle_loop_count);
+                    if (HPX_UNLIKELY(state_val == pending)) {
+                        if (HPX_LIKELY(next_thrd == nullptr)) {
+                            // schedule other work
+                            scheduler.SchedulingPolicy::wait_or_add_new(
+                                num_thread, is_running_state(this_state.load()),
+                                idle_loop_count);
+                        }
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
@@ -376,7 +396,7 @@ namespace hpx { namespace threads { namespace detail
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                 }
-                else if (active == state_val) {
+                else if (HPX_UNLIKELY(active == state_val)) {
                     LTM_(warning) << "tfunc(" << num_thread << "): " //-V128
                         "thread(" << thrd->get_thread_id().get() << "), "
                         "description(" << thrd->get_description() << "), "
@@ -396,7 +416,7 @@ namespace hpx { namespace threads { namespace detail
                 // or terminated, this will delete the HPX thread as all
                 // references go out of scope.
                 // REVIEW: what has to be done with depleted HPX threads?
-                if (state_val == depleted || state_val == terminated)
+                if (HPX_LIKELY(state_val == depleted || state_val == terminated))
                 {
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
                     ++counters.executed_threads_;
@@ -444,7 +464,7 @@ namespace hpx { namespace threads { namespace detail
             }
 
             // something went badly wrong, give up
-            if (this_state.load() == state_terminating)
+            if (HPX_UNLIKELY(this_state.load() == state_terminating))
                 break;
 
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)

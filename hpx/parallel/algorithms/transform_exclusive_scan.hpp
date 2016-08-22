@@ -132,9 +132,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     hpx::util::unwrapped(op),
                     // step 3 runs final_accumulation on each partition
                     [op](zip_iterator part_begin, std::size_t part_size,
-                        hpx::shared_future<T> f_accu)
+                        hpx::shared_future<T> curr, hpx::shared_future<T> next)
                     {
-                        T val = f_accu.get();
+                        next.get();     // rethrow exceptions
+
+                        T val = curr.get();
                         OutIter dst = get<1>(part_begin.get_iterator_tuple());
                         *dst++ = val;
                         util::loop_n(dst, part_size - 1,
