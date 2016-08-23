@@ -23,6 +23,7 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <set>
 #include <string>

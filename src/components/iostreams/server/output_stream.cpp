@@ -19,8 +19,7 @@
 
 #include <hpx/util/io_service_pool.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <memory>
 #include <utility>
 
@@ -50,15 +49,15 @@ namespace hpx { namespace iostreams { namespace detail
 namespace hpx { namespace iostreams { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    void output_stream::call_write_async(boost::uint32_t locality_id,
-        boost::uint64_t count, detail::buffer in)
+    void output_stream::call_write_async(std::uint32_t locality_id,
+        std::uint64_t count, detail::buffer in)
     { // {{{
         // Perform the IO operation.
         pending_output_.output(locality_id, count, std::move(in), write_f, mtx_);
     } // }}}
 
-    void output_stream::write_async(boost::uint32_t locality_id,
-        boost::uint64_t count, detail::buffer in)
+    void output_stream::write_async(std::uint32_t locality_id,
+        std::uint64_t count, detail::buffer in)
     { // {{{
         // Perform the IO in another OS thread.
         hpx::get_thread_pool("io_pool")->get_io_service().post(
@@ -67,8 +66,8 @@ namespace hpx { namespace iostreams { namespace server
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    void output_stream::call_write_sync(boost::uint32_t locality_id,
-        boost::uint64_t count, detail::buffer in, threads::thread_id_type caller)
+    void output_stream::call_write_sync(std::uint32_t locality_id,
+        std::uint64_t count, detail::buffer in, threads::thread_id_type caller)
     {
         // Perform the IO operation.
         pending_output_.output(locality_id, count, std::move(in), write_f, mtx_);
@@ -77,8 +76,8 @@ namespace hpx { namespace iostreams { namespace server
         threads::set_thread_state(caller, threads::pending);
     }
 
-    void output_stream::write_sync(boost::uint32_t locality_id,
-        boost::uint64_t count, detail::buffer in)
+    void output_stream::write_sync(std::uint32_t locality_id,
+        std::uint64_t count, detail::buffer in)
     { // {{{
         // Perform the IO in another OS thread.
         hpx::get_thread_pool("io_pool")->get_io_service().post(

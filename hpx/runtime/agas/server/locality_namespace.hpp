@@ -23,12 +23,13 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/format.hpp>
+
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
-
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
 
 namespace hpx { namespace agas
 {
@@ -49,14 +50,14 @@ struct HPX_EXPORT locality_namespace
     typedef lcos::local::spinlock mutex_type;
     typedef components::fixed_component_base<locality_namespace> base_type;
 
-    typedef boost::int32_t component_type;
+    typedef std::int32_t component_type;
 
     // stores the locality endpoints, and number of OS-threads running on this locality
     typedef hpx::util::tuple<
-        parcelset::endpoints_type, boost::uint32_t>
+        parcelset::endpoints_type, std::uint32_t>
     partition_type;
 
-    typedef std::map<boost::uint32_t, partition_type> partition_table_type;
+    typedef std::map<std::uint32_t, partition_type> partition_table_type;
     // }}}
 
   private:
@@ -66,7 +67,7 @@ struct HPX_EXPORT locality_namespace
     std::string instance_name_;
 
     partition_table_type partitions_;
-    boost::uint32_t prefix_counter_;
+    std::uint32_t prefix_counter_;
     primary_namespace* primary_;
 
     struct update_time_on_exit;
@@ -87,8 +88,8 @@ struct HPX_EXPORT locality_namespace
               , time_(0)
             {}
 
-            boost::atomic<boost::int64_t> count_;
-            boost::atomic<boost::int64_t> time_;
+            boost::atomic<std::int64_t> count_;
+            boost::atomic<std::int64_t> time_;
         };
 
         counter_data()
@@ -96,23 +97,23 @@ struct HPX_EXPORT locality_namespace
 
     public:
         // access current counter values
-        boost::int64_t get_allocate_count(bool);
-        boost::int64_t get_resolve_locality_count(bool);
-        boost::int64_t get_free_count(bool);
-        boost::int64_t get_localities_count(bool);
-        boost::int64_t get_num_localities_count(bool);
-        boost::int64_t get_num_threads_count(bool);
-        boost::int64_t get_resolved_localities_count(bool);
-        boost::int64_t get_overall_count(bool);
+        std::int64_t get_allocate_count(bool);
+        std::int64_t get_resolve_locality_count(bool);
+        std::int64_t get_free_count(bool);
+        std::int64_t get_localities_count(bool);
+        std::int64_t get_num_localities_count(bool);
+        std::int64_t get_num_threads_count(bool);
+        std::int64_t get_resolved_localities_count(bool);
+        std::int64_t get_overall_count(bool);
 
-        boost::int64_t get_allocate_time(bool);
-        boost::int64_t get_resolve_locality_time(bool);
-        boost::int64_t get_free_time(bool);
-        boost::int64_t get_localities_time(bool);
-        boost::int64_t get_num_localities_time(bool);
-        boost::int64_t get_num_threads_time(bool);
-        boost::int64_t get_resolved_localities_time(bool);
-        boost::int64_t get_overall_time(bool);
+        std::int64_t get_allocate_time(bool);
+        std::int64_t get_resolve_locality_time(bool);
+        std::int64_t get_free_time(bool);
+        std::int64_t get_localities_time(bool);
+        std::int64_t get_num_localities_time(bool);
+        std::int64_t get_num_threads_time(bool);
+        std::int64_t get_resolved_localities_time(bool);
+        std::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_allocate_count();
@@ -139,7 +140,7 @@ struct HPX_EXPORT locality_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
+        update_time_on_exit(boost::atomic<std::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
           , t_(t)
         {}
@@ -149,8 +150,8 @@ struct HPX_EXPORT locality_namespace
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
+        std::uint64_t started_at_;
+        boost::atomic<std::int64_t>& t_;
     };
 
   public:

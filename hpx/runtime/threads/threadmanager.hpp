@@ -19,8 +19,10 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
+
+#include <cstddef>
+#include <cstdint>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -52,7 +54,7 @@ namespace hpx { namespace threads
         virtual state status() const = 0;
 
         /// \brief return the number of HPX-threads with the given state
-        virtual boost::int64_t get_thread_count(
+        virtual std::int64_t get_thread_count(
             thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
@@ -178,19 +180,19 @@ namespace hpx { namespace threads
         virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
-        virtual boost::int64_t get_executed_threads(
+        virtual std::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual boost::int64_t get_executed_thread_phases(
+        virtual std::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-        virtual boost::int64_t get_thread_phase_duration(
+        virtual std::int64_t get_thread_phase_duration(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual boost::int64_t get_thread_duration(
+        virtual std::int64_t get_thread_duration(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual boost::int64_t get_thread_phase_overhead(
+        virtual std::int64_t get_thread_phase_overhead(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual boost::int64_t get_thread_overhead(
+        virtual std::int64_t get_thread_overhead(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
 #endif
 #endif

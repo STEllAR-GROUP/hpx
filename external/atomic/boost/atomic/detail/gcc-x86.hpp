@@ -11,7 +11,7 @@
 #include <boost/atomic/detail/base.hpp>
 #include <boost/atomic/detail/builder.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #define __BOOST_AMD_64 defined(__amd64__) || defined(__x86_64__)
 
@@ -399,7 +399,7 @@ public:
             "lock; cmpxchg8b 0(%4)\n"
             "movl %1, %%ebx\n"
             : "=A" (prev), "=m" (scratch)
-            : "D" ((long)desired), "c" ((long)((boost::uint64_t)desired>>32)),
+            : "D" ((long)desired), "c" ((long)((std::uint64_t)desired>>32)),
               "S" (&i), "0" (prev)
             : "memory");
         bool success=(prev==expected);

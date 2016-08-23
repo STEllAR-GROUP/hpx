@@ -10,6 +10,7 @@
 #include "htts2.hpp"
 
 #include <chrono>
+#include <cstdint>
 
 template <typename BaseClock = std::chrono::steady_clock>
 struct payload_precision_tracker : htts2::clocksource<BaseClock>
@@ -136,7 +137,7 @@ struct payload_precision_driver : htts2::driver
 
         htts2::timer<BaseClock> t;
 
-        for (boost::uint64_t i = 0; i < this->tasks_ /* = m */; ++i)
+        for (std::uint64_t i = 0; i < this->tasks_ /* = m */; ++i)
             p();
 
         // w_M [nanoseconds]

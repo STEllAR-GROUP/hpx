@@ -17,6 +17,8 @@
 #include <boost/atomic.hpp>
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <vector>
 #include <type_traits>
@@ -228,7 +230,7 @@ namespace hpx { namespace lcos
     template <typename Future, typename F>
     inline std::size_t
     wait(std::vector<Future>& lazy_values, F && f,
-        boost::int32_t suspend_for = 10)
+        std::int32_t suspend_for = 10)
     {
         typedef std::vector<Future> return_type;
 
@@ -256,7 +258,7 @@ namespace hpx { namespace lcos
     template <typename Future, typename F>
     inline std::size_t
     wait(std::vector<Future> && lazy_values, F && f,
-        boost::int32_t suspend_for = 10)
+        std::int32_t suspend_for = 10)
     {
         return wait(lazy_values, std::forward<F>(f), suspend_for);
     }
@@ -264,7 +266,7 @@ namespace hpx { namespace lcos
     template <typename Future, typename F>
     inline std::size_t
     wait(std::vector<Future> const& lazy_values, F && f,
-        boost::int32_t suspend_for = 10)
+        std::int32_t suspend_for = 10)
     {
         typedef std::vector<Future> return_type;
 

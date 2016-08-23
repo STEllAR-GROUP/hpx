@@ -20,8 +20,8 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -248,7 +248,7 @@ namespace hpx { namespace components
         // Pinning functionality
         void pin() {}
         void unpin() {}
-        boost::uint32_t pin_count() const { return 0; }
+        std::uint32_t pin_count() const { return 0; }
 
         void mark_as_migrated()
         {

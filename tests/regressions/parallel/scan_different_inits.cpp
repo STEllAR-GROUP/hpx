@@ -9,6 +9,7 @@
 #include <hpx/include/parallel_transform_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

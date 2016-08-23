@@ -23,6 +23,8 @@
 #include <boost/accumulators/accumulators.hpp>
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -140,7 +142,7 @@ namespace hpx { namespace plugins { namespace parcel
         // collect data for time between parcels histogram
         if (time_between_parcels_)
         {
-            boost::int64_t parcel_time = util::high_resolution_clock::now();
+            std::int64_t parcel_time = util::high_resolution_clock::now();
             (*time_between_parcels_)(parcel_time - last_parcel_time_);
             last_parcel_time_ = parcel_time;
         }
@@ -246,18 +248,18 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     // performance counter values
-    boost::int64_t
+    std::int64_t
     coalescing_message_handler::get_average_time_between_parcels(bool reset)
     {
         std::unique_lock<mutex_type> l(mtx_);
-        boost::int64_t now = util::high_resolution_clock::now();
+        std::int64_t now = util::high_resolution_clock::now();
         if (num_parcels_ == 0)
         {
             if (reset) started_at_ = now;
             return 0;
         }
 
-        boost::int64_t num_parcels = num_parcels_ - reset_time_num_parcels_;
+        std::int64_t num_parcels = num_parcels_ - reset_time_num_parcels_;
         if (num_parcels == 0)
         {
             if (reset) started_at_ = now;
@@ -265,7 +267,7 @@ namespace hpx { namespace plugins { namespace parcel
         }
 
         HPX_ASSERT(now >= started_at_);
-        boost::int64_t value = (now - started_at_) / num_parcels;
+        std::int64_t value = (now - started_at_) / num_parcels;
 
         if (reset)
         {
@@ -276,16 +278,16 @@ namespace hpx { namespace plugins { namespace parcel
         return value;
     }
 
-    boost::int64_t coalescing_message_handler::get_parcels_count(bool reset)
+    std::int64_t coalescing_message_handler::get_parcels_count(bool reset)
     {
         std::unique_lock<mutex_type> l(mtx_);
-        boost::int64_t num_parcels = num_parcels_ - reset_num_parcels_;
+        std::int64_t num_parcels = num_parcels_ - reset_num_parcels_;
         if (reset)
             reset_num_parcels_ = num_parcels_;
         return num_parcels;
     }
 
-    boost::int64_t
+    std::int64_t
         coalescing_message_handler::get_parcels_per_message_count(bool reset)
     {
         std::unique_lock<mutex_type> l(mtx_);
@@ -300,9 +302,9 @@ namespace hpx { namespace plugins { namespace parcel
             return 0;
         }
 
-        boost::int64_t num_parcels =
+        std::int64_t num_parcels =
             num_parcels_ - reset_num_parcels_per_message_parcels_;
-        boost::int64_t
+        std::int64_t
             num_messages = num_messages_ - reset_num_parcels_per_message_messages_;
 
         if (reset)
@@ -317,19 +319,19 @@ namespace hpx { namespace plugins { namespace parcel
         return num_parcels / num_messages;
     }
 
-    boost::int64_t coalescing_message_handler::get_messages_count(bool reset)
+    std::int64_t coalescing_message_handler::get_messages_count(bool reset)
     {
         std::unique_lock<mutex_type> l(mtx_);
-        boost::int64_t num_messages = num_messages_ - reset_num_messages_;
+        std::int64_t num_messages = num_messages_ - reset_num_messages_;
         if (reset)
             reset_num_messages_ = num_messages_;
         return num_messages;
     }
 
-    std::vector<boost::int64_t>
+    std::vector<std::int64_t>
     coalescing_message_handler::get_time_between_parcels_histogram(bool reset)
     {
-        std::vector<boost::int64_t> result;
+        std::vector<std::int64_t> result;
 
         std::unique_lock<mutex_type> l(mtx_);
         if (!time_between_parcels_)
@@ -350,7 +352,7 @@ namespace hpx { namespace plugins { namespace parcel
         auto data = hpx::util::histogram(*time_between_parcels_);
         for (auto const& item : data)
         {
-            result.push_back(boost::int64_t(item.second * 1000));
+            result.push_back(std::int64_t(item.second * 1000));
         }
 
         return result;
@@ -358,9 +360,9 @@ namespace hpx { namespace plugins { namespace parcel
 
     void
     coalescing_message_handler::get_time_between_parcels_histogram_creator(
-        boost::int64_t min_boundary, boost::int64_t max_boundary,
-        boost::int64_t num_buckets,
-        util::function_nonser<std::vector<boost::int64_t>(bool)>& result)
+        std::int64_t min_boundary, std::int64_t max_boundary,
+        std::int64_t num_buckets,
+        util::function_nonser<std::vector<std::int64_t>(bool)>& result)
     {
         std::unique_lock<mutex_type> l(mtx_);
         if (time_between_parcels_)

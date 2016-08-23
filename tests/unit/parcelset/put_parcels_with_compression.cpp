@@ -11,6 +11,7 @@
 #include <hpx/include/compression_registration.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>

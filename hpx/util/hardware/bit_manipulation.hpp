@@ -9,7 +9,7 @@
 #if !defined(HPX_68441787_8A39_4DAC_9D9E_705B6FA19BCD)
 #define HPX_68441787_8A39_4DAC_9D9E_705B6FA19BCD
 
-#include <boost/cstdint.hpp>
+#include <cstddef>
 
 namespace hpx { namespace util { namespace hardware
 {

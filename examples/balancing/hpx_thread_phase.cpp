@@ -13,6 +13,7 @@
 #include <boost/lockfree/queue.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <iostream>
 #include <mutex>

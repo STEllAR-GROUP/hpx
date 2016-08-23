@@ -9,6 +9,7 @@
 
 #include <boost/program_options/parsers.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

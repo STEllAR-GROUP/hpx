@@ -13,6 +13,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <vector>
 
 #define NUM_FUTURES std::size_t(2*HPX_CONTINUATION_MAX_RECURSION_DEPTH)

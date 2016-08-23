@@ -14,6 +14,8 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <utility>
 #include <vector>
@@ -89,10 +91,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks =
                 static_cast<std::size_t>(
-                    static_cast<boost::uint32_t>(buffer_.num_chunks_.first));
+                    static_cast<std::uint32_t>(buffer_.num_chunks_.first));
             std::size_t num_non_zero_copy_chunks =
                 static_cast<std::size_t>(
-                    static_cast<boost::uint32_t>(buffer_.num_chunks_.second));
+                    static_cast<std::uint32_t>(buffer_.num_chunks_.second));
             buffer_.transmission_chunks_.resize(
                 num_zero_copy_chunks + num_non_zero_copy_chunks
             );

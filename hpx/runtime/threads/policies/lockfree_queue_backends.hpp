@@ -11,9 +11,11 @@
 #include <hpx/config.hpp>
 
 #include <hpx/util/lockfree/deque.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/lockfree/queue.hpp>
 #include <boost/lockfree/stack.hpp>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace hpx { namespace threads { namespace policies
 {
@@ -29,7 +31,7 @@ struct basic_lockfree_queue_backend
     typedef T value_type;
     typedef T& reference;
     typedef T const& const_reference;
-    typedef boost::uint64_t size_type;
+    typedef std::uint64_t size_type;
 
     basic_lockfree_queue_backend(
         size_type initial_size = 0
@@ -92,7 +94,7 @@ struct lockfree_abp_fifo_backend
     typedef T value_type;
     typedef T& reference;
     typedef T const& const_reference;
-    typedef boost::uint64_t size_type;
+    typedef std::uint64_t size_type;
 
     lockfree_abp_fifo_backend(
         size_type initial_size = 0
@@ -140,7 +142,7 @@ struct lockfree_abp_lifo_backend
     typedef T value_type;
     typedef T& reference;
     typedef T const& const_reference;
-    typedef boost::uint64_t size_type;
+    typedef std::uint64_t size_type;
 
     lockfree_abp_lifo_backend(
         size_type initial_size = 0

@@ -18,6 +18,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <list>
 #include <mutex>
 #include <utility>

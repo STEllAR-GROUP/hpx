@@ -16,18 +16,18 @@
 
 #include <hpx/util/unwrapped.hpp>
 
+#include <cstdint>
 #include <iostream>
 #include <utility>
 #include <string>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t threshold = 2;
+std::uint64_t threshold = 2;
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
+HPX_NOINLINE std::uint64_t fibonacci_serial(std::uint64_t n)
 {
     if (n < 2)
         return n;
@@ -35,18 +35,18 @@ HPX_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
+hpx::future<std::uint64_t> fibonacci(std::uint64_t n)
 {
     if (n < 2) return hpx::make_ready_future(n);
     if (n < threshold) return hpx::make_ready_future(fibonacci_serial(n));
 
-    hpx::future<boost::uint64_t> lhs_future = hpx::async(&fibonacci, n-1);
-    hpx::future<boost::uint64_t> rhs_future = fibonacci(n-2);
+    hpx::future<std::uint64_t> lhs_future = hpx::async(&fibonacci, n-1);
+    hpx::future<std::uint64_t> rhs_future = fibonacci(n-2);
 
     return
         hpx::dataflow(
             hpx::util::unwrapped(
-            [](boost::uint64_t lhs, boost::uint64_t rhs)
+            [](std::uint64_t lhs, std::uint64_t rhs)
             {
                 return lhs + rhs;
             })
@@ -58,9 +58,9 @@ hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
 int hpx_main(boost::program_options::variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
-    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    std::uint64_t n = vm["n-value"].as<std::uint64_t>();
     std::string test = vm["test"].as<std::string>();
-    boost::uint64_t max_runs = vm["n-runs"].as<boost::uint64_t>();
+    std::uint64_t max_runs = vm["n-runs"].as<std::uint64_t>();
 
     if (max_runs == 0) {
         std::cerr << "fibonacci_dataflow: wrong command line argument value for "
@@ -77,21 +77,21 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     bool executed_one = false;
-    boost::uint64_t r = 0;
+    std::uint64_t r = 0;
 
     if (test == "all" || test == "0")
     {
         // Keep track of the time required to execute.
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (boost::uint64_t i = 0; i != max_runs; ++i)
+        for (std::uint64_t i = 0; i != max_runs; ++i)
         {
             // serial execution
             r = fibonacci_serial(n);
         }
 
 //      double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
-        boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
@@ -102,9 +102,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (test == "all" || test == "1")
     {
         // Keep track of the time required to execute.
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (boost::uint64_t i = 0; i != max_runs; ++i)
+        for (std::uint64_t i = 0; i != max_runs; ++i)
         {
             // Create a future for the whole calculation, execute it locally,
             // and wait for it.
@@ -112,7 +112,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
 //      double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
-        boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_await(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
@@ -139,9 +139,9 @@ int main(int argc, char* argv[])
 
     using boost::program_options::value;
     desc_commandline.add_options()
-        ( "n-value", value<boost::uint64_t>()->default_value(10),
+        ( "n-value", value<std::uint64_t>()->default_value(10),
           "n value for the Fibonacci function")
-        ( "n-runs", value<boost::uint64_t>()->default_value(1),
+        ( "n-runs", value<std::uint64_t>()->default_value(1),
           "number of runs to perform")
         ( "threshold", value<unsigned int>()->default_value(2),
           "threshold for switching to serial code")

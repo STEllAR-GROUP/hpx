@@ -8,20 +8,20 @@
 #define HPX_STENCIL_PRINT_TIME_HPP
 
 #include <boost/format.hpp>
-#include <boost/cstdint.hpp>
 
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_time_results(
-    boost::uint32_t num_localities
-  , boost::uint64_t num_os_threads
-  , boost::uint64_t elapsed
-  , boost::uint64_t nx
-  , boost::uint64_t np
-  , boost::uint64_t nt
+    std::uint32_t num_localities
+  , std::uint64_t num_os_threads
+  , std::uint64_t elapsed
+  , std::uint64_t nx
+  , std::uint64_t np
+  , std::uint64_t nt
   , bool header
     )
 {
@@ -43,11 +43,11 @@ void print_time_results(
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_time_results(
-    boost::uint64_t num_os_threads
-  , boost::uint64_t elapsed
-  , boost::uint64_t nx
-  , boost::uint64_t np
-  , boost::uint64_t nt
+    std::uint64_t num_os_threads
+  , std::uint64_t elapsed
+  , std::uint64_t nx
+  , std::uint64_t np
+  , std::uint64_t nt
   , bool header
     )
 {
@@ -67,10 +67,10 @@ void print_time_results(
 }
 
 void print_time_results(
-    boost::uint64_t num_os_threads
-  , boost::uint64_t elapsed
-  , boost::uint64_t nx
-  , boost::uint64_t nt
+    std::uint64_t num_os_threads
+  , std::uint64_t elapsed
+  , std::uint64_t nx
+  , std::uint64_t nt
   , bool header
     )
 {

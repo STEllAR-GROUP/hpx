@@ -7,8 +7,9 @@
 #define HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM
 
 #include <H5Cpp.h>
-#include <boost/cstdint.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,7 +17,7 @@
 namespace interpolate1d
 {
     // extract the lower and upper bounds, etc.
-    boost::uint64_t extract_data_range (std::string const& datafilename,
+    std::uint64_t extract_data_range (std::string const& datafilename,
         double& minval, double& maxval, double& delta, std::size_t start = 0,
         std::size_t end = std::size_t(-1));
 

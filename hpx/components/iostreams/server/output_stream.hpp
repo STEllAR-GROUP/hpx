@@ -17,6 +17,7 @@
 #include <hpx/components/iostreams/server/order_output.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 
+#include <cstdint>
 #include <functional>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -38,9 +39,9 @@ namespace hpx { namespace iostreams { namespace server
 
         // Executed in an io_pool thread to prevent io from blocking an HPX
         // shepherd thread.
-        void call_write_async(boost::uint32_t locality_id, boost::uint64_t count,
+        void call_write_async(std::uint32_t locality_id, std::uint64_t count,
             detail::buffer in);
-        void call_write_sync(boost::uint32_t locality_id, boost::uint64_t count,
+        void call_write_sync(std::uint32_t locality_id, std::uint64_t count,
             detail::buffer in, threads::thread_id_type caller);
 
     public:
@@ -63,10 +64,10 @@ namespace hpx { namespace iostreams { namespace server
           : write_f(make_std_ostream_write_function(os.get()))
         {}
 
-        void write_async(boost::uint32_t locality_id,
-            boost::uint64_t count, detail::buffer in);
-        void write_sync(boost::uint32_t locality_id,
-            boost::uint64_t count, detail::buffer in);
+        void write_async(std::uint32_t locality_id,
+            std::uint64_t count, detail::buffer in);
+        void write_sync(std::uint32_t locality_id,
+            std::uint64_t count, detail::buffer in);
 
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_async);
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_sync);

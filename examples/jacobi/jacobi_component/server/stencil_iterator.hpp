@@ -14,6 +14,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <cstddef>
 #include <vector>
 
 namespace jacobi

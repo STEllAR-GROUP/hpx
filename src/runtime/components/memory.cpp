@@ -10,6 +10,9 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::memory,
     hpx::components::component_memory)
@@ -62,9 +65,9 @@ namespace hpx { namespace components { namespace server
     naming::gid_type allocate(std::size_t size)
     {
         naming::gid_type gid(hpx::applier::get_applier().get_raw_locality());
-        gid.set_lsb(new boost::uint8_t[size]);
+        gid.set_lsb(new std::uint8_t[size]);
         naming::detail::set_credit_for_gid(gid,
-            boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
+            std::int64_t(HPX_GLOBALCREDIT_INITIAL));
         return gid;
     }
 }}}

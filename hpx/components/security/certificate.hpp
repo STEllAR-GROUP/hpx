@@ -18,6 +18,8 @@
 #include "certificate_signing_request.hpp"
 #include "public_key.hpp"
 
+#include <cstddef>
+
 namespace hpx { namespace components { namespace security
 {
 #if defined(HPX_MSVC)

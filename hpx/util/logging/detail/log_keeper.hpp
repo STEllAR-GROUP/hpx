@@ -24,7 +24,7 @@
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -147,7 +147,7 @@ private:
 */
 struct ensure_early_log_creation {
     template<class type> ensure_early_log_creation ( type & log) {
-    typedef boost::int64_t long_type ;
+    typedef std::int64_t long_type ;
         long_type ignore = reinterpret_cast<long_type>(&log);
         // we need to force the compiler to force creation of the log
         if ( time(nullptr) < 0)

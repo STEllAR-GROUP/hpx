@@ -14,6 +14,7 @@
 
 #include <boost/utility/binary.hpp>
 
+#include <cstddef>
 #include <string>
 
 namespace hpx { namespace agas

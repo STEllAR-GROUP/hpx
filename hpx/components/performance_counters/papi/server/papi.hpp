@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/util/interval_timer.hpp>
 
+#include <cstdint>
 #include <map>
 #include <vector>
 
@@ -84,11 +85,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // lock for all thread counters
         mutable mutex_type mtx_;
         // monitored thread index (as assigned by papi_thread_mapper)
-        boost::uint32_t const thread_index_;
+        std::uint32_t const thread_index_;
         // related PAPI event set
         int evset_;
         // time stamp of last update
-        boost::int64_t timestamp_;
+        std::int64_t timestamp_;
         // accumulated counter values
         std::vector<long long> counts_;
         // array of pointers to corresponding HPX counter objects
@@ -96,7 +97,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
     public:
         thread_counters(): thread_index_(-1), evset_(PAPI_NULL), timestamp_(-1) { }
-        thread_counters(boost::uint32_t);
+        thread_counters(std::uint32_t);
         ~thread_counters();
 
         // add new PAPI event to the event set
@@ -108,9 +109,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         // terminate counting due to thread going out of scope;
         // this is the only explicitly locked function
-        bool terminate(boost::uint32_t tix);
+        bool terminate(std::uint32_t tix);
 
-        boost::uint32_t get_thread_index() const {return thread_index_;}
+        std::uint32_t get_thread_index() const {return thread_index_;}
         mutex_type& get_lock() const {return mtx_;}
 
     protected:
@@ -131,7 +132,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         typedef hpx::lcos::local::spinlock mutex_type;
 
     private:
-        typedef std::map<boost::uint32_t, thread_counters *> ttable_type;
+        typedef std::map<std::uint32_t, thread_counters *> ttable_type;
 
         //// shared state
         // mutex to protect shared state
@@ -143,7 +144,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         papi_counter_base() { };
 
         // lookup or create thread_counters instance for thread tix
-        thread_counters *get_thread_counters(boost::uint32_t tix);
+        thread_counters *get_thread_counters(std::uint32_t tix);
 
         mutex_type& get_global_mtx()
         {
@@ -163,11 +164,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // PAPI event associated with the counter and index into counter array
         int const event_;
         // index associated with active PAPI counter
-        boost::uint32_t index_;
+        std::uint32_t index_;
         // most recently retrieved counter value
         long long value_;
         // timestamp corresponding to cached counter value
-        boost::int64_t timestamp_;
+        std::int64_t timestamp_;
         // counting status
         counter_status status_;
         // pointer to shared thread_counters struct
@@ -212,13 +213,13 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         //// methods below operate on shared state and require locking in the caller
 
         // initialize counter metadata
-        void update_index(boost::uint32_t i)
+        void update_index(std::uint32_t i)
         {
             index_ = i;
         }
 
         // update counter value and timestamp
-        void update_state(boost::int64_t tstamp, long long cnt,
+        void update_state(std::int64_t tstamp, long long cnt,
                           counter_status st = PAPI_COUNTER_ACTIVE)
         {
             timestamp_ = tstamp;

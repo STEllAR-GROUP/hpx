@@ -11,6 +11,8 @@
 
 #include <boost/multi_array.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace serialization
 {
     template <class T, std::size_t N, class Allocator>

@@ -10,6 +10,7 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
 #include <ctime>
 #include <iostream>
 #include <string>

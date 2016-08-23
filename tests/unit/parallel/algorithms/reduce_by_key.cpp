@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 #ifdef EXTRA_DEBUG
+# include <cstddef>
 # include <string>
 # include <iostream>
 #endif

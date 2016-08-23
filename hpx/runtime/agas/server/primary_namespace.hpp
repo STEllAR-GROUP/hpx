@@ -28,6 +28,7 @@
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <map>
@@ -122,11 +123,11 @@ struct HPX_EXPORT primary_namespace
     typedef lcos::local::spinlock mutex_type;
     typedef components::fixed_component_base<primary_namespace> base_type;
 
-    typedef boost::int32_t component_type;
+    typedef std::int32_t component_type;
 
     typedef std::pair<gva, naming::gid_type> gva_table_data_type;
     typedef std::map<naming::gid_type, gva_table_data_type> gva_table_type;
-    typedef std::map<naming::gid_type, boost::int64_t> refcnt_table_type;
+    typedef std::map<naming::gid_type, std::int64_t> refcnt_table_type;
 
     typedef hpx::util::tuple<naming::gid_type, gva, naming::gid_type>
         resolved_type;
@@ -165,8 +166,8 @@ struct HPX_EXPORT primary_namespace
               , time_(0)
             {}
 
-            boost::atomic<boost::int64_t> count_;
-            boost::atomic<boost::int64_t> time_;
+            boost::atomic<std::int64_t> count_;
+            boost::atomic<std::int64_t> time_;
         };
 
         counter_data()
@@ -174,27 +175,27 @@ struct HPX_EXPORT primary_namespace
 
     public:
         // access current counter values
-        boost::int64_t get_route_count(bool);
-        boost::int64_t get_bind_gid_count(bool);
-        boost::int64_t get_resolve_gid_count(bool);
-        boost::int64_t get_unbind_gid_count(bool);
-        boost::int64_t get_increment_credit_count(bool);
-        boost::int64_t get_decrement_credit_count(bool);
-        boost::int64_t get_allocate_count(bool);
-        boost::int64_t get_begin_migration_count(bool);
-        boost::int64_t get_end_migration_count(bool);
-        boost::int64_t get_overall_count(bool);
+        std::int64_t get_route_count(bool);
+        std::int64_t get_bind_gid_count(bool);
+        std::int64_t get_resolve_gid_count(bool);
+        std::int64_t get_unbind_gid_count(bool);
+        std::int64_t get_increment_credit_count(bool);
+        std::int64_t get_decrement_credit_count(bool);
+        std::int64_t get_allocate_count(bool);
+        std::int64_t get_begin_migration_count(bool);
+        std::int64_t get_end_migration_count(bool);
+        std::int64_t get_overall_count(bool);
 
-        boost::int64_t get_route_time(bool);
-        boost::int64_t get_bind_gid_time(bool);
-        boost::int64_t get_resolve_gid_time(bool);
-        boost::int64_t get_unbind_gid_time(bool);
-        boost::int64_t get_increment_credit_time(bool);
-        boost::int64_t get_decrement_credit_time(bool);
-        boost::int64_t get_allocate_time(bool);
-        boost::int64_t get_begin_migration_time(bool);
-        boost::int64_t get_end_migration_time(bool);
-        boost::int64_t get_overall_time(bool);
+        std::int64_t get_route_time(bool);
+        std::int64_t get_bind_gid_time(bool);
+        std::int64_t get_resolve_gid_time(bool);
+        std::int64_t get_unbind_gid_time(bool);
+        std::int64_t get_increment_credit_time(bool);
+        std::int64_t get_decrement_credit_time(bool);
+        std::int64_t get_allocate_time(bool);
+        std::int64_t get_begin_migration_time(bool);
+        std::int64_t get_end_migration_time(bool);
+        std::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_route_count();
@@ -225,7 +226,7 @@ struct HPX_EXPORT primary_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
+        update_time_on_exit(boost::atomic<std::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
           , t_(t)
         {}
@@ -235,8 +236,8 @@ struct HPX_EXPORT primary_namespace
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
+        std::uint64_t started_at_;
+        boost::atomic<std::int64_t>& t_;
     };
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -319,7 +320,7 @@ struct HPX_EXPORT primary_namespace
 
     void register_server_instance(
         char const* servicename
-      , boost::uint32_t locality_id = naming::invalid_locality_id
+      , std::uint32_t locality_id = naming::invalid_locality_id
       , error_code& ec = throws
         );
 

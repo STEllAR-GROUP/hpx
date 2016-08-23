@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <typeinfo>

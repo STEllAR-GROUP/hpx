@@ -14,6 +14,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
+#include <cstdint>
 #include <iostream>
 #include <mutex>
 #include <sstream>
@@ -116,7 +117,7 @@ namespace hpx { namespace components { namespace server
     private:
         int arg_;
         int arg_init_;
-        boost::uint32_t prefix_;
+        std::uint32_t prefix_;
         hpx::lcos::local::mutex mtx_;
     };
 

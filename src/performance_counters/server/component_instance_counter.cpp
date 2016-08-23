@@ -10,6 +10,7 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstdint>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,10 +18,10 @@ namespace hpx { namespace performance_counters { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // Extract the current number of instances for the given component type
-    boost::int64_t get_instance_count(components::component_type type)
+    std::int64_t get_instance_count(components::component_type type)
     {
         using components::stubs::runtime_support;
-        return boost::int64_t(runtime_support::get_instance_count(find_here(), type));
+        return std::int64_t(runtime_support::get_instance_count(find_here(), type));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -63,7 +64,7 @@ namespace hpx { namespace performance_counters { namespace detail
                     return naming::invalid_gid;
                 }
 
-                hpx::util::function_nonser<boost::int64_t()> f =
+                hpx::util::function_nonser<std::int64_t()> f =
                     util::bind(&get_instance_count, type);
                 return create_raw_counter(info, std::move(f), ec);
             }

@@ -9,8 +9,8 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
-
 #include <chrono>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -52,7 +52,7 @@ void hpx_test_main(
     variables_map& vm
     )
 {
-    boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
+    std::uint64_t const delay = vm["delay"].as<std::uint64_t>();
 
     {
         /// AGAS reference-counting test 6 (from #126):
@@ -140,7 +140,7 @@ int main(
 
     cmdline.add_options()
         ( "delay"
-        , value<boost::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(1000)
         , "number of milliseconds to wait for object destruction")
         ;
 

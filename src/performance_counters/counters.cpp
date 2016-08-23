@@ -34,6 +34,8 @@
 #include <boost/spirit/include/qi_directive.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
@@ -358,7 +360,7 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.parent_.index_.empty()) {
                 path.parentinstanceindex_ =
-                    hpx::util::safe_lexical_cast<boost::uint64_t>
+                    hpx::util::safe_lexical_cast<std::uint64_t>
                     (elements.instance_.parent_.index_);
             }
 
@@ -367,7 +369,7 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.child_.index_.empty()) {
                 path.instanceindex_ =
-                    hpx::util::safe_lexical_cast<boost::uint64_t>
+                    hpx::util::safe_lexical_cast<std::uint64_t>
                     (elements.instance_.child_.index_);
             }
         }
@@ -453,7 +455,7 @@ namespace hpx { namespace performance_counters
 
         if (p.parentinstancename_.empty()) {
             p.parentinstancename_ = "locality";
-            p.parentinstanceindex_ = static_cast<boost::int64_t>(get_locality_id());
+            p.parentinstanceindex_ = static_cast<std::int64_t>(get_locality_id());
             if (p.instancename_.empty())
             {
                 p.instancename_ = "total";
@@ -614,7 +616,7 @@ namespace hpx { namespace performance_counters
     namespace detail
     {
         naming::gid_type create_raw_counter_value(
-            counter_info const& info, boost::int64_t* countervalue,
+            counter_info const& info, std::int64_t* countervalue,
             error_code& ec)
         {
             naming::gid_type gid;
@@ -624,7 +626,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<boost::int64_t()> const& f, error_code& ec)
+            hpx::util::function_nonser<std::int64_t()> const& f, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
@@ -633,7 +635,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
+            hpx::util::function_nonser<std::int64_t(bool)> const& f, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
@@ -642,7 +644,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::vector<boost::int64_t>()> const& f,
+            hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
             error_code& ec)
         {
             naming::gid_type gid;
@@ -652,7 +654,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::vector<boost::int64_t>(bool)> const& f,
+            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const& f,
             error_code& ec)
         {
             naming::gid_type gid;
@@ -675,7 +677,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<boost::int64_t> const& parameters, error_code& ec)
+            std::vector<std::int64_t> const& parameters, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().
@@ -733,7 +735,7 @@ namespace hpx { namespace performance_counters
 
             if (paths.parentinstancename_ == "locality" &&
                 paths.parentinstanceindex_ !=
-                    static_cast<boost::int64_t>(hpx::get_locality_id()))
+                    static_cast<std::int64_t>(hpx::get_locality_id()))
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "attempt to create counter on wrong locality ("
@@ -813,7 +815,7 @@ namespace hpx { namespace performance_counters
             std::size_t num_threads = get_os_thread_count();
             for (std::size_t l = 0; l != num_threads; ++l)
             {
-                p.instanceindex_ = static_cast<boost::int64_t>(l);
+                p.instanceindex_ = static_cast<std::int64_t>(l);
                 counter_status status = get_counter_name(p, i.fullname_, ec);
                 if (!status_is_valid(status) || !f(i, ec) || ec)
                     return false;
@@ -829,7 +831,7 @@ namespace hpx { namespace performance_counters
                 = hpx::threads::get_topology().get_number_of_numa_nodes();
             for (std::size_t l = 0; l != num_nodes; ++l)
             {
-                p.instanceindex_ = static_cast<boost::int64_t>(l);
+                p.instanceindex_ = static_cast<std::int64_t>(l);
                 counter_status status = get_counter_name(p, i.fullname_, ec);
                 if (!status_is_valid(status) || !f(i, ec) || ec)
                     return false;
@@ -854,11 +856,11 @@ namespace hpx { namespace performance_counters
                 expand_nodes = true;
             }
 
-            boost::uint32_t last_locality =
+            std::uint32_t last_locality =
                 get_num_localities(hpx::launch::sync);
-            for (boost::uint32_t l = 0; l != last_locality; ++l)
+            for (std::uint32_t l = 0; l != last_locality; ++l)
             {
-                p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+                p.parentinstanceindex_ = static_cast<std::int32_t>(l);
                 if (expand_threads) {
                     if (!detail::expand_counter_info_threads(i, p, f, ec))
                         return false;
@@ -983,7 +985,7 @@ namespace hpx { namespace performance_counters
                 if (p.parentinstancename_ == "locality" &&
                         (   p.parentinstanceindex_ < 0 ||
                             p.parentinstanceindex_ >=
-                                static_cast<boost::int32_t>(
+                                static_cast<std::int32_t>(
                                     get_num_localities(hpx::launch::sync))
                         )
                     )
@@ -1000,7 +1002,7 @@ namespace hpx { namespace performance_counters
                 if (p.parentinstanceindex_ >= 0) {
                     f = runtime_support::create_performance_counter_async(
                         naming::get_id_from_locality_id(
-                            static_cast<boost::uint32_t>(p.parentinstanceindex_)),
+                            static_cast<std::uint32_t>(p.parentinstanceindex_)),
                         complemented_info);
                 }
                 else {

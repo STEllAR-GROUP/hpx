@@ -9,13 +9,14 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct decrement_server
   : hpx::components::managed_component_base<decrement_server>
 {
-    boost::int32_t call(boost::int32_t i) const
+    std::int32_t call(std::int32_t i) const
     {
         return i - 1;
     }
@@ -40,10 +41,10 @@ void test_remote_async(hpx::id_type const& target)
             hpx::components::new_<decrement_client>(target);
 
         call_action call;
-        hpx::future<boost::int32_t> f1 = hpx::async(call, dec_f, 42);
+        hpx::future<std::int32_t> f1 = hpx::async(call, dec_f, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async(hpx::launch::all, call, dec_f, 42);
         HPX_TEST_EQ(f2.get(), 41);
     }
@@ -54,18 +55,18 @@ void test_remote_async(hpx::id_type const& target)
 
         call_action call;
 
-        hpx::future<boost::int32_t> f1 =
+        hpx::future<std::int32_t> f1 =
             hpx::async(hpx::util::bind(call, dec_f, 42));
         HPX_TEST_EQ(f1.get(), 41);
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async(hpx::util::bind(call, _1, 42), dec_f);
         HPX_TEST_EQ(f2.get(), 41);
 
-        hpx::future<boost::int32_t> f3 =
+        hpx::future<std::int32_t> f3 =
             hpx::async(hpx::util::bind(call, _1, _2), dec_f, 42);
         HPX_TEST_EQ(f3.get(), 41);
     }
@@ -74,11 +75,11 @@ void test_remote_async(hpx::id_type const& target)
         decrement_client dec_f =
             hpx::components::new_<decrement_client>(target);
 
-        hpx::future<boost::int32_t> f1 =
+        hpx::future<std::int32_t> f1 =
             hpx::async<call_action>(dec_f, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async<call_action>(hpx::launch::all, dec_f, 42);
         HPX_TEST_EQ(f2.get(), 41);
     }

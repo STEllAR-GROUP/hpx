@@ -14,6 +14,7 @@
 #include <hpx/compute/detail/get_proxy_type.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
 
+#include <cstddef>
 #include <iterator>
 
 namespace hpx { namespace compute { namespace detail

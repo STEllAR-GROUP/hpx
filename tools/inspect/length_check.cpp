@@ -8,6 +8,7 @@
 
 #include "length_check.hpp"
 #include "function_hyper.hpp"
+#include <cstddef>
 #include <iostream>
 #include <functional>
 #include <string>

@@ -8,10 +8,11 @@
 #include <hpx/util/lightweight_test.hpp>
 //
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
-#include <iostream>
 #include <algorithm>
+#include <cstddef>
 #include <string>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <stack>

@@ -33,19 +33,20 @@
 
 #include <hpx/config.hpp>
 
-#include "worker_timed.hpp"
-
 #include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <omp.h>
+#include <boost/format.hpp>
+#include <boost/program_options.hpp>
 
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
+#include <omp.h>
+
+#include "worker_timed.hpp"
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -58,8 +59,8 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
-boost::uint64_t tasks = 500000;
-boost::uint64_t delay = 0;
+std::uint64_t tasks = 500000;
+std::uint64_t delay = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,7 +97,7 @@ int omp_main(
     #pragma omp parallel
     #pragma omp single
     {
-        for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (std::uint64_t i = 0; i < tasks; ++i)
             #if _OPENMP>=200805
             #pragma omp task untied
             #endif
@@ -133,11 +134,11 @@ int main(
          "number of OS-threads to use")
 
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , value<std::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(0)
+        , value<std::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
 
         ( "no-header"

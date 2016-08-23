@@ -9,7 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstddef>
+#include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace detail
@@ -19,11 +20,11 @@ namespace hpx { namespace threads { namespace detail
     class combined_tagged_state
     {
     private:
-        typedef boost::int64_t tagged_state_type;
+        typedef std::int64_t tagged_state_type;
 
-        typedef boost::int8_t thread_state_type;
-        typedef boost::int8_t thread_state_ex_type;
-        typedef boost::int64_t tag_type;
+        typedef std::int8_t thread_state_type;
+        typedef std::int8_t thread_state_ex_type;
+        typedef std::int64_t tag_type;
 
         static const std::size_t state_shift    = 56;  // 8th byte
         static const std::size_t state_ex_shift = 48;  // 7th byte

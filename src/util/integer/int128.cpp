@@ -10,6 +10,8 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <algorithm>
@@ -87,16 +89,16 @@ namespace hpx { namespace util { namespace integer
     };
 
     int128::int128 (const float a) throw ()
-        : lo ((boost::uint64_t) fmodf (a, 18446744073709551616.0f)),
-          hi ((boost::int64_t) (a / 18446744073709551616.0f)) {};
+        : lo ((std::uint64_t) fmodf (a, 18446744073709551616.0f)),
+          hi ((std::int64_t) (a / 18446744073709551616.0f)) {};
 
     int128::int128 (const double & a) throw ()
-        : lo ((boost::uint64_t) fmod (a, 18446744073709551616.0)),
-          hi ((boost::int64_t) (a / 18446744073709551616.0)) {};
+        : lo ((std::uint64_t) fmod (a, 18446744073709551616.0)),
+          hi ((std::int64_t) (a / 18446744073709551616.0)) {};
 
     int128::int128 (const long double & a) throw ()
-        : lo ((boost::uint64_t) fmodl (a, 18446744073709551616.0l)),
-          hi ((boost::int64_t) (a / 18446744073709551616.0l)) {};
+        : lo ((std::uint64_t) fmodl (a, 18446744073709551616.0l)),
+          hi ((std::int64_t) (a / 18446744073709551616.0l)) {};
 
     float int128::toFloat () const throw () {
         return (float) this->hi * 18446744073709551616.0f
@@ -164,7 +166,7 @@ namespace hpx { namespace util { namespace integer
     };
 
     int128 & int128::operator += (const int128 & b) throw () {
-        boost::uint64_t old_lo = this->lo;
+        std::uint64_t old_lo = this->lo;
 
         this->lo += b.lo;
         this->hi += b.hi + (this->lo < old_lo);
@@ -207,11 +209,11 @@ namespace hpx { namespace util { namespace integer
         // only remainder
         if (ds > dd) {
             remainder = *this;
-            return boost::int64_t(0ll);
+            return std::int64_t(0ll);
         };
 
-        int128 r = boost::int64_t(0ll);
-        int128 q = boost::int64_t(0ll);
+        int128 r = std::int64_t(0ll);
+        int128 q = std::int64_t(0ll);
     //    while (dd >= ds) { dd -= ds; q += 1; }; // extreme slow version
 
         unsigned int b = 127;
@@ -280,7 +282,7 @@ namespace hpx { namespace util { namespace integer
             this->lo >>= n;
 
             // get lower N bits of high qword
-            boost::uint64_t mask = 0ull;
+            std::uint64_t mask = 0ull;
             for (unsigned int i = 0; i < n; ++i)
                 mask |= (1ll << i);
 
@@ -308,7 +310,7 @@ namespace hpx { namespace util { namespace integer
             this->hi <<= n;
 
             // get higher N bits of low qword
-            boost::uint64_t mask = 0ull;
+            std::uint64_t mask = 0ull;
             for (unsigned int i = 0; i < n; ++i)
                 mask |= (1ll << (63 - i));
 
@@ -350,7 +352,7 @@ namespace hpx { namespace util { namespace integer
     bool operator <  (const int128 & a, const int128 & b) throw () {
         if (a.hi == b.hi) {
             if (a.hi < 0)
-                return (boost::int64_t) a.lo < (boost::int64_t) b.lo;
+                return (std::int64_t) a.lo < (std::int64_t) b.lo;
             else
                 return a.lo < b.lo;
         } else
@@ -371,8 +373,8 @@ namespace hpx { namespace util { namespace integer
     template <typename Archive>
     void int128::save(Archive& ar, const unsigned int version) const
     {
-        boost::int64_t hi_ = hi;
-        boost::uint64_t lo_ = lo;
+        std::int64_t hi_ = hi;
+        std::uint64_t lo_ = lo;
         ar & lo_ & hi_;
     }
 
@@ -382,8 +384,8 @@ namespace hpx { namespace util { namespace integer
     template <typename Archive>
     void int128::load(Archive& ar, const unsigned int version)
     {
-        boost::int64_t hi_ = 0;
-        boost::uint64_t lo_ = 0;
+        std::int64_t hi_ = 0;
+        std::uint64_t lo_ = 0;
         ar & lo_ & hi_;
         hi = hi_;
         lo = lo_;

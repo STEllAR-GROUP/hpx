@@ -13,6 +13,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <utility>
 #include <vector>
 

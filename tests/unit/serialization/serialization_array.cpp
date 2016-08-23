@@ -14,6 +14,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <numeric>
 #include <vector>
 

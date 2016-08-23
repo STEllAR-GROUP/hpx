@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 
+#include <cstddef>
 #include <string>
 
 namespace hpx

@@ -9,6 +9,8 @@
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 inline bool close_enough(double m, double ex, double perc)
 {
@@ -20,7 +22,7 @@ int hpx_main(boost::program_options::variables_map&)
 {
     const size_t n = 1000000;
 
-    boost::uint32_t const prefix = hpx::get_locality_id();
+    std::uint32_t const prefix = hpx::get_locality_id();
     // use floating point instructions here to avoid measuring runtime side effects
     boost::format cnt_name("/papi{locality#%d/worker-thread#0}/PAPI_FP_INS");
 
@@ -64,10 +66,10 @@ int hpx_main(boost::program_options::variables_map&)
                 status_is_valid(value4.status_);
     if (pass)
     {
-        boost::uint64_t cnt1 = value1.get_value<boost::uint64_t>();
-        boost::uint64_t cnt2 = value2.get_value<boost::uint64_t>();
-        boost::uint64_t cnt3 = value3.get_value<boost::uint64_t>();
-        boost::uint64_t cnt4 = value4.get_value<boost::uint64_t>();
+        std::uint64_t cnt1 = value1.get_value<std::uint64_t>();
+        std::uint64_t cnt2 = value2.get_value<std::uint64_t>();
+        std::uint64_t cnt3 = value3.get_value<std::uint64_t>();
+        std::uint64_t cnt4 = value4.get_value<std::uint64_t>();
 
         std::cout << n << " counted fp instructions, result: " << cnt1 << std::endl
                   << n << " uncounted fp instructions, result: "

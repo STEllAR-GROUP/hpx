@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/barrier.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <vector>

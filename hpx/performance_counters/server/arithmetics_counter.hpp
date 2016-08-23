@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/util/interval_timer.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -79,7 +80,7 @@ namespace hpx { namespace performance_counters { namespace server
         std::vector<std::string> base_counter_names_;
         ///^ names of base counters to be queried
         std::vector<naming::id_type> base_counter_ids_;
-        boost::uint64_t invocation_count_;
+        std::uint64_t invocation_count_;
     };
 }}}
 

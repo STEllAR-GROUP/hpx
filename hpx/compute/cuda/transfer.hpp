@@ -16,6 +16,7 @@
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/detail/iterator.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 

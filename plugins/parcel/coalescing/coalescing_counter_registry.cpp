@@ -13,6 +13,7 @@
 #include <boost/format.hpp>
 #include <boost/regex.hpp>
 
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -156,8 +157,8 @@ namespace hpx { namespace plugins { namespace parcel
 
     coalescing_counter_registry::get_counter_values_type
         coalescing_counter_registry::get_time_between_parcels_histogram_counter(
-            std::string const& name, boost::int64_t min_boundary,
-            boost::int64_t max_boundary, boost::int64_t num_buckets)
+            std::string const& name, std::int64_t min_boundary,
+            std::int64_t max_boundary, std::int64_t num_buckets)
     {
         map_type::iterator it = map_.find(name);
         if (it == map_.end())

@@ -13,6 +13,8 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <iostream>
 #include <memory>
@@ -96,11 +98,11 @@ hpx::lcos::local::spinlock storage_mutex;
 
 //
 typedef struct {
-    boost::uint64_t iterations;
-    boost::uint64_t local_storage_MB;
-    boost::uint64_t global_storage_MB;
-    boost::uint64_t transfer_size_B;
-    boost::uint64_t threads;
+    std::uint64_t iterations;
+    std::uint64_t local_storage_MB;
+    std::uint64_t global_storage_MB;
+    std::uint64_t transfer_size_B;
+    std::uint64_t threads;
     std::string     network;
     bool            all2all;
     bool            distribution;
@@ -416,7 +418,7 @@ void test_write(
     hpx::util::high_resolution_timer timerWrite;
 
     bool active = (rank==0) | (rank>0 && options.all2all);
-    for(boost::uint64_t i = 0; active && i < options.iterations; i++) {
+    for(std::uint64_t i = 0; active && i < options.iterations; i++) {
         DEBUG_OUTPUT(1,
             std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
         );
@@ -587,7 +589,7 @@ void test_read(
     hpx::util::high_resolution_timer timerRead;
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
-    for(boost::uint64_t i = 0; active && i < options.iterations; i++) {
+    for(std::uint64_t i = 0; active && i < options.iterations; i++) {
       DEBUG_OUTPUT(1,
           std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
       );
@@ -776,14 +778,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     //
     // extract command line argument
     test_options options;
-    options.transfer_size_B   = vm["transferKB"].as<boost::uint64_t>() * 1024;
-    options.local_storage_MB  = vm["localMB"].as<boost::uint64_t>();
-    options.global_storage_MB = vm["globalMB"].as<boost::uint64_t>();
-    options.iterations        = vm["iterations"].as<boost::uint64_t>();
+    options.transfer_size_B   = vm["transferKB"].as<std::uint64_t>() * 1024;
+    options.local_storage_MB  = vm["localMB"].as<std::uint64_t>();
+    options.global_storage_MB = vm["globalMB"].as<std::uint64_t>();
+    options.iterations        = vm["iterations"].as<std::uint64_t>();
     options.threads           = hpx::get_os_thread_count();
     options.network           = vm["parceltype"].as<std::string>();
     options.all2all           = vm["all-to-all"].as<bool>();
-    options.distribution      = vm["distribution"].as<boost::uint64_t>() ? true : false;
+    options.distribution      = vm["distribution"].as<std::uint64_t>() ? true : false;
 
     //
     if (options.global_storage_MB>0) {
@@ -839,14 +841,14 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "localMB",
-          boost::program_options::value<boost::uint64_t>()->default_value(256),
+          boost::program_options::value<std::uint64_t>()->default_value(256),
           "Sets the storage capacity (in MB) on each node.\n"
           "The total storage will be num_ranks * localMB")
         ;
 
     desc_commandline.add_options()
         ( "globalMB",
-          boost::program_options::value<boost::uint64_t>()->default_value(0),
+          boost::program_options::value<std::uint64_t>()->default_value(0),
           "Sets the storage capacity (in MB) for the entire job.\n"
           "The storage per node will be globalMB / num_ranks\n"
           "By default, localMB is used, setting this overrides localMB value."
@@ -855,14 +857,14 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "transferKB",
-          boost::program_options::value<boost::uint64_t>()->default_value(64),
+          boost::program_options::value<std::uint64_t>()->default_value(64),
           "Sets the default block transfer size (in KB).\n"
           "Each put/get IOP will be this size")
         ;
 
     desc_commandline.add_options()
         ( "iterations",
-          boost::program_options::value<boost::uint64_t>()->default_value(5),
+          boost::program_options::value<std::uint64_t>()->default_value(5),
           "The number of iterations over the global memory.\n")
         ;
 
@@ -886,7 +888,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "distribution",
-          boost::program_options::value<boost::uint64_t>()->default_value(1),
+          boost::program_options::value<std::uint64_t>()->default_value(1),
           "Specify the distribution of data blocks to send/receive,\n"
           "in random mode, blocks of data are sent from one rank to \
             any other rank (including itself),"

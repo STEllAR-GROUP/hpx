@@ -11,6 +11,7 @@
 #include <hpx/performance_counters/server/raw_values_counter.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -29,7 +30,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     raw_values_counter::raw_values_counter(counter_info const& info,
-            hpx::util::function_nonser<std::vector<boost::int64_t>(bool)> f)
+            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f)
       : base_type_holder(info), f_(std::move(f)), reset_(false)
     {
         if (info.type_ != counter_histogram) {
@@ -48,7 +49,7 @@ namespace hpx { namespace performance_counters { namespace server
         values.scaling_ = 1;
         values.scale_inverse_ = false;
         values.status_ = status_new_data;
-        values.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
+        values.time_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         values.count_ = ++invocation_count_;
         return values;
     }

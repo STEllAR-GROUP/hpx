@@ -8,6 +8,7 @@
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <set>
 #include <string>

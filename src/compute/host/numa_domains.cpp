@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <cstddef>
 #include <vector>
 
 namespace hpx { namespace compute { namespace host

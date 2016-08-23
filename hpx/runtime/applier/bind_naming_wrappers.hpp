@@ -11,6 +11,8 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace applier
 {
     // helper functions allowing to bind and unbind a GID to a given address

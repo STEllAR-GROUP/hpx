@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <iosfwd>
 #include <string>
 #include <vector>

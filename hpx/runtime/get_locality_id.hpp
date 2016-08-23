@@ -13,7 +13,7 @@
 
 #include <hpx/exception_fwd.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx
 {
@@ -39,7 +39,7 @@ namespace hpx
     ///
     /// \note     This function needs to be executed on a HPX-thread. It will
     ///           fail otherwise (it will return -1).
-    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+    HPX_API_EXPORT std::uint32_t get_locality_id(error_code& ec = throws);
 }
 
 #endif

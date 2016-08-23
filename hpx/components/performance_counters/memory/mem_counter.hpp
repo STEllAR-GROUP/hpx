@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace performance_counters { namespace memory
 {
     // returns virtual memory value
-    boost::uint64_t read_psm_virtual(bool);
+    std::uint64_t read_psm_virtual(bool);
 
     // returns resident memory value
-    boost::uint64_t read_psm_resident(bool);
+    std::uint64_t read_psm_resident(bool);
 }}}
 
 #endif

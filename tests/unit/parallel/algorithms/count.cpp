@@ -10,6 +10,8 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -37,10 +39,10 @@ void test_count(ExPolicy policy, IteratorTag)
         c[i] = 0;
     }
 
-    boost::int64_t num_items = hpx::parallel::count(policy,
+    std::int64_t num_items = hpx::parallel::count(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), std::size_t(0));
 
-    HPX_TEST_EQ(num_items, static_cast<boost::int64_t>(find_count));
+    HPX_TEST_EQ(num_items, static_cast<std::int64_t>(find_count));
 }
 
 template <typename ExPolicy, typename IteratorTag>

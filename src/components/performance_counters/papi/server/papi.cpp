@@ -21,6 +21,7 @@
 #include <boost/format.hpp>
 #include <boost/version.hpp>
 
+#include <cstdint>
 #include <functional>
 #include <mutex>
 #include <string>
@@ -50,7 +51,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
     ///////////////////////////////////////////////////////////////////////////
     // methods
-    thread_counters::thread_counters(boost::uint32_t tix):
+    thread_counters::thread_counters(std::uint32_t tix):
         thread_index_(tix), evset_(PAPI_NULL)
     {
         char const *locstr =
@@ -134,13 +135,13 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
             if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
         }
-        timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
+        timestamp_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         cnt->update_state(timestamp_, counts_[cnt->get_counter_index()]);
         if (reset) counts_[cnt->get_counter_index()] = 0;
         return true;
     }
 
-    bool thread_counters::terminate(boost::uint32_t tix)
+    bool thread_counters::terminate(std::uint32_t tix)
     {
         std::lock_guard<mutex_type> m(mtx_);
         return finalize();
@@ -163,7 +164,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             if (PAPI_stop(evset_, &tmp[0]) != PAPI_OK) return false;
             // accumulate existing counts before modifying event set
             if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
-            timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
+            timestamp_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         }
         return true;
     }
@@ -174,7 +175,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         {
             if (stop_all())
             {
-                for (boost::uint32_t i = 0; i < cnttab_.size(); ++i)
+                for (std::uint32_t i = 0; i < cnttab_.size(); ++i)
                 { // retrieve the most recent values for the still active counters
                     papi_counter *c = cnttab_[i];
                     if (c->get_status() == PAPI_COUNTER_ACTIVE)
@@ -189,7 +190,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_counters *papi_counter_base::get_thread_counters(boost::uint32_t tix)
+    thread_counters *papi_counter_base::get_thread_counters(std::uint32_t tix)
     {
         std::lock_guard<mutex_type> m(base_mtx_);
 
@@ -227,7 +228,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         }
         // find OS thread associated with the counter
         std::string label;
-        boost::uint32_t tix = util::get_counter_thread(cpe, label);
+        std::uint32_t tix = util::get_counter_thread(cpe, label);
         if (tix == hpx::util::thread_mapper::invalid_index)
         {
             HPX_THROW_EXCEPTION(hpx::no_success, locstr,

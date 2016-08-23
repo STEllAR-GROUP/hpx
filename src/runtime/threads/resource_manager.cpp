@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <utility>
 #include <vector>

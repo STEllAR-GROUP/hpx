@@ -28,6 +28,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <mutex>

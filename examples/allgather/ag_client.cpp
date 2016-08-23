@@ -11,6 +11,7 @@
 #include "ag/server/allgather.hpp"
 #include "ag/server/allgather_and_gate.hpp"
 
+#include <cstddef>
 #include <iostream>
 #include <vector>
 #include <math.h>
