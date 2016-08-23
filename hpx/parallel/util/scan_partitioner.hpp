@@ -253,7 +253,7 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (...) {
                     errors.push_back(boost::current_exception());
-                } 
+                }
 
                 // wait for all tasks to finish
                 return dataflow(
