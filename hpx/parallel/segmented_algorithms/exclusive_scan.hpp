@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
-        
+ 
         struct merge_exclusive_scan
         {
             // adds init to each element except for the first one
@@ -48,14 +48,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return dest;
             }
         };
-        
+ 
         ///////////////////////////////////////////////////////////////////////
 
         // do exclusive scan returns result as vector
-        // first element of result vector is last T of scan 
+        // first element of result vector is last T of scan
         // (can be used to transfer to the next partition)
 
-        // first element can be use because it will be 
+        // first element can be use because it will be
         // overwritten by the last T of the previous partition
         template <typename Value>
         struct segmented_exclusive_scan_vector
@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef util::detail::algorithm_result<ExPolicy, vector_type> result;
 
                 vector_type res(std::distance(first, last));
-                
+
                 // use first element to save last T of scan
                 return result::get(
                     dataflow([=, &op](vector_type r) {
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                     }, std::move(res)));
             }
-        }; 
+        };
 
         ///////////////////////////////////////////////////////////////////////
         // sequential implementation
@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     std::forward<ExPolicy>(policy),
                     first, last, dest, std::move(init), std::forward<Op>(op),
                     merge_exclusive_scan(),
-                    // new init value is first element from 
+                    // new init value is first element from
                     // segmented_excluisve_scan_vector + last init value
                     [op] (vector_type v, T val) {
                         return op(v.front(), val);

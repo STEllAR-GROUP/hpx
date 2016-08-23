@@ -32,8 +32,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
-        
-        // adds init to each element from first to dest 
+
+        // adds init to each element from first to dest
         struct merge_inclusive_scan
         {
             template <typename InIter, typename OutIter, typename T, typename Op>
@@ -141,7 +141,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     std::forward<ExPolicy>(policy),
                     first, last, dest, std::move(init), std::forward<Op>(op),
                     merge_inclusive_scan(),
-                    // new init value is last element from 
+                    // new init value is last element from
                     // segmented_incluisve_scan_vector + last init value
                     [op] (vector_type v, T val) {
                         return op(v.back(), val);

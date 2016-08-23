@@ -334,7 +334,7 @@ void inclusive_scan_tests()
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3));
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3, localities));
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(localities));
-    
+ 
     inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
 
     inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
